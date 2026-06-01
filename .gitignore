@@ -13,6 +13,7 @@ dist/
 build/
 coverage/
 output/
+.playwright-cli/
 var/oreshnik/.last-preflight.json
 var/oreshnik/.session-start
 *.tsbuildinfo
