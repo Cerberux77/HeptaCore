@@ -1,5 +1,16 @@
 {
-  "version": 1,
-  "current": "master",
-  "branches": []
+  "version": 2,
+  "current": "MADRE/v2-s-hc-xx-plan-holistico-turpial-jean-oauth-readiness-2026-06-01",
+  "branches": [
+    {
+      "version": 2,
+      "name": "MADRE/v2-s-hc-xx-plan-holistico-turpial-jean-oauth-readiness-2026-06-01",
+      "sprint": "S-HC-XX",
+      "operator": "Manuel",
+      "date": "2026-06-01",
+      "at": "2026-06-01T15:36:07.072Z",
+      "previous": "master",
+      "description": "plan holistico Turpial Jean OAuth readiness"
+    }
+  ]
 }

@@ -1,0 +1,11 @@
+{
+  "sprint": "S-HC-XX",
+  "operator": "Manuel",
+  "status": "CERRADO",
+  "date": "2026-06-01",
+  "at": "2026-06-01T15:36:07.072Z",
+  "branch": "Manuel/s-hc-xx-plan-holistico-heptacore-turpial-jean-2026-06-01",
+  "previousMother": "master",
+  "nextMother": "MADRE/v2-s-hc-xx-plan-holistico-turpial-jean-oauth-readiness-2026-06-01",
+  "description": "plan holistico Turpial Jean OAuth readiness"
+}

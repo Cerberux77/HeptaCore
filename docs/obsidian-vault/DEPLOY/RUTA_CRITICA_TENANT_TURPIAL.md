@@ -2,7 +2,7 @@
 type: critical-path
 project: "HeptaCore"
 tenant: "turpial"
-last_updated: "2026-06-01T00:00:00.000Z"
+last_updated: "2026-06-01T15:45:00.000Z"
 tags:
   - "#deploy"
   - "#turpial"
@@ -30,6 +30,7 @@ Llegar a Turpial como primer tenant operable con publicacion controlada, empezan
 - Audit log.
 - Sin secretos en git.
 - OAuth/token storage definido.
+- `.env.rrss` local validado con `npm run worker:meta:readiness`.
 
 ## Gate 3 - Worker Dry-Run
 
@@ -53,6 +54,20 @@ Llegar a Turpial como primer tenant operable con publicacion controlada, empezan
 - Registrar audit log.
 - Capturar metrica inicial.
 - Reporte diario enviado.
+
+## Ruta Rapida OAuth 2026-06-01
+
+1. Crear `.env.rrss` local en raiz desde `examples/tenants/turpial/content/queue/.env.rrss.example`.
+2. Completar tokens fuera de chat y fuera de git.
+3. Ejecutar `npm run worker:meta:readiness`.
+4. Si falla, resolver permisos, Page ID o Instagram Business Account ID.
+5. Si pasa, ejecutar solo dry-run hasta que exista aprobacion humana documentada.
+6. Publicacion real requiere:
+   - hard stop levantado explicitamente,
+   - posts aprobados,
+   - rollback/pausa listo,
+   - `BOT_DRY_RUN=false`,
+   - `HEPTACORE_ALLOW_REAL_PUBLISH=I_UNDERSTAND_REAL_RRSS_PUBLICATION`.
 
 ## No Entra Antes del Primer Publish
 
