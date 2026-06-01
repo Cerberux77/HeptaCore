@@ -1,0 +1,6 @@
+{
+  "buildCommand": "npm run build -w @heptacore/web",
+  "devCommand": "npm run dev -w @heptacore/web",
+  "installCommand": "npm install",
+  "framework": "nextjs"
+}
