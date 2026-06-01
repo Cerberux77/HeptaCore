@@ -51,7 +51,21 @@ export type TurpialConsoleData = {
   queue: QueueItem[];
 };
 
-const root = process.cwd().replace(/\\apps\\web$/, "");
+function findRepoRoot(start: string) {
+  let current = start;
+
+  for (let depth = 0; depth < 6; depth += 1) {
+    const candidate = path.join(current, "examples", "tenants", "turpial");
+    if (fs.existsSync(candidate)) return current;
+    const parent = path.dirname(current);
+    if (parent === current) break;
+    current = parent;
+  }
+
+  return start;
+}
+
+const root = findRepoRoot(process.cwd());
 const tenantRoot = path.join(root, "examples", "tenants", "turpial");
 const queuePath = path.join(tenantRoot, "content", "queue", "publication-queue.json");
 const assetRoot = path.join(tenantRoot, "content", "inbox");
