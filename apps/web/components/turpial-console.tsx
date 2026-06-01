@@ -29,7 +29,7 @@ import {
 import { HeptaCoreWordmark } from "./heptacore-mark";
 import type { QueueItem, TurpialConsoleData } from "../lib/turpial";
 
-type View = "overview" | "queue" | "strategy" | "intake" | "bot";
+type View = "overview" | "queue" | "pending" | "drafts" | "assets" | "calendar" | "strategy" | "intake" | "bot";
 
 function assetUrl(path?: string) {
   if (!path) return "";
@@ -53,9 +53,32 @@ export function TurpialConsole({ data }: { data: TurpialConsoleData }) {
   );
   const selected = queue.find((item) => item.id === selectedId) ?? queue[0];
   const pendingReview = queue.filter((item) => item.status !== "published" && (item.requiresHumanReview || item.riskLevel !== "low"));
+  const drafts = queue.filter((item) => item.status === "draft");
   const scheduled = queue.filter((item) => item.status !== "published").sort((a, b) => a.scheduledFor.localeCompare(b.scheduledFor));
   const readyNow = scheduled.slice(0, 5);
   const marketplaceItems = queue.filter((item) => item.pilar.includes("marketplace") || item.pilar.includes("vendedores"));
+  const assetRows = Array.from(
+    queue.reduce((assets, item) => {
+      if (!item.selectedAssetPath) return assets;
+      const current = assets.get(item.selectedAssetPath) ?? [];
+      current.push(item);
+      assets.set(item.selectedAssetPath, current);
+      return assets;
+    }, new Map<string, QueueItem[]>())
+  );
+  const scheduleRows = Array.from(
+    scheduled.reduce((dates, item) => {
+      const current = dates.get(item.scheduledFor) ?? [];
+      current.push(item);
+      dates.set(item.scheduledFor, current);
+      return dates;
+    }, new Map<string, QueueItem[]>())
+  );
+
+  function openQueueView(nextView: View, items: QueueItem[]) {
+    setSelectedId(items[0]?.id ?? selectedId);
+    setView(nextView);
+  }
 
   function updateStatus(id: string, status: string) {
     setStatuses((current) => ({ ...current, [id]: status }));
@@ -99,11 +122,11 @@ export function TurpialConsole({ data }: { data: TurpialConsoleData }) {
         </header>
 
         <section className="status-strip">
-          <Status label="Publicaciones" value={data.metrics.total} note="cola importada" />
-          <Status label="Pendientes" value={pendingReview.length} note="requieren criterio" tone="warn" />
-          <Status label="Drafts" value={data.metrics.drafts} note="listos para revision" />
-          <Status label="Assets" value="46/46" note="sin faltantes" tone="ok" />
-          <Status label="Proximo" value={data.metrics.nextDate.slice(5)} note="primer hito" />
+          <Status label="Publicaciones" value={data.metrics.total} note="cola importada" onClick={() => openQueueView("queue", scheduled)} />
+          <Status label="Pendientes" value={pendingReview.length} note="requieren criterio" tone="warn" onClick={() => openQueueView("pending", pendingReview)} />
+          <Status label="Drafts" value={data.metrics.drafts} note="listos para revision" onClick={() => openQueueView("drafts", drafts)} />
+          <Status label="Assets" value="46/46" note="sin faltantes" tone="ok" onClick={() => setView("assets")} />
+          <Status label="Proximo" value={data.metrics.nextDate.slice(5)} note="primer hito" onClick={() => setView("calendar")} />
         </section>
 
         {view === "overview" && (
@@ -169,6 +192,84 @@ export function TurpialConsole({ data }: { data: TurpialConsoleData }) {
             </section>
             <section className="work-panel detail-column">
               <PostPreview item={selected} updateStatus={updateStatus} expanded />
+            </section>
+          </div>
+        )}
+
+        {view === "pending" && selected && (
+          <QueueReviewView
+            title="Pendientes con criterio humano"
+            items={pendingReview}
+            selected={selected}
+            setSelectedId={setSelectedId}
+            updateStatus={updateStatus}
+          />
+        )}
+
+        {view === "drafts" && selected && (
+          <QueueReviewView
+            title="Drafts listos para revision"
+            items={drafts}
+            selected={selected}
+            setSelectedId={setSelectedId}
+            updateStatus={updateStatus}
+          />
+        )}
+
+        {view === "assets" && (
+          <div className="asset-workspace">
+            <section className="work-panel span-2">
+              <PanelTitle icon={<ImageIcon size={17} />} title="Assets Turpial vinculados a la cola" />
+              <div className="asset-summary">
+                <span><strong>46/46</strong><small>inventario base presente</small></span>
+                <span><strong>{assetRows.length}</strong><small>assets usados por publicaciones</small></span>
+                <span><strong>{data.metrics.missingAssets}</strong><small>bloqueos por archivo faltante</small></span>
+              </div>
+            </section>
+            <section className="work-panel span-2">
+              <div className="asset-grid">
+                {assetRows.map(([path, items]) => (
+                  <button key={path} className="asset-card" onClick={() => { setSelectedId(items[0].id); setView("queue"); }}>
+                    <Thumb item={items[0]} />
+                    <span>
+                      <strong>{path.split("/").at(-1)}</strong>
+                      <small>{items.length} publicacion(es) dependen de este asset</small>
+                      <em>{items.map((item) => item.scheduledFor).sort()[0]}</em>
+                    </span>
+                    <ChevronRight size={16} />
+                  </button>
+                ))}
+              </div>
+            </section>
+            <section className="work-panel">
+              <PanelTitle icon={<Upload size={17} />} title="Carga y generacion IA" />
+              <p className="muted-note">MVP pendiente: uploader persistente, specs por formato, prompt IA y registro en Asset DB. Hasta entonces los assets viven en `examples/tenants/turpial/content/inbox`.</p>
+            </section>
+            <section className="work-panel">
+              <PanelTitle icon={<AlertTriangle size={17} />} title="Criterio de bloqueo" />
+              <ul className="dense-list">
+                <li>Critico: asset faltante en una publicacion de los proximos 7 dias.</li>
+                <li>Opcional: asset futuro no vinculado a un hito aprobado.</li>
+                <li>Generacion IA: permitida solo como propuesta, no publica sin revision humana.</li>
+              </ul>
+            </section>
+          </div>
+        )}
+
+        {view === "calendar" && (
+          <div className="calendar-workspace">
+            <section className="work-panel span-2">
+              <PanelTitle icon={<CalendarClock size={17} />} title="Calendario y proximo hito" />
+              <div className="calendar-list">
+                {scheduleRows.map(([date, items]) => (
+                  <button key={date} className="calendar-row" onClick={() => { setSelectedId(items[0].id); setView("queue"); }}>
+                    <strong>{date}</strong>
+                    <span>{items.length} publicacion(es)</span>
+                    <small>{items.filter((item) => item.requiresHumanReview || item.riskLevel !== "low").length} requieren criterio</small>
+                    <ChevronRight size={16} />
+                  </button>
+                ))}
+              </div>
             </section>
           </div>
         )}
@@ -251,13 +352,51 @@ function NavButton({ active, icon, children, onClick }: { active: boolean; icon:
   return <button className={active ? "active" : ""} onClick={onClick}>{icon}{children}</button>;
 }
 
-function Status({ label, value, note, tone }: { label: string; value: string | number; note: string; tone?: "ok" | "warn" }) {
+function Status({ label, value, note, tone, onClick }: { label: string; value: string | number; note: string; tone?: "ok" | "warn"; onClick?: () => void }) {
   return (
-    <article className={`status-card ${tone ? `status-${tone}` : ""}`}>
+    <button className={`status-card ${tone ? `status-${tone}` : ""}`} onClick={onClick}>
       <span>{label}</span>
       <strong>{value}</strong>
       <small>{note}</small>
-    </article>
+    </button>
+  );
+}
+
+function QueueReviewView({
+  title,
+  items,
+  selected,
+  setSelectedId,
+  updateStatus
+}: {
+  title: string;
+  items: QueueItem[];
+  selected: QueueItem;
+  setSelectedId: (id: string) => void;
+  updateStatus: (id: string, status: string) => void;
+}) {
+  return (
+    <div className="queue-workspace">
+      <section className="work-panel queue-column">
+        <PanelTitle icon={<ClipboardList size={17} />} title={title} />
+        <div className="queue-scroll">
+          {items.map((item) => (
+            <button key={item.id} className={item.id === selected.id ? "queue-card active" : "queue-card"} onClick={() => setSelectedId(item.id)}>
+              <Thumb item={item} />
+              <span>
+                <small>{channelLabel(item)} / {item.scheduledFor}</small>
+                <strong>{item.title}</strong>
+                <em>{item.requiresHumanReview ? "criterio humano" : item.status}</em>
+              </span>
+              <Risk item={item} />
+            </button>
+          ))}
+        </div>
+      </section>
+      <section className="work-panel detail-column">
+        <PostPreview item={items.find((item) => item.id === selected.id) ?? items[0] ?? selected} updateStatus={updateStatus} expanded />
+      </section>
+    </div>
   );
 }
 

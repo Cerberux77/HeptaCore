@@ -5,8 +5,12 @@ import { config, loadQueue, saveQueue } from "./config.mjs";
 function resolveAsset(entry) {
   const assetPath = entry.selectedAssetPath || "";
   const fullPath = resolve(config.root, assetPath);
+  const tenantRelativePath = assetPath.startsWith("content/")
+    ? resolve(config.root, "examples", "tenants", config.tenantSlug, assetPath)
+    : "";
 
   if (!existsSync(fullPath)) {
+    if (tenantRelativePath && existsSync(tenantRelativePath)) return tenantRelativePath;
     const fallback = resolve(config.paths.inbox, entry.selectedAsset || "");
     if (existsSync(fallback)) return fallback;
     return null;
@@ -32,6 +36,10 @@ async function publishFacebookPost(entry) {
     };
   }
 
+  if (config.realPublishConfirmation !== "I_UNDERSTAND_REAL_RRSS_PUBLICATION") {
+    return { ok: false, error: "Real publishing blocked: HEPTACORE_ALLOW_REAL_PUBLISH is not confirmed" };
+  }
+
   const token = config.facebook.accessToken;
   const pageId = config.facebook.pageId;
 
@@ -40,7 +48,7 @@ async function publishFacebookPost(entry) {
   }
 
   try {
-    const url = `https://graph.facebook.com/v19.0/${pageId}/photos`;
+    const url = `https://graph.facebook.com/${config.graphVersion}/${pageId}/photos`;
     const form = new FormData();
     form.append("caption", entry.caption);
     form.append("access_token", token);
@@ -79,6 +87,10 @@ async function publishInstagramPost(entry) {
     };
   }
 
+  if (config.realPublishConfirmation !== "I_UNDERSTAND_REAL_RRSS_PUBLICATION") {
+    return { ok: false, error: "Real publishing blocked: HEPTACORE_ALLOW_REAL_PUBLISH is not confirmed" };
+  }
+
   const token = config.facebook.accessToken;
   const igId = config.instagram.businessAccountId;
 
@@ -89,7 +101,7 @@ async function publishInstagramPost(entry) {
   try {
     const isVideo = entry.format === "reel";
     const mediaType = isVideo ? "REELS" : "IMAGE";
-    const endpoint = `https://graph.facebook.com/v19.0/${igId}/media`;
+    const endpoint = `https://graph.facebook.com/${config.graphVersion}/${igId}/media`;
 
     const createParams = new URLSearchParams({
       caption: entry.caption,
@@ -115,7 +127,7 @@ async function publishInstagramPost(entry) {
     }
 
     const publishRes = await fetch(
-      `https://graph.facebook.com/v19.0/${igId}/media_publish`,
+      `https://graph.facebook.com/${config.graphVersion}/${igId}/media_publish`,
       {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
@@ -155,6 +167,10 @@ async function publishStory(entry) {
     };
   }
 
+  if (config.realPublishConfirmation !== "I_UNDERSTAND_REAL_RRSS_PUBLICATION") {
+    return { ok: false, error: "Real publishing blocked: HEPTACORE_ALLOW_REAL_PUBLISH is not confirmed" };
+  }
+
   return { ok: false, error: "Story publishing via API requires content_publish_limit approval. Use Meta Business Suite manual flow." };
 }
 
@@ -181,7 +197,8 @@ export async function publishQueue(dateStr) {
   let failed = 0;
 
   for (const entry of queue) {
-    if (entry.status === "published" || entry.status === "ready") continue;
+    if (entry.status === "published") continue;
+    if (!config.dryRun && !["approved", "scheduled"].includes(entry.status)) continue;
     if (entry.scheduledFor !== dateStr) continue;
 
     console.log(`\n[${entry.id}] ${entry.channel}/${entry.format} — "${entry.title}"`);

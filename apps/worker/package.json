@@ -8,6 +8,7 @@
     "start": "node src/index.mjs",
     "publish": "node src/publisher.mjs",
     "schedule": "node src/scheduler.mjs",
+    "meta:readiness": "node src/meta-readiness.mjs",
     "validate": "node src/validate.mjs",
     "report": "node src/report.mjs"
   },

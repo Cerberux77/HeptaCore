@@ -207,13 +207,17 @@ p {
 }
 .status-card {
   display: grid;
+  width: 100%;
+  text-align: left;
   gap: 3px;
   min-height: 82px;
   padding: 13px;
   border: 1px solid var(--hc-line);
   border-radius: 8px;
   background: var(--hc-panel);
+  color: inherit;
 }
+.status-card:hover { border-color: rgba(11, 117, 111, .32); }
 .status-card span {
   color: var(--hc-fog);
   font-size: 10px;
@@ -541,12 +545,98 @@ p {
 
 .strategy-grid,
 .intake-grid,
-.bot-grid {
+.bot-grid,
+.asset-workspace,
+.calendar-workspace {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 14px;
 }
 .span-2 { grid-column: span 2; }
+.asset-summary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  padding: 14px;
+}
+.asset-summary span {
+  display: grid;
+  gap: 3px;
+  min-height: 72px;
+  padding: 12px;
+  border: 1px solid var(--hc-line);
+  border-radius: 8px;
+  background: var(--hc-bone);
+}
+.asset-summary strong {
+  font-size: 22px;
+  font-weight: 650;
+}
+.asset-summary small,
+.muted-note {
+  color: var(--hc-graphite);
+  font-size: 13px;
+  line-height: 1.5;
+}
+.muted-note {
+  padding: 14px;
+  margin: 0;
+}
+.asset-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  padding: 14px;
+}
+.asset-card,
+.calendar-row {
+  display: grid;
+  align-items: center;
+  min-width: 0;
+  padding: 10px;
+  border: 1px solid var(--hc-line);
+  border-radius: 8px;
+  background: var(--hc-panel);
+  color: inherit;
+  text-align: left;
+}
+.asset-card {
+  grid-template-columns: 54px minmax(0, 1fr) 18px;
+  gap: 10px;
+}
+.asset-card span {
+  display: grid;
+  min-width: 0;
+  gap: 2px;
+}
+.asset-card strong,
+.asset-card small,
+.asset-card em {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.asset-card small,
+.asset-card em,
+.calendar-row small,
+.calendar-row span {
+  color: var(--hc-graphite);
+  font-size: 12px;
+}
+.calendar-list {
+  display: grid;
+  gap: 10px;
+  padding: 14px;
+}
+.calendar-row {
+  grid-template-columns: 120px minmax(0, 1fr) minmax(0, 1fr) 18px;
+  gap: 10px;
+}
+.asset-card:hover,
+.calendar-row:hover {
+  border-color: rgba(11, 117, 111, .32);
+  background: var(--hc-bone);
+}
 .strategy-defs {
   display: grid;
   grid-template-columns: 130px 1fr;
@@ -616,7 +706,9 @@ textarea { min-height: 84px; resize: vertical; }
   .queue-workspace,
   .strategy-grid,
   .intake-grid,
-  .bot-grid {
+  .bot-grid,
+  .asset-workspace,
+  .calendar-workspace {
     grid-template-columns: 1fr;
   }
   .app-sidebar {
@@ -636,7 +728,12 @@ textarea { min-height: 84px; resize: vertical; }
   .workspace-header { display: grid; }
   .header-actions { justify-content: start; }
   .status-strip,
+  .asset-summary,
+  .asset-grid,
   .market-grid {
+    grid-template-columns: 1fr;
+  }
+  .calendar-row {
     grid-template-columns: 1fr;
   }
   .compact-row,

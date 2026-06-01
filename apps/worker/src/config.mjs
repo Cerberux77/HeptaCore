@@ -37,6 +37,8 @@ export const config = {
 
   mode: process.env.BOT_MODE || "draft",
   dryRun: process.env.BOT_DRY_RUN !== "false",
+  graphVersion: process.env.META_GRAPH_VERSION || "v19.0",
+  realPublishConfirmation: process.env.HEPTACORE_ALLOW_REAL_PUBLISH || "",
 
   publishIntervalMinutes: parseInt(process.env.PUBLISH_INTERVAL_MINUTES || "360", 10),
 
@@ -70,6 +72,9 @@ export const config = {
     if (!this.facebook.accessToken) warnings.push("FACEBOOK_PAGE_ACCESS_TOKEN no configurado");
     if (!this.facebook.pageId) warnings.push("FACEBOOK_PAGE_ID no configurado");
     if (!this.instagram.businessAccountId) warnings.push("INSTAGRAM_BUSINESS_ACCOUNT_ID no configurado");
+    if (!this.dryRun && this.realPublishConfirmation !== "I_UNDERSTAND_REAL_RRSS_PUBLICATION") {
+      warnings.push("HEPTACORE_ALLOW_REAL_PUBLISH no confirma publicacion real");
+    }
     return warnings;
   }
 };
