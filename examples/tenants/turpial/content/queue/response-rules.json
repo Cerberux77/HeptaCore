@@ -1,0 +1,215 @@
+[
+  {
+    "id": "response_rule_1",
+    "keyword": [
+      "comprar",
+      "compra",
+      "compro",
+      "busco",
+      "necesito comprar"
+    ],
+    "channel": "instagram",
+    "intent": "COMPRAR",
+    "suggestedReply": "¡Gracias por tu interés! Tenemos un marketplace con equipos e instrumentos disponibles. Escríbenos por WhatsApp y te orientamos con lo que buscas. Link en la bio.",
+    "escalateToHuman": false,
+    "risk": "low",
+    "active": true,
+    "activeForAutoReply": false,
+    "notes": "Sugerencia. Revisión humana requerida antes de envío."
+  },
+  {
+    "id": "response_rule_2",
+    "keyword": [
+      "vender",
+      "vendo",
+      "publicar",
+      "anunciar",
+      "listing"
+    ],
+    "channel": "instagram",
+    "intent": "VENDER",
+    "suggestedReply": "¡Claro! Publicar tu equipo en el marketplace es gratis. La comisión es transparente: 5% solo si se vende. Escríbenos por WhatsApp y te ayudamos con el listing. Link en la bio.",
+    "escalateToHuman": false,
+    "risk": "low",
+    "active": true,
+    "activeForAutoReply": false,
+    "notes": "Sugerencia. Revisión humana requerida antes de envío."
+  },
+  {
+    "id": "response_rule_3",
+    "keyword": [
+      "precio",
+      "costo",
+      "cuánto",
+      "cuanto",
+      "vale",
+      "presupuesto",
+      "cotizar"
+    ],
+    "channel": "both",
+    "intent": "PRECIO",
+    "suggestedReply": "¡Buena pregunta! Los precios varían según el proyecto. ¿Qué necesitas grabar, mezclar o producir? Escríbenos por WhatsApp con los detalles y te damos un estimado sin compromiso.",
+    "escalateToHuman": true,
+    "risk": "medium",
+    "active": true,
+    "activeForAutoReply": false,
+    "notes": "Sugerencia. Revisión humana requerida antes de envío."
+  },
+  {
+    "id": "response_rule_4",
+    "keyword": [
+      "ensayar",
+      "ensayo",
+      "sala",
+      "reservar"
+    ],
+    "channel": "both",
+    "intent": "INFO",
+    "suggestedReply": "Tenemos salas de ensayo equipadas en Caracas. Cada sala tiene backline, acústica cuidada y espacio para banda completa. Escríbenos por WhatsApp para disponibilidad y reserva.",
+    "escalateToHuman": false,
+    "risk": "low",
+    "active": true,
+    "activeForAutoReply": false,
+    "notes": "Sugerencia. Revisión humana requerida antes de envío."
+  },
+  {
+    "id": "response_rule_5",
+    "keyword": [
+      "grabar",
+      "grabacion",
+      "grabación",
+      "estudio"
+    ],
+    "channel": "both",
+    "intent": "INFO",
+    "suggestedReply": "Nuestro estudio de grabación está equipado para proyectos profesionales. Tenemos más de 10 años de experiencia. Escríbenos por WhatsApp y coordinamos tu sesión.",
+    "escalateToHuman": false,
+    "risk": "low",
+    "active": true,
+    "activeForAutoReply": false,
+    "notes": "Sugerencia. Revisión humana requerida antes de envío."
+  },
+  {
+    "id": "response_rule_6",
+    "keyword": [
+      "confianza",
+      "seguro",
+      "protegida",
+      "protección"
+    ],
+    "channel": "both",
+    "intent": "CONFIANZA",
+    "suggestedReply": "La operación protegida funciona así: el comprador paga, el dinero queda retenido hasta que confirma que recibió el equipo en buenas condiciones. Ahí se libera el pago. Simple y transparente.",
+    "escalateToHuman": false,
+    "risk": "low",
+    "active": true,
+    "activeForAutoReply": false,
+    "notes": "Sugerencia. Revisión humana requerida antes de envío."
+  },
+  {
+    "id": "response_rule_7",
+    "keyword": [
+      "pago",
+      "pagar",
+      "dinero",
+      "transferencia",
+      "deposito",
+      "pago movil"
+    ],
+    "channel": "both",
+    "intent": "PAGO",
+    "suggestedReply": "Para información sobre métodos de pago y el proceso de transacción, escríbenos por WhatsApp. Nuestro equipo te guía personalmente en cada paso.",
+    "escalateToHuman": true,
+    "risk": "high",
+    "active": false,
+    "activeForAutoReply": false,
+    "notes": "SIEMPRE derivar a humano. No respuesta automática."
+  },
+  {
+    "id": "response_rule_8",
+    "keyword": [
+      "envio",
+      "envío",
+      "entrega",
+      "delivery",
+      "domicilio"
+    ],
+    "channel": "both",
+    "intent": "ENVÍO",
+    "suggestedReply": "La entrega del equipo se coordina directamente entre comprador y vendedor. Podemos orientarte con recomendaciones. Escríbenos por WhatsApp.",
+    "escalateToHuman": true,
+    "risk": "medium",
+    "active": false,
+    "activeForAutoReply": false,
+    "notes": "SIEMPRE derivar a humano. No respuesta automática."
+  },
+  {
+    "id": "response_rule_9",
+    "keyword": [
+      "guitarra",
+      "guitarrista",
+      "guitarras"
+    ],
+    "channel": "both",
+    "intent": "GUITARRA",
+    "suggestedReply": "¿Buscas guitarra? En nuestro marketplace hay opciones. También tenemos contenido educativo sobre compra de guitarras usadas. Revisa nuestro carrusel fijado. Link en bio.",
+    "escalateToHuman": false,
+    "risk": "low",
+    "active": true,
+    "activeForAutoReply": false,
+    "notes": "Sugerencia. Revisión humana requerida antes de envío."
+  },
+  {
+    "id": "response_rule_10",
+    "keyword": [
+      "teclado",
+      "piano",
+      "sintetizador",
+      "midi"
+    ],
+    "channel": "both",
+    "intent": "TECLADO",
+    "suggestedReply": "¿Tecladista? Tenemos salas con backline que incluye teclados. También hay opciones en el marketplace. Escríbenos por WhatsApp para lo que necesites.",
+    "escalateToHuman": false,
+    "risk": "low",
+    "active": true,
+    "activeForAutoReply": false,
+    "notes": "Sugerencia. Revisión humana requerida antes de envío."
+  },
+  {
+    "id": "response_rule_11",
+    "keyword": [
+      "dj",
+      "controlador",
+      "cdj",
+      "mezclar en vivo"
+    ],
+    "channel": "both",
+    "intent": "DJ",
+    "suggestedReply": "Tenemos espacio y equipo para DJs. Si buscas equipo, revisa el marketplace. Si necesitas alquilar, escríbenos por WhatsApp.",
+    "escalateToHuman": false,
+    "risk": "low",
+    "active": true,
+    "activeForAutoReply": false,
+    "notes": "Sugerencia. Revisión humana requerida antes de envío."
+  },
+  {
+    "id": "response_rule_12",
+    "keyword": [
+      "problema",
+      "disputa",
+      "reclamo",
+      "queja",
+      "no me llegó",
+      "mal estado"
+    ],
+    "channel": "both",
+    "intent": "RECLAMO",
+    "suggestedReply": "Lamentamos cualquier inconveniente. Nuestro equipo revisa cada caso personalmente. Escríbenos por WhatsApp con los detalles de tu situación y lo resolvemos.",
+    "escalateToHuman": true,
+    "risk": "high",
+    "active": false,
+    "activeForAutoReply": false,
+    "notes": "SIEMPRE derivar a humano. No respuesta automática."
+  }
+]

@@ -1,0 +1,128 @@
+{
+  "project": "HeptaCore",
+  "updatedAt": "2026-06-01T12:00:00.000Z",
+  "resiliencePolicy": "If an owner is unavailable for more than one working block or blocks the critical path, backupOwner may take over after recording reassignment.",
+  "tasks": [
+    {
+      "id": "S-HC-00",
+      "title": "Foundation baseline commit",
+      "owner": "Manuel",
+      "backupOwner": "Jean",
+      "status": "done",
+      "track": "foundation",
+      "zone": ["repo", "docs", "oreshnik"],
+      "dependsOn": [],
+      "acceptance": ["Initial monorepo committed", "Oreshnik vault operational", "Build/typecheck pass"],
+      "handoff": "Jean reviews baseline after commit."
+    },
+    {
+      "id": "S-HC-01",
+      "title": "Console shell: tenant dashboard, onboarding, checklist, draft queue",
+      "owner": "Manuel",
+      "backupOwner": "Jean",
+      "status": "ready",
+      "track": "product-ui",
+      "zone": ["apps/web", "packages/ui", "packages/agents"],
+      "dependsOn": ["S-HC-00"],
+      "acceptance": ["Tenant dashboard route", "Onboarding form mock", "Input checklist", "Draft queue screen"],
+      "handoff": "Jean can take dashboard data wiring if Manuel is unavailable."
+    },
+    {
+      "id": "S-HC-02",
+      "title": "Turpial importer and Prisma seed",
+      "owner": "Jean",
+      "backupOwner": "Manuel",
+      "status": "ready",
+      "track": "data",
+      "zone": ["packages/db", "examples/tenants/turpial", "scripts"],
+      "dependsOn": ["S-HC-00"],
+      "acceptance": ["Seed tenant", "Import assets metadata", "Import publication queue", "No real credentials"],
+      "handoff": "Manuel can implement importer from existing queue if Jean is unavailable."
+    },
+    {
+      "id": "S-HC-03",
+      "title": "Agent strategy runner",
+      "owner": "Manuel",
+      "backupOwner": "Jean",
+      "status": "pending",
+      "track": "agents",
+      "zone": ["packages/agents", "packages/core"],
+      "dependsOn": ["S-HC-01", "S-HC-02"],
+      "acceptance": ["Client intake -> offer reframing", "Network priorities", "Minimum inputs", "Draft plan object"],
+      "handoff": "Jean can wire persistence while Manuel owns strategy prompts."
+    },
+    {
+      "id": "S-HC-04",
+      "title": "Auth, RBAC and tenant guards",
+      "owner": "Jean",
+      "backupOwner": "Manuel",
+      "status": "pending",
+      "track": "security",
+      "zone": ["apps/web", "packages/db", "packages/core"],
+      "dependsOn": ["S-HC-02"],
+      "acceptance": ["Auth provider chosen", "Tenant membership checks", "Role matrix", "Audit baseline"],
+      "handoff": "Requires double lock for schema changes."
+    },
+    {
+      "id": "S-HC-05",
+      "title": "Approval queue and human gates",
+      "owner": "Manuel",
+      "backupOwner": "Jean",
+      "status": "pending",
+      "track": "workflow",
+      "zone": ["apps/web", "packages/core", "packages/db"],
+      "dependsOn": ["S-HC-01", "S-HC-04"],
+      "acceptance": ["Approve/reject drafts", "Sensitive action labels", "Audit event", "No publish without approval"],
+      "handoff": "Jean can complete audit persistence if Manuel is unavailable."
+    },
+    {
+      "id": "S-HC-06",
+      "title": "Worker queue with retries and tenant scope",
+      "owner": "Jean",
+      "backupOwner": "Manuel",
+      "status": "pending",
+      "track": "worker",
+      "zone": ["apps/worker", "packages/integrations", "packages/core"],
+      "dependsOn": ["S-HC-02", "S-HC-05"],
+      "acceptance": ["Queue abstraction", "Dry-run jobs", "Retries", "Tenant scoped logs"],
+      "handoff": "Manuel can keep file queue fallback if Jean is unavailable."
+    },
+    {
+      "id": "S-HC-07",
+      "title": "Turpial tenant dashboard report",
+      "owner": "Manuel",
+      "backupOwner": "Jean",
+      "status": "pending",
+      "track": "analytics",
+      "zone": ["apps/web", "packages/agents", "packages/db"],
+      "dependsOn": ["S-HC-02", "S-HC-05"],
+      "acceptance": ["Draft counts", "Pending approvals", "Asset blockers", "Daily report preview"],
+      "handoff": "Jean can wire DB queries if Manuel is unavailable."
+    },
+    {
+      "id": "S-HC-08",
+      "title": "Meta adapter sandbox design",
+      "owner": "Jean",
+      "backupOwner": "Manuel",
+      "status": "pending",
+      "track": "integrations",
+      "zone": ["packages/integrations", "apps/worker", "docs"],
+      "dependsOn": ["S-HC-06"],
+      "acceptance": ["Adapter interface", "Mock adapter", "Approval gate respected", "No real token required"],
+      "handoff": "Manuel can document and stub adapter if Jean is unavailable."
+    },
+    {
+      "id": "S-HC-09",
+      "title": "First tenant publish readiness gate",
+      "owner": "Manuel",
+      "backupOwner": "Jean",
+      "status": "pending",
+      "track": "release",
+      "zone": ["docs", "apps/worker", "apps/web"],
+      "dependsOn": ["S-HC-05", "S-HC-06", "S-HC-08"],
+      "acceptance": ["Turpial approvals listed", "Credentials checklist", "Dry-run report", "Rollback plan"],
+      "handoff": "Either operator can run readiness if docs are current."
+    }
+  ],
+  "reassignments": []
+}

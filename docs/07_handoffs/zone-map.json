@@ -1,0 +1,130 @@
+{
+  "version": "1.0",
+  "project": "HeptaCore",
+  "zones": {
+    "packages/db/**": {
+      "owner": "Jean+Manuel",
+      "lock": "double_jean_manuel",
+      "sprints": ["*"],
+      "criticality": "critical",
+      "notes": "Prisma schema, migrations and DB access require coordination."
+    },
+    "package.json": {
+      "owner": "Jean+Manuel",
+      "lock": "double_jean_manuel",
+      "sprints": ["*"],
+      "criticality": "high"
+    },
+    "package-lock.json": {
+      "owner": "Jean+Manuel",
+      "lock": "double_jean_manuel",
+      "sprints": ["*"],
+      "criticality": "high"
+    },
+    "README.md": {
+      "owner": "Both",
+      "lock": "shared_docs",
+      "sprints": ["*"],
+      "criticality": "low"
+    },
+    ".gitignore": {
+      "owner": "Both",
+      "lock": "owner_per_sprint",
+      "sprints": ["*"],
+      "criticality": "medium"
+    },
+    "prisma.config.ts": {
+      "owner": "Jean+Manuel",
+      "lock": "double_jean_manuel",
+      "sprints": ["*"],
+      "criticality": "critical"
+    },
+    "apps/worker/**": {
+      "owner": "Jean",
+      "lock": "owner_per_sprint",
+      "sprints": ["*"],
+      "criticality": "high"
+    },
+    "packages/agents/**": {
+      "owner": "Manuel",
+      "lock": "owner_per_sprint",
+      "sprints": ["*"],
+      "criticality": "high"
+    },
+    "apps/web/**": {
+      "owner": "Manuel",
+      "lock": "owner_per_sprint",
+      "sprints": ["*"],
+      "criticality": "medium"
+    },
+    "packages/integrations/**": {
+      "owner": "Jean+Manuel",
+      "lock": "double_jean_manuel",
+      "sprints": ["*"],
+      "criticality": "high"
+    },
+    "docs/obsidian-vault/**": {
+      "owner": "Both",
+      "lock": "shared_docs",
+      "sprints": ["*"],
+      "criticality": "high"
+    },
+    "docs/**": {
+      "owner": "Both",
+      "lock": "shared_docs",
+      "sprints": ["*"],
+      "criticality": "medium"
+    },
+    "scripts/oreshnik/**": {
+      "owner": "Manuel",
+      "lock": "owner_per_sprint",
+      "sprints": ["*"],
+      "criticality": "high"
+    },
+    ".env.example": {
+      "owner": "Both",
+      "lock": "owner_per_sprint",
+      "sprints": ["*"],
+      "criticality": "low"
+    },
+    ".env.rrss.example": {
+      "owner": "Both",
+      "lock": "owner_per_sprint",
+      "sprints": ["*"],
+      "criticality": "low"
+    },
+    ".env": {
+      "owner": "Nobody",
+      "lock": "forbidden",
+      "sprints": [],
+      "criticality": "critical"
+    },
+    ".env.*": {
+      "owner": "Nobody",
+      "lock": "forbidden",
+      "sprints": [],
+      "criticality": "critical",
+      "notes": "Examples are allowed by gitignore exception, real env files are forbidden."
+    },
+    "examples/tenants/turpial/**": {
+      "owner": "Manuel",
+      "lock": "owner_per_sprint",
+      "sprints": ["*"],
+      "criticality": "medium"
+    },
+    "content/**": {
+      "owner": "Manuel",
+      "lock": "owner_per_sprint",
+      "sprints": ["S-HC-00"],
+      "criticality": "low",
+      "notes": "Legacy path from initial Turpial import. Expected to disappear after migration commit."
+    },
+    "src/**": {
+      "owner": "Manuel",
+      "lock": "owner_per_sprint",
+      "sprints": ["S-HC-00"],
+      "criticality": "low",
+      "notes": "Legacy path from initial worker migration. Expected to disappear after migration commit."
+    }
+  }
+}

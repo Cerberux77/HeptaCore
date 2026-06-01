@@ -1,0 +1,63 @@
+{
+  "reportGeneratedAt": "2026-06-01T02:00:00.000Z",
+  "sprint": "S-RRSS-bot-live-review-mvp",
+  "totalDrafts": 30,
+  "scheduleStart": "2026-06-02",
+  "scheduleEnd": "2026-07-01",
+  "summary": {
+    "instagram_feed": 10,
+    "instagram_reels": 4,
+    "instagram_stories": 5,
+    "instagram_carousels": 5,
+    "facebook_feed": 10,
+    "total": 30
+  },
+  "byPilar": {
+    "estudio_servicios": 11,
+    "comunidad_musical": 6,
+    "educacion_compradores": 5,
+    "educacion_vendedores": 3,
+    "confianza_operacion_protegida": 2,
+    "marketplace_equipos": 3
+  },
+  "byRisk": {
+    "low": 18,
+    "medium": 12
+  },
+  "needsHumanReview": 7,
+  "drafts": [
+    {"id": "ig_post_01", "date": "2026-06-02", "channel": "instagram", "format": "feed", "asset": "instagram/grid-estudio.jpg", "pilar": "estudio_servicios"},
+    {"id": "reel_01", "date": "2026-06-03", "channel": "instagram", "format": "reel", "asset": "reels/reel-tour.mp4", "pilar": "estudio_servicios"},
+    {"id": "fb_post_01", "date": "2026-06-04", "channel": "facebook", "format": "feed", "asset": "facebook/bienvenidos-fb.jpg", "pilar": "estudio_servicios"},
+    {"id": "ig_post_02", "date": "2026-06-06", "channel": "instagram", "format": "carousel", "asset": "instagram/grid-sala.jpg", "pilar": "estudio_servicios"},
+    {"id": "story_01", "date": "2026-06-06", "channel": "instagram", "format": "story", "asset": "stories/story-noche.jpg", "pilar": "comunidad_musical"},
+    {"id": "fb_post_02", "date": "2026-06-08", "channel": "facebook", "format": "feed", "asset": "facebook/equipo-consola.jpg", "pilar": "estudio_servicios"},
+    {"id": "fb_post_10", "date": "2026-06-08", "channel": "facebook", "format": "feed", "asset": "facebook/persona-banda.jpg", "pilar": "comunidad_musical"},
+    {"id": "reel_03", "date": "2026-06-09", "channel": "instagram", "format": "reel", "asset": "reels/reel-timelapse.mp4", "pilar": "comunidad_musical"},
+    {"id": "ig_post_04", "date": "2026-06-10", "channel": "instagram", "format": "carousel", "asset": "marketplace/operacion-protegida.png", "pilar": "confianza_operacion_protegida"},
+    {"id": "ig_post_07", "date": "2026-06-11", "channel": "instagram", "format": "carousel", "asset": "instagram/carrusel-guitarra.jpg", "pilar": "educacion_compradores"},
+    {"id": "story_02", "date": "2026-06-12", "channel": "instagram", "format": "story", "asset": "stories/story-detalle.jpg", "pilar": "educacion_vendedores"},
+    {"id": "ig_post_03", "date": "2026-06-14", "channel": "instagram", "format": "feed", "asset": "instagram/grid-consola.jpg", "pilar": "estudio_servicios"},
+    {"id": "fb_post_03", "date": "2026-06-15", "channel": "facebook", "format": "feed", "asset": "facebook/persona-sesion.jpg", "pilar": "estudio_servicios"},
+    {"id": "reel_02", "date": "2026-06-16", "channel": "instagram", "format": "reel", "asset": "reels/closeup-consola.mp4", "pilar": "educacion_vendedores"},
+    {"id": "fb_post_04", "date": "2026-06-17", "channel": "facebook", "format": "feed", "asset": "marketplace/como-vender.jpg", "pilar": "educacion_vendedores"},
+    {"id": "story_03", "date": "2026-06-18", "channel": "instagram", "format": "story", "asset": "stories/story-sala.jpg", "pilar": "educacion_compradores"},
+    {"id": "ig_post_05", "date": "2026-06-19", "channel": "instagram", "format": "carousel", "asset": "marketplace/operacion-protegida.png", "pilar": "confianza_operacion_protegida"},
+    {"id": "ig_post_08", "date": "2026-06-20", "channel": "instagram", "format": "carousel", "asset": "instagram/carrusel-microfonos.jpg", "pilar": "educacion_compradores"},
+    {"id": "ig_post_06", "date": "2026-06-21", "channel": "instagram", "format": "feed", "asset": "instagram/grid-produccion.jpg", "pilar": "comunidad_musical"},
+    {"id": "story_04", "date": "2026-06-22", "channel": "instagram", "format": "story", "asset": "stories/story-fachada.jpg", "pilar": "estudio_servicios"},
+    {"id": "reel_04", "date": "2026-06-23", "channel": "instagram", "format": "reel", "asset": "reels/reel-antes-despues.mp4", "pilar": "estudio_servicios"},
+    {"id": "fb_post_05", "date": "2026-06-24", "channel": "facebook", "format": "feed", "asset": "marketplace/mp-equipo-01.jpg", "pilar": "educacion_vendedores"},
+    {"id": "fb_post_06", "date": "2026-06-25", "channel": "facebook", "format": "feed", "asset": "facebook/equipo-microfono.jpg", "pilar": "marketplace_equipos"},
+    {"id": "fb_post_07", "date": "2026-06-26", "channel": "facebook", "format": "feed", "asset": "facebook/estudio-01.jpg", "pilar": "educacion_compradores"},
+    {"id": "fb_post_08", "date": "2026-06-27", "channel": "facebook", "format": "feed", "asset": "facebook/estudio-02.jpg", "pilar": "educacion_compradores"},
+    {"id": "ig_post_09", "date": "2026-06-28", "channel": "instagram", "format": "feed", "asset": "instagram/grid-ambiente.jpg", "pilar": "estudio_servicios"},
+    {"id": "ig_post_10", "date": "2026-06-29", "channel": "instagram", "format": "carousel", "asset": "instagram/carrusel-monitores.jpg", "pilar": "educacion_compradores"},
+    {"id": "story_05", "date": "2026-06-30", "channel": "instagram", "format": "story", "asset": "stories/story-logo.jpg", "pilar": "comunidad_musical"},
+    {"id": "fb_post_09", "date": "2026-07-01", "channel": "facebook", "format": "feed", "asset": "facebook/bienvenidos-fb.jpg", "pilar": "comunidad_musical"}
+  ],
+  "pendingAssets": [
+    {"id": "M1b", "file": "mp-equipo-02.jpg", "owner": "Jean", "status": "PENDING"},
+    {"id": "M1c", "file": "mp-equipo-03.jpg", "owner": "Jean", "status": "PENDING"}
+  ]
+}

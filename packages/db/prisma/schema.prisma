@@ -1,0 +1,362 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum TenantPlan {
+  PILOT
+  GROWTH
+  PRO
+  ENTERPRISE
+}
+
+enum UserRole {
+  OWNER
+  ADMIN
+  STRATEGIST
+  EDITOR
+  ANALYST
+  APPROVER
+  VIEWER
+}
+
+enum SocialNetwork {
+  INSTAGRAM
+  FACEBOOK
+  TIKTOK
+  YOUTUBE
+  LINKEDIN
+  X
+}
+
+enum AutomationMode {
+  DRAFT_ONLY
+  APPROVAL_REQUIRED
+  AUTOPILOT_LIMITED
+  AUTOPILOT_FULL
+}
+
+enum ApprovalStatus {
+  DRAFT
+  NEEDS_REVIEW
+  APPROVED
+  REJECTED
+  SCHEDULED
+  PUBLISHED
+  FAILED
+}
+
+enum AssetKind {
+  IMAGE
+  VIDEO
+  AUDIO
+  DOCUMENT
+  LOGO
+  BRAND_REFERENCE
+}
+
+enum CampaignStatus {
+  PROPOSED
+  NEEDS_APPROVAL
+  APPROVED
+  ACTIVE
+  PAUSED
+  COMPLETED
+  REJECTED
+}
+
+model Tenant {
+  id             String         @id @default(cuid())
+  slug           String         @unique
+  name           String
+  plan           TenantPlan     @default(PILOT)
+  automationMode AutomationMode @default(DRAFT_ONLY)
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  memberships    Membership[]
+  projects       Project[]
+  assets         Asset[]
+  socialAccounts SocialAccount[]
+  drafts         ContentDraft[]
+  approvals      Approval[]
+  credentials    CredentialVaultItem[]
+  interactions   Interaction[]
+  campaigns      Campaign[]
+  leads          Lead[]
+  reports        Report[]
+  auditLogs      AuditLog[]
+}
+
+model User {
+  id          String       @id @default(cuid())
+  email       String       @unique
+  name        String?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  memberships Membership[]
+  approvals   Approval[]   @relation("ApprovalReviewer")
+  auditLogs   AuditLog[]
+}
+
+model Membership {
+  id        String   @id @default(cuid())
+  tenantId  String
+  userId    String
+  role      UserRole
+  createdAt DateTime @default(now())
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([tenantId, userId])
+  @@index([tenantId, role])
+}
+
+model Project {
+  id             String   @id @default(cuid())
+  tenantId       String
+  name           String
+  description    String?
+  offer          String?
+  audience       Json?
+  valueProps     Json?
+  constraints    Json?
+  strategyBrief  Json?
+  onboardingDone Boolean  @default(false)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  tenant  Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  assets  Asset[]
+  drafts  ContentDraft[]
+  reports Report[]
+
+  @@index([tenantId])
+}
+
+model Asset {
+  id           String    @id @default(cuid())
+  tenantId     String
+  projectId    String?
+  kind         AssetKind
+  sourcePath   String?
+  storageKey   String?
+  filename     String
+  mimeType     String?
+  metadata     Json?
+  rightsStatus String    @default("needs_review")
+  createdAt    DateTime  @default(now())
+
+  tenant  Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  project Project? @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  drafts  ContentDraftAsset[]
+
+  @@index([tenantId, kind])
+  @@index([projectId])
+}
+
+model SocialAccount {
+  id                String        @id @default(cuid())
+  tenantId          String
+  network           SocialNetwork
+  handle            String?
+  externalAccountId String?
+  status            String        @default("disconnected")
+  scopes            String[]
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+
+  tenant       Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  drafts       ContentDraft[]
+  interactions Interaction[]
+  campaigns    Campaign[]
+
+  @@unique([tenantId, network, externalAccountId])
+  @@index([tenantId, network])
+}
+
+model CredentialVaultItem {
+  id              String   @id @default(cuid())
+  tenantId        String
+  socialAccountId String?
+  provider        String
+  label           String
+  encryptedBlob   Bytes
+  keyVersion      String
+  expiresAt       DateTime?
+  rotatedAt       DateTime?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId, provider])
+}
+
+model ContentDraft {
+  id              String         @id @default(cuid())
+  tenantId        String
+  projectId       String?
+  socialAccountId String?
+  network         SocialNetwork
+  format          String
+  title           String
+  caption         String
+  hashtags        String[]
+  cta             String?
+  pillar          String?
+  status          ApprovalStatus @default(DRAFT)
+  riskLevel       String         @default("low")
+  requiresReview  Boolean        @default(true)
+  scheduledFor    DateTime?
+  publishedAt     DateTime?
+  externalPostId  String?
+  source          String?
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  tenant        Tenant         @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  project       Project?       @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  socialAccount SocialAccount? @relation(fields: [socialAccountId], references: [id], onDelete: SetNull)
+  assets        ContentDraftAsset[]
+  approvals     Approval[]
+  metrics       MetricSnapshot[]
+
+  @@index([tenantId, network, status])
+  @@index([tenantId, scheduledFor])
+}
+
+model ContentDraftAsset {
+  id      String @id @default(cuid())
+  draftId String
+  assetId String
+  role    String @default("primary")
+
+  draft ContentDraft @relation(fields: [draftId], references: [id], onDelete: Cascade)
+  asset Asset        @relation(fields: [assetId], references: [id], onDelete: Cascade)
+
+  @@unique([draftId, assetId, role])
+}
+
+model Approval {
+  id         String         @id @default(cuid())
+  tenantId   String
+  draftId    String?
+  reviewerId String?
+  status     ApprovalStatus
+  reason     String?
+  createdAt  DateTime       @default(now())
+
+  tenant   Tenant        @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  draft    ContentDraft? @relation(fields: [draftId], references: [id], onDelete: Cascade)
+  reviewer User?         @relation("ApprovalReviewer", fields: [reviewerId], references: [id], onDelete: SetNull)
+
+  @@index([tenantId, status])
+}
+
+model Interaction {
+  id              String        @id @default(cuid())
+  tenantId        String
+  socialAccountId String?
+  network         SocialNetwork
+  externalId      String?
+  authorHandle    String?
+  body            String
+  sentiment       String?
+  topic           String?
+  riskLevel       String        @default("low")
+  responseDraft   String?
+  status          String        @default("new")
+  createdAt       DateTime      @default(now())
+
+  tenant        Tenant         @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  socialAccount SocialAccount? @relation(fields: [socialAccountId], references: [id], onDelete: SetNull)
+
+  @@index([tenantId, network, status])
+}
+
+model Campaign {
+  id              String         @id @default(cuid())
+  tenantId        String
+  socialAccountId String?
+  network         SocialNetwork
+  name            String
+  objective       String
+  platformBudget  Decimal        @db.Decimal(12, 2)
+  overheadRate    Decimal        @default(0.35) @db.Decimal(4, 2)
+  totalCharge     Decimal        @db.Decimal(12, 2)
+  status          CampaignStatus @default(PROPOSED)
+  recommendation  Json?
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  tenant        Tenant         @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  socialAccount SocialAccount? @relation(fields: [socialAccountId], references: [id], onDelete: SetNull)
+
+  @@index([tenantId, status])
+}
+
+model Lead {
+  id        String   @id @default(cuid())
+  tenantId  String
+  source    String
+  name      String?
+  contact   String?
+  company   String?
+  score     Int      @default(0)
+  consent   String   @default("unknown")
+  metadata  Json?
+  createdAt DateTime @default(now())
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId, source])
+}
+
+model MetricSnapshot {
+  id         String   @id @default(cuid())
+  draftId    String?
+  metric     String
+  value      Decimal  @db.Decimal(18, 4)
+  capturedAt DateTime @default(now())
+
+  draft ContentDraft? @relation(fields: [draftId], references: [id], onDelete: Cascade)
+
+  @@index([draftId, capturedAt])
+}
+
+model Report {
+  id        String   @id @default(cuid())
+  tenantId  String
+  projectId String?
+  type      String
+  period    String
+  payload   Json
+  sentTo    Json?
+  createdAt DateTime @default(now())
+
+  tenant  Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  project Project? @relation(fields: [projectId], references: [id], onDelete: SetNull)
+
+  @@index([tenantId, type, period])
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  tenantId  String?
+  actorId   String?
+  action    String
+  target    String?
+  metadata  Json?
+  createdAt DateTime @default(now())
+
+  tenant Tenant? @relation(fields: [tenantId], references: [id], onDelete: SetNull)
+  actor  User?   @relation(fields: [actorId], references: [id], onDelete: SetNull)
+
+  @@index([tenantId, action])
+  @@index([actorId])
+}

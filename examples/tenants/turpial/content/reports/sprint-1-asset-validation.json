@@ -1,0 +1,78 @@
+{
+  "generatedAt": "2026-06-01T02:00:00.000Z",
+  "sprint": "S-RRSS-bot-live-review-mvp",
+  "totalExpected": 46,
+  "totalPresent": 44,
+  "missing": [
+    {
+      "id": "M1b",
+      "filename": "mp-equipo-02.jpg",
+      "expectedPath": "data/rrss/inbox/marketplace/mp-equipo-02.jpg",
+      "status": "PENDING_JEAN",
+      "notes": "No enviado por Jean. Usar fallback de public/ si es urgente."
+    },
+    {
+      "id": "M1c",
+      "filename": "mp-equipo-03.jpg",
+      "expectedPath": "data/rrss/inbox/marketplace/mp-equipo-03.jpg",
+      "status": "PENDING_JEAN",
+      "notes": "No enviado por Jean. Usar fallback de public/ si es urgente."
+    }
+  ],
+  "repairs": [
+    {
+      "original": "reel-antes-despues-final.mp4",
+      "fixed": "reel-antes-despues.mp4",
+      "reason": "Nombre no coincidia con especificacion"
+    },
+    {
+      "original": "closeup-consola.mp4.mp4",
+      "fixed": "closeup-consola.mp4",
+      "reason": "Doble extension .mp4"
+    },
+    {
+      "count": 11,
+      "pattern": "*.jpg.jpeg",
+      "fixed": "*.jpg",
+      "reason": "Doble extension por transferencia WhatsApp"
+    }
+  ],
+  "inventory": {
+    "brand": {
+      "expected": 6,
+      "present": 6,
+      "files": ["avatar.png", "hl-estudio.png", "hl-salas.png", "hl-marketplace.png", "hl-comunidad.png", "hl-faq.png"]
+    },
+    "facebook": {
+      "expected": 13,
+      "present": 13,
+      "files": ["cover.jpg", "estudio-01.jpg", "estudio-02.jpg", "estudio-03.jpg", "estudio-noche.jpg", "estudio-wide.jpg", "persona-consola.jpg", "persona-sesion.jpg", "persona-banda.jpg", "equipo-consola.jpg", "equipo-microfono.jpg", "equipo-guitarra.jpg", "bienvenidos-fb.jpg"]
+    },
+    "instagram": {
+      "expected": 12,
+      "present": 12,
+      "files": ["grid-estudio.jpg", "grid-sala.jpg", "grid-consola.jpg", "grid-equipo.jpg", "grid-espacio.jpg", "grid-ambiente.jpg", "grid-comunidad.jpg", "grid-produccion.jpg", "grid-logo.jpg", "carrusel-guitarra.jpg", "carrusel-microfonos.jpg", "carrusel-monitores.jpg"]
+    },
+    "reels": {
+      "expected": 5,
+      "present": 5,
+      "files": ["tour-estudio.mp4", "closeup-consola.mp4", "reel-tour.mp4", "reel-antes-despues.mp4", "reel-timelapse.mp4"]
+    },
+    "stories": {
+      "expected": 5,
+      "present": 5,
+      "files": ["story-noche.jpg", "story-detalle.jpg", "story-sala.jpg", "story-logo.jpg", "story-fachada.jpg"]
+    },
+    "highlights": {
+      "expected": 2,
+      "present": 2,
+      "files": ["hl-comunidad.png", "hl-faq.png"]
+    },
+    "marketplace": {
+      "expected": 5,
+      "present": 3,
+      "files": ["mp-equipo-01.jpg", "como-vender.jpg", "operacion-protegida.png"],
+      "missing": ["mp-equipo-02.jpg", "mp-equipo-03.jpg"]
+    }
+  }
+}
