@@ -3,8 +3,8 @@ type: master-dashboard
 project: "HeptaCore"
 status: active-foundation
 phase: "Foundation: monorepo, agent core, landing, Prisma, worker and Turpial tenant seed"
-last_updated: "01/06/26 00:00"
-mother_branch: "master"
+last_updated: "01/06/26 11:36"
+mother_branch: "MADRE/v2-s-hc-xx-plan-holistico-turpial-jean-oauth-readiness-2026-06-01"
 production_branch: "none"
 tags:
   - "#central"
@@ -84,6 +84,20 @@ HeptaCore ya tiene base monorepo:
 | Worker Turpial | `npm run worker:validate` | PASS con 2 assets opcionales faltantes |
 | Prisma validate | `npx prisma validate` | PASS |
 
+## Actualizacion 2026-06-01 15:45 VET
+
+Se documento la auditoria de estado y ruta Turpial en `docs/07_handoffs/heptacore-state-audit-turpial-production.md`.
+
+Estado operativo actualizado:
+
+| Area | Estado |
+|---|---|
+| Cola Turpial | 29/29 valida |
+| Assets Turpial | 46/46 presentes |
+| Cards dashboard | Clickeables hacia cola, pendientes, drafts, assets y calendario |
+| OAuth Meta | Readiness local agregado; pendiente `.env.rrss` real |
+| Publicacion real | Bloqueada por hard stop hasta aprobacion humana y doble lock |
+
 ## Navegacion
 
 - [[METODOLOGIA/METODOLOGIA_ORESHNIK_HEPTACORE]]
@@ -98,4 +112,11 @@ HeptaCore ya tiene base monorepo:
 
 ---
 
-> **Ultima actualizacion:** 01/06/26 00:00 VET | **Estado:** Foundation en curso | **Operador:** Manuel
+> **Ultima actualizacion:** 01/06/26 11:36 VET | **Estado:** S-HC-XX CERRADO | **Operador:** Manuel
+
+## Cierre S-HC-XX - 2026-06-01
+
+- Operador: Manuel
+- Rama hija: `Manuel/s-hc-xx-plan-holistico-heptacore-turpial-jean-2026-06-01`
+- Rama madre docs: `MADRE/v2-s-hc-xx-plan-holistico-turpial-jean-oauth-readiness-2026-06-01`
+- Descripcion: plan holistico Turpial Jean OAuth readiness
