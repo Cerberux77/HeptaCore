@@ -7,7 +7,38 @@ function mask(value) {
   return `${value.slice(0, 6)}...${value.slice(-4)}`;
 }
 
-async function graphGet(path, params = {}) {
+async function graphGet(host, path, params = {}) {
+  const basePath = path.replace(/^\//, "");
+  const versionedPath = basePath.startsWith(`${config.graphVersion}/`) ? basePath : `${config.graphVersion}/${basePath}`;
+  const url = new URL(`https://${host}/${versionedPath}`);
+  for (const [key, value] of Object.entries(params)) {
+    if (value) url.searchParams.set(key, value);
+  }
+
+  const response = await fetch(url);
+  const data = await response.json();
+  if (!response.ok || data.error) {
+    return {
+      ok: false,
+      status: response.status,
+      error: data.error?.message || response.statusText,
+      code: data.error?.code,
+      type: data.error?.type
+    };
+  }
+
+  return { ok: true, data };
+}
+
+async function graphFacebookGet(path, params = {}) {
+  return graphGet("graph.facebook.com", path, params);
+}
+
+async function graphInstagramGet(path, params = {}) {
+  return graphGet("graph.instagram.com", path, params);
+}
+
+async function graphFacebookUnversionedGet(path, params = {}) {
   const url = new URL(`https://graph.facebook.com/${config.graphVersion}/${path.replace(/^\//, "")}`);
   for (const [key, value] of Object.entries(params)) {
     if (value) url.searchParams.set(key, value);
@@ -53,7 +84,7 @@ export async function checkFacebookReadiness() {
     return blockedStatus("FACEBOOK_PAGE_ACCESS_TOKEN not configured");
   }
 
-  const identity = await graphGet("me", {
+  const identity = await graphFacebookGet("me", {
     fields: "id,name",
     access_token: config.facebook.accessToken
   });
@@ -65,7 +96,7 @@ export async function checkFacebookReadiness() {
     };
   }
 
-  const page = await graphGet(config.facebook.pageId, {
+  const page = await graphFacebookGet(config.facebook.pageId, {
     fields: "id,name",
     access_token: config.facebook.accessToken
   });
@@ -100,22 +131,81 @@ export async function checkInstagramReadiness() {
     return blockedStatus("permission flow not configured");
   }
 
-  const account = await graphGet(config.instagram.businessAccountId, {
-    fields: "id,username,name,media_count",
+  const identity = await graphInstagramGet("me", {
+    fields: "id,user_id,username,name,account_type,media_count",
     access_token: config.instagram.accessToken
   });
+
+  if (!identity.ok) {
+    return {
+      ...blockedStatus(`Instagram token identity failed: ${identity.error}`),
+      checks: [{ name: "Instagram token identity", result: identity }]
+    };
+  }
+
+  const identityIds = [identity.data.id, identity.data.user_id].filter(Boolean).map(String);
+  const accountId = String(config.instagram.businessAccountId);
+  const checks = [{ name: "Instagram token identity", result: identity }];
+
+  if (!identityIds.includes(accountId)) {
+    return {
+      ...blockedStatus("Instagram token identity did not return the configured account id"),
+      checks
+    };
+  }
+
+  const account = await graphInstagramGet(config.instagram.businessAccountId, {
+    fields: "id,user_id,username,name,account_type,media_count",
+    access_token: config.instagram.accessToken
+  });
+  checks.push({ name: "Instagram account access", result: account });
 
   if (!account.ok) {
     return {
       ...blockedStatus(`Instagram account access failed: ${account.error}`),
-      checks: [{ name: "Instagram Business account access", result: account }]
+      checks
+    };
+  }
+
+  if (!config.instagram.appId || !config.instagram.appSecret) {
+    return {
+      ...blockedStatus("content publishing permission not detectable without INSTAGRAM_APP_ID and INSTAGRAM_APP_SECRET"),
+      checks
+    };
+  }
+
+  const tokenDebug = await graphFacebookUnversionedGet("debug_token", {
+    input_token: config.instagram.accessToken,
+    access_token: `${config.instagram.appId}|${config.instagram.appSecret}`
+  });
+  checks.push({ name: "Instagram token permissions", result: tokenDebug });
+
+  if (!tokenDebug.ok) {
+    return {
+      ...blockedStatus(`Instagram token permissions failed: ${tokenDebug.error}`),
+      checks
+    };
+  }
+
+  const scopes = tokenDebug.data.data?.scopes || [];
+  const hasBasic = scopes.includes("instagram_business_basic") || scopes.includes("business_basic");
+  const hasPublish = scopes.includes("instagram_business_content_publish") || scopes.includes("business_content_publish");
+
+  if (!hasBasic || !hasPublish) {
+    const missing = [
+      hasBasic ? "" : "instagram_business_basic",
+      hasPublish ? "" : "instagram_business_content_publish"
+    ].filter(Boolean).join(", ");
+    return {
+      ...blockedStatus(`missing Instagram permission(s): ${missing}`),
+      checks
     };
   }
 
   const name = account.data.name || account.data.username;
   return {
     ...readyStatus([account.data.id, name].filter(Boolean).join(" / ")),
-    checks: [{ name: "Instagram Business account access", result: account }]
+    checks
   };
 }
 
@@ -140,7 +230,11 @@ function printChecks(checks = []) {
   for (const check of checks) {
     if (check.result.ok) {
       const data = check.result.data;
-      const summary = [data.id, data.name || data.username].filter(Boolean).join(" / ");
+      const tokenData = data.data || {};
+      const summary = [
+        data.id || tokenData.user_id || tokenData.app_id,
+        data.name || data.username || tokenData.type
+      ].filter(Boolean).join(" / ");
       console.log(`OK  ${check.name}${summary ? `: ${summary}` : ""}`);
       continue;
     }
@@ -159,6 +253,8 @@ async function run() {
   console.log(`Facebook page token: ${mask(config.facebook.accessToken)}`);
   console.log(`Instagram business id: ${config.instagram.businessAccountId || "missing"}`);
   console.log(`Instagram token: ${mask(config.instagram.accessToken)}`);
+  console.log(`Instagram app id: ${config.instagram.appId || "missing"}`);
+  console.log(`Instagram redirect uri: ${config.instagram.redirectUri ? "configured" : "missing"}`);
 
   const warnings = config.validate();
   if (warnings.length > 0) {

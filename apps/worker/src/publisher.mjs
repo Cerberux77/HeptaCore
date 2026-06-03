@@ -112,7 +112,7 @@ async function publishInstagramPost(entry) {
   try {
     const isVideo = entry.format === "reel";
     const mediaType = isVideo ? "REELS" : "IMAGE";
-    const endpoint = `https://graph.facebook.com/${config.graphVersion}/${igId}/media`;
+    const endpoint = `https://graph.instagram.com/${config.graphVersion}/${igId}/media`;
 
     const createParams = new URLSearchParams({
       caption: entry.caption,
@@ -138,7 +138,7 @@ async function publishInstagramPost(entry) {
     }
 
     const publishRes = await fetch(
-      `https://graph.facebook.com/${config.graphVersion}/${igId}/media_publish`,
+      `https://graph.instagram.com/${config.graphVersion}/${igId}/media_publish`,
       {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },

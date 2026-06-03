@@ -53,7 +53,10 @@ export const config = {
 
   instagram: {
     businessAccountId: process.env.INSTAGRAM_BUSINESS_ACCOUNT_ID || "",
-    accessToken: process.env.INSTAGRAM_ACCESS_TOKEN || ""
+    accessToken: process.env.INSTAGRAM_ACCESS_TOKEN || "",
+    appId: process.env.INSTAGRAM_APP_ID || process.env.FACEBOOK_APP_ID || "",
+    appSecret: process.env.INSTAGRAM_APP_SECRET || process.env.FACEBOOK_APP_SECRET || "",
+    redirectUri: process.env.INSTAGRAM_REDIRECT_URI || ""
   },
 
   whatsapp: {
@@ -79,6 +82,15 @@ export const config = {
     }
     if (this.requireInstagram && !this.instagram.accessToken) {
       warnings.push("INSTAGRAM_ACCESS_TOKEN no configurado");
+    }
+    if (this.requireInstagram && !this.instagram.appId) {
+      warnings.push("INSTAGRAM_APP_ID no configurado");
+    }
+    if (this.requireInstagram && !this.instagram.appSecret) {
+      warnings.push("INSTAGRAM_APP_SECRET no configurado");
+    }
+    if (this.requireInstagram && !this.instagram.redirectUri) {
+      warnings.push("INSTAGRAM_REDIRECT_URI no configurado");
     }
     if (!this.dryRun && this.realPublishConfirmation !== "I_UNDERSTAND_REAL_RRSS_PUBLICATION") {
       warnings.push("HEPTACORE_ALLOW_REAL_PUBLISH no confirma publicacion real");

@@ -146,8 +146,10 @@ Ese comando:
 - Lee `.env.rrss`.
 - No imprime tokens.
 - Consulta Meta Graph en modo lectura.
-- Valida Page ID, Page Access Token e Instagram Business Account ID.
-- Falla si faltan credenciales.
+- Valida Facebook con `FACEBOOK_PAGE_ID` y `FACEBOOK_PAGE_ACCESS_TOKEN`.
+- Valida Instagram por separado con Instagram API with Instagram Login, usando `INSTAGRAM_ACCESS_TOKEN`.
+- No valida Instagram usando el Facebook Page Access Token.
+- Si `META_REQUIRE_INSTAGRAM=false`, el global puede quedar `READY_FOR_FACEBOOK_ONLY`.
 
 Para usarlo hoy:
 
@@ -155,11 +157,30 @@ Para usarlo hoy:
 2. Completar:
    - `FACEBOOK_PAGE_ID`
    - `FACEBOOK_PAGE_ACCESS_TOKEN`
+   - `META_REQUIRE_INSTAGRAM=false` para rollout Facebook-only, o `true` cuando Instagram deba ser obligatorio.
+   - `INSTAGRAM_APP_ID`
+   - `INSTAGRAM_APP_SECRET`
+   - `INSTAGRAM_REDIRECT_URI`
+   - `INSTAGRAM_ACCESS_TOKEN`
    - `INSTAGRAM_BUSINESS_ACCOUNT_ID`
-   - opcional `FACEBOOK_APP_ID` y `FACEBOOK_APP_SECRET`
 3. Ejecutar `npm run worker:meta:readiness`.
 4. Si pasa, ejecutar worker dry-run.
 5. Publicacion real solo tras aprobacion humana y levantamiento explicito del hard stop.
+
+Pantalla exacta para generar token Instagram:
+
+1. Ir a `developers.facebook.com/apps/{APP_ID}`.
+2. Abrir el producto `Instagram`.
+3. Entrar en `API setup with Instagram login`.
+4. Configurar `Valid OAuth Redirect URIs` con el mismo valor de `INSTAGRAM_REDIRECT_URI`.
+5. Usar el flujo `Business Login for Instagram` / `Instagram Login` para autorizar la cuenta profesional de Turpial.
+6. Solicitar al menos estos permisos:
+   - `instagram_business_basic`
+   - `instagram_business_content_publish`
+7. Intercambiar el code OAuth por token y guardar el token en `INSTAGRAM_ACCESS_TOKEN`.
+8. Guardar el id retornado por `/me` como `INSTAGRAM_BUSINESS_ACCOUNT_ID`.
+
+Readiness Instagram queda `BLOCKED` si no puede confirmar la identidad de `/me`, si el id configurado no coincide, o si `debug_token` no detecta `instagram_business_content_publish`.
 
 Gate tecnico agregado:
 
