@@ -1,6 +1,7 @@
 import { existsSync } from "node:fs";
 import { resolve } from "node:path";
 import { config, loadQueue, saveQueue } from "./config.mjs";
+import { checkFacebookReadiness, checkInstagramReadiness } from "./meta-readiness.mjs";
 
 function resolveAsset(entry) {
   const assetPath = entry.selectedAssetPath || "";
@@ -47,6 +48,11 @@ async function publishFacebookPost(entry) {
     return { ok: false, error: "Facebook credentials not configured" };
   }
 
+  const readiness = await checkFacebookReadiness();
+  if (!readiness.ok) {
+    return { ok: false, error: `Facebook readiness blocked: ${readiness.reason}` };
+  }
+
   try {
     const url = `https://graph.facebook.com/${config.graphVersion}/${pageId}/photos`;
     const form = new FormData();
@@ -91,11 +97,16 @@ async function publishInstagramPost(entry) {
     return { ok: false, error: "Real publishing blocked: HEPTACORE_ALLOW_REAL_PUBLISH is not confirmed" };
   }
 
-  const token = config.facebook.accessToken;
+  const token = config.instagram.accessToken;
   const igId = config.instagram.businessAccountId;
 
   if (!token || !igId) {
     return { ok: false, error: "Instagram credentials not configured" };
+  }
+
+  const readiness = await checkInstagramReadiness();
+  if (!readiness.ok) {
+    return { ok: false, error: `Instagram readiness blocked: ${readiness.reason}` };
   }
 
   try {

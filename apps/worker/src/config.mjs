@@ -20,7 +20,8 @@ function loadEnv() {
     const eq = trimmed.indexOf("=");
     if (eq === -1) continue;
     const key = trimmed.slice(0, eq).trim();
-    const value = trimmed.slice(eq + 1).trim();
+    const rawValue = trimmed.slice(eq + 1).trim();
+    const value = rawValue.replace(/^(['"])(.*)\1$/, "$2");
     if (!process.env[key]) process.env[key] = value;
   }
 }
@@ -38,6 +39,7 @@ export const config = {
   mode: process.env.BOT_MODE || "draft",
   dryRun: process.env.BOT_DRY_RUN !== "false",
   graphVersion: process.env.META_GRAPH_VERSION || "v19.0",
+  requireInstagram: process.env.META_REQUIRE_INSTAGRAM === "true",
   realPublishConfirmation: process.env.HEPTACORE_ALLOW_REAL_PUBLISH || "",
 
   publishIntervalMinutes: parseInt(process.env.PUBLISH_INTERVAL_MINUTES || "360", 10),
@@ -50,7 +52,8 @@ export const config = {
   },
 
   instagram: {
-    businessAccountId: process.env.INSTAGRAM_BUSINESS_ACCOUNT_ID || ""
+    businessAccountId: process.env.INSTAGRAM_BUSINESS_ACCOUNT_ID || "",
+    accessToken: process.env.INSTAGRAM_ACCESS_TOKEN || ""
   },
 
   whatsapp: {
@@ -71,7 +74,12 @@ export const config = {
     const warnings = [];
     if (!this.facebook.accessToken) warnings.push("FACEBOOK_PAGE_ACCESS_TOKEN no configurado");
     if (!this.facebook.pageId) warnings.push("FACEBOOK_PAGE_ID no configurado");
-    if (!this.instagram.businessAccountId) warnings.push("INSTAGRAM_BUSINESS_ACCOUNT_ID no configurado");
+    if (this.requireInstagram && !this.instagram.businessAccountId) {
+      warnings.push("INSTAGRAM_BUSINESS_ACCOUNT_ID no configurado");
+    }
+    if (this.requireInstagram && !this.instagram.accessToken) {
+      warnings.push("INSTAGRAM_ACCESS_TOKEN no configurado");
+    }
     if (!this.dryRun && this.realPublishConfirmation !== "I_UNDERSTAND_REAL_RRSS_PUBLICATION") {
       warnings.push("HEPTACORE_ALLOW_REAL_PUBLISH no confirma publicacion real");
     }
