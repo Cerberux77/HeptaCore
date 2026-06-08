@@ -1,6 +1,6 @@
 {
-  "version": 3,
-  "current": "MADRE/v3-s-hc-01-closure-and-saas-oauth-foundation-2026-06-08",
+  "version": 4,
+  "current": "MADRE/v4-s-hc-01-closure-and-saas-oauth-foundation-2026-06-08",
   "branches": [
     {
       "version": 2,
@@ -20,6 +20,16 @@
       "date": "2026-06-08",
       "at": "2026-06-08T22:20:45.130Z",
       "previous": "MADRE/v2-s-hc-xx-plan-holistico-turpial-jean-oauth-readiness-2026-06-01",
+      "description": "closure and saas oauth foundation"
+    },
+    {
+      "version": 4,
+      "name": "MADRE/v4-s-hc-01-closure-and-saas-oauth-foundation-2026-06-08",
+      "sprint": "S-HC-01",
+      "operator": "Manuel",
+      "date": "2026-06-08",
+      "at": "2026-06-08T22:26:37.533Z",
+      "previous": "MADRE/v3-s-hc-01-closure-and-saas-oauth-foundation-2026-06-08",
       "description": "closure and saas oauth foundation"
     }
   ]

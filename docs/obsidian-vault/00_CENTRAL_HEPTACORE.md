@@ -3,8 +3,8 @@ type: master-dashboard
 project: "HeptaCore"
 status: active-foundation
 phase: "Foundation: monorepo, agent core, landing, Prisma, worker and Turpial tenant seed"
-last_updated: "08/06/26 18:20"
-mother_branch: "MADRE/v3-s-hc-01-closure-and-saas-oauth-foundation-2026-06-08"
+last_updated: "08/06/26 18:26"
+mother_branch: "MADRE/v4-s-hc-01-closure-and-saas-oauth-foundation-2026-06-08"
 production_branch: "none"
 tags:
   - "#central"
@@ -129,7 +129,7 @@ Handoff canonico de esta etapa: `docs/07_handoffs/S-HC-01_CLOSURE_S-HC-02_S-HC-0
 
 ---
 
-> **Ultima actualizacion:** 08/06/26 18:20 VET | **Estado:** S-HC-01 CERRADO | **Operador:** Manuel
+> **Ultima actualizacion:** 08/06/26 18:26 VET | **Estado:** S-HC-01 CERRADO | **Operador:** Manuel
 
 ## Cierre S-HC-XX - 2026-06-01
 

@@ -1,8 +1,8 @@
 ---
 type: sprint-plan
 project: "HeptaCore"
-last_updated: "2026-06-08T22:20:45.130Z"
-mother_branch: "MADRE/v3-s-hc-01-closure-and-saas-oauth-foundation-2026-06-08"
+last_updated: "2026-06-08T22:26:37.533Z"
+mother_branch: "MADRE/v4-s-hc-01-closure-and-saas-oauth-foundation-2026-06-08"
 tags:
   - "#sprints"
   - "#manuel"
@@ -95,4 +95,15 @@ Ver [[PLAN_PARALELO_MANUEL_JEAN]] para distribucion de carga, backups y reasigna
 | Rama | `Manuel/s-hc-xx-plan-holistico-heptacore-turpial-jean-2026-06-01` |
 | Estado | CERRADO |
 | Madre docs | `MADRE/v3-s-hc-01-closure-and-saas-oauth-foundation-2026-06-08` |
+| Descripcion | closure and saas oauth foundation |
+
+
+## Cierre S-HC-01 - 2026-06-08
+
+| Campo | Valor |
+|---|---|
+| Operador | Manuel |
+| Rama | `Manuel/s-hc-xx-plan-holistico-heptacore-turpial-jean-2026-06-01` |
+| Estado | CERRADO |
+| Madre docs | `MADRE/v4-s-hc-01-closure-and-saas-oauth-foundation-2026-06-08` |
 | Descripcion | closure and saas oauth foundation |
