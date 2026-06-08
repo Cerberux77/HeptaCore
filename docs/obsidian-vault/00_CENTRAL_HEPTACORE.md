@@ -3,8 +3,8 @@ type: master-dashboard
 project: "HeptaCore"
 status: active-foundation
 phase: "Foundation: monorepo, agent core, landing, Prisma, worker and Turpial tenant seed"
-last_updated: "01/06/26 11:36"
-mother_branch: "MADRE/v2-s-hc-xx-plan-holistico-turpial-jean-oauth-readiness-2026-06-01"
+last_updated: "08/06/26 18:20"
+mother_branch: "MADRE/v3-s-hc-01-closure-and-saas-oauth-foundation-2026-06-08"
 production_branch: "none"
 tags:
   - "#central"
@@ -98,6 +98,23 @@ Estado operativo actualizado:
 | OAuth Meta | Readiness local agregado; pendiente `.env.rrss` real |
 | Publicacion real | Bloqueada por hard stop hasta aprobacion humana y doble lock |
 
+## Actualizacion 2026-06-08 18:15 VET
+
+S-HC-01 queda preparado para cierre con HeptaCore en Vercel Production y foundation SaaS/OAuth documentada.
+
+| Area | Estado |
+|---|---|
+| Production URL | `https://heptacore.vercel.app` |
+| Callback Instagram temporal | `https://heptacore.vercel.app/api/oauth/instagram/callback` |
+| Dominio final pendiente | `https://app.heptacore.com` |
+| DB SaaS foundation | Prisma extendido de forma aditiva para tenants, auth, OAuth, onboarding, contenido y publishing jobs |
+| Auth | Scaffold de `User.passwordHash`, guard de tenant y `/dashboard` protegido |
+| OAuth Instagram | Login URL + callback con code exchange seguro, sin retornar ni guardar token |
+| Token storage | Bloqueado hasta `ENCRYPTION_KEY` + vault adapter |
+| Turpial Sound | Seed script sin secretos: `node scripts/seed-turpial-foundation.mjs` |
+
+Handoff canonico de esta etapa: `docs/07_handoffs/S-HC-01_CLOSURE_S-HC-02_S-HC-06_FOUNDATION_2026-06-08.md`.
+
 ## Navegacion
 
 - [[METODOLOGIA/METODOLOGIA_ORESHNIK_HEPTACORE]]
@@ -112,7 +129,7 @@ Estado operativo actualizado:
 
 ---
 
-> **Ultima actualizacion:** 01/06/26 11:36 VET | **Estado:** S-HC-XX CERRADO | **Operador:** Manuel
+> **Ultima actualizacion:** 08/06/26 18:20 VET | **Estado:** S-HC-01 CERRADO | **Operador:** Manuel
 
 ## Cierre S-HC-XX - 2026-06-01
 
@@ -120,3 +137,10 @@ Estado operativo actualizado:
 - Rama hija: `Manuel/s-hc-xx-plan-holistico-heptacore-turpial-jean-2026-06-01`
 - Rama madre docs: `MADRE/v2-s-hc-xx-plan-holistico-turpial-jean-oauth-readiness-2026-06-01`
 - Descripcion: plan holistico Turpial Jean OAuth readiness
+
+## Cierre S-HC-01 - 2026-06-08
+
+- Operador: Manuel
+- Rama hija: `Manuel/s-hc-xx-plan-holistico-heptacore-turpial-jean-2026-06-01`
+- Rama madre docs: `MADRE/v3-s-hc-01-closure-and-saas-oauth-foundation-2026-06-08`
+- Descripcion: closure and saas oauth foundation

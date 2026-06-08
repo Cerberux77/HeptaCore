@@ -1,8 +1,8 @@
 ---
 type: sprint-plan
 project: "HeptaCore"
-last_updated: "2026-06-01T15:36:07.072Z"
-mother_branch: "MADRE/v2-s-hc-xx-plan-holistico-turpial-jean-oauth-readiness-2026-06-01"
+last_updated: "2026-06-08T22:20:45.130Z"
+mother_branch: "MADRE/v3-s-hc-01-closure-and-saas-oauth-foundation-2026-06-08"
 tags:
   - "#sprints"
   - "#manuel"
@@ -43,6 +43,21 @@ tags:
 | Approval persistente | Pendiente | Manuel + Jean | Acciones guardan en DB + audit log |
 | Publicacion real | Bloqueada por hard stop | Manuel + Jean | Aprobacion explicita, rollback y primer post bajo riesgo |
 
+## Actualizacion S-HC-01 / S-HC-02 / S-HC-06 - 2026-06-08
+
+| Sprint | Estado | Resultado |
+|---|---|---|
+| S-HC-01 | Listo para cierre | Production URL y callback temporal documentados; build/typecheck/worker validate PASS |
+| S-HC-02 | Foundation iniciado | Prisma SaaS extendido para `Tenant`, `User`, `TenantMember`, `Invitation`, OAuth, brand/strategy/content/publishing |
+| S-HC-06 | Foundation iniciado | Instagram login URL y callback con code exchange seguro; storage bloqueado hasta encryption/vault |
+
+Bloqueos activos:
+
+- No guardar tokens OAuth hasta implementar `ENCRYPTION_KEY` y vault adapter.
+- No crear primer admin hasta completar password hashing y sesiones.
+- No publicar RRSS reales hasta Meta readiness, aprobacion humana y levantamiento explicito del hard stop.
+- No aplicar migracion en Production sin review de `20260608221500_init_saas_tenants_auth_oauth_content`.
+
 ## Paralelizacion
 
 Ver [[PLAN_PARALELO_MANUEL_JEAN]] para distribucion de carga, backups y reasignacion.
@@ -70,3 +85,14 @@ Ver [[PLAN_PARALELO_MANUEL_JEAN]] para distribucion de carga, backups y reasigna
 | Estado | CERRADO |
 | Madre docs | `MADRE/v2-s-hc-xx-plan-holistico-turpial-jean-oauth-readiness-2026-06-01` |
 | Descripcion | plan holistico Turpial Jean OAuth readiness |
+
+
+## Cierre S-HC-01 - 2026-06-08
+
+| Campo | Valor |
+|---|---|
+| Operador | Manuel |
+| Rama | `Manuel/s-hc-xx-plan-holistico-heptacore-turpial-jean-2026-06-01` |
+| Estado | CERRADO |
+| Madre docs | `MADRE/v3-s-hc-01-closure-and-saas-oauth-foundation-2026-06-08` |
+| Descripcion | closure and saas oauth foundation |

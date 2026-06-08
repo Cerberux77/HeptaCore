@@ -1,0 +1,22 @@
+{
+  "sprint": "S-HC-01",
+  "operator": "Manuel",
+  "status": "CERRADO",
+  "date": "2026-06-08",
+  "at": "2026-06-08T22:20:45.130Z",
+  "branch": "Manuel/s-hc-xx-plan-holistico-heptacore-turpial-jean-2026-06-01",
+  "previousMother": "MADRE/v2-s-hc-xx-plan-holistico-turpial-jean-oauth-readiness-2026-06-01",
+  "nextMother": "MADRE/v3-s-hc-01-closure-and-saas-oauth-foundation-2026-06-08",
+  "description": "closure and saas oauth foundation",
+  "changedFiles": [
+    ".env.example",
+    "apps/web/app/api/oauth/instagram/callback/route.ts",
+    "apps/web/app/api/tenant-assets/[[...path]]/route.ts",
+    "apps/web/components/turpial-console.tsx",
+    "apps/web/lib/turpial.ts",
+    "docs/03_DATA_MODEL_SUMMARY.md",
+    "docs/obsidian-vault/00_CENTRAL_HEPTACORE.md",
+    "docs/obsidian-vault/SPRINTS/PLAN_MAESTRO_SPRINTS.md",
+    "packages/db/prisma/schema.prisma"
+  ]
+}
