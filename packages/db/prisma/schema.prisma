@@ -14,13 +14,32 @@ enum TenantPlan {
 }
 
 enum UserRole {
+  SUPER_ADMIN
+  TENANT_ADMIN
   OWNER
   ADMIN
   STRATEGIST
   EDITOR
   ANALYST
   APPROVER
+  PUBLISHER
   VIEWER
+}
+
+enum OAuthProvider {
+  FACEBOOK
+  INSTAGRAM
+  WHATSAPP
+}
+
+enum ContentStatus {
+  DRAFT
+  IN_REVIEW
+  APPROVED
+  REJECTED
+  SCHEDULED
+  PUBLISHED
+  FAILED
 }
 
 enum SocialNetwork {
@@ -77,13 +96,19 @@ model Tenant {
   createdAt      DateTime       @default(now())
   updatedAt      DateTime       @updatedAt
 
-  memberships    Membership[]
+  memberships    TenantMember[]
   projects       Project[]
-  assets         Asset[]
+  assets         ContentAsset[]
   socialAccounts SocialAccount[]
-  drafts         ContentDraft[]
-  approvals      Approval[]
-  credentials    CredentialVaultItem[]
+  drafts         ContentPost[]
+  approvals      ContentApproval[]
+  credentials    OAuthCredential[]
+  invitations    Invitation[]
+  oauthConnections OAuthConnection[]
+  brandProfiles  BrandProfile[]
+  strategyBriefs StrategyBrief[]
+  contentPillars ContentPillar[]
+  publishingJobs PublishingJob[]
   interactions   Interaction[]
   campaigns      Campaign[]
   leads          Lead[]
@@ -95,14 +120,16 @@ model User {
   id          String       @id @default(cuid())
   email       String       @unique
   name        String?
+  passwordHash String?
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
-  memberships Membership[]
-  approvals   Approval[]   @relation("ApprovalReviewer")
+  memberships TenantMember[]
+  invitations Invitation[]  @relation("InvitationAcceptedBy")
+  approvals   ContentApproval[] @relation("ApprovalReviewer")
   auditLogs   AuditLog[]
 }
 
-model Membership {
+model TenantMember {
   id        String   @id @default(cuid())
   tenantId  String
   userId    String
@@ -113,6 +140,25 @@ model Membership {
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([tenantId, userId])
+  @@index([tenantId, role])
+  @@map("Membership")
+}
+
+model Invitation {
+  id           String    @id @default(cuid())
+  tenantId     String
+  email        String
+  role         UserRole
+  tokenHash    String
+  acceptedById String?
+  acceptedAt   DateTime?
+  expiresAt    DateTime
+  createdAt    DateTime  @default(now())
+
+  tenant     Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  acceptedBy User?  @relation("InvitationAcceptedBy", fields: [acceptedById], references: [id], onDelete: SetNull)
+
+  @@unique([tenantId, email])
   @@index([tenantId, role])
 }
 
@@ -131,14 +177,14 @@ model Project {
   updatedAt      DateTime @updatedAt
 
   tenant  Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  assets  Asset[]
-  drafts  ContentDraft[]
+  assets  ContentAsset[]
+  drafts  ContentPost[]
   reports Report[]
 
   @@index([tenantId])
 }
 
-model Asset {
+model ContentAsset {
   id           String    @id @default(cuid())
   tenantId     String
   projectId    String?
@@ -157,6 +203,7 @@ model Asset {
 
   @@index([tenantId, kind])
   @@index([projectId])
+  @@map("Asset")
 }
 
 model SocialAccount {
@@ -171,15 +218,16 @@ model SocialAccount {
   updatedAt         DateTime      @updatedAt
 
   tenant       Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  drafts       ContentDraft[]
+  drafts       ContentPost[]
   interactions Interaction[]
   campaigns    Campaign[]
+  oauthConnections OAuthConnection[]
 
   @@unique([tenantId, network, externalAccountId])
   @@index([tenantId, network])
 }
 
-model CredentialVaultItem {
+model OAuthCredential {
   id              String   @id @default(cuid())
   tenantId        String
   socialAccountId String?
@@ -195,9 +243,84 @@ model CredentialVaultItem {
   tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
 
   @@index([tenantId, provider])
+  @@map("CredentialVaultItem")
 }
 
-model ContentDraft {
+model OAuthConnection {
+  id              String        @id @default(cuid())
+  tenantId        String
+  socialAccountId String?
+  provider        OAuthProvider
+  providerUserId  String?
+  scopes          String[]
+  status          String        @default("pending")
+  tokenRef        String?
+  expiresAt       DateTime?
+  connectedAt     DateTime?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  tenant        Tenant         @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  socialAccount SocialAccount? @relation(fields: [socialAccountId], references: [id], onDelete: SetNull)
+
+  @@index([tenantId, provider, status])
+}
+
+model BrandProfile {
+  id                 String   @id @default(cuid())
+  tenantId           String
+  brandName          String
+  industry           String?
+  servicesProducts   Json?
+  targetAudience     Json?
+  geography          String?
+  toneOfVoice        Json?
+  socialChannels     Json?
+  competitors        Json?
+  assetAvailability  Json?
+  approvalContact    Json?
+  publishingPermissions Json?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId])
+}
+
+model StrategyBrief {
+  id             String        @id @default(cuid())
+  tenantId       String
+  title          String
+  status         ContentStatus @default(DRAFT)
+  businessGoals  Json?
+  positioning    Json?
+  audience       Json?
+  channels       Json?
+  assetChecklist Json?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId, status])
+}
+
+model ContentPillar {
+  id          String   @id @default(cuid())
+  tenantId    String
+  name        String
+  description String?
+  priority    Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@unique([tenantId, name])
+}
+
+model ContentPost {
   id              String         @id @default(cuid())
   tenantId        String
   projectId       String?
@@ -223,11 +346,13 @@ model ContentDraft {
   project       Project?       @relation(fields: [projectId], references: [id], onDelete: SetNull)
   socialAccount SocialAccount? @relation(fields: [socialAccountId], references: [id], onDelete: SetNull)
   assets        ContentDraftAsset[]
-  approvals     Approval[]
+  approvals     ContentApproval[]
   metrics       MetricSnapshot[]
+  publishingJobs PublishingJob[]
 
   @@index([tenantId, network, status])
   @@index([tenantId, scheduledFor])
+  @@map("ContentDraft")
 }
 
 model ContentDraftAsset {
@@ -236,13 +361,13 @@ model ContentDraftAsset {
   assetId String
   role    String @default("primary")
 
-  draft ContentDraft @relation(fields: [draftId], references: [id], onDelete: Cascade)
-  asset Asset        @relation(fields: [assetId], references: [id], onDelete: Cascade)
+  draft ContentPost  @relation(fields: [draftId], references: [id], onDelete: Cascade)
+  asset ContentAsset @relation(fields: [assetId], references: [id], onDelete: Cascade)
 
   @@unique([draftId, assetId, role])
 }
 
-model Approval {
+model ContentApproval {
   id         String         @id @default(cuid())
   tenantId   String
   draftId    String?
@@ -252,10 +377,42 @@ model Approval {
   createdAt  DateTime       @default(now())
 
   tenant   Tenant        @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  draft    ContentDraft? @relation(fields: [draftId], references: [id], onDelete: Cascade)
+  draft    ContentPost? @relation(fields: [draftId], references: [id], onDelete: Cascade)
   reviewer User?         @relation("ApprovalReviewer", fields: [reviewerId], references: [id], onDelete: SetNull)
 
   @@index([tenantId, status])
+  @@map("Approval")
+}
+
+model PublishingJob {
+  id          String        @id @default(cuid())
+  tenantId    String
+  postId      String?
+  provider    OAuthProvider
+  status      ContentStatus @default(SCHEDULED)
+  scheduledFor DateTime?
+  attempts    Int           @default(0)
+  lastError   String?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  tenant  Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  post    ContentPost? @relation(fields: [postId], references: [id], onDelete: SetNull)
+  result  PublishingResult?
+
+  @@index([tenantId, provider, status])
+}
+
+model PublishingResult {
+  id             String   @id @default(cuid())
+  jobId          String   @unique
+  provider       OAuthProvider
+  externalPostId String?
+  ok             Boolean
+  response       Json?
+  createdAt      DateTime @default(now())
+
+  job PublishingJob @relation(fields: [jobId], references: [id], onDelete: Cascade)
 }
 
 model Interaction {
@@ -324,7 +481,7 @@ model MetricSnapshot {
   value      Decimal  @db.Decimal(18, 4)
   capturedAt DateTime @default(now())
 
-  draft ContentDraft? @relation(fields: [draftId], references: [id], onDelete: Cascade)
+  draft ContentPost? @relation(fields: [draftId], references: [id], onDelete: Cascade)
 
   @@index([draftId, capturedAt])
 }

@@ -33,7 +33,7 @@ type View = "overview" | "queue" | "pending" | "drafts" | "assets" | "calendar" 
 
 function assetUrl(path?: string) {
   if (!path) return "";
-  return `/api/tenant-assets/${path.replace(/^content\/inbox\//, "")}`;
+  return `/assets/${path.replace(/^content\/inbox\//, "")}`;
 }
 
 function channelLabel(item: QueueItem) {
@@ -243,7 +243,7 @@ export function TurpialConsole({ data }: { data: TurpialConsoleData }) {
             </section>
             <section className="work-panel">
               <PanelTitle icon={<Upload size={17} />} title="Carga y generacion IA" />
-              <p className="muted-note">MVP pendiente: uploader persistente, specs por formato, prompt IA y registro en Asset DB. Hasta entonces los assets viven en `examples/tenants/turpial/content/inbox`.</p>
+              <p className="muted-note">MVP pendiente: uploader persistente, specs por formato, prompt IA y registro en Asset DB. Los assets se sirven desde public/assets/.</p>
             </section>
             <section className="work-panel">
               <PanelTitle icon={<AlertTriangle size={17} />} title="Criterio de bloqueo" />

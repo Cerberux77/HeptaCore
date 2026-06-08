@@ -1,0 +1,109 @@
+﻿HEPTACORE SAFE ENV AUDIT - NO SECRET VALUES
+Root: D:\PROYECTOS\PROYECTOS VISUAL STUDIO\HeptaCore
+Generated: 06/08/2026 17:36:15
+
+LOCAL ENV STRUCTURE
+===================
+
+File                                                     Line N
+                                                              a
+                                                              m
+                                                              e
+----                                                     ---- -
+.env.example                                                1 D
+.env.example                                                2 H
+.env.example                                                3 B
+.env.example                                                4 B
+.env.example                                                5 M
+.env.example                                                6 I
+.env.example                                                7 I
+.env.example                                                8 I
+.env.example                                                9 I
+.env.example                                               10 I
+.env.rrss                                                   7 B
+.env.rrss                                                   8 B
+.env.rrss                                                   9 H
+.env.rrss                                                  12 D
+.env.rrss                                                  15 D
+.env.rrss                                                  18 P
+.env.rrss                                                  19 P
+.env.rrss                                                  20 P
+.env.rrss                                                  21 P
+.env.rrss                                                  22 P
+.env.rrss                                                  25 P
+.env.rrss                                                  26 P
+.env.rrss                                                  27 P
+.env.rrss                                                  28 P
+.env.rrss                                                  29 P
+.env.rrss                                                  30 P
+.env.rrss                                                  31 P
+.env.rrss                                                  32 P
+.env.rrss                                                  35 M
+.env.rrss                                                  36 M
+.env.rrss                                                  37 M
+.env.rrss                                                  38 M
+.env.rrss                                                  39 M
+.env.rrss                                                  42 F
+.env.rrss                                                  43 F
+.env.rrss                                                  44 I
+.env.rrss                                                  47 M
+.env.rrss                                                  48 M
+.env.rrss                                                  49 M
+.env.rrss                                                  52 R
+.env.rrss                                                  53 W
+.env.rrss                                                  54 W
+.env.rrss                                                  55 W
+.env.rrss.example                                          13 F
+.env.rrss.example                                          14 F
+.env.rrss.example                                          15 F
+.env.rrss.example                                          16 F
+.env.rrss.example                                          19 I
+.env.rrss.example                                          22 M
+.env.rrss.example                                          27 M
+.env.rrss.example                                          28 M
+.env.rrss.example                                          31 W
+.env.rrss.example                                          34 M
+.env.rrss.example                                          37 B
+.env.rrss.example                                          38 B
+.env.rrss.example                                          39 P
+examples\tenants\turpial\content\queue\.env.rrss.example   13 M
+examples\tenants\turpial\content\queue\.env.rrss.example   14 F
+examples\tenants\turpial\content\queue\.env.rrss.example   15 F
+examples\tenants\turpial\content\queue\.env.rrss.example   16 F
+examples\tenants\turpial\content\queue\.env.rrss.example   17 F
+examples\tenants\turpial\content\queue\.env.rrss.example   20 I
+examples\tenants\turpial\content\queue\.env.rrss.example   23 M
+examples\tenants\turpial\content\queue\.env.rrss.example   28 M
+examples\tenants\turpial\content\queue\.env.rrss.example   29 M
+examples\tenants\turpial\content\queue\.env.rrss.example   32 W
+examples\tenants\turpial\content\queue\.env.rrss.example   35 M
+examples\tenants\turpial\content\queue\.env.rrss.example   38 B
+examples\tenants\turpial\content\queue\.env.rrss.example   39 B
+examples\tenants\turpial\content\queue\.env.rrss.example   40 P
+
+
+
+VERCEL ENV STRUCTURE
+====================
+
+ name                                       value               environments                created    
+ INSTAGRAM_APP_SECRET                       Encrypted           Production                  2m ago     
+ INSTAGRAM_APP_ID                           Encrypted           Production                  6m ago     
+ INSTAGRAM_REDIRECT_URI                     Encrypted           Production                  8m ago     
+ HEPTACORE_DB_NEON_PROJECT_ID               Encrypted           Production, Preview         6d ago     
+ HEPTACORE_DB_PGDATABASE                    Encrypted           Production, Preview         6d ago     
+ HEPTACORE_DB_POSTGRES_URL_NON_POOLING      Encrypted           Production, Preview         6d ago     
+ HEPTACORE_DB_POSTGRES_DATABASE             Encrypted           Production, Preview         6d ago     
+ HEPTACORE_DB_DATABASE_URL                  Encrypted           Production, Preview         6d ago     
+ HEPTACORE_DB_PGUSER                        Encrypted           Production, Preview         6d ago     
+ HEPTACORE_DB_POSTGRES_HOST                 Encrypted           Production, Preview         6d ago     
+ HEPTACORE_DB_POSTGRES_PRISMA_URL           Encrypted           Production, Preview         6d ago     
+ HEPTACORE_DB_POSTGRES_URL_NO_SSL           Encrypted           Production, Preview         6d ago     
+ HEPTACORE_DB_PGHOST                        Encrypted           Production, Preview         6d ago     
+ HEPTACORE_DB_PGHOST_UNPOOLED               Encrypted           Production, Preview         6d ago     
+ HEPTACORE_DB_POSTGRES_URL                  Encrypted           Production, Preview         6d ago     
+ HEPTACORE_DB_PGPASSWORD                    Encrypted           Production, Preview         6d ago     
+ HEPTACORE_DB_DATABASE_URL_UNPOOLED         Encrypted           Production, Preview         6d ago     
+ HEPTACORE_DB_POSTGRES_PASSWORD             Encrypted           Production, Preview         6d ago     
+ HEPTACORE_DB_POSTGRES_USER                 Encrypted           Production, Preview         6d ago     
+

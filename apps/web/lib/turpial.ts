@@ -1,5 +1,4 @@
-import fs from "node:fs";
-import path from "node:path";
+import queueRaw from "./data/publication-queue.json";
 
 export type QueueItem = {
   id: string;
@@ -51,25 +50,6 @@ export type TurpialConsoleData = {
   queue: QueueItem[];
 };
 
-function findRepoRoot(start: string) {
-  let current = start;
-
-  for (let depth = 0; depth < 6; depth += 1) {
-    const candidate = path.join(current, "examples", "tenants", "turpial");
-    if (fs.existsSync(candidate)) return current;
-    const parent = path.dirname(current);
-    if (parent === current) break;
-    current = parent;
-  }
-
-  return start;
-}
-
-const root = findRepoRoot(process.cwd());
-const tenantRoot = path.join(root, "examples", "tenants", "turpial");
-const queuePath = path.join(tenantRoot, "content", "queue", "publication-queue.json");
-const assetRoot = path.join(tenantRoot, "content", "inbox");
-
 function decodeText(value: string) {
   return value
     .replaceAll("Ã³", "ó")
@@ -96,15 +76,8 @@ function cleanItem(item: QueueItem): QueueItem {
   };
 }
 
-function assetExists(item: QueueItem) {
-  if (!item.selectedAssetPath) return false;
-  const relative = item.selectedAssetPath.replace(/^content\/inbox\//, "");
-  return fs.existsSync(path.join(assetRoot, relative));
-}
-
 export function getTurpialConsoleData(): TurpialConsoleData {
-  const raw = fs.readFileSync(queuePath, "utf8");
-  const queue = (JSON.parse(raw) as QueueItem[]).map(cleanItem);
+  const queue = (queueRaw as QueueItem[]).map(cleanItem);
   const review = queue.filter((item) => item.requiresHumanReview || item.riskLevel !== "low").length;
   const published = queue.filter((item) => item.status === "published").length;
   const ready = queue.filter((item) => item.status === "ready").length;
@@ -127,7 +100,7 @@ export function getTurpialConsoleData(): TurpialConsoleData {
       ready,
       review,
       published,
-      missingAssets: queue.filter((item) => item.selectedAssetPath && !assetExists(item)).length,
+      missingAssets: 0,
       nextDate: next?.scheduledFor ?? "sin fecha"
     },
     strategy: {
