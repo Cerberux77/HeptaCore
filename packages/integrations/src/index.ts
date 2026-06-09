@@ -14,6 +14,7 @@ export type PublishResult = {
   ok: boolean;
   externalPostId?: string;
   error?: string;
+  dryRun?: boolean;
 };
 
 export interface SocialNetworkAdapter {
@@ -21,3 +22,5 @@ export interface SocialNetworkAdapter {
   publish(draft: PublishDraft): Promise<PublishResult>;
   fetchMetrics(externalPostId: string): Promise<Record<string, number>>;
 }
+
+export { MockMetaAdapter, MockFacebookAdapter } from "./mock-meta-adapter.js";

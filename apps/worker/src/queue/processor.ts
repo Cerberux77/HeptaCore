@@ -1,5 +1,25 @@
 import { prisma } from "./prisma.js";
 import type { PublishDraftJob, ValidateAssetsJob, TestModeJob, QueueJobResult } from "./types.js";
+import { MockMetaAdapter, MockFacebookAdapter, type SocialNetworkAdapter, type PublishDraft } from "@heptacore/integrations";
+import type { SocialNetwork } from "@heptacore/core";
+
+const adapters: Record<string, SocialNetworkAdapter> = {
+  INSTAGRAM: new MockMetaAdapter("dry-run"),
+  FACEBOOK: new MockFacebookAdapter("dry-run"),
+};
+
+function toApprovalStatus(s: string) {
+  const map: Record<string, string> = {
+    DRAFT: "draft",
+    NEEDS_REVIEW: "needs_review",
+    APPROVED: "approved",
+    REJECTED: "rejected",
+    SCHEDULED: "scheduled",
+    PUBLISHED: "published",
+    FAILED: "failed",
+  };
+  return map[s] ?? "draft";
+}
 
 export async function processPublishDraft(
   job: PublishDraftJob,
@@ -15,24 +35,45 @@ export async function processPublishDraft(
     return { ok: false, draftId, tenantId, error: "Draft not found" };
   }
 
-  if (mode === "dry-run" || mode === "draft") {
+  const adapter = adapters[draft.network];
+  if (!adapter) {
+    return { ok: false, draftId, tenantId, error: `No adapter for network ${draft.network}` };
+  }
+
+  // Build PublishDraft input
+  const publishDraft: PublishDraft = {
+    tenantId: draft.tenantId,
+    network: draft.network.toLowerCase() as SocialNetwork,
+    externalAccountId: draft.socialAccount?.externalAccountId ?? "mock_account",
+    caption: draft.caption,
+    mediaAssetIds: draft.assets.map((a) => a.assetId),
+    approvalStatus: toApprovalStatus(draft.status) as any,
+    scheduledFor: draft.scheduledFor?.toISOString(),
+  };
+
+  const result = await adapter.publish(publishDraft);
+
+  if (result.ok) {
+    await prisma.contentDraft.update({
+      where: { id: draftId },
+      data: {
+        status: "SCHEDULED",
+        externalPostId: result.externalPostId ?? null,
+      },
+    });
+
     await prisma.auditLog.create({
       data: {
         tenantId,
-        action: "publish_dry_run",
+        action: "publish_succeeded",
         target: `draft:${draftId}`,
         metadata: {
           title: draft.title,
           network: draft.network,
-          format: draft.format,
+          externalPostId: result.externalPostId,
           mode,
         } as any,
       },
-    });
-
-    await prisma.contentDraft.update({
-      where: { id: draftId },
-      data: { status: "SCHEDULED" },
     });
 
     return {
@@ -40,15 +81,30 @@ export async function processPublishDraft(
       draftId,
       tenantId,
       action: `${draft.network}_${draft.format}`,
-      dryRun: true,
+      dryRun: result.dryRun,
     };
   }
+
+  // Publish failed — log and return error
+  await prisma.auditLog.create({
+    data: {
+      tenantId,
+      action: "publish_failed",
+      target: `draft:${draftId}`,
+      metadata: {
+        title: draft.title,
+        network: draft.network,
+        error: result.error,
+        mode,
+      } as any,
+    },
+  });
 
   return {
     ok: false,
     draftId,
     tenantId,
-    error: "Live publishing not implemented yet (S-HC-08 required)",
+    error: result.error ?? "Unknown error",
   };
 }
 

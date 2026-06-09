@@ -19,6 +19,7 @@
   },
   "dependencies": {
     "@heptacore/core": "0.1.0",
+    "@heptacore/integrations": "0.1.0",
     "@prisma/adapter-pg": "latest",
     "@prisma/client": "latest",
     "bullmq": "latest",
