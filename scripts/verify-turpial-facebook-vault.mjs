@@ -1,0 +1,81 @@
+import { PrismaPg } from "@prisma/adapter-pg";
+import { PrismaClient } from "@prisma/client";
+
+const tenantSlug = "turpial-sound";
+const provider = "FACEBOOK";
+
+const datasourceUrl = process.env.DATABASE_URL;
+
+if (!datasourceUrl) {
+  console.error("DATABASE_URL is required to verify the Facebook OAuth vault. No secret values were printed.");
+  process.exit(1);
+}
+
+const adapter = new PrismaPg({ connectionString: datasourceUrl });
+const prisma = new PrismaClient({ adapter });
+
+try {
+  const connection = await prisma.oAuthConnection.findFirst({
+    where: {
+      provider,
+      tenant: {
+        slug: tenantSlug
+      }
+    },
+    orderBy: {
+      updatedAt: "desc"
+    },
+    include: {
+      tenant: {
+        select: {
+          slug: true
+        }
+      }
+    }
+  });
+
+  if (!connection) {
+    console.log(JSON.stringify({
+      ok: true,
+      found: false,
+      tenantSlug,
+      provider: "facebook"
+    }, null, 2));
+    process.exit(0);
+  }
+
+  const credential = connection.tokenRef
+    ? await prisma.oAuthCredential.findUnique({
+        where: {
+          id: connection.tokenRef
+        },
+        select: {
+          id: true,
+          encryptedBlob: true,
+          createdAt: true,
+          updatedAt: true
+        }
+      })
+    : null;
+
+  console.log(JSON.stringify({
+    ok: true,
+    found: true,
+    tenantSlug: connection.tenant.slug,
+    provider: "facebook",
+    pageId: connection.providerUserId,
+    providerUserId: connection.providerUserId,
+    connectionId: connection.id,
+    credentialId: connection.tokenRef,
+    credentialFound: Boolean(credential),
+    encryptedBlobPresent: Boolean(credential?.encryptedBlob?.byteLength),
+    status: connection.status,
+    tokenRefPresent: Boolean(connection.tokenRef),
+    credentialCreatedAt: credential?.createdAt ?? null,
+    credentialUpdatedAt: credential?.updatedAt ?? null,
+    createdAt: connection.createdAt,
+    updatedAt: connection.updatedAt
+  }, null, 2));
+} finally {
+  await prisma.$disconnect();
+}
