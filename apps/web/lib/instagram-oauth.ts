@@ -16,3 +16,17 @@ export function getConfiguredInstagramRedirectUri() {
   return value ? cleanUrl(value) : null;
 }
 
+export function getSafeInstagramRedirectUri(value: string | null | undefined) {
+  if (!value) return null;
+
+  const cleaned = cleanUrl(value);
+
+  try {
+    const url = new URL(cleaned);
+    if (url.pathname !== callbackPath) return null;
+    if (url.protocol !== "https:" && url.hostname !== "localhost") return null;
+    return cleaned;
+  } catch {
+    return null;
+  }
+}

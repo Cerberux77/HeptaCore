@@ -1,5 +1,9 @@
 import { NextResponse } from "next/server";
-import { getConfiguredInstagramRedirectUri, getInstagramRedirectUri } from "../../../../../lib/instagram-oauth";
+import {
+  getConfiguredInstagramRedirectUri,
+  getInstagramRedirectUri,
+  getSafeInstagramRedirectUri
+} from "../../../../../lib/instagram-oauth";
 import { canPersistEncryptedTokens } from "../../../../../lib/token-vault";
 
 const tokenUrl = "https://api.instagram.com/oauth/access_token";
@@ -17,6 +21,7 @@ function parseState(state: string | null) {
       tenantSlug: parsed.tenantSlug ?? null,
       nonceReceived: Boolean(parsed.nonce),
       csrf: parsed.csrf ?? "missing",
+      redirectUri: getSafeInstagramRedirectUri(parsed.redirectUri),
       redirectUriReceived: Boolean(parsed.redirectUri)
     };
   } catch {
@@ -24,6 +29,7 @@ function parseState(state: string | null) {
       tenantSlug: state,
       nonceReceived: false,
       csrf: "unparsed-legacy-state",
+      redirectUri: null,
       redirectUriReceived: false
     };
   }
@@ -51,19 +57,15 @@ async function exchangeCode(code: string, redirectUri: string) {
     };
   }
 
-  const body = new URLSearchParams({
-    client_id: appId,
-    client_secret: appSecret,
-    grant_type: "authorization_code",
-    redirect_uri: redirectUri,
-    code
-  });
+  const body = new FormData();
+  body.set("client_id", appId);
+  body.set("client_secret", appSecret);
+  body.set("grant_type", "authorization_code");
+  body.set("redirect_uri", redirectUri);
+  body.set("code", code);
 
   const response = await fetch(tokenUrl, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/x-www-form-urlencoded"
-    },
     body
   });
 
@@ -120,7 +122,9 @@ export async function GET(request: Request) {
   const errorReason = searchParams.get("error_reason");
   const errorDescription = searchParams.get("error_description");
   const parsedState = parseState(state);
-  const redirectUri = getInstagramRedirectUri(request);
+  const fallbackRedirectUri = getInstagramRedirectUri(request);
+  const redirectUri = parsedState?.redirectUri ?? fallbackRedirectUri;
+  const redirectUriSource = parsedState?.redirectUri ? "state" : "request-origin";
   const configuredRedirectUri = getConfiguredInstagramRedirectUri();
 
   if (error) {
@@ -135,6 +139,7 @@ export async function GET(request: Request) {
         errorDescription,
         state: parsedState,
         redirectUri,
+        redirectUriSource,
         configuredRedirectUri
       },
       { status: 400 }
@@ -149,6 +154,7 @@ export async function GET(request: Request) {
       tokenReceived: false,
       state: parsedState,
       redirectUri,
+      redirectUriSource,
       configuredRedirectUri,
       message: "Callback received. No authorization code was provided."
     });
@@ -159,6 +165,7 @@ export async function GET(request: Request) {
   return NextResponse.json(
     {
       ...exchanged.body,
+      redirectUriSource,
       state: parsedState,
       redirectUri,
       configuredRedirectUri
