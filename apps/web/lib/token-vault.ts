@@ -1,6 +1,6 @@
 import { createCipheriv, createDecipheriv, randomBytes } from "node:crypto";
 import { PrismaPg } from "@prisma/adapter-pg";
-import { Prisma, PrismaClient } from "@prisma/client";
+import { PrismaClient } from "@prisma/client";
 
 const algorithm = "aes-256-gcm";
 const keyVersion = "enc:v1:aes-256-gcm";
@@ -10,6 +10,10 @@ const instagramScopes = [
 ];
 
 type VaultPrismaClient = InstanceType<typeof PrismaClient>;
+type VaultTransactionClient = Omit<
+  VaultPrismaClient,
+  "$connect" | "$disconnect" | "$on" | "$transaction" | "$use" | "$extends"
+>;
 
 declare global {
   // eslint-disable-next-line no-var
@@ -186,7 +190,7 @@ export async function storeOAuthToken(input: VaultStorageInput): Promise<VaultSt
   });
 
   try {
-    const stored = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
+    const stored = await prisma.$transaction(async (tx: VaultTransactionClient) => {
       const tenant = await tx.tenant.findUnique({
         where: { slug: input.tenantSlug }
       });
