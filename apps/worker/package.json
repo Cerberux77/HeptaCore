@@ -1,18 +1,34 @@
 {
   "name": "@heptacore/worker",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
-  "description": "HeptaCore tenant-aware RRSS worker seeded from the Turpial bot.",
+  "description": "HeptaCore tenant-aware RRSS worker with BullMQ/Redis queue",
   "type": "module",
   "scripts": {
     "start": "node src/index.mjs",
     "publish": "node src/publisher.mjs",
     "schedule": "node src/scheduler.mjs",
     "validate": "node src/validate.mjs",
-    "report": "node src/report.mjs"
+    "report": "node src/report.mjs",
+    "queue:dev": "tsx src/queue/index.ts --worker",
+    "queue:enqueue": "tsx src/queue/index.ts --enqueue-drafts",
+    "queue:stats": "tsx src/queue/index.ts --stats",
+    "queue:test": "tsx src/queue/index.ts --test",
+    "queue:clean": "tsx src/queue/index.ts --clean",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@heptacore/core": "0.1.0"
+    "@heptacore/core": "0.1.0",
+    "@prisma/adapter-pg": "latest",
+    "@prisma/client": "latest",
+    "bullmq": "latest",
+    "ioredis": "latest",
+    "pg": "latest"
+  },
+  "devDependencies": {
+    "@types/node": "latest",
+    "tsx": "latest",
+    "typescript": "latest"
   },
   "engines": {
     "node": ">=20.0.0"
