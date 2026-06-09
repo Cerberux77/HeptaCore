@@ -278,11 +278,11 @@
     },
     {
       "id": "S-HC-PUB-01",
-      "title": "First real Turpial Sound publishing proof",
+      "title": "First real Turpial Sound publishing proof from product UI",
       "owner": "Jean",
       "backupOwner": "Manuel",
       "agent": "Codex",
-      "status": "depends_on",
+      "status": "assigned",
       "track": "tenant-proof",
       "branch": "Jean/s-hc-pub-01-turpial-controlled-publishing-2026-06-09",
       "zone": ["product-ui", "apps/worker:controlled", "docs/07_handoffs/**"],
