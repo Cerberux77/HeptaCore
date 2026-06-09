@@ -153,7 +153,7 @@ export function DashboardConsole({
         <header className="workspace-header">
           <div>
             <span className="section-label">Tenant: {tenantSlug}</span>
-            <h1>Control de RRSS y aprobaciones</h1>
+            <h1>Control de RRSS y APROBACIONES</h1>
           </div>
           <div className="header-actions">
             <button className="primary-action" onClick={() => setView("queue")}>
