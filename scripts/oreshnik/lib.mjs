@@ -35,7 +35,11 @@ export function hasFlag(name) {
 }
 
 export function git(args, options = {}) {
-  const result = spawnSync("git", args, { cwd: ROOT, encoding: "utf8" });
+  const result = spawnSync("git", args, {
+    cwd: ROOT,
+    encoding: "utf8",
+    timeout: options.timeoutMs
+  });
   if (result.status !== 0 && !options.allowFail) {
     throw new Error((result.stderr || result.stdout || `git ${args.join(" ")}`).trim());
   }
@@ -52,7 +56,8 @@ export function sh(command, options = {}) {
     return execFileSync(process.platform === "win32" ? "cmd.exe" : "sh", process.platform === "win32" ? ["/d", "/s", "/c", command] : ["-lc", command], {
       cwd: ROOT,
       encoding: "utf8",
-      stdio: "pipe"
+      stdio: "pipe",
+      timeout: options.timeoutMs || 30000
     }).trim();
   } catch (error) {
     if (options.fatal) throw error;

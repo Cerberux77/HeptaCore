@@ -6,10 +6,12 @@ import {
   currentBranch,
   getArg,
   git,
+  hasFlag,
   isMotherBranch,
   log,
   nonIgnoredDirtyFiles,
   nowVet,
+  readJson,
   readMother,
   resolveOperator,
   ROOT,
@@ -23,6 +25,7 @@ import {
 const sprint = getArg("--sprint");
 const operator = resolveOperator(getArg("--operator"));
 const desc = getArg("--desc", "sprint");
+const dryRun = hasFlag("--dry-run");
 const vet = nowVet();
 const mother = readMother();
 
@@ -40,12 +43,23 @@ const dirty = nonIgnoredDirtyFiles();
 
 log("INFO", `Operator: ${operator}`);
 log("INFO", `Sprint: ${sprint || "not specified"}`);
+if (dryRun) log("INFO", "Mode: dry-run");
 log("INFO", `Current branch: ${branch}`);
 log("INFO", `Dynamic mother: ${mother.current} (v${mother.version})`);
 
 console.log("");
-log("INFO", "1/7 Git fetch and mother availability");
-git(["fetch", "origin", "--prune", "--quiet"], { allowFail: true });
+log("INFO", "1/8 Auto-sync docs from mother (Google Docs model)");
+const syncResult = sh(`node scripts/oreshnik/sync-from-mother.mjs`, { fatal: false });
+if (syncResult) console.log(syncResult);
+else log("OK", "Mother docs synced or no mother available yet.");
+
+console.log("");
+log("INFO", "2/8 Git fetch and mother availability");
+const fetchResult = git(["fetch", "origin", "--prune", "--quiet"], { allowFail: true, timeoutMs: 15000 });
+if (fetchResult.status === null) {
+  warnings++;
+  log("WARN", "git fetch timed out after 15s; continuing with local refs.");
+}
 const originMother = git(["rev-parse", "--verify", `origin/${mother.current}`], { allowFail: true });
 const localMother = git(["rev-parse", "--verify", mother.current], { allowFail: true });
 if (originMother.ok || localMother.ok) log("OK", "Mother branch is available locally or remotely.");
@@ -55,7 +69,7 @@ else {
 }
 
 console.log("");
-log("INFO", "2/7 Working tree");
+log("INFO", "3/8 Working tree");
 if (dirty.length > 0) {
   log("WARN", `${dirty.length} changed file(s). Preflight will not auto-switch branches while dirty.`);
   warnings++;
@@ -64,10 +78,12 @@ if (dirty.length > 0) {
 }
 
 console.log("");
-log("INFO", "3/7 Branch management");
+log("INFO", "4/8 Branch management");
 if (sprint) {
   const expected = `${operator}/${sanitize(sprint)}-${sanitize(desc)}-${today()}`;
-  if (isMotherBranch(branch)) {
+  if (dryRun) {
+    log("OK", `Dry-run: would use or create child branch ${expected}.`);
+  } else if (isMotherBranch(branch)) {
     if (dirty.length > 0) {
       log("WARN", `On mother-like branch. Commit/stash first, then preflight can create ${expected}.`);
       warnings++;
@@ -93,9 +109,9 @@ if (sprint) {
 }
 
 console.log("");
-log("INFO", "4/7 Zone check");
+log("INFO", "5/8 Zone check");
 if (sprint) {
-  const zone = sh(`node scripts/oreshnik/zone-check.mjs --sprint ${sprint}`);
+  const zone = sh(`node scripts/oreshnik/zone-check.mjs --sprint ${sprint} --operator ${operator}`);
   if (zone.includes("[ FAIL")) {
     console.log(zone);
     blockers++;
@@ -107,7 +123,7 @@ if (sprint) {
 }
 
 console.log("");
-log("INFO", "5/7 Environment and secrets");
+log("INFO", "6/8 Environment and secrets");
 const forbidden = dirty.filter((file) => /^\.env($|\.)/.test(file) && !file.endsWith(".example"));
 if (forbidden.length > 0) {
   forbidden.forEach((file) => log("FAIL", `Secret-like file changed: ${file}`));
@@ -122,27 +138,31 @@ else {
 }
 
 console.log("");
-log("INFO", "6/7 Build checks available");
+log("INFO", "7/8 Build checks available");
 const pkg = existsSync(join(ROOT, "package.json"));
 const prisma = existsSync(join(ROOT, "packages", "db", "prisma", "schema.prisma"));
 if (pkg) log("OK", "package.json present.");
 if (prisma) log("OK", "Prisma schema present.");
 
 console.log("");
-log("INFO", "7/7 Session ledger");
-mkdirSync(RUNS_DIR, { recursive: true });
-writeJson(join(RUNS_DIR, ".last-preflight.json"), {
-  sprint: sprint || null,
-  operator,
-  branch,
-  mother: mother.current,
-  dirtyCount: dirty.length,
-  blockers,
-  warnings,
-  at: vet.iso
-});
-writeFileSync(join(RUNS_DIR, ".session-start"), vet.iso, "utf8");
-log("OK", "Preflight ledger updated.");
+log("INFO", "8/8 Session ledger");
+if (dryRun) {
+  log("OK", "Dry-run: ledger not modified.");
+} else {
+  mkdirSync(RUNS_DIR, { recursive: true });
+  writeJson(join(RUNS_DIR, ".last-preflight.json"), {
+    sprint: sprint || null,
+    operator,
+    branch,
+    mother: mother.current,
+    dirtyCount: dirty.length,
+    blockers,
+    warnings,
+    at: vet.iso
+  });
+  writeFileSync(join(RUNS_DIR, ".session-start"), vet.iso, "utf8");
+  log("OK", "Preflight ledger updated.");
+}
 
 console.log("");
 console.log(`${colors.bold}PRE-FLIGHT RESULT${colors.reset}`);
@@ -161,3 +181,33 @@ if (blockers > 0) {
 
 console.log(`${warnings > 0 ? colors.yellow : colors.green}${colors.bold}[ORESHNIK] OK${colors.reset}`);
 console.log(`Close command: node scripts/oreshnik/close-sprint.mjs --sprint ${sprint || "SXX"} --operator ${operator} --desc "${desc}"`);
+
+if (dryRun) {
+  const taskBoard = readJson(join(ROOT, "var", "oreshnik", "task-board.json"), { tasks: [] });
+  const chosenTask = sprint
+    ? taskBoard.tasks.find((task) => task.id === sprint)
+    : taskBoard.tasks.find((task) => task.status === "assigned")
+      || taskBoard.tasks.find((task) => task.status === "ready" && task.owner === operator)
+      || taskBoard.tasks.find((task) => task.status === "ready");
+  const recommendedSprint = chosenTask?.id || sprint || "S-HC-PROD-00";
+  const recommendedOwner = chosenTask?.owner || operator;
+  const recommendedBranch = chosenTask?.branch || `${recommendedOwner}/${sanitize(recommendedSprint)}-${sanitize(desc)}-${today()}`;
+  console.log("");
+  console.log(JSON.stringify({
+    ok: true,
+    operator,
+    mode: "dry-run",
+    assignmentSource: "oreshnik",
+    recommendedSprint,
+    recommendedOwner,
+    branch: recommendedBranch,
+    status: chosenTask?.status || "unregistered",
+    dependencies: chosenTask?.dependsOn || [],
+    currentBranch: branch,
+    mother: mother.current,
+    publishAllowed: false,
+    approvalRequired: recommendedSprint === "S-HC-PUB-01" || recommendedSprint === "S-HC-PROD-05",
+    warnings,
+    blockers
+  }, null, 2));
+}
