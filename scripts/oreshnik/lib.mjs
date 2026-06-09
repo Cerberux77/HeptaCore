@@ -91,6 +91,47 @@ export function writeMother(value) {
   writeJson(MOTHER_FILE, value);
 }
 
+export function discoverLatestMother() {
+  const local = readMother();
+
+  // 1. Try local branches first (fast, no network)
+  const localBranches = git(["branch", "--list", "MADRE/v*"], { allowFail: true }).output;
+  const localMatch = [...(localBranches.matchAll(/MADRE\/v(\d+)-/g))].map((m) => ({ name: m[0].replace(/-\d+$/, ""), version: parseInt(m[1]) }));
+  if (localMatch.length > 0) {
+    localMatch.sort((a, b) => b.version - a.version);
+    const best = localMatch[0];
+    const fullName = localBranches.split(/\r?\n/).find((b) => b.includes(best.name)) || best.name;
+    if (best.version > local.version) {
+      const updated = { ...local, version: best.version, current: fullName };
+      writeMother(updated);
+      return updated;
+    }
+    return local;
+  }
+
+  // 2. Try origin (bloated, timeout-protected)
+  git(["fetch", "origin", "--prune", "--quiet"], { allowFail: true, timeoutMs: 10000 });
+  const raw = git(["ls-remote", "--heads", "origin", "refs/heads/MADRE/v*"], { allowFail: true, timeoutMs: 10000 }).output;
+  if (!raw) return local;
+
+  const branches = raw.split(/\r?\n/).filter(Boolean).map((line) => {
+    const match = line.match(/refs\/heads\/(MADRE\/v(\d+)-.*)/);
+    return match ? { name: match[1], version: parseInt(match[2], 10) } : null;
+  }).filter(Boolean);
+
+  if (branches.length === 0) return local;
+  branches.sort((a, b) => b.version - a.version);
+  const latest = branches[0];
+
+  if (latest.version > (local.version || 0)) {
+    const updated = { ...local, version: latest.version, current: latest.name };
+    writeMother(updated);
+    return updated;
+  }
+
+  return local;
+}
+
 export function currentBranch() {
   return git(["branch", "--show-current"], { allowFail: true }).output || "DETACHED";
 }

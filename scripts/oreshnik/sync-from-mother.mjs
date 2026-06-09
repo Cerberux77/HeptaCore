@@ -1,7 +1,7 @@
 #!/usr/bin/env node
-import { currentBranch, git, log, readMother, sh } from "./lib.mjs";
+import { currentBranch, discoverLatestMother, git, log, sh } from "./lib.mjs";
 
-const mother = readMother().current;
+const mother = discoverLatestMother().current;
 const branch = currentBranch();
 
 console.log("");
