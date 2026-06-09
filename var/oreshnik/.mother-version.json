@@ -1,6 +1,6 @@
 {
-  "version": 7,
-  "current": "MADRE/v7-s-hc-05-approval-queue-human-gates-2026-06-09",
+  "version": 8,
+  "current": "MADRE/v8-s-hc-08-meta-adapter-sandbox-mock-2026-06-09",
   "branches": [
     {
       "version": 2,
@@ -61,6 +61,16 @@
       "at": "2026-06-09T20:02:39.755Z",
       "previous": "MADRE/v6-s-hc-01-console-dashboard-checklist-2026-06-09",
       "description": "approval-queue-human-gates"
+    },
+    {
+      "version": 8,
+      "name": "MADRE/v8-s-hc-08-meta-adapter-sandbox-mock-2026-06-09",
+      "sprint": "S-HC-08",
+      "operator": "Jean",
+      "date": "2026-06-09",
+      "at": "2026-06-09T20:09:45.421Z",
+      "previous": "MADRE/v7-s-hc-05-approval-queue-human-gates-2026-06-09",
+      "description": "meta-adapter-sandbox-mock"
     }
   ]
 }
