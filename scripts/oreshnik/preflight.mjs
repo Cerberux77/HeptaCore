@@ -79,16 +79,19 @@ if (dirty.length > 0) {
 }
 
 console.log("");
-log("INFO", "4/8 Branch management");
+log("INFO", "4/8 Branch management (mother = integration branch with code + docs)");
 if (sprint) {
   const expected = `${operator}/${sanitize(sprint)}-${sanitize(desc)}-${today()}`;
   if (dryRun) {
-    log("OK", `Dry-run: would use or create child branch ${expected}.`);
+    log("OK", `Dry-run: would create child branch ${expected} from mother ${mother.current}.`);
   } else if (isMotherBranch(branch)) {
     if (dirty.length > 0) {
-      log("WARN", `On mother-like branch. Commit/stash first, then preflight can create ${expected}.`);
+      log("WARN", `On mother branch. Commit/stash first, then preflight can create ${expected}.`);
       warnings++;
     } else {
+      // Ensure mother is up to date so child inherits latest code + docs
+      git(["checkout", mother.current], { allowFail: true });
+      git(["pull", "origin", mother.current, "--ff-only"], { allowFail: true });
       const exists = git(["branch", "--list", expected], { allowFail: true }).output;
       if (exists) {
         git(["checkout", expected], { allowFail: false });

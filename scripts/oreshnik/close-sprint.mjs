@@ -108,15 +108,18 @@ if (!stagedAfter) {
 
 const motherExists = git(["rev-parse", "--verify", mother.current], { allowFail: true }).ok;
 if (motherExists) {
-  git(["checkout", mother.current], { allowFail: false });
+  // Create new mother from CHILD branch (carries all code forward)
+  git(["checkout", branch], { allowFail: false });
   git(["checkout", "-b", newMother], { allowFail: false });
-  const base = git(["merge-base", "HEAD", branch], { allowFail: true }).output || mother.current;
-  const merge = git(["diff", "--name-only", `${base}...${branch}`, "--", "docs/obsidian-vault", "docs/07_handoffs"], { allowFail: true }).output;
-  if (merge) {
-    const result = git(["show", `${branch}:docs/obsidian-vault/00_CENTRAL_HEPTACORE.md`], { allowFail: true });
-    if (result.ok) writeFileSafe(CENTRAL_DOC, result.output);
-    git(["checkout", branch, "--", "docs/obsidian-vault", "docs/07_handoffs"], { allowFail: true });
-  }
+
+  // Union-merge old mother's docs so nothing is lost
+  const base = git(["merge-base", mother.current, branch], { allowFail: true }).output || mother.current;
+  const result = sh(`node scripts/oreshnik/merge-docs-union.mjs --base ${base} --source ${mother.current}`, { fatal: false });
+  if (result) console.log(result);
+
+  // Ensure Oreshnik infrastructure files are present from child
+  git(["checkout", branch, "--", "var/oreshnik/.mother-version.json", "var/sprint-events", "scripts/oreshnik"], { allowFail: true });
+
   writeMother(nextMotherData);
   writeJson(eventPath, {
     sprint,
@@ -127,17 +130,18 @@ if (motherExists) {
     branch,
     previousMother: mother.current,
     nextMother: newMother,
-    description: desc
+    description: desc,
+    codeIntegrated: true
   });
-  git(["add", "docs/obsidian-vault", "docs/07_handoffs", "var/oreshnik/.mother-version.json", "var/sprint-events"], { allowFail: false });
+  git(["add", "."], { allowFail: false });
   if (git(["diff", "--cached", "--name-only"], { allowFail: true }).output) {
-    git(["commit", "-m", `docs(mother): integrate ${sprint} - ${operator}`], { allowFail: false });
-    log("OK", `Created local mother branch ${newMother}.`);
+    git(["commit", "-m", `feat(mother): integrate ${sprint} — ${operator} (code + docs)`], { allowFail: false });
+    log("OK", `Created integration mother branch ${newMother} with full code + docs.`);
   }
   if (push) {
     git(["push", "origin", branch], { allowFail: false });
     git(["push", "origin", newMother], { allowFail: false });
-    log("OK", "Pushed child branch and mother branch.");
+    log("OK", "Pushed child branch and mother integration branch.");
   } else {
     log("WARN", "Push skipped. Re-run with --push when ready.");
   }
