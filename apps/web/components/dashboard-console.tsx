@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import {
   AlertTriangle,
   BarChart3,
@@ -101,17 +101,22 @@ export function DashboardConsole({
 }) {
   const [view, setView] = useState<View>("overview");
   const [selectedId, setSelectedId] = useState(queue[0]?.id ?? "");
-  const selected = queue.find((i) => i.id === selectedId) ?? queue[0];
+  const [localQueue, setLocalQueue] = useState(queue);
+  const selected = localQueue.find((i) => i.id === selectedId) ?? localQueue[0];
 
-  const pendingReview = queue.filter(
+  const pendingReview = localQueue.filter(
     (i) => i.status !== "PUBLISHED" && (i.requiresReview || i.riskLevel !== "low"),
   );
-  const scheduled = queue
+  const scheduled = localQueue
     .filter((i) => i.status !== "PUBLISHED")
     .sort((a, b) => (a.scheduledFor ?? "").localeCompare(b.scheduledFor ?? ""));
   const readyNow = scheduled.slice(0, 5);
 
   const nextDate = scheduled[0]?.scheduledFor?.slice(5) ?? "--";
+
+  const updateLocalStatus = useCallback((id: string, newStatus: string) => {
+    setLocalQueue((prev) => prev.map((d) => (d.id === id ? { ...d, status: newStatus } : d)));
+  }, []);
 
   return (
     <main className="app-shell">
@@ -257,6 +262,15 @@ export function DashboardConsole({
                 <div className="tag-row">
                   {selected.hashtags.map((h) => <span key={h}>{h}</span>)}
                 </div>
+                {selected.status === "DRAFT" || selected.status === "NEEDS_REVIEW" ? (
+                  <ApprovalActions draftId={selected.id} onStatusChange={(s) => updateLocalStatus(selected.id, s)} />
+                ) : (
+                  <div className="approval-actions">
+                    <span style={{ color: "var(--hc-fog)", fontSize: 12, padding: "8px 0" }}>
+                      Estado: {selected.status}
+                    </span>
+                  </div>
+                )}
               </div>
             </section>
           </div>
@@ -311,5 +325,52 @@ function CheckCircleIcon() {
       <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
       <polyline points="22 4 12 14.01 9 11.01" />
     </svg>
+  );
+}
+
+function ApprovalActions({
+  draftId,
+  onStatusChange,
+}: {
+  draftId: string;
+  onStatusChange: (status: string) => void;
+}) {
+  const [loading, setLoading] = useState<"approve" | "reject" | null>(null);
+
+  async function handleApprove() {
+    setLoading("approve");
+    try {
+      const res = await fetch(`/api/drafts/${draftId}/approve`, { method: "POST" });
+      const data = await res.json();
+      if (data.ok) onStatusChange("APPROVED");
+      else alert(data.error || "Error");
+    } finally {
+      setLoading(null);
+    }
+  }
+
+  async function handleReject() {
+    setLoading("reject");
+    try {
+      const res = await fetch(`/api/drafts/${draftId}/reject`, { method: "POST" });
+      const data = await res.json();
+      if (data.ok) onStatusChange("REJECTED");
+      else alert(data.error || "Error");
+    } finally {
+      setLoading(null);
+    }
+  }
+
+  return (
+    <div className="approval-actions">
+      <button className="approve" onClick={handleApprove} disabled={loading !== null}>
+        <Check size={16} />
+        {loading === "approve" ? "Aprobando..." : "Aprobar"}
+      </button>
+      <button onClick={handleReject} disabled={loading !== null}>
+        <X size={16} />
+        {loading === "reject" ? "Rechazando..." : "Rechazar"}
+      </button>
+    </div>
   );
 }
