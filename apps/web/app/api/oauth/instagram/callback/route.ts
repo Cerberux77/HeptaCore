@@ -4,7 +4,13 @@ import {
   getInstagramRedirectUri,
   getSafeInstagramRedirectUri
 } from "../../../../../lib/instagram-oauth";
-import { canPersistEncryptedTokens } from "../../../../../lib/token-vault";
+import {
+  getEncryptionKeyStatus,
+  instagramScopes,
+  storeOAuthToken
+} from "../../../../../lib/token-vault";
+
+export const runtime = "nodejs";
 
 const tokenUrl = "https://api.instagram.com/oauth/access_token";
 const requestContentType = "application/x-www-form-urlencoded";
@@ -24,6 +30,7 @@ function redactSensitiveTokenText(value: string) {
 type InstagramTokenPayload = {
   access_token?: string;
   expires_in?: number;
+  token_type?: string;
   user_id?: string | number;
   error_type?: string;
   code?: number;
@@ -65,9 +72,10 @@ function parseState(state: string | null) {
   }
 }
 
-async function exchangeCode(code: string, redirectUri: string) {
+async function exchangeCode(code: string, redirectUri: string, tenantSlug: string | null) {
   const appId = process.env.INSTAGRAM_APP_ID;
   const appSecret = process.env.INSTAGRAM_APP_SECRET;
+  const encryptionStatus = getEncryptionKeyStatus();
   const diagnostics = {
     tokenEndpoint: tokenUrl,
     requestContentType,
@@ -77,7 +85,9 @@ async function exchangeCode(code: string, redirectUri: string) {
     appSecretLength: appSecret?.length ?? 0,
     redirectUriUsedForExchange: redirectUri,
     redirectUriLength: redirectUri.length,
-    codeLength: code.length
+    codeLength: code.length,
+    vaultAdapter: "implemented",
+    ...encryptionStatus
   };
 
   if (!appId || !appSecret) {
@@ -137,6 +147,24 @@ async function exchangeCode(code: string, redirectUri: string) {
     };
   }
 
+  const providerUserId = payload.user_id === undefined ? null : String(payload.user_id);
+  const storage = tenantSlug && providerUserId
+    ? await storeOAuthToken({
+        tenantSlug,
+        provider: "INSTAGRAM",
+        providerUserId,
+        accessToken: payload.access_token,
+        tokenType: payload.token_type,
+        expiresIn: payload.expires_in ?? null,
+        scopes: instagramScopes
+      })
+    : {
+        tokenStored: false,
+        storageBlockedBy: tenantSlug ? "missing_provider_user_id" : "missing_tenant_slug",
+        vaultAdapter: "implemented" as const,
+        ...encryptionStatus
+      };
+
   return {
     ok: true,
     status: 200,
@@ -147,6 +175,7 @@ async function exchangeCode(code: string, redirectUri: string) {
       tokenReceived: true,
       expiresIn: payload.expires_in ?? null,
       providerUserIdReceived: Boolean(payload.user_id),
+      providerAccountId: providerUserId,
       tokenEndpoint: tokenUrl,
       requestContentType,
       appIdUsedLast4: last4(appId),
@@ -155,11 +184,10 @@ async function exchangeCode(code: string, redirectUri: string) {
       codeLength: code.length,
       tokenHttpStatus: response.status,
       redirectUriSource: "request-origin",
-      tokenStored: false,
-      storageBlockedBy: canPersistEncryptedTokens()
-        ? "vault_adapter_not_implemented"
-        : "missing_ENCRYPTION_KEY",
-      message: "Token exchange succeeded. Access token was not returned, logged, or stored."
+      ...storage,
+      message: storage.tokenStored
+        ? "Token exchange succeeded. Access token was encrypted and stored."
+        : "Token exchange succeeded. Access token was not returned or logged, but storage failed."
     }
   };
 }
@@ -210,7 +238,7 @@ export async function GET(request: Request) {
     });
   }
 
-  const exchanged = await exchangeCode(code, redirectUri);
+  const exchanged = await exchangeCode(code, redirectUri, parsedState?.tenantSlug ?? null);
 
   return NextResponse.json(
     {

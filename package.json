@@ -19,6 +19,7 @@
     "worker:report": "npm run report -w @heptacore/worker",
     "db:generate": "npm run db:generate -w @heptacore/db",
     "db:migrate": "npm run db:migrate -w @heptacore/db",
+    "oauth:vault:verify:turpial": "node scripts/verify-turpial-oauth-vault.mjs",
     "oreshnik:preflight": "node scripts/oreshnik/preflight.mjs",
     "oreshnik:status": "node scripts/oreshnik/status.mjs",
     "oreshnik:sync": "node scripts/oreshnik/sync-from-mother.mjs",
