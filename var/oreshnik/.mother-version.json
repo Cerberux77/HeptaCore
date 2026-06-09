@@ -1,6 +1,6 @@
 {
-  "version": 6,
-  "current": "MADRE/v6-s-hc-01-console-dashboard-checklist-2026-06-09",
+  "version": 7,
+  "current": "MADRE/v7-s-hc-05-approval-queue-human-gates-2026-06-09",
   "branches": [
     {
       "version": 2,
@@ -51,6 +51,16 @@
       "at": "2026-06-09T19:59:26.760Z",
       "previous": "MADRE/v5-s-hc-06-worker-queue-bullmq-redis-2026-06-09",
       "description": "console-dashboard-checklist"
+    },
+    {
+      "version": 7,
+      "name": "MADRE/v7-s-hc-05-approval-queue-human-gates-2026-06-09",
+      "sprint": "S-HC-05",
+      "operator": "Jean",
+      "date": "2026-06-09",
+      "at": "2026-06-09T20:02:39.755Z",
+      "previous": "MADRE/v6-s-hc-01-console-dashboard-checklist-2026-06-09",
+      "description": "approval-queue-human-gates"
     }
   ]
 }
