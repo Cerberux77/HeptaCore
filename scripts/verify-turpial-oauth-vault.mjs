@@ -41,12 +41,32 @@ try {
     process.exit(0);
   }
 
+  const credential = connection.tokenRef
+    ? await prisma.oAuthCredential.findUnique({
+        where: {
+          id: connection.tokenRef
+        },
+        select: {
+          id: true,
+          encryptedBlob: true,
+          createdAt: true,
+          updatedAt: true
+        }
+      })
+    : null;
+
   console.log(JSON.stringify({
     ok: true,
     found: true,
     tenantSlug: connection.tenant.slug,
     provider: "instagram",
     providerUserId: connection.providerUserId,
+    connectionId: connection.id,
+    credentialId: connection.tokenRef,
+    credentialFound: Boolean(credential),
+    encryptedBlobPresent: Boolean(credential?.encryptedBlob?.byteLength),
+    credentialCreatedAt: credential?.createdAt ?? null,
+    credentialUpdatedAt: credential?.updatedAt ?? null,
     status: connection.status,
     tokenRefPresent: Boolean(connection.tokenRef),
     expiresAt: connection.expiresAt,

@@ -44,6 +44,14 @@ export type VaultStorageInput = {
 export type VaultStorageResult = {
   tokenStored: boolean;
   storageBlockedBy?: string;
+  storageErrorName?: string;
+  storageErrorCode?: string | null;
+  storageErrorMessage?: string;
+  storageStep?: string;
+  tenantResolved?: boolean;
+  tenantIdPresent?: boolean;
+  providerAccountIdPresent?: boolean;
+  modelsUsed?: string[];
   tenantSlug?: string;
   provider?: "instagram";
   providerUserId?: string;
@@ -60,6 +68,20 @@ type SealedTokenEnvelope = {
   iv: string;
   authTag: string;
   ciphertext: string;
+};
+
+type VaultStorageDiagnostics = {
+  storageStep: string;
+  tenantResolved: boolean;
+  tenantIdPresent: boolean;
+  providerAccountIdPresent: boolean;
+  modelsUsed: string[];
+};
+
+type SafePrismaError = {
+  storageErrorName: string;
+  storageErrorCode: string | null;
+  storageErrorMessage: string;
 };
 
 function normalizeEncryptionKey(value: string) {
@@ -80,6 +102,22 @@ function decodeEncryptionKey(value: string | undefined) {
   }
 
   return Buffer.from(paddedBase64, "base64");
+}
+
+function getSafePrismaError(error: unknown): SafePrismaError {
+  const record = error as {
+    name?: unknown;
+    code?: unknown;
+    message?: unknown;
+  };
+
+  return {
+    storageErrorName: typeof record.name === "string" ? record.name : "Error",
+    storageErrorCode: typeof record.code === "string" ? record.code : null,
+    storageErrorMessage: typeof record.message === "string"
+      ? record.message.split("\n").map((line) => line.trim()).filter(Boolean).slice(-1)[0] ?? "vault_storage_failed"
+      : "vault_storage_failed"
+  };
 }
 
 export function getEncryptionKeyStatus() {
@@ -180,10 +218,18 @@ export async function storeOAuthToken(input: VaultStorageInput): Promise<VaultSt
     vaultAdapter: "implemented" as const,
     ...keyStatus
   };
+  const diagnostics: VaultStorageDiagnostics = {
+    storageStep: "init",
+    tenantResolved: false,
+    tenantIdPresent: false,
+    providerAccountIdPresent: Boolean(input.providerUserId),
+    modelsUsed: ["Tenant", "SocialAccount", "OAuthCredential", "OAuthConnection"]
+  };
 
   if (!keyStatus.encryptionKeyPresent) {
     return {
       ...baseResult,
+      ...diagnostics,
       tokenStored: false,
       storageBlockedBy: "missing_ENCRYPTION_KEY"
     };
@@ -192,6 +238,7 @@ export async function storeOAuthToken(input: VaultStorageInput): Promise<VaultSt
   if (!keyStatus.encryptionKeyValidLength) {
     return {
       ...baseResult,
+      ...diagnostics,
       tokenStored: false,
       storageBlockedBy: "invalid_ENCRYPTION_KEY_length"
     };
@@ -213,6 +260,7 @@ export async function storeOAuthToken(input: VaultStorageInput): Promise<VaultSt
 
   try {
     const stored = await prisma.$transaction(async (tx: VaultTransactionClient) => {
+      diagnostics.storageStep = "tenant_lookup";
       const tenant = await tx.tenant.findUnique({
         where: { slug: input.tenantSlug }
       });
@@ -221,27 +269,39 @@ export async function storeOAuthToken(input: VaultStorageInput): Promise<VaultSt
         throw new Error("tenant_not_found");
       }
 
-      const socialAccount = await tx.socialAccount.upsert({
+      diagnostics.tenantResolved = true;
+      diagnostics.tenantIdPresent = Boolean(tenant.id);
+      diagnostics.storageStep = "social_account_find";
+      const existingSocialAccount = await tx.socialAccount.findFirst({
         where: {
-          tenantId_network_externalAccountId: {
-            tenantId: tenant.id,
-            network: "INSTAGRAM",
-            externalAccountId: input.providerUserId
-          }
-        },
-        update: {
-          status: "connected",
-          scopes
-        },
-        create: {
           tenantId: tenant.id,
           network: "INSTAGRAM",
-          externalAccountId: input.providerUserId,
-          status: "connected",
-          scopes
+          externalAccountId: input.providerUserId
         }
       });
 
+      diagnostics.storageStep = existingSocialAccount
+        ? "social_account_update"
+        : "social_account_create";
+      const socialAccount = existingSocialAccount
+        ? await tx.socialAccount.update({
+            where: { id: existingSocialAccount.id },
+            data: {
+              status: "connected",
+              scopes
+            }
+          })
+        : await tx.socialAccount.create({
+            data: {
+              tenantId: tenant.id,
+              network: "INSTAGRAM",
+              externalAccountId: input.providerUserId,
+              status: "connected",
+              scopes
+            }
+          });
+
+      diagnostics.storageStep = "oauth_connection_find";
       const existingConnection = await tx.oAuthConnection.findFirst({
         where: {
           tenantId: tenant.id,
@@ -250,6 +310,9 @@ export async function storeOAuthToken(input: VaultStorageInput): Promise<VaultSt
         }
       });
 
+      diagnostics.storageStep = existingConnection?.tokenRef
+        ? "oauth_credential_update"
+        : "oauth_credential_create";
       const credential = existingConnection?.tokenRef
         ? await tx.oAuthCredential.update({
             where: { id: existingConnection.tokenRef },
@@ -273,6 +336,9 @@ export async function storeOAuthToken(input: VaultStorageInput): Promise<VaultSt
             }
           });
 
+      diagnostics.storageStep = existingConnection
+        ? "oauth_connection_update"
+        : "oauth_connection_create";
       const connection = existingConnection
         ? await tx.oAuthConnection.update({
             where: { id: existingConnection.id },
@@ -308,17 +374,22 @@ export async function storeOAuthToken(input: VaultStorageInput): Promise<VaultSt
 
     return {
       ...baseResult,
+      ...diagnostics,
+      storageStep: "complete",
       tokenStored: true,
       provider: "instagram",
       ...stored
     };
   } catch (error) {
+    const safeError = getSafePrismaError(error);
     const storageBlockedBy = error instanceof Error && error.message === "tenant_not_found"
       ? "tenant_not_found"
       : "vault_storage_failed";
 
     return {
       ...baseResult,
+      ...diagnostics,
+      ...safeError,
       tokenStored: false,
       storageBlockedBy
     };
