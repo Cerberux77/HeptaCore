@@ -1,6 +1,15 @@
+import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "@prisma/client";
 
-const prisma = new PrismaClient();
+const datasourceUrl = process.env.DATABASE_URL;
+
+if (!datasourceUrl) {
+  console.error("DATABASE_URL is required to seed Turpial Sound. No secret values were printed.");
+  process.exit(1);
+}
+
+const adapter = new PrismaPg({ connectionString: datasourceUrl });
+const prisma = new PrismaClient({ adapter });
 
 const tenant = {
   slug: "turpial-sound",
@@ -125,4 +134,3 @@ main()
   .finally(async () => {
     await prisma.$disconnect();
   });
-

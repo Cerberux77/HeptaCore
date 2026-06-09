@@ -9,7 +9,9 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@prisma/client": "latest"
+    "@prisma/adapter-pg": "^7.8.0",
+    "@prisma/client": "latest",
+    "pg": "^8.21.0"
   },
   "devDependencies": {
     "prisma": "latest",

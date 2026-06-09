@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { getConfiguredInstagramRedirectUri, getInstagramRedirectUri } from "../../../../../lib/instagram-oauth";
 import { canPersistEncryptedTokens } from "../../../../../lib/token-vault";
 
 const tokenUrl = "https://api.instagram.com/oauth/access_token";
@@ -10,27 +11,29 @@ function parseState(state: string | null) {
       tenantSlug?: string;
       nonce?: string;
       csrf?: string;
+      redirectUri?: string;
     };
     return {
       tenantSlug: parsed.tenantSlug ?? null,
       nonceReceived: Boolean(parsed.nonce),
-      csrf: parsed.csrf ?? "missing"
+      csrf: parsed.csrf ?? "missing",
+      redirectUriReceived: Boolean(parsed.redirectUri)
     };
   } catch {
     return {
       tenantSlug: state,
       nonceReceived: false,
-      csrf: "unparsed-legacy-state"
+      csrf: "unparsed-legacy-state",
+      redirectUriReceived: false
     };
   }
 }
 
-async function exchangeCode(code: string) {
+async function exchangeCode(code: string, redirectUri: string) {
   const appId = process.env.INSTAGRAM_APP_ID;
   const appSecret = process.env.INSTAGRAM_APP_SECRET;
-  const redirectUri = process.env.INSTAGRAM_REDIRECT_URI;
 
-  if (!appId || !appSecret || !redirectUri) {
+  if (!appId || !appSecret) {
     return {
       ok: false,
       status: 500,
@@ -42,8 +45,7 @@ async function exchangeCode(code: string) {
         message: "Instagram OAuth env vars are incomplete.",
         missingEnv: {
           INSTAGRAM_APP_ID: !appId,
-          INSTAGRAM_APP_SECRET: !appSecret,
-          INSTAGRAM_REDIRECT_URI: !redirectUri
+          INSTAGRAM_APP_SECRET: !appSecret
         }
       }
     };
@@ -100,6 +102,7 @@ async function exchangeCode(code: string) {
       tokenReceived: true,
       expiresIn: payload.expires_in ?? null,
       providerUserIdReceived: Boolean(payload.user_id),
+      redirectUriSource: "request-origin",
       tokenStored: false,
       storageBlockedBy: canPersistEncryptedTokens()
         ? "vault_adapter_not_implemented"
@@ -117,6 +120,8 @@ export async function GET(request: Request) {
   const errorReason = searchParams.get("error_reason");
   const errorDescription = searchParams.get("error_description");
   const parsedState = parseState(state);
+  const redirectUri = getInstagramRedirectUri(request);
+  const configuredRedirectUri = getConfiguredInstagramRedirectUri();
 
   if (error) {
     return NextResponse.json(
@@ -128,7 +133,9 @@ export async function GET(request: Request) {
         error,
         errorReason,
         errorDescription,
-        state: parsedState
+        state: parsedState,
+        redirectUri,
+        configuredRedirectUri
       },
       { status: 400 }
     );
@@ -141,16 +148,20 @@ export async function GET(request: Request) {
       codeReceived: false,
       tokenReceived: false,
       state: parsedState,
+      redirectUri,
+      configuredRedirectUri,
       message: "Callback received. No authorization code was provided."
     });
   }
 
-  const exchanged = await exchangeCode(code);
+  const exchanged = await exchangeCode(code, redirectUri);
 
   return NextResponse.json(
     {
       ...exchanged.body,
-      state: parsedState
+      state: parsedState,
+      redirectUri,
+      configuredRedirectUri
     },
     { status: exchanged.status }
   );
