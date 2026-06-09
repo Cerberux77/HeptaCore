@@ -3,7 +3,7 @@ type: methodology
 project: "HeptaCore"
 fecha: "2026-06-09"
 actualizado: "2026-06-09"
-methodology: "Oreshnik HeptaCore Control Bus v1.1"
+methodology: "Oreshnik HeptaCore Control Bus v1.2"
 tags:
   - "#methodology"
   - "#oreshnik"
@@ -20,14 +20,36 @@ Oreshnik en HeptaCore es la metodologia operativa de sprint, vector bus y contro
 
 No es una marca externa ni una metafora belica. En este repositorio significa:
 
-- preflight antes de editar;
+- preflight antes de asignar o editar;
 - ownership explicito por rama, developer, agente y zona;
+- asignacion de trabajo por Oreshnik, no por seleccion manual;
 - docs antes y despues del trabajo;
 - validaciones reproducibles;
 - handoff compacto al cierre;
 - hard stops para produccion, RRSS, secretos, DB, auth y seguridad.
 
-## Capas del Control Bus
+## Autoridad De Asignacion
+
+Oreshnik asigna el trabajo.
+
+- Los developers no se autoasignan tareas.
+- Manuel no asigna tareas de codigo manualmente salvo override de emergencia documentado.
+- Jean no elige scope desde backlog ni desde un prompt libre.
+- Los agentes reciben paquetes de asignacion y no pueden ampliar scope.
+- Manuel mantiene rol de revision/aprobacion para gates peligrosos como publicacion real, secretos, DB/auth/security y Meta settings.
+
+Flujo correcto:
+
+```txt
+Manuel dispara preflight
+Oreshnik revisa repo, docs, sprint metadata y zone-map
+Oreshnik emite paquete de asignacion
+Jean ejecuta solo el paquete asignado
+Manuel revisa/aprueba gates peligrosos
+Oreshnik genera handoff/cierre
+```
+
+## Capas Del Control Bus
 
 | Capa | Responsabilidad | Documento canonico |
 |---|---|---|
@@ -35,50 +57,60 @@ No es una marca externa ni una metafora belica. En este repositorio significa:
 | Tenant layer | Estado por cliente/tenant y conexiones | [[../TENANTS/TURPIAL_SOUND/TENANT_STATUS]] |
 | Sprint layer | Sprint activo, gates y cierre | [[SPRINT_PROTOCOL]] |
 | Branch ownership | Ramas y zonas de edicion | [[BRANCH_OWNERSHIP]] |
-| Developer ownership | Responsabilidades Manuel/Jean | [[../COLABORADORES/ESTADO_MANUEL]], [[../COLABORADORES/ESTADO_JEAN]] |
+| Developer ownership | Responsabilidades Manuel/Jean como roles, no autoasignacion | [[../COLABORADORES/ESTADO_MANUEL]], [[../COLABORADORES/ESTADO_JEAN]] |
 | Agent ownership | Tarea asignada, limites y reporte | [[AGENT_HANDOFF_PROTOCOL]] |
 | Validation gates | Typecheck, build, worker, vault y zone check | [[../QA/QA_RUNBOOK]] |
 | Publish safety | Discovery/dry-run/aprobacion/publicacion | [[PUBLISHING_SAFETY_PROTOCOL]] |
+| Allocation | Owner, branch, allowed files, prohibited files | [[TASK_ALLOCATION_PROTOCOL]] |
 
-## Reparto Manuel / Jean
+## Roles Manuel / Jean
 
 | Area | Manuel | Jean |
 |---|---|---|
-| Producto y oferta | Voz, CTA, tenant strategy, aprobacion humana | Validacion tecnica independiente |
-| Docs y control | Central docs, cierre Oreshnik, mother docs | Handoffs de su sprint y reporte final |
-| Backend/DB/Auth | Solo con doble lock | Owner tecnico preferente |
-| Worker/publicacion | Define riesgo y aprobacion | Discovery, dry-run, jobs, readiness |
-| Meta/RRSS | Aprueba acciones reales | Verifica readiness sin publicar |
+| Producto y oferta | Revision y aprobacion humana | Validacion tecnica si Oreshnik lo asigna |
+| Docs y control | Puede disparar preflight/cierre | Handoffs de su paquete asignado |
+| Backend/DB/Auth | Solo con doble lock | Owner tecnico si Oreshnik asigna y doble lock existe |
+| Worker/publicacion | Gate de aprobacion real | Discovery/dry-run si Oreshnik asigna |
+| Meta/RRSS | Aprueba acciones reales | Verifica readiness sin publicar si Oreshnik asigna |
 
-## Como Reciben Tareas los Agentes
+## Como Reciben Tareas Los Agentes
 
-Cada prompt de agente debe incluir:
+Cada prompt de agente debe incluir o referenciar un paquete de asignacion Oreshnik:
 
 1. Sprint ID.
-2. Rama esperada o instruccion de crear rama.
-3. Scope permitido.
-4. Hard stops.
-5. Validaciones obligatorias.
-6. Archivos canonicos a actualizar.
-7. Formato de handoff final.
+2. Developer owner.
+3. Agent owner.
+4. Rama esperada o instruccion de crear rama.
+5. Scope permitido.
+6. Archivos permitidos.
+7. Archivos prohibidos.
+8. Hard stops.
+9. Validaciones obligatorias.
+10. Archivos canonicos a actualizar.
+11. Formato de handoff final.
 
-El agente debe ejecutar preflight antes de editar:
-
-```bash
-npm run oreshnik:preflight -- --sprint S-HC-CTRL-01 --operator Manuel --desc "descripcion"
-```
-
-Jean usa:
+Oreshnik debe ejecutar preflight antes de asignar:
 
 ```bash
-npm run oreshnik:preflight -- --sprint S-HC-PUB-01 --operator Jean --desc "turpial controlled publishing discovery dry-run"
+npm run oreshnik:preflight -- --sprint S-HC-CTRL-02 --operator Manuel --desc "Make Oreshnik responsible for task allocation"
 ```
+
+Ejemplo de candidato en dry-run:
+
+```bash
+npm run oreshnik:assign -- --candidate S-HC-PUB-01 --owner Jean --dry-run
+```
+
+Jean solo ejecuta despues de recibir un paquete Oreshnik con `ok: true`.
 
 ## Docs Antes / Docs Despues
 
-Antes de editar codigo o ejecutar acciones con riesgo, el operador debe leer:
+Antes de asignar codigo o ejecutar acciones con riesgo, Oreshnik debe leer:
 
 - [[../00_CENTRAL_HEPTACORE]]
+- [[ORESHNIK_CONTROL_BUS]]
+- [[PREFLIGHT_PROTOCOL]]
+- [[TASK_ALLOCATION_PROTOCOL]]
 - [[BUS_CONTROL]]
 - [[BRANCH_OWNERSHIP]]
 - `docs/07_handoffs/zone-map.json`
@@ -92,7 +124,24 @@ Antes de cerrar, el operador debe actualizar:
 - handoff del sprint;
 - estado del colaborador si aplica.
 
-## Gates de Validacion
+## Preflight De Asignacion
+
+Antes de asignar una tarea, Oreshnik debe revisar:
+
+- rama actual;
+- dirty working tree;
+- untracked files;
+- sprint activo;
+- zone-map ownership;
+- archivos cambiados recientemente;
+- estado productivo/tenant;
+- estado de docs;
+- estado de validaciones;
+- seguridad de publicacion.
+
+Con eso decide task id, developer owner, agent owner, branch, allowed files, prohibited files, validation gates y stop criteria.
+
+## Gates De Validacion
 
 Minimo para cerrar sprint documental/control:
 
@@ -103,8 +152,6 @@ git log --oneline -5
 npm run typecheck
 npm run build
 npm run worker:validate
-node .\scripts\verify-turpial-oauth-vault.mjs
-node .\scripts\verify-turpial-facebook-vault.mjs
 ```
 
 Si falla algo, el cierre queda `PARTIAL` y el handoff debe decir exactamente que fallo.
@@ -117,20 +164,22 @@ Si falla algo, el cierre queda `PARTIAL` y el handoff debe decir exactamente que
 - Las zonas con lock doble no se editan sin acuerdo explicito.
 - Si hay conflicto de zona, se detiene implementacion y se documenta el bloqueo.
 
-## Proteccion de Publicacion
+## Proteccion De Publicacion
 
 La publicacion real esta bloqueada por defecto. Para cualquier salida RRSS se exige:
 
-1. discovery;
-2. dry-run;
-3. candidato de bajo riesgo;
-4. comando exacto preparado;
-5. aprobacion explicita de Manuel;
-6. una sola plataforma;
-7. un solo post;
-8. reporte inmediato.
+1. asignacion Oreshnik;
+2. discovery;
+3. dry-run;
+4. candidato de bajo riesgo;
+5. comando exacto preparado;
+6. aprobacion explicita de Manuel;
+7. una sola plataforma;
+8. un solo post;
+9. postmortem/handoff inmediato.
 
 `S-HC-CTRL-01` no autoriza publicar nada.
+`S-HC-CTRL-02` no autoriza publicar nada.
 
 ## Stop Criteria
 
@@ -141,5 +190,4 @@ La publicacion real esta bloqueada por defecto. Para cualquier salida RRSS se ex
 - Build/typecheck roto sin documentar.
 - Vault central desactualizado.
 - Conflicto de rama/zona no resuelto.
-- Agente sin owner o sin handoff.
-
+- Agente sin owner o sin paquete de asignacion.

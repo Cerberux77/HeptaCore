@@ -16,12 +16,14 @@ tags:
 
 Preparar el primer test controlado de publicacion para `turpial-sound` sin publicar nada durante discovery ni dry-run.
 
+Este plan es candidato de asignacion. Jean solo lo ejecuta si Oreshnik emite un paquete de asignacion con `ok: true`, owner, branch, allowed files, prohibited files, validation gates y stop criteria.
+
 ## Phase 1: Discovery
 
-Jean debe:
+Si Oreshnik asigna este candidato, Jean debe:
 
-- crear su rama `Jean/s-hc-pub-01-turpial-controlled-publishing-2026-06-09`;
-- ejecutar preflight;
+- crear solo la rama indicada por el paquete Oreshnik;
+- conservar el paquete en el handoff;
 - revisar `apps/worker/src/publisher.mjs`, `apps/worker/src/config.mjs`, `apps/worker/src/meta-readiness.mjs`;
 - revisar `examples/tenants/turpial/content/queue/publication-queue.json`;
 - listar drafts/assets disponibles;
@@ -41,7 +43,7 @@ Si el comando exacto cambia tras discovery, Jean debe documentar el comando real
 
 ## Phase 3: Preparar Comando One-Post
 
-Jean debe devolver el comando exacto para una sola publicacion, pero no ejecutarlo. El comando debe incluir:
+Jean debe devolver el comando exacto para una sola publicacion, pero no ejecutarlo. Esto aplica solo si Oreshnik asigno el candidato. El comando debe incluir:
 
 - plataforma unica;
 - id de post elegido, o documentar `BLOCKED` si el worker actual no soporta ejecutar un solo id sin cambios seguros;
@@ -63,7 +65,7 @@ Sin esa frase o equivalente explicito, no se ejecuta.
 
 ## Phase 5: Real Publish
 
-Fuera de `S-HC-CTRL-01` y solo tras gate:
+Fuera de `S-HC-CTRL-02` y solo tras asignacion Oreshnik, discovery, dry-run y gate:
 
 - una plataforma;
 - un post;
@@ -73,7 +75,7 @@ Fuera de `S-HC-CTRL-01` y solo tras gate:
 
 ## Candidato Inicial Sugerido Para Discovery
 
-Jean debe evaluar primero posts de bajo riesgo, sin claims comerciales sensibles y con asset existente:
+Si Oreshnik asigna este candidato, Jean debe evaluar primero posts de bajo riesgo, sin claims comerciales sensibles y con asset existente:
 
 - `fb_post_02` - Facebook feed, estudio/produccion, bajo riesgo, asset `equipo-consola.jpg`;
 - `fb_post_10` - Facebook feed, engagement comunidad, bajo riesgo, asset `persona-banda.jpg`;

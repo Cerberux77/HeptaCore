@@ -17,7 +17,10 @@ Este vault es la capa operacional compartida entre Manuel y Jean. Git es la fuen
 
 - [[00_CENTRAL_HEPTACORE]] - estado actual, pendientes y decisiones.
 - [[METODOLOGIA/METODOLOGIA_ORESHNIK_HEPTACORE]] - protocolo Oreshnik adaptado.
+- [[METODOLOGIA/ORESHNIK_CONTROL_BUS]] - autoridad de asignacion del bus.
 - [[METODOLOGIA/INSTRUCCION_APERTURA_SESION]] - preflight de cada sesion.
+- [[METODOLOGIA/PREFLIGHT_PROTOCOL]] - checklist de preflight previo a asignacion.
+- [[METODOLOGIA/TASK_ALLOCATION_PROTOCOL]] - paquete de asignacion Oreshnik.
 - [[METODOLOGIA/BUS_CONTROL]] - locks, zonas, stop conditions.
 - [[METODOLOGIA/SPRINT_PROTOCOL]] - apertura, ejecucion y cierre.
 - [[METODOLOGIA/BRANCH_OWNERSHIP]] - ramas, locks y zonas compartidas.

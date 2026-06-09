@@ -44,4 +44,4 @@ Estado documentado desde auditoria Turpial:
 
 ## Nota De Riesgo
 
-La cola local contiene un `ig_post_01` marcado `ready` y con `publishedAt` de dry-run previo. Jean debe tratarlo como dato historico local y confirmar estado real antes de recomendar cualquier candidato.
+La cola local contiene un `ig_post_01` marcado `ready` y con `publishedAt` de dry-run previo. Si Oreshnik asigna S-HC-PUB-01, Jean debe tratarlo como dato historico local y confirmar estado real antes de recomendar cualquier candidato.

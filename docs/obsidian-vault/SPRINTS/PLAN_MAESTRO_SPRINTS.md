@@ -1,8 +1,8 @@
 ---
 type: sprint-plan
 project: "HeptaCore"
-last_updated: "2026-06-09T17:15:53.688Z"
-mother_branch: "MADRE/v5-s-hc-ctrl-01-validate-oreshnik-control-bus-onboard-jean-and-p-2026-06-09"
+last_updated: "2026-06-09T17:33:47.297Z"
+mother_branch: "MADRE/v6-s-hc-ctrl-02-make-oreshnik-responsible-for-task-allocation-2026-06-09"
 tags:
   - "#sprints"
   - "#manuel"
@@ -22,7 +22,7 @@ tags:
 | Sprint | Owner sugerido | Scope | Criterio de cierre |
 |---|---|---|---|
 | S-HC-CTRL-01 | Manuel | Validar Control Bus/Oreshnik, onboarding Jean y preparar S-HC-PUB-01 | Docs control + onboarding + handoff + validaciones |
-| S-HC-PUB-01 | Jean | Turpial Sound first controlled publishing test: discovery + dry-run + comando preparado | No publish; candidate + command + handoff |
+| S-HC-PUB-01 | Pendiente Oreshnik | Turpial Sound first controlled publishing test: discovery + dry-run + comando preparado | No publish; Oreshnik assignment packet + candidate + command + handoff |
 | S-HC-01 | Manuel | Console shell: tenant dashboard, cards clickeables, draft queue, assets y calendario MVP | Build PASS + UI navegable |
 | S-HC-02 | Jean | Prisma seed/importer Turpial + DB service layer | Seed local documentado + typecheck PASS |
 | S-HC-02A | Jean | Meta OAuth readiness local + secret handling operativo | `npm run worker:meta:readiness` PASS sin tokens en git |
@@ -50,7 +50,8 @@ tags:
 | Sprint | Owner | Estado | Resultado esperado |
 |---|---|---|---|
 | S-HC-CTRL-01 | Manuel | En curso | Control Bus formalizado y Jean listo para discovery/dry-run |
-| S-HC-PUB-01 | Jean | Preparado | Validar conexiones, assets y dry-run sin publicar |
+| S-HC-CTRL-02 | Manuel | En curso | Corregir autoridad: Oreshnik asigna workload |
+| S-HC-PUB-01 | Pendiente Oreshnik | Candidato | Validar conexiones, assets y dry-run sin publicar si Oreshnik asigna |
 
 ## Actualizacion S-HC-01 / S-HC-02 / S-HC-06 - 2026-06-08
 
@@ -127,3 +128,14 @@ Ver [[PLAN_PARALELO_MANUEL_JEAN]] para distribucion de carga, backups y reasigna
 | Estado | CERRADO |
 | Madre docs | `MADRE/v5-s-hc-ctrl-01-validate-oreshnik-control-bus-onboard-jean-and-p-2026-06-09` |
 | Descripcion | Validate Oreshnik Control Bus, onboard Jean, and prepare first controlled publishing sprint |
+
+
+## Cierre S-HC-CTRL-02 - 2026-06-09
+
+| Campo | Valor |
+|---|---|
+| Operador | Manuel |
+| Rama | `Manuel/s-hc-xx-plan-holistico-heptacore-turpial-jean-2026-06-01` |
+| Estado | CERRADO |
+| Madre docs | `MADRE/v6-s-hc-ctrl-02-make-oreshnik-responsible-for-task-allocation-2026-06-09` |
+| Descripcion | Make Oreshnik responsible for task allocation |

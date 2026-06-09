@@ -34,6 +34,11 @@ tags:
 | Agent | Que puede hacer cada agente en esta sesion | [[AGENT_HANDOFF_PROTOCOL]] |
 | Validation | Como se prueba antes de cerrar | [[../QA/QA_RUNBOOK]] |
 | Publish | Como se evita publicar por accidente | [[PUBLISHING_SAFETY_PROTOCOL]] |
+| Allocation | Como Oreshnik asigna trabajo seguro | [[TASK_ALLOCATION_PROTOCOL]] |
+
+## Autoridad De Asignacion
+
+Oreshnik asigna workload mediante preflight + paquete de asignacion. Manuel y Jean no reparten tareas manualmente salvo override de emergencia documentado. Jean no ejecuta un prompt libre; ejecuta solo el paquete emitido por Oreshnik.
 
 ## Zonas y Locks
 

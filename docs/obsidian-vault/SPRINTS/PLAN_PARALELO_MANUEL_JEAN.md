@@ -12,6 +12,8 @@ tags:
 
 # Plan Paralelo Manuel + Jean
 
+> S-HC-CTRL-02 correction: this document is planning input for Oreshnik, not manual task assignment. Owners listed here are candidate owners. Developers execute only after Oreshnik preflight + assignment packet.
+
 ## Politica de Resiliencia
 
 Si un operador esta ausente durante un bloque de trabajo o bloquea la ruta critica, la tarea pasa al backup owner. La reasignacion debe registrarse:
@@ -66,10 +68,10 @@ Objetivo: llegar hoy a cola aprobable y OAuth verificable sin saltar guardrails.
 |---:|---|---|---|
 | 1 | Manuel | Revisar primeros 7 posts y CTA | Consola Turpial |
 | 2 | Manuel | Crear `.env.rrss` local con tokens existentes | Basado en `.env.rrss.example`; no commitear |
-| 3 | Jean | Validar OAuth en modo lectura | `npm run worker:meta:readiness` |
+| 3 | Pendiente Oreshnik | Validar OAuth en modo lectura | `npm run worker:meta:readiness` |
 | 4 | Codex | Mantener UI/worker dry-run estable | `npm run typecheck`, `npm run worker:validate` |
 | 5 | Manuel + Jean | Decidir si se levanta hard stop de publicacion real | Documento de aprobacion + rollback |
-| 6 | Jean | Si se aprueba, primera publicacion de bajo riesgo con gate | `BOT_DRY_RUN=false` + `HEPTACORE_ALLOW_REAL_PUBLISH=I_UNDERSTAND_REAL_RRSS_PUBLICATION` |
+| 6 | Pendiente Oreshnik + Manuel gate | Si se aprueba, primera publicacion de bajo riesgo con gate | `BOT_DRY_RUN=false` + `HEPTACORE_ALLOW_REAL_PUBLISH=I_UNDERSTAND_REAL_RRSS_PUBLICATION` |
 
 Nota: mientras el hard stop "No real RRSS publishing" siga activo, la salida de Turpial debe ser manual/semi-manual desde Meta Business Suite usando la cola aprobada.
 

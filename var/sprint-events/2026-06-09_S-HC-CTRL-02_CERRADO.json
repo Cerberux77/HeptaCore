@@ -1,0 +1,26 @@
+{
+  "sprint": "S-HC-CTRL-02",
+  "operator": "Manuel",
+  "status": "CERRADO",
+  "date": "2026-06-09",
+  "at": "2026-06-09T17:33:47.297Z",
+  "branch": "Manuel/s-hc-xx-plan-holistico-heptacore-turpial-jean-2026-06-01",
+  "previousMother": "MADRE/v5-s-hc-ctrl-01-validate-oreshnik-control-bus-onboard-jean-and-p-2026-06-09",
+  "nextMother": "MADRE/v6-s-hc-ctrl-02-make-oreshnik-responsible-for-task-allocation-2026-06-09",
+  "description": "Make Oreshnik responsible for task allocation",
+  "changedFiles": [
+    "docs/07_handoffs/S-HC-CTRL-01_HANDOFF.md",
+    "docs/obsidian-vault/00_CENTRAL_HEPTACORE.md",
+    "docs/obsidian-vault/00_INDICE_MAESTRO.md",
+    "docs/obsidian-vault/COLABORADORES/ESTADO_JEAN.md",
+    "docs/obsidian-vault/COLABORADORES/JEAN_FIRST_TASK.md",
+    "docs/obsidian-vault/COLABORADORES/JEAN_ONBOARDING.md",
+    "docs/obsidian-vault/METODOLOGIA/BUS_CONTROL.md",
+    "docs/obsidian-vault/METODOLOGIA/METODOLOGIA_ORESHNIK_HEPTACORE.md",
+    "docs/obsidian-vault/SPRINTS/PLAN_MAESTRO_SPRINTS.md",
+    "docs/obsidian-vault/SPRINTS/PLAN_PARALELO_MANUEL_JEAN.md",
+    "docs/obsidian-vault/TENANTS/TURPIAL_SOUND/CONTENT_ASSETS_STATUS.md",
+    "docs/obsidian-vault/TENANTS/TURPIAL_SOUND/FIRST_PUBLISHING_TEST_PLAN.md",
+    "package.json"
+  ]
+}

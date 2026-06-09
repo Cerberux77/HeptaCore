@@ -2,9 +2,9 @@
 type: master-dashboard
 project: "HeptaCore"
 status: active-production
-phase: "Control Bus validated, Turpial Sound social vault connected, publishing held"
-last_updated: "09/06/26 13:15"
-mother_branch: "MADRE/v5-s-hc-ctrl-01-validate-oreshnik-control-bus-onboard-jean-and-p-2026-06-09"
+phase: "Control Bus allocation authority correction, publishing held"
+last_updated: "09/06/26 13:33"
+mother_branch: "MADRE/v6-s-hc-ctrl-02-make-oreshnik-responsible-for-task-allocation-2026-06-09"
 current_branch: "Manuel/s-hc-xx-plan-holistico-heptacore-turpial-jean-2026-06-01"
 tags:
   - "#central"
@@ -27,7 +27,7 @@ tags:
 | Production URL | `https://heptacore.vercel.app` |
 | Tenant piloto | `turpial-sound` |
 | Publicacion RRSS real | Bloqueada hasta aprobacion explicita de Manuel |
-| Sprint actual | `S-HC-CTRL-01` |
+| Sprint actual | `S-HC-CTRL-02` |
 | Rama actual | `Manuel/s-hc-xx-plan-holistico-heptacore-turpial-jean-2026-06-01` |
 
 ## Tenant Turpial Sound
@@ -60,7 +60,10 @@ Ambos deben devolver `ok: true`, `found: true`, `status: connected`, `encryptedB
 ## Indice Oreshnik / Control Bus
 
 - [[METODOLOGIA/METODOLOGIA_ORESHNIK_HEPTACORE]] - metodologia operativa completa.
+- [[METODOLOGIA/ORESHNIK_CONTROL_BUS]] - autoridad de asignacion Oreshnik.
 - [[METODOLOGIA/BUS_CONTROL]] - capas, locks, gates y stop criteria.
+- [[METODOLOGIA/PREFLIGHT_PROTOCOL]] - checklist de preflight previo a asignacion.
+- [[METODOLOGIA/TASK_ALLOCATION_PROTOCOL]] - paquete de asignacion Oreshnik.
 - [[METODOLOGIA/SPRINT_PROTOCOL]] - apertura, ejecucion y cierre de sprint.
 - [[METODOLOGIA/BRANCH_OWNERSHIP]] - convenciones de ramas y zonas de coordinacion.
 - [[METODOLOGIA/AGENT_HANDOFF_PROTOCOL]] - protocolo de handoff entre humanos y agentes.
@@ -73,17 +76,30 @@ Ambos deben devolver `ok: true`, `found: true`, `status: connected`, `encryptedB
 |---|---|
 | [[COLABORADORES/ESTADO_JEAN]] | Estado vivo de Jean |
 | [[COLABORADORES/JEAN_ONBOARDING]] | Onboarding y setup |
-| [[COLABORADORES/JEAN_FIRST_TASK]] | Prompt listo para S-HC-PUB-01 |
+| [[COLABORADORES/JEAN_FIRST_TASK]] | Candidato de asignacion Oreshnik para S-HC-PUB-01 |
 
 ## Siguiente Sprint Controlado
 
 | Sprint | Owner | Scope | Estado |
 |---|---|---|---|
-| `S-HC-PUB-01` | Jean | Turpial Sound first controlled publishing test: discovery + dry-run + comando preparado | Preparado, sin publicar |
+| `S-HC-PUB-01` | Pendiente Oreshnik | Turpial Sound first controlled publishing test: discovery + dry-run + comando preparado | Candidato, no asignado manualmente |
+
+## Control-State Actual
+
+La proxima accion no es ejecucion manual.
+
+La proxima accion es:
+
+```txt
+Oreshnik preflight + Oreshnik assignment packet
+```
+
+Jean no ejecuta `S-HC-PUB-01` hasta que Oreshnik lo asigne. Manuel no lo asigna manualmente salvo override de emergencia documentado. La publicacion real sigue bloqueada.
 
 ## Reglas Activas
 
-- No publicar en redes reales desde HeptaCore en `S-HC-CTRL-01`.
+- No publicar en redes reales desde HeptaCore en `S-HC-CTRL-02`.
+- No ejecutar tareas por seleccion manual: Oreshnik debe emitir paquete de asignacion.
 - No pedir ni commitear credenciales reales.
 - No scraping real, gasto de campanas, DM masivo ni cambios de Meta Developer settings.
 - No modificar Prisma, auth, security ni vault adapters sin doble lock Manuel + Jean.
@@ -110,3 +126,10 @@ Ultima actualizacion: 2026-06-09 VET | Operador: Manuel | Sprint: `S-HC-CTRL-01`
 - Rama hija: `Manuel/s-hc-xx-plan-holistico-heptacore-turpial-jean-2026-06-01`
 - Rama madre docs: `MADRE/v5-s-hc-ctrl-01-validate-oreshnik-control-bus-onboard-jean-and-p-2026-06-09`
 - Descripcion: Validate Oreshnik Control Bus, onboard Jean, and prepare first controlled publishing sprint
+
+## Cierre S-HC-CTRL-02 - 2026-06-09
+
+- Operador: Manuel
+- Rama hija: `Manuel/s-hc-xx-plan-holistico-heptacore-turpial-jean-2026-06-01`
+- Rama madre docs: `MADRE/v6-s-hc-ctrl-02-make-oreshnik-responsible-for-task-allocation-2026-06-09`
+- Descripcion: Make Oreshnik responsible for task allocation

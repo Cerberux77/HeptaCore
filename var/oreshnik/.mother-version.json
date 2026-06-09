@@ -1,6 +1,6 @@
 {
-  "version": 5,
-  "current": "MADRE/v5-s-hc-ctrl-01-validate-oreshnik-control-bus-onboard-jean-and-p-2026-06-09",
+  "version": 6,
+  "current": "MADRE/v6-s-hc-ctrl-02-make-oreshnik-responsible-for-task-allocation-2026-06-09",
   "branches": [
     {
       "version": 2,
@@ -41,6 +41,16 @@
       "at": "2026-06-09T17:15:53.688Z",
       "previous": "MADRE/v4-s-hc-01-closure-and-saas-oauth-foundation-2026-06-08",
       "description": "Validate Oreshnik Control Bus, onboard Jean, and prepare first controlled publishing sprint"
+    },
+    {
+      "version": 6,
+      "name": "MADRE/v6-s-hc-ctrl-02-make-oreshnik-responsible-for-task-allocation-2026-06-09",
+      "sprint": "S-HC-CTRL-02",
+      "operator": "Manuel",
+      "date": "2026-06-09",
+      "at": "2026-06-09T17:33:47.297Z",
+      "previous": "MADRE/v5-s-hc-ctrl-01-validate-oreshnik-control-bus-onboard-jean-and-p-2026-06-09",
+      "description": "Make Oreshnik responsible for task allocation"
     }
   ]
 }

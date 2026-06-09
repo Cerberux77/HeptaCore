@@ -14,7 +14,7 @@ tags:
 
 Repo remoto: `<HEPTACORE_GITHUB_REMOTE_URL>`
 
-Jean debe usar su propia rama y no trabajar sobre ramas `Manuel/*`.
+Jean debe usar su propia rama y no trabajar sobre ramas `Manuel/*`. Jean no elige tareas desde backlog ni desde prompts libres: espera un paquete de asignacion emitido por Oreshnik.
 
 ## Checkout
 
@@ -22,7 +22,6 @@ Jean debe usar su propia rama y no trabajar sobre ramas `Manuel/*`.
 git clone <HEPTACORE_GITHUB_REMOTE_URL>
 cd HeptaCore
 npm install
-git checkout -b Jean/s-hc-pub-01-turpial-controlled-publishing-2026-06-09
 ```
 
 Si ya tiene el repo:
@@ -30,8 +29,9 @@ Si ya tiene el repo:
 ```bash
 git fetch --all --prune
 git status --short
-git checkout -b Jean/s-hc-pub-01-turpial-controlled-publishing-2026-06-09
 ```
+
+Jean crea la rama solo cuando el paquete Oreshnik indique el nombre exacto.
 
 ## Requisitos
 
@@ -44,19 +44,26 @@ git checkout -b Jean/s-hc-pub-01-turpial-controlled-publishing-2026-06-09
 ## Lectura Inicial
 
 1. [[../00_CENTRAL_HEPTACORE]]
-2. [[../METODOLOGIA/METODOLOGIA_ORESHNIK_HEPTACORE]]
-3. [[../METODOLOGIA/BUS_CONTROL]]
-4. [[../METODOLOGIA/BRANCH_OWNERSHIP]]
-5. [[../TENANTS/TURPIAL_SOUND/TENANT_STATUS]]
-6. [[../TENANTS/TURPIAL_SOUND/FIRST_PUBLISHING_TEST_PLAN]]
+2. [[../METODOLOGIA/ORESHNIK_CONTROL_BUS]]
+3. [[../METODOLOGIA/METODOLOGIA_ORESHNIK_HEPTACORE]]
+4. [[../METODOLOGIA/BUS_CONTROL]]
+5. [[../METODOLOGIA/PREFLIGHT_PROTOCOL]]
+6. [[../METODOLOGIA/TASK_ALLOCATION_PROTOCOL]]
+7. [[../METODOLOGIA/BRANCH_OWNERSHIP]]
+8. [[../TENANTS/TURPIAL_SOUND/TENANT_STATUS]]
+9. [[../TENANTS/TURPIAL_SOUND/FIRST_PUBLISHING_TEST_PLAN]]
 
-## Preflight
+## Assignment
+
+Jean no inicia implementacion solo con preflight. Debe recibir un paquete Oreshnik con `ok: true`, rama, owner, allowed files, prohibited files, validaciones y stop criteria.
+
+Ejemplo de paquete candidato en dry-run:
 
 ```bash
-npm run oreshnik:preflight -- --sprint S-HC-PUB-01 --operator Jean --desc "turpial controlled publishing discovery dry-run"
+npm run oreshnik:assign -- --candidate S-HC-PUB-01 --owner Jean --dry-run
 ```
 
-Si hay blockers, parar y resolver antes de editar.
+Si hay blockers o el paquete queda `recommended_pending_formal_assignment`, parar y pedir asignacion formal.
 
 ## Validaciones
 
@@ -88,6 +95,7 @@ Si falta un secreto, reportar el nombre de variable faltante sin pedir el valor.
 
 Jean debe entregar:
 
+- paquete Oreshnik recibido;
 - rama;
 - commit;
 - comandos ejecutados;
@@ -102,6 +110,7 @@ Jean debe entregar:
 
 Parar si:
 
+- no existe paquete Oreshnik;
 - un comando intenta publicar real;
 - aparece un token en salida;
 - falla vault verify;

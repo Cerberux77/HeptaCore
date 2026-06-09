@@ -12,6 +12,8 @@ tags:
 
 # S-HC-CTRL-01 Handoff
 
+> Superseded by `S-HC-CTRL-02` for task allocation authority. Do not send `JEAN_FIRST_TASK.md` as a manual task. Run Oreshnik preflight + assignment first.
+
 ## Objective
 
 Validate and formalize the Oreshnik / Control Bus methodology inside HeptaCore, onboard Jean, and prepare `S-HC-PUB-01` for controlled Turpial Sound publishing discovery/dry-run.
@@ -93,11 +95,11 @@ Existing docs found and adapted:
 Manuel:
 
 - Review this commit and docs.
-- Send Jean the prompt in `docs/obsidian-vault/COLABORADORES/JEAN_FIRST_TASK.md`.
+- Run Oreshnik preflight + assignment before Jean executes `S-HC-PUB-01`.
 - Do not approve real publish until Jean returns discovery + dry-run results.
 
 Jean:
 
-- Create `Jean/s-hc-pub-01-turpial-controlled-publishing-2026-06-09`.
-- Execute `S-HC-PUB-01`.
+- Wait for an Oreshnik assignment packet before creating the branch.
+- Execute `S-HC-PUB-01` only if assigned by Oreshnik.
 - Report candidate and one-post command without executing public publish.

@@ -12,7 +12,7 @@ tags:
 
 ## Rama Actual Esperada
 
-`Jean/s-hc-pub-01-turpial-controlled-publishing-2026-06-09`
+Pendiente paquete Oreshnik. Candidato actual: `Jean/s-hc-pub-01-turpial-controlled-publishing-2026-06-09`.
 
 ## Responsabilidades Sugeridas
 
@@ -27,9 +27,10 @@ tags:
 | Prioridad | Pendiente | Estado |
 |---|---|---|
 | P0 | Revisar monorepo y Prisma schema | Pendiente |
-| P0 | Ejecutar S-HC-PUB-01 discovery + dry-run Turpial | Preparado |
-| P0 | Validar vault Facebook/Instagram sin imprimir secretos | Preparado |
-| P0 | Reportar candidato y comando one-post sin publicar | Preparado |
+| P0 | Esperar paquete Oreshnik para S-HC-PUB-01 | Pendiente asignacion |
+| P0 | Ejecutar discovery + dry-run Turpial solo si Oreshnik asigna | Candidato |
+| P0 | Validar vault Facebook/Instagram sin imprimir secretos | Candidato |
+| P0 | Reportar candidato y comando one-post sin publicar | Candidato |
 | P1 | Proponer DB local/hospedada | Pendiente |
 | P1 | Implementar seed/import Turpial | Pendiente |
 | P1 | Disenar auth + RBAC | Pendiente |
