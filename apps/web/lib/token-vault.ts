@@ -8,6 +8,7 @@ const instagramScopes = [
   "instagram_business_basic",
   "instagram_business_content_publish"
 ];
+const encryptionKeyBytes = 32;
 
 type VaultPrismaClient = InstanceType<typeof PrismaClient>;
 type VaultTransactionClient = Omit<
@@ -61,8 +62,30 @@ type SealedTokenEnvelope = {
   ciphertext: string;
 };
 
+function normalizeEncryptionKey(value: string) {
+  return value.trim().replace(/^['"]|['"]$/g, "").replace(/\s+/g, "");
+}
+
+function decodeEncryptionKey(value: string | undefined) {
+  if (!value) return null;
+
+  const normalized = normalizeEncryptionKey(value);
+  if (!normalized) return null;
+
+  const base64 = normalized.replace(/-/g, "+").replace(/_/g, "/");
+  const paddedBase64 = base64.padEnd(Math.ceil(base64.length / 4) * 4, "=");
+
+  if (!/^[A-Za-z0-9+/]+={0,2}$/.test(paddedBase64)) {
+    return null;
+  }
+
+  return Buffer.from(paddedBase64, "base64");
+}
+
 export function getEncryptionKeyStatus() {
   const value = process.env.ENCRYPTION_KEY;
+  const key = decodeEncryptionKey(value);
+
   if (!value) {
     return {
       encryptionKeyPresent: false,
@@ -72,7 +95,7 @@ export function getEncryptionKeyStatus() {
 
   return {
     encryptionKeyPresent: true,
-    encryptionKeyValidLength: Buffer.from(value, "base64").length === 32
+    encryptionKeyValidLength: key?.length === encryptionKeyBytes
   };
 }
 
@@ -82,10 +105,9 @@ export function canPersistEncryptedTokens() {
 }
 
 function getEncryptionKey() {
-  const value = process.env.ENCRYPTION_KEY;
-  const key = value ? Buffer.from(value, "base64") : Buffer.alloc(0);
+  const key = decodeEncryptionKey(process.env.ENCRYPTION_KEY);
 
-  if (key.length !== 32) {
+  if (!key || key.length !== encryptionKeyBytes) {
     throw new Error("ENCRYPTION_KEY must be a base64-encoded 32-byte key.");
   }
 
