@@ -80,3 +80,6 @@ export function buildMinimumIntakeChecklist(networks: SocialNetwork[]) {
 
   return [...base, ...networkItems];
 }
+
+export { reframeOffer, generateDraftPlan } from "./strategy-runner.js";
+export type { StrategyOutput, DraftPlanItem } from "./strategy-runner.js";

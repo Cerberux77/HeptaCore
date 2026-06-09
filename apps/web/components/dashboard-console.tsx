@@ -9,8 +9,11 @@ import {
   ChevronRight,
   Circle,
   ClipboardList,
+  FileText,
   Gauge,
   ImageIcon,
+  LockKeyhole,
+  MessageSquareText,
   Settings2,
   ShieldCheck,
   X,
@@ -18,7 +21,7 @@ import {
 import { HeptaCoreWordmark } from "./heptacore-mark";
 import type { DashboardMetrics, DraftQueueItem } from "../lib/dashboard";
 
-type View = "overview" | "queue" | "checklist";
+type View = "overview" | "queue" | "checklist" | "reports" | "readiness";
 
 function assetUrl(path: string | null | undefined) {
   if (!path) return "";
@@ -92,11 +95,15 @@ export function DashboardConsole({
   metrics,
   queue,
   checklist,
+  report,
+  readiness,
   tenantSlug,
 }: {
   metrics: DashboardMetrics | null;
   queue: DraftQueueItem[];
   checklist: Array<{ label: string; done: boolean }>;
+  report: any;
+  readiness: any;
   tenantSlug: string;
 }) {
   const [view, setView] = useState<View>("overview");
@@ -133,6 +140,8 @@ export function DashboardConsole({
           <NavButton icon={<Gauge size={17} />} active={view === "overview"} onClick={() => setView("overview")}>Operaciones</NavButton>
           <NavButton icon={<ClipboardList size={17} />} active={view === "queue"} onClick={() => setView("queue")}>Cola de drafts</NavButton>
           <NavButton icon={<Check size={17} />} active={view === "checklist"} onClick={() => setView("checklist")}>Checklist</NavButton>
+          <NavButton icon={<FileText size={17} />} active={view === "reports"} onClick={() => setView("reports")}>Reportes</NavButton>
+          <NavButton icon={<LockKeyhole size={17} />} active={view === "readiness"} onClick={() => setView("readiness")}>Publicacion</NavButton>
         </nav>
         <div className="guardrail-box">
           <ShieldCheck size={17} />
@@ -292,6 +301,73 @@ export function DashboardConsole({
                   </li>
                 ))}
               </ul>
+            </section>
+          </div>
+        )}
+
+        {view === "reports" && report && (
+          <div className="strategy-grid">
+            <section className="work-panel span-2">
+              <PanelTitle icon={<BarChart3 size={17} />} title={`Reporte: ${report.tenantName}`} />
+              <div style={{ padding: 14 }}>
+                <div className="status-strip" style={{ marginBottom: 14 }}>
+                  <StatusCard label="Total drafts" value={report.total} note="en cola" />
+                  <StatusCard label="Requieren revision" value={report.needsReview} note="humanos" tone="warn" />
+                  <StatusCard label="Sin assets" value={report.pendingAssets} note="bloqueados" tone={report.pendingAssets > 0 ? "warn" : "ok"} />
+                </div>
+                <h3>Por estado</h3>
+                <div className="tag-row" style={{ marginBottom: 14 }}>
+                  {report.byStatus.map((s: any) => (
+                    <span key={s.status}>{s.status}: {s.count}</span>
+                  ))}
+                </div>
+                <h3>Por red</h3>
+                <div className="tag-row" style={{ marginBottom: 14 }}>
+                  {report.byNetwork.map((n: any) => (
+                    <span key={n.network}>{n.network}: {n.count}</span>
+                  ))}
+                </div>
+                <h3>Actividad reciente</h3>
+                <ul className="dense-list">
+                  {report.recentActivity.slice(0, 10).map((a: any, i: number) => (
+                    <li key={i}>{a.at} — {a.action} ({a.target})</li>
+                  ))}
+                </ul>
+              </div>
+            </section>
+          </div>
+        )}
+
+        {view === "readiness" && readiness && (
+          <div className="strategy-grid">
+            <section className="work-panel span-2">
+              <PanelTitle icon={<LockKeyhole size={17} />} title={`Readiness Gate: ${readiness.tenantName}`} />
+              <div style={{ padding: 14 }}>
+                <div className={`status-card ${readiness.allPassed ? "status-ok" : "status-warn"}`} style={{ marginBottom: 14 }}>
+                  <span>Estado</span>
+                  <strong>{readiness.allPassed ? "LISTO" : "BLOQUEADO"}</strong>
+                  <small>{readiness.summary}</small>
+                </div>
+                <h3>Gates de seguridad</h3>
+                <ul className="check-list">
+                  {readiness.gates.map((g: any, i: number) => (
+                    <li key={i}>
+                      {g.passed ? <CheckCircleIcon /> : <Circle size={17} style={{ color: "var(--hc-fog)", flexShrink: 0 }} />}
+                      <span>{g.label}</span>
+                    </li>
+                  ))}
+                </ul>
+                {!readiness.allPassed && (
+                  <>
+                    <h3 style={{ marginTop: 14 }}>Plan de rollback</h3>
+                    <ul className="dense-list">
+                      {readiness.rollbackPlan.map((step: string, i: number) => (
+                        <li key={i}>{step}</li>
+                      ))}
+                    </ul>
+                  </>
+                )}
+              </div>
             </section>
           </div>
         )}

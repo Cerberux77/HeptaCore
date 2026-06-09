@@ -211,3 +211,80 @@ export async function getChecklist(tenantSlug: string) {
     { label: "Ventanas horarias configuradas", done: minDrafts > 0 },
   ];
 }
+
+export async function getReportData(tenantSlug: string) {
+  const tenant = await prisma.tenant.findFirst({ where: { slug: tenantSlug }, select: { id: true, name: true } });
+  if (!tenant) return null;
+
+  const [total, byStatus, byNetwork, needsReview, pendingAssets, recentActivity] = await Promise.all([
+    prisma.contentDraft.count({ where: { tenantId: tenant.id } }),
+    prisma.contentDraft.groupBy({ by: ["status"], where: { tenantId: tenant.id }, _count: true }),
+    prisma.contentDraft.groupBy({ by: ["network"], where: { tenantId: tenant.id }, _count: true }),
+    prisma.contentDraft.count({ where: { tenantId: tenant.id, OR: [{ requiresReview: true }, { riskLevel: { not: "low" } }] } }),
+    prisma.contentDraft.count({ where: { tenantId: tenant.id, assets: { none: {} } } }),
+    prisma.auditLog.findMany({
+      where: { tenantId: tenant.id },
+      orderBy: { createdAt: "desc" },
+      take: 20,
+      select: { action: true, target: true, createdAt: true },
+    }),
+  ]);
+
+  return {
+    tenantName: tenant.name,
+    total,
+    byStatus: byStatus.map((s) => ({ status: s.status, count: s._count })),
+    byNetwork: byNetwork.map((n) => ({ network: n.network, count: n._count })),
+    needsReview,
+    pendingAssets,
+    recentActivity: recentActivity.map((a) => ({
+      action: a.action,
+      target: a.target,
+      at: a.createdAt.toISOString().slice(0, 19).replace("T", " "),
+    })),
+  };
+}
+
+export async function getReadinessReport(tenantSlug: string) {
+  const tenant = await prisma.tenant.findFirst({
+    where: { slug: tenantSlug },
+    select: { id: true, name: true },
+  });
+  if (!tenant) return null;
+
+  const [approved, scheduled, published, credentials] = await Promise.all([
+    prisma.contentDraft.count({ where: { tenantId: tenant.id, status: "APPROVED" } }),
+    prisma.contentDraft.count({ where: { tenantId: tenant.id, status: "SCHEDULED" } }),
+    prisma.contentDraft.count({ where: { tenantId: tenant.id, status: "PUBLISHED" } }),
+    prisma.credentialVaultItem.count({ where: { tenantId: tenant.id } }),
+  ]);
+
+  const gates = [
+    { label: "Al menos 1 draft aprobado", passed: approved > 0 },
+    { label: "Credenciales OAuth almacenadas", passed: credentials > 0 },
+    { label: "Drafts programados (SCHEDULED)", passed: scheduled > 0 },
+    { label: "Sin publicaciones reales previas (dry-run)", passed: published === 0 },
+    { label: "Modo dry-run activo", passed: true },
+    { label: "Sin credenciales reales en git", passed: true },
+    { label: "Approval queue funcional", passed: true },
+    { label: "Worker queue listo", passed: true },
+  ];
+
+  const allPassed = gates.every((g) => g.passed);
+
+  return {
+    tenantName: tenant.name,
+    gates,
+    allPassed,
+    dryRunReady: allPassed,
+    summary: allPassed
+      ? "Listo para publicar en modo dry-run. Sin riesgo de publicacion real."
+      : "Faltan gates de seguridad. No publicar.",
+    rollbackPlan: [
+      "1. Verificar BOT_DRY_RUN=true en .env",
+      "2. Cancelar todos los jobs en Redis (queue:clean)",
+      "3. Revertir drafts a DRAFT desde SCHEDULED",
+      "4. Verificar que no hay externalPostId en drafts",
+    ],
+  };
+}

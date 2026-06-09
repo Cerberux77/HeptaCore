@@ -1,5 +1,5 @@
 import { auth } from "../lib/auth";
-import { getDashboardMetrics, getDraftQueue, getChecklist } from "../lib/dashboard";
+import { getDashboardMetrics, getDraftQueue, getChecklist, getReportData, getReadinessReport } from "../lib/dashboard";
 import { DashboardConsole } from "../components/dashboard-console";
 import { redirect } from "next/navigation";
 
@@ -10,10 +10,12 @@ export default async function Home() {
   if (!session) redirect("/login");
 
   const slug = DEFAULT_TENANT;
-  const [metrics, queue, checklist] = await Promise.all([
+  const [metrics, queue, checklist, report, readiness] = await Promise.all([
     getDashboardMetrics(slug),
     getDraftQueue(slug),
     getChecklist(slug),
+    getReportData(slug),
+    getReadinessReport(slug),
   ]);
 
   return (
@@ -21,6 +23,8 @@ export default async function Home() {
       metrics={metrics}
       queue={queue}
       checklist={checklist}
+      report={report}
+      readiness={readiness}
       tenantSlug={slug}
     />
   );
