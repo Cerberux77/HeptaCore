@@ -111,7 +111,7 @@ if (sprint) {
 console.log("");
 log("INFO", "5/8 Zone check");
 if (sprint) {
-  const zone = sh(`node scripts/oreshnik/zone-check.mjs --sprint ${sprint}`);
+  const zone = sh(`node scripts/oreshnik/zone-check.mjs --sprint ${sprint} --operator ${operator}`);
   if (zone.includes("[ FAIL")) {
     console.log(zone);
     blockers++;

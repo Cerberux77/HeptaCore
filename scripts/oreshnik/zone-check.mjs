@@ -4,6 +4,7 @@ import { join } from "node:path";
 import { currentBranch, getArg, git, log, readMother, ROOT } from "./lib.mjs";
 
 const sprint = getArg("--sprint") || getArg("-s");
+const operator = getArg("--operator") || getArg("-o");
 const branch = getArg("--branch") || currentBranch();
 const zoneMapPath = join(ROOT, "docs", "07_handoffs", "zone-map.json");
 
@@ -18,6 +19,7 @@ if (!existsSync(zoneMapPath)) {
 }
 
 const zoneMap = JSON.parse(readFileSync(zoneMapPath, "utf8"));
+const sprintOwner = zoneMap.sprintOwners?.[sprint];
 const mother = readMother().current;
 let changed = git(["diff", "--name-only", `${mother}...${branch}`], { allowFail: true }).output;
 if (!changed) changed = git(["diff", "--name-only"], { allowFail: true }).output;
@@ -48,8 +50,8 @@ for (const file of files) {
     matched = true;
     const allowed = zone.sprints?.includes("*") || zone.sprints?.includes(sprint);
     if (zone.lock === "forbidden") collisions.push(`${file}: forbidden zone (${pattern})`);
-    else if (zone.lock === "jean_exclusive" && !/^S-J|^S-JEAN/i.test(sprint)) collisions.push(`${file}: Jean exclusive zone (${pattern})`);
-    else if (zone.lock === "manuel_exclusive" && !/^S-M|^S-MANUEL/i.test(sprint)) collisions.push(`${file}: Manuel exclusive zone (${pattern})`);
+    else if (zone.lock === "jean_exclusive" && operator !== "Jean") collisions.push(`${file}: Jean exclusive zone (${pattern}) — este sprint es de ${sprintOwner || "Jean"}, pero el operador es ${operator || "desconocido"}`);
+    else if (zone.lock === "manuel_exclusive" && operator !== "Manuel") collisions.push(`${file}: Manuel exclusive zone (${pattern}) — este sprint es de ${sprintOwner || "Manuel"}, pero el operador es ${operator || "desconocido"}`);
     else if (zone.lock === "double_jean_manuel") warnings.push(`${file}: double lock required (${pattern})`);
     else if (!allowed) warnings.push(`${file}: not explicitly mapped to ${sprint} (${pattern})`);
     break;
