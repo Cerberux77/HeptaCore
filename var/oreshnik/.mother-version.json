@@ -1,6 +1,6 @@
 {
-  "version": 9,
-  "current": "MADRE/v9-s-hc-03-strategy-runner-2026-06-09",
+  "version": 10,
+  "current": "MADRE/v10-s-hc-07-reports-dashboard-2026-06-09",
   "branches": [
     {
       "version": 2,
@@ -81,6 +81,16 @@
       "at": "2026-06-09T20:17:08.658Z",
       "previous": "MADRE/v8-s-hc-08-meta-adapter-sandbox-mock-2026-06-09",
       "description": "strategy-runner"
+    },
+    {
+      "version": 10,
+      "name": "MADRE/v10-s-hc-07-reports-dashboard-2026-06-09",
+      "sprint": "S-HC-07",
+      "operator": "Jean",
+      "date": "2026-06-09",
+      "at": "2026-06-09T20:17:13.361Z",
+      "previous": "MADRE/v9-s-hc-03-strategy-runner-2026-06-09",
+      "description": "reports-dashboard"
     }
   ]
 }

@@ -1,8 +1,8 @@
 ---
 type: sprint-plan
 project: "HeptaCore"
-last_updated: "2026-06-09T20:17:08.658Z"
-mother_branch: "MADRE/v9-s-hc-03-strategy-runner-2026-06-09"
+last_updated: "2026-06-09T20:17:13.361Z"
+mother_branch: "MADRE/v10-s-hc-07-reports-dashboard-2026-06-09"
 tags:
   - "#sprints"
   - "#manuel"
@@ -135,3 +135,14 @@ Ver [[PLAN_PARALELO_MANUEL_JEAN]] para distribucion de carga, backups y reasigna
 | Estado | CERRADO |
 | Madre docs | `MADRE/v9-s-hc-03-strategy-runner-2026-06-09` |
 | Descripcion | strategy-runner |
+
+
+## Cierre S-HC-07 - 2026-06-09
+
+| Campo | Valor |
+|---|---|
+| Operador | Jean |
+| Rama | `Jean/s-hc-00-onboarding-2026-06-09` |
+| Estado | CERRADO |
+| Madre docs | `MADRE/v10-s-hc-07-reports-dashboard-2026-06-09` |
+| Descripcion | reports-dashboard |

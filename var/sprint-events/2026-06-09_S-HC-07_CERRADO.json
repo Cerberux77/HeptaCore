@@ -1,0 +1,11 @@
+{
+  "sprint": "S-HC-07",
+  "operator": "Jean",
+  "status": "CERRADO",
+  "date": "2026-06-09",
+  "at": "2026-06-09T20:17:13.361Z",
+  "branch": "Jean/s-hc-00-onboarding-2026-06-09",
+  "previousMother": "MADRE/v9-s-hc-03-strategy-runner-2026-06-09",
+  "nextMother": "MADRE/v10-s-hc-07-reports-dashboard-2026-06-09",
+  "description": "reports-dashboard"
+}
