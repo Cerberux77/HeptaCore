@@ -1,6 +1,6 @@
 {
-  "version": 4,
-  "current": "MADRE/v4-s-hc-01-closure-and-saas-oauth-foundation-2026-06-08",
+  "version": 5,
+  "current": "MADRE/v5-s-hc-ctrl-01-validate-oreshnik-control-bus-onboard-jean-and-p-2026-06-09",
   "branches": [
     {
       "version": 2,
@@ -31,6 +31,16 @@
       "at": "2026-06-08T22:26:37.533Z",
       "previous": "MADRE/v3-s-hc-01-closure-and-saas-oauth-foundation-2026-06-08",
       "description": "closure and saas oauth foundation"
+    },
+    {
+      "version": 5,
+      "name": "MADRE/v5-s-hc-ctrl-01-validate-oreshnik-control-bus-onboard-jean-and-p-2026-06-09",
+      "sprint": "S-HC-CTRL-01",
+      "operator": "Manuel",
+      "date": "2026-06-09",
+      "at": "2026-06-09T17:15:53.688Z",
+      "previous": "MADRE/v4-s-hc-01-closure-and-saas-oauth-foundation-2026-06-08",
+      "description": "Validate Oreshnik Control Bus, onboard Jean, and prepare first controlled publishing sprint"
     }
   ]
 }

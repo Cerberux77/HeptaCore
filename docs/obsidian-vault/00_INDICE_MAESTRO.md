@@ -1,7 +1,7 @@
 ---
 type: vault-index
 project: "HeptaCore"
-last_updated: "2026-06-01T00:00:00.000Z"
+last_updated: "2026-06-09"
 mother_branch: "master"
 tags:
   - "#heptacore"
@@ -19,9 +19,17 @@ Este vault es la capa operacional compartida entre Manuel y Jean. Git es la fuen
 - [[METODOLOGIA/METODOLOGIA_ORESHNIK_HEPTACORE]] - protocolo Oreshnik adaptado.
 - [[METODOLOGIA/INSTRUCCION_APERTURA_SESION]] - preflight de cada sesion.
 - [[METODOLOGIA/BUS_CONTROL]] - locks, zonas, stop conditions.
+- [[METODOLOGIA/SPRINT_PROTOCOL]] - apertura, ejecucion y cierre.
+- [[METODOLOGIA/BRANCH_OWNERSHIP]] - ramas, locks y zonas compartidas.
+- [[METODOLOGIA/AGENT_HANDOFF_PROTOCOL]] - entradas/salidas para agentes.
+- [[METODOLOGIA/PUBLISHING_SAFETY_PROTOCOL]] - gates para discovery, dry-run y publicacion real.
 - [[SPRINTS/PLAN_MAESTRO_SPRINTS]] - sprints, ownership y estado.
 - [[COLABORADORES/ESTADO_MANUEL]] - avance y pendientes Manuel.
 - [[COLABORADORES/ESTADO_JEAN]] - avance y pendientes Jean.
+- [[COLABORADORES/JEAN_ONBOARDING]] - setup operativo de Jean.
+- [[COLABORADORES/JEAN_FIRST_TASK]] - prompt listo para S-HC-PUB-01.
+- [[TENANTS/TURPIAL_SOUND/TENANT_STATUS]] - estado del primer tenant.
+- [[TENANTS/TURPIAL_SOUND/FIRST_PUBLISHING_TEST_PLAN]] - plan controlado de publicacion Turpial.
 - [[ARQUITECTURA/HEPTACORE_SYSTEM_MAP]] - mapa tecnico del producto.
 - [[QA/QA_RUNBOOK]] - validaciones de cierre.
 

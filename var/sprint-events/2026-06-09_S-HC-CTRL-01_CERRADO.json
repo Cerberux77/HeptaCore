@@ -1,0 +1,19 @@
+{
+  "sprint": "S-HC-CTRL-01",
+  "operator": "Manuel",
+  "status": "CERRADO",
+  "date": "2026-06-09",
+  "at": "2026-06-09T17:15:53.688Z",
+  "branch": "Manuel/s-hc-xx-plan-holistico-heptacore-turpial-jean-2026-06-01",
+  "previousMother": "MADRE/v4-s-hc-01-closure-and-saas-oauth-foundation-2026-06-08",
+  "nextMother": "MADRE/v5-s-hc-ctrl-01-validate-oreshnik-control-bus-onboard-jean-and-p-2026-06-09",
+  "description": "Validate Oreshnik Control Bus, onboard Jean, and prepare first controlled publishing sprint",
+  "changedFiles": [
+    "docs/obsidian-vault/00_CENTRAL_HEPTACORE.md",
+    "docs/obsidian-vault/00_INDICE_MAESTRO.md",
+    "docs/obsidian-vault/COLABORADORES/ESTADO_JEAN.md",
+    "docs/obsidian-vault/METODOLOGIA/BUS_CONTROL.md",
+    "docs/obsidian-vault/METODOLOGIA/METODOLOGIA_ORESHNIK_HEPTACORE.md",
+    "docs/obsidian-vault/SPRINTS/PLAN_MAESTRO_SPRINTS.md"
+  ]
+}

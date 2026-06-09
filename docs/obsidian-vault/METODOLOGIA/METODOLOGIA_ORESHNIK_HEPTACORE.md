@@ -1,85 +1,145 @@
 ---
 type: methodology
 project: "HeptaCore"
-fecha: "2026-06-01"
-actualizado: "2026-06-01T00:00:00.000Z"
-methodology: "Oreshnik HeptaCore v1.0"
+fecha: "2026-06-09"
+actualizado: "2026-06-09"
+methodology: "Oreshnik HeptaCore Control Bus v1.1"
 tags:
   - "#methodology"
   - "#oreshnik"
+  - "#control-bus"
   - "#manuel"
   - "#jean"
 ---
 
 # Metodologia Oreshnik HeptaCore
 
-## Objetivo
+## Que Es
 
-Mantener a Manuel y Jean trabajando en paralelo sin perder estado, documentacion ni trazabilidad. El resultado esperado es similar a Google Docs en terminos operativos: la rama madre conserva la documentacion integrada mas reciente de ambos, mientras cada operador trabaja en su rama hija.
+Oreshnik en HeptaCore es la metodologia operativa de sprint, vector bus y control bus para coordinar trabajo entre Manuel, Jean y agentes como Codex o Kilo sin perder estado, sobrescribir cambios ni ejecutar acciones reales de riesgo.
 
-## Principio
+No es una marca externa ni una metafora belica. En este repositorio significa:
 
-Git es la fuente de verdad. Obsidian es la interfaz. Oreshnik automatiza preflight, control de zonas, cierre, eventos y actualizacion del vault.
+- preflight antes de editar;
+- ownership explicito por rama, developer, agente y zona;
+- docs antes y despues del trabajo;
+- validaciones reproducibles;
+- handoff compacto al cierre;
+- hard stops para produccion, RRSS, secretos, DB, auth y seguridad.
 
-## Flujo
+## Capas del Control Bus
 
-```txt
-Abrir sesion
-  -> preflight
-  -> sync docs desde madre
-  -> crear/validar rama hija
-  -> ejecutar sprint
-  -> actualizar docs
-  -> validar
-  -> close-sprint
-  -> registrar evento
-  -> crear nueva madre docs
-```
-
-## Comandos
-
-```bash
-npm run oreshnik:status
-npm run oreshnik:preflight -- --sprint S-HC-01 --operator Manuel --desc "console-onboarding"
-npm run oreshnik:zone -- --sprint S-HC-01
-npm run oreshnik:close -- --sprint S-HC-01 --operator Manuel --desc "console-onboarding"
-```
-
-Usar `--push` en `close-sprint` solo cuando el cierre este revisado:
-
-```bash
-npm run oreshnik:close -- --sprint S-HC-01 --operator Manuel --desc "console-onboarding" --push
-```
-
-## Contrato Anti-Pisada
-
-1. Nadie trabaja directo en madre salvo cierre documental controlado.
-2. Cada sprint tiene owner unico.
-3. Las zonas compartidas requieren coordinacion explicita.
-4. `packages/db/prisma/schema.prisma` requiere lock doble Manuel + Jean.
-5. `docs/obsidian-vault` se fusiona con merge documental, no con reemplazo destructivo.
-6. Si ambos editan la misma seccion y no se puede fusionar, se bloquea el cierre.
-7. El codigo de producto no se integra automaticamente a madre docs; se integra por merge/review normal.
-
-## Stop Conditions
-
-- Secretos en diff.
-- Cambio de Prisma schema sin lock doble.
-- Publicacion real o gasto real sin aprobacion.
-- Scraping real sin aprobacion.
-- Build roto.
-- Typecheck roto.
-- Worker publica fuera de dry-run.
-- Conflicto de zona con el otro operador.
-- Vault central desactualizado al cierre.
-- Sprint sin owner o sin criterio de cierre.
-
-## Reparto Inicial Sugerido
-
-| Track | Manuel | Jean |
+| Capa | Responsabilidad | Documento canonico |
 |---|---|---|
-| Producto/agentes | Strategy, prompts, UX, landing | Arquitectura de runtime y validacion |
-| DB/backend | Modelo funcional y seeds | Prisma/Auth/seguridad |
-| Worker | RRSS pipeline y drafts | Queue/jobs/retries |
-| Frontend | Landing, console UX | Componentizacion, dashboard |
-| QA/docs | Vault, Oreshnik, runbooks | Validacion independiente |
+| Mission layer | Objetivo del producto, estado de produccion y prioridades | [[../00_CENTRAL_HEPTACORE]] |
+| Tenant layer | Estado por cliente/tenant y conexiones | [[../TENANTS/TURPIAL_SOUND/TENANT_STATUS]] |
+| Sprint layer | Sprint activo, gates y cierre | [[SPRINT_PROTOCOL]] |
+| Branch ownership | Ramas y zonas de edicion | [[BRANCH_OWNERSHIP]] |
+| Developer ownership | Responsabilidades Manuel/Jean | [[../COLABORADORES/ESTADO_MANUEL]], [[../COLABORADORES/ESTADO_JEAN]] |
+| Agent ownership | Tarea asignada, limites y reporte | [[AGENT_HANDOFF_PROTOCOL]] |
+| Validation gates | Typecheck, build, worker, vault y zone check | [[../QA/QA_RUNBOOK]] |
+| Publish safety | Discovery/dry-run/aprobacion/publicacion | [[PUBLISHING_SAFETY_PROTOCOL]] |
+
+## Reparto Manuel / Jean
+
+| Area | Manuel | Jean |
+|---|---|---|
+| Producto y oferta | Voz, CTA, tenant strategy, aprobacion humana | Validacion tecnica independiente |
+| Docs y control | Central docs, cierre Oreshnik, mother docs | Handoffs de su sprint y reporte final |
+| Backend/DB/Auth | Solo con doble lock | Owner tecnico preferente |
+| Worker/publicacion | Define riesgo y aprobacion | Discovery, dry-run, jobs, readiness |
+| Meta/RRSS | Aprueba acciones reales | Verifica readiness sin publicar |
+
+## Como Reciben Tareas los Agentes
+
+Cada prompt de agente debe incluir:
+
+1. Sprint ID.
+2. Rama esperada o instruccion de crear rama.
+3. Scope permitido.
+4. Hard stops.
+5. Validaciones obligatorias.
+6. Archivos canonicos a actualizar.
+7. Formato de handoff final.
+
+El agente debe ejecutar preflight antes de editar:
+
+```bash
+npm run oreshnik:preflight -- --sprint S-HC-CTRL-01 --operator Manuel --desc "descripcion"
+```
+
+Jean usa:
+
+```bash
+npm run oreshnik:preflight -- --sprint S-HC-PUB-01 --operator Jean --desc "turpial controlled publishing discovery dry-run"
+```
+
+## Docs Antes / Docs Despues
+
+Antes de editar codigo o ejecutar acciones con riesgo, el operador debe leer:
+
+- [[../00_CENTRAL_HEPTACORE]]
+- [[BUS_CONTROL]]
+- [[BRANCH_OWNERSHIP]]
+- `docs/07_handoffs/zone-map.json`
+- el handoff del sprint anterior si existe.
+
+Antes de cerrar, el operador debe actualizar:
+
+- central dashboard;
+- plan maestro de sprints;
+- docs del tenant afectado;
+- handoff del sprint;
+- estado del colaborador si aplica.
+
+## Gates de Validacion
+
+Minimo para cerrar sprint documental/control:
+
+```bash
+git status --short
+git branch --show-current
+git log --oneline -5
+npm run typecheck
+npm run build
+npm run worker:validate
+node .\scripts\verify-turpial-oauth-vault.mjs
+node .\scripts\verify-turpial-facebook-vault.mjs
+```
+
+Si falla algo, el cierre queda `PARTIAL` y el handoff debe decir exactamente que fallo.
+
+## Evitar Conflictos
+
+- Manuel y Jean trabajan en ramas hijas separadas.
+- Las ramas madre `MADRE/*` son solo para documentacion integrada por Oreshnik.
+- Nadie sobreescribe docs compartidos sin revisar el estado actual.
+- Las zonas con lock doble no se editan sin acuerdo explicito.
+- Si hay conflicto de zona, se detiene implementacion y se documenta el bloqueo.
+
+## Proteccion de Publicacion
+
+La publicacion real esta bloqueada por defecto. Para cualquier salida RRSS se exige:
+
+1. discovery;
+2. dry-run;
+3. candidato de bajo riesgo;
+4. comando exacto preparado;
+5. aprobacion explicita de Manuel;
+6. una sola plataforma;
+7. un solo post;
+8. reporte inmediato.
+
+`S-HC-CTRL-01` no autoriza publicar nada.
+
+## Stop Criteria
+
+- Secretos en git, chat o logs.
+- Cambio de Prisma/schema/auth/security sin doble lock.
+- Publicacion real, gasto o scraping real.
+- Meta Developer settings modificados sin aprobacion.
+- Build/typecheck roto sin documentar.
+- Vault central desactualizado.
+- Conflicto de rama/zona no resuelto.
+- Agente sin owner o sin handoff.
+
