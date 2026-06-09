@@ -1,0 +1,11 @@
+{
+  "sprint": "S-HC-05",
+  "operator": "Jean",
+  "status": "CERRADO",
+  "date": "2026-06-09",
+  "at": "2026-06-09T20:02:39.755Z",
+  "branch": "Jean/s-hc-00-onboarding-2026-06-09",
+  "previousMother": "MADRE/v6-s-hc-01-console-dashboard-checklist-2026-06-09",
+  "nextMother": "MADRE/v7-s-hc-05-approval-queue-human-gates-2026-06-09",
+  "description": "approval-queue-human-gates"
+}
