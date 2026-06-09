@@ -1,6 +1,6 @@
 {
-  "version": 10,
-  "current": "MADRE/v10-s-hc-07-reports-dashboard-2026-06-09",
+  "version": 11,
+  "current": "MADRE/v11-s-hc-09-publish-readiness-gate-2026-06-09",
   "branches": [
     {
       "version": 2,
@@ -91,6 +91,16 @@
       "at": "2026-06-09T20:17:13.361Z",
       "previous": "MADRE/v9-s-hc-03-strategy-runner-2026-06-09",
       "description": "reports-dashboard"
+    },
+    {
+      "version": 11,
+      "name": "MADRE/v11-s-hc-09-publish-readiness-gate-2026-06-09",
+      "sprint": "S-HC-09",
+      "operator": "Jean",
+      "date": "2026-06-09",
+      "at": "2026-06-09T20:17:18.089Z",
+      "previous": "MADRE/v10-s-hc-07-reports-dashboard-2026-06-09",
+      "description": "publish-readiness-gate"
     }
   ]
 }
