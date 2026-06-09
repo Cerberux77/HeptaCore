@@ -1,15 +1,16 @@
 #!/usr/bin/env node
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
-import { currentBranch, getArg, git, log, readMother, ROOT } from "./lib.mjs";
+import { currentBranch, getArg, git, log, readJson, readMother, ROOT } from "./lib.mjs";
 
 const sprint = getArg("--sprint") || getArg("-s");
 const operator = getArg("--operator") || getArg("-o");
 const branch = getArg("--branch") || currentBranch();
 const zoneMapPath = join(ROOT, "docs", "07_handoffs", "zone-map.json");
+const taskBoardPath = join(ROOT, "var", "oreshnik", "task-board.json");
 
 if (!sprint) {
-  console.error("Usage: node scripts/oreshnik/zone-check.mjs --sprint SXX [--branch branch]");
+  console.error("Usage: node scripts/oreshnik/zone-check.mjs --sprint SXX --operator Name [--branch branch]");
   process.exit(2);
 }
 
@@ -19,7 +20,20 @@ if (!existsSync(zoneMapPath)) {
 }
 
 const zoneMap = JSON.parse(readFileSync(zoneMapPath, "utf8"));
-const sprintOwner = zoneMap.sprintOwners?.[sprint];
+
+// Dynamic assignment: task-board is the single source of truth for who owns each sprint
+const taskBoard = existsSync(taskBoardPath) ? readJson(taskBoardPath, { tasks: [] }) : { tasks: [] };
+const task = taskBoard.tasks.find((t) => t.id === sprint);
+const assignedOwner = task?.owner || zoneMap.sprintOwners?.[sprint] || null;
+const reassigned = taskBoard.reassignments?.find((r) => r.task === sprint && r.active !== false);
+
+// Reassignment overrides original owner
+const effectiveOwner = reassigned?.to || assignedOwner;
+
+if (!effectiveOwner) {
+  log("WARN", `Sprint ${sprint} not found in task-board.json and no sprintOwners fallback. Zone enforcement reduced to forbidden zones only.`);
+}
+
 const mother = readMother().current;
 let baseRef = mother;
 let motherExists = git(["rev-parse", "--verify", mother], { allowFail: true }).ok;
@@ -56,8 +70,8 @@ for (const file of files) {
     matched = true;
     const allowed = zone.sprints?.includes("*") || zone.sprints?.includes(sprint);
     if (zone.lock === "forbidden") collisions.push(`${file}: forbidden zone (${pattern})`);
-    else if (zone.lock === "jean_exclusive" && operator !== "Jean") collisions.push(`${file}: Jean exclusive zone (${pattern}) — este sprint es de ${sprintOwner || "Jean"}, pero el operador es ${operator || "desconocido"}`);
-    else if (zone.lock === "manuel_exclusive" && operator !== "Manuel") collisions.push(`${file}: Manuel exclusive zone (${pattern}) — este sprint es de ${sprintOwner || "Manuel"}, pero el operador es ${operator || "desconocido"}`);
+    else if (zone.lock === "jean_exclusive" && operator !== "Jean") collisions.push(`${file}: Jean exclusive zone (${pattern}) — asignado a ${effectiveOwner || "nadie"}, operador actual ${operator}`);
+    else if (zone.lock === "manuel_exclusive" && operator !== "Manuel") collisions.push(`${file}: Manuel exclusive zone (${pattern}) — asignado a ${effectiveOwner || "nadie"}, operador actual ${operator}`);
     else if (zone.lock === "double_jean_manuel") warnings.push(`${file}: double lock required (${pattern})`);
     else if (!allowed) warnings.push(`${file}: not explicitly mapped to ${sprint} (${pattern})`);
     break;

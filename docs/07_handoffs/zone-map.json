@@ -1,28 +1,7 @@
 {
   "version": "2.0",
   "project": "HeptaCore",
-  "strictAssignment": true,
-  "sprintOwners": {
-    "S-HC-00": "Manuel",
-    "S-HC-01": "Manuel",
-    "S-HC-02": "Jean",
-    "S-HC-02A": "Jean",
-    "S-HC-03": "Manuel",
-    "S-HC-04": "Jean",
-    "S-HC-05": "Manuel",
-    "S-HC-06": "Jean",
-    "S-HC-07": "Manuel",
-    "S-HC-08": "Jean",
-    "S-HC-09": "Manuel",
-    "S-HC-PROD-00": "Manuel",
-    "S-HC-PROD-01": "Jean",
-    "S-HC-PROD-02": "Manuel",
-    "S-HC-PROD-03": "Jean",
-    "S-HC-PROD-04": "Jean",
-    "S-HC-PROD-05": "Jean",
-    "S-HC-PROD-06": "Manuel",
-    "S-HC-PUB-01": "Jean"
-  },
+  "assignmentSource": "var/oreshnik/task-board.json",
   "zones": {
     "packages/db/**": {
       "owner": "Jean+Manuel",

@@ -7,6 +7,134 @@
   "statuses": ["ready", "assigned", "blocked", "depends_on", "done"],
   "tasks": [
     {
+      "id": "S-HC-00",
+      "title": "Monorepo, landing, worker, Prisma, Turpial seed, vault, Oreshnik",
+      "owner": "Manuel",
+      "backupOwner": "Jean",
+      "status": "done",
+      "track": "foundation",
+      "branch": "Manuel/s-hc-xx-plan-holistico-heptacore-turpial-jean-2026-06-01",
+      "dependsOn": [],
+      "handoff": "docs/07_handoffs/S-HC-00_HANDOFF.md"
+    },
+    {
+      "id": "S-HC-01",
+      "title": "Console shell: dashboard, cards, draft queue, assets, calendario",
+      "owner": "Manuel",
+      "backupOwner": "Jean",
+      "status": "done",
+      "track": "operator-console",
+      "branch": "Manuel/s-hc-xx-plan-holistico-heptacore-turpial-jean-2026-06-01",
+      "dependsOn": ["S-HC-00"],
+      "handoff": "docs/07_handoffs/S-HC-01_HANDOFF.md"
+    },
+    {
+      "id": "S-HC-02",
+      "title": "Prisma seed/importer Turpial + DB service layer",
+      "owner": "Jean",
+      "backupOwner": "Manuel",
+      "status": "assigned",
+      "track": "db-foundation",
+      "branch": "Jean/s-hc-02-prisma-seed-turpial-2026-06-09",
+      "dependsOn": ["S-HC-PROD-00"],
+      "handoff": "docs/07_handoffs/S-HC-02_HANDOFF.md",
+      "closureStatus": "PENDIENTE_CLOSURE",
+      "closureNote": "Jean reporta completado localmente. Requiere oreshnik:close --push."
+    },
+    {
+      "id": "S-HC-04",
+      "title": "Auth + RBAC + AuditLog (Login, sesiones, roles, registro actividad)",
+      "owner": "Jean",
+      "backupOwner": "Manuel",
+      "status": "assigned",
+      "track": "auth-operator",
+      "branch": "Jean/s-hc-04-auth-rbac-auditlog-2026-06-09",
+      "zone": ["apps/web/app/login/**", "apps/web/lib/tenant-auth.ts"],
+      "allowedFiles": ["apps/web/app/login/**", "apps/web/lib/tenant-auth.ts", "docs/obsidian-vault/PRODUCT/**", "docs/07_handoffs/S-HC-04_HANDOFF.md"],
+      "prohibitedFiles": [".env", ".env.*", "apps/web/app/api/oauth/**", "packages/db/prisma/schema.prisma", "packages/db/prisma/migrations/**"],
+      "dependsOn": ["S-HC-02"],
+      "validations": ["npm run typecheck", "npm run build", "npm run worker:validate"],
+      "doneCriteria": ["Login funcional", "Sesiones", "Roles OWNER/EDITOR/VIEWER", "AuditLog escribe", "Guards de permisos", "No OAuth regression"],
+      "handoff": "docs/07_handoffs/S-HC-04_HANDOFF.md"
+    },
+    {
+      "id": "S-HC-05",
+      "title": "Approval queue + human gates",
+      "owner": "Manuel",
+      "backupOwner": "Jean",
+      "status": "depends_on",
+      "track": "approval-workflow",
+      "dependsOn": ["S-HC-01", "S-HC-04"],
+      "handoff": "docs/07_handoffs/S-HC-05_HANDOFF.md"
+    },
+    {
+      "id": "S-HC-06",
+      "title": "Worker queue BullMQ/Redis + dry-run jobs",
+      "owner": "Jean",
+      "backupOwner": "Manuel",
+      "status": "depends_on",
+      "track": "worker-queue",
+      "dependsOn": ["S-HC-02", "S-HC-05"],
+      "handoff": "docs/07_handoffs/S-HC-06_HANDOFF.md"
+    },
+    {
+      "id": "S-HC-08",
+      "title": "Meta adapter sandbox design",
+      "owner": "Jean",
+      "backupOwner": "Manuel",
+      "status": "depends_on",
+      "track": "integrations",
+      "dependsOn": ["S-HC-06"],
+      "handoff": "docs/07_handoffs/S-HC-08_HANDOFF.md"
+    },
+    {
+      "id": "S-HC-07",
+      "title": "Reports dashboard + daily summary",
+      "owner": "Manuel",
+      "backupOwner": "Jean",
+      "status": "depends_on",
+      "track": "reports",
+      "dependsOn": ["S-HC-05", "S-HC-06"],
+      "handoff": "docs/07_handoffs/S-HC-07_HANDOFF.md"
+    },
+    {
+      "id": "S-HC-09",
+      "title": "First tenant publish readiness gate",
+      "owner": "Manuel",
+      "backupOwner": "Jean",
+      "status": "depends_on",
+      "track": "publish-gate",
+      "dependsOn": ["S-HC-05", "S-HC-06", "S-HC-08"],
+      "handoff": "docs/07_handoffs/S-HC-09_HANDOFF.md"
+    },
+    {
+      "id": "S-HC-CTRL-01",
+      "title": "Validar Control Bus/Oreshnik, onboarding Jean",
+      "owner": "Manuel",
+      "status": "done",
+      "track": "control-bus",
+      "dependsOn": [],
+      "handoff": "docs/07_handoffs/S-HC-CTRL-01_HANDOFF.md"
+    },
+    {
+      "id": "S-HC-CTRL-02",
+      "title": "Corregir autoridad: Oreshnik asigna workload",
+      "owner": "Manuel",
+      "status": "done",
+      "track": "control-bus",
+      "dependsOn": ["S-HC-CTRL-01"],
+      "handoff": "docs/07_handoffs/S-HC-CTRL-02_HANDOFF.md"
+    },
+    {
+      "id": "S-HC-CTRL-03",
+      "title": "Replicate Turpial Sound Oreshnik allocation model",
+      "owner": "Manuel",
+      "status": "done",
+      "track": "control-bus",
+      "dependsOn": ["S-HC-CTRL-02"],
+      "handoff": "docs/07_handoffs/S-HC-CTRL-03_HANDOFF.md"
+    },
+    {
       "id": "S-HC-PROD-00",
       "title": "Product audit and sprint allocation",
       "owner": "Manuel",
@@ -61,26 +189,7 @@
       "doneCriteria": ["Login funcional con email/password", "Sesiones emitidas y validadas", "Roles RBAC: OWNER, EDITOR, VIEWER operativos", "AuditLog registra quien entro, que hizo y cuando", "Guards de permisos en endpoints criticos", "No OAuth regression"],
       "handoff": "docs/07_handoffs/S-HC-PROD-01_HANDOFF.md",
       "closureStatus": "LOCAL_SIN_PUSH",
-      "closureNote": "Jean reporta trabajando S-HC-04 (Auth/RBAC) en local. NO existe rama, código ni commits en el repo. Requiere crear rama, commitear, pushear y ejecutar oreshnik:close al terminar."
-    },
-    {
-      "id": "S-HC-02",
-      "title": "Prisma seed/importer Turpial + DB service layer",
-      "owner": "Jean",
-      "backupOwner": "Manuel",
-      "agent": "Codex",
-      "status": "done",
-      "track": "db-foundation",
-      "branch": "Jean/s-hc-02-prisma-seed-turpial-2026-06-09",
-      "zone": ["packages/db/**", "scripts/**", "examples/tenants/turpial/**"],
-      "allowedFiles": [],
-      "prohibitedFiles": [],
-      "dependsOn": ["S-HC-PROD-00"],
-      "validations": [],
-      "doneCriteria": ["29 posts Turpial Sound en DB", "46 imagenes cargadas en DB", "Modelos User, Membership, AuditLog creados", "Prisma schema estable y migrado", "typecheck PASS"],
-      "handoff": "docs/07_handoffs/S-HC-02_HANDOFF.md",
-      "closureStatus": "PENDIENTE_CLOSURE",
-      "closureNote": "Jean reporta completado localmente. NO hay rama Jean/*, NO hay commits de Jean, NO hay sprint-event. Requiere: git push + npm run oreshnik:close -- --sprint S-HC-02 --operator Jean --push"
+      "closureNote": "Jean reporta trabajando S-HC-04 (Auth/RBAC) en local. Requiere crear rama, commitear, pushear y ejecutar oreshnik:close al terminar."
     },
     {
       "id": "S-HC-PROD-02",
