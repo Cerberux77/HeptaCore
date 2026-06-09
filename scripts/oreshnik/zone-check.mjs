@@ -21,7 +21,13 @@ if (!existsSync(zoneMapPath)) {
 const zoneMap = JSON.parse(readFileSync(zoneMapPath, "utf8"));
 const sprintOwner = zoneMap.sprintOwners?.[sprint];
 const mother = readMother().current;
-let changed = git(["diff", "--name-only", `${mother}...${branch}`], { allowFail: true }).output;
+let baseRef = mother;
+let motherExists = git(["rev-parse", "--verify", mother], { allowFail: true }).ok;
+if (!motherExists) {
+  baseRef = git(["rev-parse", "--verify", "master"], { allowFail: true }).ok ? "master" : "HEAD~10";
+  log("WARN", `Mother '${mother}' not found. Using ${baseRef} as diff base.`);
+}
+let changed = git(["diff", "--name-only", `${baseRef}...${branch}`], { allowFail: true }).output;
 if (!changed) changed = git(["diff", "--name-only"], { allowFail: true }).output;
 const files = changed.split(/\r?\n/).filter(Boolean);
 
