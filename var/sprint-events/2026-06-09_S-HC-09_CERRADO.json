@@ -1,0 +1,14 @@
+{
+  "sprint": "S-HC-09",
+  "operator": "Jean",
+  "status": "CERRADO",
+  "date": "2026-06-09",
+  "at": "2026-06-09T20:17:18.089Z",
+  "branch": "Jean/s-hc-00-onboarding-2026-06-09",
+  "previousMother": "MADRE/v10-s-hc-07-reports-dashboard-2026-06-09",
+  "nextMother": "MADRE/v11-s-hc-09-publish-readiness-gate-2026-06-09",
+  "description": "publish-readiness-gate",
+  "changedFiles": [
+    "var/oreshnik/task-board.json"
+  ]
+}
