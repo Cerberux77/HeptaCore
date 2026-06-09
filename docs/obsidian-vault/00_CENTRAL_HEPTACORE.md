@@ -2,9 +2,9 @@
 type: master-dashboard
 project: "HeptaCore"
 status: active-production
-phase: "Turpial Oreshnik model replicated, publishing held"
-last_updated: "09/06/26 13:45"
-mother_branch: "MADRE/v7-s-hc-ctrl-03-replicate-turpial-sound-oreshnik-allocation-mode-2026-06-09"
+phase: "Product roadmap allocated, Turpial proof gated by operator console"
+last_updated: "09/06/26 14:20"
+mother_branch: "MADRE/v8-s-hc-prod-00-product-audit-and-sprint-allocation-for-turpial--2026-06-09"
 current_branch: "Manuel/s-hc-xx-plan-holistico-heptacore-turpial-jean-2026-06-01"
 tags:
   - "#central"
@@ -27,7 +27,7 @@ tags:
 | Production URL | `https://heptacore.vercel.app` |
 | Tenant piloto | `turpial-sound` |
 | Publicacion RRSS real | Bloqueada hasta aprobacion explicita de Manuel |
-| Sprint actual | `S-HC-CTRL-03` |
+| Sprint actual | `S-HC-PROD-00` |
 | Rama actual | `Manuel/s-hc-xx-plan-holistico-heptacore-turpial-jean-2026-06-01` |
 
 ## Tenant Turpial Sound
@@ -72,6 +72,13 @@ Ambos deben devolver `ok: true`, `found: true`, `status: connected`, `encryptedB
 - [[METODOLOGIA/PUBLISHING_SAFETY_PROTOCOL]] - protocolo de seguridad para publicaciones.
 - `docs/07_handoffs/zone-map.json` - mapa de zonas y locks.
 
+## Product Roadmap
+
+- [[PRODUCT/HEPTACORE_PRODUCT_ROADMAP]] - product gap matrix and executable sprint sequence.
+- [[PRODUCT/TURPIAL_SOUND_PROOF_OF_CONCEPT]] - product-first proof plan for `turpial-sound`.
+- [[PRODUCT/OPERATOR_CONSOLE_REQUIREMENTS]] - login, assignment, tenant console, dry-run and publish gate requirements.
+- [[PRODUCT/SPRINT_ALLOCATION_BOARD]] - human-readable mirror of `var/oreshnik/task-board.json`.
+
 ## Jean
 
 | Documento | Uso |
@@ -84,19 +91,38 @@ Ambos deben devolver `ok: true`, `found: true`, `status: connected`, `encryptedB
 
 | Sprint | Owner | Scope | Estado |
 |---|---|---|---|
-| `S-HC-PUB-01` | Pendiente Oreshnik | Turpial Sound first controlled publishing test: discovery + dry-run + comando preparado | Candidato, no asignado manualmente |
+| `S-HC-PROD-01` | Manuel | Login/users/roles for Manuel and Jean | Ready after `S-HC-PROD-00` closes |
+| `S-HC-PROD-03` | Jean | Turpial Sound tenant console | Ready after `S-HC-PROD-00` closes |
+| `S-HC-PUB-01` | Jean | First real Turpial Sound publishing proof from product UI | Depends on product UI prerequisites |
 
 ## Control-State Actual
 
-La proxima accion no es ejecucion manual.
+La proxima accion no es ejecucion manual ni publicacion por consola.
 
 La proxima accion es:
 
 ```txt
-Oreshnik preflight + Oreshnik assignment packet
+Oreshnik close S-HC-PROD-00 -> Oreshnik assignment packet for product sprints
 ```
 
-Jean no ejecuta `S-HC-PUB-01` hasta que Oreshnik lo asigne. Manuel no lo asigna manualmente salvo override de emergencia documentado. La publicacion real sigue bloqueada.
+Jean no ejecuta `S-HC-PUB-01` hasta que el producto permita login, lane asignado, tenant console, discovery/dry-run UI, publish gate y event/handoff recording. Manuel no lo asigna manualmente salvo override de emergencia documentado. La publicacion real sigue bloqueada.
+
+## Product Reality Check - S-HC-PROD-00
+
+| Capability | Estado |
+|---|---|
+| Login operativo | Partial: page and cookie guard exist, session issuer missing |
+| Roles operador | Partial: Prisma roles exist, product wiring missing |
+| Oreshnik dashboard | Missing |
+| Assigned task screen | Missing |
+| Tenant console `turpial-sound` | Partial: static/local queue console exists |
+| Social connection status UI | Missing |
+| Strategy/assets/content queue UI | Partial: local JSON queue view exists |
+| Discovery/dry-run from UI | Missing |
+| One-post publish from UI | Missing |
+| Product publish hard gate | Missing |
+| Logs/handoff/event ledger from UI | Missing |
+| Obsidian/docs sync from UI | Missing |
 
 ## Modelo Oreshnik Heredado
 
@@ -170,3 +196,10 @@ Ultima actualizacion: 2026-06-09 VET | Operador: Manuel | Sprint: `S-HC-CTRL-01`
 - Rama hija: `Manuel/s-hc-xx-plan-holistico-heptacore-turpial-jean-2026-06-01`
 - Rama madre docs: `MADRE/v7-s-hc-ctrl-03-replicate-turpial-sound-oreshnik-allocation-mode-2026-06-09`
 - Descripcion: Replicate Turpial Sound Oreshnik allocation model
+
+## Cierre S-HC-PROD-00 - 2026-06-09
+
+- Operador: Manuel
+- Rama hija: `Manuel/s-hc-xx-plan-holistico-heptacore-turpial-jean-2026-06-01`
+- Rama madre docs: `MADRE/v8-s-hc-prod-00-product-audit-and-sprint-allocation-for-turpial--2026-06-09`
+- Descripcion: Product audit and sprint allocation for Turpial proof

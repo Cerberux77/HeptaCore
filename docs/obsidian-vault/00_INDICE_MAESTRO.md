@@ -35,6 +35,10 @@ Este vault es la capa operacional compartida entre Manuel y Jean. Git es la fuen
 - [[COLABORADORES/JEAN_FIRST_TASK]] - candidato Oreshnik pendiente de preflight para S-HC-PUB-01.
 - [[TENANTS/TURPIAL_SOUND/TENANT_STATUS]] - estado del primer tenant.
 - [[TENANTS/TURPIAL_SOUND/FIRST_PUBLISHING_TEST_PLAN]] - plan controlado de publicacion Turpial.
+- [[PRODUCT/HEPTACORE_PRODUCT_ROADMAP]] - roadmap ejecutable hacia el proof productivo.
+- [[PRODUCT/TURPIAL_SOUND_PROOF_OF_CONCEPT]] - prueba Turpial por UI.
+- [[PRODUCT/OPERATOR_CONSOLE_REQUIREMENTS]] - requerimientos de consola operador.
+- [[PRODUCT/SPRINT_ALLOCATION_BOARD]] - asignacion Oreshnik de sprints producto.
 - [[ARQUITECTURA/HEPTACORE_SYSTEM_MAP]] - mapa tecnico del producto.
 - [[QA/QA_RUNBOOK]] - validaciones de cierre.
 

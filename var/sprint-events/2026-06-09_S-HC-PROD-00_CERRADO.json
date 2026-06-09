@@ -1,0 +1,23 @@
+{
+  "sprint": "S-HC-PROD-00",
+  "operator": "Manuel",
+  "status": "CERRADO",
+  "date": "2026-06-09",
+  "at": "2026-06-09T18:20:36.168Z",
+  "branch": "Manuel/s-hc-xx-plan-holistico-heptacore-turpial-jean-2026-06-01",
+  "previousMother": "MADRE/v7-s-hc-ctrl-03-replicate-turpial-sound-oreshnik-allocation-mode-2026-06-09",
+  "nextMother": "MADRE/v8-s-hc-prod-00-product-audit-and-sprint-allocation-for-turpial--2026-06-09",
+  "description": "Product audit and sprint allocation for Turpial proof",
+  "changedFiles": [
+    "docs/obsidian-vault/00_CENTRAL_HEPTACORE.md",
+    "docs/obsidian-vault/00_INDICE_MAESTRO.md",
+    "docs/obsidian-vault/COLABORADORES/JEAN_ONBOARDING.md",
+    "docs/obsidian-vault/METODOLOGIA/ORESHNIK_CONTROL_BUS.md",
+    "docs/obsidian-vault/METODOLOGIA/TASK_ALLOCATION_PROTOCOL.md",
+    "docs/obsidian-vault/TENANTS/TURPIAL_SOUND/FIRST_PUBLISHING_TEST_PLAN.md",
+    "scripts/oreshnik/preflight-assignment.mjs",
+    "scripts/oreshnik/preflight.mjs",
+    "scripts/oreshnik/task-board.mjs",
+    "var/oreshnik/task-board.json"
+  ]
+}

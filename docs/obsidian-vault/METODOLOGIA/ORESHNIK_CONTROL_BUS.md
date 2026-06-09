@@ -99,3 +99,15 @@ Publishing work is never a free-form task. Any publishing assignment must includ
 | Agent handoff rules | AGENTS + handoffs | AGENTS + `AGENT_HANDOFF_PROTOCOL.md` | Present | Clarified assignment packet requirement |
 | Validation gates | tsc/build/diff/env/preview | typecheck/build/worker validate | Present | HeptaCore-specific gates |
 | Publish hard stop | RRSS dry-run/docs | `PUBLISHING_SAFETY_PROTOCOL.md` | Present | Real publish blocked |
+
+## Product Allocation Rule
+
+For the Turpial Sound proof, Oreshnik must not assign `S-HC-PUB-01` as a console-only publishing task while required product surfaces are missing. The allocator must first route work into product sprints that create the operator path:
+
+```txt
+login -> Oreshnik dashboard -> tenant console -> discovery UI -> dry-run UI -> controlled publish gate -> event/handoff recording -> first proof
+```
+
+`S-HC-PUB-01` remains a candidate, but it depends on `S-HC-PROD-01` through `S-HC-PROD-06`.
+
+Assignment approval is not required. Discovery approval is not required. Dry-run approval is not required. Real public publishing approval is required and must be implemented in the product flow.

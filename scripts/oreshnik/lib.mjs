@@ -35,7 +35,11 @@ export function hasFlag(name) {
 }
 
 export function git(args, options = {}) {
-  const result = spawnSync("git", args, { cwd: ROOT, encoding: "utf8" });
+  const result = spawnSync("git", args, {
+    cwd: ROOT,
+    encoding: "utf8",
+    timeout: options.timeoutMs
+  });
   if (result.status !== 0 && !options.allowFail) {
     throw new Error((result.stderr || result.stdout || `git ${args.join(" ")}`).trim());
   }

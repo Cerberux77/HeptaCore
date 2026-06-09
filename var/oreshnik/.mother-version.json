@@ -1,6 +1,6 @@
 {
-  "version": 7,
-  "current": "MADRE/v7-s-hc-ctrl-03-replicate-turpial-sound-oreshnik-allocation-mode-2026-06-09",
+  "version": 8,
+  "current": "MADRE/v8-s-hc-prod-00-product-audit-and-sprint-allocation-for-turpial--2026-06-09",
   "branches": [
     {
       "version": 2,
@@ -61,6 +61,16 @@
       "at": "2026-06-09T17:45:19.571Z",
       "previous": "MADRE/v6-s-hc-ctrl-02-make-oreshnik-responsible-for-task-allocation-2026-06-09",
       "description": "Replicate Turpial Sound Oreshnik allocation model"
+    },
+    {
+      "version": 8,
+      "name": "MADRE/v8-s-hc-prod-00-product-audit-and-sprint-allocation-for-turpial--2026-06-09",
+      "sprint": "S-HC-PROD-00",
+      "operator": "Manuel",
+      "date": "2026-06-09",
+      "at": "2026-06-09T18:20:36.168Z",
+      "previous": "MADRE/v7-s-hc-ctrl-03-replicate-turpial-sound-oreshnik-allocation-mode-2026-06-09",
+      "description": "Product audit and sprint allocation for Turpial proof"
     }
   ]
 }

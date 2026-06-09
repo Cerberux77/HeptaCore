@@ -11,6 +11,7 @@ import {
   log,
   nonIgnoredDirtyFiles,
   nowVet,
+  readJson,
   readMother,
   resolveOperator,
   ROOT,
@@ -48,7 +49,11 @@ log("INFO", `Dynamic mother: ${mother.current} (v${mother.version})`);
 
 console.log("");
 log("INFO", "1/7 Git fetch and mother availability");
-git(["fetch", "origin", "--prune", "--quiet"], { allowFail: true });
+const fetchResult = git(["fetch", "origin", "--prune", "--quiet"], { allowFail: true, timeoutMs: 15000 });
+if (fetchResult.status === null) {
+  warnings++;
+  log("WARN", "git fetch timed out after 15s; continuing with local refs.");
+}
 const originMother = git(["rev-parse", "--verify", `origin/${mother.current}`], { allowFail: true });
 const localMother = git(["rev-parse", "--verify", mother.current], { allowFail: true });
 if (originMother.ok || localMother.ok) log("OK", "Mother branch is available locally or remotely.");
@@ -172,11 +177,15 @@ console.log(`${warnings > 0 ? colors.yellow : colors.green}${colors.bold}[ORESHN
 console.log(`Close command: node scripts/oreshnik/close-sprint.mjs --sprint ${sprint || "SXX"} --operator ${operator} --desc "${desc}"`);
 
 if (dryRun) {
-  const recommendedSprint = operator === "Jean" ? "S-HC-PUB-01" : (sprint || "S-HC-PUB-01");
-  const recommendedOwner = recommendedSprint === "S-HC-PUB-01" ? "Jean" : operator;
-  const recommendedBranch = recommendedSprint === "S-HC-PUB-01"
-    ? "Jean/s-hc-pub-01-turpial-controlled-publishing-2026-06-09"
-    : `${operator}/${sanitize(recommendedSprint)}-${sanitize(desc)}-${today()}`;
+  const taskBoard = readJson(join(ROOT, "var", "oreshnik", "task-board.json"), { tasks: [] });
+  const chosenTask = sprint
+    ? taskBoard.tasks.find((task) => task.id === sprint)
+    : taskBoard.tasks.find((task) => task.status === "assigned")
+      || taskBoard.tasks.find((task) => task.status === "ready" && task.owner === operator)
+      || taskBoard.tasks.find((task) => task.status === "ready");
+  const recommendedSprint = chosenTask?.id || sprint || "S-HC-PROD-00";
+  const recommendedOwner = chosenTask?.owner || operator;
+  const recommendedBranch = chosenTask?.branch || `${recommendedOwner}/${sanitize(recommendedSprint)}-${sanitize(desc)}-${today()}`;
   console.log("");
   console.log(JSON.stringify({
     ok: true,
@@ -186,10 +195,12 @@ if (dryRun) {
     recommendedSprint,
     recommendedOwner,
     branch: recommendedBranch,
+    status: chosenTask?.status || "unregistered",
+    dependencies: chosenTask?.dependsOn || [],
     currentBranch: branch,
     mother: mother.current,
     publishAllowed: false,
-    approvalRequired: true,
+    approvalRequired: recommendedSprint === "S-HC-PUB-01" || recommendedSprint === "S-HC-PROD-05",
     warnings,
     blockers
   }, null, 2));

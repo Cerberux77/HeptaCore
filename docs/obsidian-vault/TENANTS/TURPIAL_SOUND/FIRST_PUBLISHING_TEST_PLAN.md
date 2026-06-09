@@ -18,9 +18,20 @@ Preparar el primer test controlado de publicacion para `turpial-sound` sin publi
 
 Este plan es candidato de asignacion. Jean solo lo ejecuta si Oreshnik emite un paquete de asignacion con `ok: true`, owner, branch, allowed files, prohibited files, validation gates y stop criteria.
 
+Desde `S-HC-PROD-00`, este plan deja de ser un ejercicio de consola independiente. `S-HC-PUB-01` depende de que HeptaCore pueda ejecutar la prueba desde el producto: login, dashboard Oreshnik, tenant console, discovery UI, dry-run UI, publish gate y registro de eventos/handoff.
+
+Prerequisitos:
+
+- `S-HC-PROD-01`: login/users/roles para Manuel y Jean.
+- `S-HC-PROD-02`: dashboard Oreshnik con lane asignado.
+- `S-HC-PROD-03`: consola tenant Turpial Sound.
+- `S-HC-PROD-04`: discovery + dry-run desde UI.
+- `S-HC-PROD-05`: publish controlado one-post desde UI con gate.
+- `S-HC-PROD-06`: logs/handoff/Obsidian event recording.
+
 ## Phase 1: Discovery
 
-Si Oreshnik asigna este candidato, Jean debe:
+Si Oreshnik asigna este candidato despues de los prerequisitos producto, Jean debe:
 
 - crear solo la rama indicada por el paquete Oreshnik;
 - conservar el paquete en el handoff;

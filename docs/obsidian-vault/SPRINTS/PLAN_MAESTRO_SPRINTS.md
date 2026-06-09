@@ -1,8 +1,8 @@
 ---
 type: sprint-plan
 project: "HeptaCore"
-last_updated: "2026-06-09T17:45:19.571Z"
-mother_branch: "MADRE/v7-s-hc-ctrl-03-replicate-turpial-sound-oreshnik-allocation-mode-2026-06-09"
+last_updated: "2026-06-09T18:20:36.168Z"
+mother_branch: "MADRE/v8-s-hc-prod-00-product-audit-and-sprint-allocation-for-turpial--2026-06-09"
 tags:
   - "#sprints"
   - "#manuel"
@@ -150,3 +150,14 @@ Ver [[PLAN_PARALELO_MANUEL_JEAN]] para distribucion de carga, backups y reasigna
 | Estado | CERRADO |
 | Madre docs | `MADRE/v7-s-hc-ctrl-03-replicate-turpial-sound-oreshnik-allocation-mode-2026-06-09` |
 | Descripcion | Replicate Turpial Sound Oreshnik allocation model |
+
+
+## Cierre S-HC-PROD-00 - 2026-06-09
+
+| Campo | Valor |
+|---|---|
+| Operador | Manuel |
+| Rama | `Manuel/s-hc-xx-plan-holistico-heptacore-turpial-jean-2026-06-01` |
+| Estado | CERRADO |
+| Madre docs | `MADRE/v8-s-hc-prod-00-product-audit-and-sprint-allocation-for-turpial--2026-06-09` |
+| Descripcion | Product audit and sprint allocation for Turpial proof |

@@ -11,7 +11,7 @@ import {
   RUNS_DIR
 } from "./lib.mjs";
 
-const candidate = getArg("--candidate", "S-HC-PUB-01");
+const requestedCandidate = getArg("--candidate", "");
 const requestedOwner = getArg("--owner", "");
 const dryRun = process.argv.includes("--dry-run");
 
@@ -25,7 +25,12 @@ function readText(relativePath) {
 }
 
 function isStarterVaultOnly(file) {
-  return file === "docs/Heptacore" || file.startsWith("docs/Heptacore/");
+  return file === "docs/Heptacore"
+    || file.startsWith("docs/Heptacore/")
+    || file === "docs/obsidian-vault/.obsidian"
+    || file.startsWith("docs/obsidian-vault/.obsidian/")
+    || file === "docs/obsidian-vault/Heptacore"
+    || file.startsWith("docs/obsidian-vault/Heptacore/");
 }
 
 const branch = currentBranch();
@@ -57,6 +62,32 @@ const centralText = readText("docs/obsidian-vault/00_CENTRAL_HEPTACORE.md");
 const publishBlocked = /Publicacion RRSS real\s*\|\s*Bloqueada/i.test(centralText) ||
   /publicacion real sigue bloqueada/i.test(centralText);
 
+function dependenciesMet(task) {
+  const done = new Set(taskBoard.tasks.filter((item) => item.status === "done").map((item) => item.id));
+  return (task.dependsOn || []).every((dependency) => done.has(dependency));
+}
+
+function chooseCandidate() {
+  if (requestedCandidate) return requestedCandidate;
+
+  if (requestedOwner) {
+    const ownerReady = taskBoard.tasks.find((task) => task.status === "ready" && task.owner === requestedOwner && dependenciesMet(task));
+    if (ownerReady) return ownerReady.id;
+    const ownerAssigned = taskBoard.tasks.find((task) => task.status === "assigned" && task.owner === requestedOwner);
+    if (ownerAssigned) return ownerAssigned.id;
+  }
+
+  const assigned = taskBoard.tasks.find((task) => task.status === "assigned");
+  if (assigned) return assigned.id;
+
+  const ready = taskBoard.tasks.find((task) => task.status === "ready" && dependenciesMet(task));
+  if (ready) return ready.id;
+
+  const available = taskBoard.tasks.find((task) => task.status === "ready");
+  return available?.id || "S-HC-PUB-01";
+}
+
+const candidate = chooseCandidate();
 const taskFromBoard = taskBoard.tasks.find((task) => task.id === candidate);
 const candidateDefinitions = {
   "S-HC-PUB-01": {
@@ -110,14 +141,19 @@ const definition = candidateDefinitions[candidate] || {
   title: taskFromBoard?.title || "Unregistered candidate",
   recommendedOwner: taskFromBoard?.owner || requestedOwner || "Unassigned",
   agent: "Codex",
-  branch: `${taskFromBoard?.owner || requestedOwner || "Owner"}/${candidate.toLowerCase()}-assignment`,
-  risk: "unknown",
-  approvalRequired: true,
-  allowedFiles: [],
-  inspectOnlyFiles: [],
-  prohibitedFiles: [".env", ".env.*"],
-  validations: ["npm run typecheck", "npm run build", "npm run worker:validate"],
-  stopCriteria: ["candidate not registered in preflight-assignment script"]
+  branch: taskFromBoard?.branch || `${taskFromBoard?.owner || requestedOwner || "Owner"}/${candidate.toLowerCase()}-assignment`,
+  risk: taskFromBoard?.track?.includes("publishing") ? "medium" : "low",
+  approvalRequired: candidate === "S-HC-PUB-01" || candidate === "S-HC-PROD-05",
+  allowedFiles: taskFromBoard?.allowedFiles || [],
+  inspectOnlyFiles: (taskFromBoard?.zone || []).filter((zone) => zone.includes(":inspect")),
+  prohibitedFiles: taskFromBoard?.prohibitedFiles || [".env", ".env.*"],
+  validations: taskFromBoard?.validations || ["npm run typecheck", "npm run build", "npm run worker:validate"],
+  stopCriteria: [
+    "scope exceeds Oreshnik assignment packet",
+    "dirty critical file outside assigned scope",
+    "token or secret appears in chat, logs, or diff",
+    "real publishing attempted without product gate and Manuel approval"
+  ]
 };
 
 const blockers = [];
@@ -138,6 +174,7 @@ const ok = blockers.length === 0;
 const packet = {
   ok,
   dryRun,
+  requestedCandidate: requestedCandidate || null,
   candidate,
   sprint: definition.sprint,
   title: definition.title,

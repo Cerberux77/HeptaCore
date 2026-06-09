@@ -73,3 +73,14 @@ Manuel may override allocation only to stop risk, unblock a critical production 
 ## Jean Execution Rule
 
 Jean executes only an Oreshnik-issued packet. If Jean receives a prompt without a packet, he must run preflight/assignment or ask for the packet. He must not choose a task from backlog manually.
+
+## Product Proof Allocation
+
+For product proof work, the task board is canonical at `var/oreshnik/task-board.json`.
+
+Oreshnik may allocate `S-HC-PROD-01` and `S-HC-PROD-03` in parallel after `S-HC-PROD-00` closes because Manuel and Jean work in different zones:
+
+- Manuel: auth/operator/Oreshnik shell.
+- Jean: Turpial tenant console and publishing workflow UI.
+
+Oreshnik must keep `S-HC-PUB-01` in `depends_on` until the product can perform discovery, dry-run, approval-gated one-post publish and event/handoff recording from the UI.

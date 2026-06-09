@@ -11,7 +11,7 @@ if (!existsSync(boardPath)) {
 }
 
 const board = JSON.parse(readFileSync(boardPath, "utf8"));
-const statusOrder = ["active", "ready", "blocked", "pending", "done"];
+const statusOrder = ["assigned", "ready", "depends_on", "blocked", "pending", "done"];
 
 console.log("");
 console.log(`${colors.bold}HeptaCore Parallel Task Board${colors.reset}`);

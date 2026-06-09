@@ -59,11 +59,13 @@ Jean no inicia implementacion solo con preflight. Debe recibir un paquete Oreshn
 
 El modelo viene de Turpial Sound: rama hija propia, lectura de la madre dinamica antes de trabajar y cierre/handoff que aporta docs sin pisar a Manuel.
 
+Desde `S-HC-PROD-00`, Jean no debe saltar directo a `S-HC-PUB-01` por consola. El candidato de publicacion real depende de sprints producto. El primer carril probable de Jean es `S-HC-PROD-03` para acercar Turpial Sound al proof desde la UI, y luego `S-HC-PROD-04`/`S-HC-PROD-05` cuando Oreshnik los libere.
+
 Ejemplo de paquete candidato en dry-run:
 
 ```bash
 npm run oreshnik:resume -- --operator Jean --dry-run
-npm run oreshnik:assign -- --candidate S-HC-PUB-01 --owner Jean --dry-run
+npm run oreshnik:assign -- --dry-run
 ```
 
 Si hay blockers o el paquete queda `recommended_pending_formal_assignment`, parar y pedir asignacion formal.
