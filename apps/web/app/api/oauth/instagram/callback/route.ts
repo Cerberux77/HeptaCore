@@ -7,6 +7,36 @@ import {
 import { canPersistEncryptedTokens } from "../../../../../lib/token-vault";
 
 const tokenUrl = "https://api.instagram.com/oauth/access_token";
+const requestContentType = "application/x-www-form-urlencoded";
+
+function last4(value: string | undefined) {
+  return value ? value.slice(-4) : null;
+}
+
+function redactSensitiveTokenText(value: string) {
+  return value
+    .replace(/("access_token"\s*:\s*")[^"]+/gi, "$1[redacted]")
+    .replace(/("client_secret"\s*:\s*")[^"]+/gi, "$1[redacted]")
+    .replace(/(access_token=)[^&\s"]+/gi, "$1[redacted]")
+    .replace(/(client_secret=)[^&\s"]+/gi, "$1[redacted]");
+}
+
+type InstagramTokenPayload = {
+  access_token?: string;
+  expires_in?: number;
+  user_id?: string | number;
+  error_type?: string;
+  code?: number;
+  error_message?: string;
+};
+
+function parseTokenPayload(rawBody: string): InstagramTokenPayload {
+  try {
+    return JSON.parse(rawBody || "{}") as InstagramTokenPayload;
+  } catch {
+    return {};
+  }
+}
 
 function parseState(state: string | null) {
   if (!state) return null;
@@ -38,6 +68,17 @@ function parseState(state: string | null) {
 async function exchangeCode(code: string, redirectUri: string) {
   const appId = process.env.INSTAGRAM_APP_ID;
   const appSecret = process.env.INSTAGRAM_APP_SECRET;
+  const diagnostics = {
+    tokenEndpoint: tokenUrl,
+    requestContentType,
+    appIdUsedLast4: last4(appId),
+    appIdExpectedLast4: last4(process.env.INSTAGRAM_APP_ID),
+    appSecretPresent: Boolean(appSecret),
+    appSecretLength: appSecret?.length ?? 0,
+    redirectUriUsedForExchange: redirectUri,
+    redirectUriLength: redirectUri.length,
+    codeLength: code.length
+  };
 
   if (!appId || !appSecret) {
     return {
@@ -52,12 +93,13 @@ async function exchangeCode(code: string, redirectUri: string) {
         missingEnv: {
           INSTAGRAM_APP_ID: !appId,
           INSTAGRAM_APP_SECRET: !appSecret
-        }
+        },
+        ...diagnostics
       }
     };
   }
 
-  const body = new FormData();
+  const body = new URLSearchParams();
   body.set("client_id", appId);
   body.set("client_secret", appSecret);
   body.set("grant_type", "authorization_code");
@@ -66,17 +108,15 @@ async function exchangeCode(code: string, redirectUri: string) {
 
   const response = await fetch(tokenUrl, {
     method: "POST",
-    body
+    headers: {
+      "Content-Type": requestContentType
+    },
+    body: body.toString()
   });
 
-  const payload = (await response.json().catch(() => ({}))) as {
-    access_token?: string;
-    expires_in?: number;
-    user_id?: string | number;
-    error_type?: string;
-    code?: number;
-    error_message?: string;
-  };
+  const rawBody = await response.text();
+  const tokenRawErrorBody = redactSensitiveTokenText(rawBody);
+  const payload = parseTokenPayload(rawBody);
 
   if (!response.ok || !payload.access_token) {
     return {
@@ -89,7 +129,10 @@ async function exchangeCode(code: string, redirectUri: string) {
         tokenReceived: false,
         errorType: payload.error_type ?? "token_exchange_failed",
         errorCode: payload.code ?? response.status,
-        message: payload.error_message ?? "Instagram token exchange failed."
+        message: payload.error_message ?? "Instagram token exchange failed.",
+        tokenHttpStatus: response.status,
+        tokenRawErrorBody,
+        ...diagnostics
       }
     };
   }
@@ -104,6 +147,13 @@ async function exchangeCode(code: string, redirectUri: string) {
       tokenReceived: true,
       expiresIn: payload.expires_in ?? null,
       providerUserIdReceived: Boolean(payload.user_id),
+      tokenEndpoint: tokenUrl,
+      requestContentType,
+      appIdUsedLast4: last4(appId),
+      redirectUriUsedForExchange: redirectUri,
+      redirectUriLength: redirectUri.length,
+      codeLength: code.length,
+      tokenHttpStatus: response.status,
       redirectUriSource: "request-origin",
       tokenStored: false,
       storageBlockedBy: canPersistEncryptedTokens()
