@@ -23,8 +23,24 @@ function cuid() {
   return `c${Date.now().toString(36)}${Math.random().toString(36).slice(2, 10)}`;
 }
 
-const tenant = await prisma.tenant.findFirst({ where: { slug: TENANT_SLUG } });
-if (!tenant) throw new Error(`Tenant ${TENANT_SLUG} not found`);
+let tenant = await prisma.tenant.findFirst({ where: { slug: TENANT_SLUG } });
+if (!tenant) {
+  tenant = await prisma.tenant.create({
+    data: {
+      slug: TENANT_SLUG,
+      name: "Turpial Sound",
+      plan: "PILOT",
+      automationMode: "APPROVAL_REQUIRED",
+    },
+  });
+  console.log(`Tenant created: ${TENANT_SLUG}`);
+} else {
+  tenant = await prisma.tenant.update({
+    where: { id: tenant.id },
+    data: { name: "Turpial Sound", automationMode: "APPROVAL_REQUIRED" },
+  });
+  console.log(`Tenant found: ${TENANT_SLUG}`);
+}
 
 // 1. Find or create Project
 let project = await prisma.project.findFirst({ where: { tenantId: tenant.id, name: "Turpial Sound" } });
@@ -41,7 +57,44 @@ if (!project) {
 }
 console.log(`Project: ${project.id}`);
 
-// 2. Get existing social accounts
+// 2. Ensure brand profile and sandbox social accounts
+const existingProfile = await prisma.brandProfile.findFirst({ where: { tenantId: tenant.id } });
+if (!existingProfile) {
+  await prisma.brandProfile.create({
+    data: {
+      id: cuid(),
+      tenantId: tenant.id,
+      brandName: "Turpial Sound",
+      industry: "Musica, estudio de grabacion, salas de ensayo y marketplace",
+      geography: "Caracas, Venezuela",
+      toneOfVoice: ["tecnico", "cercano", "confiable", "comunidad musical"],
+      socialChannels: ["instagram", "facebook"],
+      servicesProducts: ["estudio", "salas de ensayo", "produccion musical", "marketplace"],
+      targetAudience: ["bandas", "solistas", "productores", "compradores de equipos"],
+      assetAvailability: { localAssets: true, count: 46 },
+      publishingPermissions: { realPublishing: false, dryRun: true, requiresManualApproval: true },
+      updatedAt: new Date(),
+    },
+  });
+  console.log("BrandProfile created");
+}
+
+for (const network of ["INSTAGRAM", "FACEBOOK"]) {
+  const existing = await prisma.socialAccount.findFirst({ where: { tenantId: tenant.id, network } });
+  if (!existing) {
+    await prisma.socialAccount.create({
+      data: {
+        tenantId: tenant.id,
+        network,
+        handle: network === "INSTAGRAM" ? "@turpialsound" : "Turpial Sound",
+        externalAccountId: `sandbox-${network.toLowerCase()}-${TENANT_SLUG}`,
+        status: "sandbox_connected",
+        scopes: ["dry_run", "content_planning"],
+      },
+    });
+  }
+}
+
 const accounts = await prisma.socialAccount.findMany({ where: { tenantId: tenant.id } });
 const accountByNetwork = {};
 for (const a of accounts) {
@@ -124,7 +177,10 @@ console.log(`Assets: ${Object.keys(assetMap).length}`);
 
 // 5. Create ContentDrafts from queue
 let draftCount = 0;
-for (const item of queue) {
+const existingDrafts = await prisma.contentDraft.count({ where: { tenantId: tenant.id } });
+if (existingDrafts > 0) {
+  console.log(`ContentDrafts already present: ${existingDrafts}. Skipping draft import.`);
+} else for (const item of queue) {
   const channel = CHANNEL_MAP[item.channel] || "INSTAGRAM";
   const networkAccount = accountByNetwork[channel];
   const pillar = item.pilar ? pillarMap[item.pilar] : null;
@@ -189,6 +245,25 @@ for (const item of queue) {
   draftCount++;
 }
 console.log(`ContentDrafts: ${draftCount}`);
+
+const approvedCount = await prisma.contentDraft.count({ where: { tenantId: tenant.id, status: "APPROVED" } });
+if (approvedCount === 0) {
+  const initialApproved = await prisma.contentDraft.findMany({
+    where: { tenantId: tenant.id, status: "DRAFT", assets: { some: {} } },
+    orderBy: [{ scheduledFor: "asc" }, { createdAt: "asc" }],
+    take: 3,
+    select: { id: true, title: true },
+  });
+
+  for (const draft of initialApproved) {
+    await prisma.contentDraft.update({
+      where: { id: draft.id },
+      data: { status: "APPROVED", requiresReview: false },
+    });
+  }
+
+  console.log(`Initial approved drafts: ${initialApproved.length}`);
+}
 
 await prisma.$disconnect();
 await pool.end();

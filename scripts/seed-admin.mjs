@@ -3,9 +3,12 @@ import { PrismaClient } from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import pg from "pg";
 
-const ADMIN_EMAIL = "jean@heptacore.dev";
-const ADMIN_PASSWORD = "admin123";
-const TENANT_SLUG = "turpial-sound";
+const ADMIN_EMAIL = process.env.HEPTACORE_ADMIN_EMAIL || "jean@heptacore.dev";
+const ADMIN_PASSWORD = process.env.HEPTACORE_ADMIN_PASSWORD || "admin123";
+const ADMIN_ROLE = process.env.HEPTACORE_ADMIN_ROLE || "SUPER_ADMIN";
+const TENANT_SLUG = process.env.HEPTACORE_TENANT_SLUG === "turpial"
+  ? "turpial-sound"
+  : process.env.HEPTACORE_TENANT_SLUG || "turpial-sound";
 
 const pool = new pg.Pool({ connectionString: process.env.DATABASE_URL });
 const adapter = new PrismaPg(pool);
@@ -31,15 +34,15 @@ const membership = await prisma.membership.findFirst({
 });
 if (!membership) {
   await prisma.membership.create({
-    data: { tenantId: tenant.id, userId: user.id, role: "OWNER" },
+    data: { tenantId: tenant.id, userId: user.id, role: ADMIN_ROLE },
   });
-  console.log(`Membership created: OWNER on ${TENANT_SLUG}`);
+  console.log(`Membership created: ${ADMIN_ROLE} on ${TENANT_SLUG}`);
 } else {
   await prisma.membership.update({
     where: { id: membership.id },
-    data: { role: "OWNER" },
+    data: { role: ADMIN_ROLE },
   });
-  console.log(`Membership updated: OWNER on ${TENANT_SLUG}`);
+  console.log(`Membership updated: ${ADMIN_ROLE} on ${TENANT_SLUG}`);
 }
 
 await prisma.$disconnect();

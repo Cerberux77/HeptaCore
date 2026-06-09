@@ -1,0 +1,3 @@
+-- Historical migration already applied in production.
+-- The SQL file was restored as a placeholder because the deployed database
+-- already has this migration recorded in _prisma_migrations.

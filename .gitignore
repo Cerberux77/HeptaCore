@@ -20,5 +20,6 @@ var/oreshnik/.session-start
 *.tsbuildinfo
 packages/db/prisma/dev.db
 packages/db/prisma/dev.db-journal
+apps/web/public/tenant-assets/
 
 .vercel

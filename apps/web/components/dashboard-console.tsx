@@ -5,6 +5,7 @@ import {
   AlertTriangle,
   BarChart3,
   Bot,
+  CalendarDays,
   Check,
   ChevronRight,
   Circle,
@@ -14,18 +15,25 @@ import {
   ImageIcon,
   LockKeyhole,
   MessageSquareText,
+  PackageSearch,
   Settings2,
   ShieldCheck,
   X,
 } from "lucide-react";
 import { HeptaCoreWordmark } from "./heptacore-mark";
-import type { DashboardMetrics, DraftQueueItem } from "../lib/dashboard";
+import type {
+  CalendarItem,
+  DashboardMetrics,
+  DraftQueueItem,
+  StrategySnapshot,
+  TenantAssetItem,
+} from "../lib/dashboard";
 
-type View = "overview" | "queue" | "checklist" | "reports" | "readiness";
+type View = "overview" | "strategy" | "queue" | "assets" | "calendar" | "checklist" | "reports" | "readiness";
 
 function assetUrl(path: string | null | undefined) {
   if (!path) return "";
-  return `/api/tenant-assets/${path.replace(/^content\/inbox\//, "")}`;
+  return `/tenant-assets/turpial/${path.replace(/^content\/inbox\//, "")}`;
 }
 
 function channelLabel(item: DraftQueueItem) {
@@ -94,21 +102,32 @@ function StatusCard({
 export function DashboardConsole({
   metrics,
   queue,
+  assets,
+  strategy,
+  calendar,
   checklist,
   report,
   readiness,
   tenantSlug,
+  adminMode = false,
 }: {
   metrics: DashboardMetrics | null;
   queue: DraftQueueItem[];
+  assets: TenantAssetItem[];
+  strategy: StrategySnapshot | null;
+  calendar: CalendarItem[];
   checklist: Array<{ label: string; done: boolean }>;
   report: any;
   readiness: any;
   tenantSlug: string;
+  adminMode?: boolean;
 }) {
   const [view, setView] = useState<View>("overview");
   const [selectedId, setSelectedId] = useState(queue[0]?.id ?? "");
   const [localQueue, setLocalQueue] = useState(queue);
+  const [manualApproval, setManualApproval] = useState(false);
+  const [publishState, setPublishState] = useState<"idle" | "loading" | "done" | "error">("idle");
+  const [publishMessage, setPublishMessage] = useState("");
   const selected = localQueue.find((i) => i.id === selectedId) ?? localQueue[0];
 
   const pendingReview = localQueue.filter(
@@ -125,6 +144,38 @@ export function DashboardConsole({
     setLocalQueue((prev) => prev.map((d) => (d.id === id ? { ...d, status: newStatus } : d)));
   }, []);
 
+  const firstApproved = localQueue.find((item) => item.status === "APPROVED");
+
+  async function handleDryRunPublish() {
+    if (!firstApproved) return;
+    setPublishState("loading");
+    setPublishMessage("");
+    try {
+      const res = await fetch("/api/publishing/publish", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          tenantSlug,
+          draftId: firstApproved.id,
+          manualApproval,
+          mode: "dry-run",
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.ok) {
+        setPublishState("error");
+        setPublishMessage(data.error || "No se pudo ejecutar el dry-run.");
+        return;
+      }
+      updateLocalStatus(firstApproved.id, "SCHEDULED");
+      setPublishState("done");
+      setPublishMessage(`Dry-run registrado para ${firstApproved.title}.`);
+    } catch (error) {
+      setPublishState("error");
+      setPublishMessage(error instanceof Error ? error.message : "Error de red.");
+    }
+  }
+
   return (
     <main className="app-shell">
       <aside className="app-sidebar">
@@ -138,10 +189,14 @@ export function DashboardConsole({
         </div>
         <nav className="app-nav">
           <NavButton icon={<Gauge size={17} />} active={view === "overview"} onClick={() => setView("overview")}>Operaciones</NavButton>
+          <NavButton icon={<Bot size={17} />} active={view === "strategy"} onClick={() => setView("strategy")}>Estrategia</NavButton>
           <NavButton icon={<ClipboardList size={17} />} active={view === "queue"} onClick={() => setView("queue")}>Cola de drafts</NavButton>
+          <NavButton icon={<PackageSearch size={17} />} active={view === "assets"} onClick={() => setView("assets")}>Activos</NavButton>
+          <NavButton icon={<CalendarDays size={17} />} active={view === "calendar"} onClick={() => setView("calendar")}>Cronograma</NavButton>
           <NavButton icon={<Check size={17} />} active={view === "checklist"} onClick={() => setView("checklist")}>Checklist</NavButton>
           <NavButton icon={<FileText size={17} />} active={view === "reports"} onClick={() => setView("reports")}>Reportes</NavButton>
           <NavButton icon={<LockKeyhole size={17} />} active={view === "readiness"} onClick={() => setView("readiness")}>Publicacion</NavButton>
+          {adminMode && <a className="nav-link" href="/admin"><ShieldCheck size={17} /> Admin global</a>}
         </nav>
         <div className="guardrail-box">
           <ShieldCheck size={17} />
@@ -156,6 +211,11 @@ export function DashboardConsole({
             <h1>Control de RRSS y APROBACIONES</h1>
           </div>
           <div className="header-actions">
+            {adminMode && (
+              <a className="tool-button" href="/admin">
+                <ShieldCheck size={16} /> Admin
+              </a>
+            )}
             <button className="primary-action" onClick={() => setView("queue")}>
               <Check size={16} /> Revisar cola
             </button>
@@ -232,6 +292,37 @@ export function DashboardConsole({
           </div>
         )}
 
+        {view === "strategy" && (
+          <div className="strategy-grid">
+            <section className="work-panel span-2">
+              <PanelTitle icon={<Bot size={17} />} title="Estrategia activa" />
+              <dl className="strategy-defs">
+                <dt>Proyecto</dt>
+                <dd>{strategy?.projectName ?? metrics?.tenant.name ?? "Tenant"}</dd>
+                <dt>Oferta</dt>
+                <dd>{strategy?.projectDescription ?? "Estrategia pendiente de completar."}</dd>
+                <dt>Voz</dt>
+                <dd>
+                  {strategy?.brandVoice.length
+                    ? strategy.brandVoice.join(" / ")
+                    : "Criterio tecnico, confianza, comunidad y conversion por WhatsApp."}
+                </dd>
+              </dl>
+            </section>
+            <section className="work-panel span-2">
+              <PanelTitle icon={<MessageSquareText size={17} />} title="Pilares de contenido" />
+              <div className="market-grid pillars-grid">
+                {(strategy?.pillars.length ? strategy.pillars : metrics?.pillars ?? []).map((pillar: any) => (
+                  <div className="market-card" key={pillar.name}>
+                    <strong>{pillar.name}</strong>
+                    <small>{pillar.description ?? `${pillar.count ?? pillar.priority ?? 0} piezas planificadas`}</small>
+                  </div>
+                ))}
+              </div>
+            </section>
+          </div>
+        )}
+
         {view === "queue" && selected && (
           <div className="queue-workspace">
             <section className="work-panel queue-column">
@@ -280,6 +371,54 @@ export function DashboardConsole({
                     </span>
                   </div>
                 )}
+              </div>
+            </section>
+          </div>
+        )}
+
+        {view === "assets" && (
+          <div className="strategy-grid">
+            <section className="work-panel span-2">
+              <PanelTitle icon={<PackageSearch size={17} />} title="Activos del tenant" />
+              <div className="market-grid">
+                {assets.map((asset) => (
+                  <div className="market-card" key={asset.id}>
+                    {asset.path ? (
+                      <img src={assetUrl(asset.path)} alt={asset.filename} className="asset-tile" />
+                    ) : (
+                      <div className="asset-tile asset-empty"><PackageSearch size={22} /></div>
+                    )}
+                    <strong>{asset.filename}</strong>
+                    <small>{asset.kind} / {asset.rightsStatus} / {asset.draftCount} drafts</small>
+                  </div>
+                ))}
+                {assets.length === 0 && <p style={{ padding: 14 }}>No hay activos cargados.</p>}
+              </div>
+            </section>
+          </div>
+        )}
+
+        {view === "calendar" && (
+          <div className="strategy-grid">
+            <section className="work-panel span-2">
+              <PanelTitle icon={<CalendarDays size={17} />} title="Cronograma propuesto" />
+              <div className="calendar-list">
+                {calendar.map((item) => (
+                  <button
+                    key={item.id}
+                    className="calendar-row"
+                    onClick={() => {
+                      setSelectedId(item.id);
+                      setView("queue");
+                    }}
+                  >
+                    <span>{item.scheduledFor ?? "Sin fecha"}</span>
+                    <strong>{item.title}</strong>
+                    <small>{item.network} / {item.format} / {item.status}</small>
+                    <Risk level={item.riskLevel} />
+                  </button>
+                ))}
+                {calendar.length === 0 && <p style={{ padding: 14 }}>No hay cronograma cargado.</p>}
               </div>
             </section>
           </div>
@@ -346,7 +485,9 @@ export function DashboardConsole({
                 <div className={`status-card ${readiness.allPassed ? "status-ok" : "status-warn"}`} style={{ marginBottom: 14 }}>
                   <span>Estado</span>
                   <strong>{readiness.allPassed ? "LISTO" : "BLOQUEADO"}</strong>
-                  <small>{readiness.summary}</small>
+                  <small>
+                    {readiness.summary} Credenciales: {readiness.credentialCount ?? 0}. Programados: {readiness.scheduledDrafts ?? 0}.
+                  </small>
                 </div>
                 <h3>Gates de seguridad</h3>
                 <ul className="check-list">
@@ -357,6 +498,34 @@ export function DashboardConsole({
                     </li>
                   ))}
                 </ul>
+                <div className="publish-gate">
+                  <label className="gate-check">
+                    <input
+                      type="checkbox"
+                      checked={manualApproval}
+                      onChange={(event) => setManualApproval(event.target.checked)}
+                    />
+                    Manuel aprueba ejecutar este dry-run controlado. No se publicara en redes reales.
+                  </label>
+                  <button
+                    className="primary-action"
+                    onClick={handleDryRunPublish}
+                    disabled={!manualApproval || publishState === "loading" || !firstApproved}
+                  >
+                    <LockKeyhole size={16} />
+                    {publishState === "loading" ? "Ejecutando..." : "Ejecutar dry-run"}
+                  </button>
+                  <small>
+                    {firstApproved
+                      ? `Siguiente draft aprobado: ${firstApproved.title}`
+                      : "No hay drafts aprobados para ejecutar."}
+                  </small>
+                  {publishMessage && (
+                    <p className={publishState === "error" ? "login-error" : "publish-ok"}>
+                      {publishMessage}
+                    </p>
+                  )}
+                </div>
                 {!readiness.allPassed && (
                   <>
                     <h3 style={{ marginTop: 14 }}>Plan de rollback</h3>

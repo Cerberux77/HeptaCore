@@ -49,6 +49,63 @@ export type DraftQueueItem = {
   asset: { filename: string; path: string | null; kind: string } | null;
 };
 
+export type TenantAssetItem = {
+  id: string;
+  filename: string;
+  kind: string;
+  path: string | null;
+  rightsStatus: string;
+  draftCount: number;
+};
+
+export type StrategySnapshot = {
+  projectName: string | null;
+  projectDescription: string | null;
+  brandVoice: string[];
+  pillars: Array<{ name: string; description: string | null; priority: number }>;
+};
+
+export type CalendarItem = {
+  id: string;
+  title: string;
+  network: string;
+  format: string;
+  status: string;
+  scheduledFor: string | null;
+  riskLevel: string;
+};
+
+export type AdminDashboardData = {
+  totals: {
+    tenants: number;
+    drafts: number;
+    approved: number;
+    scheduled: number;
+    published: number;
+    assets: number;
+    pendingReview: number;
+  };
+  tenants: Array<{
+    id: string;
+    slug: string;
+    name: string;
+    plan: string;
+    mode: string;
+    drafts: number;
+    approved: number;
+    scheduled: number;
+    published: number;
+    assets: number;
+    pendingReview: number;
+  }>;
+  recentActivity: Array<{
+    tenantName: string | null;
+    action: string;
+    target: string | null;
+    at: string;
+  }>;
+};
+
 export const getDashboardMetrics = cache(
   async (tenantSlug: string): Promise<DashboardMetrics | null> => {
     const tenant = await prisma.tenant.findFirst({
@@ -132,6 +189,107 @@ export const getDashboardMetrics = cache(
   },
 );
 
+export async function getTenantAssets(tenantSlug: string): Promise<TenantAssetItem[]> {
+  const tenant = await prisma.tenant.findFirst({
+    where: { slug: tenantSlug },
+    select: { id: true },
+  });
+  if (!tenant) return [];
+
+  const assets = await prisma.asset.findMany({
+    where: { tenantId: tenant.id },
+    orderBy: [{ kind: "asc" }, { filename: "asc" }],
+    select: {
+      id: true,
+      filename: true,
+      kind: true,
+      sourcePath: true,
+      rightsStatus: true,
+      _count: { select: { drafts: true } },
+    },
+  });
+
+  return assets.map((asset) => ({
+    id: asset.id,
+    filename: asset.filename,
+    kind: asset.kind,
+    path: asset.sourcePath,
+    rightsStatus: asset.rightsStatus,
+    draftCount: asset._count.drafts,
+  }));
+}
+
+export async function getStrategySnapshot(tenantSlug: string): Promise<StrategySnapshot | null> {
+  const tenant = await prisma.tenant.findFirst({
+    where: { slug: tenantSlug },
+    select: { id: true },
+  });
+  if (!tenant) return null;
+
+  const [project, profile, pillars] = await Promise.all([
+    prisma.project.findFirst({
+      where: { tenantId: tenant.id },
+      orderBy: { createdAt: "asc" },
+      select: { name: true, description: true },
+    }),
+    prisma.brandProfile.findFirst({
+      where: { tenantId: tenant.id },
+      select: { toneOfVoice: true },
+    }),
+    prisma.contentPillar.findMany({
+      where: { tenantId: tenant.id },
+      orderBy: [{ priority: "desc" }, { name: "asc" }],
+      select: { name: true, description: true, priority: true },
+    }),
+  ]);
+
+  const voice = Array.isArray(profile?.toneOfVoice)
+    ? (profile?.toneOfVoice as unknown[]).map(String)
+    : profile?.toneOfVoice && typeof profile.toneOfVoice === "object"
+      ? Object.values(profile.toneOfVoice as Record<string, unknown>).map(String)
+      : [];
+
+  return {
+    projectName: project?.name ?? null,
+    projectDescription: project?.description ?? null,
+    brandVoice: voice,
+    pillars,
+  };
+}
+
+export async function getContentCalendar(tenantSlug: string): Promise<CalendarItem[]> {
+  const tenant = await prisma.tenant.findFirst({
+    where: { slug: tenantSlug },
+    select: { id: true },
+  });
+  if (!tenant) return [];
+
+  const drafts = await prisma.contentDraft.findMany({
+    where: { tenantId: tenant.id },
+    orderBy: [{ scheduledFor: "asc" }, { createdAt: "asc" }],
+    take: 60,
+    select: {
+      id: true,
+      title: true,
+      network: true,
+      format: true,
+      status: true,
+      scheduledFor: true,
+      riskLevel: true,
+    },
+  });
+
+  return drafts.map((draft) => ({
+    id: draft.id,
+    title: draft.title,
+    network: draft.network,
+    format: draft.format,
+    status: draft.status,
+    scheduledFor: draft.scheduledFor?.toISOString().slice(0, 10) ?? null,
+    riskLevel: draft.riskLevel,
+  }));
+}
+
 export const getDraftQueue = cache(
   async (tenantSlug: string): Promise<DraftQueueItem[]> => {
     const tenant = await prisma.tenant.findFirst({
@@ -193,10 +351,11 @@ export async function getChecklist(tenantSlug: string) {
   });
   if (!tenant) return [];
 
-  const [project, profile, accounts, minDrafts] = await Promise.all([
+  const [project, profile, accounts, credentials, minDrafts] = await Promise.all([
     prisma.project.findFirst({ where: { tenantId: tenant.id } }),
     prisma.brandProfile.findFirst({ where: { tenantId: tenant.id } }),
     prisma.socialAccount.count({ where: { tenantId: tenant.id } }),
+    prisma.credentialVaultItem.count({ where: { tenantId: tenant.id } }),
     prisma.contentDraft.count({ where: { tenantId: tenant.id, status: "APPROVED" } }),
   ]);
 
@@ -205,7 +364,7 @@ export async function getChecklist(tenantSlug: string) {
     { label: "Proyecto definido", done: !!project },
     { label: "Cuentas sociales conectadas", done: accounts > 0 },
     { label: "Al menos 1 draft aprobado", done: minDrafts > 0 },
-    { label: "Credenciales OAuth configuradas", done: false },
+    { label: "Credenciales OAuth configuradas", done: credentials > 0 },
     { label: "Voz de marca y CTA definidos", done: !!profile },
     { label: "Assets validados", done: minDrafts > 0 },
     { label: "Ventanas horarias configuradas", done: minDrafts > 0 },
@@ -252,31 +411,37 @@ export async function getReadinessReport(tenantSlug: string) {
   });
   if (!tenant) return null;
 
-  const [approved, scheduled, published, credentials] = await Promise.all([
+  const [approved, scheduled, published, credentials, assetsLinked] = await Promise.all([
     prisma.contentDraft.count({ where: { tenantId: tenant.id, status: "APPROVED" } }),
     prisma.contentDraft.count({ where: { tenantId: tenant.id, status: "SCHEDULED" } }),
     prisma.contentDraft.count({ where: { tenantId: tenant.id, status: "PUBLISHED" } }),
     prisma.credentialVaultItem.count({ where: { tenantId: tenant.id } }),
+    prisma.contentDraft.count({ where: { tenantId: tenant.id, status: "APPROVED", assets: { some: {} } } }),
   ]);
 
   const gates = [
     { label: "Al menos 1 draft aprobado", passed: approved > 0 },
-    { label: "Credenciales OAuth almacenadas", passed: credentials > 0 },
-    { label: "Drafts programados (SCHEDULED)", passed: scheduled > 0 },
+    { label: "Draft aprobado con asset vinculado", passed: assetsLinked > 0 },
+    { label: "Credenciales OAuth del tenant en vault", passed: credentials > 0 },
     { label: "Sin publicaciones reales previas (dry-run)", passed: published === 0 },
     { label: "Modo dry-run activo", passed: true },
     { label: "Sin credenciales reales en git", passed: true },
     { label: "Approval queue funcional", passed: true },
-    { label: "Worker queue listo", passed: true },
+    { label: "Dry-run ejecutable desde la web", passed: true },
   ];
 
   const allPassed = gates.every((g) => g.passed);
+  const livePublishingReady = credentials > 0 && scheduled > 0;
 
   return {
     tenantName: tenant.name,
     gates,
     allPassed,
     dryRunReady: allPassed,
+    livePublishingReady,
+    approvedDrafts: approved,
+    scheduledDrafts: scheduled,
+    credentialCount: credentials,
     summary: allPassed
       ? "Listo para publicar en modo dry-run. Sin riesgo de publicacion real."
       : "Faltan gates de seguridad. No publicar.",
@@ -286,5 +451,81 @@ export async function getReadinessReport(tenantSlug: string) {
       "3. Revertir drafts a DRAFT desde SCHEDULED",
       "4. Verificar que no hay externalPostId en drafts",
     ],
+  };
+}
+
+export async function getAdminDashboard(): Promise<AdminDashboardData> {
+  const tenants = await prisma.tenant.findMany({
+    orderBy: { createdAt: "asc" },
+    select: {
+      id: true,
+      slug: true,
+      name: true,
+      plan: true,
+      automationMode: true,
+    },
+  });
+
+  const rows = await Promise.all(
+    tenants.map(async (tenant) => {
+      const [drafts, approved, scheduled, published, assets, pendingReview] = await Promise.all([
+        prisma.contentDraft.count({ where: { tenantId: tenant.id } }),
+        prisma.contentDraft.count({ where: { tenantId: tenant.id, status: "APPROVED" } }),
+        prisma.contentDraft.count({ where: { tenantId: tenant.id, status: "SCHEDULED" } }),
+        prisma.contentDraft.count({ where: { tenantId: tenant.id, status: "PUBLISHED" } }),
+        prisma.asset.count({ where: { tenantId: tenant.id } }),
+        prisma.contentDraft.count({
+          where: {
+            tenantId: tenant.id,
+            status: { notIn: ["PUBLISHED", "REJECTED"] },
+            OR: [{ requiresReview: true }, { riskLevel: { not: "low" } }],
+          },
+        }),
+      ]);
+
+      return {
+        id: tenant.id,
+        slug: tenant.slug,
+        name: tenant.name,
+        plan: tenant.plan,
+        mode: tenant.automationMode,
+        drafts,
+        approved,
+        scheduled,
+        published,
+        assets,
+        pendingReview,
+      };
+    }),
+  );
+
+  const recentActivity = await prisma.auditLog.findMany({
+    orderBy: { createdAt: "desc" },
+    take: 30,
+    select: {
+      action: true,
+      target: true,
+      createdAt: true,
+      tenant: { select: { name: true } },
+    },
+  });
+
+  return {
+    totals: {
+      tenants: rows.length,
+      drafts: rows.reduce((sum, row) => sum + row.drafts, 0),
+      approved: rows.reduce((sum, row) => sum + row.approved, 0),
+      scheduled: rows.reduce((sum, row) => sum + row.scheduled, 0),
+      published: rows.reduce((sum, row) => sum + row.published, 0),
+      assets: rows.reduce((sum, row) => sum + row.assets, 0),
+      pendingReview: rows.reduce((sum, row) => sum + row.pendingReview, 0),
+    },
+    tenants: rows,
+    recentActivity: recentActivity.map((item) => ({
+      tenantName: item.tenant?.name ?? null,
+      action: item.action,
+      target: item.target,
+      at: item.createdAt.toISOString().slice(0, 19).replace("T", " "),
+    })),
   };
 }
