@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "next dev --port 3000",
-    "build": "next build",
+    "build": "prisma generate --schema ../../packages/db/prisma/schema.prisma && next build",
     "start": "next start --port 3000",
     "lint": "next lint",
     "typecheck": "tsc --noEmit"
@@ -15,10 +15,13 @@
     "@heptacore/agents": "0.1.0",
     "@heptacore/core": "0.1.0",
     "@heptacore/ui": "0.1.0",
+    "@prisma/adapter-pg": "latest",
+    "@prisma/client": "latest",
     "bcryptjs": "^3.0.3",
     "lucide-react": "latest",
     "next": "latest",
     "next-auth": "^5.0.0-beta.31",
+    "pg": "latest",
     "react": "latest",
     "react-dom": "latest"
   },
@@ -27,6 +30,7 @@
     "@types/node": "latest",
     "@types/react": "latest",
     "@types/react-dom": "latest",
+    "prisma": "latest",
     "typescript": "latest"
   }
 }
