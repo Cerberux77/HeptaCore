@@ -2,9 +2,9 @@
 type: master-dashboard
 project: "HeptaCore"
 status: active-production
-phase: "Control Bus allocation authority correction, publishing held"
-last_updated: "09/06/26 13:33"
-mother_branch: "MADRE/v6-s-hc-ctrl-02-make-oreshnik-responsible-for-task-allocation-2026-06-09"
+phase: "Turpial Oreshnik model replicated, publishing held"
+last_updated: "09/06/26 13:45"
+mother_branch: "MADRE/v7-s-hc-ctrl-03-replicate-turpial-sound-oreshnik-allocation-mode-2026-06-09"
 current_branch: "Manuel/s-hc-xx-plan-holistico-heptacore-turpial-jean-2026-06-01"
 tags:
   - "#central"
@@ -27,7 +27,7 @@ tags:
 | Production URL | `https://heptacore.vercel.app` |
 | Tenant piloto | `turpial-sound` |
 | Publicacion RRSS real | Bloqueada hasta aprobacion explicita de Manuel |
-| Sprint actual | `S-HC-CTRL-02` |
+| Sprint actual | `S-HC-CTRL-03` |
 | Rama actual | `Manuel/s-hc-xx-plan-holistico-heptacore-turpial-jean-2026-06-01` |
 
 ## Tenant Turpial Sound
@@ -64,6 +64,8 @@ Ambos deben devolver `ok: true`, `found: true`, `status: connected`, `encryptedB
 - [[METODOLOGIA/BUS_CONTROL]] - capas, locks, gates y stop criteria.
 - [[METODOLOGIA/PREFLIGHT_PROTOCOL]] - checklist de preflight previo a asignacion.
 - [[METODOLOGIA/TASK_ALLOCATION_PROTOCOL]] - paquete de asignacion Oreshnik.
+- [[METODOLOGIA/MOTHER_CHILD_BRANCH_MODEL]] - madre/hija como fuente colaborativa.
+- [[METODOLOGIA/COLLABORATIVE_DOCS_PROTOCOL]] - docs tipo Google Docs sobre Git.
 - [[METODOLOGIA/SPRINT_PROTOCOL]] - apertura, ejecucion y cierre de sprint.
 - [[METODOLOGIA/BRANCH_OWNERSHIP]] - convenciones de ramas y zonas de coordinacion.
 - [[METODOLOGIA/AGENT_HANDOFF_PROTOCOL]] - protocolo de handoff entre humanos y agentes.
@@ -96,9 +98,37 @@ Oreshnik preflight + Oreshnik assignment packet
 
 Jean no ejecuta `S-HC-PUB-01` hasta que Oreshnik lo asigne. Manuel no lo asigna manualmente salvo override de emergencia documentado. La publicacion real sigue bloqueada.
 
+## Modelo Oreshnik Heredado
+
+HeptaCore hereda el modelo funcional de Turpial Sound inspeccionado en:
+
+```txt
+D:\PROYECTOS\PROYECTOS VISUAL STUDIO\Turpialsound\turpialsound
+```
+
+Piezas adaptadas:
+
+- preflight con madre dinamica;
+- sync/resume desde mother docs;
+- ramas hijas por operador;
+- union merge de docs;
+- cierre con ledger de sprint;
+- zone-map para evitar colisiones;
+- handoff append-only;
+- reasignacion por Oreshnik cuando un operador esta bloqueado/stale.
+
+Comandos HeptaCore:
+
+```bash
+npm run oreshnik:preflight
+npm run oreshnik:resume
+npm run oreshnik:assign
+npm run oreshnik:close
+```
+
 ## Reglas Activas
 
-- No publicar en redes reales desde HeptaCore en `S-HC-CTRL-02`.
+- No publicar en redes reales desde HeptaCore en `S-HC-CTRL-03`.
 - No ejecutar tareas por seleccion manual: Oreshnik debe emitir paquete de asignacion.
 - No pedir ni commitear credenciales reales.
 - No scraping real, gasto de campanas, DM masivo ni cambios de Meta Developer settings.
@@ -133,3 +163,10 @@ Ultima actualizacion: 2026-06-09 VET | Operador: Manuel | Sprint: `S-HC-CTRL-01`
 - Rama hija: `Manuel/s-hc-xx-plan-holistico-heptacore-turpial-jean-2026-06-01`
 - Rama madre docs: `MADRE/v6-s-hc-ctrl-02-make-oreshnik-responsible-for-task-allocation-2026-06-09`
 - Descripcion: Make Oreshnik responsible for task allocation
+
+## Cierre S-HC-CTRL-03 - 2026-06-09
+
+- Operador: Manuel
+- Rama hija: `Manuel/s-hc-xx-plan-holistico-heptacore-turpial-jean-2026-06-01`
+- Rama madre docs: `MADRE/v7-s-hc-ctrl-03-replicate-turpial-sound-oreshnik-allocation-mode-2026-06-09`
+- Descripcion: Replicate Turpial Sound Oreshnik allocation model

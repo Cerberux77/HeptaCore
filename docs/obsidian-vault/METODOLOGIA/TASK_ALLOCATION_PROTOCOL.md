@@ -28,6 +28,8 @@ Oreshnik reads:
 - tenant state;
 - validation status.
 
+This mirrors Turpial Sound's assignment log / bus-control model, adapted so HeptaCore emits an explicit JSON assignment packet.
+
 ## Assignment Packet
 
 Each packet must contain:

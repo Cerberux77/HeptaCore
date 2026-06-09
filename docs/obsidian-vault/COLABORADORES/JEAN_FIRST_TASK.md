@@ -23,6 +23,7 @@ Jean may execute it only after Oreshnik assigns it with an assignment packet. Th
 
 ```bash
 npm run oreshnik:preflight -- --sprint S-HC-PUB-01 --operator Jean --desc "turpial controlled publishing discovery dry-run"
+npm run oreshnik:resume -- --operator Jean --dry-run
 npm run oreshnik:assign -- --candidate S-HC-PUB-01 --owner Jean --dry-run
 ```
 

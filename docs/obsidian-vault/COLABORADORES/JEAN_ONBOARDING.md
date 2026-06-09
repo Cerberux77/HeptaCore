@@ -57,9 +57,12 @@ Jean crea la rama solo cuando el paquete Oreshnik indique el nombre exacto.
 
 Jean no inicia implementacion solo con preflight. Debe recibir un paquete Oreshnik con `ok: true`, rama, owner, allowed files, prohibited files, validaciones y stop criteria.
 
+El modelo viene de Turpial Sound: rama hija propia, lectura de la madre dinamica antes de trabajar y cierre/handoff que aporta docs sin pisar a Manuel.
+
 Ejemplo de paquete candidato en dry-run:
 
 ```bash
+npm run oreshnik:resume -- --operator Jean --dry-run
 npm run oreshnik:assign -- --candidate S-HC-PUB-01 --owner Jean --dry-run
 ```
 

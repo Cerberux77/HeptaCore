@@ -24,6 +24,7 @@
     "verify:turpial:facebook-vault": "node scripts/verify-turpial-facebook-vault.mjs",
     "oreshnik:assign": "node scripts/oreshnik/preflight-assignment.mjs",
     "oreshnik:preflight": "node scripts/oreshnik/preflight.mjs",
+    "oreshnik:resume": "node scripts/oreshnik/resume.mjs",
     "oreshnik:status": "node scripts/oreshnik/status.mjs",
     "oreshnik:sync": "node scripts/oreshnik/sync-from-mother.mjs",
     "oreshnik:close": "node scripts/oreshnik/close-sprint.mjs",

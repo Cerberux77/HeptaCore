@@ -4,6 +4,18 @@
   "resiliencePolicy": "If an owner is unavailable for more than one working block or blocks the critical path, backupOwner may take over after recording reassignment.",
   "tasks": [
     {
+      "id": "S-HC-PUB-01",
+      "title": "Turpial Sound controlled publishing discovery and dry-run",
+      "owner": "Jean",
+      "backupOwner": "Manuel",
+      "status": "ready",
+      "track": "controlled-publishing",
+      "zone": ["docs", "apps/worker:inspect-only", "examples/tenants/turpial:inspect-only"],
+      "dependsOn": ["S-HC-CTRL-03"],
+      "acceptance": ["Oreshnik assignment packet", "Discovery only first", "Dry-run second", "One-post command returned but not executed", "No real publishing"],
+      "handoff": "Jean updates docs/07_handoffs/S-HC-PUB-01_HANDOFF.md after Oreshnik assignment."
+    },
+    {
       "id": "S-HC-00",
       "title": "Foundation baseline commit",
       "owner": "Manuel",

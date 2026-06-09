@@ -1,0 +1,23 @@
+{
+  "sprint": "S-HC-CTRL-03",
+  "operator": "Manuel",
+  "status": "CERRADO",
+  "date": "2026-06-09",
+  "at": "2026-06-09T17:45:19.571Z",
+  "branch": "Manuel/s-hc-xx-plan-holistico-heptacore-turpial-jean-2026-06-01",
+  "previousMother": "MADRE/v6-s-hc-ctrl-02-make-oreshnik-responsible-for-task-allocation-2026-06-09",
+  "nextMother": "MADRE/v7-s-hc-ctrl-03-replicate-turpial-sound-oreshnik-allocation-mode-2026-06-09",
+  "description": "Replicate Turpial Sound Oreshnik allocation model",
+  "changedFiles": [
+    "docs/obsidian-vault/00_CENTRAL_HEPTACORE.md",
+    "docs/obsidian-vault/00_INDICE_MAESTRO.md",
+    "docs/obsidian-vault/COLABORADORES/JEAN_FIRST_TASK.md",
+    "docs/obsidian-vault/COLABORADORES/JEAN_ONBOARDING.md",
+    "docs/obsidian-vault/METODOLOGIA/ORESHNIK_CONTROL_BUS.md",
+    "docs/obsidian-vault/METODOLOGIA/PREFLIGHT_PROTOCOL.md",
+    "docs/obsidian-vault/METODOLOGIA/TASK_ALLOCATION_PROTOCOL.md",
+    "package.json",
+    "scripts/oreshnik/preflight.mjs",
+    "var/oreshnik/task-board.json"
+  ]
+}

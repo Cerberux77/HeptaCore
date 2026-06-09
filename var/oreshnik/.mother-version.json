@@ -1,6 +1,6 @@
 {
-  "version": 6,
-  "current": "MADRE/v6-s-hc-ctrl-02-make-oreshnik-responsible-for-task-allocation-2026-06-09",
+  "version": 7,
+  "current": "MADRE/v7-s-hc-ctrl-03-replicate-turpial-sound-oreshnik-allocation-mode-2026-06-09",
   "branches": [
     {
       "version": 2,
@@ -51,6 +51,16 @@
       "at": "2026-06-09T17:33:47.297Z",
       "previous": "MADRE/v5-s-hc-ctrl-01-validate-oreshnik-control-bus-onboard-jean-and-p-2026-06-09",
       "description": "Make Oreshnik responsible for task allocation"
+    },
+    {
+      "version": 7,
+      "name": "MADRE/v7-s-hc-ctrl-03-replicate-turpial-sound-oreshnik-allocation-mode-2026-06-09",
+      "sprint": "S-HC-CTRL-03",
+      "operator": "Manuel",
+      "date": "2026-06-09",
+      "at": "2026-06-09T17:45:19.571Z",
+      "previous": "MADRE/v6-s-hc-ctrl-02-make-oreshnik-responsible-for-task-allocation-2026-06-09",
+      "description": "Replicate Turpial Sound Oreshnik allocation model"
     }
   ]
 }

@@ -21,6 +21,8 @@ Este vault es la capa operacional compartida entre Manuel y Jean. Git es la fuen
 - [[METODOLOGIA/INSTRUCCION_APERTURA_SESION]] - preflight de cada sesion.
 - [[METODOLOGIA/PREFLIGHT_PROTOCOL]] - checklist de preflight previo a asignacion.
 - [[METODOLOGIA/TASK_ALLOCATION_PROTOCOL]] - paquete de asignacion Oreshnik.
+- [[METODOLOGIA/MOTHER_CHILD_BRANCH_MODEL]] - modelo madre/hija heredado de Turpial.
+- [[METODOLOGIA/COLLABORATIVE_DOCS_PROTOCOL]] - protocolo de docs colaborativos.
 - [[METODOLOGIA/BUS_CONTROL]] - locks, zonas, stop conditions.
 - [[METODOLOGIA/SPRINT_PROTOCOL]] - apertura, ejecucion y cierre.
 - [[METODOLOGIA/BRANCH_OWNERSHIP]] - ramas, locks y zonas compartidas.
@@ -30,7 +32,7 @@ Este vault es la capa operacional compartida entre Manuel y Jean. Git es la fuen
 - [[COLABORADORES/ESTADO_MANUEL]] - avance y pendientes Manuel.
 - [[COLABORADORES/ESTADO_JEAN]] - avance y pendientes Jean.
 - [[COLABORADORES/JEAN_ONBOARDING]] - setup operativo de Jean.
-- [[COLABORADORES/JEAN_FIRST_TASK]] - prompt listo para S-HC-PUB-01.
+- [[COLABORADORES/JEAN_FIRST_TASK]] - candidato Oreshnik pendiente de preflight para S-HC-PUB-01.
 - [[TENANTS/TURPIAL_SOUND/TENANT_STATUS]] - estado del primer tenant.
 - [[TENANTS/TURPIAL_SOUND/FIRST_PUBLISHING_TEST_PLAN]] - plan controlado de publicacion Turpial.
 - [[ARQUITECTURA/HEPTACORE_SYSTEM_MAP]] - mapa tecnico del producto.

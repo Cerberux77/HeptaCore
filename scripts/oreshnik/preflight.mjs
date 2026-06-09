@@ -6,6 +6,7 @@ import {
   currentBranch,
   getArg,
   git,
+  hasFlag,
   isMotherBranch,
   log,
   nonIgnoredDirtyFiles,
@@ -23,6 +24,7 @@ import {
 const sprint = getArg("--sprint");
 const operator = resolveOperator(getArg("--operator"));
 const desc = getArg("--desc", "sprint");
+const dryRun = hasFlag("--dry-run");
 const vet = nowVet();
 const mother = readMother();
 
@@ -40,6 +42,7 @@ const dirty = nonIgnoredDirtyFiles();
 
 log("INFO", `Operator: ${operator}`);
 log("INFO", `Sprint: ${sprint || "not specified"}`);
+if (dryRun) log("INFO", "Mode: dry-run");
 log("INFO", `Current branch: ${branch}`);
 log("INFO", `Dynamic mother: ${mother.current} (v${mother.version})`);
 
@@ -67,7 +70,9 @@ console.log("");
 log("INFO", "3/7 Branch management");
 if (sprint) {
   const expected = `${operator}/${sanitize(sprint)}-${sanitize(desc)}-${today()}`;
-  if (isMotherBranch(branch)) {
+  if (dryRun) {
+    log("OK", `Dry-run: would use or create child branch ${expected}.`);
+  } else if (isMotherBranch(branch)) {
     if (dirty.length > 0) {
       log("WARN", `On mother-like branch. Commit/stash first, then preflight can create ${expected}.`);
       warnings++;
@@ -130,19 +135,23 @@ if (prisma) log("OK", "Prisma schema present.");
 
 console.log("");
 log("INFO", "7/7 Session ledger");
-mkdirSync(RUNS_DIR, { recursive: true });
-writeJson(join(RUNS_DIR, ".last-preflight.json"), {
-  sprint: sprint || null,
-  operator,
-  branch,
-  mother: mother.current,
-  dirtyCount: dirty.length,
-  blockers,
-  warnings,
-  at: vet.iso
-});
-writeFileSync(join(RUNS_DIR, ".session-start"), vet.iso, "utf8");
-log("OK", "Preflight ledger updated.");
+if (dryRun) {
+  log("OK", "Dry-run: ledger not modified.");
+} else {
+  mkdirSync(RUNS_DIR, { recursive: true });
+  writeJson(join(RUNS_DIR, ".last-preflight.json"), {
+    sprint: sprint || null,
+    operator,
+    branch,
+    mother: mother.current,
+    dirtyCount: dirty.length,
+    blockers,
+    warnings,
+    at: vet.iso
+  });
+  writeFileSync(join(RUNS_DIR, ".session-start"), vet.iso, "utf8");
+  log("OK", "Preflight ledger updated.");
+}
 
 console.log("");
 console.log(`${colors.bold}PRE-FLIGHT RESULT${colors.reset}`);
@@ -161,3 +170,27 @@ if (blockers > 0) {
 
 console.log(`${warnings > 0 ? colors.yellow : colors.green}${colors.bold}[ORESHNIK] OK${colors.reset}`);
 console.log(`Close command: node scripts/oreshnik/close-sprint.mjs --sprint ${sprint || "SXX"} --operator ${operator} --desc "${desc}"`);
+
+if (dryRun) {
+  const recommendedSprint = operator === "Jean" ? "S-HC-PUB-01" : (sprint || "S-HC-PUB-01");
+  const recommendedOwner = recommendedSprint === "S-HC-PUB-01" ? "Jean" : operator;
+  const recommendedBranch = recommendedSprint === "S-HC-PUB-01"
+    ? "Jean/s-hc-pub-01-turpial-controlled-publishing-2026-06-09"
+    : `${operator}/${sanitize(recommendedSprint)}-${sanitize(desc)}-${today()}`;
+  console.log("");
+  console.log(JSON.stringify({
+    ok: true,
+    operator,
+    mode: "dry-run",
+    assignmentSource: "oreshnik",
+    recommendedSprint,
+    recommendedOwner,
+    branch: recommendedBranch,
+    currentBranch: branch,
+    mother: mother.current,
+    publishAllowed: false,
+    approvalRequired: true,
+    warnings,
+    blockers
+  }, null, 2));
+}

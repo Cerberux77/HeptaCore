@@ -14,6 +14,8 @@ tags:
 
 Oreshnik is the operating control bus for HeptaCore. It reviews repo state, docs state, sprint metadata, zone ownership and validation state before distributing work to Manuel, Jean or an agent.
 
+This model is inherited from the functional Turpial Sound Oreshnik implementation, especially its dynamic mother branch, child branch, preflight, sync-from-mother, close-sprint, merge-docs-union and sprint-event ledger flow.
+
 ## Task Allocation Authority
 
 Oreshnik is the allocator.
@@ -76,3 +78,24 @@ Publishing work is never a free-form task. Any publishing assignment must includ
 - explicit `publishAllowed: false` until approval.
 
 `S-HC-PUB-01` is a candidate only until Oreshnik preflight assignment confirms it.
+
+## Turpial Sound Comparison
+
+| Turpial Sound feature | File/script | HeptaCore equivalent | Status | Action |
+|---|---|---|---|---|
+| Mother branch concept | `scripts/oreshnik/runs/.mother-version.json`, `00_CENTRAL_TURPIAL.md` | `var/oreshnik/.mother-version.json`, `00_CENTRAL_HEPTACORE.md` | Adapted | Keep dynamic `MADRE/vN-*` docs branches |
+| Child branch concept | `Manuel/*`, `Jean/*` from preflight | `Manuel/*`, `Jean/*` | Present | Documented in branch protocol |
+| Collaborative docs update model | `merge-docs-union.mjs`, close sprint | `merge-docs-union.mjs`, close sprint | Present, improved docs | Add mother/child and collaborative docs protocols |
+| Preflight command | `node scripts/oreshnik/preflight.mjs` | `npm run oreshnik:preflight` | Present | Added dry-run packet output |
+| Resume command | `sync-from-mother.mjs` | `npm run oreshnik:resume` | Added | Sync docs then emit assignment packet |
+| Close command | `close-sprint.mjs` | `npm run oreshnik:close` | Present | Keep HeptaCore paths |
+| Assignment allocator | preflight assignment log + bus rules | `preflight-assignment.mjs`, task board | Improved | Oreshnik emits packet |
+| Sprint event ledger | `var/sprint-events/*` | `var/sprint-events/*` | Present | Continue append-only events |
+| Handoff protocol | `docs/07_handoffs/*` | `docs/07_handoffs/*` | Present | No overwrites |
+| Zone map / file ownership | `docs/07_handoffs/zone-map.json` | same | Present | HeptaCore SaaS zones |
+| Obsidian vault index | `00_INDICE_MAESTRO.md` | same | Present | Updated canonical links |
+| Collision prevention | `zone-check.ps1`, preflight | `zone-check.mjs`, preflight | Present | Keep JS implementation |
+| Blocked/stale/reassignment | `.sprint-assignments.json`, bus docs | task board, assignment packet, resilience docs | Partial | Added docs and task-board candidate |
+| Agent handoff rules | AGENTS + handoffs | AGENTS + `AGENT_HANDOFF_PROTOCOL.md` | Present | Clarified assignment packet requirement |
+| Validation gates | tsc/build/diff/env/preview | typecheck/build/worker validate | Present | HeptaCore-specific gates |
+| Publish hard stop | RRSS dry-run/docs | `PUBLISHING_SAFETY_PROTOCOL.md` | Present | Real publish blocked |

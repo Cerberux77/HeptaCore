@@ -13,6 +13,8 @@ tags:
 
 Preflight is the inspection gate before task allocation or implementation. It checks whether the repo is safe enough for Oreshnik to issue an assignment packet.
 
+Inherited behavior from Turpial Sound: preflight reads the dynamic mother branch, fetches remote refs, checks branch lane, checks docs/control state, checks zone ownership and emits an operator lane. HeptaCore keeps those behaviors and adds SaaS tenant/publishing gates.
+
 ## Checklist
 
 | Check | Required inspection |
@@ -34,6 +36,7 @@ Preflight is the inspection gate before task allocation or implementation. It ch
 ```bash
 npm run oreshnik:preflight -- --sprint S-HC-CTRL-02 --operator Manuel --desc "Make Oreshnik responsible for task allocation"
 npm run oreshnik:assign -- --candidate S-HC-PUB-01 --owner Jean --dry-run
+npm run oreshnik:resume -- --operator Jean --dry-run
 ```
 
 ## Output
