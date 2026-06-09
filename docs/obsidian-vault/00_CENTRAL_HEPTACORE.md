@@ -3,8 +3,8 @@ type: master-dashboard
 project: "HeptaCore"
 status: active-foundation
 phase: "Foundation: monorepo, agent core, landing, Prisma, worker and Turpial tenant seed"
-last_updated: "09/06/26 16:17"
-mother_branch: "MADRE/v11-s-hc-09-publish-readiness-gate-2026-06-09"
+last_updated: "09/06/26 19:30"
+mother_branch: "MADRE/v15-s-hc-prod-01-producto-operativo-tenant-admin-produccion-2026-06-09"
 production_branch: "none"
 tags:
   - "#central"
@@ -98,7 +98,7 @@ HeptaCore ya tiene base monorepo:
 
 ---
 
-> **Ultima actualizacion:** 09/06/26 16:17 VET | **Estado:** S-HC-09 CERRADO | **Operador:** Jean
+> **Ultima actualizacion:** 09/06/26 19:30 VET | **Estado:** S-HC-PROD-01 CERRADO | **Operador:** Manuel
 
 ## Cierre S-HC-04 - 2026-06-09
 
@@ -366,3 +366,10 @@ Ultima actualizacion: 2026-06-09 VET | Operador: Manuel | Sprint: `S-HC-PROD-01`
 - Rama hija: `Manuel/s-hc-xx-plan-holistico-heptacore-turpial-jean-2026-06-01`
 - Rama madre docs: `MADRE/v8-s-hc-prod-00-product-audit-and-sprint-allocation-for-turpial--2026-06-09`
 - Descripcion: Product audit and sprint allocation for Turpial proof
+
+## Cierre S-HC-PROD-01 - 2026-06-09
+
+- Operador: Manuel
+- Rama hija: `Manuel/s-hc-prod-01-producto-operativo-tenant-admin-produccion-2026-06-09`
+- Rama madre docs: `MADRE/v15-s-hc-prod-01-producto-operativo-tenant-admin-produccion-2026-06-09`
+- Descripcion: producto operativo tenant admin produccion

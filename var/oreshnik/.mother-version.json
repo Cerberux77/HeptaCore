@@ -1,16 +1,26 @@
 {
-    "current":  "MADRE/v14-integration-all-code-2026-06-09",
-    "branches":  [
-                     {
-                         "previous":  "MADRE/v11-s-hc-09-publish-readiness-gate-2026-06-09",
-                         "sprint":  "INTEGRATION",
-                         "operator":  "Manuel",
-                         "name":  "MADRE/v14-integration-all-code-2026-06-09",
-                         "description":  "Full integration mother — Jean\u0027s 9 sprints code + latest docs + Oreshnik infrastructure",
-                         "version":  14,
-                         "at":  "2026-06-09T21:06:00.000Z",
-                         "date":  "2026-06-09"
-                     }
-                 ],
-    "version":  14
+  "current": "MADRE/v15-s-hc-prod-01-producto-operativo-tenant-admin-produccion-2026-06-09",
+  "branches": [
+    {
+      "previous": "MADRE/v11-s-hc-09-publish-readiness-gate-2026-06-09",
+      "sprint": "INTEGRATION",
+      "operator": "Manuel",
+      "name": "MADRE/v14-integration-all-code-2026-06-09",
+      "description": "Full integration mother ï¿½ Jean's 9 sprints code + latest docs + Oreshnik infrastructure",
+      "version": 14,
+      "at": "2026-06-09T21:06:00.000Z",
+      "date": "2026-06-09"
+    },
+    {
+      "version": 15,
+      "name": "MADRE/v15-s-hc-prod-01-producto-operativo-tenant-admin-produccion-2026-06-09",
+      "sprint": "S-HC-PROD-01",
+      "operator": "Manuel",
+      "date": "2026-06-09",
+      "at": "2026-06-09T23:30:43.747Z",
+      "previous": "MADRE/v14-integration-all-code-2026-06-09",
+      "description": "producto operativo tenant admin produccion"
+    }
+  ],
+  "version": 15
 }
