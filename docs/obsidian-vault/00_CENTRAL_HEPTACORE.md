@@ -3,8 +3,8 @@ type: master-dashboard
 project: "HeptaCore"
 status: active-foundation
 phase: "Foundation: monorepo, agent core, landing, Prisma, worker and Turpial tenant seed"
-last_updated: "09/06/26 19:30"
-mother_branch: "MADRE/v15-s-hc-prod-01-producto-operativo-tenant-admin-produccion-2026-06-09"
+last_updated: "09/06/26 19:31"
+mother_branch: "MADRE/v16-s-hc-prod-01-producto-operativo-tenant-admin-produccion-2026-06-09"
 production_branch: "none"
 tags:
   - "#central"
@@ -98,7 +98,7 @@ HeptaCore ya tiene base monorepo:
 
 ---
 
-> **Ultima actualizacion:** 09/06/26 19:30 VET | **Estado:** S-HC-PROD-01 CERRADO | **Operador:** Manuel
+> **Ultima actualizacion:** 09/06/26 19:31 VET | **Estado:** S-HC-PROD-01 CERRADO | **Operador:** Manuel
 
 ## Cierre S-HC-04 - 2026-06-09
 

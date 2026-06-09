@@ -3,23 +3,10 @@
   "operator": "Manuel",
   "status": "CERRADO",
   "date": "2026-06-09",
-  "at": "2026-06-09T23:30:43.747Z",
+  "at": "2026-06-09T23:31:37.871Z",
   "branch": "Manuel/s-hc-prod-01-producto-operativo-tenant-admin-produccion-2026-06-09",
-  "previousMother": "MADRE/v14-integration-all-code-2026-06-09",
-  "nextMother": "MADRE/v15-s-hc-prod-01-producto-operativo-tenant-admin-produccion-2026-06-09",
+  "previousMother": "MADRE/v15-s-hc-prod-01-producto-operativo-tenant-admin-produccion-2026-06-09",
+  "nextMother": "MADRE/v16-s-hc-prod-01-producto-operativo-tenant-admin-produccion-2026-06-09",
   "description": "producto operativo tenant admin produccion",
-  "changedFiles": [
-    ".gitignore",
-    "apps/web/app/globals.css",
-    "apps/web/app/page.tsx",
-    "apps/web/components/dashboard-console.tsx",
-    "apps/web/components/turpial-console.tsx",
-    "apps/web/lib/dashboard.ts",
-    "apps/web/lib/prisma.ts",
-    "apps/web/middleware.ts",
-    "apps/web/next.config.mjs",
-    "apps/web/package.json",
-    "scripts/seed-admin.mjs",
-    "scripts/seed-turpial.mjs"
-  ]
+  "changedFiles": []
 }
