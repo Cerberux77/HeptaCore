@@ -92,29 +92,41 @@ export function writeMother(value) {
 }
 
 export function discoverLatestMother() {
-  git(["fetch", "origin", "--prune", "--quiet"], { allowFail: true, timeoutMs: 15000 });
-  const raw = git(["ls-remote", "--heads", "origin", "refs/heads/MADRE/v*"], { allowFail: true }).output;
-  if (!raw) return readMother();
+  const local = readMother();
+
+  // 1. Try local branches first (fast, no network)
+  const localBranches = git(["branch", "--list", "MADRE/v*"], { allowFail: true }).output;
+  const localMatch = [...(localBranches.matchAll(/MADRE\/v(\d+)-/g))].map((m) => ({ name: m[0].replace(/-\d+$/, ""), version: parseInt(m[1]) }));
+  if (localMatch.length > 0) {
+    localMatch.sort((a, b) => b.version - a.version);
+    const best = localMatch[0];
+    const fullName = localBranches.split(/\r?\n/).find((b) => b.includes(best.name)) || best.name;
+    if (best.version > local.version) {
+      const updated = { ...local, version: best.version, current: fullName };
+      writeMother(updated);
+      return updated;
+    }
+    return local;
+  }
+
+  // 2. Try origin (bloated, timeout-protected)
+  git(["fetch", "origin", "--prune", "--quiet"], { allowFail: true, timeoutMs: 10000 });
+  const raw = git(["ls-remote", "--heads", "origin", "refs/heads/MADRE/v*"], { allowFail: true, timeoutMs: 10000 }).output;
+  if (!raw) return local;
 
   const branches = raw.split(/\r?\n/).filter(Boolean).map((line) => {
     const match = line.match(/refs\/heads\/(MADRE\/v(\d+)-.*)/);
     return match ? { name: match[1], version: parseInt(match[2], 10) } : null;
   }).filter(Boolean);
 
-  if (branches.length === 0) return readMother();
-
+  if (branches.length === 0) return local;
   branches.sort((a, b) => b.version - a.version);
   const latest = branches[0];
-  const local = readMother();
 
   if (latest.version > (local.version || 0)) {
-    log("INFO", `Discovered newer mother on origin: ${latest.name} (v${latest.version}) vs local v${local.version || 0}`);
-    writeMother({
-      ...local,
-      version: latest.version,
-      current: latest.name
-    });
-    return { ...local, version: latest.version, current: latest.name };
+    const updated = { ...local, version: latest.version, current: latest.name };
+    writeMother(updated);
+    return updated;
   }
 
   return local;
