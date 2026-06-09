@@ -1,76 +1,106 @@
 {
-  "version": 8,
-  "current": "MADRE/v8-s-hc-prod-00-product-audit-and-sprint-allocation-for-turpial--2026-06-09",
+  "version": 11,
+  "current": "MADRE/v11-s-hc-09-publish-readiness-gate-2026-06-09",
   "branches": [
     {
       "version": 2,
-      "name": "MADRE/v2-s-hc-xx-plan-holistico-turpial-jean-oauth-readiness-2026-06-01",
-      "sprint": "S-HC-XX",
-      "operator": "Manuel",
-      "date": "2026-06-01",
-      "at": "2026-06-01T15:36:07.072Z",
+      "name": "MADRE/v2-s-hc-04-auth-rbac-audit-2026-06-09",
+      "sprint": "S-HC-04",
+      "operator": "Jean",
+      "date": "2026-06-09",
+      "at": "2026-06-09T19:11:16.179Z",
       "previous": "master",
-      "description": "plan holistico Turpial Jean OAuth readiness"
+      "description": "auth-rbac-audit"
     },
     {
       "version": 3,
-      "name": "MADRE/v3-s-hc-01-closure-and-saas-oauth-foundation-2026-06-08",
-      "sprint": "S-HC-01",
-      "operator": "Manuel",
-      "date": "2026-06-08",
-      "at": "2026-06-08T22:20:45.130Z",
-      "previous": "MADRE/v2-s-hc-xx-plan-holistico-turpial-jean-oauth-readiness-2026-06-01",
-      "description": "closure and saas oauth foundation"
+      "name": "MADRE/v3-s-hc-04-auth-rbac-audit-2026-06-09",
+      "sprint": "S-HC-04",
+      "operator": "Jean",
+      "date": "2026-06-09",
+      "at": "2026-06-09T19:11:52.202Z",
+      "previous": "MADRE/v2-s-hc-04-auth-rbac-audit-2026-06-09",
+      "description": "auth-rbac-audit"
     },
     {
       "version": 4,
-      "name": "MADRE/v4-s-hc-01-closure-and-saas-oauth-foundation-2026-06-08",
-      "sprint": "S-HC-01",
-      "operator": "Manuel",
-      "date": "2026-06-08",
-      "at": "2026-06-08T22:26:37.533Z",
-      "previous": "MADRE/v3-s-hc-01-closure-and-saas-oauth-foundation-2026-06-08",
-      "description": "closure and saas oauth foundation"
+      "name": "MADRE/v4-s-hc-04-auth-rbac-audit-2026-06-09",
+      "sprint": "S-HC-04",
+      "operator": "Jean",
+      "date": "2026-06-09",
+      "at": "2026-06-09T19:13:36.091Z",
+      "previous": "MADRE/v3-s-hc-04-auth-rbac-audit-2026-06-09",
+      "description": "auth-rbac-audit"
     },
     {
       "version": 5,
-      "name": "MADRE/v5-s-hc-ctrl-01-validate-oreshnik-control-bus-onboard-jean-and-p-2026-06-09",
-      "sprint": "S-HC-CTRL-01",
-      "operator": "Manuel",
+      "name": "MADRE/v5-s-hc-06-worker-queue-bullmq-redis-2026-06-09",
+      "sprint": "S-HC-06",
+      "operator": "Jean",
       "date": "2026-06-09",
-      "at": "2026-06-09T17:15:53.688Z",
-      "previous": "MADRE/v4-s-hc-01-closure-and-saas-oauth-foundation-2026-06-08",
-      "description": "Validate Oreshnik Control Bus, onboard Jean, and prepare first controlled publishing sprint"
+      "at": "2026-06-09T19:46:49.526Z",
+      "previous": "MADRE/v4-s-hc-04-auth-rbac-audit-2026-06-09",
+      "description": "worker-queue-bullmq-redis"
     },
     {
       "version": 6,
-      "name": "MADRE/v6-s-hc-ctrl-02-make-oreshnik-responsible-for-task-allocation-2026-06-09",
-      "sprint": "S-HC-CTRL-02",
-      "operator": "Manuel",
+      "name": "MADRE/v6-s-hc-01-console-dashboard-checklist-2026-06-09",
+      "sprint": "S-HC-01",
+      "operator": "Jean",
       "date": "2026-06-09",
-      "at": "2026-06-09T17:33:47.297Z",
-      "previous": "MADRE/v5-s-hc-ctrl-01-validate-oreshnik-control-bus-onboard-jean-and-p-2026-06-09",
-      "description": "Make Oreshnik responsible for task allocation"
+      "at": "2026-06-09T19:59:26.760Z",
+      "previous": "MADRE/v5-s-hc-06-worker-queue-bullmq-redis-2026-06-09",
+      "description": "console-dashboard-checklist"
     },
     {
       "version": 7,
-      "name": "MADRE/v7-s-hc-ctrl-03-replicate-turpial-sound-oreshnik-allocation-mode-2026-06-09",
-      "sprint": "S-HC-CTRL-03",
-      "operator": "Manuel",
+      "name": "MADRE/v7-s-hc-05-approval-queue-human-gates-2026-06-09",
+      "sprint": "S-HC-05",
+      "operator": "Jean",
       "date": "2026-06-09",
-      "at": "2026-06-09T17:45:19.571Z",
-      "previous": "MADRE/v6-s-hc-ctrl-02-make-oreshnik-responsible-for-task-allocation-2026-06-09",
-      "description": "Replicate Turpial Sound Oreshnik allocation model"
+      "at": "2026-06-09T20:02:39.755Z",
+      "previous": "MADRE/v6-s-hc-01-console-dashboard-checklist-2026-06-09",
+      "description": "approval-queue-human-gates"
     },
     {
       "version": 8,
-      "name": "MADRE/v8-s-hc-prod-00-product-audit-and-sprint-allocation-for-turpial--2026-06-09",
-      "sprint": "S-HC-PROD-00",
-      "operator": "Manuel",
+      "name": "MADRE/v8-s-hc-08-meta-adapter-sandbox-mock-2026-06-09",
+      "sprint": "S-HC-08",
+      "operator": "Jean",
       "date": "2026-06-09",
-      "at": "2026-06-09T18:20:36.168Z",
-      "previous": "MADRE/v7-s-hc-ctrl-03-replicate-turpial-sound-oreshnik-allocation-mode-2026-06-09",
-      "description": "Product audit and sprint allocation for Turpial proof"
+      "at": "2026-06-09T20:09:45.421Z",
+      "previous": "MADRE/v7-s-hc-05-approval-queue-human-gates-2026-06-09",
+      "description": "meta-adapter-sandbox-mock"
+    },
+    {
+      "version": 9,
+      "name": "MADRE/v9-s-hc-03-strategy-runner-2026-06-09",
+      "sprint": "S-HC-03",
+      "operator": "Jean",
+      "date": "2026-06-09",
+      "at": "2026-06-09T20:17:08.658Z",
+      "previous": "MADRE/v8-s-hc-08-meta-adapter-sandbox-mock-2026-06-09",
+      "description": "strategy-runner"
+    },
+    {
+      "version": 10,
+      "name": "MADRE/v10-s-hc-07-reports-dashboard-2026-06-09",
+      "sprint": "S-HC-07",
+      "operator": "Jean",
+      "date": "2026-06-09",
+      "at": "2026-06-09T20:17:13.361Z",
+      "previous": "MADRE/v9-s-hc-03-strategy-runner-2026-06-09",
+      "description": "reports-dashboard"
+    },
+    {
+      "version": 11,
+      "name": "MADRE/v11-s-hc-09-publish-readiness-gate-2026-06-09",
+      "sprint": "S-HC-09",
+      "operator": "Jean",
+      "date": "2026-06-09",
+      "at": "2026-06-09T20:17:18.089Z",
+      "previous": "MADRE/v10-s-hc-07-reports-dashboard-2026-06-09",
+      "description": "publish-readiness-gate"
     }
   ]
 }
