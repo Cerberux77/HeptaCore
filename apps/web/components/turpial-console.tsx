@@ -89,7 +89,7 @@ export function TurpialConsole({ data }: { data: TurpialConsoleData }) {
         <header className="workspace-header">
           <div>
             <span className="section-label">Tenant activo / Turpial</span>
-            <h1>Control de RRSS y aprobaciones</h1>
+            <h1>Control de RRSS y APROBACIONES</h1>
           </div>
           <div className="header-actions">
             <button className="tool-button"><Search size={16} /> Buscar</button>
