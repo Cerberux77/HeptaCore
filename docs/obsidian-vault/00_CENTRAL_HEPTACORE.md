@@ -3,8 +3,8 @@ type: master-dashboard
 project: "HeptaCore"
 status: active-foundation
 phase: "Foundation: monorepo, agent core, landing, Prisma, worker and Turpial tenant seed"
-last_updated: "09/06/26 16:09"
-mother_branch: "MADRE/v8-s-hc-08-meta-adapter-sandbox-mock-2026-06-09"
+last_updated: "09/06/26 16:17"
+mother_branch: "MADRE/v9-s-hc-03-strategy-runner-2026-06-09"
 production_branch: "none"
 tags:
   - "#central"
@@ -98,7 +98,7 @@ HeptaCore ya tiene base monorepo:
 
 ---
 
-> **Ultima actualizacion:** 09/06/26 16:09 VET | **Estado:** S-HC-08 CERRADO | **Operador:** Jean
+> **Ultima actualizacion:** 09/06/26 16:17 VET | **Estado:** S-HC-03 CERRADO | **Operador:** Jean
 
 ## Cierre S-HC-04 - 2026-06-09
 
@@ -134,3 +134,10 @@ HeptaCore ya tiene base monorepo:
 - Rama hija: `Jean/s-hc-00-onboarding-2026-06-09`
 - Rama madre docs: `MADRE/v8-s-hc-08-meta-adapter-sandbox-mock-2026-06-09`
 - Descripcion: meta-adapter-sandbox-mock
+
+## Cierre S-HC-03 - 2026-06-09
+
+- Operador: Jean
+- Rama hija: `Jean/s-hc-00-onboarding-2026-06-09`
+- Rama madre docs: `MADRE/v9-s-hc-03-strategy-runner-2026-06-09`
+- Descripcion: strategy-runner
