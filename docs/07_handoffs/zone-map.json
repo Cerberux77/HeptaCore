@@ -1,96 +1,233 @@
 {
-  "version": "1.0",
+  "version": "2.0",
   "project": "HeptaCore",
+  "assignmentSource": "var/oreshnik/task-board.json",
   "zones": {
     "packages/db/**": {
       "owner": "Jean+Manuel",
       "lock": "double_jean_manuel",
-      "sprints": ["*"],
+      "sprints": [
+        "*"
+      ],
       "criticality": "critical",
       "notes": "Prisma schema, migrations and DB access require coordination."
     },
     "package.json": {
       "owner": "Jean+Manuel",
       "lock": "double_jean_manuel",
-      "sprints": ["*"],
+      "sprints": [
+        "*"
+      ],
       "criticality": "high"
     },
     "package-lock.json": {
       "owner": "Jean+Manuel",
       "lock": "double_jean_manuel",
-      "sprints": ["*"],
+      "sprints": [
+        "*"
+      ],
       "criticality": "high"
     },
     "README.md": {
       "owner": "Both",
       "lock": "shared_docs",
-      "sprints": ["*"],
+      "sprints": [
+        "*"
+      ],
       "criticality": "low"
     },
     ".gitignore": {
       "owner": "Both",
       "lock": "owner_per_sprint",
-      "sprints": ["*"],
+      "sprints": [
+        "*"
+      ],
       "criticality": "medium"
     },
     "prisma.config.ts": {
       "owner": "Jean+Manuel",
       "lock": "double_jean_manuel",
-      "sprints": ["*"],
+      "sprints": [
+        "*"
+      ],
       "criticality": "critical"
     },
     "apps/worker/**": {
       "owner": "Jean",
-      "lock": "owner_per_sprint",
-      "sprints": ["*"],
-      "criticality": "high"
+      "lock": "jean_exclusive",
+      "sprints": [
+        "*"
+      ],
+      "criticality": "high",
+      "notes": "Worker, publishing, jobs, retries. Manuel solo lectura."
     },
     "packages/agents/**": {
       "owner": "Manuel",
-      "lock": "owner_per_sprint",
-      "sprints": ["*"],
-      "criticality": "high"
+      "lock": "manuel_exclusive",
+      "sprints": [
+        "*"
+      ],
+      "criticality": "high",
+      "notes": "Agent strategy runner, council, prompts. Jean NO tocar."
+    },
+    "apps/web/app/login/**": {
+      "owner": "Jean",
+      "lock": "jean_exclusive",
+      "sprints": [
+        "S-HC-04",
+        "S-HC-PROD-01",
+        "S-HC-PROD-03"
+      ],
+      "criticality": "high",
+      "notes": "Auth, login page. Manuel NO tocar durante Auth sprint."
+    },
+    "apps/web/app/dashboard/**": {
+      "owner": "Manuel",
+      "lock": "manuel_exclusive",
+      "sprints": [
+        "*"
+      ],
+      "criticality": "high",
+      "notes": "Dashboard general, Oreshnik lane. Jean NO tocar."
+    },
+    "apps/web/app/tenants/**": {
+      "owner": "Jean",
+      "lock": "jean_exclusive",
+      "sprints": [
+        "S-HC-PROD-03"
+      ],
+      "criticality": "medium",
+      "notes": "Tenant console turpial-sound."
+    },
+    "apps/web/app/api/oauth/**": {
+      "owner": "Manuel",
+      "lock": "manuel_exclusive",
+      "sprints": [
+        "*"
+      ],
+      "criticality": "critical",
+      "notes": "OAuth Instagram/Facebook. Jean NO tocar. Doble lock con packages/integrations."
+    },
+    "apps/web/lib/tenant-auth.ts": {
+      "owner": "Jean",
+      "lock": "jean_exclusive",
+      "sprints": [
+        "S-HC-04",
+        "S-HC-PROD-01"
+      ],
+      "criticality": "high",
+      "notes": "Session, auth guards."
+    },
+    "apps/web/lib/token-vault.ts": {
+      "owner": "Manuel",
+      "lock": "manuel_exclusive",
+      "sprints": [
+        "*"
+      ],
+      "criticality": "critical",
+      "notes": "AES-256-GCM encryption. Jean NO tocar sin doble lock."
+    },
+    "apps/web/components/turpial-console.tsx": {
+      "owner": "Jean",
+      "lock": "jean_exclusive",
+      "sprints": [
+        "S-HC-PROD-03"
+      ],
+      "criticality": "medium",
+      "notes": "Turpial console UI."
+    },
+    "apps/web/lib/turpial.ts": {
+      "owner": "Jean",
+      "lock": "jean_exclusive",
+      "sprints": [
+        "S-HC-PROD-03"
+      ],
+      "criticality": "medium",
+      "notes": "Turpial data layer."
     },
     "apps/web/**": {
       "owner": "Manuel",
-      "lock": "owner_per_sprint",
-      "sprints": ["*"],
-      "criticality": "medium"
+      "lock": "manuel_exclusive",
+      "sprints": [
+        "*"
+      ],
+      "criticality": "medium",
+      "notes": "Resto de apps/web. Zonas de Jean definidas arriba tienen prioridad por ser más específicas."
     },
     "packages/integrations/**": {
       "owner": "Jean+Manuel",
       "lock": "double_jean_manuel",
-      "sprints": ["*"],
+      "sprints": [
+        "*"
+      ],
       "criticality": "high"
     },
     "docs/obsidian-vault/**": {
       "owner": "Both",
       "lock": "shared_docs",
-      "sprints": ["*"],
+      "sprints": [
+        "*"
+      ],
       "criticality": "high"
     },
     "docs/**": {
       "owner": "Both",
       "lock": "shared_docs",
-      "sprints": ["*"],
+      "sprints": [
+        "*"
+      ],
       "criticality": "medium"
     },
     "scripts/oreshnik/**": {
       "owner": "Manuel",
+      "lock": "manuel_exclusive",
+      "sprints": [
+        "*"
+      ],
+      "criticality": "high",
+      "notes": "Infraestructura Oreshnik. Jean NO tocar."
+    },
+    "scripts/seed-turpial-*.mjs": {
+      "owner": "Jean",
+      "lock": "jean_exclusive",
+      "sprints": [
+        "S-HC-02"
+      ],
+      "criticality": "medium",
+      "notes": "Seed scripts Turpial."
+    },
+    "scripts/verify-turpial-*.mjs": {
+      "owner": "Jean",
+      "lock": "jean_exclusive",
+      "sprints": [
+        "S-HC-02A",
+        "S-HC-PUB-01"
+      ],
+      "criticality": "high",
+      "notes": "Verificación OAuth vault."
+    },
+    "examples/tenants/turpial/**": {
+      "owner": "Manuel",
       "lock": "owner_per_sprint",
-      "sprints": ["*"],
-      "criticality": "high"
+      "sprints": [
+        "*"
+      ],
+      "criticality": "medium"
     },
     ".env.example": {
       "owner": "Both",
       "lock": "owner_per_sprint",
-      "sprints": ["*"],
+      "sprints": [
+        "*"
+      ],
       "criticality": "low"
     },
     ".env.rrss.example": {
       "owner": "Both",
       "lock": "owner_per_sprint",
-      "sprints": ["*"],
+      "sprints": [
+        "*"
+      ],
       "criticality": "low"
     },
     ".env": {
@@ -106,23 +243,21 @@
       "criticality": "critical",
       "notes": "Examples are allowed by gitignore exception, real env files are forbidden."
     },
-    "examples/tenants/turpial/**": {
-      "owner": "Manuel",
-      "lock": "owner_per_sprint",
-      "sprints": ["*"],
-      "criticality": "medium"
-    },
     "content/**": {
       "owner": "Manuel",
       "lock": "owner_per_sprint",
-      "sprints": ["S-HC-00"],
+      "sprints": [
+        "S-HC-00"
+      ],
       "criticality": "low",
       "notes": "Legacy path from initial Turpial import. Expected to disappear after migration commit."
     },
     "src/**": {
       "owner": "Manuel",
       "lock": "owner_per_sprint",
-      "sprints": ["S-HC-00"],
+      "sprints": [
+        "S-HC-00"
+      ],
       "criticality": "low",
       "notes": "Legacy path from initial worker migration. Expected to disappear after migration commit."
     }
