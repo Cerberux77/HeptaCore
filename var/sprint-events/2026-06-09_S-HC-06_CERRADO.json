@@ -1,0 +1,12 @@
+{
+  "sprint": "S-HC-06",
+  "operator": "Jean",
+  "status": "CERRADO",
+  "date": "2026-06-09",
+  "at": "2026-06-09T19:46:49.526Z",
+  "branch": "Jean/s-hc-00-onboarding-2026-06-09",
+  "previousMother": "MADRE/v4-s-hc-04-auth-rbac-audit-2026-06-09",
+  "nextMother": "MADRE/v5-s-hc-06-worker-queue-bullmq-redis-2026-06-09",
+  "description": "worker-queue-bullmq-redis",
+  "changedFiles": []
+}

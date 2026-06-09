@@ -1,6 +1,6 @@
 {
-  "version": 4,
-  "current": "MADRE/v4-s-hc-04-auth-rbac-audit-2026-06-09",
+  "version": 5,
+  "current": "MADRE/v5-s-hc-06-worker-queue-bullmq-redis-2026-06-09",
   "branches": [
     {
       "version": 2,
@@ -31,6 +31,16 @@
       "at": "2026-06-09T19:13:36.091Z",
       "previous": "MADRE/v3-s-hc-04-auth-rbac-audit-2026-06-09",
       "description": "auth-rbac-audit"
+    },
+    {
+      "version": 5,
+      "name": "MADRE/v5-s-hc-06-worker-queue-bullmq-redis-2026-06-09",
+      "sprint": "S-HC-06",
+      "operator": "Jean",
+      "date": "2026-06-09",
+      "at": "2026-06-09T19:46:49.526Z",
+      "previous": "MADRE/v4-s-hc-04-auth-rbac-audit-2026-06-09",
+      "description": "worker-queue-bullmq-redis"
     }
   ]
 }
