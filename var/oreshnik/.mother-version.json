@@ -1,6 +1,6 @@
 {
-  "version": 3,
-  "current": "MADRE/v3-s-hc-04-auth-rbac-audit-2026-06-09",
+  "version": 4,
+  "current": "MADRE/v4-s-hc-04-auth-rbac-audit-2026-06-09",
   "branches": [
     {
       "version": 2,
@@ -20,6 +20,16 @@
       "date": "2026-06-09",
       "at": "2026-06-09T19:11:52.202Z",
       "previous": "MADRE/v2-s-hc-04-auth-rbac-audit-2026-06-09",
+      "description": "auth-rbac-audit"
+    },
+    {
+      "version": 4,
+      "name": "MADRE/v4-s-hc-04-auth-rbac-audit-2026-06-09",
+      "sprint": "S-HC-04",
+      "operator": "Jean",
+      "date": "2026-06-09",
+      "at": "2026-06-09T19:13:36.091Z",
+      "previous": "MADRE/v3-s-hc-04-auth-rbac-audit-2026-06-09",
       "description": "auth-rbac-audit"
     }
   ]
