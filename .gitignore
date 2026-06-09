@@ -4,6 +4,7 @@ node_modules/
 !.env.example
 !.env.rrss.example
 .env.rrss
+env.rrss
 logs/
 *.log
 .DS_Store
