@@ -8,7 +8,7 @@ console.log("");
 log("INFO", `Sync docs from mother: ${mother}`);
 log("INFO", `Current branch: ${branch}`);
 
-git(["fetch", "origin", "--prune", "--quiet"], { allowFail: true });
+git(["fetch", "origin", "--prune", "--quiet"], { allowFail: true, timeoutMs: 10000 });
 const motherRef = git(["rev-parse", "--verify", `origin/${mother}`], { allowFail: true }).ok ? `origin/${mother}` : mother;
 const exists = git(["rev-parse", "--verify", motherRef], { allowFail: true });
 if (!exists.ok) {

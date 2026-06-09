@@ -56,7 +56,8 @@ export function sh(command, options = {}) {
     return execFileSync(process.platform === "win32" ? "cmd.exe" : "sh", process.platform === "win32" ? ["/d", "/s", "/c", command] : ["-lc", command], {
       cwd: ROOT,
       encoding: "utf8",
-      stdio: "pipe"
+      stdio: "pipe",
+      timeout: options.timeoutMs || 30000
     }).trim();
   } catch (error) {
     if (options.fatal) throw error;
