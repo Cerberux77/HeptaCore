@@ -48,7 +48,13 @@ log("INFO", `Current branch: ${branch}`);
 log("INFO", `Dynamic mother: ${mother.current} (v${mother.version})`);
 
 console.log("");
-log("INFO", "1/7 Git fetch and mother availability");
+log("INFO", "1/8 Auto-sync docs from mother (Google Docs model)");
+const syncResult = sh(`node scripts/oreshnik/sync-from-mother.mjs`, { fatal: false });
+if (syncResult) console.log(syncResult);
+else log("OK", "Mother docs synced or no mother available yet.");
+
+console.log("");
+log("INFO", "2/8 Git fetch and mother availability");
 const fetchResult = git(["fetch", "origin", "--prune", "--quiet"], { allowFail: true, timeoutMs: 15000 });
 if (fetchResult.status === null) {
   warnings++;
@@ -63,7 +69,7 @@ else {
 }
 
 console.log("");
-log("INFO", "2/7 Working tree");
+log("INFO", "3/8 Working tree");
 if (dirty.length > 0) {
   log("WARN", `${dirty.length} changed file(s). Preflight will not auto-switch branches while dirty.`);
   warnings++;
@@ -72,7 +78,7 @@ if (dirty.length > 0) {
 }
 
 console.log("");
-log("INFO", "3/7 Branch management");
+log("INFO", "4/8 Branch management");
 if (sprint) {
   const expected = `${operator}/${sanitize(sprint)}-${sanitize(desc)}-${today()}`;
   if (dryRun) {
@@ -103,7 +109,7 @@ if (sprint) {
 }
 
 console.log("");
-log("INFO", "4/7 Zone check");
+log("INFO", "5/8 Zone check");
 if (sprint) {
   const zone = sh(`node scripts/oreshnik/zone-check.mjs --sprint ${sprint}`);
   if (zone.includes("[ FAIL")) {
@@ -117,7 +123,7 @@ if (sprint) {
 }
 
 console.log("");
-log("INFO", "5/7 Environment and secrets");
+log("INFO", "6/8 Environment and secrets");
 const forbidden = dirty.filter((file) => /^\.env($|\.)/.test(file) && !file.endsWith(".example"));
 if (forbidden.length > 0) {
   forbidden.forEach((file) => log("FAIL", `Secret-like file changed: ${file}`));
@@ -132,14 +138,14 @@ else {
 }
 
 console.log("");
-log("INFO", "6/7 Build checks available");
+log("INFO", "7/8 Build checks available");
 const pkg = existsSync(join(ROOT, "package.json"));
 const prisma = existsSync(join(ROOT, "packages", "db", "prisma", "schema.prisma"));
 if (pkg) log("OK", "package.json present.");
 if (prisma) log("OK", "Prisma schema present.");
 
 console.log("");
-log("INFO", "7/7 Session ledger");
+log("INFO", "8/8 Session ledger");
 if (dryRun) {
   log("OK", "Dry-run: ledger not modified.");
 } else {

@@ -2,8 +2,8 @@
 type: master-dashboard
 project: "HeptaCore"
 status: active-production
-phase: "Product roadmap allocated, Turpial proof gated by operator console"
-last_updated: "09/06/26 14:20"
+phase: "Jean reporta S-HC-02 (hecho) y S-HC-04 (en curso) en local. CERO ramas/commits/cierres de Jean en el repo."
+last_updated: "09/06/26 15:25 VET"
 mother_branch: "MADRE/v8-s-hc-prod-00-product-audit-and-sprint-allocation-for-turpial--2026-06-09"
 current_branch: "Manuel/s-hc-xx-plan-holistico-heptacore-turpial-jean-2026-06-01"
 tags:
@@ -13,6 +13,7 @@ tags:
   - "#jean"
   - "#heptacore"
   - "#control-bus"
+  - "#closure-pendiente-jean"
 ---
 
 # HeptaCore - Central Dashboard
@@ -27,8 +28,10 @@ tags:
 | Production URL | `https://heptacore.vercel.app` |
 | Tenant piloto | `turpial-sound` |
 | Publicacion RRSS real | Bloqueada hasta aprobacion explicita de Manuel |
-| Sprint actual | `S-HC-PROD-00` |
+| Sprint actual | `S-HC-04` — Jean reporta trabajando Auth/RBAC en LOCAL. **Sin rama, commits ni push en el repo.** |
 | Rama actual | `Manuel/s-hc-xx-plan-holistico-heptacore-turpial-jean-2026-06-01` |
+| Jean S-HC-02 | Reportado completado localmente — **sin closure, sin rama `Jean/*`, sin sprint-event** |
+| Jean S-HC-04 | Reportado en curso localmente — **sin rama, sin código visible en repo** |
 
 ## Tenant Turpial Sound
 
@@ -91,21 +94,24 @@ Ambos deben devolver `ok: true`, `found: true`, `status: connected`, `encryptedB
 
 | Sprint | Owner | Scope | Estado |
 |---|---|---|---|
-| `S-HC-PROD-01` | Manuel | Login/users/roles for Manuel and Jean | Ready after `S-HC-PROD-00` closes |
-| `S-HC-PROD-03` | Jean | Turpial Sound tenant console | Ready after `S-HC-PROD-00` closes |
-| `S-HC-PUB-01` | Jean | First real Turpial Sound publishing proof from product UI | Depends on product UI prerequisites |
+| `S-HC-04` | Jean | Auth + RBAC + AuditLog (Login, sesiones, roles, registro actividad) | **assigned** |
+| `S-HC-PROD-03` | Jean | Turpial Sound tenant console | **assigned** |
+| `S-HC-02` | Jean | Prisma seed/importer Turpial + DB service layer | **done** |
+| `S-HC-PROD-02` | Manuel | Oreshnik operator dashboard | depends_on S-HC-04 (Jean) |
+| `S-HC-PROD-04` | Jean | Discovery and dry-run from UI | depends_on S-HC-PROD-02 + S-HC-PROD-03 |
+| `S-HC-PUB-01` | Jean | First real Turpial Sound publishing proof | Depends on product UI prerequisites |
 
 ## Control-State Actual
 
-La proxima accion no es ejecucion manual ni publicacion por consola.
+**ALERTA**: Modelo Oreshnik exige `oreshnik:close --push` post-sprint. Jean no ha ejecutado closures. Ver [[PRODUCT/STATUS_BOARD]].
 
-La proxima accion es:
-
-```txt
-Oreshnik close S-HC-PROD-00 -> Oreshnik assignment packet for product sprints
+Jean debe ejecutar en su máquina local:
+```bash
+npm run oreshnik:close -- --sprint S-HC-02 --operator Jean --desc "prisma-seed-importer-turpial" --push
+npm run oreshnik:close -- --sprint S-HC-04 --operator Jean --desc "auth-rbac-auditlog" --push
 ```
 
-Jean no ejecuta `S-HC-PUB-01` hasta que el producto permita login, lane asignado, tenant console, discovery/dry-run UI, publish gate y event/handoff recording. Manuel no lo asigna manualmente salvo override de emergencia documentado. La publicacion real sigue bloqueada.
+SIN estos comandos: cero visibilidad para Manuel, cero MADRE generada, cero avance documentado.
 
 ## Product Reality Check - S-HC-PROD-00
 
@@ -174,7 +180,7 @@ npm run oreshnik:close
 
 ---
 
-Ultima actualizacion: 2026-06-09 VET | Operador: Manuel | Sprint: `S-HC-CTRL-01`
+Ultima actualizacion: 2026-06-09 VET | Operador: Manuel | Sprint: `S-HC-PROD-01` + `S-HC-PROD-03` — Fase 1 paralela activa
 
 ## Cierre S-HC-CTRL-01 - 2026-06-09
 

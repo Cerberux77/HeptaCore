@@ -68,6 +68,39 @@ Bloqueos activos:
 - No publicar RRSS reales hasta Meta readiness, aprobacion humana y levantamiento explicito del hard stop.
 - No aplicar migracion en Production sin review de `20260608221500_init_saas_tenants_auth_oauth_content`.
 
+## Asignacion Activa — 2026-06-09 15:25 VET
+
+### Sprints con CLOSURE (push + MADRE + sprint-event)
+
+| Sprint | Owner | Rama | Madre | Estado |
+|---|---|---|---|---|
+| S-HC-XX | Manuel | `Manuel/s-hc-xx...` | MADRE/v2 | CERRADO |
+| S-HC-01 | Manuel | `Manuel/s-hc-xx...` | MADRE/v3, v4 | CERRADO |
+| S-HC-CTRL-01 | Manuel | `Manuel/s-hc-xx...` | MADRE/v5 | CERRADO |
+| S-HC-CTRL-02 | Manuel | `Manuel/s-hc-xx...` | MADRE/v6 | CERRADO |
+| S-HC-CTRL-03 | Manuel | `Manuel/s-hc-xx...` | MADRE/v7 | CERRADO |
+| S-HC-PROD-00 | Manuel | `Manuel/s-hc-xx...` | MADRE/v8 | CERRADO |
+
+### Sprints SIN closure (trabajo local de Jean, invisible en repo)
+
+| Sprint | Owner reportado | Rama en repo | Commits en repo | Requiere |
+|---|---|---|---|---|
+| S-HC-02 | Jean | **NO EXISTE** | **CERO** | `oreshnik:close --push` |
+| S-HC-04 | Jean | **NO EXISTE** | **CERO** | `oreshnik:preflight` → commit → `oreshnik:close --push` |
+
+**Causa**: Jean trabaja localmente sin ejecutar el script de cierre que el modelo TurpialSound exige. Sin closure: sin MADRE, sin visibilidad, sin avance documentado.
+
+### Proximos sprints (dependen de S-HC-04)
+
+| Sprint | Owner | Depende de | Estado |
+|---|---|---|---|
+| S-HC-PROD-02 | Manuel | S-HC-04 (Jean) | depends_on |
+| S-HC-PROD-03 | Jean | S-HC-PROD-00 | assigned |
+| S-HC-PROD-04 | Jean | S-HC-PROD-02 + S-HC-PROD-03 | depends_on |
+| S-HC-PROD-05 | Jean | S-HC-PROD-04 + S-HC-PROD-06 | depends_on |
+| S-HC-PROD-06 | Manuel | S-HC-PROD-02 | depends_on |
+| S-HC-PUB-01 | Jean | PROD-01 al 06 | depends_on |
+
 ## Paralelizacion
 
 Ver [[PLAN_PARALELO_MANUEL_JEAN]] para distribucion de carga, backups y reasignacion.
