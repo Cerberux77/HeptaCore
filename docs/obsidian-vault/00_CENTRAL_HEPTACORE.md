@@ -3,8 +3,8 @@ type: master-dashboard
 project: "HeptaCore"
 status: active-foundation
 phase: "Foundation: monorepo, agent core, landing, Prisma, worker and Turpial tenant seed"
-last_updated: "09/06/26 15:46"
-mother_branch: "MADRE/v5-s-hc-06-worker-queue-bullmq-redis-2026-06-09"
+last_updated: "09/06/26 15:59"
+mother_branch: "MADRE/v6-s-hc-01-console-dashboard-checklist-2026-06-09"
 production_branch: "none"
 tags:
   - "#central"
@@ -98,7 +98,7 @@ HeptaCore ya tiene base monorepo:
 
 ---
 
-> **Ultima actualizacion:** 09/06/26 15:46 VET | **Estado:** S-HC-06 CERRADO | **Operador:** Jean
+> **Ultima actualizacion:** 09/06/26 15:59 VET | **Estado:** S-HC-01 CERRADO | **Operador:** Jean
 
 ## Cierre S-HC-04 - 2026-06-09
 
@@ -113,3 +113,10 @@ HeptaCore ya tiene base monorepo:
 - Rama hija: `Jean/s-hc-00-onboarding-2026-06-09`
 - Rama madre docs: `MADRE/v5-s-hc-06-worker-queue-bullmq-redis-2026-06-09`
 - Descripcion: worker-queue-bullmq-redis
+
+## Cierre S-HC-01 - 2026-06-09
+
+- Operador: Jean
+- Rama hija: `Jean/s-hc-00-onboarding-2026-06-09`
+- Rama madre docs: `MADRE/v6-s-hc-01-console-dashboard-checklist-2026-06-09`
+- Descripcion: console-dashboard-checklist

@@ -1,8 +1,8 @@
 ---
 type: sprint-plan
 project: "HeptaCore"
-last_updated: "2026-06-09T19:46:49.526Z"
-mother_branch: "MADRE/v5-s-hc-06-worker-queue-bullmq-redis-2026-06-09"
+last_updated: "2026-06-09T19:59:26.760Z"
+mother_branch: "MADRE/v6-s-hc-01-console-dashboard-checklist-2026-06-09"
 tags:
   - "#sprints"
   - "#manuel"
@@ -91,3 +91,14 @@ Ver [[PLAN_PARALELO_MANUEL_JEAN]] para distribucion de carga, backups y reasigna
 | Estado | CERRADO |
 | Madre docs | `MADRE/v5-s-hc-06-worker-queue-bullmq-redis-2026-06-09` |
 | Descripcion | worker-queue-bullmq-redis |
+
+
+## Cierre S-HC-01 - 2026-06-09
+
+| Campo | Valor |
+|---|---|
+| Operador | Jean |
+| Rama | `Jean/s-hc-00-onboarding-2026-06-09` |
+| Estado | CERRADO |
+| Madre docs | `MADRE/v6-s-hc-01-console-dashboard-checklist-2026-06-09` |
+| Descripcion | console-dashboard-checklist |

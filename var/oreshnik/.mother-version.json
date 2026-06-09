@@ -1,6 +1,6 @@
 {
-  "version": 5,
-  "current": "MADRE/v5-s-hc-06-worker-queue-bullmq-redis-2026-06-09",
+  "version": 6,
+  "current": "MADRE/v6-s-hc-01-console-dashboard-checklist-2026-06-09",
   "branches": [
     {
       "version": 2,
@@ -41,6 +41,16 @@
       "at": "2026-06-09T19:46:49.526Z",
       "previous": "MADRE/v4-s-hc-04-auth-rbac-audit-2026-06-09",
       "description": "worker-queue-bullmq-redis"
+    },
+    {
+      "version": 6,
+      "name": "MADRE/v6-s-hc-01-console-dashboard-checklist-2026-06-09",
+      "sprint": "S-HC-01",
+      "operator": "Jean",
+      "date": "2026-06-09",
+      "at": "2026-06-09T19:59:26.760Z",
+      "previous": "MADRE/v5-s-hc-06-worker-queue-bullmq-redis-2026-06-09",
+      "description": "console-dashboard-checklist"
     }
   ]
 }

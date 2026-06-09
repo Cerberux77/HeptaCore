@@ -1,0 +1,14 @@
+{
+  "sprint": "S-HC-01",
+  "operator": "Jean",
+  "status": "CERRADO",
+  "date": "2026-06-09",
+  "at": "2026-06-09T19:59:26.760Z",
+  "branch": "Jean/s-hc-00-onboarding-2026-06-09",
+  "previousMother": "MADRE/v5-s-hc-06-worker-queue-bullmq-redis-2026-06-09",
+  "nextMother": "MADRE/v6-s-hc-01-console-dashboard-checklist-2026-06-09",
+  "description": "console-dashboard-checklist",
+  "changedFiles": [
+    "var/oreshnik/task-board.json"
+  ]
+}
