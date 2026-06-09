@@ -1,5 +1,16 @@
 {
-  "version": 1,
-  "current": "master",
-  "branches": []
+  "version": 2,
+  "current": "MADRE/v2-s-hc-04-auth-rbac-audit-2026-06-09",
+  "branches": [
+    {
+      "version": 2,
+      "name": "MADRE/v2-s-hc-04-auth-rbac-audit-2026-06-09",
+      "sprint": "S-HC-04",
+      "operator": "Jean",
+      "date": "2026-06-09",
+      "at": "2026-06-09T19:11:16.179Z",
+      "previous": "master",
+      "description": "auth-rbac-audit"
+    }
+  ]
 }

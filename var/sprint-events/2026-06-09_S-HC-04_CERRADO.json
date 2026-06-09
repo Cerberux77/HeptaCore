@@ -1,0 +1,21 @@
+{
+  "sprint": "S-HC-04",
+  "operator": "Jean",
+  "status": "CERRADO",
+  "date": "2026-06-09",
+  "at": "2026-06-09T19:11:16.179Z",
+  "branch": "Jean/s-hc-00-onboarding-2026-06-09",
+  "previousMother": "master",
+  "nextMother": "MADRE/v2-s-hc-04-auth-rbac-audit-2026-06-09",
+  "description": "auth-rbac-audit",
+  "changedFiles": [
+    ".env.example",
+    ".gitignore",
+    "apps/web/app/globals.css",
+    "apps/web/package.json",
+    "package-lock.json",
+    "package.json",
+    "packages/db/prisma/schema.prisma",
+    "prisma.config.ts"
+  ]
+}

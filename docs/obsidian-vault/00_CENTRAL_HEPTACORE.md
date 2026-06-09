@@ -3,8 +3,8 @@ type: master-dashboard
 project: "HeptaCore"
 status: active-foundation
 phase: "Foundation: monorepo, agent core, landing, Prisma, worker and Turpial tenant seed"
-last_updated: "01/06/26 00:00"
-mother_branch: "master"
+last_updated: "09/06/26 15:11"
+mother_branch: "MADRE/v2-s-hc-04-auth-rbac-audit-2026-06-09"
 production_branch: "none"
 tags:
   - "#central"
@@ -98,4 +98,11 @@ HeptaCore ya tiene base monorepo:
 
 ---
 
-> **Ultima actualizacion:** 01/06/26 00:00 VET | **Estado:** Foundation en curso | **Operador:** Manuel
+> **Ultima actualizacion:** 09/06/26 15:11 VET | **Estado:** S-HC-04 CERRADO | **Operador:** Jean
+
+## Cierre S-HC-04 - 2026-06-09
+
+- Operador: Jean
+- Rama hija: `Jean/s-hc-00-onboarding-2026-06-09`
+- Rama madre docs: `MADRE/v2-s-hc-04-auth-rbac-audit-2026-06-09`
+- Descripcion: auth-rbac-audit

@@ -1,8 +1,8 @@
 ---
 type: sprint-plan
 project: "HeptaCore"
-last_updated: "2026-06-01T00:00:00.000Z"
-mother_branch: "master"
+last_updated: "2026-06-09T19:11:16.179Z"
+mother_branch: "MADRE/v2-s-hc-04-auth-rbac-audit-2026-06-09"
 tags:
   - "#sprints"
   - "#manuel"
@@ -47,3 +47,14 @@ Ver [[PLAN_PARALELO_MANUEL_JEAN]] para distribucion de carga, backups y reasigna
 | Observability | Jean | P1 |
 | WhatsApp reports | Jean | P2 |
 | Paid scraper compliance | Ambos | P2 |
+
+
+## Cierre S-HC-04 - 2026-06-09
+
+| Campo | Valor |
+|---|---|
+| Operador | Jean |
+| Rama | `Jean/s-hc-00-onboarding-2026-06-09` |
+| Estado | CERRADO |
+| Madre docs | `MADRE/v2-s-hc-04-auth-rbac-audit-2026-06-09` |
+| Descripcion | auth-rbac-audit |
