@@ -4,7 +4,7 @@ project: "HeptaCore"
 status: active-foundation
 phase: "Foundation: monorepo, agent core, landing, Prisma, worker and Turpial tenant seed"
 last_updated: "09/06/26 15:11"
-mother_branch: "MADRE/v2-s-hc-04-auth-rbac-audit-2026-06-09"
+mother_branch: "MADRE/v3-s-hc-04-auth-rbac-audit-2026-06-09"
 production_branch: "none"
 tags:
   - "#central"
