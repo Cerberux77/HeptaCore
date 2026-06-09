@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
-import { CENTRAL_DOC, colors, currentBranch, git, readMother, ROOT, statusPorcelain } from "./lib.mjs";
+import { CENTRAL_DOC, colors, currentBranch, discoverLatestMother, git, ROOT, statusPorcelain } from "./lib.mjs";
 
-const mother = readMother();
+const mother = discoverLatestMother();
 const branch = currentBranch();
 const status = statusPorcelain();
 

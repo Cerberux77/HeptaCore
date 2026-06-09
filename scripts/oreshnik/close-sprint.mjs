@@ -16,7 +16,8 @@ import {
   resolveOperator,
   sanitize,
   writeJson,
-  writeMother
+  writeMother,
+  discoverLatestMother
 } from "./lib.mjs";
 
 const sprint = getArg("--sprint");
@@ -32,7 +33,7 @@ if (!sprint) {
 
 const vet = nowVet();
 const branch = currentBranch();
-const mother = readMother();
+const mother = discoverLatestMother();
 const newVersion = (mother.version || 1) + 1;
 const newMother = `MADRE/v${newVersion}-${sanitize(sprint)}-${sanitize(desc)}-${vet.date}`;
 

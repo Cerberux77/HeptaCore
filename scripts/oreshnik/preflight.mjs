@@ -19,7 +19,8 @@ import {
   sanitize,
   sh,
   today,
-  writeJson
+  writeJson,
+  discoverLatestMother
 } from "./lib.mjs";
 
 const sprint = getArg("--sprint");
@@ -27,7 +28,7 @@ const operator = resolveOperator(getArg("--operator"));
 const desc = getArg("--desc", "sprint");
 const dryRun = hasFlag("--dry-run");
 const vet = nowVet();
-const mother = readMother();
+const mother = discoverLatestMother();
 
 console.log("");
 console.log(`${colors.bold}==============================================${colors.reset}`);

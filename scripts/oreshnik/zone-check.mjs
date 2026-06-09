@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
-import { currentBranch, getArg, git, log, readJson, readMother, ROOT } from "./lib.mjs";
+import { currentBranch, discoverLatestMother, getArg, git, log, readJson, ROOT } from "./lib.mjs";
 
 const sprint = getArg("--sprint") || getArg("-s");
 const operator = getArg("--operator") || getArg("-o");
@@ -34,7 +34,7 @@ if (!effectiveOwner) {
   log("WARN", `Sprint ${sprint} not found in task-board.json and no sprintOwners fallback. Zone enforcement reduced to forbidden zones only.`);
 }
 
-const mother = readMother().current;
+const mother = discoverLatestMother().current;
 let baseRef = mother;
 let motherExists = git(["rev-parse", "--verify", mother], { allowFail: true }).ok;
 if (!motherExists) {

@@ -91,6 +91,35 @@ export function writeMother(value) {
   writeJson(MOTHER_FILE, value);
 }
 
+export function discoverLatestMother() {
+  git(["fetch", "origin", "--prune", "--quiet"], { allowFail: true, timeoutMs: 15000 });
+  const raw = git(["ls-remote", "--heads", "origin", "refs/heads/MADRE/v*"], { allowFail: true }).output;
+  if (!raw) return readMother();
+
+  const branches = raw.split(/\r?\n/).filter(Boolean).map((line) => {
+    const match = line.match(/refs\/heads\/(MADRE\/v(\d+)-.*)/);
+    return match ? { name: match[1], version: parseInt(match[2], 10) } : null;
+  }).filter(Boolean);
+
+  if (branches.length === 0) return readMother();
+
+  branches.sort((a, b) => b.version - a.version);
+  const latest = branches[0];
+  const local = readMother();
+
+  if (latest.version > (local.version || 0)) {
+    log("INFO", `Discovered newer mother on origin: ${latest.name} (v${latest.version}) vs local v${local.version || 0}`);
+    writeMother({
+      ...local,
+      version: latest.version,
+      current: latest.name
+    });
+    return { ...local, version: latest.version, current: latest.name };
+  }
+
+  return local;
+}
+
 export function currentBranch() {
   return git(["branch", "--show-current"], { allowFail: true }).output || "DETACHED";
 }
