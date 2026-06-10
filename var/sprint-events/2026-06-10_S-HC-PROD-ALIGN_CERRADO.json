@@ -1,0 +1,12 @@
+{
+  "sprint": "S-HC-PROD-ALIGN",
+  "operator": "Manuel",
+  "status": "CERRADO",
+  "date": "2026-06-10",
+  "at": "2026-06-10T23:54:43.089Z",
+  "branch": "Manuel/s-hc-prod-01-producto-operativo-tenant-admin-produccion-2026-06-09",
+  "previousMother": "MADRE/v16-s-hc-prod-01-producto-operativo-tenant-admin-produccion-2026-06-09",
+  "nextMother": "MADRE/v17-s-hc-prod-align-alineacion-oreshnik-middleware-manual-usuario-2026-06-10",
+  "description": "alineacion oreshnik middleware manual usuario",
+  "changedFiles": []
+}

@@ -3,8 +3,8 @@ type: master-dashboard
 project: "HeptaCore"
 status: active-foundation
 phase: "Foundation: monorepo, agent core, landing, Prisma, worker and Turpial tenant seed"
-last_updated: "09/06/26 19:31"
-mother_branch: "MADRE/v16-s-hc-prod-01-producto-operativo-tenant-admin-produccion-2026-06-09"
+last_updated: "10/06/26 19:54"
+mother_branch: "MADRE/v17-s-hc-prod-align-alineacion-oreshnik-middleware-manual-usuario-2026-06-10"
 production_branch: "none"
 tags:
   - "#central"
@@ -98,7 +98,7 @@ HeptaCore ya tiene base monorepo:
 
 ---
 
-> **Ultima actualizacion:** 09/06/26 19:31 VET | **Estado:** S-HC-PROD-01 CERRADO | **Operador:** Manuel
+> **Ultima actualizacion:** 10/06/26 19:54 VET | **Estado:** S-HC-PROD-ALIGN CERRADO | **Operador:** Manuel
 
 ## Cierre S-HC-04 - 2026-06-09
 
@@ -373,3 +373,10 @@ Ultima actualizacion: 2026-06-09 VET | Operador: Manuel | Sprint: `S-HC-PROD-01`
 - Rama hija: `Manuel/s-hc-prod-01-producto-operativo-tenant-admin-produccion-2026-06-09`
 - Rama madre docs: `MADRE/v15-s-hc-prod-01-producto-operativo-tenant-admin-produccion-2026-06-09`
 - Descripcion: producto operativo tenant admin produccion
+
+## Cierre S-HC-PROD-ALIGN - 2026-06-10
+
+- Operador: Manuel
+- Rama hija: `Manuel/s-hc-prod-01-producto-operativo-tenant-admin-produccion-2026-06-09`
+- Rama madre docs: `MADRE/v17-s-hc-prod-align-alineacion-oreshnik-middleware-manual-usuario-2026-06-10`
+- Descripcion: alineacion oreshnik middleware manual usuario

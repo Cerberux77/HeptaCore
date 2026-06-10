@@ -1,8 +1,8 @@
 ---
 type: sprint-plan
 project: "HeptaCore"
-last_updated: "2026-06-09T23:31:37.871Z"
-mother_branch: "MADRE/v16-s-hc-prod-01-producto-operativo-tenant-admin-produccion-2026-06-09"
+last_updated: "2026-06-10T23:54:43.089Z"
+mother_branch: "MADRE/v17-s-hc-prod-align-alineacion-oreshnik-middleware-manual-usuario-2026-06-10"
 tags:
   - "#sprints"
   - "#manuel"
@@ -375,3 +375,14 @@ Ver [[PLAN_PARALELO_MANUEL_JEAN]] para distribucion de carga, backups y reasigna
 | Estado | CERRADO |
 | Madre docs | `MADRE/v16-s-hc-prod-01-producto-operativo-tenant-admin-produccion-2026-06-09` |
 | Descripcion | producto operativo tenant admin produccion |
+
+
+## Cierre S-HC-PROD-ALIGN - 2026-06-10
+
+| Campo | Valor |
+|---|---|
+| Operador | Manuel |
+| Rama | `Manuel/s-hc-prod-01-producto-operativo-tenant-admin-produccion-2026-06-09` |
+| Estado | CERRADO |
+| Madre docs | `MADRE/v17-s-hc-prod-align-alineacion-oreshnik-middleware-manual-usuario-2026-06-10` |
+| Descripcion | alineacion oreshnik middleware manual usuario |
