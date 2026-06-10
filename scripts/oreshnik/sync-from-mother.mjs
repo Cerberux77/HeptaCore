@@ -1,18 +1,19 @@
 #!/usr/bin/env node
-import { currentBranch, git, log, readMother, sh } from "./lib.mjs";
+import { currentBranch, git, log, resolveMother, sh } from "./lib.mjs";
 
-const mother = readMother().current;
+const mother = resolveMother();
 const branch = currentBranch();
 
 console.log("");
-log("INFO", `Sync docs from mother: ${mother}`);
+log("INFO", `Sync docs from mother: ${mother.effective}`);
+if (mother.declaredMissing) log("WARN", `Declared mother '${mother.current}' is missing; using '${mother.effective}'.`);
 log("INFO", `Current branch: ${branch}`);
 
 git(["fetch", "origin", "--prune", "--quiet"], { allowFail: true });
-const motherRef = git(["rev-parse", "--verify", `origin/${mother}`], { allowFail: true }).ok ? `origin/${mother}` : mother;
+const motherRef = mother.effectiveRef;
 const exists = git(["rev-parse", "--verify", motherRef], { allowFail: true });
 if (!exists.ok) {
-  log("WARN", `Mother '${mother}' not found. Nothing to sync yet.`);
+  log("WARN", `Mother '${mother.effective}' not found. Nothing to sync yet.`);
   process.exit(0);
 }
 

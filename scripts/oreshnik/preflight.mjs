@@ -11,6 +11,7 @@ import {
   nonIgnoredDirtyFiles,
   nowVet,
   readMother,
+  resolveMother,
   resolveOperator,
   ROOT,
   RUNS_DIR,
@@ -24,7 +25,7 @@ const sprint = getArg("--sprint");
 const operator = resolveOperator(getArg("--operator"));
 const desc = getArg("--desc", "sprint");
 const vet = nowVet();
-const mother = readMother();
+let mother = readMother();
 
 console.log("");
 console.log(`${colors.bold}==============================================${colors.reset}`);
@@ -46,11 +47,12 @@ log("INFO", `Dynamic mother: ${mother.current} (v${mother.version})`);
 console.log("");
 log("INFO", "1/7 Git fetch and mother availability");
 git(["fetch", "origin", "--prune", "--quiet"], { allowFail: true });
+mother = resolveMother();
 const originMother = git(["rev-parse", "--verify", `origin/${mother.current}`], { allowFail: true });
 const localMother = git(["rev-parse", "--verify", mother.current], { allowFail: true });
 if (originMother.ok || localMother.ok) log("OK", "Mother branch is available locally or remotely.");
 else {
-  log("WARN", `Mother branch '${mother.current}' not found yet. This is acceptable before first shared mother is pushed.`);
+  log("WARN", `Mother branch '${mother.current}' not found yet. Effective mother: ${mother.effective}.`);
   warnings++;
 }
 
@@ -95,7 +97,7 @@ if (sprint) {
 console.log("");
 log("INFO", "4/7 Zone check");
 if (sprint) {
-  const zone = sh(`node scripts/oreshnik/zone-check.mjs --sprint ${sprint}`);
+  const zone = sh(`node scripts/oreshnik/zone-check.mjs --sprint ${sprint} --operator ${operator}`);
   if (zone.includes("[ FAIL")) {
     console.log(zone);
     blockers++;
@@ -136,6 +138,7 @@ writeJson(join(RUNS_DIR, ".last-preflight.json"), {
   operator,
   branch,
   mother: mother.current,
+  effectiveMother: mother.effective,
   dirtyCount: dirty.length,
   blockers,
   warnings,

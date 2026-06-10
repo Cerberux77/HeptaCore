@@ -1,9 +1,10 @@
 #!/usr/bin/env node
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
-import { currentBranch, getArg, git, log, readMother, ROOT } from "./lib.mjs";
+import { currentBranch, getArg, git, log, porcelainPath, resolveMother, resolveOperator, ROOT, statusPorcelain } from "./lib.mjs";
 
 const sprint = getArg("--sprint") || getArg("-s");
+const operator = resolveOperator(getArg("--operator"));
 const branch = getArg("--branch") || currentBranch();
 const zoneMapPath = join(ROOT, "docs", "07_handoffs", "zone-map.json");
 
@@ -18,10 +19,15 @@ if (!existsSync(zoneMapPath)) {
 }
 
 const zoneMap = JSON.parse(readFileSync(zoneMapPath, "utf8"));
-const mother = readMother().current;
-let changed = git(["diff", "--name-only", `${mother}...${branch}`], { allowFail: true }).output;
-if (!changed) changed = git(["diff", "--name-only"], { allowFail: true }).output;
-const files = changed.split(/\r?\n/).filter(Boolean);
+const mother = resolveMother();
+const dirty = statusPorcelain()
+  .map(porcelainPath)
+  .filter((file) => !file.startsWith("var/oreshnik/") && !file.startsWith("output/"));
+let files = dirty;
+if (files.length === 0) {
+  const changed = git(["diff", "--name-only", `${mother.effectiveRef}...${branch}`], { allowFail: true }).output;
+  files = changed.split(/\r?\n/).filter(Boolean);
+}
 
 if (files.length === 0) {
   log("OK", `No changed files to check for ${sprint}.`);
@@ -48,8 +54,8 @@ for (const file of files) {
     matched = true;
     const allowed = zone.sprints?.includes("*") || zone.sprints?.includes(sprint);
     if (zone.lock === "forbidden") collisions.push(`${file}: forbidden zone (${pattern})`);
-    else if (zone.lock === "jean_exclusive" && !/^S-J|^S-JEAN/i.test(sprint)) collisions.push(`${file}: Jean exclusive zone (${pattern})`);
-    else if (zone.lock === "manuel_exclusive" && !/^S-M|^S-MANUEL/i.test(sprint)) collisions.push(`${file}: Manuel exclusive zone (${pattern})`);
+    else if (zone.lock === "jean_exclusive" && operator !== "Jean") collisions.push(`${file}: Jean exclusive zone (${pattern})`);
+    else if (zone.lock === "manuel_exclusive" && operator !== "Manuel") collisions.push(`${file}: Manuel exclusive zone (${pattern})`);
     else if (zone.lock === "double_jean_manuel") warnings.push(`${file}: double lock required (${pattern})`);
     else if (!allowed) warnings.push(`${file}: not explicitly mapped to ${sprint} (${pattern})`);
     break;

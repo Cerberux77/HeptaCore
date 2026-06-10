@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
-import { dirname, join } from "node:path";
+import { join } from "node:path";
 import {
   CENTRAL_DOC,
   EVENTS_DIR,
@@ -12,7 +12,7 @@ import {
   hasFlag,
   log,
   nowVet,
-  readMother,
+  resolveMother,
   resolveOperator,
   sanitize,
   writeJson,
@@ -32,8 +32,9 @@ if (!sprint) {
 
 const vet = nowVet();
 const branch = currentBranch();
-const mother = readMother();
-const newVersion = (mother.version || 1) + 1;
+git(["fetch", "origin", "--prune", "--quiet"], { allowFail: true });
+const mother = resolveMother();
+const newVersion = Math.max(mother.version || 1, mother.discoveredVersion || 0) + 1;
 const newMother = `MADRE/v${newVersion}-${sanitize(sprint)}-${sanitize(desc)}-${vet.date}`;
 
 console.log("");
@@ -43,6 +44,7 @@ log("INFO", `Sprint: ${sprint}`);
 log("INFO", `Operator: ${operator}`);
 log("INFO", `Branch: ${branch}`);
 log("INFO", `Current mother: ${mother.current}`);
+if (mother.declaredMissing) log("WARN", `Declared mother missing; closing from effective mother ${mother.effective}.`);
 log("INFO", `Next mother: ${newMother}`);
 
 if (!new RegExp(`^${operator}/`, "i").test(branch) && !force) {
@@ -105,45 +107,16 @@ if (!stagedAfter) {
   log("OK", "Closure documentation committed on child branch.");
 }
 
-const motherExists = git(["rev-parse", "--verify", mother.current], { allowFail: true }).ok;
-if (motherExists) {
-  git(["checkout", mother.current], { allowFail: false });
-  git(["checkout", "-b", newMother], { allowFail: false });
-  const base = git(["merge-base", "HEAD", branch], { allowFail: true }).output || mother.current;
-  const merge = git(["diff", "--name-only", `${base}...${branch}`, "--", "docs/obsidian-vault", "docs/07_handoffs"], { allowFail: true }).output;
-  if (merge) {
-    const result = git(["show", `${branch}:docs/obsidian-vault/00_CENTRAL_HEPTACORE.md`], { allowFail: true });
-    if (result.ok) writeFileSafe(CENTRAL_DOC, result.output);
-    git(["checkout", branch, "--", "docs/obsidian-vault", "docs/07_handoffs"], { allowFail: true });
-  }
-  writeMother(nextMotherData);
-  writeJson(eventPath, {
-    sprint,
-    operator,
-    status: "CERRADO",
-    date: vet.date,
-    at: vet.iso,
-    branch,
-    previousMother: mother.current,
-    nextMother: newMother,
-    description: desc
-  });
-  git(["add", "docs/obsidian-vault", "docs/07_handoffs", "var/oreshnik/.mother-version.json", "var/sprint-events"], { allowFail: false });
-  if (git(["diff", "--cached", "--name-only"], { allowFail: true }).output) {
-    git(["commit", "-m", `docs(mother): integrate ${sprint} - ${operator}`], { allowFail: false });
-    log("OK", `Created local mother branch ${newMother}.`);
-  }
-  if (push) {
-    git(["push", "origin", branch], { allowFail: false });
-    git(["push", "origin", newMother], { allowFail: false });
-    log("OK", "Pushed child branch and mother branch.");
-  } else {
-    log("WARN", "Push skipped. Re-run with --push when ready.");
-  }
-  git(["checkout", branch], { allowFail: false });
+git(["checkout", "-b", newMother, branch], { allowFail: false });
+log("OK", `Created local mother branch ${newMother} from ${branch}.`);
+if (push) {
+  git(["push", "origin", branch], { allowFail: false });
+  git(["push", "origin", newMother], { allowFail: false });
+  log("OK", "Pushed child branch and mother branch.");
 } else {
-  log("WARN", `Mother '${mother.current}' does not exist locally. Recorded closure metadata only.`);
+  log("WARN", "Push skipped. Re-run with --push when ready.");
 }
+git(["checkout", branch], { allowFail: false });
 
 console.log("");
 console.log(`${colors.green}${colors.bold}SPRINT CLOSED: ${sprint}${colors.reset}`);
@@ -184,7 +157,3 @@ function appendIfMissing(currentContent, path, addition) {
   else writeFileSync(path, `${currentContent.trimEnd()}\n${addition}`, "utf8");
 }
 
-function writeFileSafe(path, content) {
-  mkdirSync(dirname(path), { recursive: true });
-  writeFileSync(path, content, "utf8");
-}

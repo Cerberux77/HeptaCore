@@ -56,7 +56,7 @@ export function sh(command, options = {}) {
     }).trim();
   } catch (error) {
     if (options.fatal) throw error;
-    return "";
+    return [error.stdout, error.stderr].filter(Boolean).join("\n").trim();
   }
 }
 
@@ -84,6 +84,67 @@ export function readMother() {
 
 export function writeMother(value) {
   writeJson(MOTHER_FILE, value);
+}
+
+export function refExists(ref) {
+  return git(["rev-parse", "--verify", ref], { allowFail: true }).ok;
+}
+
+export function discoverLatestMother() {
+  const refs = git(
+    [
+      "for-each-ref",
+      "--format=%(refname:short)",
+      "refs/heads/MADRE",
+      "refs/remotes/origin/MADRE"
+    ],
+    { allowFail: true }
+  ).output
+    .split(/\r?\n/)
+    .filter(Boolean)
+    .map((ref) => ref.replace(/^origin\//, ""));
+
+  const latest = refs
+    .map((name) => {
+      const version = Number(name.match(/^MADRE\/v(\d+)/i)?.[1] || 0);
+      return { name, version };
+    })
+    .filter((item) => item.version > 0)
+    .sort((a, b) => b.version - a.version || a.name.localeCompare(b.name))[0];
+
+  return latest || null;
+}
+
+export function resolveMother() {
+  const declared = readMother();
+  const declaredRef = refExists(`origin/${declared.current}`) ? `origin/${declared.current}` : declared.current;
+  if (refExists(declaredRef)) {
+    return {
+      ...declared,
+      effective: declared.current,
+      effectiveRef: declaredRef,
+      declaredMissing: false
+    };
+  }
+
+  const latest = discoverLatestMother();
+  if (latest) {
+    const latestRef = refExists(`origin/${latest.name}`) ? `origin/${latest.name}` : latest.name;
+    return {
+      ...declared,
+      effective: latest.name,
+      effectiveRef: latestRef,
+      declaredMissing: true,
+      discoveredVersion: latest.version
+    };
+  }
+
+  return {
+    ...declared,
+    effective: declared.current,
+    effectiveRef: declared.current,
+    declaredMissing: true
+  };
 }
 
 export function currentBranch() {
@@ -133,8 +194,14 @@ export function statusPorcelain() {
   return git(["status", "--porcelain"], { allowFail: true }).output.split(/\r?\n/).filter(Boolean);
 }
 
+export function porcelainPath(line) {
+  return String(line)
+    .replace(/^[ MADRCU?!]{1,2}\s+/, "")
+    .replace(/^.* -> /, "");
+}
+
 export function nonIgnoredDirtyFiles() {
   return statusPorcelain()
-    .map((line) => line.slice(3))
+    .map(porcelainPath)
     .filter((file) => !file.startsWith("var/oreshnik/") && !file.startsWith("output/"));
 }
