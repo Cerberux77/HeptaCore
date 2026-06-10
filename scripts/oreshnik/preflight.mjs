@@ -98,7 +98,8 @@ console.log("");
 log("INFO", "4/7 Zone check");
 if (sprint) {
   const zone = sh(`node scripts/oreshnik/zone-check.mjs --sprint ${sprint} --operator ${operator}`);
-  if (zone.includes("[ FAIL")) {
+  const zonePlain = zone.replace(/\x1b\[[0-9;]*m/g, "");
+  if (zonePlain.includes("[ FAIL")) {
     console.log(zone);
     blockers++;
   } else {
