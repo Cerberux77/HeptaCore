@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { GlobalAssistant } from "../components/global-assistant";
 
 export const metadata: Metadata = {
   title: "HeptaCore | Inteligencia multidimensional + gestion de RRSS",
@@ -10,7 +11,10 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="es">
-      <body>{children}</body>
+      <body>
+        {children}
+        <GlobalAssistant />
+      </body>
     </html>
   );
 }
