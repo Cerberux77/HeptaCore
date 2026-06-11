@@ -12,9 +12,12 @@ import {
   hasFlag,
   log,
   nowVet,
+  readJson,
   resolveMother,
   resolveOperator,
+  ROOT,
   sanitize,
+  sh,
   writeJson,
   writeMother
 } from "./lib.mjs";
@@ -61,6 +64,7 @@ if (secretChanges.length > 0) {
   process.exit(1);
 }
 
+updateTaskBoard();
 updateVaultDocs();
 
 mkdirSync(EVENTS_DIR, { recursive: true });
@@ -97,8 +101,19 @@ const nextMotherData = {
   ]
 };
 writeMother(nextMotherData);
+sh(`node scripts/oreshnik/canonical-check.mjs --fix --sprint ${sprint} --operator ${operator}`, { fatal: true });
 
-git(["add", "docs/obsidian-vault", "docs/07_handoffs", "var/oreshnik/.mother-version.json", "var/sprint-events"], { allowFail: false });
+git([
+  "add",
+  "docs/obsidian-vault",
+  "docs/07_handoffs",
+  "scripts/oreshnik",
+  "package.json",
+  "package-lock.json",
+  "var/oreshnik/.mother-version.json",
+  "var/oreshnik/task-board.json",
+  "var/sprint-events"
+], { allowFail: false });
 const stagedAfter = git(["diff", "--cached", "--name-only"], { allowFail: true }).output;
 if (!stagedAfter) {
   log("WARN", "No staged documentation changes.");
@@ -141,6 +156,29 @@ function updateVaultDocs() {
     content += `\n\n## Cierre ${sprint} - ${vet.date}\n\n| Campo | Valor |\n|---|---|\n| Operador | ${operator} |\n| Rama | \`${branch}\` |\n| Estado | CERRADO |\n| Madre docs | \`${newMother}\` |\n| Descripcion | ${desc} |\n`;
     writeFileSync(plan, content, "utf8");
   }
+}
+
+function updateTaskBoard() {
+  const absoluteBoardPath = join(ROOT, "var", "oreshnik", "task-board.json");
+  const board = readJson(absoluteBoardPath, null);
+  const task = board?.tasks?.find((item) => item.id === sprint);
+  if (!task) {
+    log("WARN", `Sprint ${sprint} not found in var/oreshnik/task-board.json; closure event will still be recorded.`);
+    return;
+  }
+
+  task.status = "done";
+  task.history = task.history || [];
+  task.history.push({
+    at: vet.iso,
+    action: "closed",
+    operator,
+    branch,
+    description: desc
+  });
+  board.updatedAt = vet.iso;
+  writeJson(absoluteBoardPath, board);
+  log("OK", `Task board marked ${sprint} as done.`);
 }
 
 function replaceOrInsertFrontmatter(content, key, value) {

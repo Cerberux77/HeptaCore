@@ -1,102 +1,82 @@
 ---
 type: status-board
 project: "HeptaCore"
-last_updated: "09/06/26 15:20 VET"
-generated_by: "Kilo via Oreshnik"
-source: "git log, commits reales, task-board.json, TurpialSound model"
+last_updated: "2026-06-11T00:59:21.832Z"
+generated_by: "Oreshnik canonical-check"
+source: "var/oreshnik/task-board.json"
 ---
 
-# STATUS BOARD — Realidad del Repositorio
+# STATUS BOARD - Realidad Canonica del Repositorio
 
-> Lo que está en git, archivos y commits. No lo que dicen los docs.
+> Fuente operativa: `var/oreshnik/task-board.json`. Si este documento contradice el task board, el preflight debe bloquear.
 
-## Sprints Cerrados (con closure + push + MADRE + sprint-event)
+## Orden de Ejecucion Actual
 
-| Sprint | Rama | Commits | Evento |
+- Wave 1 parallel: Jean S-HC-PROD-02, Manuel S-HC-PROD-03 (LLM provider adapter + Turpial tenant QA)
+- Wave 2 parallel: Jean S-HC-PROD-04, Manuel S-HC-PROD-05 after S-HC-PROD-03
+- Wave 3 parallel: Jean S-HC-PROD-09/S-HC-PROD-11, Manuel S-HC-PROD-07/S-HC-PROD-08/S-HC-PROD-10 after core proof
+- Wave 4 sequential: S-HC-PROD-06 control bus/dashboard after PROD-02/03/04/05/07/08/09/10/11
+- Final: S-HC-RELEASE-01 end-to-end Turpial Sound production proof
+
+## Tareas Ready/Pending
+
+| Sprint | Estado | Owner | Scope | Depende de |
+|---|---|---|---|---|
+| S-HC-PROD-02 | ready | Jean | Production DB/Auth/env and Turpial seed smoke | S-HC-PROD-ALIGN |
+| S-HC-PROD-03 | ready | Manuel | LLM provider adapter plus Turpial tenant functional QA and UX polish | S-HC-PROD-ALIGN |
+| S-HC-PROD-04 | pending | Jean | Worker, Redis and persistent dry-run processing | S-HC-PROD-02 |
+| S-HC-PROD-05 | pending | Manuel | Publishing gate UI, AuditLog and rollback proof | S-HC-PROD-03 |
+| S-HC-PROD-06 | pending | Manuel | Oreshnik operator dashboard and canonical task board | S-HC-PROD-02, S-HC-PROD-03, S-HC-PROD-04, S-HC-PROD-05, S-HC-PROD-07, S-HC-PROD-08, S-HC-PROD-09, S-HC-PROD-10, S-HC-PROD-11 |
+| S-HC-PROD-07 | pending | Manuel | Sales landing, client onboarding and login entry | S-HC-PROD-03 |
+| S-HC-PROD-08 | pending | Manuel | Draft editor and post modification workflow | S-HC-PROD-03 |
+| S-HC-PROD-09 | pending | Jean | Paid ads campaign engine with 35 percent overhead gate | S-HC-PROD-04 |
+| S-HC-PROD-10 | pending | Manuel | Paid ads management UI and tenant billing surface | S-HC-PROD-05, S-HC-PROD-09 |
+| S-HC-PROD-11 | pending | Jean | Paid scraper compliance and controlled discovery adapter | S-HC-PROD-04 |
+| S-HC-RELEASE-01 | pending | Manuel+Jean | End-to-end Turpial Sound production proof | S-HC-PROD-02, S-HC-PROD-03, S-HC-PROD-04, S-HC-PROD-05, S-HC-PROD-06, S-HC-PROD-07, S-HC-PROD-08, S-HC-PROD-09, S-HC-PROD-10, S-HC-PROD-11 |
+
+## Asignacion Manuel
+
+| Sprint | Estado | Scope | Depende de |
 |---|---|---|---|
-| S-HC-XX | `Manuel/s-hc-xx-plan-holistico...` | `a1ec5ec` | `2026-06-01_S-HC-XX_CERRADO.json` |
-| S-HC-01 | `Manuel/s-hc-xx-plan-holistico...` | `45b9195` | `2026-06-08_S-HC-01_CERRADO.json` |
-| S-HC-CTRL-01 | `Manuel/s-hc-xx-plan-holistico...` | `314f85b` | `2026-06-09_S-HC-CTRL-01_CERRADO.json` |
-| S-HC-CTRL-02 | `Manuel/s-hc-xx-plan-holistico...` | `8116c10` | `2026-06-09_S-HC-CTRL-02_CERRADO.json` |
-| S-HC-CTRL-03 | `Manuel/s-hc-xx-plan-holistico...` | `4cff455` | `2026-06-09_S-HC-CTRL-03_CERRADO.json` |
-| S-HC-PROD-00 | `Manuel/s-hc-xx-plan-holistico...` | `3d0ab33` | `2026-06-09_S-HC-PROD-00_CERRADO.json` |
+| S-HC-PROD-03 | ready | LLM provider adapter plus Turpial tenant functional QA and UX polish | S-HC-PROD-ALIGN |
+| S-HC-PROD-05 | pending | Publishing gate UI, AuditLog and rollback proof | S-HC-PROD-03 |
+| S-HC-PROD-06 | pending | Oreshnik operator dashboard and canonical task board | S-HC-PROD-02, S-HC-PROD-03, S-HC-PROD-04, S-HC-PROD-05, S-HC-PROD-07, S-HC-PROD-08, S-HC-PROD-09, S-HC-PROD-10, S-HC-PROD-11 |
+| S-HC-PROD-07 | pending | Sales landing, client onboarding and login entry | S-HC-PROD-03 |
+| S-HC-PROD-08 | pending | Draft editor and post modification workflow | S-HC-PROD-03 |
+| S-HC-PROD-10 | pending | Paid ads management UI and tenant billing surface | S-HC-PROD-05, S-HC-PROD-09 |
+| S-HC-RELEASE-01 | pending | End-to-end Turpial Sound production proof | S-HC-PROD-02, S-HC-PROD-03, S-HC-PROD-04, S-HC-PROD-05, S-HC-PROD-06, S-HC-PROD-07, S-HC-PROD-08, S-HC-PROD-09, S-HC-PROD-10, S-HC-PROD-11 |
 
-**MADRE branches generadas**: MADRE/v2 → MADRE/v8 (7 versiones de docs)
+## Asignacion Jean
 
-## Sprint Reportado por Jean (SIN closure, SIN push, SIN rama, SIN sprint-event)
-
-| Sprint | Owner reportado | Estado real en repo | Evidencia |
+| Sprint | Estado | Scope | Depende de |
 |---|---|---|---|
-| S-HC-02 | Jean | **NO EXISTE** rama `Jean/*`. Cero commits de Jean. | `git log --all --author="Jean"` = vacío. `git branch -a` = sin `jean/` |
-| S-HC-04 | Jean | **NO EXISTE** rama `Jean/*`. Cero código de Auth/RBAC. | `/login` es placeholder de 9 líneas. Sin hashing, sin sesiones, sin RBAC guards. |
+| S-HC-PROD-02 | ready | Production DB/Auth/env and Turpial seed smoke | S-HC-PROD-ALIGN |
+| S-HC-PROD-04 | pending | Worker, Redis and persistent dry-run processing | S-HC-PROD-02 |
+| S-HC-PROD-09 | pending | Paid ads campaign engine with 35 percent overhead gate | S-HC-PROD-04 |
+| S-HC-PROD-11 | pending | Paid scraper compliance and controlled discovery adapter | S-HC-PROD-04 |
+| S-HC-RELEASE-01 | pending | End-to-end Turpial Sound production proof | S-HC-PROD-02, S-HC-PROD-03, S-HC-PROD-04, S-HC-PROD-05, S-HC-PROD-06, S-HC-PROD-07, S-HC-PROD-08, S-HC-PROD-09, S-HC-PROD-10, S-HC-PROD-11 |
 
-## Lo que EXISTE en código (hecho por Manuel)
+## Hard Stops Vigentes
 
-| Feature | Archivos clave | Estado |
+- No real RRSS publishing sin desbloqueo explicito.
+- No campaign spend.
+- No real scraping.
+- No credenciales en git.
+- No Prisma/schema/auth/security changes sin doble lock cuando aplique.
+- No sprint closure sin vault, handoff y validaciones.
+
+## Sprints Cerrados Segun Task Board
+
+| Sprint | Owner | Scope |
 |---|---|---|
-| Monorepo + landing + Vercel deploy | Raíz, `apps/web/`, `vercel.json` | DONE |
-| Prisma schema (20+ modelos con AuditLog, UserRole) | `packages/db/prisma/schema.prisma` | DONE |
-| 2 migraciones aplicadas | `packages/db/prisma/migrations/` | DONE |
-| Instagram OAuth login + callback | `apps/web/app/api/oauth/instagram/` | DONE |
-| Token vault AES-256-GCM | `apps/web/lib/token-vault.ts` | DONE |
-| TurpialConsole UI (9 vistas) | `apps/web/components/turpial-console.tsx:495` | DONE |
-| 29 posts + 46 assets Turpial | `apps/web/lib/data/`, `apps/web/public/assets/` | DONE |
-| Seed scripts Turpial | `scripts/seed-turpial-*.mjs` | DONE |
-| Oreshnik scripts (preflight, close, assign, merge-docs-union, etc.) | `scripts/oreshnik/` | DONE |
-| tenant-auth.ts (lee cookie, sin emitir sesión) | `apps/web/lib/tenant-auth.ts:37` | PARTIAL |
-| Login page placeholder | `apps/web/app/login/page.tsx` | PARTIAL |
-| Dashboard básico | `apps/web/app/dashboard/page.tsx` | PARTIAL |
-| Facebook page token vault | `scripts/seed-turpial-facebook-vault.mjs` | DONE |
-
-## Lo que FALTA (cero código)
-
-| Feature | Sprint asignado | Responsable |
-|---|---|---|
-| Password hashing (bcrypt/argon2) | S-HC-04 | Jean |
-| Session issuance (JWT/cookies) | S-HC-04 | Jean |
-| RBAC guards por rol (OWNER/EDITOR/VIEWER) | S-HC-04 | Jean |
-| AuditLog writer (modelo existe, sin código) | S-HC-04 | Jean |
-| User registration/signup | S-HC-04 | Jean |
-| Oreshnik dashboard | S-HC-PROD-02 | Manuel |
-| Tenant console turpial en DB real | S-HC-PROD-03 | Jean |
-| Discovery + dry-run desde UI | S-HC-PROD-04 | Jean |
-| Controlled one-post publishing | S-HC-PROD-05 | Jean |
-| Logs/handoff/event recording | S-HC-PROD-06 | Manuel |
-| First real publish (bloqueado) | S-HC-PUB-01 | Jean |
-
-## Diagnóstico del Desfase
-
-Jean reporta haber completado S-HC-02 (Prisma seed/importer) y estar ejecutando S-HC-04 (Auth/RBAC). Sin embargo:
-
-1. **No existe rama `Jean/*` en origin ni local.**
-2. **Cero commits atribuidos a Jean.**
-3. **Cero sprint-events de Jean.**
-4. **El código de Auth/RBAC no existe** — solo modelos en schema (creados por Manuel).
-
-**Causa raíz**: Jean está trabajando en LOCAL sin seguir el protocolo Oreshnik de cierre que obliga push, documentación y creación de rama MADRE después de cada sprint. Esto es exactamente lo que el modelo TurpialSound resolvía con el script `close-sprint.mjs`.
-
-## Acción Requerida de Jean
-
-Jean debe ejecutar inmediatamente en su máquina local (donde tenga su trabajo real):
-
-```bash
-# 1. Crear/Pushear su rama si existe localmente
-git checkout Jean/s-hc-02-prisma-seed-turpial-2026-06-09
-git push origin Jean/s-hc-02-prisma-seed-turpial-2026-06-09
-
-# 2. Cerrar S-HC-02 formalmente
-npm run oreshnik:close -- --sprint S-HC-02 --operator Jean --desc "prisma-seed-importer-turpial" --push
-
-# 3. Crear rama S-HC-04
-npm run oreshnik:preflight -- --sprint S-HC-04 --operator Jean --desc "auth-rbac-auditlog"
-
-# 4. Hacer commit del código de Auth local y pushear
-git add .
-git commit -m "feat(auth): implement login, roles RBAC, auditlog"
-git push origin Jean/s-hc-04-auth-rbac-auditlog-2026-06-09
-
-# 5. Cerrar S-HC-04 cuando termine
-npm run oreshnik:close -- --sprint S-HC-04 --operator Jean --desc "auth-rbac-auditlog" --push
-```
-
-SIN estos pasos, el trabajo de Jean es invisible para Oreshnik y para Manuel.
+| S-HC-00 | Manuel | Foundation baseline commit |
+| S-HC-01 | Jean | Console shell: tenant dashboard, onboarding, checklist, draft queue |
+| S-HC-02 | Jean | Turpial importer and Prisma seed |
+| S-HC-03 | Jean | Agent strategy runner |
+| S-HC-04 | Jean | Auth, RBAC and tenant guards |
+| S-HC-05 | Jean | Approval queue and human gates |
+| S-HC-06 | Jean | Worker queue with retries and tenant scope |
+| S-HC-07 | Jean | Turpial tenant dashboard report |
+| S-HC-08 | Jean | Meta adapter sandbox design |
+| S-HC-09 | Jean | First tenant publish readiness gate |
+| S-HC-MAINT-ALIGN-01 | Manuel | Canonical task board and derived docs alignment gate |

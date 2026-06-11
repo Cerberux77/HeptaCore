@@ -23,6 +23,7 @@
     "oreshnik:status": "node scripts/oreshnik/status.mjs",
     "oreshnik:sync": "node scripts/oreshnik/sync-from-mother.mjs",
     "oreshnik:close": "node scripts/oreshnik/close-sprint.mjs",
+    "oreshnik:canonical": "node scripts/oreshnik/canonical-check.mjs",
     "oreshnik:zone": "node scripts/oreshnik/zone-check.mjs",
     "oreshnik:tasks": "node scripts/oreshnik/task-board.mjs",
     "oreshnik:reassign": "node scripts/oreshnik/reassign-task.mjs",

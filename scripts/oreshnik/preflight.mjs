@@ -45,7 +45,7 @@ log("INFO", `Current branch: ${branch}`);
 log("INFO", `Dynamic mother: ${mother.current} (v${mother.version})`);
 
 console.log("");
-log("INFO", "1/7 Git fetch and mother availability");
+log("INFO", "1/8 Git fetch and mother availability");
 git(["fetch", "origin", "--prune", "--quiet"], { allowFail: true });
 mother = resolveMother();
 const originMother = git(["rev-parse", "--verify", `origin/${mother.current}`], { allowFail: true });
@@ -57,7 +57,7 @@ else {
 }
 
 console.log("");
-log("INFO", "2/7 Working tree");
+log("INFO", "2/8 Working tree");
 if (dirty.length > 0) {
   log("WARN", `${dirty.length} changed file(s). Preflight will not auto-switch branches while dirty.`);
   warnings++;
@@ -66,7 +66,7 @@ if (dirty.length > 0) {
 }
 
 console.log("");
-log("INFO", "3/7 Branch management");
+log("INFO", "3/8 Branch management");
 if (sprint) {
   const expected = `${operator}/${sanitize(sprint)}-${sanitize(desc)}-${today()}`;
   if (isMotherBranch(branch)) {
@@ -95,7 +95,7 @@ if (sprint) {
 }
 
 console.log("");
-log("INFO", "4/7 Zone check");
+log("INFO", "4/8 Zone check");
 if (sprint) {
   const zone = sh(`node scripts/oreshnik/zone-check.mjs --sprint ${sprint} --operator ${operator}`);
   const zonePlain = zone.replace(/\x1b\[[0-9;]*m/g, "");
@@ -110,7 +110,20 @@ if (sprint) {
 }
 
 console.log("");
-log("INFO", "5/7 Environment and secrets");
+log("INFO", "5/8 Canonical assignment/doc alignment");
+{
+  const canonical = sh(`node scripts/oreshnik/canonical-check.mjs --sprint ${sprint || ""} --operator ${operator}`);
+  const canonicalPlain = canonical.replace(/\x1b\[[0-9;]*m/g, "");
+  if (canonicalPlain.includes("[ FAIL")) {
+    console.log(canonical);
+    blockers++;
+  } else {
+    console.log(canonical);
+  }
+}
+
+console.log("");
+log("INFO", "6/8 Environment and secrets");
 const forbidden = dirty.filter((file) => /^\.env($|\.)/.test(file) && !file.endsWith(".example"));
 if (forbidden.length > 0) {
   forbidden.forEach((file) => log("FAIL", `Secret-like file changed: ${file}`));
@@ -125,14 +138,14 @@ else {
 }
 
 console.log("");
-log("INFO", "6/7 Build checks available");
+log("INFO", "7/8 Build checks available");
 const pkg = existsSync(join(ROOT, "package.json"));
 const prisma = existsSync(join(ROOT, "packages", "db", "prisma", "schema.prisma"));
 if (pkg) log("OK", "package.json present.");
 if (prisma) log("OK", "Prisma schema present.");
 
 console.log("");
-log("INFO", "7/7 Session ledger");
+log("INFO", "8/8 Session ledger");
 mkdirSync(RUNS_DIR, { recursive: true });
 writeJson(join(RUNS_DIR, ".last-preflight.json"), {
   sprint: sprint || null,
