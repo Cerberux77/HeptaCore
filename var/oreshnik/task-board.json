@@ -1,6 +1,6 @@
 {
   "project": "HeptaCore",
-  "updatedAt": "2026-06-11T01:46:33.673Z",
+  "updatedAt": "2026-06-11T01:50:03.894Z",
   "resiliencePolicy": "If an owner is unavailable for more than one working block or blocks the critical path, backupOwner may take over after recording reassignment.",
   "closurePolicy": "No sprint may be closed until acceptance criteria, base tests, sprint-specific tests, docs/handoff, and Oreshnik zone checks pass. See docs/obsidian-vault/METODOLOGIA/ORQUESTACION_AGENTES_HEPTACORE.md.",
   "baseTestMatrix": [
@@ -509,7 +509,7 @@
       "title": "Paid ads campaign engine with 35 percent overhead gate",
       "owner": "Jean",
       "backupOwner": "Manuel",
-      "status": "pending",
+      "status": "done",
       "track": "paid-growth",
       "zone": [
         "apps/worker",
@@ -527,7 +527,16 @@
         "Worker/integration contract supports dry-run campaign creation",
         "Compliance notes explain platform spend, HeptaCore overhead and rollback/no-spend proof"
       ],
-      "handoff": "Jean owns worker/integration campaign engine. Manuel will own web campaign UI separately."
+      "handoff": "Jean owns worker/integration campaign engine. Manuel will own web campaign UI separately.",
+      "history": [
+        {
+          "at": "2026-06-11T01:50:03.894Z",
+          "action": "closed",
+          "operator": "Jean",
+          "branch": "Jean/s-hc-canonical-alignment-2026-06-09",
+          "description": "paid-ads-campaign-engine-35pct-overhead-gate"
+        }
+      ]
     },
     {
       "id": "S-HC-PROD-10",

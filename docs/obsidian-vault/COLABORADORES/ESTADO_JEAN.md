@@ -2,7 +2,7 @@
 type: collaborator-status
 project: "HeptaCore"
 operator: "Jean"
-last_updated: "2026-06-11T01:46:35.589Z"
+last_updated: "2026-06-11T01:50:05.708Z"
 generated_by: "Oreshnik canonical-check"
 source: "var/oreshnik/task-board.json"
 ---
@@ -21,23 +21,10 @@ source: "var/oreshnik/task-board.json"
 
 | Sprint | Scope | Depende de |
 |---|---|---|
-| S-HC-PROD-09 | Paid ads campaign engine with 35 percent overhead gate | S-HC-PROD-04 |
 | S-HC-PROD-11 | Paid scraper compliance and controlled discovery adapter | S-HC-PROD-04 |
 | S-HC-RELEASE-01 | End-to-end Turpial Sound production proof | S-HC-PROD-02, S-HC-PROD-03, S-HC-PROD-04, S-HC-PROD-05, S-HC-PROD-06, S-HC-PROD-07, S-HC-PROD-08, S-HC-PROD-09, S-HC-PROD-10, S-HC-PROD-11 |
 
 ## Detalle de Aceptacion
-
-### S-HC-PROD-09 - Paid ads campaign engine with 35 percent overhead gate
-
-Estado: `pending`
-
-- Campaign spend remains blocked unless explicitly approved
-- Campaign plan includes platform budget, 35 percent overhead, total client charge and approval state
-- No real campaign spend can execute from default env
-- Worker/integration contract supports dry-run campaign creation
-- Compliance notes explain platform spend, HeptaCore overhead and rollback/no-spend proof
-
-Zonas: `apps/worker`, `packages/integrations`, `packages/core`, `docs`
 
 ### S-HC-PROD-11 - Paid scraper compliance and controlled discovery adapter
 

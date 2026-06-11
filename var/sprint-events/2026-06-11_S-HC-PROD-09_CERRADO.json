@@ -1,0 +1,18 @@
+{
+  "sprint": "S-HC-PROD-09",
+  "operator": "Jean",
+  "status": "CERRADO",
+  "date": "2026-06-11",
+  "at": "2026-06-11T01:50:03.894Z",
+  "branch": "Jean/s-hc-canonical-alignment-2026-06-09",
+  "previousMother": "MADRE/v22-s-hc-prod-04-worker-redis-persistent-dryrun-processing-2026-06-11",
+  "nextMother": "MADRE/v23-s-hc-prod-09-paid-ads-campaign-engine-35pct-overhead-gate-2026-06-11",
+  "description": "paid-ads-campaign-engine-35pct-overhead-gate",
+  "changedFiles": [
+    ".env.example",
+    "apps/worker/src/queue/client.ts",
+    "apps/worker/src/queue/index.ts",
+    "apps/worker/src/queue/types.ts",
+    "apps/worker/src/queue/worker.ts"
+  ]
+}
