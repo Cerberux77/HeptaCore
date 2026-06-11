@@ -617,3 +617,113 @@ Ver [[PLAN_PARALELO_MANUEL_JEAN]] para distribucion de carga, backups y reasigna
 | Estado | CERRADO |
 | Madre docs | `MADRE/v38-s-hc-release-02-trial-payment-cta-qa-bot-cost-table-2026-06-11` |
 | Descripcion | trial-payment-cta-qa-bot-cost-table |
+
+---
+
+# S-HC-RELEASE-02 — Desglose por Sprints (80/20 Pareto)
+
+> Auditado 2026-06-11 19:25. Rama `Manuel/s-hc-prod-01-producto-operativo-tenant-admin-produccion-2026-06-09`.
+> Merge a master: `afb9b66`. Deploy Vercel: `JEiQXu0r2sPnC0X8f2TT`.
+
+## Sprint 1/11: S-HC-PROD-HS — Hard stops + Autopilot
+| Campo | Valor |
+|---|---|
+| Operador | **Manuel** |
+| Pareto | 80% valor |
+| Archivos | `publish/route.ts`, `dashboard-console.tsx`, `admin-console.tsx`, `.env.example`, Vercel env |
+| QA Manual | Vista Publicacion → verificar toggle dry-run/live → publicar 1 post real → status PUBLISHED |
+
+## Sprint 2/11: S-HC-PROD-AUTH — Registro + Recovery
+| Campo | Valor |
+|---|---|
+| Operador | **Manuel** |
+| Pareto | 80% valor |
+| Archivos | `register/page.tsx`, `recover/page.tsx`, `reset-password/page.tsx`, `api/auth/register`, `api/auth/recover`, `api/auth/reset-password`, `api/invitations`, `login/page.tsx`, `middleware.ts` |
+| QA Manual | Admin crea invitacion → usuario se registra con token → login → recover password → reset → login |
+
+## Sprint 3/11: S-HC-PROD-LLM — LLM Config + Pricing
+| Campo | Valor |
+|---|---|
+| Operador | **Manuel** |
+| Pareto | 60% valor |
+| Archivos | `schema.prisma` (llmConfig+costConfig), `api/admin/llm-config`, `api/strategy/generate`, `api/strategy/update`, `admin-console.tsx`, `dashboard-console.tsx`, `llm-adapter.ts`, `pricing.ts`, `core/src/index.ts` |
+| QA Manual | Admin setea provider+modelo+overhead → Dashboard genera estrategia → verifica costo y JSON |
+
+## Sprint 4/11: S-HC-PROD-CAL — Calendario + Hora
+| Campo | Valor |
+|---|---|
+| Operador | **Manuel** |
+| Pareto | 40% valor |
+| Archivos | `dashboard-console.tsx` (vistas lista/semana/mes), `lib/dashboard.ts` (datetime) |
+| QA Manual | Vista Cronograma → toggle Semana/Mes → verificar hora y posts en cada dia |
+
+## Sprint 5/11: S-HC-PROD-STRAT — Estrategia editable + Generacion IA
+| Campo | Valor |
+|---|---|
+| Operador | **Manuel** |
+| Pareto | 60% valor |
+| Archivos | `dashboard-console.tsx`, `api/strategy/update` |
+| QA Manual | Vista Estrategia → editar nombre/oferta/voz → guardar → recargar → verificar persistencia |
+
+## Sprint 6/11: S-HC-PROD-QUEUE — Reorden + Edicion visible
+| Campo | Valor |
+|---|---|
+| Operador | **Manuel** |
+| Pareto | 40% valor |
+| Archivos | `dashboard-console.tsx` (EDITAR+▲▼), `api/drafts/reorder`, `schema.prisma` (sortOrder) |
+| QA Manual | Vista Cola → click EDITAR → modificar titulo → guardar → click ▲▼ → verificar reorden |
+
+## Sprint 7/11: S-HC-PROD-ASSETS — Assets specs + Reemplazo
+| Campo | Valor |
+|---|---|
+| Operador | **Manuel** |
+| Pareto | 40% valor |
+| Archivos | `dashboard-console.tsx` (specs+reemplazar), `api/drafts/[id]/asset`, `scripts/fix-asset-links.mjs` |
+| QA Manual | Vista Activos → ver specs → seleccionar draft → Reemplazar asset → verificar cambio de preview y status |
+
+## Sprint 8/11: S-HC-PROD-PREVIEW — Preview red social
+| Campo | Valor |
+|---|---|
+| Operador | **Manuel** |
+| Pareto | 20% valor |
+| Archivos | `dashboard-console.tsx` (platform-preview, getPlatformFrameClass) |
+| QA Manual | Vista Overview → ver frame IG/FB con imagen + caption. Vista Cola → selec draft → misma verificacion |
+
+## Sprint 9/11: S-HC-PROD-TRIAL — Trial gate + Pago CTA + QA Bot
+| Campo | Valor |
+|---|---|
+| Operador | **Manuel** |
+| Pareto | 60% valor |
+| Archivos | `lib/trial.ts`, `publish/route.ts` (trial gate), `tenant/[slug]/page.tsx`, `dashboard-console.tsx` (banner+modal), `assistant-fab.tsx`, `global-assistant.tsx`, `layout.tsx`, `api/assistant`, `docs/qa/heptacore-knowledge.md` |
+| QA Manual | Publicar 2 posts en IG → ver banner rojo → Activar plan → ver modal pago → WhatsApp → asistente FAB responde preguntas |
+
+## Sprint 10/11: S-HC-JEAN-ALIGN — Oreshnik + Worker (Jean)
+| Campo | Valor |
+|---|---|
+| Operador | **Jean** |
+| Pareto | Crítico — infraestructura |
+| Archivos | `scripts/oreshnik/obsidian-guard.mjs`, `preflight.mjs`, `close-sprint.mjs`, `zone-check.mjs`, `zone-map.json`, `package.json` |
+| QA Manual (Jean) | `npm run oreshnik:obsidian-guard -- --force` → PASS. `npm run worker:validate` → 29/29, 46/46. `npm run typecheck` → todos PASS |
+
+## Sprint 11/11: S-HC-PROD-LANDING — Landing page
+| Campo | Valor |
+|---|---|
+| Operador | **Manuel** |
+| Pareto | 20% valor |
+| Archivos | `app/page.tsx`, `app/globals.css` (landing CSS block) |
+| QA Manual | Abrir `/` sin sesion → hero full-screen + stats + features + steps + pricing + contacto + footer + asistente FAB |
+
+---
+
+## Comando de alineacion para Jean
+
+```bash
+git fetch origin
+git checkout Jean/s-hc-prod-01-producto-operativo-tenant-admin-produccion-2026-06-09
+git pull origin Jean/s-hc-prod-01-producto-operativo-tenant-admin-produccion-2026-06-09
+git merge origin/MADRE/v38-s-hc-release-02-trial-payment-cta-qa-bot-cost-table-2026-06-11 -m "align: S-HC-RELEASE-02 desde MADRE/v38"
+npm run typecheck
+npm run worker:validate
+npm run oreshnik:obsidian-guard -- --force
+npm run oreshnik:preflight -- --sprint S-HC-JEAN-ALIGN --operator Jean --desc "alineacion-sprint-10-oreshnik-worker"
+```
