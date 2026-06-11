@@ -1,7 +1,7 @@
 ---
 type: status-board
 project: "HeptaCore"
-last_updated: "2026-06-11T01:54:01.145Z"
+last_updated: "2026-06-11T01:54:58.581Z"
 generated_by: "Oreshnik canonical-check"
 source: "var/oreshnik/task-board.json"
 ---
@@ -28,7 +28,6 @@ source: "var/oreshnik/task-board.json"
 | S-HC-PROD-07 | pending | Manuel | Sales landing, client onboarding and login entry | S-HC-PROD-03 |
 | S-HC-PROD-08 | pending | Manuel | Draft editor and post modification workflow | S-HC-PROD-03 |
 | S-HC-PROD-10 | pending | Manuel | Paid ads management UI and tenant billing surface | S-HC-PROD-05, S-HC-PROD-09 |
-| S-HC-MAINT-CLOSE-GATE-01 | ready | Manuel | Automatic closure validation gate before Oreshnik close | S-HC-MAINT-SYNC-01 |
 | S-HC-MAINT-MOTHER-SYNC-01 | ready | Manuel | Automatic canonical merge for newer MADRE branches | S-HC-MAINT-SYNC-01 |
 | S-HC-RELEASE-01 | pending | Manuel+Jean | End-to-end Turpial Sound production proof | S-HC-PROD-02, S-HC-PROD-03, S-HC-PROD-04, S-HC-PROD-05, S-HC-PROD-06, S-HC-PROD-07, S-HC-PROD-08, S-HC-PROD-09, S-HC-PROD-10, S-HC-PROD-11 |
 
@@ -42,7 +41,6 @@ source: "var/oreshnik/task-board.json"
 | S-HC-PROD-07 | pending | Sales landing, client onboarding and login entry | S-HC-PROD-03 |
 | S-HC-PROD-08 | pending | Draft editor and post modification workflow | S-HC-PROD-03 |
 | S-HC-PROD-10 | pending | Paid ads management UI and tenant billing surface | S-HC-PROD-05, S-HC-PROD-09 |
-| S-HC-MAINT-CLOSE-GATE-01 | ready | Automatic closure validation gate before Oreshnik close | S-HC-MAINT-SYNC-01 |
 | S-HC-MAINT-MOTHER-SYNC-01 | ready | Automatic canonical merge for newer MADRE branches | S-HC-MAINT-SYNC-01 |
 | S-HC-RELEASE-01 | pending | End-to-end Turpial Sound production proof | S-HC-PROD-02, S-HC-PROD-03, S-HC-PROD-04, S-HC-PROD-05, S-HC-PROD-06, S-HC-PROD-07, S-HC-PROD-08, S-HC-PROD-09, S-HC-PROD-10, S-HC-PROD-11 |
 
@@ -82,3 +80,4 @@ source: "var/oreshnik/task-board.json"
 | S-HC-MAINT-ALIGN-01 | Manuel | Canonical task board and derived docs alignment gate |
 | S-HC-MAINT-PUSH-01 | Manuel | Mandatory remote push on every Oreshnik close |
 | S-HC-MAINT-SYNC-01 | Manuel | Mandatory remote fast-forward and divergence gate in preflight |
+| S-HC-MAINT-CLOSE-GATE-01 | Manuel | Automatic closure validation gate before Oreshnik close |

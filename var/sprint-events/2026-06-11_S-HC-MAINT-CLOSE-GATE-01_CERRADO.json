@@ -1,0 +1,12 @@
+{
+  "sprint": "S-HC-MAINT-CLOSE-GATE-01",
+  "operator": "Manuel",
+  "status": "CERRADO",
+  "date": "2026-06-11",
+  "at": "2026-06-11T01:54:31.352Z",
+  "branch": "Manuel/s-hc-prod-01-producto-operativo-tenant-admin-produccion-2026-06-09",
+  "previousMother": "MADRE/v24-s-hc-prod-11-paid-scraper-compliance-controlled-discovery-ada-2026-06-11",
+  "nextMother": "MADRE/v25-s-hc-maint-close-gate-01-cierre-automatico-con-validaciones-2026-06-11",
+  "description": "cierre automatico con validaciones",
+  "changedFiles": []
+}

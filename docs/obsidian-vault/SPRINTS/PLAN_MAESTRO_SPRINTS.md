@@ -1,8 +1,8 @@
 ---
 type: sprint-plan
 project: "HeptaCore"
-last_updated: "2026-06-11T01:52:08.355Z"
-mother_branch: "MADRE/v24-s-hc-prod-11-paid-scraper-compliance-controlled-discovery-ada-2026-06-11"
+last_updated: "2026-06-11T01:54:31.352Z"
+mother_branch: "MADRE/v25-s-hc-maint-close-gate-01-cierre-automatico-con-validaciones-2026-06-11"
 tags:
   - "#sprints"
   - "#manuel"
@@ -463,3 +463,14 @@ Ver [[PLAN_PARALELO_MANUEL_JEAN]] para distribucion de carga, backups y reasigna
 | Estado | CERRADO |
 | Madre docs | `MADRE/v24-s-hc-prod-11-paid-scraper-compliance-controlled-discovery-ada-2026-06-11` |
 | Descripcion | paid-scraper-compliance-controlled-discovery-adapter |
+
+
+## Cierre S-HC-MAINT-CLOSE-GATE-01 - 2026-06-11
+
+| Campo | Valor |
+|---|---|
+| Operador | Manuel |
+| Rama | `Manuel/s-hc-prod-01-producto-operativo-tenant-admin-produccion-2026-06-09` |
+| Estado | CERRADO |
+| Madre docs | `MADRE/v25-s-hc-maint-close-gate-01-cierre-automatico-con-validaciones-2026-06-11` |
+| Descripcion | cierre automatico con validaciones |

@@ -2,7 +2,7 @@
 type: collaborator-status
 project: "HeptaCore"
 operator: "Manuel"
-last_updated: "2026-06-11T01:54:01.145Z"
+last_updated: "2026-06-11T01:54:58.581Z"
 generated_by: "Oreshnik canonical-check"
 source: "var/oreshnik/task-board.json"
 ---
@@ -16,7 +16,6 @@ source: "var/oreshnik/task-board.json"
 | Sprint | Scope | Depende de |
 |---|---|---|
 | S-HC-PROD-03 | LLM provider adapter plus Turpial tenant functional QA and UX polish | S-HC-PROD-ALIGN |
-| S-HC-MAINT-CLOSE-GATE-01 | Automatic closure validation gate before Oreshnik close | S-HC-MAINT-SYNC-01 |
 | S-HC-MAINT-MOTHER-SYNC-01 | Automatic canonical merge for newer MADRE branches | S-HC-MAINT-SYNC-01 |
 
 ## Pending
@@ -104,18 +103,6 @@ Estado: `pending`
 - UI labels real spend as blocked until explicit production unlock
 
 Zonas: `apps/web/components`, `apps/web/app/api`, `apps/web/lib/dashboard.ts`, `docs`
-
-### S-HC-MAINT-CLOSE-GATE-01 - Automatic closure validation gate before Oreshnik close
-
-Estado: `ready`
-
-- oreshnik:close runs canonical check before closing
-- oreshnik:close runs zone check before closing
-- oreshnik:close runs typecheck, build and worker validation before closing
-- oreshnik:close stops before docs, commit or push if any validation fails
-- oreshnik:close announces that all validations passed before proceeding
-
-Zonas: `scripts/oreshnik`, `var/oreshnik`, `docs`
 
 ### S-HC-MAINT-MOTHER-SYNC-01 - Automatic canonical merge for newer MADRE branches
 
