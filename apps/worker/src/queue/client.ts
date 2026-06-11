@@ -1,5 +1,5 @@
 import { Queue, type JobsOptions } from "bullmq";
-import type { PublishDraftJob, ValidateAssetsJob, TestModeJob, QueueStats } from "./types.js";
+import type { PublishDraftJob, ValidateAssetsJob, TestModeJob, CampaignJob, QueueStats } from "./types.js";
 
 function redisUrl(): string {
   return process.env.REDIS_URL || process.env.REDISCLOUD_URL || "redis://localhost:6379";
@@ -29,20 +29,28 @@ const _testQueue = new Queue<TestModeJob>("heptacore-test", {
   defaultJobOptions: defaultJobOpts,
 });
 
+const _campaignQueue = new Queue<CampaignJob>("heptacore-campaign", {
+  connection,
+  defaultJobOptions: defaultJobOpts,
+});
+
 export const publishQueue = _publishQueue;
 export const validateQueue = _validateQueue;
 export const testQueue = _testQueue;
+export const campaignQueue = _campaignQueue;
 
 export async function getQueueStats() {
-  const [pub, val, tst] = await Promise.all([
+  const [pub, val, tst, camp] = await Promise.all([
     _publishQueue.getJobCounts(),
     _validateQueue.getJobCounts(),
     _testQueue.getJobCounts(),
+    _campaignQueue.getJobCounts(),
   ]);
   return {
     publish: pub as unknown as QueueStats,
     validate: val as unknown as QueueStats,
     test: tst as unknown as QueueStats,
+    campaign: camp as unknown as QueueStats,
   };
 }
 
@@ -51,5 +59,6 @@ export async function closeQueues(): Promise<void> {
     _publishQueue.close(),
     _validateQueue.close(),
     _testQueue.close(),
+    _campaignQueue.close(),
   ]);
 }

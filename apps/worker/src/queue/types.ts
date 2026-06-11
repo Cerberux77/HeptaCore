@@ -18,7 +18,17 @@ export interface TestModeJob {
   mode: QueueMode;
 }
 
-export type QueueJobName = "publish-draft" | "validate-assets" | "test-mode";
+export interface CampaignJob {
+  tenantId: string;
+  socialAccountId?: string;
+  network?: string;
+  name: string;
+  objective: string;
+  platformBudget: number;
+  mode: "draft" | "dry-run" | "live";
+}
+
+export type QueueJobName = "publish-draft" | "validate-assets" | "test-mode" | "campaign";
 
 export interface QueueJobResult {
   ok: boolean;

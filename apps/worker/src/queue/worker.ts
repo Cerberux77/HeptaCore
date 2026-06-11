@@ -1,7 +1,8 @@
 import { Worker } from "bullmq";
 import { processPublishDraft, processValidateAssets, processTestMode } from "./processor.js";
+import { processCampaign } from "./campaign-processor.js";
 import { prisma } from "./prisma.js";
-import type { QueueJobResult } from "./types.js";
+import type { QueueJobResult, CampaignJob } from "./types.js";
 
 const connection = {
   url: process.env.REDIS_URL || process.env.REDISCLOUD_URL || "redis://localhost:6379",
@@ -45,6 +46,21 @@ export function startWorker(): Worker {
     { connection, concurrency: 1 },
   );
 
+  const campaignWorker = new Worker(
+    "heptacore-campaign",
+    async (job) => {
+      console.log(
+        `[worker] processing campaign #${job.id} name=${job.data.name} budget=${job.data.platformBudget} tenant=${job.data.tenantId}`,
+      );
+      return processCampaign(job.data as CampaignJob);
+    },
+    {
+      connection,
+      concurrency: 1,
+      limiter: { max: 3, duration: 60000 },
+    },
+  );
+
   worker.on("completed", async (job, result: QueueJobResult) => {
     console.log(`[worker] completed #${job.id} ok=${result.ok}`);
     if (job.data.tenantId) {
@@ -77,6 +93,6 @@ export function startWorker(): Worker {
   });
 
   console.log("[worker] BullMQ workers started");
-  console.log("[worker] Queues: heptacore-publish, heptacore-validate, heptacore-test");
+  console.log("[worker] Queues: heptacore-publish, heptacore-validate, heptacore-test, heptacore-campaign");
   return worker;
 }
