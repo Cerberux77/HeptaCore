@@ -3,8 +3,8 @@ type: master-dashboard
 project: "HeptaCore"
 status: active-production
 phase: "Canonical Oreshnik task board governs current assignments"
-last_updated: "2026-06-11T01:45:36.384Z"
-mother_branch: "MADRE/v21-s-hc-prod-02-production-db-auth-env-turpial-seed-smoke-2026-06-11"
+last_updated: "2026-06-11T01:50:31.947Z"
+mother_branch: "MADRE/v22-s-hc-prod-04-worker-redis-persistent-dryrun-processing-2026-06-11"
 tags:
   - "#central"
   - "#status/live-source"
@@ -21,8 +21,8 @@ tags:
 
 | Campo | Valor |
 |---|---|
-| Task board actualizado | 2026-06-11T01:47:00.000Z |
-| Rama madre | MADRE/v21-s-hc-prod-02-production-db-auth-env-turpial-seed-smoke-2026-06-11 |
+| Task board actualizado | 2026-06-11T01:52:00.000Z |
+| Rama madre | MADRE/v22-s-hc-prod-04-worker-redis-persistent-dryrun-processing-2026-06-11 |
 | Publicacion RRSS real | Bloqueada hasta aprobacion explicita |
 | Campaign spend | Bloqueado |
 | Real scraping | Bloqueado |
@@ -40,7 +40,6 @@ tags:
 | Sprint | Estado | Owner | Scope | Depende de |
 |---|---|---|---|---|
 | S-HC-PROD-03 | ready | Manuel | LLM provider adapter plus Turpial tenant functional QA and UX polish | S-HC-PROD-ALIGN |
-| S-HC-PROD-04 | pending | Jean | Worker, Redis and persistent dry-run processing | S-HC-PROD-02 |
 | S-HC-PROD-05 | pending | Manuel | Publishing gate UI, AuditLog and rollback proof | S-HC-PROD-03 |
 | S-HC-PROD-06 | pending | Manuel | Oreshnik operator dashboard and canonical task board | S-HC-PROD-02, S-HC-PROD-03, S-HC-PROD-04, S-HC-PROD-05, S-HC-PROD-07, S-HC-PROD-08, S-HC-PROD-09, S-HC-PROD-10, S-HC-PROD-11 |
 | S-HC-PROD-07 | pending | Manuel | Sales landing, client onboarding and login entry | S-HC-PROD-03 |
@@ -62,7 +61,6 @@ tags:
 
 | Sprint | Owner | Scope | Depende de |
 |---|---|---|---|
-| S-HC-PROD-04 | Jean | Worker, Redis and persistent dry-run processing | S-HC-PROD-02 |
 | S-HC-PROD-05 | Manuel | Publishing gate UI, AuditLog and rollback proof | S-HC-PROD-03 |
 | S-HC-PROD-06 | Manuel | Oreshnik operator dashboard and canonical task board | S-HC-PROD-02, S-HC-PROD-03, S-HC-PROD-04, S-HC-PROD-05, S-HC-PROD-07, S-HC-PROD-08, S-HC-PROD-09, S-HC-PROD-10, S-HC-PROD-11 |
 | S-HC-PROD-07 | Manuel | Sales landing, client onboarding and login entry | S-HC-PROD-03 |

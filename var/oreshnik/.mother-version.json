@@ -1,5 +1,5 @@
 {
-  "current": "MADRE/v21-s-hc-prod-02-production-db-auth-env-turpial-seed-smoke-2026-06-11",
+  "current": "MADRE/v22-s-hc-prod-04-worker-redis-persistent-dryrun-processing-2026-06-11",
   "branches": [
     {
       "previous": "MADRE/v11-s-hc-09-publish-readiness-gate-2026-06-09",
@@ -80,11 +80,21 @@
       "at": "2026-06-11T01:44:03.976Z",
       "previous": "MADRE/v20-s-hc-maint-sync-01-preflight-remote-sync-obligatorio-2026-06-11",
       "description": "production-db-auth-env-turpial-seed-smoke"
+    },
+    {
+      "version": 22,
+      "name": "MADRE/v22-s-hc-prod-04-worker-redis-persistent-dryrun-processing-2026-06-11",
+      "sprint": "S-HC-PROD-04",
+      "operator": "Jean",
+      "date": "2026-06-11",
+      "at": "2026-06-11T01:46:33.673Z",
+      "previous": "MADRE/v21-s-hc-prod-02-production-db-auth-env-turpial-seed-smoke-2026-06-11",
+      "description": "worker-redis-persistent-dryrun-processing"
     }
   ],
-  "version": 21,
-  "effective": "MADRE/v20-s-hc-maint-sync-01-preflight-remote-sync-obligatorio-2026-06-11",
-  "effectiveRef": "origin/MADRE/v20-s-hc-maint-sync-01-preflight-remote-sync-obligatorio-2026-06-11",
+  "version": 22,
+  "effective": "MADRE/v21-s-hc-prod-02-production-db-auth-env-turpial-seed-smoke-2026-06-11",
+  "effectiveRef": "origin/MADRE/v21-s-hc-prod-02-production-db-auth-env-turpial-seed-smoke-2026-06-11",
   "declaredMissing": false,
   "discoveredVersion": 14
 }

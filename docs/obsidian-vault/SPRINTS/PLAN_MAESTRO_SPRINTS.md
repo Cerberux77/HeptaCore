@@ -1,8 +1,8 @@
 ---
 type: sprint-plan
 project: "HeptaCore"
-last_updated: "2026-06-11T01:44:03.976Z"
-mother_branch: "MADRE/v21-s-hc-prod-02-production-db-auth-env-turpial-seed-smoke-2026-06-11"
+last_updated: "2026-06-11T01:46:33.673Z"
+mother_branch: "MADRE/v22-s-hc-prod-04-worker-redis-persistent-dryrun-processing-2026-06-11"
 tags:
   - "#sprints"
   - "#manuel"
@@ -430,3 +430,14 @@ Ver [[PLAN_PARALELO_MANUEL_JEAN]] para distribucion de carga, backups y reasigna
 | Estado | CERRADO |
 | Madre docs | `MADRE/v21-s-hc-prod-02-production-db-auth-env-turpial-seed-smoke-2026-06-11` |
 | Descripcion | production-db-auth-env-turpial-seed-smoke |
+
+
+## Cierre S-HC-PROD-04 - 2026-06-11
+
+| Campo | Valor |
+|---|---|
+| Operador | Jean |
+| Rama | `Jean/s-hc-canonical-alignment-2026-06-09` |
+| Estado | CERRADO |
+| Madre docs | `MADRE/v22-s-hc-prod-04-worker-redis-persistent-dryrun-processing-2026-06-11` |
+| Descripcion | worker-redis-persistent-dryrun-processing |
