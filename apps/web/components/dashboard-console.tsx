@@ -10,17 +10,21 @@ import {
   ChevronRight,
   Circle,
   ClipboardList,
+  DollarSign,
   FileText,
   Gauge,
   ImageIcon,
+  Info,
   LockKeyhole,
   MessageSquareText,
   PackageSearch,
   Settings2,
   ShieldCheck,
+  TrendingUp,
   X,
 } from "lucide-react";
 import { HeptaCoreWordmark } from "./heptacore-mark";
+import { AssistantFab } from "./assistant-fab";
 import type {
   CalendarItem,
   DashboardMetrics,
@@ -28,8 +32,10 @@ import type {
   StrategySnapshot,
   TenantAssetItem,
 } from "../lib/dashboard";
+import type { TrialStatus } from "../lib/trial";
 
 type View = "overview" | "strategy" | "queue" | "assets" | "calendar" | "checklist" | "reports" | "readiness";
+type CalendarView = "list" | "week" | "month";
 
 function assetUrl(path: string | null | undefined) {
   if (!path) return "";
@@ -38,6 +44,16 @@ function assetUrl(path: string | null | undefined) {
 
 function channelLabel(item: DraftQueueItem) {
   return `${item.network} / ${item.format}`;
+}
+
+function getPlatformFrameClass(item: DraftQueueItem) {
+  const ch = item.network.toLowerCase();
+  const fmt = item.format?.toLowerCase() ?? "feed";
+  if (ch === "instagram" && (fmt === "story" || fmt === "reel")) return "frame-ig-vertical";
+  if (ch === "instagram" && fmt === "feed") return "frame-ig-square";
+  if (ch === "instagram" && fmt === "carousel") return "frame-ig-portrait";
+  if (ch === "tiktok" || ch === "youtube") return "frame-ig-vertical";
+  return "frame-facebook";
 }
 
 function Thumb({ item }: { item: DraftQueueItem }) {
@@ -67,13 +83,13 @@ function PanelTitle({
 }: {
   icon: React.ReactNode;
   title: string;
-  action?: string;
+  action?: React.ReactNode;
   onAction?: () => void;
 }) {
   return (
     <div className="panel-title">
       <span>{icon} {title}</span>
-      {action && <button onClick={onAction}>{action}</button>}
+      {action && (typeof action === "string" ? <button onClick={onAction}>{action}</button> : action)}
     </div>
   );
 }
@@ -83,19 +99,32 @@ function StatusCard({
   value,
   note,
   tone,
+  onClick,
 }: {
   label: string;
   value: string | number;
   note: string;
   tone?: "ok" | "warn";
+  onClick?: () => void;
 }) {
   const cls = tone === "ok" ? "status-ok" : tone === "warn" ? "status-warn" : "";
   return (
-    <div className={`status-card ${cls}`}>
+    <button
+      className={`status-card ${cls}`}
+      onClick={onClick}
+      style={{
+        cursor: onClick ? "pointer" : "default",
+        border: "none",
+        background: "var(--hc-surface)",
+        textAlign: "left",
+        width: "100%",
+        fontFamily: "inherit",
+      }}
+    >
       <span>{label}</span>
       <strong>{value}</strong>
       <small>{note}</small>
-    </div>
+    </button>
   );
 }
 
@@ -110,6 +139,7 @@ export function DashboardConsole({
   readiness,
   tenantSlug,
   adminMode = false,
+  trial,
 }: {
   metrics: DashboardMetrics | null;
   queue: DraftQueueItem[];
@@ -121,11 +151,17 @@ export function DashboardConsole({
   readiness: any;
   tenantSlug: string;
   adminMode?: boolean;
+  trial?: TrialStatus;
 }) {
   const [view, setView] = useState<View>("overview");
   const [selectedId, setSelectedId] = useState(queue[0]?.id ?? "");
   const [localQueue, setLocalQueue] = useState(queue);
   const [manualApproval, setManualApproval] = useState(false);
+  const [publishMode, setPublishMode] = useState<"dry-run" | "live">("dry-run");
+  const tenantAutoPilot =
+    metrics?.tenant.mode === "AUTOPILOT_FULL" || metrics?.tenant.mode === "AUTOPILOT_LIMITED";
+  const tenantNeedsManual =
+    metrics?.tenant.mode === "APPROVAL_REQUIRED" || metrics?.tenant.mode === "DRAFT_ONLY";
   const [publishState, setPublishState] = useState<"idle" | "loading" | "done" | "error">("idle");
   const [publishMessage, setPublishMessage] = useState("");
   const [editMode, setEditMode] = useState(false);
@@ -133,6 +169,21 @@ export function DashboardConsole({
   const [editCaption, setEditCaption] = useState("");
   const [editHashtags, setEditHashtags] = useState("");
   const [editSaving, setEditSaving] = useState(false);
+  const [calendarView, setCalendarView] = useState<CalendarView>("list");
+  const [strategyEdit, setStrategyEdit] = useState(false);
+  const [strategyName, setStrategyName] = useState("");
+  const [strategyDesc, setStrategyDesc] = useState("");
+  const [strategyVoice, setStrategyVoice] = useState("");
+  const [strategySaving, setStrategySaving] = useState(false);
+  const [llmProvider, setLlmProvider] = useState("deterministic");
+  const [llmModel, setLlmModel] = useState("");
+  const [llmApiKey, setLlmApiKey] = useState("");
+  const [llmOpen, setLlmOpen] = useState(false);
+  const [strategyGenerating, setStrategyGenerating] = useState(false);
+  const [strategyResult, setStrategyResult] = useState<null | { provider: string; strategy: any; cost?: any }>(null);
+  const [assetPickerOpen, setAssetPickerOpen] = useState(false);
+  const [assetReplacing, setAssetReplacing] = useState(false);
+  const [paymentModalOpen, setPaymentModalOpen] = useState(false);
   const selected = localQueue.find((i) => i.id === selectedId) ?? localQueue[0];
 
   const pendingReview = localQueue.filter(
@@ -151,30 +202,35 @@ export function DashboardConsole({
 
   const firstApproved = localQueue.find((item) => item.status === "APPROVED");
 
-  async function handleDryRunPublish() {
+  async function handlePublish() {
     if (!firstApproved) return;
     setPublishState("loading");
     setPublishMessage("");
     try {
+      const effectiveMode = tenantAutoPilot ? publishMode : "dry-run";
       const res = await fetch("/api/publishing/publish", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           tenantSlug,
           draftId: firstApproved.id,
-          manualApproval,
-          mode: "dry-run",
+          manualApproval: manualApproval || tenantAutoPilot,
+          mode: effectiveMode,
         }),
       });
       const data = await res.json();
       if (!res.ok || !data.ok) {
         setPublishState("error");
-        setPublishMessage(data.error || "No se pudo ejecutar el dry-run.");
+        setPublishMessage(data.error || "No se pudo ejecutar la publicacion.");
         return;
       }
-      updateLocalStatus(firstApproved.id, "SCHEDULED");
+      updateLocalStatus(firstApproved.id, data.realPublish ? "PUBLISHED" : "SCHEDULED");
       setPublishState("done");
-      setPublishMessage(`Dry-run registrado para ${firstApproved.title}.`);
+      setPublishMessage(
+        data.realPublish
+          ? `Publicado en vivo: ${firstApproved.title}.`
+          : `Dry-run registrado para ${firstApproved.title}.`,
+      );
     } catch (error) {
       setPublishState("error");
       setPublishMessage(error instanceof Error ? error.message : "Error de red.");
@@ -188,8 +244,76 @@ export function DashboardConsole({
     setEditMode(true);
   }
 
+  function startStrategyEdit() {
+    setStrategyName(strategy?.projectName ?? metrics?.tenant.name ?? "");
+    setStrategyDesc(strategy?.projectDescription ?? "");
+    setStrategyVoice(strategy?.brandVoice.join(" / ") ?? "");
+    setStrategyEdit(true);
+  }
+
+  async function handleSaveStrategy() {
+    setStrategySaving(true);
+    try {
+      const voiceList = strategyVoice.split("/").map((v) => v.trim()).filter(Boolean);
+      const res = await fetch("/api/strategy/update", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          tenantSlug,
+          projectName: strategyName,
+          projectDescription: strategyDesc,
+          brandVoice: voiceList,
+          pillars: strategy?.pillars.map((p) => ({ name: p.name, description: p.description, priority: p.priority })) ?? [],
+        }),
+      });
+      if (!res.ok) {
+        alert("Error al guardar estrategia");
+        return;
+      }
+      setStrategyEdit(false);
+    } finally {
+      setStrategySaving(false);
+    }
+  }
+
+  async function handleGenerateStrategy() {
+    setStrategyGenerating(true);
+    setStrategyResult(null);
+    try {
+      const res = await fetch("/api/strategy/generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          tenantSlug,
+          providerConfig: { provider: llmProvider, model: llmModel, apiKey: llmApiKey },
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        alert(data.error || "Error al generar estrategia");
+        return;
+      }
+      setStrategyResult(data);
+    } finally {
+      setStrategyGenerating(false);
+    }
+  }
+
   function cancelEdit() {
     setEditMode(false);
+  }
+
+  async function handleMoveItem(id: string, direction: "up" | "down") {
+    try {
+      const res = await fetch("/api/drafts/reorder", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id, direction }),
+      });
+      if (res.ok) {
+        window.location.reload();
+      }
+    } catch { /* ignore */ }
   }
 
   async function handleSaveEdit() {
@@ -222,6 +346,27 @@ export function DashboardConsole({
     }
   }
 
+  async function handleReplaceAsset(newAssetId: string) {
+    if (!selected) return;
+    setAssetReplacing(true);
+    try {
+      const res = await fetch(`/api/drafts/${selected.id}/asset`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ assetId: newAssetId }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.ok) {
+        alert(data.error || "Error al reemplazar asset");
+        return;
+      }
+      window.location.reload();
+    } finally {
+      setAssetReplacing(false);
+      setAssetPickerOpen(false);
+    }
+  }
+
   return (
     <main className="app-shell">
       <aside className="app-sidebar">
@@ -246,7 +391,13 @@ export function DashboardConsole({
         </nav>
         <div className="guardrail-box">
           <ShieldCheck size={17} />
-          <span>Dry-run activo. Sin publicacion real. Todo pasa por aprobacion humana.</span>
+          <span>
+            {metrics?.tenant.mode === "AUTOPILOT_FULL"
+              ? "Autopilot completo. Publicacion real habilitada sin gates manuales."
+              : metrics?.tenant.mode === "AUTOPILOT_LIMITED"
+                ? "Autopilot limitado. Publicacion real con gates minimos de seguridad."
+                : "Modo revision. Publicacion real bloqueada. Todo pasa por aprobacion humana."}
+          </span>
         </div>
       </aside>
 
@@ -270,12 +421,64 @@ export function DashboardConsole({
 
         {metrics && (
           <section className="status-strip">
-            <StatusCard label="Total" value={metrics.counts.totalDrafts} note="drafts en DB" />
-            <StatusCard label="Pendientes" value={pendingReview.length} note="requieren criterio" tone="warn" />
-            <StatusCard label="Aprobados" value={metrics.counts.approved} note="listos para publicar" />
-            <StatusCard label="Assets" value={metrics.counts.totalAssets} note="importados" tone="ok" />
-            <StatusCard label="Proximo" value={nextDate} note="primer hito" />
+            <StatusCard label="Total" value={metrics.counts.totalDrafts} note="drafts en DB" onClick={() => setView("queue")} />
+            <StatusCard label="Pendientes" value={pendingReview.length} note="requieren criterio" tone="warn" onClick={() => setView("queue")} />
+            <StatusCard label="Aprobados" value={metrics.counts.approved} note="listos para publicar" onClick={() => setView("readiness")} />
+            <StatusCard label="Assets" value={metrics.counts.totalAssets} note="importados" tone="ok" onClick={() => setView("assets")} />
+            <StatusCard label="Proximo" value={nextDate} note="primer hito" onClick={() => setView("calendar")} />
           </section>
+        )}
+        {trial && !trial.trialActive && (
+          <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 14px", margin: "0 0 12px 0", background: "var(--hc-sand)", borderRadius: 8, fontSize: 12 }}>
+            <AlertTriangle size={18} style={{ flexShrink: 0, color: "var(--hc-ink)" }} />
+            <span style={{ flex: 1 }}>Periodo de prueba agotado ({trial.totalPublished} posts publicados, limite {trial.limitPerNetwork} por red).</span>
+            <button onClick={() => setPaymentModalOpen(true)} style={{ fontWeight: 700, padding: "6px 16px", borderRadius: 6, border: "none", background: "var(--hc-teal)", color: "#fff", cursor: "pointer", fontSize: 12, whiteSpace: "nowrap" }}>
+              Activar plan
+            </button>
+          </div>
+        )}
+        {trial && trial.trialActive && (
+          <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 14px", margin: "0 0 12px 0", background: "var(--hc-bone)", borderRadius: 8, fontSize: 11, color: "var(--hc-fog)" }}>
+            <Info size={14} />
+            <span>Periodo de prueba activo. {Object.entries(trial.postsRemaining).filter(([,r]) => r > 0).map(([n, r]) => `${n.toLowerCase()} (${r} libre${r !== 1 ? "s" : ""})`).join(", ")}</span>
+          </div>
+        )}
+
+        {paymentModalOpen && (
+          <div style={{ position: "fixed", inset: 0, zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)" }} onClick={() => setPaymentModalOpen(false)} />
+            <div style={{ position: "relative", background: "var(--hc-surface)", borderRadius: 12, padding: 24, maxWidth: 440, width: "90%", boxShadow: "0 8px 32px rgba(0,0,0,0.3)", maxHeight: "90vh", overflow: "auto", zIndex: 1 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+                <h2 style={{ margin: 0, fontSize: 16 }}>Activar HeptaCore</h2>
+                <button onClick={() => setPaymentModalOpen(false)} style={{ border: "none", background: "none", cursor: "pointer", fontSize: 18, color: "var(--hc-fog)" }}><X size={20} /></button>
+              </div>
+              <p style={{ fontSize: 13, color: "var(--hc-fog)", marginBottom: 16 }}>
+                Contacta por WhatsApp para activar tu plan y continuar publicando sin limites.
+              </p>
+              <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                <div style={{ padding: 12, background: "var(--hc-bone)", borderRadius: 8 }}>
+                  <strong style={{ fontSize: 13 }}>Pago Movil</strong>
+                  <p style={{ fontSize: 12, margin: "4px 0", color: "var(--hc-fog)" }}>Banco Mercantil · CI V-13894619 · Telf 04141333305</p>
+                </div>
+                <div style={{ padding: 12, background: "var(--hc-bone)", borderRadius: 8 }}>
+                  <strong style={{ fontSize: 13 }}>Transferencia</strong>
+                  <p style={{ fontSize: 12, margin: "4px 0", color: "var(--hc-fog)" }}>Mercantil 01050187331187028916 · Turpial Sound · V-13894619</p>
+                </div>
+                <div style={{ padding: 12, background: "var(--hc-bone)", borderRadius: 8 }}>
+                  <strong style={{ fontSize: 13 }}>Binance Pay</strong>
+                  <p style={{ fontSize: 12, margin: "4px 0", color: "var(--hc-fog)" }}>Pay ID 11757221 · manuelverax</p>
+                </div>
+                <a
+                  href="https://wa.me/584168017844"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, padding: "12px 20px", borderRadius: 8, background: "#25D366", color: "#fff", textDecoration: "none", fontWeight: 700, fontSize: 14, marginTop: 4 }}
+                >
+                  Contactar por WhatsApp
+                </a>
+              </div>
+            </div>
+          </div>
         )}
 
         {view === "overview" && (
@@ -309,7 +512,19 @@ export function DashboardConsole({
                     </div>
                     <Risk level={selected.riskLevel} />
                   </div>
-                  <Thumb item={selected} />
+                  <div className={`platform-preview ${getPlatformFrameClass(selected)}`}>
+                    <div className="platform-chrome">
+                      <span>{selected.network.charAt(0).toUpperCase() + selected.network.slice(1)}</span>
+                      <strong>{selected.format}</strong>
+                    </div>
+                    <div className="platform-media">
+                      <img src={assetUrl(selected.asset?.path)} alt={selected.title} />
+                    </div>
+                    <div className="platform-caption">
+                      <strong>{metrics?.tenant.name ?? "Tenant"}</strong>
+                      <span>{selected.caption}</span>
+                    </div>
+                  </div>
                   <div className="caption-box">{selected.caption}</div>
                 </div>
               )}
@@ -327,10 +542,21 @@ export function DashboardConsole({
             </section>
 
             <section className="work-panel">
-              <PanelTitle icon={<AlertTriangle size={17} />} title="Bloqueos reales" />
+              <PanelTitle icon={<AlertTriangle size={17} />} title="Estado de publicacion" />
               <ul className="dense-list">
-                <li>OAuth real de Meta pendiente.</li>
-                <li>Publicacion real bloqueada hasta aprobacion humana.</li>
+                <li>Modo del tenant: <strong>{metrics?.tenant.mode ?? "draft"}</strong></li>
+                {metrics?.tenant.mode === "AUTOPILOT_FULL" && (
+                  <li>Publicacion real habilitada sin gates manuales.</li>
+                )}
+                {metrics?.tenant.mode === "AUTOPILOT_LIMITED" && (
+                  <li>Publicacion real con gates minimos de seguridad.</li>
+                )}
+                {(metrics?.tenant.mode === "DRAFT_ONLY" || metrics?.tenant.mode === "APPROVAL_REQUIRED") && (
+                  <>
+                    <li>OAuth real de Meta pendiente.</li>
+                    <li>Publicacion real bloqueada hasta aprobacion humana.</li>
+                  </>
+                )}
                 <li>Respuestas delicadas requieren cola de revision.</li>
                 <li>Campanas pagas en modo recomendacion.</li>
               </ul>
@@ -341,19 +567,113 @@ export function DashboardConsole({
         {view === "strategy" && (
           <div className="strategy-grid">
             <section className="work-panel span-2">
-              <PanelTitle icon={<Bot size={17} />} title="Estrategia activa" />
-              <dl className="strategy-defs">
-                <dt>Proyecto</dt>
-                <dd>{strategy?.projectName ?? metrics?.tenant.name ?? "Tenant"}</dd>
-                <dt>Oferta</dt>
-                <dd>{strategy?.projectDescription ?? "Estrategia pendiente de completar."}</dd>
-                <dt>Voz</dt>
-                <dd>
-                  {strategy?.brandVoice.length
-                    ? strategy.brandVoice.join(" / ")
-                    : "Criterio tecnico, confianza, comunidad y conversion por WhatsApp."}
-                </dd>
-              </dl>
+              <PanelTitle icon={<Bot size={17} />} title="Generar estrategia con IA" />
+              <div style={{ padding: 14 }}>
+                <button onClick={() => setLlmOpen(!llmOpen)} style={{ marginBottom: 12, fontSize: 12, padding: "6px 14px", borderRadius: 6, border: "1px solid var(--hc-line)", background: "var(--hc-bone)", color: "var(--hc-ink)" }}>
+                  <Settings2 size={14} style={{ verticalAlign: "middle", marginRight: 4 }} />
+                  {llmOpen ? "Ocultar configuracion LLM" : "Configurar LLM"}
+                </button>
+                {llmOpen && (
+                  <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 12, padding: 10, background: "var(--hc-bone)", borderRadius: 8 }}>
+                    <label style={{ fontSize: 12, color: "var(--hc-fog)" }}>
+                      Provider:
+                      <select value={llmProvider} onChange={(e) => setLlmProvider(e.target.value)} style={{ marginLeft: 8, padding: "4px 8px", borderRadius: 4, border: "1px solid var(--hc-line)", fontSize: 12 }}>
+                        <option value="deterministic">Deterministico (sin API)</option>
+                        <option value="openai">OpenAI</option>
+                        <option value="anthropic">Anthropic (Claude)</option>
+                        <option value="gemini">Gemini</option>
+                        <option value="deepseek">DeepSeek</option>
+                      </select>
+                    </label>
+                    {llmProvider !== "deterministic" && (
+                      <>
+                        <label style={{ fontSize: 12, color: "var(--hc-fog)" }}>
+                          Modelo:
+                          <input value={llmModel} onChange={(e) => setLlmModel(e.target.value)} placeholder={llmProvider === "openai" ? "gpt-4o" : llmProvider === "anthropic" ? "claude-3-5-haiku-latest" : llmProvider === "gemini" ? "gemini-2.0-flash" : "deepseek-chat"} style={{ marginLeft: 8, padding: "4px 8px", borderRadius: 4, border: "1px solid var(--hc-line)", fontSize: 12, width: 220 }} />
+                        </label>
+                        <label style={{ fontSize: 12, color: "var(--hc-fog)" }}>
+                          API Key:
+                          <input type="password" value={llmApiKey} onChange={(e) => setLlmApiKey(e.target.value)} placeholder="sk-..." style={{ marginLeft: 8, padding: "4px 8px", borderRadius: 4, border: "1px solid var(--hc-line)", fontSize: 12, width: 320 }} />
+                        </label>
+                      </>
+                    )}
+                  </div>
+                )}
+                <button className="primary-action" onClick={handleGenerateStrategy} disabled={strategyGenerating} style={{ fontSize: 14, padding: "10px 24px" }}>
+                  <Bot size={18} style={{ marginRight: 6 }} />
+                  {strategyGenerating ? "Generando estrategia..." : "Generar estrategia"}
+                </button>
+                {llmProvider !== "deterministic" && (
+                  <LlmCostEstimate provider={llmProvider} model={llmModel} />
+                )}
+                {strategyResult && (
+                  <div style={{ marginTop: 12, padding: 10, background: "var(--hc-bone)", borderRadius: 8, fontSize: 12 }}>
+                    <strong style={{ color: "var(--hc-teal)" }}>Estrategia generada con: {strategyResult.provider}</strong>
+                    {strategyResult.cost && (
+                      <div style={{ marginTop: 6, padding: "6px 8px", background: "var(--hc-surface)", borderRadius: 6, fontSize: 11, display: "flex", flexWrap: "wrap", gap: 12 }}>
+                        <span><strong>{strategyResult.cost.modelLabel}</strong>{strategyResult.cost.reasoning ? " (razonador)" : ""}</span>
+                        <span>{strategyResult.cost.promptTokens.toLocaleString()} + {strategyResult.cost.completionTokens.toLocaleString()} tokens</span>
+                        <span>API: ${strategyResult.cost.apiCost.toFixed(6)}</span>
+                        <span style={{ color: "var(--hc-teal)", fontWeight: 700 }}>
+                          x{strategyResult.cost.overheadFactor} = ${strategyResult.cost.tenantCost.toFixed(4)} USD
+                        </span>
+                      </div>
+                    )}
+                    <div style={{ marginTop: 4, maxHeight: 200, overflow: "auto" }}>
+                      <pre style={{ fontSize: 10, whiteSpace: "pre-wrap" }}>{JSON.stringify(strategyResult.strategy, null, 2)}</pre>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </section>
+
+            <section className="work-panel span-2">
+              <PanelTitle
+                icon={<Bot size={17} />}
+                title="Estrategia activa"
+                action={
+                  strategyEdit ? (
+                    <span style={{ display: "flex", gap: 4 }}>
+                      <button onClick={handleSaveStrategy} disabled={strategySaving} style={{ fontSize: 11, padding: "2px 8px", borderRadius: 4, border: "none", background: "var(--hc-teal)", color: "#fff" }}>
+                        <Check size={14} style={{ verticalAlign: "middle" }} /> {strategySaving ? "Guardando..." : "Guardar"}
+                      </button>
+                      <button onClick={() => setStrategyEdit(false)} style={{ fontSize: 11, padding: "2px 8px" }}>
+                        <X size={14} style={{ verticalAlign: "middle" }} /> Cancelar
+                      </button>
+                    </span>
+                  ) : (
+                    <button onClick={startStrategyEdit} style={{ fontSize: 11 }}>
+                      <Settings2 size={14} style={{ verticalAlign: "middle", marginRight: 4 }} />
+                      Editar estrategia
+                    </button>
+                  )
+                }
+              />
+              {strategyEdit ? (
+                <div style={{ padding: 14, display: "flex", flexDirection: "column", gap: 10 }}>
+                  <label style={{ fontSize: 12, color: "var(--hc-fog)" }}>
+                    Nombre del proyecto
+                    <input style={{ width: "100%", marginTop: 4, padding: "6px 10px", borderRadius: 6, border: "1px solid var(--hc-line)", fontSize: 13 }} value={strategyName} onChange={(e) => setStrategyName(e.target.value)} />
+                  </label>
+                  <label style={{ fontSize: 12, color: "var(--hc-fog)" }}>
+                    Oferta / Descripcion
+                    <textarea style={{ width: "100%", marginTop: 4, padding: "6px 10px", borderRadius: 6, border: "1px solid var(--hc-line)", fontSize: 13, minHeight: 60, resize: "vertical" }} value={strategyDesc} onChange={(e) => setStrategyDesc(e.target.value)} />
+                  </label>
+                  <label style={{ fontSize: 12, color: "var(--hc-fog)" }}>
+                    Voz de marca (separada por /)
+                    <input style={{ width: "100%", marginTop: 4, padding: "6px 10px", borderRadius: 6, border: "1px solid var(--hc-line)", fontSize: 13 }} value={strategyVoice} onChange={(e) => setStrategyVoice(e.target.value)} placeholder="Criterio tecnico / Confianza / Comunidad" />
+                  </label>
+                </div>
+              ) : (
+                <dl className="strategy-defs">
+                  <dt>Proyecto</dt>
+                  <dd>{strategy?.projectName ?? metrics?.tenant.name ?? "Tenant"}</dd>
+                  <dt>Oferta</dt>
+                  <dd>{strategy?.projectDescription ?? "Estrategia pendiente de completar."}</dd>
+                  <dt>Voz</dt>
+                  <dd>{strategy?.brandVoice.length ? strategy.brandVoice.join(" / ") : "Criterio tecnico, confianza, comunidad y conversion por WhatsApp."}</dd>
+                </dl>
+              )}
             </section>
             <section className="work-panel span-2">
               <PanelTitle icon={<MessageSquareText size={17} />} title="Pilares de contenido" />
@@ -374,20 +694,47 @@ export function DashboardConsole({
             <section className="work-panel queue-column">
               <PanelTitle icon={<ClipboardList size={17} />} title="Cola de publicaciones" />
               <div className="queue-scroll">
-                {scheduled.map((item) => (
-                  <button
-                    key={item.id}
-                    className={item.id === selected.id ? "queue-card active" : "queue-card"}
-                    onClick={() => setSelectedId(item.id)}
-                  >
-                    <Thumb item={item} />
-                    <span>
-                      <small>{channelLabel(item)} / {item.scheduledFor}</small>
-                      <strong>{item.title}</strong>
-                      <em>{item.status}</em>
-                    </span>
-                    <Risk level={item.riskLevel} />
-                  </button>
+                {scheduled.map((item, idx) => (
+                  <div key={item.id} style={{ position: "relative" }}>
+                    <button
+                      className={item.id === selected.id ? "queue-card active" : "queue-card"}
+                      onClick={() => setSelectedId(item.id)}
+                      style={{ width: "100%", textAlign: "left" }}
+                    >
+                      <Thumb item={item} />
+                      <span>
+                        <small>{channelLabel(item)} / {item.scheduledFor}</small>
+                        <strong>{item.title}</strong>
+                        <em>{item.status}</em>
+                      </span>
+                      <Risk level={item.riskLevel} />
+                    </button>
+                    <div style={{ position: "absolute", right: 6, top: 4, display: "flex", flexDirection: "column", gap: 2 }}>
+                      <button
+                        onClick={(e) => { e.stopPropagation(); setSelectedId(item.id); startEdit(); }}
+                        style={{ fontSize: 10, padding: "2px 6px", borderRadius: 3, border: "1px solid var(--hc-teal)", background: "var(--hc-bone)", color: "var(--hc-teal)", cursor: "pointer", lineHeight: "16px", fontWeight: 700 }}
+                        title="Editar este draft"
+                      >
+                        EDITAR
+                      </button>
+                      <button
+                        onClick={(e) => { e.stopPropagation(); handleMoveItem(item.id, "up"); }}
+                        disabled={idx === 0}
+                        style={{ fontSize: 10, padding: "1px 6px", borderRadius: 3, border: "1px solid var(--hc-line)", background: "var(--hc-bone)", cursor: idx === 0 ? "default" : "pointer", opacity: idx === 0 ? 0.3 : 1, lineHeight: "16px" }}
+                        title="Mover arriba"
+                      >
+                        &#9650;
+                      </button>
+                      <button
+                        onClick={(e) => { e.stopPropagation(); handleMoveItem(item.id, "down"); }}
+                        disabled={idx === scheduled.length - 1}
+                        style={{ fontSize: 10, padding: "1px 6px", borderRadius: 3, border: "1px solid var(--hc-line)", background: "var(--hc-bone)", cursor: idx === scheduled.length - 1 ? "default" : "pointer", opacity: idx === scheduled.length - 1 ? 0.3 : 1, lineHeight: "16px" }}
+                        title="Mover abajo"
+                      >
+                        &#9660;
+                      </button>
+                    </div>
+                  </div>
                 ))}
                 {scheduled.length === 0 && <p style={{ padding: 14 }}>Cola vacia.</p>}
               </div>
@@ -403,7 +750,70 @@ export function DashboardConsole({
                   </div>
                   <Risk level={selected.riskLevel} />
                 </div>
-                <Thumb item={selected} />
+                <div className={`platform-preview ${getPlatformFrameClass(selected)}`}>
+                  <div className="platform-chrome">
+                    <span>{selected.network.charAt(0).toUpperCase() + selected.network.slice(1)}</span>
+                    <strong>{selected.format}</strong>
+                  </div>
+                  <div className="platform-media">
+                    <img src={assetUrl(selected.asset?.path)} alt={selected.title} />
+                  </div>
+                  <div className="platform-caption">
+                    <strong>{metrics?.tenant.name ?? "Tenant"}</strong>
+                    <span>{editMode ? editCaption : selected.caption}</span>
+                  </div>
+                </div>
+                <div style={{ padding: 8, display: "flex", alignItems: "center", gap: 8 }}>
+                  <span style={{ fontSize: 11, color: "var(--hc-fog)" }}>
+                    Asset: <strong>{selected.asset?.filename ?? "Sin asset"}</strong> ({selected.asset?.kind ?? "N/A"})
+                  </span>
+                  <button
+                    onClick={() => setAssetPickerOpen(!assetPickerOpen)}
+                    style={{ fontSize: 11, padding: "3px 10px", borderRadius: 4, border: "1px solid var(--hc-line)", background: "var(--hc-bone)", color: "var(--hc-ink)", cursor: "pointer" }}
+                  >
+                    Reemplazar
+                  </button>
+                </div>
+                {assetPickerOpen && (
+                  <div style={{ padding: "8px 8px 4px 8px", background: "var(--hc-bone)", borderTop: "1px solid var(--hc-line)" }}>
+                    <strong style={{ fontSize: 11 }}>Seleccionar nuevo asset:</strong>
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 6, maxHeight: 160, overflowY: "auto" }}>
+                      {assets
+                        .filter((a) => a.id !== selected.asset?.filename || true)
+                        .slice(0, 20)
+                        .map((asset) => (
+                          <button
+                            key={asset.id}
+                            onClick={() => handleReplaceAsset(asset.id)}
+                            disabled={assetReplacing}
+                            style={{
+                              display: "flex",
+                              flexDirection: "column",
+                              alignItems: "center",
+                              gap: 2,
+                              padding: 4,
+                              borderRadius: 4,
+                              border: "1px solid var(--hc-line)",
+                              background: "var(--hc-surface)",
+                              cursor: "pointer",
+                              fontSize: 10,
+                              maxWidth: 100,
+                            }}
+                          >
+                            {asset.path ? (
+                              <img src={assetUrl(asset.path)} alt={asset.filename} style={{ width: 60, height: 60, objectFit: "cover", borderRadius: 3 }} />
+                            ) : (
+                              <div style={{ width: 60, height: 60, display: "flex", alignItems: "center", justifyContent: "center", background: "var(--hc-bone)", borderRadius: 3 }}>
+                                <PackageSearch size={18} />
+                              </div>
+                            )}
+                            <span style={{ fontSize: 9, textAlign: "center", lineHeight: 1.1 }}>{asset.filename.slice(0, 20)}</span>
+                            <small style={{ color: "var(--hc-fog)", fontSize: 8 }}>{asset.kind}</small>
+                          </button>
+                        ))}
+                    </div>
+                  </div>
+                )}
                 {editMode ? (
                   <div style={{ padding: 12, display: "flex", flexDirection: "column", gap: 8 }}>
                     <label style={{ fontSize: 12, color: "var(--hc-fog)" }}>
@@ -473,7 +883,46 @@ export function DashboardConsole({
 
         {view === "assets" && (
           <div className="strategy-grid">
-            <section className="work-panel span-2">
+            <section className="work-panel">
+              <PanelTitle icon={<PackageSearch size={17} />} title="Especificaciones por plataforma" />
+              <div style={{ padding: 14 }}>
+                <div style={{ marginBottom: 12 }}>
+                  <strong style={{ fontSize: 13, display: "flex", alignItems: "center", gap: 4 }}>
+                    <ImageIcon size={14} /> Instagram
+                  </strong>
+                  <ul className="dense-list" style={{ marginTop: 4 }}>
+                    <li>Feed: 1080x1080 (1:1) JPG/PNG</li>
+                    <li>Story: 1080x1920 (9:16) JPG/PNG</li>
+                    <li>Reel: 1080x1920 (9:16) MP4, max 90s</li>
+                    <li>Carousel: 1080x1080 (1:1) JPG/PNG, 2-10 slides</li>
+                  </ul>
+                </div>
+                <div style={{ marginBottom: 12 }}>
+                  <strong style={{ fontSize: 13 }}>Facebook</strong>
+                  <ul className="dense-list" style={{ marginTop: 4 }}>
+                    <li>Feed: 1200x630 (1.91:1) JPG/PNG</li>
+                    <li>Video: 1080p MP4, max 240min</li>
+                    <li>Carousel: 1080x1080 (1:1) JPG/PNG</li>
+                  </ul>
+                </div>
+                <div style={{ marginBottom: 12 }}>
+                  <strong style={{ fontSize: 13 }}>TikTok</strong>
+                  <ul className="dense-list" style={{ marginTop: 4 }}>
+                    <li>Video: 1080x1920 (9:16) MP4, 5s-10min</li>
+                    <li>Carousel: 1080x1920 (9:16) JPG</li>
+                  </ul>
+                </div>
+                <div>
+                  <strong style={{ fontSize: 13 }}>YouTube</strong>
+                  <ul className="dense-list" style={{ marginTop: 4 }}>
+                    <li>Video: 1920x1080 (16:9) MP4</li>
+                    <li>Short: 1080x1920 (9:16) MP4, max 60s</li>
+                    <li>Thumbnail: 1280x720 JPG</li>
+                  </ul>
+                </div>
+              </div>
+            </section>
+            <section className="work-panel">
               <PanelTitle icon={<PackageSearch size={17} />} title="Activos del tenant" />
               <div className="market-grid">
                 {assets.map((asset) => (
@@ -496,25 +945,167 @@ export function DashboardConsole({
         {view === "calendar" && (
           <div className="strategy-grid">
             <section className="work-panel span-2">
-              <PanelTitle icon={<CalendarDays size={17} />} title="Cronograma propuesto" />
-              <div className="calendar-list">
-                {calendar.map((item) => (
-                  <button
-                    key={item.id}
-                    className="calendar-row"
-                    onClick={() => {
-                      setSelectedId(item.id);
-                      setView("queue");
-                    }}
-                  >
-                    <span>{item.scheduledFor ?? "Sin fecha"}</span>
-                    <strong>{item.title}</strong>
-                    <small>{item.network} / {item.format} / {item.status}</small>
-                    <Risk level={item.riskLevel} />
-                  </button>
-                ))}
-                {calendar.length === 0 && <p style={{ padding: 14 }}>No hay cronograma cargado.</p>}
-              </div>
+              <PanelTitle
+                icon={<CalendarDays size={17} />}
+                title="Cronograma"
+                action={
+                  <span style={{ display: "flex", gap: "4px" }}>
+                    <button
+                      onClick={() => setCalendarView("list")}
+                      style={{
+                        fontWeight: calendarView === "list" ? 700 : 400,
+                        fontSize: 11,
+                        padding: "2px 8px",
+                        borderRadius: 4,
+                        border: "1px solid var(--hc-line)",
+                        background: calendarView === "list" ? "var(--hc-ink)" : "var(--hc-bone)",
+                        color: calendarView === "list" ? "#fff" : "var(--hc-ink)",
+                      }}
+                    >
+                      Lista
+                    </button>
+                    <button
+                      onClick={() => setCalendarView("week")}
+                      style={{
+                        fontWeight: calendarView === "week" ? 700 : 400,
+                        fontSize: 11,
+                        padding: "2px 8px",
+                        borderRadius: 4,
+                        border: "1px solid var(--hc-line)",
+                        background: calendarView === "week" ? "var(--hc-ink)" : "var(--hc-bone)",
+                        color: calendarView === "week" ? "#fff" : "var(--hc-ink)",
+                      }}
+                    >
+                      Semana
+                    </button>
+                    <button
+                      onClick={() => setCalendarView("month")}
+                      style={{
+                        fontWeight: calendarView === "month" ? 700 : 400,
+                        fontSize: 11,
+                        padding: "2px 8px",
+                        borderRadius: 4,
+                        border: "1px solid var(--hc-line)",
+                        background: calendarView === "month" ? "var(--hc-ink)" : "var(--hc-bone)",
+                        color: calendarView === "month" ? "#fff" : "var(--hc-ink)",
+                      }}
+                    >
+                      Mes
+                    </button>
+                  </span>
+                }
+              />
+              {calendarView === "list" && (
+                <div className="calendar-list">
+                  {calendar.map((item) => (
+                    <button
+                      key={item.id}
+                      className="calendar-row"
+                      onClick={() => {
+                        setSelectedId(item.id);
+                        setView("queue");
+                      }}
+                    >
+                      <span>{item.scheduledFor ?? "Sin fecha"}</span>
+                      <strong>{item.title}</strong>
+                      <small>{item.network} / {item.format} / {item.status}</small>
+                      <Risk level={item.riskLevel} />
+                    </button>
+                  ))}
+                  {calendar.length === 0 && <p style={{ padding: 14 }}>No hay cronograma cargado.</p>}
+                </div>
+              )}
+              {calendarView === "week" && (
+                <div style={{ padding: 14, overflowX: "auto" }}>
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: 4, minWidth: 700 }}>
+                    {["Lun", "Mar", "Mie", "Jue", "Vie", "Sab", "Dom"].map((day) => (
+                      <div key={day} style={{ textAlign: "center", fontSize: 11, fontWeight: 700, color: "var(--hc-fog)", padding: "4px 0", borderBottom: "1px solid var(--hc-line)" }}>
+                        {day}
+                      </div>
+                    ))}
+                    {calendar.map((item) => {
+                      const d = item.scheduledFor ? new Date(item.scheduledFor) : null;
+                      const dayOfWeek = d ? (d.getDay() + 6) % 7 : null;
+                      return dayOfWeek !== null ? (
+                        <div
+                          key={item.id}
+                          onClick={() => { setSelectedId(item.id); setView("queue"); }}
+                          style={{
+                            gridColumn: dayOfWeek + 1,
+                            padding: "4px 6px",
+                            fontSize: 10,
+                            borderRadius: 4,
+                            border: "1px solid var(--hc-line)",
+                            background: "var(--hc-bone)",
+                            cursor: "pointer",
+                          }}
+                        >
+                          <strong>{d?.toLocaleDateString("es", { weekday: "short", day: "numeric" })}</strong>
+                          <small style={{ display: "block" }}>{d?.toLocaleTimeString("es", { hour: "2-digit", minute: "2-digit" })}</small>
+                          <span>{item.title.slice(0, 20)}</span>
+                          <Risk level={item.riskLevel} />
+                        </div>
+                      ) : null;
+                    })}
+                  </div>
+                </div>
+              )}
+              {calendarView === "month" && (
+                <div style={{ padding: 14, overflowX: "auto" }}>
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: 2, minWidth: 700 }}>
+                    {["Lun", "Mar", "Mie", "Jue", "Vie", "Sab", "Dom"].map((day) => (
+                      <div key={day} style={{ textAlign: "center", fontSize: 10, fontWeight: 700, color: "var(--hc-fog)", padding: "2px" }}>
+                        {day}
+                      </div>
+                    ))}
+                    {Array.from({ length: 31 }, (_, i) => {
+                      const day = i + 1;
+                      const dayItems = calendar.filter((item) => {
+                        const d = item.scheduledFor ? new Date(item.scheduledFor) : null;
+                        return d && d.getDate() === day;
+                      });
+                      return (
+                        <div
+                          key={day}
+                          style={{
+                            minHeight: 50,
+                            padding: 2,
+                            border: "1px solid var(--hc-line)",
+                            borderRadius: 4,
+                            background: dayItems.length > 0 ? "var(--hc-bone)" : "transparent",
+                            fontSize: 10,
+                          }}
+                        >
+                          <span style={{ fontWeight: 700, fontSize: 10 }}>{day}</span>
+                          {dayItems.slice(0, 2).map((item) => (
+                            <div
+                              key={item.id}
+                              onClick={() => { setSelectedId(item.id); setView("queue"); }}
+                              style={{
+                                padding: "1px 3px",
+                                marginTop: 1,
+                                borderRadius: 2,
+                                background: "var(--hc-teal)",
+                                color: "#fff",
+                                fontSize: 9,
+                                cursor: "pointer",
+                                whiteSpace: "nowrap",
+                                overflow: "hidden",
+                                textOverflow: "ellipsis",
+                              }}
+                            >
+                              {item.title.slice(0, 15)}
+                            </div>
+                          ))}
+                          {dayItems.length > 2 && (
+                            <span style={{ fontSize: 9, color: "var(--hc-fog)" }}>+{dayItems.length - 2}</span>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
             </section>
           </div>
         )}
@@ -593,22 +1184,55 @@ export function DashboardConsole({
                     </li>
                   ))}
                 </ul>
-                <div className="publish-gate">
-                  <label className="gate-check">
-                    <input
-                      type="checkbox"
-                      checked={manualApproval}
-                      onChange={(event) => setManualApproval(event.target.checked)}
-                    />
-                    Manuel aprueba ejecutar este dry-run controlado. No se publicara en redes reales.
+                {tenantAutoPilot && (
+                  <label className="gate-check" style={{ marginBottom: 10, display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+                    <span style={{ fontSize: 13, color: "var(--hc-ink)" }}>Modo de publicacion:</span>
+                    <select
+                      value={publishMode}
+                      onChange={(e) => setPublishMode(e.target.value as "dry-run" | "live")}
+                      style={{ padding: "6px 10px", borderRadius: 6, border: "1px solid var(--hc-line)", fontSize: 13 }}
+                    >
+                      <option value="dry-run">Dry-run (prueba sin publicar)</option>
+                      <option value="live">Publicacion real en redes</option>
+                    </select>
                   </label>
+                )}
+                <div className="publish-gate">
+                  {tenantNeedsManual && (
+                    <label className="gate-check">
+                      <input
+                        type="checkbox"
+                        checked={manualApproval}
+                        onChange={(event) => setManualApproval(event.target.checked)}
+                      />
+                      Manuel aprueba ejecutar este dry-run controlado. No se publicara en redes reales.
+                    </label>
+                  )}
+                  {tenantAutoPilot && publishMode === "live" && (
+                    <label className="gate-check">
+                      <input
+                        type="checkbox"
+                        checked={manualApproval}
+                        onChange={(event) => setManualApproval(event.target.checked)}
+                      />
+                      Confirmo que quiero publicar en redes reales. Esta accion no es reversible.
+                    </label>
+                  )}
                   <button
                     className="primary-action"
-                    onClick={handleDryRunPublish}
-                    disabled={!manualApproval || publishState === "loading" || !firstApproved}
+                    onClick={handlePublish}
+                    disabled={
+                      publishState === "loading" ||
+                      !firstApproved ||
+                      (!manualApproval && (tenantNeedsManual || (tenantAutoPilot && publishMode === "live")))
+                    }
                   >
                     <LockKeyhole size={16} />
-                    {publishState === "loading" ? "Ejecutando..." : "Ejecutar dry-run"}
+                    {publishState === "loading"
+                      ? "Ejecutando..."
+                      : tenantAutoPilot && publishMode === "live"
+                        ? "Publicar en redes reales"
+                        : "Ejecutar dry-run"}
                   </button>
                   <small>
                     {firstApproved
@@ -637,6 +1261,7 @@ export function DashboardConsole({
           </div>
         )}
       </section>
+      <AssistantFab />
     </main>
   );
 }
@@ -712,6 +1337,94 @@ function ApprovalActions({
         <X size={16} />
         {loading === "reject" ? "Rechazando..." : "Rechazar"}
       </button>
+    </div>
+  );
+}
+
+const MODEL_PRICING_TABLE: Array<{
+  provider: string;
+  model: string;
+  label: string;
+  reasoning: boolean;
+  estCost: number;
+  tier: string;
+  speed: string;
+}> = [
+  { provider: "openai", model: "gpt-4o", label: "GPT-4o", reasoning: false, estCost: 0.0140, tier: "Premium", speed: "Medio" },
+  { provider: "openai", model: "gpt-4o-mini", label: "GPT-4o Mini", reasoning: false, estCost: 0.00084, tier: "Económico", speed: "Rápido" },
+  { provider: "openai", model: "gpt-4.1", label: "GPT-4.1", reasoning: false, estCost: 0.0120, tier: "Premium", speed: "Medio" },
+  { provider: "openai", model: "gpt-4.1-mini", label: "GPT-4.1 Mini", reasoning: false, estCost: 0.0024, tier: "Balance", speed: "Rápido" },
+  { provider: "openai", model: "gpt-4.1-nano", label: "GPT-4.1 Nano", reasoning: false, estCost: 0.00056, tier: "Económico", speed: "Muy rápido" },
+  { provider: "openai", model: "o3-mini", label: "o3 Mini", reasoning: true, estCost: 0.0062, tier: "Balance", speed: "Lento" },
+  { provider: "anthropic", model: "claude-3-5-haiku-latest", label: "Claude 3.5 Haiku", reasoning: false, estCost: 0.00544, tier: "Económico", speed: "Rápido" },
+  { provider: "anthropic", model: "claude-3-5-sonnet-latest", label: "Claude 3.5 Sonnet", reasoning: false, estCost: 0.0204, tier: "Premium", speed: "Medio" },
+  { provider: "anthropic", model: "claude-3-7-sonnet-latest", label: "Claude 3.7 Sonnet", reasoning: true, estCost: 0.0204, tier: "Premium", speed: "Lento" },
+  { provider: "gemini", model: "gemini-2.0-flash", label: "Gemini 2.0 Flash", reasoning: false, estCost: 0.00056, tier: "Económico", speed: "Muy rápido" },
+  { provider: "gemini", model: "gemini-2.5-pro", label: "Gemini 2.5 Pro", reasoning: true, estCost: 0.0130, tier: "Premium", speed: "Lento" },
+  { provider: "deepseek", model: "deepseek-chat", label: "DeepSeek Chat", reasoning: false, estCost: 0.00045, tier: "Económico", speed: "Rápido" },
+  { provider: "deepseek", model: "deepseek-reasoner", label: "DeepSeek Reasoner", reasoning: true, estCost: 0.00304, tier: "Balance", speed: "Lento" },
+];
+
+function LlmCostEstimate({ provider, model }: { provider: string; model: string }) {
+  const [open, setOpen] = useState(false);
+  const selected = MODEL_PRICING_TABLE.find((m) => m.model === model && m.provider === provider);
+  const filtered = MODEL_PRICING_TABLE.filter((m) => m.provider === provider);
+
+  const estWithOverhead = selected ? (selected.estCost * 2.0).toFixed(4) : "0.00";
+
+  return (
+    <div style={{ marginTop: 8, fontSize: 11 }}>
+      {selected && (
+        <div style={{ padding: "6px 8px", background: "var(--hc-surface)", borderRadius: 6, display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
+          <span><strong>{selected.label}</strong> {selected.reasoning ? "🧠" : ""}</span>
+          <span style={{ color: "var(--hc-fog)" }}>API: <strong>${selected.estCost.toFixed(6)}</strong>/estrategia</span>
+          <span style={{ color: "var(--hc-teal)", fontWeight: 700 }}>
+            <TrendingUp size={12} style={{ verticalAlign: "middle" }} /> ~${estWithOverhead} c/overhead
+          </span>
+          <span style={{ fontSize: 10, color: "var(--hc-fog)" }}>{selected.tier} · {selected.speed}</span>
+        </div>
+      )}
+      <button
+        onClick={() => setOpen(!open)}
+        style={{ marginTop: 6, fontSize: 10, padding: "3px 8px", borderRadius: 4, border: "1px solid var(--hc-line)", background: "var(--hc-bone)", color: "var(--hc-fog)", cursor: "pointer" }}
+      >
+        <Info size={10} style={{ verticalAlign: "middle", marginRight: 3 }} />
+        {open ? "Ocultar" : "Ver"} comparativa de costos
+      </button>
+      {open && (
+        <div style={{ marginTop: 6, border: "1px solid var(--hc-line)", borderRadius: 6, overflow: "hidden", fontSize: 10 }}>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 70px 65px 70px 65px", gap: 0, background: "var(--hc-ink)", color: "#fff", padding: "4px 8px", fontWeight: 700 }}>
+            <span>Modelo</span>
+            <span>API/est</span>
+            <span>Tier</span>
+            <span>Velocidad</span>
+            <span>Razonador</span>
+          </div>
+          {filtered.map((m) => (
+            <div
+              key={m.model}
+              style={{
+                display: "grid",
+                gridTemplateColumns: "1fr 70px 65px 70px 65px",
+                gap: 0,
+                padding: "4px 8px",
+                borderTop: "1px solid var(--hc-line)",
+                background: m.model === model ? "var(--hc-teal)" : "var(--hc-surface)",
+                color: m.model === model ? "#fff" : "var(--hc-ink)",
+              }}
+            >
+              <span style={{ fontWeight: m.model === model ? 700 : 400 }}>{m.label}</span>
+              <span>${m.estCost.toFixed(6)}</span>
+              <span>{m.tier}</span>
+              <span>{m.speed}</span>
+              <span>{m.reasoning ? "Sí" : "No"}</span>
+            </div>
+          ))}
+          <div style={{ padding: "4px 8px", background: "var(--hc-bone)", fontSize: 9, color: "var(--hc-fog)" }}>
+            Estimado basado en ~800 prompt + ~1200 completion tokens por estrategia. Costo tenant = API × overhead (2x default).
+          </div>
+        </div>
+      )}
     </div>
   );
 }

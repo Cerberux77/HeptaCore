@@ -12,6 +12,8 @@ model Tenant {
   name            String
   plan            TenantPlan            @default(PILOT)
   automationMode  AutomationMode        @default(DRAFT_ONLY)
+  llmConfig       Json?
+  costConfig      Json?
   createdAt       DateTime              @default(now())
   updatedAt       DateTime              @updatedAt
   approvals       Approval[]
@@ -157,6 +159,7 @@ model ContentDraft {
   publishedAt     DateTime?
   externalPostId  String?
   source          String?
+  sortOrder       Int?
   createdAt       DateTime            @default(now())
   updatedAt       DateTime            @updatedAt
   approvals       Approval[]

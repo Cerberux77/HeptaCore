@@ -10,7 +10,14 @@ export default function middleware(req: NextRequest) {
   const path = req.nextUrl.pathname;
 
   // Allow public routes
-  if (path === "/login" || path.startsWith("/api/auth/")) {
+  if (
+    path === "/" ||
+    path === "/login" ||
+    path === "/register" ||
+    path === "/recover" ||
+    path === "/reset-password" ||
+    path.startsWith("/api/auth/")
+  ) {
     return NextResponse.next();
   }
 

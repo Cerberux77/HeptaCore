@@ -1,5 +1,6 @@
 import { cache } from "react";
 import { prisma } from "./prisma";
+import { getTrialStatus, type TrialStatus } from "./trial";
 
 export type DashboardMetrics = {
   tenant: {
@@ -193,7 +194,7 @@ export const getDashboardMetrics = cache(
         format: d.format,
         status: d.status,
         riskLevel: d.riskLevel,
-        scheduledFor: d.scheduledFor?.toISOString().slice(0, 10) ?? null,
+        scheduledFor: d.scheduledFor?.toISOString().slice(0, 16).replace("T", " ") ?? null,
         assetPath: d.assets[0]?.asset.sourcePath ?? null,
       })),
       pillars: pillars.map((p) => ({ name: p.pillar!, count: p._count })),
@@ -297,7 +298,7 @@ export async function getContentCalendar(tenantSlug: string): Promise<CalendarIt
     network: draft.network,
     format: draft.format,
     status: draft.status,
-    scheduledFor: draft.scheduledFor?.toISOString().slice(0, 10) ?? null,
+    scheduledFor: draft.scheduledFor?.toISOString().slice(0, 16).replace("T", " ") ?? null,
     riskLevel: draft.riskLevel,
   }));
 }
@@ -341,7 +342,7 @@ export const getDraftQueue = cache(
       status: d.status,
       riskLevel: d.riskLevel,
       requiresReview: d.requiresReview,
-      scheduledFor: d.scheduledFor?.toISOString().slice(0, 10) ?? null,
+      scheduledFor: d.scheduledFor?.toISOString().slice(0, 16).replace("T", " ") ?? null,
       hashtags: d.hashtags,
       cta: d.cta,
       source: d.source,

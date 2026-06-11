@@ -343,7 +343,7 @@ export async function generateStrategyWithLLM(
   intake: ClientIntake,
   context?: Partial<TurpialContext>,
   providerConfig?: Partial<LLMProviderConfig>,
-): Promise<{ strategy: StrategyOutput; provider: string }> {
+): Promise<{ strategy: StrategyOutput; provider: string; usage?: { promptTokens: number; completionTokens: number } }> {
   const provider = getLLMProvider(providerConfig);
 
   if (provider.provider === "deterministic") {
@@ -369,6 +369,7 @@ export async function generateStrategyWithLLM(
     return {
       strategy: validateStrategyOutput(parsed, intake),
       provider: provider.provider,
+      usage: result.usage ? { promptTokens: result.usage.promptTokens, completionTokens: result.usage.completionTokens } : undefined,
     };
   } catch (err) {
     console.warn(`LLM strategy generation failed (${provider.provider}), falling back to deterministic:`, err instanceof Error ? err.message : err);

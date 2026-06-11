@@ -1,18 +1,142 @@
 "use client";
 
+import { useState } from "react";
 import {
   BarChart3,
+  Bot,
   Building2,
   Check,
   ClipboardList,
   DollarSign,
   Gauge,
+  Info,
   PackageSearch,
+  Save,
   ShieldCheck,
+  TrendingUp,
   X,
 } from "lucide-react";
 import { HeptaCoreWordmark } from "./heptacore-mark";
 import type { AdminDashboardData } from "../lib/dashboard";
+
+type LlmConfigState = {
+  provider: string;
+  model: string;
+  apiKey: string;
+};
+
+function TenantLlmSection({ slug, name }: { slug: string; name: string }) {
+  const [open, setOpen] = useState(false);
+  const [config, setConfig] = useState<LlmConfigState>({ provider: "deterministic", model: "", apiKey: "" });
+  const [overheadFactor, setOverheadFactor] = useState(2.0);
+  const [loading, setLoading] = useState(false);
+  const [saved, setSaved] = useState(false);
+
+  async function loadConfig() {
+    setOpen(!open);
+    if (!open) {
+      try {
+        const res = await fetch(`/api/admin/llm-config?tenantSlug=${slug}`);
+        if (res.ok) {
+          const data = await res.json();
+          setConfig({ provider: data.llmConfig.provider, model: data.llmConfig.model, apiKey: "" });
+          setOverheadFactor(data.costConfig?.overheadFactor ?? 2.0);
+        }
+      } catch { /* ignore */ }
+    }
+  }
+
+  async function saveConfig() {
+    setLoading(true);
+    setSaved(false);
+    try {
+      const res = await fetch("/api/admin/llm-config", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ tenantSlug: slug, ...config, overheadFactor }),
+      });
+      if (res.ok) setSaved(true);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <div>
+      <button className="tool-button" onClick={loadConfig} style={{ fontSize: 12 }}>
+        <Bot size={14} /> LLM
+      </button>
+      {open && (
+        <div className="tenant-row" style={{ background: "var(--hc-bone)", marginTop: 6, padding: 10, borderRadius: 8, flexDirection: "column", alignItems: "stretch", gap: 8 }}>
+          <strong style={{ fontSize: 12 }}>{name} - Configuracion LLM</strong>
+          <label style={{ fontSize: 11, display: "flex", gap: 6, alignItems: "center" }}>
+            Provider:
+            <select
+              value={config.provider}
+              onChange={(e) => setConfig({ ...config, provider: e.target.value })}
+              style={{ padding: "4px 8px", borderRadius: 4, border: "1px solid var(--hc-line)", fontSize: 11 }}
+            >
+              <option value="deterministic">Deterministico (sin API)</option>
+              <option value="openai">OpenAI</option>
+              <option value="anthropic">Anthropic</option>
+              <option value="gemini">Gemini</option>
+              <option value="deepseek">DeepSeek</option>
+            </select>
+          </label>
+          {config.provider !== "deterministic" && (
+            <>
+              <label style={{ fontSize: 11, display: "flex", gap: 6, alignItems: "center" }}>
+                Model:
+                <input
+                  value={config.model}
+                  onChange={(e) => setConfig({ ...config, model: e.target.value })}
+                  placeholder="gpt-4o-mini"
+                  style={{ padding: "4px 8px", borderRadius: 4, border: "1px solid var(--hc-line)", fontSize: 11, flex: 1 }}
+                />
+              </label>
+              <label style={{ fontSize: 11, display: "flex", gap: 6, alignItems: "center" }}>
+                API Key:
+                <input
+                  type="password"
+                  value={config.apiKey}
+                  onChange={(e) => setConfig({ ...config, apiKey: e.target.value })}
+                  placeholder="sk-..."
+                  style={{ padding: "4px 8px", borderRadius: 4, border: "1px solid var(--hc-line)", fontSize: 11, flex: 1 }}
+                />
+              </label>
+            </>
+          )}
+          <label style={{ fontSize: 11, display: "flex", gap: 6, alignItems: "center" }}>
+            <TrendingUp size={12} /> Overhead:
+            <input
+              type="number"
+              step="0.1"
+              min="1.0"
+              max="10.0"
+              value={overheadFactor}
+              onChange={(e) => setOverheadFactor(parseFloat(e.target.value) || 2.0)}
+              style={{ padding: "4px 8px", borderRadius: 4, border: "1px solid var(--hc-line)", fontSize: 11, width: 70 }}
+            />
+            <span style={{ fontSize: 10, color: "var(--hc-fog)" }}>x</span>
+            <small style={{ fontSize: 10, color: "var(--hc-fog)" }}>
+              (Utilidad: {((overheadFactor - 1) * 100).toFixed(0)}%)
+            </small>
+          </label>
+          <AdminPricingTable overheadFactor={overheadFactor} />
+          <div style={{ display: "flex", gap: 6 }}>
+            <button onClick={saveConfig} disabled={loading} style={{ fontSize: 11, padding: "4px 10px", borderRadius: 4, background: "var(--hc-teal)", color: "#fff", border: "none" }}>
+              <Save size={12} /> {loading ? "Guardando..." : "Guardar"}
+            </button>
+            {saved && <span style={{ fontSize: 11, color: "var(--hc-teal)", display: "flex", alignItems: "center" }}><Check size={12} /> Guardado</span>}
+            <button onClick={() => setOpen(false)} style={{ fontSize: 11, padding: "4px 10px", borderRadius: 4, border: "1px solid var(--hc-line)", background: "var(--hc-bone)" }}>
+              <X size={12} /> Cerrar
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
 
 function StatusCard({
   label,
@@ -50,7 +174,7 @@ export function AdminConsole({ data }: { data: AdminDashboardData }) {
         </nav>
         <div className="guardrail-box">
           <ShieldCheck size={17} />
-          <span>Publicacion real bloqueada. El admin consolida tenants y ejecuta solo gates controlados.</span>
+          <span>Admin global. Control de tenants y gates de publicacion. Los tenants en autopilot pueden publicar en real.</span>
         </div>
       </aside>
 
@@ -88,6 +212,7 @@ export function AdminConsole({ data }: { data: AdminDashboardData }) {
                 <span>Aprobados</span>
                 <span>Agenda</span>
                 <span>Activos</span>
+                <span>LLM</span>
                 <span></span>
               </div>
               {data.tenants.map((tenant) => (
@@ -98,6 +223,7 @@ export function AdminConsole({ data }: { data: AdminDashboardData }) {
                   <span><Check size={14} /> {tenant.approved}</span>
                   <span><BarChart3 size={14} /> {tenant.scheduled}</span>
                   <span><PackageSearch size={14} /> {tenant.assets}</span>
+                  <span><TenantLlmSection slug={tenant.slug} name={tenant.name} /></span>
                   <a className="tool-button" href={`/tenant/${tenant.slug}`}>Abrir</a>
                 </div>
               ))}
@@ -155,5 +281,88 @@ export function AdminConsole({ data }: { data: AdminDashboardData }) {
         </div>
       </section>
     </main>
+  );
+}
+
+function AdminPricingTable({ overheadFactor }: { overheadFactor: number }) {
+  const [open, setOpen] = useState(false);
+
+  const rows = [
+    { provider: "OpenAI", models: [
+      { label: "GPT-4o", cost: 0.0140, tier: "Premium", speed: "Medio", reasoning: false },
+      { label: "GPT-4o Mini", cost: 0.00084, tier: "Económico", speed: "Rápido", reasoning: false },
+      { label: "GPT-4.1", cost: 0.0120, tier: "Premium", speed: "Medio", reasoning: false },
+      { label: "GPT-4.1 Mini", cost: 0.0024, tier: "Balance", speed: "Rápido", reasoning: false },
+      { label: "GPT-4.1 Nano", cost: 0.00056, tier: "Económico", speed: "Muy rápido", reasoning: false },
+      { label: "o3 Mini", cost: 0.0062, tier: "Balance", speed: "Lento", reasoning: true },
+    ]},
+    { provider: "Anthropic", models: [
+      { label: "Claude 3.5 Haiku", cost: 0.00544, tier: "Económico", speed: "Rápido", reasoning: false },
+      { label: "Claude 3.5 Sonnet", cost: 0.0204, tier: "Premium", speed: "Medio", reasoning: false },
+      { label: "Claude 3.7 Sonnet", cost: 0.0204, tier: "Premium", speed: "Lento", reasoning: true },
+    ]},
+    { provider: "Gemini", models: [
+      { label: "Gemini 2.0 Flash", cost: 0.00056, tier: "Económico", speed: "Muy rápido", reasoning: false },
+      { label: "Gemini 2.5 Pro", cost: 0.0130, tier: "Premium", speed: "Lento", reasoning: true },
+    ]},
+    { provider: "DeepSeek", models: [
+      { label: "DeepSeek Chat", cost: 0.00045, tier: "Económico", speed: "Rápido", reasoning: false },
+      { label: "DeepSeek Reasoner", cost: 0.00304, tier: "Balance", speed: "Lento", reasoning: true },
+    ]},
+  ];
+
+  return (
+    <div style={{ fontSize: 10 }}>
+      <button
+        onClick={() => setOpen(!open)}
+        style={{ fontSize: 10, padding: "2px 6px", borderRadius: 4, border: "1px solid var(--hc-line)", background: "var(--hc-bone)", color: "var(--hc-fog)", cursor: "pointer" }}
+      >
+        <Info size={10} style={{ verticalAlign: "middle", marginRight: 2 }} />
+        {open ? "Ocultar tabla de costos" : "Ver tabla de costos por modelo"}
+      </button>
+      {open && (
+        <div style={{ marginTop: 6, border: "1px solid var(--hc-line)", borderRadius: 6, overflow: "hidden" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 70px 55px 60px 55px 65px", gap: 0, background: "var(--hc-ink)", color: "#fff", padding: "3px 6px", fontWeight: 700, fontSize: 9 }}>
+            <span>Modelo</span>
+            <span>API/est</span>
+            <span>Tier</span>
+            <span>Velocidad</span>
+            <span>Razonador</span>
+            <span>x{overheadFactor}</span>
+          </div>
+          {rows.map((group) => (
+            <div key={group.provider}>
+              <div style={{ padding: "2px 6px", background: "var(--hc-bone)", fontWeight: 700, fontSize: 9, color: "var(--hc-fog)" }}>
+                {group.provider}
+              </div>
+              {group.models.map((m) => (
+                <div
+                  key={m.label}
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "1fr 70px 55px 60px 55px 65px",
+                    gap: 0,
+                    padding: "3px 6px",
+                    borderTop: "1px solid var(--hc-line)",
+                    background: "var(--hc-surface)",
+                    fontSize: 9,
+                  }}
+                >
+                  <span style={{ fontWeight: 500 }}>{m.label}</span>
+                  <span>${m.cost.toFixed(6)}</span>
+                  <span>{m.tier}</span>
+                  <span>{m.speed}</span>
+                  <span>{m.reasoning ? "Sí" : "No"}</span>
+                  <span style={{ color: "var(--hc-teal)", fontWeight: 700 }}>${(m.cost * overheadFactor).toFixed(4)}</span>
+                </div>
+              ))}
+            </div>
+          ))}
+          <div style={{ padding: "4px 6px", background: "var(--hc-bone)", fontSize: 8, color: "var(--hc-fog)" }}>
+            ~2000 tokens/estrategia. Costo tenant = API × overhead. El tenant paga la última columna.
+          </div>
+        </div>
+      )}
+    </div>
   );
 }

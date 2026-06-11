@@ -7,6 +7,11 @@ import {
   generateStrategyWithLLM,
 } from "@heptacore/agents";
 import type { TurpialContext } from "@heptacore/agents";
+import {
+  calculateApiCost,
+  calculateTenantCost,
+  DEFAULT_OVERHEAD_FACTOR,
+} from "@heptacore/core";
 
 export const dynamic = "force-dynamic";
 
@@ -25,7 +30,7 @@ export async function POST(req: Request) {
 
   const tenant = await prisma.tenant.findFirst({
     where: { slug: tenantSlug },
-    select: { id: true, name: true },
+    select: { id: true, name: true, llmConfig: true, costConfig: true },
   });
   if (!tenant) {
     return NextResponse.json({ error: "Tenant not found" }, { status: 404 });
@@ -105,13 +110,42 @@ export async function POST(req: Request) {
     console.warn("Could not load tenant context for strategy generation:", err instanceof Error ? err.message : err);
   }
 
+  const tenantLlmConfig = (tenant.llmConfig as Record<string, unknown>) ?? {};
+
   const providerConfig = {
-    provider: process.env.LLM_PROVIDER ?? "deterministic",
-    apiKey: process.env.LLM_PROVIDER_API_KEY,
-    model: process.env.LLM_MODEL,
+    provider: String(body.providerConfig?.provider || tenantLlmConfig.provider || process.env.LLM_PROVIDER || "deterministic"),
+    apiKey: String(body.providerConfig?.apiKey || tenantLlmConfig.apiKey || process.env.LLM_PROVIDER_API_KEY || ""),
+    model: String(body.providerConfig?.model || tenantLlmConfig.model || process.env.LLM_MODEL || ""),
   };
 
   const result = await generateStrategyWithLLM(parsed.data, context, providerConfig);
+
+  const tenantCostConfig = (tenant.costConfig as Record<string, unknown>) ?? {};
+  const overheadFactor = typeof tenantCostConfig.overheadFactor === "number"
+    ? tenantCostConfig.overheadFactor
+    : DEFAULT_OVERHEAD_FACTOR;
+
+  let costInfo: Record<string, unknown> | null = null;
+  if (result.usage && providerConfig.provider !== "deterministic") {
+    const { totalApiCost, modelPricing } = calculateApiCost(
+      providerConfig.model || "unknown",
+      result.usage.promptTokens,
+      result.usage.completionTokens,
+    );
+    const { tenantCost, heptaCoreProfit } = calculateTenantCost(totalApiCost, overheadFactor);
+    costInfo = {
+      model: providerConfig.model,
+      modelLabel: modelPricing.label,
+      reasoning: modelPricing.reasoning,
+      promptTokens: result.usage.promptTokens,
+      completionTokens: result.usage.completionTokens,
+      apiCost: parseFloat(totalApiCost.toFixed(6)),
+      overheadFactor,
+      tenantCost: parseFloat(tenantCost.toFixed(4)),
+      heptaCoreProfit: parseFloat(heptaCoreProfit.toFixed(4)),
+      currency: "USD",
+    };
+  }
 
   await auditLog({
     tenantId: tenant.id,
@@ -123,6 +157,7 @@ export async function POST(req: Request) {
       title: result.strategy.title,
       channels: result.strategy.channels.length,
       draftPlanItems: result.strategy.draftPlan.length,
+      cost: costInfo,
     },
   });
 
@@ -131,5 +166,6 @@ export async function POST(req: Request) {
     tenantSlug,
     strategy: result.strategy,
     provider: result.provider,
+    cost: costInfo,
   });
 }

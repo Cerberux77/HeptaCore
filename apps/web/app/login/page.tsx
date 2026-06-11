@@ -3,6 +3,7 @@
 import { signIn } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
 import { Suspense, useState, type FormEvent } from "react";
+import Link from "next/link";
 
 function LoginForm() {
   const searchParams = useSearchParams();
@@ -72,6 +73,10 @@ function LoginForm() {
         <button type="submit" disabled={loading} className="login-button">
           {loading ? "Entrando..." : "Entrar"}
         </button>
+
+        <div className="login-links">
+          <Link href="/recover" className="login-link">Olvide mi contrasena</Link>
+        </div>
       </form>
     </div>
   );

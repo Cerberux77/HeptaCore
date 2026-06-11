@@ -11,6 +11,7 @@ import {
   getStrategySnapshot,
   getTenantAssets,
 } from "../../../lib/dashboard";
+import { getTrialStatus } from "../../../lib/trial";
 
 export const dynamic = "force-dynamic";
 
@@ -40,6 +41,8 @@ export default async function TenantPage({
   const hasTenantAccess = session.user.memberships?.some((membership) => membership.tenantId === metrics.tenant.id);
   if (!isGlobalAdmin && !hasTenantAccess) redirect("/");
 
+  const trial = await getTrialStatus(metrics.tenant.id);
+
   return (
     <DashboardConsole
       metrics={metrics}
@@ -52,6 +55,7 @@ export default async function TenantPage({
       readiness={readiness}
       tenantSlug={slug}
       adminMode={isGlobalAdmin}
+      trial={trial}
     />
   );
 }
