@@ -2,7 +2,7 @@
 type: collaborator-status
 project: "HeptaCore"
 operator: "Manuel"
-last_updated: "2026-06-11T01:54:58.581Z"
+last_updated: "2026-06-11T01:56:16.650Z"
 generated_by: "Oreshnik canonical-check"
 source: "var/oreshnik/task-board.json"
 ---
@@ -16,7 +16,6 @@ source: "var/oreshnik/task-board.json"
 | Sprint | Scope | Depende de |
 |---|---|---|
 | S-HC-PROD-03 | LLM provider adapter plus Turpial tenant functional QA and UX polish | S-HC-PROD-ALIGN |
-| S-HC-MAINT-MOTHER-SYNC-01 | Automatic canonical merge for newer MADRE branches | S-HC-MAINT-SYNC-01 |
 
 ## Pending
 
@@ -103,18 +102,6 @@ Estado: `pending`
 - UI labels real spend as blocked until explicit production unlock
 
 Zonas: `apps/web/components`, `apps/web/app/api`, `apps/web/lib/dashboard.ts`, `docs`
-
-### S-HC-MAINT-MOTHER-SYNC-01 - Automatic canonical merge for newer MADRE branches
-
-Estado: `ready`
-
-- Preflight attempts automatic sync when a newer remote MADRE exists and the working tree is clean
-- Canonical task-board conflicts are merged by task id
-- Derived docs are regenerated instead of manually resolved
-- Non-canonical code conflicts still block for human review
-- Operators stop seeing repeated conflicts in generated docs
-
-Zonas: `scripts/oreshnik`, `var/oreshnik`, `docs`
 
 ### S-HC-RELEASE-01 - End-to-end Turpial Sound production proof
 

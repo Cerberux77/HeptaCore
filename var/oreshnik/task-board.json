@@ -1,6 +1,6 @@
 {
   "project": "HeptaCore",
-  "updatedAt": "2026-06-11T01:54:31.352Z",
+  "updatedAt": "2026-06-11T01:55:49.971Z",
   "resiliencePolicy": "If an owner is unavailable for more than one working block or blocks the critical path, backupOwner may take over after recording reassignment.",
   "closurePolicy": "No sprint may be closed until acceptance criteria, base tests, sprint-specific tests, docs/handoff, and Oreshnik zone checks pass. See docs/obsidian-vault/METODOLOGIA/ORQUESTACION_AGENTES_HEPTACORE.md.",
   "baseTestMatrix": [
@@ -734,7 +734,7 @@
       "title": "Automatic canonical merge for newer MADRE branches",
       "owner": "Manuel",
       "backupOwner": "Jean",
-      "status": "ready",
+      "status": "done",
       "track": "maintenance",
       "zone": [
         "scripts/oreshnik",
@@ -751,7 +751,16 @@
         "Non-canonical code conflicts still block for human review",
         "Operators stop seeing repeated conflicts in generated docs"
       ],
-      "handoff": "This removes recurring manual conflicts for task-board and derived docs while preserving hard stops for real code conflicts."
+      "handoff": "This removes recurring manual conflicts for task-board and derived docs while preserving hard stops for real code conflicts.",
+      "history": [
+        {
+          "at": "2026-06-11T01:55:49.971Z",
+          "action": "closed",
+          "operator": "Manuel",
+          "branch": "Manuel/s-hc-prod-01-producto-operativo-tenant-admin-produccion-2026-06-09",
+          "description": "sync automatico de madres canonicas"
+        }
+      ]
     },
     {
       "id": "S-HC-RELEASE-01",

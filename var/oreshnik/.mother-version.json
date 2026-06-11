@@ -1,5 +1,5 @@
 {
-  "current": "MADRE/v25-s-hc-maint-close-gate-01-cierre-automatico-con-validaciones-2026-06-11",
+  "current": "MADRE/v26-s-hc-maint-mother-sync-01-sync-automatico-de-madres-canonicas-2026-06-11",
   "branches": [
     {
       "previous": "MADRE/v11-s-hc-09-publish-readiness-gate-2026-06-09",
@@ -120,11 +120,21 @@
       "at": "2026-06-11T01:54:31.352Z",
       "previous": "MADRE/v24-s-hc-prod-11-paid-scraper-compliance-controlled-discovery-ada-2026-06-11",
       "description": "cierre automatico con validaciones"
+    },
+    {
+      "version": 26,
+      "name": "MADRE/v26-s-hc-maint-mother-sync-01-sync-automatico-de-madres-canonicas-2026-06-11",
+      "sprint": "S-HC-MAINT-MOTHER-SYNC-01",
+      "operator": "Manuel",
+      "date": "2026-06-11",
+      "at": "2026-06-11T01:55:49.971Z",
+      "previous": "MADRE/v25-s-hc-maint-close-gate-01-cierre-automatico-con-validaciones-2026-06-11",
+      "description": "sync automatico de madres canonicas"
     }
   ],
-  "version": 25,
-  "effective": "MADRE/v24-s-hc-prod-11-paid-scraper-compliance-controlled-discovery-ada-2026-06-11",
-  "effectiveRef": "origin/MADRE/v24-s-hc-prod-11-paid-scraper-compliance-controlled-discovery-ada-2026-06-11",
+  "version": 26,
+  "effective": "MADRE/v25-s-hc-maint-close-gate-01-cierre-automatico-con-validaciones-2026-06-11",
+  "effectiveRef": "origin/MADRE/v25-s-hc-maint-close-gate-01-cierre-automatico-con-validaciones-2026-06-11",
   "declaredMissing": false,
   "discoveredVersion": 14
 }

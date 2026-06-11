@@ -3,8 +3,8 @@ type: master-dashboard
 project: "HeptaCore"
 status: active-production
 phase: "Canonical Oreshnik task board governs current assignments"
-last_updated: "2026-06-11T01:54:58.581Z"
-mother_branch: "MADRE/v25-s-hc-maint-close-gate-01-cierre-automatico-con-validaciones-2026-06-11"
+last_updated: "2026-06-11T01:56:16.650Z"
+mother_branch: "MADRE/v26-s-hc-maint-mother-sync-01-sync-automatico-de-madres-canonicas-2026-06-11"
 tags:
   - "#central"
   - "#status/live-source"
@@ -21,8 +21,8 @@ tags:
 
 | Campo | Valor |
 |---|---|
-| Task board actualizado | 2026-06-11T01:54:31.352Z |
-| Rama madre | MADRE/v25-s-hc-maint-close-gate-01-cierre-automatico-con-validaciones-2026-06-11 |
+| Task board actualizado | 2026-06-11T01:55:49.971Z |
+| Rama madre | MADRE/v26-s-hc-maint-mother-sync-01-sync-automatico-de-madres-canonicas-2026-06-11 |
 | Publicacion RRSS real | Bloqueada hasta aprobacion explicita |
 | Campaign spend | Bloqueado |
 | Real scraping | Bloqueado |
@@ -45,7 +45,6 @@ tags:
 | S-HC-PROD-07 | pending | Manuel | Sales landing, client onboarding and login entry | S-HC-PROD-03 |
 | S-HC-PROD-08 | pending | Manuel | Draft editor and post modification workflow | S-HC-PROD-03 |
 | S-HC-PROD-10 | pending | Manuel | Paid ads management UI and tenant billing surface | S-HC-PROD-05, S-HC-PROD-09 |
-| S-HC-MAINT-MOTHER-SYNC-01 | ready | Manuel | Automatic canonical merge for newer MADRE branches | S-HC-MAINT-SYNC-01 |
 | S-HC-RELEASE-01 | pending | Manuel+Jean | End-to-end Turpial Sound production proof | S-HC-PROD-02, S-HC-PROD-03, S-HC-PROD-04, S-HC-PROD-05, S-HC-PROD-06, S-HC-PROD-07, S-HC-PROD-08, S-HC-PROD-09, S-HC-PROD-10, S-HC-PROD-11 |
 
 ## Ready Ahora
@@ -53,7 +52,6 @@ tags:
 | Sprint | Owner | Scope |
 |---|---|---|
 | S-HC-PROD-03 | Manuel | LLM provider adapter plus Turpial tenant functional QA and UX polish |
-| S-HC-MAINT-MOTHER-SYNC-01 | Manuel | Automatic canonical merge for newer MADRE branches |
 
 ## Pendientes Bloqueados por Dependencias
 
