@@ -1,8 +1,8 @@
 ---
 type: sprint-plan
 project: "HeptaCore"
-last_updated: "2026-06-11T01:06:32.827Z"
-mother_branch: "MADRE/v19-s-hc-maint-push-01-closure-push-obligatorio-2026-06-11"
+last_updated: "2026-06-11T01:15:56.934Z"
+mother_branch: "MADRE/v20-s-hc-maint-sync-01-preflight-remote-sync-obligatorio-2026-06-11"
 tags:
   - "#sprints"
   - "#manuel"
@@ -408,3 +408,14 @@ Ver [[PLAN_PARALELO_MANUEL_JEAN]] para distribucion de carga, backups y reasigna
 | Estado | CERRADO |
 | Madre docs | `MADRE/v19-s-hc-maint-push-01-closure-push-obligatorio-2026-06-11` |
 | Descripcion | closure push obligatorio |
+
+
+## Cierre S-HC-MAINT-SYNC-01 - 2026-06-11
+
+| Campo | Valor |
+|---|---|
+| Operador | Manuel |
+| Rama | `Manuel/s-hc-prod-01-producto-operativo-tenant-admin-produccion-2026-06-09` |
+| Estado | CERRADO |
+| Madre docs | `MADRE/v20-s-hc-maint-sync-01-preflight-remote-sync-obligatorio-2026-06-11` |
+| Descripcion | preflight remote sync obligatorio |
