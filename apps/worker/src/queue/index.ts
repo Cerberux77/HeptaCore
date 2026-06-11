@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 
 import { startWorker } from "./worker.js";
-import { publishQueue, validateQueue, testQueue, getQueueStats, closeQueues } from "./client.js";
+import { publishQueue, validateQueue, testQueue, campaignQueue, getQueueStats, closeQueues } from "./client.js";
 import { prisma } from "./prisma.js";
-import type { PublishDraftJob } from "./types.js";
+import type { PublishDraftJob, CampaignJob } from "./types.js";
 
 async function main() {
   const args = process.argv.slice(2);
@@ -17,6 +17,12 @@ Comandos:
   --enqueue-drafts [tenant]   Encolar todos los drafts DRAFT para publicar
   --enqueue-date YYYY-MM-DD   Encolar drafts programados para una fecha
   --enqueue-single DRAFT_ID   Encolar un draft especifico
+  --campaign-propose           Proponer campana pagada (dry-run, 35% overhead)
+    --tenant TENANT_SLUG       Tenant slug para la campana
+    --network INSTAGRAM|FACEBOOK Red social
+    --name "Nombre campana"    Nombre de la campana
+    --objective OBJETIVO       Objetivo de la campana
+    --budget MONTO             Presupuesto de plataforma en USD
   --validate [tenant]         Validar assets de todos los drafts
   --test [tenant]             Escaneo de test-mode
   --stats                     Mostrar estadisticas de queues
@@ -149,12 +155,65 @@ DB:    DATABASE_URL (Neon pool)
     return;
   }
 
+  if (args.includes("--campaign-propose")) {
+    const getArgVal = (flag: string): string | null => {
+      const idx = args.indexOf(flag);
+      return idx !== -1 && args[idx + 1] && !args[idx + 1].startsWith("--") ? args[idx + 1] : null;
+    };
+
+    const tenantSlug = getArgVal("--tenant") || "turpial-sound";
+    const network = getArgVal("--network") || "INSTAGRAM";
+    const name = getArgVal("--name") || "Campana HeptaCore";
+    const objective = getArgVal("--objective") || "brand_awareness";
+    const budgetStr = getArgVal("--budget") || "500";
+
+    const tenant = await prisma.tenant.findFirst({ where: { slug: tenantSlug } });
+    if (!tenant) { console.error(`Tenant not found: ${tenantSlug}`); process.exit(1); }
+
+    const socialAccount = await prisma.socialAccount.findFirst({
+      where: { tenantId: tenant.id, network: network as any },
+    });
+
+    const platformBudget = parseFloat(budgetStr);
+    if (isNaN(platformBudget) || platformBudget <= 0) {
+      console.error(`Invalid budget: ${budgetStr}`);
+      process.exit(1);
+    }
+
+    await campaignQueue.add("campaign", {
+      tenantId: tenant.id,
+      socialAccountId: socialAccount?.id ?? null,
+      network,
+      name,
+      objective,
+      platformBudget,
+      mode: "dry-run",
+    } as CampaignJob);
+
+    const overheadAmount = platformBudget * 0.35;
+    const totalCharge = platformBudget + overheadAmount;
+
+    console.log(`[cli] Campaign proposed:`);
+    console.log(`  Tenant: ${tenantSlug}`);
+    console.log(`  Name: ${name}`);
+    console.log(`  Network: ${network}`);
+    console.log(`  Objective: ${objective}`);
+    console.log(`  Platform Budget: $${platformBudget.toFixed(2)}`);
+    console.log(`  HeptaCore Overhead (35%): $${overheadAmount.toFixed(2)}`);
+    console.log(`  Total Client Charge: $${totalCharge.toFixed(2)}`);
+    console.log(`  Status: PROPOSED (dry-run — no real spend)`);
+    await closeQueues();
+    await prisma.$disconnect();
+    return;
+  }
+
   if (args.includes("--stats")) {
     const stats = await getQueueStats();
     console.log("\n=== Queue Stats ===");
     console.log(`  heptacore-publish:    waiting=${stats.publish.waiting} active=${stats.publish.active} completed=${stats.publish.completed} failed=${stats.publish.failed} delayed=${stats.publish.delayed}`);
     console.log(`  heptacore-validate:   waiting=${stats.validate.waiting} active=${stats.validate.active} completed=${stats.validate.completed} failed=${stats.validate.failed} delayed=${stats.validate.delayed}`);
     console.log(`  heptacore-test:       waiting=${stats.test.waiting} active=${stats.test.active} completed=${stats.test.completed} failed=${stats.test.failed} delayed=${stats.test.delayed}`);
+    console.log(`  heptacore-campaign:   waiting=${stats.campaign.waiting} active=${stats.campaign.active} completed=${stats.campaign.completed} failed=${stats.campaign.failed} delayed=${stats.campaign.delayed}`);
     await closeQueues();
     await prisma.$disconnect();
     return;
@@ -167,6 +226,8 @@ DB:    DATABASE_URL (Neon pool)
     await validateQueue.clean(0, 1000, "failed");
     await testQueue.clean(0, 1000, "completed");
     await testQueue.clean(0, 1000, "failed");
+    await campaignQueue.clean(0, 1000, "completed");
+    await campaignQueue.clean(0, 1000, "failed");
     console.log("[cli] Queues cleaned.");
     await closeQueues();
     await prisma.$disconnect();

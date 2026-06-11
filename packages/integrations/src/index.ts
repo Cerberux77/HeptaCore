@@ -24,3 +24,5 @@ export interface SocialNetworkAdapter {
 }
 
 export { MockMetaAdapter, MockFacebookAdapter } from "./mock-meta-adapter.js";
+export { DiscoveryAdapter, MockDiscoveryAdapter } from "./discovery-adapter.js";
+export type { DiscoverySource, DiscoveryResult, DiscoveryItem, DiscoveryMode } from "./discovery-adapter.js";
