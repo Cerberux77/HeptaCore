@@ -1,5 +1,5 @@
 {
-  "current": "MADRE/v37-s-hc-release-02-pricing-overhead-cost-tracking-2026-06-11",
+  "current": "MADRE/v38-s-hc-release-02-trial-payment-cta-qa-bot-cost-table-2026-06-11",
   "branches": [
     {
       "previous": "MADRE/v11-s-hc-09-publish-readiness-gate-2026-06-09",
@@ -240,11 +240,21 @@
       "at": "2026-06-11T22:24:49.871Z",
       "previous": "MADRE/v36-s-hc-release-02-preview-redes-reemplazo-assets-2026-06-11",
       "description": "pricing-overhead-cost-tracking"
+    },
+    {
+      "version": 38,
+      "name": "MADRE/v38-s-hc-release-02-trial-payment-cta-qa-bot-cost-table-2026-06-11",
+      "sprint": "S-HC-RELEASE-02",
+      "operator": "Manuel",
+      "date": "2026-06-11",
+      "at": "2026-06-11T22:46:21.193Z",
+      "previous": "MADRE/v37-s-hc-release-02-pricing-overhead-cost-tracking-2026-06-11",
+      "description": "trial-payment-cta-qa-bot-cost-table"
     }
   ],
-  "version": 37,
-  "effective": "MADRE/v36-s-hc-release-02-preview-redes-reemplazo-assets-2026-06-11",
-  "effectiveRef": "origin/MADRE/v36-s-hc-release-02-preview-redes-reemplazo-assets-2026-06-11",
+  "version": 38,
+  "effective": "MADRE/v37-s-hc-release-02-pricing-overhead-cost-tracking-2026-06-11",
+  "effectiveRef": "origin/MADRE/v37-s-hc-release-02-pricing-overhead-cost-tracking-2026-06-11",
   "declaredMissing": false,
   "discoveredVersion": 14
 }

@@ -1,8 +1,8 @@
 ---
 type: sprint-plan
 project: "HeptaCore"
-last_updated: "2026-06-11T22:24:49.871Z"
-mother_branch: "MADRE/v37-s-hc-release-02-pricing-overhead-cost-tracking-2026-06-11"
+last_updated: "2026-06-11T22:46:21.193Z"
+mother_branch: "MADRE/v38-s-hc-release-02-trial-payment-cta-qa-bot-cost-table-2026-06-11"
 tags:
   - "#sprints"
   - "#manuel"
@@ -606,3 +606,14 @@ Ver [[PLAN_PARALELO_MANUEL_JEAN]] para distribucion de carga, backups y reasigna
 | Estado | CERRADO |
 | Madre docs | `MADRE/v37-s-hc-release-02-pricing-overhead-cost-tracking-2026-06-11` |
 | Descripcion | pricing-overhead-cost-tracking |
+
+
+## Cierre S-HC-RELEASE-02 - 2026-06-11
+
+| Campo | Valor |
+|---|---|
+| Operador | Manuel |
+| Rama | `Manuel/s-hc-prod-01-producto-operativo-tenant-admin-produccion-2026-06-09` |
+| Estado | CERRADO |
+| Madre docs | `MADRE/v38-s-hc-release-02-trial-payment-cta-qa-bot-cost-table-2026-06-11` |
+| Descripcion | trial-payment-cta-qa-bot-cost-table |
