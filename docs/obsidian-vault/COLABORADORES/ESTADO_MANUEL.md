@@ -2,7 +2,7 @@
 type: collaborator-status
 project: "HeptaCore"
 operator: "Manuel"
-last_updated: "2026-06-11T02:44:34.563Z"
+last_updated: "2026-06-11T02:48:55.089Z"
 generated_by: "Oreshnik canonical-check"
 source: "var/oreshnik/task-board.json"
 ---
@@ -21,7 +21,6 @@ source: "var/oreshnik/task-board.json"
 
 | Sprint | Scope | Depende de |
 |---|---|---|
-| S-HC-PROD-05 | Publishing gate UI, AuditLog and rollback proof | S-HC-PROD-03 |
 | S-HC-PROD-06 | Oreshnik operator dashboard and canonical task board | S-HC-PROD-02, S-HC-PROD-03, S-HC-PROD-04, S-HC-PROD-05, S-HC-PROD-07, S-HC-PROD-08, S-HC-PROD-09, S-HC-PROD-10, S-HC-PROD-11 |
 | S-HC-PROD-07 | Sales landing, client onboarding and login entry | S-HC-PROD-03 |
 | S-HC-PROD-08 | Draft editor and post modification workflow | S-HC-PROD-03 |
@@ -29,17 +28,6 @@ source: "var/oreshnik/task-board.json"
 | S-HC-RELEASE-01 | End-to-end Turpial Sound production proof | S-HC-PROD-02, S-HC-PROD-03, S-HC-PROD-04, S-HC-PROD-05, S-HC-PROD-06, S-HC-PROD-07, S-HC-PROD-08, S-HC-PROD-09, S-HC-PROD-10, S-HC-PROD-11 |
 
 ## Detalle de Aceptacion
-
-### S-HC-PROD-05 - Publishing gate UI, AuditLog and rollback proof
-
-Estado: `pending`
-
-- Dry-run gate is clear and cannot publish real RRSS
-- Approved draft can move to SCHEDULED through UI
-- AuditLog entry is visible in reports/admin activity
-- Rollback procedure is documented and tested
-
-Zonas: `apps/web/app/api/publishing`, `apps/web/components/dashboard-console.tsx`, `apps/web/lib/dashboard.ts`, `docs`
 
 ### S-HC-PROD-06 - Oreshnik operator dashboard and canonical task board
 
