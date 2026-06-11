@@ -3,7 +3,7 @@ type: master-dashboard
 project: "HeptaCore"
 status: active-production
 phase: "Canonical Oreshnik task board governs current assignments"
-last_updated: "2026-06-11T01:59:24.493Z"
+last_updated: "2026-06-11T02:09:19.999Z"
 mother_branch: "MADRE/v27-s-hc-maint-close-spawn-01-limpiar-warning-cierre-spawn-2026-06-11"
 tags:
   - "#central"
