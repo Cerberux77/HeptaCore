@@ -1,6 +1,6 @@
 {
   "project": "HeptaCore",
-  "updatedAt": "2026-06-11T02:58:38.777Z",
+  "updatedAt": "2026-06-11T03:00:02.044Z",
   "resiliencePolicy": "If an owner is unavailable for more than one working block or blocks the critical path, backupOwner may take over after recording reassignment.",
   "closurePolicy": "No sprint may be closed until acceptance criteria, base tests, sprint-specific tests, docs/handoff, and Oreshnik zone checks pass. See docs/obsidian-vault/METODOLOGIA/ORQUESTACION_AGENTES_HEPTACORE.md.",
   "baseTestMatrix": [
@@ -511,7 +511,7 @@
       "title": "Draft editor and post modification workflow",
       "owner": "Manuel",
       "backupOwner": "Jean",
-      "status": "pending",
+      "status": "done",
       "track": "content-operations",
       "zone": [
         "apps/web/app/api/drafts",
@@ -529,7 +529,16 @@
         "AuditLog records before/after metadata for post modification",
         "UI makes edit, approve, reject and dry-run states distinct"
       ],
-      "handoff": "Manuel owns draft editor in web UI/API. Jean consumes final draft state from worker, no simultaneous edits in drafts API."
+      "handoff": "Manuel owns draft editor in web UI/API. Jean consumes final draft state from worker, no simultaneous edits in drafts API.",
+      "history": [
+        {
+          "at": "2026-06-11T03:00:02.044Z",
+          "action": "closed",
+          "operator": "Manuel",
+          "branch": "Manuel/s-hc-prod-01-producto-operativo-tenant-admin-produccion-2026-06-09",
+          "description": "Draft editor and post modification workflow"
+        }
+      ]
     },
     {
       "id": "S-HC-PROD-09",

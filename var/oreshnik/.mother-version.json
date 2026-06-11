@@ -1,5 +1,5 @@
 {
-  "current": "MADRE/v30-s-hc-prod-07-sales-landing-client-onboarding-and-login-entry-2026-06-11",
+  "current": "MADRE/v31-s-hc-prod-08-draft-editor-and-post-modification-workflow-2026-06-11",
   "branches": [
     {
       "previous": "MADRE/v11-s-hc-09-publish-readiness-gate-2026-06-09",
@@ -170,11 +170,21 @@
       "at": "2026-06-11T02:58:38.777Z",
       "previous": "MADRE/v29-s-hc-prod-05-publishing-gate-ui-auditlog-and-rollback-proof-2026-06-11",
       "description": "Sales landing client onboarding and login entry"
+    },
+    {
+      "version": 31,
+      "name": "MADRE/v31-s-hc-prod-08-draft-editor-and-post-modification-workflow-2026-06-11",
+      "sprint": "S-HC-PROD-08",
+      "operator": "Manuel",
+      "date": "2026-06-11",
+      "at": "2026-06-11T03:00:02.044Z",
+      "previous": "MADRE/v30-s-hc-prod-07-sales-landing-client-onboarding-and-login-entry-2026-06-11",
+      "description": "Draft editor and post modification workflow"
     }
   ],
-  "version": 30,
-  "effective": "MADRE/v29-s-hc-prod-05-publishing-gate-ui-auditlog-and-rollback-proof-2026-06-11",
-  "effectiveRef": "origin/MADRE/v29-s-hc-prod-05-publishing-gate-ui-auditlog-and-rollback-proof-2026-06-11",
+  "version": 31,
+  "effective": "MADRE/v30-s-hc-prod-07-sales-landing-client-onboarding-and-login-entry-2026-06-11",
+  "effectiveRef": "origin/MADRE/v30-s-hc-prod-07-sales-landing-client-onboarding-and-login-entry-2026-06-11",
   "declaredMissing": false,
   "discoveredVersion": 14
 }

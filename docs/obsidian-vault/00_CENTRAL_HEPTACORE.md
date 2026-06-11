@@ -3,8 +3,8 @@ type: master-dashboard
 project: "HeptaCore"
 status: active-production
 phase: "Canonical Oreshnik task board governs current assignments"
-last_updated: "2026-06-11T02:59:47.228Z"
-mother_branch: "MADRE/v30-s-hc-prod-07-sales-landing-client-onboarding-and-login-entry-2026-06-11"
+last_updated: "2026-06-11T03:01:04.414Z"
+mother_branch: "MADRE/v31-s-hc-prod-08-draft-editor-and-post-modification-workflow-2026-06-11"
 tags:
   - "#central"
   - "#status/live-source"
@@ -21,8 +21,8 @@ tags:
 
 | Campo | Valor |
 |---|---|
-| Task board actualizado | 2026-06-11T02:58:38.777Z |
-| Rama madre | MADRE/v30-s-hc-prod-07-sales-landing-client-onboarding-and-login-entry-2026-06-11 |
+| Task board actualizado | 2026-06-11T03:00:02.044Z |
+| Rama madre | MADRE/v31-s-hc-prod-08-draft-editor-and-post-modification-workflow-2026-06-11 |
 | Publicacion RRSS real | Bloqueada hasta aprobacion explicita |
 | Campaign spend | Bloqueado |
 | Real scraping | Bloqueado |
@@ -40,7 +40,6 @@ tags:
 | Sprint | Estado | Owner | Scope | Depende de |
 |---|---|---|---|---|
 | S-HC-PROD-06 | pending | Manuel | Oreshnik operator dashboard and canonical task board | S-HC-PROD-02, S-HC-PROD-03, S-HC-PROD-04, S-HC-PROD-05, S-HC-PROD-07, S-HC-PROD-08, S-HC-PROD-09, S-HC-PROD-10, S-HC-PROD-11 |
-| S-HC-PROD-08 | pending | Manuel | Draft editor and post modification workflow | S-HC-PROD-03 |
 | S-HC-PROD-10 | pending | Manuel | Paid ads management UI and tenant billing surface | S-HC-PROD-05, S-HC-PROD-09 |
 | S-HC-RELEASE-01 | pending | Manuel+Jean | End-to-end Turpial Sound production proof | S-HC-PROD-02, S-HC-PROD-03, S-HC-PROD-04, S-HC-PROD-05, S-HC-PROD-06, S-HC-PROD-07, S-HC-PROD-08, S-HC-PROD-09, S-HC-PROD-10, S-HC-PROD-11 |
 
@@ -55,7 +54,6 @@ tags:
 | Sprint | Owner | Scope | Depende de |
 |---|---|---|---|
 | S-HC-PROD-06 | Manuel | Oreshnik operator dashboard and canonical task board | S-HC-PROD-02, S-HC-PROD-03, S-HC-PROD-04, S-HC-PROD-05, S-HC-PROD-07, S-HC-PROD-08, S-HC-PROD-09, S-HC-PROD-10, S-HC-PROD-11 |
-| S-HC-PROD-08 | Manuel | Draft editor and post modification workflow | S-HC-PROD-03 |
 | S-HC-PROD-10 | Manuel | Paid ads management UI and tenant billing surface | S-HC-PROD-05, S-HC-PROD-09 |
 | S-HC-RELEASE-01 | Manuel+Jean | End-to-end Turpial Sound production proof | S-HC-PROD-02, S-HC-PROD-03, S-HC-PROD-04, S-HC-PROD-05, S-HC-PROD-06, S-HC-PROD-07, S-HC-PROD-08, S-HC-PROD-09, S-HC-PROD-10, S-HC-PROD-11 |
 

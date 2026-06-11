@@ -1,8 +1,8 @@
 ---
 type: sprint-plan
 project: "HeptaCore"
-last_updated: "2026-06-11T02:58:38.777Z"
-mother_branch: "MADRE/v30-s-hc-prod-07-sales-landing-client-onboarding-and-login-entry-2026-06-11"
+last_updated: "2026-06-11T03:00:02.044Z"
+mother_branch: "MADRE/v31-s-hc-prod-08-draft-editor-and-post-modification-workflow-2026-06-11"
 tags:
   - "#sprints"
   - "#manuel"
@@ -529,3 +529,14 @@ Ver [[PLAN_PARALELO_MANUEL_JEAN]] para distribucion de carga, backups y reasigna
 | Estado | CERRADO |
 | Madre docs | `MADRE/v30-s-hc-prod-07-sales-landing-client-onboarding-and-login-entry-2026-06-11` |
 | Descripcion | Sales landing client onboarding and login entry |
+
+
+## Cierre S-HC-PROD-08 - 2026-06-11
+
+| Campo | Valor |
+|---|---|
+| Operador | Manuel |
+| Rama | `Manuel/s-hc-prod-01-producto-operativo-tenant-admin-produccion-2026-06-09` |
+| Estado | CERRADO |
+| Madre docs | `MADRE/v31-s-hc-prod-08-draft-editor-and-post-modification-workflow-2026-06-11` |
+| Descripcion | Draft editor and post modification workflow |

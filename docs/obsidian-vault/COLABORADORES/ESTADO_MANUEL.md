@@ -2,7 +2,7 @@
 type: collaborator-status
 project: "HeptaCore"
 operator: "Manuel"
-last_updated: "2026-06-11T02:59:47.228Z"
+last_updated: "2026-06-11T03:01:04.414Z"
 generated_by: "Oreshnik canonical-check"
 source: "var/oreshnik/task-board.json"
 ---
@@ -22,7 +22,6 @@ source: "var/oreshnik/task-board.json"
 | Sprint | Scope | Depende de |
 |---|---|---|
 | S-HC-PROD-06 | Oreshnik operator dashboard and canonical task board | S-HC-PROD-02, S-HC-PROD-03, S-HC-PROD-04, S-HC-PROD-05, S-HC-PROD-07, S-HC-PROD-08, S-HC-PROD-09, S-HC-PROD-10, S-HC-PROD-11 |
-| S-HC-PROD-08 | Draft editor and post modification workflow | S-HC-PROD-03 |
 | S-HC-PROD-10 | Paid ads management UI and tenant billing surface | S-HC-PROD-05, S-HC-PROD-09 |
 | S-HC-RELEASE-01 | End-to-end Turpial Sound production proof | S-HC-PROD-02, S-HC-PROD-03, S-HC-PROD-04, S-HC-PROD-05, S-HC-PROD-06, S-HC-PROD-07, S-HC-PROD-08, S-HC-PROD-09, S-HC-PROD-10, S-HC-PROD-11 |
 
@@ -38,18 +37,6 @@ Estado: `pending`
 - Closeout process produces one canonical release handoff
 
 Zonas: `scripts/oreshnik`, `var/oreshnik`, `var/sprint-events`, `docs`
-
-### S-HC-PROD-08 - Draft editor and post modification workflow
-
-Estado: `pending`
-
-- Operator can edit draft title, caption, CTA, hashtags, risk/review flag and scheduled date before approval
-- Edits are tenant-scoped and RBAC-protected
-- Edited draft returns to review state when content changes after approval
-- AuditLog records before/after metadata for post modification
-- UI makes edit, approve, reject and dry-run states distinct
-
-Zonas: `apps/web/app/api/drafts`, `apps/web/components/dashboard-console.tsx`, `apps/web/lib/dashboard.ts`, `docs`
 
 ### S-HC-PROD-10 - Paid ads management UI and tenant billing surface
 
