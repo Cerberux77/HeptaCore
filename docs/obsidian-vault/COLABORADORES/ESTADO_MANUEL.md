@@ -2,7 +2,7 @@
 type: collaborator-status
 project: "HeptaCore"
 operator: "Manuel"
-last_updated: "2026-06-11T03:01:46.414Z"
+last_updated: "2026-06-11T03:03:47.965Z"
 generated_by: "Oreshnik canonical-check"
 source: "var/oreshnik/task-board.json"
 ---
@@ -21,21 +21,9 @@ source: "var/oreshnik/task-board.json"
 
 | Sprint | Scope | Depende de |
 |---|---|---|
-| S-HC-PROD-06 | Oreshnik operator dashboard and canonical task board | S-HC-PROD-02, S-HC-PROD-03, S-HC-PROD-04, S-HC-PROD-05, S-HC-PROD-07, S-HC-PROD-08, S-HC-PROD-09, S-HC-PROD-10, S-HC-PROD-11 |
 | S-HC-RELEASE-01 | End-to-end Turpial Sound production proof | S-HC-PROD-02, S-HC-PROD-03, S-HC-PROD-04, S-HC-PROD-05, S-HC-PROD-06, S-HC-PROD-07, S-HC-PROD-08, S-HC-PROD-09, S-HC-PROD-10, S-HC-PROD-11 |
 
 ## Detalle de Aceptacion
-
-### S-HC-PROD-06 - Oreshnik operator dashboard and canonical task board
-
-Estado: `pending`
-
-- Task board reflects PROD reality
-- Operator dashboard/report shows current branch, mother, events and owners
-- No stale Jean/Manuel sprint ambiguity remains
-- Closeout process produces one canonical release handoff
-
-Zonas: `scripts/oreshnik`, `var/oreshnik`, `var/sprint-events`, `docs`
 
 ### S-HC-RELEASE-01 - End-to-end Turpial Sound production proof
 

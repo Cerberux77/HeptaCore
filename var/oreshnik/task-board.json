@@ -1,6 +1,6 @@
 {
   "project": "HeptaCore",
-  "updatedAt": "2026-06-11T03:01:18.198Z",
+  "updatedAt": "2026-06-11T03:02:44.197Z",
   "resiliencePolicy": "If an owner is unavailable for more than one working block or blocks the critical path, backupOwner may take over after recording reassignment.",
   "closurePolicy": "No sprint may be closed until acceptance criteria, base tests, sprint-specific tests, docs/handoff, and Oreshnik zone checks pass. See docs/obsidian-vault/METODOLOGIA/ORQUESTACION_AGENTES_HEPTACORE.md.",
   "baseTestMatrix": [
@@ -444,7 +444,7 @@
       "title": "Oreshnik operator dashboard and canonical task board",
       "owner": "Manuel",
       "backupOwner": "Jean",
-      "status": "pending",
+      "status": "done",
       "track": "control-bus",
       "zone": [
         "scripts/oreshnik",
@@ -469,7 +469,16 @@
         "No stale Jean/Manuel sprint ambiguity remains",
         "Closeout process produces one canonical release handoff"
       ],
-      "handoff": "Manuel owns Oreshnik/control bus. Jean should not edit Oreshnik scripts without explicit double lock."
+      "handoff": "Manuel owns Oreshnik/control bus. Jean should not edit Oreshnik scripts without explicit double lock.",
+      "history": [
+        {
+          "at": "2026-06-11T03:02:44.197Z",
+          "action": "closed",
+          "operator": "Manuel",
+          "branch": "Manuel/s-hc-prod-01-producto-operativo-tenant-admin-produccion-2026-06-09",
+          "description": "Oreshnik operator dashboard and canonical task board"
+        }
+      ]
     },
     {
       "id": "S-HC-PROD-07",

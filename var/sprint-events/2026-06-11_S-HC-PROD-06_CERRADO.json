@@ -1,0 +1,21 @@
+{
+  "sprint": "S-HC-PROD-06",
+  "operator": "Manuel",
+  "status": "CERRADO",
+  "date": "2026-06-11",
+  "at": "2026-06-11T03:02:44.197Z",
+  "branch": "Manuel/s-hc-prod-01-producto-operativo-tenant-admin-produccion-2026-06-09",
+  "previousMother": "MADRE/v32-s-hc-prod-10-paid-ads-management-ui-and-tenant-billing-surfac-2026-06-11",
+  "nextMother": "MADRE/v33-s-hc-prod-06-oreshnik-operator-dashboard-and-canonical-task-b-2026-06-11",
+  "description": "Oreshnik operator dashboard and canonical task board",
+  "changedFiles": [
+    ".env.example",
+    "apps/web/app/globals.css",
+    "apps/web/app/page.tsx",
+    "apps/web/components/admin-console.tsx",
+    "apps/web/components/dashboard-console.tsx",
+    "apps/web/lib/dashboard.ts",
+    "packages/agents/src/index.ts",
+    "packages/agents/src/strategy-runner.ts"
+  ]
+}

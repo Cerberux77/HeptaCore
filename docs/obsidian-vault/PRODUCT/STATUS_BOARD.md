@@ -1,7 +1,7 @@
 ---
 type: status-board
 project: "HeptaCore"
-last_updated: "2026-06-11T03:01:46.414Z"
+last_updated: "2026-06-11T03:03:47.965Z"
 generated_by: "Oreshnik canonical-check"
 source: "var/oreshnik/task-board.json"
 ---
@@ -22,14 +22,12 @@ source: "var/oreshnik/task-board.json"
 
 | Sprint | Estado | Owner | Scope | Depende de |
 |---|---|---|---|---|
-| S-HC-PROD-06 | pending | Manuel | Oreshnik operator dashboard and canonical task board | S-HC-PROD-02, S-HC-PROD-03, S-HC-PROD-04, S-HC-PROD-05, S-HC-PROD-07, S-HC-PROD-08, S-HC-PROD-09, S-HC-PROD-10, S-HC-PROD-11 |
 | S-HC-RELEASE-01 | pending | Manuel+Jean | End-to-end Turpial Sound production proof | S-HC-PROD-02, S-HC-PROD-03, S-HC-PROD-04, S-HC-PROD-05, S-HC-PROD-06, S-HC-PROD-07, S-HC-PROD-08, S-HC-PROD-09, S-HC-PROD-10, S-HC-PROD-11 |
 
 ## Asignacion Manuel
 
 | Sprint | Estado | Scope | Depende de |
 |---|---|---|---|
-| S-HC-PROD-06 | pending | Oreshnik operator dashboard and canonical task board | S-HC-PROD-02, S-HC-PROD-03, S-HC-PROD-04, S-HC-PROD-05, S-HC-PROD-07, S-HC-PROD-08, S-HC-PROD-09, S-HC-PROD-10, S-HC-PROD-11 |
 | S-HC-RELEASE-01 | pending | End-to-end Turpial Sound production proof | S-HC-PROD-02, S-HC-PROD-03, S-HC-PROD-04, S-HC-PROD-05, S-HC-PROD-06, S-HC-PROD-07, S-HC-PROD-08, S-HC-PROD-09, S-HC-PROD-10, S-HC-PROD-11 |
 
 ## Asignacion Jean
@@ -65,6 +63,7 @@ source: "var/oreshnik/task-board.json"
 | S-HC-PROD-03 | Manuel | LLM provider adapter plus Turpial tenant functional QA and UX polish |
 | S-HC-PROD-04 | Jean | Worker, Redis and persistent dry-run processing |
 | S-HC-PROD-05 | Manuel | Publishing gate UI, AuditLog and rollback proof |
+| S-HC-PROD-06 | Manuel | Oreshnik operator dashboard and canonical task board |
 | S-HC-PROD-07 | Manuel | Sales landing, client onboarding and login entry |
 | S-HC-PROD-08 | Manuel | Draft editor and post modification workflow |
 | S-HC-PROD-09 | Jean | Paid ads campaign engine with 35 percent overhead gate |
