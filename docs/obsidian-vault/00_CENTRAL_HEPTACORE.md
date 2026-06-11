@@ -3,7 +3,7 @@ type: master-dashboard
 project: "HeptaCore"
 status: active-production
 phase: "Canonical Oreshnik task board governs current assignments"
-last_updated: "2026-06-11T01:16:33.712Z"
+last_updated: "2026-06-11T01:43:55.676Z"
 mother_branch: "MADRE/v20-s-hc-maint-sync-01-preflight-remote-sync-obligatorio-2026-06-11"
 tags:
   - "#central"
@@ -21,7 +21,7 @@ tags:
 
 | Campo | Valor |
 |---|---|
-| Task board actualizado | 2026-06-11T01:15:56.934Z |
+| Task board actualizado | 2026-06-11T01:43:30.000Z |
 | Rama madre | MADRE/v20-s-hc-maint-sync-01-preflight-remote-sync-obligatorio-2026-06-11 |
 | Publicacion RRSS real | Bloqueada hasta aprobacion explicita |
 | Campaign spend | Bloqueado |
@@ -49,6 +49,7 @@ tags:
 | S-HC-PROD-09 | pending | Jean | Paid ads campaign engine with 35 percent overhead gate | S-HC-PROD-04 |
 | S-HC-PROD-10 | pending | Manuel | Paid ads management UI and tenant billing surface | S-HC-PROD-05, S-HC-PROD-09 |
 | S-HC-PROD-11 | pending | Jean | Paid scraper compliance and controlled discovery adapter | S-HC-PROD-04 |
+| S-HC-MAINT-CLOSE-GATE-01 | ready | Manuel | Automatic closure validation gate before Oreshnik close | S-HC-MAINT-SYNC-01 |
 | S-HC-RELEASE-01 | pending | Manuel+Jean | End-to-end Turpial Sound production proof | S-HC-PROD-02, S-HC-PROD-03, S-HC-PROD-04, S-HC-PROD-05, S-HC-PROD-06, S-HC-PROD-07, S-HC-PROD-08, S-HC-PROD-09, S-HC-PROD-10, S-HC-PROD-11 |
 
 ## Ready Ahora
@@ -57,6 +58,7 @@ tags:
 |---|---|---|
 | S-HC-PROD-02 | Jean | Production DB/Auth/env and Turpial seed smoke |
 | S-HC-PROD-03 | Manuel | LLM provider adapter plus Turpial tenant functional QA and UX polish |
+| S-HC-MAINT-CLOSE-GATE-01 | Manuel | Automatic closure validation gate before Oreshnik close |
 
 ## Pendientes Bloqueados por Dependencias
 

@@ -1,6 +1,6 @@
 {
   "project": "HeptaCore",
-  "updatedAt": "2026-06-11T01:15:56.934Z",
+  "updatedAt": "2026-06-11T01:43:30.000Z",
   "resiliencePolicy": "If an owner is unavailable for more than one working block or blocks the critical path, backupOwner may take over after recording reassignment.",
   "closurePolicy": "No sprint may be closed until acceptance criteria, base tests, sprint-specific tests, docs/handoff, and Oreshnik zone checks pass. See docs/obsidian-vault/METODOLOGIA/ORQUESTACION_AGENTES_HEPTACORE.md.",
   "baseTestMatrix": [
@@ -661,6 +661,30 @@
           "description": "preflight remote sync obligatorio"
         }
       ]
+    },
+    {
+      "id": "S-HC-MAINT-CLOSE-GATE-01",
+      "title": "Automatic closure validation gate before Oreshnik close",
+      "owner": "Manuel",
+      "backupOwner": "Jean",
+      "status": "ready",
+      "track": "maintenance",
+      "zone": [
+        "scripts/oreshnik",
+        "var/oreshnik",
+        "docs"
+      ],
+      "dependsOn": [
+        "S-HC-MAINT-SYNC-01"
+      ],
+      "acceptance": [
+        "oreshnik:close runs canonical check before closing",
+        "oreshnik:close runs zone check before closing",
+        "oreshnik:close runs typecheck, build and worker validation before closing",
+        "oreshnik:close stops before docs, commit or push if any validation fails",
+        "oreshnik:close announces that all validations passed before proceeding"
+      ],
+      "handoff": "Operators only run the close command after work; the close command itself enforces the closure validation matrix."
     },
     {
       "id": "S-HC-RELEASE-01",
