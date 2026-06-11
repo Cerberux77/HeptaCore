@@ -3,11 +3,11 @@
   "operator": "Manuel",
   "status": "CERRADO",
   "date": "2026-06-11",
-  "at": "2026-06-11T22:13:32.857Z",
+  "at": "2026-06-11T22:24:49.871Z",
   "branch": "Manuel/s-hc-prod-01-producto-operativo-tenant-admin-produccion-2026-06-09",
-  "previousMother": "MADRE/v35-s-hc-release-02-producto-operativo-completo-2026-06-11",
-  "nextMother": "MADRE/v36-s-hc-release-02-preview-redes-reemplazo-assets-2026-06-11",
-  "description": "preview-redes-reemplazo-assets",
+  "previousMother": "MADRE/v36-s-hc-release-02-preview-redes-reemplazo-assets-2026-06-11",
+  "nextMother": "MADRE/v37-s-hc-release-02-pricing-overhead-cost-tracking-2026-06-11",
+  "description": "pricing-overhead-cost-tracking",
   "changedFiles": [
     ".env.example",
     "apps/web/app/api/publishing/publish/route.ts",
@@ -17,7 +17,8 @@
     "apps/web/components/dashboard-console.tsx",
     "apps/web/lib/dashboard.ts",
     "apps/web/middleware.ts",
-    "docs/07_handoffs/zone-map.json",
+    "packages/agents/src/llm-adapter.ts",
+    "packages/core/src/index.ts",
     "packages/db/prisma/schema.prisma"
   ]
 }
