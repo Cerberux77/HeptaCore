@@ -3,7 +3,7 @@
   "updatedAt": "2026-06-11T00:20:00.000Z",
   "resiliencePolicy": "If an owner is unavailable for more than one working block or blocks the critical path, backupOwner may take over after recording reassignment.",
   "currentExecutionOrder": [
-    "Wave 1 parallel: Jean S-HC-PROD-02, Manuel S-HC-PROD-03",
+    "Wave 1 parallel: Jean S-HC-PROD-02, Manuel S-HC-PROD-03 (LLM provider adapter + Turpial tenant QA)",
     "Wave 2 parallel: Jean S-HC-PROD-04, Manuel S-HC-PROD-05 after S-HC-PROD-03",
     "Wave 3 sequential: S-HC-PROD-06 control bus/dashboard after PROD-02/03/04/05",
     "Final: S-HC-RELEASE-01 end-to-end Turpial Sound production proof"
@@ -322,12 +322,13 @@
     },
     {
       "id": "S-HC-PROD-03",
-      "title": "Turpial tenant functional QA and UX polish",
+      "title": "LLM provider adapter plus Turpial tenant functional QA and UX polish",
       "owner": "Manuel",
       "backupOwner": "Jean",
       "status": "ready",
-      "track": "tenant-product",
+      "track": "tenant-strategy-product",
       "zone": [
+        "packages/agents",
         "apps/web/components/dashboard-console.tsx",
         "apps/web/components/admin-console.tsx",
         "apps/web/lib/dashboard.ts",
@@ -337,12 +338,16 @@
         "S-HC-PROD-ALIGN"
       ],
       "acceptance": [
+        "LLM provider adapter interface exists with deterministic fallback for offline/dev",
+        "Initial provider is selected by environment variable without committing secrets",
+        "Tenant-specific strategy generation can consume Turpial intake/assets/context",
+        "Generated strategy output is structured and auditable before drafts are approved",
         "Tenant console renders strategy, assets, queue, calendar, reports and readiness",
         "Approve/reject flow works in UI",
         "No overlap with Jean DB/Auth/env work",
         "Manual user path documented for Turpial Sound"
       ],
-      "handoff": "Manuel owns tenant UX/product QA. Jean should not edit dashboard-console/admin-console during this sprint."
+      "handoff": "Manuel owns packages/agents and tenant UX/product QA. Jean should not edit packages/agents, dashboard-console or admin-console during this sprint."
     },
     {
       "id": "S-HC-PROD-04",
