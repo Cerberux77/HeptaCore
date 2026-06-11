@@ -2,7 +2,7 @@
 type: collaborator-status
 project: "HeptaCore"
 operator: "Manuel"
-last_updated: "2026-06-11T02:48:55.089Z"
+last_updated: "2026-06-11T02:59:47.228Z"
 generated_by: "Oreshnik canonical-check"
 source: "var/oreshnik/task-board.json"
 ---
@@ -22,7 +22,6 @@ source: "var/oreshnik/task-board.json"
 | Sprint | Scope | Depende de |
 |---|---|---|
 | S-HC-PROD-06 | Oreshnik operator dashboard and canonical task board | S-HC-PROD-02, S-HC-PROD-03, S-HC-PROD-04, S-HC-PROD-05, S-HC-PROD-07, S-HC-PROD-08, S-HC-PROD-09, S-HC-PROD-10, S-HC-PROD-11 |
-| S-HC-PROD-07 | Sales landing, client onboarding and login entry | S-HC-PROD-03 |
 | S-HC-PROD-08 | Draft editor and post modification workflow | S-HC-PROD-03 |
 | S-HC-PROD-10 | Paid ads management UI and tenant billing surface | S-HC-PROD-05, S-HC-PROD-09 |
 | S-HC-RELEASE-01 | End-to-end Turpial Sound production proof | S-HC-PROD-02, S-HC-PROD-03, S-HC-PROD-04, S-HC-PROD-05, S-HC-PROD-06, S-HC-PROD-07, S-HC-PROD-08, S-HC-PROD-09, S-HC-PROD-10, S-HC-PROD-11 |
@@ -39,18 +38,6 @@ Estado: `pending`
 - Closeout process produces one canonical release handoff
 
 Zonas: `scripts/oreshnik`, `var/oreshnik`, `var/sprint-events`, `docs`
-
-### S-HC-PROD-07 - Sales landing, client onboarding and login entry
-
-Estado: `pending`
-
-- Public landing explains HeptaCore value, tenant operating model, approvals and paid-growth guardrails
-- Landing has clear CTA to login/onboarding without exposing tenant console publicly
-- Client onboarding path captures business, offer, audience, networks, assets and approval preferences
-- Login remains protected and usable after landing replaces root redirect
-- No marketing claim promises guaranteed sales or unsupervised automation
-
-Zonas: `apps/web/app/page.tsx`, `apps/web/app/login`, `apps/web/app/globals.css`, `apps/web/components`, `docs`
 
 ### S-HC-PROD-08 - Draft editor and post modification workflow
 

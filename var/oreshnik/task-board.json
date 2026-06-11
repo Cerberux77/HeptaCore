@@ -1,6 +1,6 @@
 {
   "project": "HeptaCore",
-  "updatedAt": "2026-06-11T02:48:21.432Z",
+  "updatedAt": "2026-06-11T02:58:38.777Z",
   "resiliencePolicy": "If an owner is unavailable for more than one working block or blocks the critical path, backupOwner may take over after recording reassignment.",
   "closurePolicy": "No sprint may be closed until acceptance criteria, base tests, sprint-specific tests, docs/handoff, and Oreshnik zone checks pass. See docs/obsidian-vault/METODOLOGIA/ORQUESTACION_AGENTES_HEPTACORE.md.",
   "baseTestMatrix": [
@@ -476,7 +476,7 @@
       "title": "Sales landing, client onboarding and login entry",
       "owner": "Manuel",
       "backupOwner": "Jean",
-      "status": "pending",
+      "status": "done",
       "track": "growth-onboarding",
       "zone": [
         "apps/web/app/page.tsx",
@@ -495,7 +495,16 @@
         "Login remains protected and usable after landing replaces root redirect",
         "No marketing claim promises guaranteed sales or unsupervised automation"
       ],
-      "handoff": "Manuel owns public web and onboarding UX. Jean should not edit landing/login while this sprint is active."
+      "handoff": "Manuel owns public web and onboarding UX. Jean should not edit landing/login while this sprint is active.",
+      "history": [
+        {
+          "at": "2026-06-11T02:58:38.777Z",
+          "action": "closed",
+          "operator": "Manuel",
+          "branch": "Manuel/s-hc-prod-01-producto-operativo-tenant-admin-produccion-2026-06-09",
+          "description": "Sales landing client onboarding and login entry"
+        }
+      ]
     },
     {
       "id": "S-HC-PROD-08",

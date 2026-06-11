@@ -1,0 +1,21 @@
+{
+  "sprint": "S-HC-PROD-07",
+  "operator": "Manuel",
+  "status": "CERRADO",
+  "date": "2026-06-11",
+  "at": "2026-06-11T02:58:38.777Z",
+  "branch": "Manuel/s-hc-prod-01-producto-operativo-tenant-admin-produccion-2026-06-09",
+  "previousMother": "MADRE/v29-s-hc-prod-05-publishing-gate-ui-auditlog-and-rollback-proof-2026-06-11",
+  "nextMother": "MADRE/v30-s-hc-prod-07-sales-landing-client-onboarding-and-login-entry-2026-06-11",
+  "description": "Sales landing client onboarding and login entry",
+  "changedFiles": [
+    ".env.example",
+    "apps/web/app/globals.css",
+    "apps/web/app/page.tsx",
+    "apps/web/components/admin-console.tsx",
+    "apps/web/components/dashboard-console.tsx",
+    "apps/web/lib/dashboard.ts",
+    "packages/agents/src/index.ts",
+    "packages/agents/src/strategy-runner.ts"
+  ]
+}

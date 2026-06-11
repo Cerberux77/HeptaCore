@@ -1,5 +1,5 @@
 {
-  "current": "MADRE/v29-s-hc-prod-05-publishing-gate-ui-auditlog-and-rollback-proof-2026-06-11",
+  "current": "MADRE/v30-s-hc-prod-07-sales-landing-client-onboarding-and-login-entry-2026-06-11",
   "branches": [
     {
       "previous": "MADRE/v11-s-hc-09-publish-readiness-gate-2026-06-09",
@@ -160,11 +160,21 @@
       "at": "2026-06-11T02:48:21.432Z",
       "previous": "MADRE/v28-s-hc-prod-03-llm-provider-adapter-plus-turpial-tenant-qa-ux-p-2026-06-11",
       "description": "Publishing gate UI AuditLog and rollback proof"
+    },
+    {
+      "version": 30,
+      "name": "MADRE/v30-s-hc-prod-07-sales-landing-client-onboarding-and-login-entry-2026-06-11",
+      "sprint": "S-HC-PROD-07",
+      "operator": "Manuel",
+      "date": "2026-06-11",
+      "at": "2026-06-11T02:58:38.777Z",
+      "previous": "MADRE/v29-s-hc-prod-05-publishing-gate-ui-auditlog-and-rollback-proof-2026-06-11",
+      "description": "Sales landing client onboarding and login entry"
     }
   ],
-  "version": 29,
-  "effective": "MADRE/v28-s-hc-prod-03-llm-provider-adapter-plus-turpial-tenant-qa-ux-p-2026-06-11",
-  "effectiveRef": "origin/MADRE/v28-s-hc-prod-03-llm-provider-adapter-plus-turpial-tenant-qa-ux-p-2026-06-11",
+  "version": 30,
+  "effective": "MADRE/v29-s-hc-prod-05-publishing-gate-ui-auditlog-and-rollback-proof-2026-06-11",
+  "effectiveRef": "origin/MADRE/v29-s-hc-prod-05-publishing-gate-ui-auditlog-and-rollback-proof-2026-06-11",
   "declaredMissing": false,
   "discoveredVersion": 14
 }
