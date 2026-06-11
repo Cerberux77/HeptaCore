@@ -1,8 +1,8 @@
 ---
 type: sprint-plan
 project: "HeptaCore"
-last_updated: "2026-06-11T03:00:02.044Z"
-mother_branch: "MADRE/v31-s-hc-prod-08-draft-editor-and-post-modification-workflow-2026-06-11"
+last_updated: "2026-06-11T03:01:18.198Z"
+mother_branch: "MADRE/v32-s-hc-prod-10-paid-ads-management-ui-and-tenant-billing-surfac-2026-06-11"
 tags:
   - "#sprints"
   - "#manuel"
@@ -540,3 +540,14 @@ Ver [[PLAN_PARALELO_MANUEL_JEAN]] para distribucion de carga, backups y reasigna
 | Estado | CERRADO |
 | Madre docs | `MADRE/v31-s-hc-prod-08-draft-editor-and-post-modification-workflow-2026-06-11` |
 | Descripcion | Draft editor and post modification workflow |
+
+
+## Cierre S-HC-PROD-10 - 2026-06-11
+
+| Campo | Valor |
+|---|---|
+| Operador | Manuel |
+| Rama | `Manuel/s-hc-prod-01-producto-operativo-tenant-admin-produccion-2026-06-09` |
+| Estado | CERRADO |
+| Madre docs | `MADRE/v32-s-hc-prod-10-paid-ads-management-ui-and-tenant-billing-surfac-2026-06-11` |
+| Descripcion | Paid ads management UI and tenant billing surface |

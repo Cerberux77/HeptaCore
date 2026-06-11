@@ -1,6 +1,6 @@
 {
   "project": "HeptaCore",
-  "updatedAt": "2026-06-11T03:00:02.044Z",
+  "updatedAt": "2026-06-11T03:01:18.198Z",
   "resiliencePolicy": "If an owner is unavailable for more than one working block or blocks the critical path, backupOwner may take over after recording reassignment.",
   "closurePolicy": "No sprint may be closed until acceptance criteria, base tests, sprint-specific tests, docs/handoff, and Oreshnik zone checks pass. See docs/obsidian-vault/METODOLOGIA/ORQUESTACION_AGENTES_HEPTACORE.md.",
   "baseTestMatrix": [
@@ -579,7 +579,7 @@
       "title": "Paid ads management UI and tenant billing surface",
       "owner": "Manuel",
       "backupOwner": "Jean",
-      "status": "pending",
+      "status": "done",
       "track": "paid-growth-ui",
       "zone": [
         "apps/web/components",
@@ -598,7 +598,16 @@
         "AuditLog records paid campaign approval decisions",
         "UI labels real spend as blocked until explicit production unlock"
       ],
-      "handoff": "Manuel owns web paid ads UI after Jean defines worker/campaign contract."
+      "handoff": "Manuel owns web paid ads UI after Jean defines worker/campaign contract.",
+      "history": [
+        {
+          "at": "2026-06-11T03:01:18.198Z",
+          "action": "closed",
+          "operator": "Manuel",
+          "branch": "Manuel/s-hc-prod-01-producto-operativo-tenant-admin-produccion-2026-06-09",
+          "description": "Paid ads management UI and tenant billing surface"
+        }
+      ]
     },
     {
       "id": "S-HC-PROD-11",

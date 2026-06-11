@@ -2,7 +2,7 @@
 type: collaborator-status
 project: "HeptaCore"
 operator: "Manuel"
-last_updated: "2026-06-11T03:01:04.414Z"
+last_updated: "2026-06-11T03:01:46.414Z"
 generated_by: "Oreshnik canonical-check"
 source: "var/oreshnik/task-board.json"
 ---
@@ -22,7 +22,6 @@ source: "var/oreshnik/task-board.json"
 | Sprint | Scope | Depende de |
 |---|---|---|
 | S-HC-PROD-06 | Oreshnik operator dashboard and canonical task board | S-HC-PROD-02, S-HC-PROD-03, S-HC-PROD-04, S-HC-PROD-05, S-HC-PROD-07, S-HC-PROD-08, S-HC-PROD-09, S-HC-PROD-10, S-HC-PROD-11 |
-| S-HC-PROD-10 | Paid ads management UI and tenant billing surface | S-HC-PROD-05, S-HC-PROD-09 |
 | S-HC-RELEASE-01 | End-to-end Turpial Sound production proof | S-HC-PROD-02, S-HC-PROD-03, S-HC-PROD-04, S-HC-PROD-05, S-HC-PROD-06, S-HC-PROD-07, S-HC-PROD-08, S-HC-PROD-09, S-HC-PROD-10, S-HC-PROD-11 |
 
 ## Detalle de Aceptacion
@@ -37,18 +36,6 @@ Estado: `pending`
 - Closeout process produces one canonical release handoff
 
 Zonas: `scripts/oreshnik`, `var/oreshnik`, `var/sprint-events`, `docs`
-
-### S-HC-PROD-10 - Paid ads management UI and tenant billing surface
-
-Estado: `pending`
-
-- Tenant can view campaign proposals, platform spend, 35 percent overhead and total charge
-- Operator can approve/reject paid campaign proposal without triggering real spend
-- Admin can see paid-growth status per tenant
-- AuditLog records paid campaign approval decisions
-- UI labels real spend as blocked until explicit production unlock
-
-Zonas: `apps/web/components`, `apps/web/app/api`, `apps/web/lib/dashboard.ts`, `docs`
 
 ### S-HC-RELEASE-01 - End-to-end Turpial Sound production proof
 

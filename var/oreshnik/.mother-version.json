@@ -1,5 +1,5 @@
 {
-  "current": "MADRE/v31-s-hc-prod-08-draft-editor-and-post-modification-workflow-2026-06-11",
+  "current": "MADRE/v32-s-hc-prod-10-paid-ads-management-ui-and-tenant-billing-surfac-2026-06-11",
   "branches": [
     {
       "previous": "MADRE/v11-s-hc-09-publish-readiness-gate-2026-06-09",
@@ -180,11 +180,21 @@
       "at": "2026-06-11T03:00:02.044Z",
       "previous": "MADRE/v30-s-hc-prod-07-sales-landing-client-onboarding-and-login-entry-2026-06-11",
       "description": "Draft editor and post modification workflow"
+    },
+    {
+      "version": 32,
+      "name": "MADRE/v32-s-hc-prod-10-paid-ads-management-ui-and-tenant-billing-surfac-2026-06-11",
+      "sprint": "S-HC-PROD-10",
+      "operator": "Manuel",
+      "date": "2026-06-11",
+      "at": "2026-06-11T03:01:18.198Z",
+      "previous": "MADRE/v31-s-hc-prod-08-draft-editor-and-post-modification-workflow-2026-06-11",
+      "description": "Paid ads management UI and tenant billing surface"
     }
   ],
-  "version": 31,
-  "effective": "MADRE/v30-s-hc-prod-07-sales-landing-client-onboarding-and-login-entry-2026-06-11",
-  "effectiveRef": "origin/MADRE/v30-s-hc-prod-07-sales-landing-client-onboarding-and-login-entry-2026-06-11",
+  "version": 32,
+  "effective": "MADRE/v31-s-hc-prod-08-draft-editor-and-post-modification-workflow-2026-06-11",
+  "effectiveRef": "origin/MADRE/v31-s-hc-prod-08-draft-editor-and-post-modification-workflow-2026-06-11",
   "declaredMissing": false,
   "discoveredVersion": 14
 }
