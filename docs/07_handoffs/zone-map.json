@@ -7,10 +7,11 @@
       "owner": "Jean+Manuel",
       "lock": "double_jean_manuel",
       "sprints": [
-        "*"
+        "*",
+        "S-HC-RELEASE-02"
       ],
       "criticality": "critical",
-      "notes": "Prisma schema, migrations and DB access require coordination."
+      "notes": "Prisma schema, migrations and DB access require coordination. S-HC-RELEASE-02: schema extended for Tenant.llmConfig and ContentDraft.sortOrder."
     },
     "package.json": {
       "owner": "Jean+Manuel",
@@ -70,13 +71,98 @@
       "criticality": "high",
       "notes": "Agent strategy runner, council, prompts. Jean NO tocar."
     },
+    "apps/web/app/register/**": {
+      "owner": "Manuel",
+      "lock": "manuel_exclusive",
+      "sprints": ["S-HC-RELEASE-02"],
+      "criticality": "high",
+      "notes": "User registration page. Jean NO tocar."
+    },
+    "apps/web/app/recover/**": {
+      "owner": "Manuel",
+      "lock": "manuel_exclusive",
+      "sprints": ["S-HC-RELEASE-02"],
+      "criticality": "high",
+      "notes": "Password recovery page."
+    },
+    "apps/web/app/reset-password/**": {
+      "owner": "Manuel",
+      "lock": "manuel_exclusive",
+      "sprints": ["S-HC-RELEASE-02"],
+      "criticality": "high",
+      "notes": "Password reset page."
+    },
+    "apps/web/app/api/auth/register/**": {
+      "owner": "Manuel",
+      "lock": "manuel_exclusive",
+      "sprints": ["S-HC-RELEASE-02"],
+      "criticality": "high",
+      "notes": "Registration API."
+    },
+    "apps/web/app/api/auth/recover/**": {
+      "owner": "Manuel",
+      "lock": "manuel_exclusive",
+      "sprints": ["S-HC-RELEASE-02"],
+      "criticality": "high",
+      "notes": "Password recovery API."
+    },
+    "apps/web/app/api/auth/reset-password/**": {
+      "owner": "Manuel",
+      "lock": "manuel_exclusive",
+      "sprints": ["S-HC-RELEASE-02"],
+      "criticality": "high",
+      "notes": "Password reset API."
+    },
+    "apps/web/app/api/invitations/**": {
+      "owner": "Manuel",
+      "lock": "manuel_exclusive",
+      "sprints": ["S-HC-RELEASE-02"],
+      "criticality": "high",
+      "notes": "Invitation management API."
+    },
+    "apps/web/app/api/admin/llm-config/**": {
+      "owner": "Manuel",
+      "lock": "manuel_exclusive",
+      "sprints": ["S-HC-RELEASE-02"],
+      "criticality": "high",
+      "notes": "LLM configuration API."
+    },
+    "apps/web/app/api/drafts/reorder/**": {
+      "owner": "Manuel",
+      "lock": "manuel_exclusive",
+      "sprints": ["S-HC-RELEASE-02"],
+      "criticality": "medium",
+      "notes": "Draft reorder API."
+    },
+    "apps/web/app/api/strategy/update/**": {
+      "owner": "Manuel",
+      "lock": "manuel_exclusive",
+      "sprints": ["S-HC-RELEASE-02"],
+      "criticality": "high",
+      "notes": "Strategy update API."
+    },
+    "scripts/fix-asset-links.mjs": {
+      "owner": "Manuel",
+      "lock": "manuel_exclusive",
+      "sprints": ["S-HC-RELEASE-02"],
+      "criticality": "low",
+      "notes": "Asset link repair utility."
+    },
+    ".kilo/**": {
+      "owner": "Manuel",
+      "lock": "manuel_exclusive",
+      "sprints": ["*"],
+      "criticality": "low",
+      "notes": "Kilo configuration and plans."
+    },
     "apps/web/app/login/**": {
       "owner": "Jean",
       "lock": "jean_exclusive",
       "sprints": [
         "S-HC-04",
         "S-HC-PROD-01",
-        "S-HC-PROD-03"
+        "S-HC-PROD-03",
+        "S-HC-RELEASE-02"
       ],
       "criticality": "high",
       "notes": "Auth, login page. Manuel NO tocar durante Auth sprint."

@@ -52,12 +52,14 @@ for (const file of files) {
   for (const [pattern, zone] of Object.entries(zoneMap.zones)) {
     if (!globToRegex(pattern).test(file)) continue;
     matched = true;
-    const allowed = zone.sprints?.includes("*") || zone.sprints?.includes(sprint);
+    const sprintAllowed = zone.sprints?.includes("*") || zone.sprints?.includes(sprint);
+
     if (zone.lock === "forbidden") collisions.push(`${file}: forbidden zone (${pattern})`);
+    else if (sprintAllowed) break;
     else if (zone.lock === "jean_exclusive" && operator !== "Jean") collisions.push(`${file}: Jean exclusive zone (${pattern})`);
     else if (zone.lock === "manuel_exclusive" && operator !== "Manuel") collisions.push(`${file}: Manuel exclusive zone (${pattern})`);
     else if (zone.lock === "double_jean_manuel") warnings.push(`${file}: double lock required (${pattern})`);
-    else if (!allowed) warnings.push(`${file}: not explicitly mapped to ${sprint} (${pattern})`);
+    else if (!sprintAllowed) warnings.push(`${file}: not explicitly mapped to ${sprint} (${pattern})`);
     break;
   }
   if (!matched) warnings.push(`${file}: no zone-map entry`);

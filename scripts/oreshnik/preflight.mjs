@@ -83,6 +83,19 @@ else {
 
 console.log("");
 log("INFO", "2/9 Working tree");
+{
+  log("INFO", "Checking Obsidian vault lock...");
+  const obsGuard = sh("node scripts/oreshnik/obsidian-guard.mjs --force");
+  const obsPlain = obsGuard.replace(/\x1b\[[0-9;]*m/g, "");
+  if (obsPlain.includes("[ FAIL")) {
+    console.log(obsGuard);
+    log("FAIL", "Obsidian vault lock detected and could not be resolved. Close Obsidian manually.");
+    blockers++;
+  } else {
+    // Don't print full output for OK to keep output clean
+    if (obsPlain.includes("[ WARN")) console.log(obsGuard);
+  }
+}
 if (dirty.length > 0) {
   log("WARN", `${dirty.length} changed file(s). Preflight will not auto-switch branches while dirty.`);
   warnings++;

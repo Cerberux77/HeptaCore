@@ -142,6 +142,10 @@ function runClosureValidationGate() {
 
   const checks = [
     {
+      name: "Obsidian vault guard",
+      command: `node scripts/oreshnik/obsidian-guard.mjs --force`
+    },
+    {
       name: "Canonical task-board/docs alignment",
       command: `node scripts/oreshnik/canonical-check.mjs --sprint ${sprint} --operator ${operator}`
     },
