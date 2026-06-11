@@ -1,7 +1,7 @@
 ---
 type: status-board
 project: "HeptaCore"
-last_updated: "2026-06-11T01:44:06.401Z"
+last_updated: "2026-06-11T01:46:35.589Z"
 generated_by: "Oreshnik canonical-check"
 source: "var/oreshnik/task-board.json"
 ---
@@ -23,7 +23,6 @@ source: "var/oreshnik/task-board.json"
 | Sprint | Estado | Owner | Scope | Depende de |
 |---|---|---|---|---|
 | S-HC-PROD-03 | ready | Manuel | LLM provider adapter plus Turpial tenant functional QA and UX polish | S-HC-PROD-ALIGN |
-| S-HC-PROD-04 | pending | Jean | Worker, Redis and persistent dry-run processing | S-HC-PROD-02 |
 | S-HC-PROD-05 | pending | Manuel | Publishing gate UI, AuditLog and rollback proof | S-HC-PROD-03 |
 | S-HC-PROD-06 | pending | Manuel | Oreshnik operator dashboard and canonical task board | S-HC-PROD-02, S-HC-PROD-03, S-HC-PROD-04, S-HC-PROD-05, S-HC-PROD-07, S-HC-PROD-08, S-HC-PROD-09, S-HC-PROD-10, S-HC-PROD-11 |
 | S-HC-PROD-07 | pending | Manuel | Sales landing, client onboarding and login entry | S-HC-PROD-03 |
@@ -49,7 +48,6 @@ source: "var/oreshnik/task-board.json"
 
 | Sprint | Estado | Scope | Depende de |
 |---|---|---|---|
-| S-HC-PROD-04 | pending | Worker, Redis and persistent dry-run processing | S-HC-PROD-02 |
 | S-HC-PROD-09 | pending | Paid ads campaign engine with 35 percent overhead gate | S-HC-PROD-04 |
 | S-HC-PROD-11 | pending | Paid scraper compliance and controlled discovery adapter | S-HC-PROD-04 |
 | S-HC-RELEASE-01 | pending | End-to-end Turpial Sound production proof | S-HC-PROD-02, S-HC-PROD-03, S-HC-PROD-04, S-HC-PROD-05, S-HC-PROD-06, S-HC-PROD-07, S-HC-PROD-08, S-HC-PROD-09, S-HC-PROD-10, S-HC-PROD-11 |
@@ -78,6 +76,7 @@ source: "var/oreshnik/task-board.json"
 | S-HC-08 | Jean | Meta adapter sandbox design |
 | S-HC-09 | Jean | First tenant publish readiness gate |
 | S-HC-PROD-02 | Jean | Production DB/Auth/env and Turpial seed smoke |
+| S-HC-PROD-04 | Jean | Worker, Redis and persistent dry-run processing |
 | S-HC-MAINT-ALIGN-01 | Manuel | Canonical task board and derived docs alignment gate |
 | S-HC-MAINT-PUSH-01 | Manuel | Mandatory remote push on every Oreshnik close |
 | S-HC-MAINT-SYNC-01 | Manuel | Mandatory remote fast-forward and divergence gate in preflight |

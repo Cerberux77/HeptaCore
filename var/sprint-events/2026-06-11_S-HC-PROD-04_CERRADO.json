@@ -1,0 +1,14 @@
+{
+  "sprint": "S-HC-PROD-04",
+  "operator": "Jean",
+  "status": "CERRADO",
+  "date": "2026-06-11",
+  "at": "2026-06-11T01:46:33.673Z",
+  "branch": "Jean/s-hc-canonical-alignment-2026-06-09",
+  "previousMother": "MADRE/v21-s-hc-prod-02-production-db-auth-env-turpial-seed-smoke-2026-06-11",
+  "nextMother": "MADRE/v22-s-hc-prod-04-worker-redis-persistent-dryrun-processing-2026-06-11",
+  "description": "worker-redis-persistent-dryrun-processing",
+  "changedFiles": [
+    ".env.example"
+  ]
+}

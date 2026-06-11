@@ -2,7 +2,7 @@
 type: collaborator-status
 project: "HeptaCore"
 operator: "Jean"
-last_updated: "2026-06-11T01:44:06.401Z"
+last_updated: "2026-06-11T01:46:35.589Z"
 generated_by: "Oreshnik canonical-check"
 source: "var/oreshnik/task-board.json"
 ---
@@ -21,23 +21,11 @@ source: "var/oreshnik/task-board.json"
 
 | Sprint | Scope | Depende de |
 |---|---|---|
-| S-HC-PROD-04 | Worker, Redis and persistent dry-run processing | S-HC-PROD-02 |
 | S-HC-PROD-09 | Paid ads campaign engine with 35 percent overhead gate | S-HC-PROD-04 |
 | S-HC-PROD-11 | Paid scraper compliance and controlled discovery adapter | S-HC-PROD-04 |
 | S-HC-RELEASE-01 | End-to-end Turpial Sound production proof | S-HC-PROD-02, S-HC-PROD-03, S-HC-PROD-04, S-HC-PROD-05, S-HC-PROD-06, S-HC-PROD-07, S-HC-PROD-08, S-HC-PROD-09, S-HC-PROD-10, S-HC-PROD-11 |
 
 ## Detalle de Aceptacion
-
-### S-HC-PROD-04 - Worker, Redis and persistent dry-run processing
-
-Estado: `pending`
-
-- Redis/worker hosting plan and configuration documented
-- Worker validates with Turpial queue
-- Dry-run job path emits logs without real RRSS publish
-- No Vercel serverless long-running worker assumption remains
-
-Zonas: `apps/worker`, `packages/integrations`, `scripts`, `docs`
 
 ### S-HC-PROD-09 - Paid ads campaign engine with 35 percent overhead gate
 
