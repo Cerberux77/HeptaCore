@@ -134,6 +134,13 @@
       "criticality": "medium",
       "notes": "Draft reorder API."
     },
+    "apps/web/app/api/drafts/[id]/asset/**": {
+      "owner": "Manuel",
+      "lock": "manuel_exclusive",
+      "sprints": ["S-HC-RELEASE-02"],
+      "criticality": "medium",
+      "notes": "Asset replacement API for drafts."
+    },
     "apps/web/app/api/strategy/update/**": {
       "owner": "Manuel",
       "lock": "manuel_exclusive",

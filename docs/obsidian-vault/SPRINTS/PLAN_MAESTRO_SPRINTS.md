@@ -1,8 +1,8 @@
 ---
 type: sprint-plan
 project: "HeptaCore"
-last_updated: "2026-06-11T22:03:10.035Z"
-mother_branch: "MADRE/v35-s-hc-release-02-producto-operativo-completo-2026-06-11"
+last_updated: "2026-06-11T22:13:32.857Z"
+mother_branch: "MADRE/v36-s-hc-release-02-preview-redes-reemplazo-assets-2026-06-11"
 tags:
   - "#sprints"
   - "#manuel"
@@ -584,3 +584,14 @@ Ver [[PLAN_PARALELO_MANUEL_JEAN]] para distribucion de carga, backups y reasigna
 | Estado | CERRADO |
 | Madre docs | `MADRE/v35-s-hc-release-02-producto-operativo-completo-2026-06-11` |
 | Descripcion | producto-operativo-completo |
+
+
+## Cierre S-HC-RELEASE-02 - 2026-06-11
+
+| Campo | Valor |
+|---|---|
+| Operador | Manuel |
+| Rama | `Manuel/s-hc-prod-01-producto-operativo-tenant-admin-produccion-2026-06-09` |
+| Estado | CERRADO |
+| Madre docs | `MADRE/v36-s-hc-release-02-preview-redes-reemplazo-assets-2026-06-11` |
+| Descripcion | preview-redes-reemplazo-assets |

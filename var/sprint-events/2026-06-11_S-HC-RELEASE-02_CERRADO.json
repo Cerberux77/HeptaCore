@@ -3,11 +3,11 @@
   "operator": "Manuel",
   "status": "CERRADO",
   "date": "2026-06-11",
-  "at": "2026-06-11T22:03:10.035Z",
+  "at": "2026-06-11T22:13:32.857Z",
   "branch": "Manuel/s-hc-prod-01-producto-operativo-tenant-admin-produccion-2026-06-09",
-  "previousMother": "MADRE/v34-s-hc-release-01-e2e-turpial-sound-production-proof-2026-06-11",
-  "nextMother": "MADRE/v35-s-hc-release-02-producto-operativo-completo-2026-06-11",
-  "description": "producto-operativo-completo",
+  "previousMother": "MADRE/v35-s-hc-release-02-producto-operativo-completo-2026-06-11",
+  "nextMother": "MADRE/v36-s-hc-release-02-preview-redes-reemplazo-assets-2026-06-11",
+  "description": "preview-redes-reemplazo-assets",
   "changedFiles": [
     ".env.example",
     "apps/web/app/api/publishing/publish/route.ts",
@@ -18,10 +18,6 @@
     "apps/web/lib/dashboard.ts",
     "apps/web/middleware.ts",
     "docs/07_handoffs/zone-map.json",
-    "package.json",
-    "packages/db/prisma/schema.prisma",
-    "scripts/oreshnik/close-sprint.mjs",
-    "scripts/oreshnik/preflight.mjs",
-    "scripts/oreshnik/zone-check.mjs"
+    "packages/db/prisma/schema.prisma"
   ]
 }
