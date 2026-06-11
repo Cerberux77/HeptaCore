@@ -128,6 +128,11 @@ export function DashboardConsole({
   const [manualApproval, setManualApproval] = useState(false);
   const [publishState, setPublishState] = useState<"idle" | "loading" | "done" | "error">("idle");
   const [publishMessage, setPublishMessage] = useState("");
+  const [editMode, setEditMode] = useState(false);
+  const [editTitle, setEditTitle] = useState("");
+  const [editCaption, setEditCaption] = useState("");
+  const [editHashtags, setEditHashtags] = useState("");
+  const [editSaving, setEditSaving] = useState(false);
   const selected = localQueue.find((i) => i.id === selectedId) ?? localQueue[0];
 
   const pendingReview = localQueue.filter(
@@ -173,6 +178,47 @@ export function DashboardConsole({
     } catch (error) {
       setPublishState("error");
       setPublishMessage(error instanceof Error ? error.message : "Error de red.");
+    }
+  }
+
+  function startEdit() {
+    setEditTitle(selected?.title ?? "");
+    setEditCaption(selected?.caption ?? "");
+    setEditHashtags(selected?.hashtags.join(" ") ?? "");
+    setEditMode(true);
+  }
+
+  function cancelEdit() {
+    setEditMode(false);
+  }
+
+  async function handleSaveEdit() {
+    if (!selected) return;
+    setEditSaving(true);
+    try {
+      const hashtagList = editHashtags
+        .split(/[\s,]+/)
+        .map((h) => h.trim())
+        .filter((h) => h.length > 0);
+
+      const res = await fetch(`/api/drafts/${selected.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: editTitle,
+          caption: editCaption,
+          hashtags: hashtagList,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.ok) {
+        alert(data.error || "Error al guardar");
+        return;
+      }
+      updateLocalStatus(selected.id, data.draft.status);
+      setEditMode(false);
+    } finally {
+      setEditSaving(false);
     }
   }
 
@@ -350,7 +396,7 @@ export function DashboardConsole({
               <div className="post-preview">
                 <div className="post-preview-head">
                   <div>
-                    <strong style={{ display: "block", fontSize: 15 }}>{selected.title}</strong>
+                    <strong style={{ display: "block", fontSize: 15 }}>{editMode ? "Editando" : selected.title}</strong>
                     <small style={{ color: "var(--hc-fog)", fontSize: 11 }}>
                       {channelLabel(selected)} / {selected.status} / {selected.scheduledFor}
                     </small>
@@ -358,11 +404,60 @@ export function DashboardConsole({
                   <Risk level={selected.riskLevel} />
                 </div>
                 <Thumb item={selected} />
-                <div className="caption-box">{selected.caption}</div>
-                <div className="tag-row">
-                  {selected.hashtags.map((h) => <span key={h}>{h}</span>)}
-                </div>
-                {selected.status === "DRAFT" || selected.status === "NEEDS_REVIEW" ? (
+                {editMode ? (
+                  <div style={{ padding: 12, display: "flex", flexDirection: "column", gap: 8 }}>
+                    <label style={{ fontSize: 12, color: "var(--hc-fog)" }}>
+                      Titulo
+                      <input
+                        style={{ width: "100%", marginTop: 4, padding: "6px 10px", borderRadius: 6, border: "1px solid var(--hc-line)", fontSize: 13 }}
+                        value={editTitle}
+                        onChange={(e) => setEditTitle(e.target.value)}
+                      />
+                    </label>
+                    <label style={{ fontSize: 12, color: "var(--hc-fog)" }}>
+                      Caption
+                      <textarea
+                        style={{ width: "100%", marginTop: 4, padding: "6px 10px", borderRadius: 6, border: "1px solid var(--hc-line)", fontSize: 13, minHeight: 80, resize: "vertical" }}
+                        value={editCaption}
+                        onChange={(e) => setEditCaption(e.target.value)}
+                      />
+                    </label>
+                    <label style={{ fontSize: 12, color: "var(--hc-fog)" }}>
+                      Hashtags
+                      <input
+                        style={{ width: "100%", marginTop: 4, padding: "6px 10px", borderRadius: 6, border: "1px solid var(--hc-line)", fontSize: 13 }}
+                        value={editHashtags}
+                        onChange={(e) => setEditHashtags(e.target.value)}
+                        placeholder="#studio #grabacion #caracas"
+                      />
+                    </label>
+                    <div style={{ display: "flex", gap: 8, marginTop: 4 }}>
+                      <button className="approve" onClick={handleSaveEdit} disabled={editSaving}>
+                        <Check size={16} />
+                        {editSaving ? "Guardando..." : "Guardar"}
+                      </button>
+                      <button onClick={cancelEdit}>
+                        <X size={16} /> Cancelar
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    <div className="caption-box">{selected.caption}</div>
+                    <div className="tag-row">
+                      {selected.hashtags.map((h) => <span key={h}>{h}</span>)}
+                    </div>
+                  </>
+                )}
+                {!editMode && (selected.status === "DRAFT" || selected.status === "NEEDS_REVIEW" || selected.status === "APPROVED") && (
+                  <div style={{ padding: 8 }}>
+                    <button onClick={startEdit} style={{ fontSize: 12, padding: "4px 12px", borderRadius: 6, border: "1px solid var(--hc-line)", background: "var(--hc-bone)", color: "var(--hc-ink)" }}>
+                      <Settings2 size={14} style={{ marginRight: 4, verticalAlign: "middle" }} />
+                      Editar
+                    </button>
+                  </div>
+                )}
+                {!editMode && (selected.status === "DRAFT" || selected.status === "NEEDS_REVIEW" ? (
                   <ApprovalActions draftId={selected.id} onStatusChange={(s) => updateLocalStatus(selected.id, s)} />
                 ) : (
                   <div className="approval-actions">
@@ -370,7 +465,7 @@ export function DashboardConsole({
                       Estado: {selected.status}
                     </span>
                   </div>
-                )}
+                ))}
               </div>
             </section>
           </div>
@@ -526,15 +621,16 @@ export function DashboardConsole({
                     </p>
                   )}
                 </div>
+                <h3 style={{ marginTop: 14 }}>Plan de rollback</h3>
+                <ul className="dense-list">
+                  {readiness.rollbackPlan.map((step: string, i: number) => (
+                    <li key={i}>{step}</li>
+                  ))}
+                </ul>
                 {!readiness.allPassed && (
-                  <>
-                    <h3 style={{ marginTop: 14 }}>Plan de rollback</h3>
-                    <ul className="dense-list">
-                      {readiness.rollbackPlan.map((step: string, i: number) => (
-                        <li key={i}>{step}</li>
-                      ))}
-                    </ul>
-                  </>
+                  <p style={{ marginTop: 8, color: "var(--hc-sand)", fontSize: 12 }}>
+                    Completa los gates de seguridad antes de ejecutar el dry-run.
+                  </p>
                 )}
               </div>
             </section>

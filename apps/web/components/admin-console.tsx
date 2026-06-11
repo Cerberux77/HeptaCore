@@ -5,9 +5,11 @@ import {
   Building2,
   Check,
   ClipboardList,
+  DollarSign,
   Gauge,
   PackageSearch,
   ShieldCheck,
+  X,
 } from "lucide-react";
 import { HeptaCoreWordmark } from "./heptacore-mark";
 import type { AdminDashboardData } from "../lib/dashboard";
@@ -99,6 +101,41 @@ export function AdminConsole({ data }: { data: AdminDashboardData }) {
                   <a className="tool-button" href={`/tenant/${tenant.slug}`}>Abrir</a>
                 </div>
               ))}
+            </div>
+          </section>
+
+          <section className="work-panel span-2">
+            <div className="panel-title">
+              <span><DollarSign size={17} /> Campanas pagas</span>
+            </div>
+            {data.campaigns.length === 0 ? (
+              <p style={{ padding: 14, color: "var(--hc-fog)", fontSize: 13 }}>No hay campanas registradas.</p>
+            ) : (
+              <div className="tenant-table">
+                <div className="tenant-row tenant-head">
+                  <span>Campana</span>
+                  <span>Tenant</span>
+                  <span>Red</span>
+                  <span>Budget plataforma</span>
+                  <span>Total (+35%)</span>
+                  <span>Estado</span>
+                </div>
+                {data.campaigns.map((c) => (
+                  <div className="tenant-row" key={c.id}>
+                    <strong>{c.name}<small>{c.objective}</small></strong>
+                    <span>{c.tenantName}</span>
+                    <span>{c.network}</span>
+                    <span>${c.platformBudget.toFixed(2)}</span>
+                    <span><DollarSign size={12} /> ${c.totalCharge.toFixed(2)}</span>
+                    <span className={c.status === "APPROVED" ? "risk-low" : c.status === "REJECTED" ? "risk-high" : "risk-medium"}>
+                      {c.status === "PROPOSED" ? "Propuesta" : c.status === "NEEDS_APPROVAL" ? "Revision" : c.status === "APPROVED" ? "Aprobada" : c.status === "REJECTED" ? "Rechazada" : c.status}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
+            <div style={{ padding: "8px 14px", fontSize: 12, color: "var(--hc-fog)", borderTop: "1px solid var(--hc-line)" }}>
+              Gasto real bloqueado. Sin ejecucion sin aprobacion. 35% overhead transparente.
             </div>
           </section>
 

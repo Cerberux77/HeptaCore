@@ -1,0 +1,135 @@
+import { NextResponse } from "next/server";
+import { auth } from "../../../../lib/auth";
+import { prisma } from "../../../../lib/prisma";
+import { auditLog } from "../../../../lib/audit";
+import {
+  clientIntakeSchema,
+  generateStrategyWithLLM,
+} from "@heptacore/agents";
+import type { TurpialContext } from "@heptacore/agents";
+
+export const dynamic = "force-dynamic";
+
+export async function POST(req: Request) {
+  const session = await auth();
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const body = await req.json().catch(() => null);
+  if (!body || typeof body.tenantSlug !== "string") {
+    return NextResponse.json({ error: "tenantSlug is required" }, { status: 400 });
+  }
+
+  const tenantSlug = body.tenantSlug as string;
+
+  const tenant = await prisma.tenant.findFirst({
+    where: { slug: tenantSlug },
+    select: { id: true, name: true },
+  });
+  if (!tenant) {
+    return NextResponse.json({ error: "Tenant not found" }, { status: 404 });
+  }
+
+  const membership = await prisma.membership.findFirst({
+    where: { tenantId: tenant.id, userId: session.user.id },
+    select: { role: true },
+  });
+  if (!membership || !["OWNER", "ADMIN", "STRATEGIST", "EDITOR", "SUPER_ADMIN", "TENANT_ADMIN"].includes(membership.role)) {
+    return NextResponse.json({ error: "Forbidden: strategist role required" }, { status: 403 });
+  }
+
+  let intake = body.intake;
+  if (!intake) {
+    const existing = await prisma.project.findFirst({
+      where: { tenantId: tenant.id },
+      orderBy: { createdAt: "desc" },
+      select: { name: true, description: true },
+    });
+    const brandProfile = await prisma.brandProfile.findFirst({
+      where: { tenantId: tenant.id },
+      select: { targetAudience: true },
+    });
+
+    intake = {
+      tenantId: tenant.id,
+      businessName: existing?.name ?? tenant.name,
+      offer: existing?.description ?? `${tenant.name} services`,
+      market: "social media marketing",
+      audience: brandProfile?.targetAudience ?? "general audience",
+      constraints: body.constraints ?? [],
+      preferredNetworks: body.preferredNetworks ?? ["instagram", "facebook"],
+    };
+  }
+
+  const parsed = clientIntakeSchema.safeParse(intake);
+  if (!parsed.success) {
+    return NextResponse.json({ error: "Invalid intake", details: parsed.error.flatten() }, { status: 400 });
+  }
+
+  const context: Partial<TurpialContext> = {};
+  try {
+    const [brandProfile, pillars, assets] = await Promise.all([
+      prisma.brandProfile.findFirst({
+        where: { tenantId: tenant.id },
+        select: { toneOfVoice: true },
+      }),
+      prisma.contentPillar.findMany({
+        where: { tenantId: tenant.id },
+        orderBy: { priority: "desc" },
+        select: { name: true, description: true },
+      }),
+      prisma.asset.findMany({
+        where: { tenantId: tenant.id },
+        take: 50,
+        orderBy: { createdAt: "desc" },
+        select: { filename: true, kind: true },
+      }),
+    ]);
+
+    const voice = Array.isArray(brandProfile?.toneOfVoice)
+      ? (brandProfile.toneOfVoice as unknown[]).map(String)
+      : brandProfile?.toneOfVoice && typeof brandProfile.toneOfVoice === "object"
+        ? Object.values(brandProfile.toneOfVoice as Record<string, unknown>).map(String)
+        : [];
+
+    context.brandVoice = voice;
+    context.contentPillars = pillars.map((p) => ({ name: p.name, description: p.description ?? "" }));
+    context.existingAssets = assets;
+    context.constraints = parsed.data.constraints;
+    context.businessName = parsed.data.businessName;
+    context.offer = parsed.data.offer;
+    context.market = parsed.data.market;
+    context.audience = parsed.data.audience;
+  } catch (err) {
+    console.warn("Could not load tenant context for strategy generation:", err instanceof Error ? err.message : err);
+  }
+
+  const providerConfig = {
+    provider: process.env.LLM_PROVIDER ?? "deterministic",
+    apiKey: process.env.LLM_PROVIDER_API_KEY,
+    model: process.env.LLM_MODEL,
+  };
+
+  const result = await generateStrategyWithLLM(parsed.data, context, providerConfig);
+
+  await auditLog({
+    tenantId: tenant.id,
+    actorId: session.user.id,
+    action: "strategy_generated",
+    target: `tenant:${tenant.id}`,
+    metadata: {
+      provider: result.provider,
+      title: result.strategy.title,
+      channels: result.strategy.channels.length,
+      draftPlanItems: result.strategy.draftPlan.length,
+    },
+  });
+
+  return NextResponse.json({
+    ok: true,
+    tenantSlug,
+    strategy: result.strategy,
+    provider: result.provider,
+  });
+}

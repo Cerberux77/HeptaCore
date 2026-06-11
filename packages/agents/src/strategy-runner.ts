@@ -1,6 +1,6 @@
-import type { ClientIntake } from "./index.js";
+import type { ClientIntake } from "./index";
 import type { SocialNetwork } from "@heptacore/core";
-import { recommendNetworks, buildMinimumIntakeChecklist } from "./index.js";
+import { recommendNetworks, buildMinimumIntakeChecklist } from "./index";
 
 export interface StrategyOutput {
   title: string;

@@ -104,6 +104,18 @@ export type AdminDashboardData = {
     target: string | null;
     at: string;
   }>;
+  campaigns: Array<{
+    id: string;
+    tenantSlug: string;
+    tenantName: string;
+    name: string;
+    network: string;
+    objective: string;
+    platformBudget: number;
+    overheadRate: number;
+    totalCharge: number;
+    status: string;
+  }>;
 };
 
 export const getDashboardMetrics = cache(
@@ -510,6 +522,22 @@ export async function getAdminDashboard(): Promise<AdminDashboardData> {
     },
   });
 
+  const campaigns = await prisma.campaign.findMany({
+    orderBy: { createdAt: "desc" },
+    take: 50,
+    select: {
+      id: true,
+      name: true,
+      network: true,
+      objective: true,
+      platformBudget: true,
+      overheadRate: true,
+      totalCharge: true,
+      status: true,
+      tenant: { select: { slug: true, name: true } },
+    },
+  });
+
   return {
     totals: {
       tenants: rows.length,
@@ -527,5 +555,53 @@ export async function getAdminDashboard(): Promise<AdminDashboardData> {
       target: item.target,
       at: item.createdAt.toISOString().slice(0, 19).replace("T", " "),
     })),
+    campaigns: campaigns.map((c) => ({
+      id: c.id,
+      tenantSlug: c.tenant.slug,
+      tenantName: c.tenant.name,
+      name: c.name,
+      network: c.network,
+      objective: c.objective,
+      platformBudget: Number(c.platformBudget),
+      overheadRate: Number(c.overheadRate),
+      totalCharge: Number(c.totalCharge),
+      status: c.status,
+    })),
   };
+}
+
+export async function getCampaigns(tenantSlug: string) {
+  const tenant = await prisma.tenant.findFirst({
+    where: { slug: tenantSlug },
+    select: { id: true, name: true },
+  });
+  if (!tenant) return [];
+
+  const campaigns = await prisma.campaign.findMany({
+    where: { tenantId: tenant.id },
+    orderBy: { createdAt: "desc" },
+    select: {
+      id: true,
+      name: true,
+      network: true,
+      objective: true,
+      platformBudget: true,
+      overheadRate: true,
+      totalCharge: true,
+      status: true,
+    },
+  });
+
+  return campaigns.map((c) => ({
+    id: c.id,
+    tenantSlug,
+    tenantName: tenant.name,
+    name: c.name,
+    network: c.network,
+    objective: c.objective,
+    platformBudget: Number(c.platformBudget),
+    overheadRate: Number(c.overheadRate),
+    totalCharge: Number(c.totalCharge),
+    status: c.status,
+  }));
 }

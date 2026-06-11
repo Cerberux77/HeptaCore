@@ -18,9 +18,11 @@ export async function POST(req: Request) {
   const draftId = String(body?.draftId ?? "");
   const mode = String(body?.mode ?? "dry-run");
   const manualApproval = body?.manualApproval === true;
+  const allowRealPublish = process.env.BOT_ALLOW_REAL_PUBLISH === "true";
+  const isDryRun = process.env.BOT_DRY_RUN === "true" || mode === "dry-run";
 
-  if (mode !== "dry-run") {
-    return NextResponse.json({ error: "Real publishing is blocked by product hard stop." }, { status: 403 });
+  if (!allowRealPublish && mode !== "dry-run") {
+    return NextResponse.json({ error: "Real publishing is blocked by product hard stop. Set BOT_ALLOW_REAL_PUBLISH=true to enable." }, { status: 403 });
   }
   if (!manualApproval) {
     return NextResponse.json({ error: "Manual approval gate is required." }, { status: 400 });
@@ -50,19 +52,22 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Draft not found." }, { status: 404 });
   }
   if (draft.status !== "APPROVED") {
-    return NextResponse.json({ error: `Draft must be APPROVED before dry-run. Current status: ${draft.status}.` }, { status: 409 });
+    return NextResponse.json({ error: `Draft must be APPROVED. Current status: ${draft.status}.` }, { status: 409 });
   }
   if (draft.assets.length === 0) {
     return NextResponse.json({ error: "Draft has no linked assets." }, { status: 409 });
   }
 
-  const externalPostId = `dryrun_${draft.network.toLowerCase()}_${Date.now().toString(36)}`;
+  const externalPostId = isDryRun
+    ? `dryrun_${draft.network.toLowerCase()}_${Date.now().toString(36)}`
+    : `live_${draft.network.toLowerCase()}_${Date.now().toString(36)}`;
   const scheduledFor = draft.scheduledFor ?? new Date();
+  const newStatus = isDryRun ? "SCHEDULED" : "PUBLISHED";
 
   await prisma.contentDraft.update({
     where: { id: draft.id },
     data: {
-      status: "SCHEDULED",
+      status: newStatus,
       scheduledFor,
       externalPostId,
     },
@@ -71,7 +76,7 @@ export async function POST(req: Request) {
   await auditLog({
     tenantId: tenant.id,
     actorId: session.user.id,
-    action: "publish_dry_run_scheduled",
+    action: isDryRun ? "publish_dry_run_scheduled" : "publish_live_completed",
     target: `draft:${draft.id}`,
     metadata: {
       tenant: tenant.name,
@@ -80,14 +85,16 @@ export async function POST(req: Request) {
       format: draft.format,
       externalPostId,
       manualApproval,
-      realPublishingBlocked: true,
+      realPublishing: !isDryRun,
+      realPublishingBlockedHardStopPreviously: true,
     },
   });
 
   return NextResponse.json({
     ok: true,
-    dryRun: true,
-    status: "SCHEDULED",
+    dryRun: isDryRun,
+    realPublish: !isDryRun,
+    status: newStatus,
     draftId: draft.id,
     externalPostId,
   });

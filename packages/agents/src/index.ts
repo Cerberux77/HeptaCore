@@ -81,5 +81,7 @@ export function buildMinimumIntakeChecklist(networks: SocialNetwork[]) {
   return [...base, ...networkItems];
 }
 
-export { reframeOffer, generateDraftPlan } from "./strategy-runner.js";
-export type { StrategyOutput, DraftPlanItem } from "./strategy-runner.js";
+export { reframeOffer, generateDraftPlan } from "./strategy-runner";
+export type { StrategyOutput, DraftPlanItem } from "./strategy-runner";
+export { generateStrategyWithLLM, getLLMProvider } from "./llm-adapter";
+export type { LLMProvider, LLMProviderConfig, LLMGenerateParams, LLMGenerateResult, TurpialContext } from "./llm-adapter";
