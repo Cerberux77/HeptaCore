@@ -1,11 +1,12 @@
 {
   "project": "HeptaCore",
-  "updatedAt": "2026-06-11T00:20:00.000Z",
+  "updatedAt": "2026-06-11T00:30:00.000Z",
   "resiliencePolicy": "If an owner is unavailable for more than one working block or blocks the critical path, backupOwner may take over after recording reassignment.",
   "currentExecutionOrder": [
     "Wave 1 parallel: Jean S-HC-PROD-02, Manuel S-HC-PROD-03 (LLM provider adapter + Turpial tenant QA)",
     "Wave 2 parallel: Jean S-HC-PROD-04, Manuel S-HC-PROD-05 after S-HC-PROD-03",
-    "Wave 3 sequential: S-HC-PROD-06 control bus/dashboard after PROD-02/03/04/05",
+    "Wave 3 parallel: Jean S-HC-PROD-09/S-HC-PROD-11, Manuel S-HC-PROD-07/S-HC-PROD-08/S-HC-PROD-10 after core proof",
+    "Wave 4 sequential: S-HC-PROD-06 control bus/dashboard after PROD-02/03/04/05/07/08/09/10/11",
     "Final: S-HC-RELEASE-01 end-to-end Turpial Sound production proof"
   ],
   "tasks": [
@@ -34,7 +35,7 @@
       "title": "Console shell: tenant dashboard, onboarding, checklist, draft queue",
       "owner": "Jean",
       "backupOwner": "Jean",
-      "status": "ready",
+      "status": "done",
       "track": "product-ui",
       "zone": [
         "apps/web",
@@ -66,7 +67,7 @@
       "title": "Turpial importer and Prisma seed",
       "owner": "Jean",
       "backupOwner": "Manuel",
-      "status": "ready",
+      "status": "done",
       "track": "data",
       "zone": [
         "packages/db",
@@ -89,7 +90,7 @@
       "title": "Agent strategy runner",
       "owner": "Jean",
       "backupOwner": "Jean",
-      "status": "pending",
+      "status": "done",
       "track": "agents",
       "zone": [
         "packages/agents",
@@ -121,7 +122,7 @@
       "title": "Auth, RBAC and tenant guards",
       "owner": "Jean",
       "backupOwner": "Manuel",
-      "status": "pending",
+      "status": "done",
       "track": "security",
       "zone": [
         "apps/web",
@@ -144,7 +145,7 @@
       "title": "Approval queue and human gates",
       "owner": "Jean",
       "backupOwner": "Jean",
-      "status": "pending",
+      "status": "done",
       "track": "workflow",
       "zone": [
         "apps/web",
@@ -177,7 +178,7 @@
       "title": "Worker queue with retries and tenant scope",
       "owner": "Jean",
       "backupOwner": "Manuel",
-      "status": "pending",
+      "status": "done",
       "track": "worker",
       "zone": [
         "apps/worker",
@@ -201,7 +202,7 @@
       "title": "Turpial tenant dashboard report",
       "owner": "Jean",
       "backupOwner": "Jean",
-      "status": "pending",
+      "status": "done",
       "track": "analytics",
       "zone": [
         "apps/web",
@@ -234,7 +235,7 @@
       "title": "Meta adapter sandbox design",
       "owner": "Jean",
       "backupOwner": "Manuel",
-      "status": "pending",
+      "status": "done",
       "track": "integrations",
       "zone": [
         "packages/integrations",
@@ -257,7 +258,7 @@
       "title": "First tenant publish readiness gate",
       "owner": "Jean",
       "backupOwner": "Jean",
-      "status": "pending",
+      "status": "done",
       "track": "release",
       "zone": [
         "docs",
@@ -414,7 +415,12 @@
         "S-HC-PROD-02",
         "S-HC-PROD-03",
         "S-HC-PROD-04",
-        "S-HC-PROD-05"
+        "S-HC-PROD-05",
+        "S-HC-PROD-07",
+        "S-HC-PROD-08",
+        "S-HC-PROD-09",
+        "S-HC-PROD-10",
+        "S-HC-PROD-11"
       ],
       "acceptance": [
         "Task board reflects PROD reality",
@@ -423,6 +429,133 @@
         "Closeout process produces one canonical release handoff"
       ],
       "handoff": "Manuel owns Oreshnik/control bus. Jean should not edit Oreshnik scripts without explicit double lock."
+    },
+    {
+      "id": "S-HC-PROD-07",
+      "title": "Sales landing, client onboarding and login entry",
+      "owner": "Manuel",
+      "backupOwner": "Jean",
+      "status": "pending",
+      "track": "growth-onboarding",
+      "zone": [
+        "apps/web/app/page.tsx",
+        "apps/web/app/login",
+        "apps/web/app/globals.css",
+        "apps/web/components",
+        "docs"
+      ],
+      "dependsOn": [
+        "S-HC-PROD-03"
+      ],
+      "acceptance": [
+        "Public landing explains HeptaCore value, tenant operating model, approvals and paid-growth guardrails",
+        "Landing has clear CTA to login/onboarding without exposing tenant console publicly",
+        "Client onboarding path captures business, offer, audience, networks, assets and approval preferences",
+        "Login remains protected and usable after landing replaces root redirect",
+        "No marketing claim promises guaranteed sales or unsupervised automation"
+      ],
+      "handoff": "Manuel owns public web and onboarding UX. Jean should not edit landing/login while this sprint is active."
+    },
+    {
+      "id": "S-HC-PROD-08",
+      "title": "Draft editor and post modification workflow",
+      "owner": "Manuel",
+      "backupOwner": "Jean",
+      "status": "pending",
+      "track": "content-operations",
+      "zone": [
+        "apps/web/app/api/drafts",
+        "apps/web/components/dashboard-console.tsx",
+        "apps/web/lib/dashboard.ts",
+        "docs"
+      ],
+      "dependsOn": [
+        "S-HC-PROD-03"
+      ],
+      "acceptance": [
+        "Operator can edit draft title, caption, CTA, hashtags, risk/review flag and scheduled date before approval",
+        "Edits are tenant-scoped and RBAC-protected",
+        "Edited draft returns to review state when content changes after approval",
+        "AuditLog records before/after metadata for post modification",
+        "UI makes edit, approve, reject and dry-run states distinct"
+      ],
+      "handoff": "Manuel owns draft editor in web UI/API. Jean consumes final draft state from worker, no simultaneous edits in drafts API."
+    },
+    {
+      "id": "S-HC-PROD-09",
+      "title": "Paid ads campaign engine with 35 percent overhead gate",
+      "owner": "Jean",
+      "backupOwner": "Manuel",
+      "status": "pending",
+      "track": "paid-growth",
+      "zone": [
+        "apps/worker",
+        "packages/integrations",
+        "packages/core",
+        "docs"
+      ],
+      "dependsOn": [
+        "S-HC-PROD-04"
+      ],
+      "acceptance": [
+        "Campaign spend remains blocked unless explicitly approved",
+        "Campaign plan includes platform budget, 35 percent overhead, total client charge and approval state",
+        "No real campaign spend can execute from default env",
+        "Worker/integration contract supports dry-run campaign creation",
+        "Compliance notes explain platform spend, HeptaCore overhead and rollback/no-spend proof"
+      ],
+      "handoff": "Jean owns worker/integration campaign engine. Manuel will own web campaign UI separately."
+    },
+    {
+      "id": "S-HC-PROD-10",
+      "title": "Paid ads management UI and tenant billing surface",
+      "owner": "Manuel",
+      "backupOwner": "Jean",
+      "status": "pending",
+      "track": "paid-growth-ui",
+      "zone": [
+        "apps/web/components",
+        "apps/web/app/api",
+        "apps/web/lib/dashboard.ts",
+        "docs"
+      ],
+      "dependsOn": [
+        "S-HC-PROD-05",
+        "S-HC-PROD-09"
+      ],
+      "acceptance": [
+        "Tenant can view campaign proposals, platform spend, 35 percent overhead and total charge",
+        "Operator can approve/reject paid campaign proposal without triggering real spend",
+        "Admin can see paid-growth status per tenant",
+        "AuditLog records paid campaign approval decisions",
+        "UI labels real spend as blocked until explicit production unlock"
+      ],
+      "handoff": "Manuel owns web paid ads UI after Jean defines worker/campaign contract."
+    },
+    {
+      "id": "S-HC-PROD-11",
+      "title": "Paid scraper compliance and controlled discovery adapter",
+      "owner": "Jean",
+      "backupOwner": "Manuel",
+      "status": "pending",
+      "track": "discovery-compliance",
+      "zone": [
+        "packages/integrations",
+        "apps/worker",
+        "packages/core",
+        "docs"
+      ],
+      "dependsOn": [
+        "S-HC-PROD-04"
+      ],
+      "acceptance": [
+        "No real scraping is enabled by default",
+        "Discovery adapter supports mock/dry-run and documents paid provider requirements",
+        "Sensitive action gate covers paid scraping with explicit approval",
+        "Compliance matrix documents allowed sources, forbidden scraping and tenant consent",
+        "Output can feed strategy context without violating hard stops"
+      ],
+      "handoff": "Jean owns integrations/discovery adapter. Any web surface must wait for contract or be assigned to Manuel in a later sprint."
     },
     {
       "id": "S-HC-RELEASE-01",
@@ -442,13 +575,22 @@
         "S-HC-PROD-03",
         "S-HC-PROD-04",
         "S-HC-PROD-05",
-        "S-HC-PROD-06"
+        "S-HC-PROD-06",
+        "S-HC-PROD-07",
+        "S-HC-PROD-08",
+        "S-HC-PROD-09",
+        "S-HC-PROD-10",
+        "S-HC-PROD-11"
       ],
       "acceptance": [
         "Login works",
+        "Sales landing and onboarding entry work",
         "Turpial tenant loads strategy and assets",
+        "Draft can be edited before approval",
         "Draft approval works",
         "Dry-run publish proof works",
+        "Paid ads proposal shows 35 percent overhead without real spend",
+        "Paid scraper/discovery remains gated and documented",
         "AuditLog/report proves the action",
         "typecheck, build and worker:validate pass",
         "Real RRSS publish remains blocked unless explicitly unlocked"
