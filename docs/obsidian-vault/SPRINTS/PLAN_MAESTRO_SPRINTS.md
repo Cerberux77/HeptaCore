@@ -1,8 +1,8 @@
 ---
 type: sprint-plan
 project: "HeptaCore"
-last_updated: "2026-06-11T01:46:33.673Z"
-mother_branch: "MADRE/v22-s-hc-prod-04-worker-redis-persistent-dryrun-processing-2026-06-11"
+last_updated: "2026-06-11T01:52:08.355Z"
+mother_branch: "MADRE/v24-s-hc-prod-11-paid-scraper-compliance-controlled-discovery-ada-2026-06-11"
 tags:
   - "#sprints"
   - "#manuel"
@@ -441,3 +441,25 @@ Ver [[PLAN_PARALELO_MANUEL_JEAN]] para distribucion de carga, backups y reasigna
 | Estado | CERRADO |
 | Madre docs | `MADRE/v22-s-hc-prod-04-worker-redis-persistent-dryrun-processing-2026-06-11` |
 | Descripcion | worker-redis-persistent-dryrun-processing |
+
+
+## Cierre S-HC-PROD-09 - 2026-06-11
+
+| Campo | Valor |
+|---|---|
+| Operador | Jean |
+| Rama | `Jean/s-hc-canonical-alignment-2026-06-09` |
+| Estado | CERRADO |
+| Madre docs | `MADRE/v23-s-hc-prod-09-paid-ads-campaign-engine-35pct-overhead-gate-2026-06-11` |
+| Descripcion | paid-ads-campaign-engine-35pct-overhead-gate |
+
+
+## Cierre S-HC-PROD-11 - 2026-06-11
+
+| Campo | Valor |
+|---|---|
+| Operador | Jean |
+| Rama | `Jean/s-hc-canonical-alignment-2026-06-09` |
+| Estado | CERRADO |
+| Madre docs | `MADRE/v24-s-hc-prod-11-paid-scraper-compliance-controlled-discovery-ada-2026-06-11` |
+| Descripcion | paid-scraper-compliance-controlled-discovery-adapter |

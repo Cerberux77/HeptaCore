@@ -3,8 +3,8 @@ type: master-dashboard
 project: "HeptaCore"
 status: active-production
 phase: "Canonical Oreshnik task board governs current assignments"
-last_updated: "2026-06-11T01:53:02.675Z"
-mother_branch: "MADRE/v22-s-hc-prod-04-worker-redis-persistent-dryrun-processing-2026-06-11"
+last_updated: "2026-06-11T01:54:01.145Z"
+mother_branch: "MADRE/v24-s-hc-prod-11-paid-scraper-compliance-controlled-discovery-ada-2026-06-11"
 tags:
   - "#central"
   - "#status/live-source"
@@ -21,8 +21,8 @@ tags:
 
 | Campo | Valor |
 |---|---|
-| Task board actualizado | 2026-06-11T01:56:00.000Z |
-| Rama madre | MADRE/v22-s-hc-prod-04-worker-redis-persistent-dryrun-processing-2026-06-11 |
+| Task board actualizado | 2026-06-11T01:53:25.238Z |
+| Rama madre | MADRE/v24-s-hc-prod-11-paid-scraper-compliance-controlled-discovery-ada-2026-06-11 |
 | Publicacion RRSS real | Bloqueada hasta aprobacion explicita |
 | Campaign spend | Bloqueado |
 | Real scraping | Bloqueado |
@@ -44,9 +44,7 @@ tags:
 | S-HC-PROD-06 | pending | Manuel | Oreshnik operator dashboard and canonical task board | S-HC-PROD-02, S-HC-PROD-03, S-HC-PROD-04, S-HC-PROD-05, S-HC-PROD-07, S-HC-PROD-08, S-HC-PROD-09, S-HC-PROD-10, S-HC-PROD-11 |
 | S-HC-PROD-07 | pending | Manuel | Sales landing, client onboarding and login entry | S-HC-PROD-03 |
 | S-HC-PROD-08 | pending | Manuel | Draft editor and post modification workflow | S-HC-PROD-03 |
-| S-HC-PROD-09 | pending | Jean | Paid ads campaign engine with 35 percent overhead gate | S-HC-PROD-04 |
 | S-HC-PROD-10 | pending | Manuel | Paid ads management UI and tenant billing surface | S-HC-PROD-05, S-HC-PROD-09 |
-| S-HC-PROD-11 | pending | Jean | Paid scraper compliance and controlled discovery adapter | S-HC-PROD-04 |
 | S-HC-MAINT-CLOSE-GATE-01 | ready | Manuel | Automatic closure validation gate before Oreshnik close | S-HC-MAINT-SYNC-01 |
 | S-HC-MAINT-MOTHER-SYNC-01 | ready | Manuel | Automatic canonical merge for newer MADRE branches | S-HC-MAINT-SYNC-01 |
 | S-HC-RELEASE-01 | pending | Manuel+Jean | End-to-end Turpial Sound production proof | S-HC-PROD-02, S-HC-PROD-03, S-HC-PROD-04, S-HC-PROD-05, S-HC-PROD-06, S-HC-PROD-07, S-HC-PROD-08, S-HC-PROD-09, S-HC-PROD-10, S-HC-PROD-11 |
@@ -67,9 +65,7 @@ tags:
 | S-HC-PROD-06 | Manuel | Oreshnik operator dashboard and canonical task board | S-HC-PROD-02, S-HC-PROD-03, S-HC-PROD-04, S-HC-PROD-05, S-HC-PROD-07, S-HC-PROD-08, S-HC-PROD-09, S-HC-PROD-10, S-HC-PROD-11 |
 | S-HC-PROD-07 | Manuel | Sales landing, client onboarding and login entry | S-HC-PROD-03 |
 | S-HC-PROD-08 | Manuel | Draft editor and post modification workflow | S-HC-PROD-03 |
-| S-HC-PROD-09 | Jean | Paid ads campaign engine with 35 percent overhead gate | S-HC-PROD-04 |
 | S-HC-PROD-10 | Manuel | Paid ads management UI and tenant billing surface | S-HC-PROD-05, S-HC-PROD-09 |
-| S-HC-PROD-11 | Jean | Paid scraper compliance and controlled discovery adapter | S-HC-PROD-04 |
 | S-HC-RELEASE-01 | Manuel+Jean | End-to-end Turpial Sound production proof | S-HC-PROD-02, S-HC-PROD-03, S-HC-PROD-04, S-HC-PROD-05, S-HC-PROD-06, S-HC-PROD-07, S-HC-PROD-08, S-HC-PROD-09, S-HC-PROD-10, S-HC-PROD-11 |
 
 ## Reglas Activas
