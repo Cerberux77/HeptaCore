@@ -1,5 +1,5 @@
 {
-  "current": "MADRE/v33-s-hc-prod-06-oreshnik-operator-dashboard-and-canonical-task-b-2026-06-11",
+  "current": "MADRE/v34-s-hc-release-01-e2e-turpial-sound-production-proof-2026-06-11",
   "branches": [
     {
       "previous": "MADRE/v11-s-hc-09-publish-readiness-gate-2026-06-09",
@@ -200,11 +200,21 @@
       "at": "2026-06-11T03:02:44.197Z",
       "previous": "MADRE/v32-s-hc-prod-10-paid-ads-management-ui-and-tenant-billing-surfac-2026-06-11",
       "description": "Oreshnik operator dashboard and canonical task board"
+    },
+    {
+      "version": 34,
+      "name": "MADRE/v34-s-hc-release-01-e2e-turpial-sound-production-proof-2026-06-11",
+      "sprint": "S-HC-RELEASE-01",
+      "operator": "Manuel",
+      "date": "2026-06-11",
+      "at": "2026-06-11T03:19:41.362Z",
+      "previous": "MADRE/v33-s-hc-prod-06-oreshnik-operator-dashboard-and-canonical-task-b-2026-06-11",
+      "description": "E2E Turpial Sound production proof"
     }
   ],
-  "version": 33,
-  "effective": "MADRE/v32-s-hc-prod-10-paid-ads-management-ui-and-tenant-billing-surfac-2026-06-11",
-  "effectiveRef": "origin/MADRE/v32-s-hc-prod-10-paid-ads-management-ui-and-tenant-billing-surfac-2026-06-11",
+  "version": 34,
+  "effective": "MADRE/v33-s-hc-prod-06-oreshnik-operator-dashboard-and-canonical-task-b-2026-06-11",
+  "effectiveRef": "origin/MADRE/v33-s-hc-prod-06-oreshnik-operator-dashboard-and-canonical-task-b-2026-06-11",
   "declaredMissing": false,
   "discoveredVersion": 14
 }

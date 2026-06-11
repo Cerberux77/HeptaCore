@@ -1,7 +1,7 @@
 ---
 type: status-board
 project: "HeptaCore"
-last_updated: "2026-06-11T03:03:47.965Z"
+last_updated: "2026-06-11T03:20:09.431Z"
 generated_by: "Oreshnik canonical-check"
 source: "var/oreshnik/task-board.json"
 ---
@@ -22,19 +22,21 @@ source: "var/oreshnik/task-board.json"
 
 | Sprint | Estado | Owner | Scope | Depende de |
 |---|---|---|---|---|
-| S-HC-RELEASE-01 | pending | Manuel+Jean | End-to-end Turpial Sound production proof | S-HC-PROD-02, S-HC-PROD-03, S-HC-PROD-04, S-HC-PROD-05, S-HC-PROD-06, S-HC-PROD-07, S-HC-PROD-08, S-HC-PROD-09, S-HC-PROD-10, S-HC-PROD-11 |
+
 
 ## Asignacion Manuel
 
 | Sprint | Estado | Scope | Depende de |
 |---|---|---|---|
-| S-HC-RELEASE-01 | pending | End-to-end Turpial Sound production proof | S-HC-PROD-02, S-HC-PROD-03, S-HC-PROD-04, S-HC-PROD-05, S-HC-PROD-06, S-HC-PROD-07, S-HC-PROD-08, S-HC-PROD-09, S-HC-PROD-10, S-HC-PROD-11 |
+| Ninguno | - | - | - |
+
 
 ## Asignacion Jean
 
 | Sprint | Estado | Scope | Depende de |
 |---|---|---|---|
-| S-HC-RELEASE-01 | pending | End-to-end Turpial Sound production proof | S-HC-PROD-02, S-HC-PROD-03, S-HC-PROD-04, S-HC-PROD-05, S-HC-PROD-06, S-HC-PROD-07, S-HC-PROD-08, S-HC-PROD-09, S-HC-PROD-10, S-HC-PROD-11 |
+| Ninguno | - | - | - |
+
 
 ## Hard Stops Vigentes
 
@@ -75,3 +77,4 @@ source: "var/oreshnik/task-board.json"
 | S-HC-MAINT-CLOSE-GATE-01 | Manuel | Automatic closure validation gate before Oreshnik close |
 | S-HC-MAINT-MOTHER-SYNC-01 | Manuel | Automatic canonical merge for newer MADRE branches |
 | S-HC-MAINT-CLOSE-SPAWN-01 | Manuel | Remove shell warning from closure validation gate |
+| S-HC-RELEASE-01 | Manuel+Jean | End-to-end Turpial Sound production proof |

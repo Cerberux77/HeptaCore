@@ -1,6 +1,6 @@
 {
   "project": "HeptaCore",
-  "updatedAt": "2026-06-11T03:02:44.197Z",
+  "updatedAt": "2026-06-11T03:19:41.362Z",
   "resiliencePolicy": "If an owner is unavailable for more than one working block or blocks the critical path, backupOwner may take over after recording reassignment.",
   "closurePolicy": "No sprint may be closed until acceptance criteria, base tests, sprint-specific tests, docs/handoff, and Oreshnik zone checks pass. See docs/obsidian-vault/METODOLOGIA/ORQUESTACION_AGENTES_HEPTACORE.md.",
   "baseTestMatrix": [
@@ -851,7 +851,7 @@
       "title": "End-to-end Turpial Sound production proof",
       "owner": "Manuel+Jean",
       "backupOwner": "Manuel+Jean",
-      "status": "pending",
+      "status": "done",
       "track": "release",
       "zone": [
         "docs",
@@ -884,7 +884,16 @@
         "typecheck, build and worker:validate pass",
         "Real RRSS publish remains blocked unless explicitly unlocked"
       ],
-      "handoff": "Final release must be sequential or pair-reviewed; no parallel edits in release sprint."
+      "handoff": "Final release must be sequential or pair-reviewed; no parallel edits in release sprint.",
+      "history": [
+        {
+          "at": "2026-06-11T03:19:41.362Z",
+          "action": "closed",
+          "operator": "Manuel",
+          "branch": "Manuel/s-hc-prod-01-producto-operativo-tenant-admin-produccion-2026-06-09",
+          "description": "E2E Turpial Sound production proof"
+        }
+      ]
     }
   ],
   "reassignments": [
