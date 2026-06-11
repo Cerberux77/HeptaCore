@@ -2,97 +2,122 @@
 type: collaborator-status
 project: "HeptaCore"
 operator: "Manuel"
-last_updated: "2026-06-01T00:00:00.000Z"
-tags:
-  - "#manuel"
-  - "#status"
+last_updated: "2026-06-11T01:29:30.649Z"
+generated_by: "Oreshnik canonical-check"
+source: "var/oreshnik/task-board.json"
 ---
 
 # Estado Manuel
 
-## Rama Actual Esperada
+> Documento derivado. La fuente operativa es `var/oreshnik/task-board.json`.
 
-`Manuel/s-hc-00-foundation-2026-06-01` o rama hija equivalente.
+## Ready
 
-## Responsabilidades Iniciales
-
-- Producto y estrategia.
-- UX/landing/consola.
-- Agent prompts y workflow de marketing.
-- Vault Obsidian + Oreshnik.
-- Turpial como tenant demo.
-
-## Pendientes
-
-| Prioridad | Pendiente | Estado |
+| Sprint | Scope | Depende de |
 |---|---|---|
-| P0 | Primer commit base HeptaCore | Pendiente |
-| P0 | Cerrar S-HC-00 con Oreshnik | Pendiente |
-| P0 | Diseñar S-HC-01 console shell | Pendiente |
-| P1 | Completar brand board final | Pendiente |
----
-type: collaborator-status
-project: "HeptaCore"
-operator: "Manuel"
-last_updated: "09/06/26 15:25 VET"
-tags:
-  - "#manuel"
-  - "#status"
----
+| S-HC-PROD-03 | LLM provider adapter plus Turpial tenant functional QA and UX polish | S-HC-PROD-ALIGN |
 
-# Estado Manuel
+## Pending
 
-## Sprint Activo: S-HC-03 — Agent Strategy Runner
-
-| Campo | Valor |
-|---|---|
-| Rama | `Manuel/s-hc-03-agent-strategy-runner-2026-06-09` |
-| Zona | `packages/agents/**`, `apps/web/components/**` |
-| Estado | **assigned** — 0 blockers |
-| Depende de | S-HC-01 (CERRADO), S-HC-02 (Jean reporta hecho) |
-
-### Objetivo
-Agent council consume strategy brief, calcula network priority, genera content checklist por pillar, persiste drafts. Runner ejecutable desde consola.
-
-### Validaciones
-```bash
-npm run typecheck
-npm run build
-```
-
-## Sprints Cerrados (con closure + push + MADRE)
-
-| Sprint | Fecha | Rama | Madre | Evento |
-|---|---|---|---|---|
-| S-HC-XX | 01/06/26 | `Manuel/s-hc-xx-plan-holistico...` | MADRE/v2 | `2026-06-01_S-HC-XX_CERRADO.json` |
-| S-HC-01 | 08/06/26 | `Manuel/s-hc-xx-plan-holistico...` | MADRE/v3, v4 | `2026-06-08_S-HC-01_CERRADO.json` |
-| S-HC-CTRL-01 | 09/06/26 | `Manuel/s-hc-xx-plan-holistico...` | MADRE/v5 | `2026-06-09_S-HC-CTRL-01_CERRADO.json` |
-| S-HC-CTRL-02 | 09/06/26 | `Manuel/s-hc-xx-plan-holistico...` | MADRE/v6 | `2026-06-09_S-HC-CTRL-02_CERRADO.json` |
-| S-HC-CTRL-03 | 09/06/26 | `Manuel/s-hc-xx-plan-holistico...` | MADRE/v7 | `2026-06-09_S-HC-CTRL-03_CERRADO.json` |
-| S-HC-PROD-00 | 09/06/26 | `Manuel/s-hc-xx-plan-holistico...` | MADRE/v8 | `2026-06-09_S-HC-PROD-00_CERRADO.json` |
-
-## Código entregado por Manuel (verificado en repo)
-
-| Feature | Archivos |
-|---|---|
-| Prisma schema (20+ modelos con AuditLog) | `packages/db/prisma/schema.prisma` |
-| 2 migraciones | `packages/db/prisma/migrations/` |
-| Instagram OAuth login + callback | `apps/web/app/api/oauth/instagram/` |
-| Token vault AES-256-GCM | `apps/web/lib/token-vault.ts` |
-| TurpialConsole UI (9 vistas, Approve/Reject) | `apps/web/components/turpial-console.tsx` |
-| 29 posts + 46 assets | `apps/web/lib/data/`, `apps/web/public/assets/` |
-| Seed scripts | `scripts/seed-turpial-*.mjs` |
-| Oreshnik (preflight, close, assign, merge-docs-union) | `scripts/oreshnik/` |
-
-## Próximo Sprint Manuel
-
-| Sprint | Estado | Desbloquea cuando |
+| Sprint | Scope | Depende de |
 |---|---|---|
-| S-HC-PROD-02 | depends_on S-HC-04 | Jean cierre S-HC-04 (Auth) con push |
-| S-HC-PROD-06 | depends_on S-HC-PROD-02 | S-HC-PROD-02 cerrado |
+| S-HC-PROD-05 | Publishing gate UI, AuditLog and rollback proof | S-HC-PROD-03 |
+| S-HC-PROD-06 | Oreshnik operator dashboard and canonical task board | S-HC-PROD-02, S-HC-PROD-03, S-HC-PROD-04, S-HC-PROD-05, S-HC-PROD-07, S-HC-PROD-08, S-HC-PROD-09, S-HC-PROD-10, S-HC-PROD-11 |
+| S-HC-PROD-07 | Sales landing, client onboarding and login entry | S-HC-PROD-03 |
+| S-HC-PROD-08 | Draft editor and post modification workflow | S-HC-PROD-03 |
+| S-HC-PROD-10 | Paid ads management UI and tenant billing surface | S-HC-PROD-05, S-HC-PROD-09 |
+| S-HC-RELEASE-01 | End-to-end Turpial Sound production proof | S-HC-PROD-02, S-HC-PROD-03, S-HC-PROD-04, S-HC-PROD-05, S-HC-PROD-06, S-HC-PROD-07, S-HC-PROD-08, S-HC-PROD-09, S-HC-PROD-10, S-HC-PROD-11 |
 
-## Acciones Inmediatas
+## Detalle de Aceptacion
 
-1. Esperar que Jean ejecute `oreshnik:close --push` para S-HC-02 y S-HC-04
-2. Si S-HC-04 (Auth) bloquea la ruta crítica >1 bloque de trabajo, usar `oreshnik:reassign`
-3. Preparar S-HC-PROD-02 (Oreshnik dashboard) para arrancar apenas Auth esté en repo
+### S-HC-PROD-03 - LLM provider adapter plus Turpial tenant functional QA and UX polish
+
+Estado: `ready`
+
+- LLM provider adapter interface exists with deterministic fallback for offline/dev
+- Initial provider is selected by environment variable without committing secrets
+- Tenant-specific strategy generation can consume Turpial intake/assets/context
+- Generated strategy output is structured and auditable before drafts are approved
+- Tenant console renders strategy, assets, queue, calendar, reports and readiness
+- Approve/reject flow works in UI
+- No overlap with Jean DB/Auth/env work
+- Manual user path documented for Turpial Sound
+
+Zonas: `packages/agents`, `apps/web/components/dashboard-console.tsx`, `apps/web/components/admin-console.tsx`, `apps/web/lib/dashboard.ts`, `docs`
+
+### S-HC-PROD-05 - Publishing gate UI, AuditLog and rollback proof
+
+Estado: `pending`
+
+- Dry-run gate is clear and cannot publish real RRSS
+- Approved draft can move to SCHEDULED through UI
+- AuditLog entry is visible in reports/admin activity
+- Rollback procedure is documented and tested
+
+Zonas: `apps/web/app/api/publishing`, `apps/web/components/dashboard-console.tsx`, `apps/web/lib/dashboard.ts`, `docs`
+
+### S-HC-PROD-06 - Oreshnik operator dashboard and canonical task board
+
+Estado: `pending`
+
+- Task board reflects PROD reality
+- Operator dashboard/report shows current branch, mother, events and owners
+- No stale Jean/Manuel sprint ambiguity remains
+- Closeout process produces one canonical release handoff
+
+Zonas: `scripts/oreshnik`, `var/oreshnik`, `var/sprint-events`, `docs`
+
+### S-HC-PROD-07 - Sales landing, client onboarding and login entry
+
+Estado: `pending`
+
+- Public landing explains HeptaCore value, tenant operating model, approvals and paid-growth guardrails
+- Landing has clear CTA to login/onboarding without exposing tenant console publicly
+- Client onboarding path captures business, offer, audience, networks, assets and approval preferences
+- Login remains protected and usable after landing replaces root redirect
+- No marketing claim promises guaranteed sales or unsupervised automation
+
+Zonas: `apps/web/app/page.tsx`, `apps/web/app/login`, `apps/web/app/globals.css`, `apps/web/components`, `docs`
+
+### S-HC-PROD-08 - Draft editor and post modification workflow
+
+Estado: `pending`
+
+- Operator can edit draft title, caption, CTA, hashtags, risk/review flag and scheduled date before approval
+- Edits are tenant-scoped and RBAC-protected
+- Edited draft returns to review state when content changes after approval
+- AuditLog records before/after metadata for post modification
+- UI makes edit, approve, reject and dry-run states distinct
+
+Zonas: `apps/web/app/api/drafts`, `apps/web/components/dashboard-console.tsx`, `apps/web/lib/dashboard.ts`, `docs`
+
+### S-HC-PROD-10 - Paid ads management UI and tenant billing surface
+
+Estado: `pending`
+
+- Tenant can view campaign proposals, platform spend, 35 percent overhead and total charge
+- Operator can approve/reject paid campaign proposal without triggering real spend
+- Admin can see paid-growth status per tenant
+- AuditLog records paid campaign approval decisions
+- UI labels real spend as blocked until explicit production unlock
+
+Zonas: `apps/web/components`, `apps/web/app/api`, `apps/web/lib/dashboard.ts`, `docs`
+
+### S-HC-RELEASE-01 - End-to-end Turpial Sound production proof
+
+Estado: `pending`
+
+- Login works
+- Sales landing and onboarding entry work
+- Turpial tenant loads strategy and assets
+- Draft can be edited before approval
+- Draft approval works
+- Dry-run publish proof works
+- Paid ads proposal shows 35 percent overhead without real spend
+- Paid scraper/discovery remains gated and documented
+- AuditLog/report proves the action
+- typecheck, build and worker:validate pass
+- Real RRSS publish remains blocked unless explicitly unlocked
+
+Zonas: `docs`, `apps/web`, `apps/worker`, `packages/integrations`
+

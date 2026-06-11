@@ -187,6 +187,15 @@
       "criticality": "high",
       "notes": "Infraestructura Oreshnik. Jean NO tocar."
     },
+    "var/oreshnik/**": {
+      "owner": "Manuel",
+      "lock": "manuel_exclusive",
+      "sprints": [
+        "*"
+      ],
+      "criticality": "high",
+      "notes": "Task board, preflight ledger and canonical Oreshnik state."
+    },
     "scripts/seed-turpial-*.mjs": {
       "owner": "Jean",
       "lock": "jean_exclusive",

@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { getArg, nowVet, ROOT, writeJson } from "./lib.mjs";
+import { getArg, nowVet, ROOT, sh, writeJson } from "./lib.mjs";
 
 const taskId = getArg("--task");
 const to = getArg("--to");
@@ -48,4 +48,5 @@ board.reassignments.push({
 });
 
 writeJson(boardPath, board);
+sh(`node scripts/oreshnik/canonical-check.mjs --fix --sprint ${taskId} --operator ${to}`, { fatal: true });
 console.log(`Reassigned ${taskId}: ${previousOwner} -> ${to}`);

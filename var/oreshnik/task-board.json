@@ -1,16 +1,21 @@
 {
   "project": "HeptaCore",
-  "updatedAt": "2026-06-09T23:59:00.000Z",
-  "canonicalState": {
-    "stage": "mvp-technical-preproduction",
-    "productionBranch": "master",
-    "productionCommitDetected": "000ce31",
-    "integrationMother": "MADRE/v14-integration-all-code-2026-06-09",
-    "realPublishing": "blocked_by_design",
-    "workerRuntime": "requires_persistent_hosting_with_redis_outside_vercel_serverless",
-    "next16MiddlewareProxyMigration": "pending_non_blocking"
-  },
+  "updatedAt": "2026-06-11T01:15:56.934Z",
   "resiliencePolicy": "If an owner is unavailable for more than one working block or blocks the critical path, backupOwner may take over after recording reassignment.",
+  "closurePolicy": "No sprint may be closed until acceptance criteria, base tests, sprint-specific tests, docs/handoff, and Oreshnik zone checks pass. See docs/obsidian-vault/METODOLOGIA/ORQUESTACION_AGENTES_HEPTACORE.md.",
+  "baseTestMatrix": [
+    "npm run typecheck",
+    "npm run build",
+    "npm run worker:validate",
+    "npm run oreshnik:zone -- --sprint <SPRINT> --operator <OPERATOR>"
+  ],
+  "currentExecutionOrder": [
+    "Wave 1 parallel: Jean S-HC-PROD-02, Manuel S-HC-PROD-03 (LLM provider adapter + Turpial tenant QA)",
+    "Wave 2 parallel: Jean S-HC-PROD-04, Manuel S-HC-PROD-05 after S-HC-PROD-03",
+    "Wave 3 parallel: Jean S-HC-PROD-09/S-HC-PROD-11, Manuel S-HC-PROD-07/S-HC-PROD-08/S-HC-PROD-10 after core proof",
+    "Wave 4 sequential: S-HC-PROD-06 control bus/dashboard after PROD-02/03/04/05/07/08/09/10/11",
+    "Final: S-HC-RELEASE-01 end-to-end Turpial Sound production proof"
+  ],
   "tasks": [
     {
       "id": "S-HC-00",
@@ -19,31 +24,50 @@
       "backupOwner": "Jean",
       "status": "done",
       "track": "foundation",
-      "zone": ["repo", "docs", "oreshnik"],
+      "zone": [
+        "repo",
+        "docs",
+        "oreshnik"
+      ],
       "dependsOn": [],
       "acceptance": [
         "Initial monorepo committed",
         "Oreshnik vault operational",
         "Build/typecheck pass"
       ],
-      "handoff": "Foundation is closed and absorbed into the pre-production MVP baseline."
+      "handoff": "Jean reviews baseline after commit."
     },
     {
       "id": "S-HC-01",
       "title": "Console shell: tenant dashboard, onboarding, checklist, draft queue",
       "owner": "Jean",
-      "backupOwner": "Manuel",
+      "backupOwner": "Jean",
       "status": "done",
       "track": "product-ui",
-      "zone": ["apps/web", "packages/ui", "packages/agents"],
-      "dependsOn": ["S-HC-00"],
+      "zone": [
+        "apps/web",
+        "packages/ui",
+        "packages/agents"
+      ],
+      "dependsOn": [
+        "S-HC-00"
+      ],
       "acceptance": [
         "Tenant dashboard route",
+        "Onboarding form mock",
         "Input checklist",
-        "Draft queue screen",
-        "Build/typecheck pass"
+        "Draft queue screen"
       ],
-      "handoff": "Closed in the integrated MVP baseline."
+      "handoff": "Jean can take dashboard data wiring if Manuel is unavailable.",
+      "history": [
+        {
+          "at": "2026-06-09T19:56:42.980Z",
+          "action": "reassigned",
+          "from": "Manuel",
+          "to": "Jean",
+          "reason": "Manuel ausente - ruta critica bloqueada"
+        }
+      ]
     },
     {
       "id": "S-HC-02",
@@ -52,32 +76,53 @@
       "backupOwner": "Manuel",
       "status": "done",
       "track": "data",
-      "zone": ["packages/db", "examples/tenants/turpial", "scripts"],
-      "dependsOn": ["S-HC-00"],
+      "zone": [
+        "packages/db",
+        "examples/tenants/turpial",
+        "scripts"
+      ],
+      "dependsOn": [
+        "S-HC-00"
+      ],
       "acceptance": [
         "Seed tenant",
         "Import assets metadata",
         "Import publication queue",
         "No real credentials"
       ],
-      "handoff": "Closed in the integrated MVP baseline."
+      "handoff": "Manuel can implement importer from existing queue if Jean is unavailable."
     },
     {
       "id": "S-HC-03",
       "title": "Agent strategy runner",
       "owner": "Jean",
-      "backupOwner": "Manuel",
+      "backupOwner": "Jean",
       "status": "done",
       "track": "agents",
-      "zone": ["packages/agents", "packages/core"],
-      "dependsOn": ["S-HC-01", "S-HC-02"],
+      "zone": [
+        "packages/agents",
+        "packages/core"
+      ],
+      "dependsOn": [
+        "S-HC-01",
+        "S-HC-02"
+      ],
       "acceptance": [
-        "Client intake to offer reframing",
+        "Client intake -> offer reframing",
         "Network priorities",
         "Minimum inputs",
         "Draft plan object"
       ],
-      "handoff": "Closed in the integrated MVP baseline."
+      "handoff": "Jean can wire persistence while Manuel owns strategy prompts.",
+      "history": [
+        {
+          "at": "2026-06-09T20:14:05.016Z",
+          "action": "reassigned",
+          "from": "Manuel",
+          "to": "Jean",
+          "reason": "Manuel ausente - completando sprints restantes"
+        }
+      ]
     },
     {
       "id": "S-HC-04",
@@ -86,32 +131,54 @@
       "backupOwner": "Manuel",
       "status": "done",
       "track": "security",
-      "zone": ["apps/web", "packages/db", "packages/core"],
-      "dependsOn": ["S-HC-02"],
+      "zone": [
+        "apps/web",
+        "packages/db",
+        "packages/core"
+      ],
+      "dependsOn": [
+        "S-HC-02"
+      ],
       "acceptance": [
         "Auth provider chosen",
         "Tenant membership checks",
         "Role matrix",
         "Audit baseline"
       ],
-      "handoff": "Closed in the integrated MVP baseline. Production still requires env and seed setup."
+      "handoff": "Requires double lock for schema changes."
     },
     {
       "id": "S-HC-05",
       "title": "Approval queue and human gates",
       "owner": "Jean",
-      "backupOwner": "Manuel",
+      "backupOwner": "Jean",
       "status": "done",
       "track": "workflow",
-      "zone": ["apps/web", "packages/core", "packages/db"],
-      "dependsOn": ["S-HC-01", "S-HC-04"],
+      "zone": [
+        "apps/web",
+        "packages/core",
+        "packages/db"
+      ],
+      "dependsOn": [
+        "S-HC-01",
+        "S-HC-04"
+      ],
       "acceptance": [
         "Approve/reject drafts",
         "Sensitive action labels",
         "Audit event",
         "No publish without approval"
       ],
-      "handoff": "Closed in the integrated MVP baseline."
+      "handoff": "Jean can complete audit persistence if Manuel is unavailable.",
+      "history": [
+        {
+          "at": "2026-06-09T20:00:34.179Z",
+          "action": "reassigned",
+          "from": "Manuel",
+          "to": "Jean",
+          "reason": "Manuel ausente - continuando ruta critica"
+        }
+      ]
     },
     {
       "id": "S-HC-06",
@@ -120,32 +187,55 @@
       "backupOwner": "Manuel",
       "status": "done",
       "track": "worker",
-      "zone": ["apps/worker", "packages/integrations", "packages/core"],
-      "dependsOn": ["S-HC-02", "S-HC-05"],
+      "zone": [
+        "apps/worker",
+        "packages/integrations",
+        "packages/core"
+      ],
+      "dependsOn": [
+        "S-HC-02",
+        "S-HC-05"
+      ],
       "acceptance": [
         "Queue abstraction",
         "Dry-run jobs",
         "Retries",
         "Tenant scoped logs"
       ],
-      "handoff": "Code is closed. Runtime remains pending until Redis and persistent worker hosting are provisioned."
+      "handoff": "Manuel can keep file queue fallback if Jean is unavailable."
     },
     {
       "id": "S-HC-07",
       "title": "Turpial tenant dashboard report",
       "owner": "Jean",
-      "backupOwner": "Manuel",
+      "backupOwner": "Jean",
       "status": "done",
       "track": "analytics",
-      "zone": ["apps/web", "packages/agents", "packages/db"],
-      "dependsOn": ["S-HC-02", "S-HC-05"],
+      "zone": [
+        "apps/web",
+        "packages/agents",
+        "packages/db"
+      ],
+      "dependsOn": [
+        "S-HC-02",
+        "S-HC-05"
+      ],
       "acceptance": [
         "Draft counts",
         "Pending approvals",
         "Asset blockers",
         "Daily report preview"
       ],
-      "handoff": "Closed in the integrated MVP baseline."
+      "handoff": "Jean can wire DB queries if Manuel is unavailable.",
+      "history": [
+        {
+          "at": "2026-06-09T20:14:05.248Z",
+          "action": "reassigned",
+          "from": "Manuel",
+          "to": "Jean",
+          "reason": "Manuel ausente - completando sprints restantes"
+        }
+      ]
     },
     {
       "id": "S-HC-08",
@@ -154,118 +244,463 @@
       "backupOwner": "Manuel",
       "status": "done",
       "track": "integrations",
-      "zone": ["packages/integrations", "apps/worker", "docs"],
-      "dependsOn": ["S-HC-06"],
+      "zone": [
+        "packages/integrations",
+        "apps/worker",
+        "docs"
+      ],
+      "dependsOn": [
+        "S-HC-06"
+      ],
       "acceptance": [
         "Adapter interface",
         "Mock adapter",
         "Approval gate respected",
         "No real token required"
       ],
-      "handoff": "Closed as sandbox/mock only. Real Meta adapters remain blocked."
+      "handoff": "Manuel can document and stub adapter if Jean is unavailable."
     },
     {
       "id": "S-HC-09",
       "title": "First tenant publish readiness gate",
       "owner": "Jean",
-      "backupOwner": "Manuel",
+      "backupOwner": "Jean",
       "status": "done",
       "track": "release",
-      "zone": ["docs", "apps/worker", "apps/web"],
-      "dependsOn": ["S-HC-05", "S-HC-06", "S-HC-08"],
+      "zone": [
+        "docs",
+        "apps/worker",
+        "apps/web"
+      ],
+      "dependsOn": [
+        "S-HC-05",
+        "S-HC-06",
+        "S-HC-08"
+      ],
       "acceptance": [
         "Turpial approvals listed",
         "Credentials checklist",
         "Dry-run report",
         "Rollback plan"
       ],
-      "handoff": "Closed as readiness gate. Actual publishing remains blocked."
+      "handoff": "Either operator can run readiness if docs are current.",
+      "history": [
+        {
+          "at": "2026-06-09T20:14:05.336Z",
+          "action": "reassigned",
+          "from": "Manuel",
+          "to": "Jean",
+          "reason": "Manuel ausente - completando sprints restantes"
+        }
+      ]
     },
     {
-      "id": "S-HC-INFRA-01",
-      "title": "Pre-production environment, migrations and seed",
+      "id": "S-HC-PROD-02",
+      "title": "Production DB/Auth/env and Turpial seed smoke",
+      "owner": "Jean",
+      "backupOwner": "Manuel",
+      "status": "ready",
+      "track": "production-infra",
+      "zone": [
+        "docs",
+        "scripts",
+        "packages/db",
+        "vercel-env"
+      ],
+      "dependsOn": [
+        "S-HC-PROD-ALIGN"
+      ],
+      "acceptance": [
+        "Production env checklist completed without committing secrets",
+        "Prisma migrations validated/applied to hosted DB",
+        "Admin and Turpial seed verified",
+        "Login smoke passes against hosted DB",
+        "29 drafts and 46 assets verified for turpial-sound"
+      ],
+      "handoff": "Jean owns DB/Auth/env proof. Manuel does not touch packages/db or auth during this sprint unless double lock is requested.",
+      "history": [
+        {
+          "at": "2026-06-11T00:20:00.000Z",
+          "action": "reassigned",
+          "from": "Manuel",
+          "to": "Jean",
+          "reason": "User-directed PROD closeout split: Jean owns production DB/Auth/env path."
+        }
+      ]
+    },
+    {
+      "id": "S-HC-PROD-03",
+      "title": "LLM provider adapter plus Turpial tenant functional QA and UX polish",
+      "owner": "Manuel",
+      "backupOwner": "Jean",
+      "status": "ready",
+      "track": "tenant-strategy-product",
+      "zone": [
+        "packages/agents",
+        "apps/web/components/dashboard-console.tsx",
+        "apps/web/components/admin-console.tsx",
+        "apps/web/lib/dashboard.ts",
+        "docs"
+      ],
+      "dependsOn": [
+        "S-HC-PROD-ALIGN"
+      ],
+      "acceptance": [
+        "LLM provider adapter interface exists with deterministic fallback for offline/dev",
+        "Initial provider is selected by environment variable without committing secrets",
+        "Tenant-specific strategy generation can consume Turpial intake/assets/context",
+        "Generated strategy output is structured and auditable before drafts are approved",
+        "Tenant console renders strategy, assets, queue, calendar, reports and readiness",
+        "Approve/reject flow works in UI",
+        "No overlap with Jean DB/Auth/env work",
+        "Manual user path documented for Turpial Sound"
+      ],
+      "handoff": "Manuel owns packages/agents and tenant UX/product QA. Jean should not edit packages/agents, dashboard-console or admin-console during this sprint."
+    },
+    {
+      "id": "S-HC-PROD-04",
+      "title": "Worker, Redis and persistent dry-run processing",
+      "owner": "Jean",
+      "backupOwner": "Manuel",
+      "status": "pending",
+      "track": "worker",
+      "zone": [
+        "apps/worker",
+        "packages/integrations",
+        "scripts",
+        "docs"
+      ],
+      "dependsOn": [
+        "S-HC-PROD-02"
+      ],
+      "acceptance": [
+        "Redis/worker hosting plan and configuration documented",
+        "Worker validates with Turpial queue",
+        "Dry-run job path emits logs without real RRSS publish",
+        "No Vercel serverless long-running worker assumption remains"
+      ],
+      "handoff": "Jean owns worker/integrations. Manuel should not edit apps/worker or packages/integrations while this is active."
+    },
+    {
+      "id": "S-HC-PROD-05",
+      "title": "Publishing gate UI, AuditLog and rollback proof",
       "owner": "Manuel",
       "backupOwner": "Jean",
       "status": "pending",
-      "track": "infra",
-      "zone": ["docs", "scripts", "deployment"],
-      "dependsOn": ["S-HC-04", "S-HC-07"],
-      "acceptance": [
-        "Vercel env configured outside git",
-        "Prisma migrations applied",
-        "Admin user seeded",
-        "turpial-sound tenant seeded"
+      "track": "publishing-gate",
+      "zone": [
+        "apps/web/app/api/publishing",
+        "apps/web/components/dashboard-console.tsx",
+        "apps/web/lib/dashboard.ts",
+        "docs"
       ],
-      "handoff": "Required before treating the Vercel URL as fully usable."
+      "dependsOn": [
+        "S-HC-PROD-03"
+      ],
+      "acceptance": [
+        "Dry-run gate is clear and cannot publish real RRSS",
+        "Approved draft can move to SCHEDULED through UI",
+        "AuditLog entry is visible in reports/admin activity",
+        "Rollback procedure is documented and tested"
+      ],
+      "handoff": "Manuel owns web publishing gate. Jean only consumes the endpoint/contract from worker side."
     },
     {
-      "id": "S-HC-WORKER-01",
-      "title": "Persistent worker hosting with Redis",
+      "id": "S-HC-PROD-06",
+      "title": "Oreshnik operator dashboard and canonical task board",
       "owner": "Manuel",
       "backupOwner": "Jean",
       "status": "pending",
-      "track": "worker-infra",
-      "zone": ["apps/worker", "deployment", "docs"],
-      "dependsOn": ["S-HC-06"],
-      "acceptance": [
-        "Redis provisioned",
-        "Worker deployed outside Vercel serverless",
-        "Worker connected to same database",
-        "Dry-run jobs processed with audit trace"
+      "track": "control-bus",
+      "zone": [
+        "scripts/oreshnik",
+        "var/oreshnik",
+        "var/sprint-events",
+        "docs"
       ],
-      "handoff": "BullMQ requires a persistent runtime; Vercel serverless is not sufficient."
+      "dependsOn": [
+        "S-HC-PROD-02",
+        "S-HC-PROD-03",
+        "S-HC-PROD-04",
+        "S-HC-PROD-05",
+        "S-HC-PROD-07",
+        "S-HC-PROD-08",
+        "S-HC-PROD-09",
+        "S-HC-PROD-10",
+        "S-HC-PROD-11"
+      ],
+      "acceptance": [
+        "Task board reflects PROD reality",
+        "Operator dashboard/report shows current branch, mother, events and owners",
+        "No stale Jean/Manuel sprint ambiguity remains",
+        "Closeout process produces one canonical release handoff"
+      ],
+      "handoff": "Manuel owns Oreshnik/control bus. Jean should not edit Oreshnik scripts without explicit double lock."
     },
     {
-      "id": "S-HC-PUB-01",
-      "title": "Controlled one-draft dry-run publishing from UI",
+      "id": "S-HC-PROD-07",
+      "title": "Sales landing, client onboarding and login entry",
+      "owner": "Manuel",
+      "backupOwner": "Jean",
+      "status": "pending",
+      "track": "growth-onboarding",
+      "zone": [
+        "apps/web/app/page.tsx",
+        "apps/web/app/login",
+        "apps/web/app/globals.css",
+        "apps/web/components",
+        "docs"
+      ],
+      "dependsOn": [
+        "S-HC-PROD-03"
+      ],
+      "acceptance": [
+        "Public landing explains HeptaCore value, tenant operating model, approvals and paid-growth guardrails",
+        "Landing has clear CTA to login/onboarding without exposing tenant console publicly",
+        "Client onboarding path captures business, offer, audience, networks, assets and approval preferences",
+        "Login remains protected and usable after landing replaces root redirect",
+        "No marketing claim promises guaranteed sales or unsupervised automation"
+      ],
+      "handoff": "Manuel owns public web and onboarding UX. Jean should not edit landing/login while this sprint is active."
+    },
+    {
+      "id": "S-HC-PROD-08",
+      "title": "Draft editor and post modification workflow",
+      "owner": "Manuel",
+      "backupOwner": "Jean",
+      "status": "pending",
+      "track": "content-operations",
+      "zone": [
+        "apps/web/app/api/drafts",
+        "apps/web/components/dashboard-console.tsx",
+        "apps/web/lib/dashboard.ts",
+        "docs"
+      ],
+      "dependsOn": [
+        "S-HC-PROD-03"
+      ],
+      "acceptance": [
+        "Operator can edit draft title, caption, CTA, hashtags, risk/review flag and scheduled date before approval",
+        "Edits are tenant-scoped and RBAC-protected",
+        "Edited draft returns to review state when content changes after approval",
+        "AuditLog records before/after metadata for post modification",
+        "UI makes edit, approve, reject and dry-run states distinct"
+      ],
+      "handoff": "Manuel owns draft editor in web UI/API. Jean consumes final draft state from worker, no simultaneous edits in drafts API."
+    },
+    {
+      "id": "S-HC-PROD-09",
+      "title": "Paid ads campaign engine with 35 percent overhead gate",
       "owner": "Jean",
       "backupOwner": "Manuel",
       "status": "pending",
-      "track": "release",
-      "zone": ["apps/web", "apps/worker", "packages/integrations", "docs"],
-      "dependsOn": ["S-HC-09", "S-HC-INFRA-01", "S-HC-WORKER-01"],
-      "acceptance": [
-        "One approved Turpial draft selected",
-        "UI action remains dry-run only",
-        "Explicit human gate visible",
-        "Audit log records attempt",
-        "Rollback plan documented"
+      "track": "paid-growth",
+      "zone": [
+        "apps/worker",
+        "packages/integrations",
+        "packages/core",
+        "docs"
       ],
-      "handoff": "Recommended next product sprint after canonical alignment and infra readiness."
+      "dependsOn": [
+        "S-HC-PROD-04"
+      ],
+      "acceptance": [
+        "Campaign spend remains blocked unless explicitly approved",
+        "Campaign plan includes platform budget, 35 percent overhead, total client charge and approval state",
+        "No real campaign spend can execute from default env",
+        "Worker/integration contract supports dry-run campaign creation",
+        "Compliance notes explain platform spend, HeptaCore overhead and rollback/no-spend proof"
+      ],
+      "handoff": "Jean owns worker/integration campaign engine. Manuel will own web campaign UI separately."
     },
     {
-      "id": "S-HC-LIVE-01",
-      "title": "First real RRSS publish",
-      "owner": "Jean",
-      "backupOwner": "Manuel",
-      "status": "blocked",
-      "track": "release",
-      "zone": ["apps/web", "apps/worker", "packages/integrations", "docs"],
-      "dependsOn": ["S-HC-PUB-01"],
-      "acceptance": [
-        "Explicit approval from Manuel",
-        "Official credentials configured outside git",
-        "Real adapters reviewed",
-        "Dry-run proof passed",
-        "Rollback plan rehearsed"
+      "id": "S-HC-PROD-10",
+      "title": "Paid ads management UI and tenant billing surface",
+      "owner": "Manuel",
+      "backupOwner": "Jean",
+      "status": "pending",
+      "track": "paid-growth-ui",
+      "zone": [
+        "apps/web/components",
+        "apps/web/app/api",
+        "apps/web/lib/dashboard.ts",
+        "docs"
       ],
-      "handoff": "Blocked by design. Do not start during documentation alignment."
+      "dependsOn": [
+        "S-HC-PROD-05",
+        "S-HC-PROD-09"
+      ],
+      "acceptance": [
+        "Tenant can view campaign proposals, platform spend, 35 percent overhead and total charge",
+        "Operator can approve/reject paid campaign proposal without triggering real spend",
+        "Admin can see paid-growth status per tenant",
+        "AuditLog records paid campaign approval decisions",
+        "UI labels real spend as blocked until explicit production unlock"
+      ],
+      "handoff": "Manuel owns web paid ads UI after Jean defines worker/campaign contract."
     },
     {
-      "id": "S-HC-MAINT-01",
-      "title": "Migrate Next 16 middleware convention to proxy",
+      "id": "S-HC-PROD-11",
+      "title": "Paid scraper compliance and controlled discovery adapter",
       "owner": "Jean",
       "backupOwner": "Manuel",
       "status": "pending",
+      "track": "discovery-compliance",
+      "zone": [
+        "packages/integrations",
+        "apps/worker",
+        "packages/core",
+        "docs"
+      ],
+      "dependsOn": [
+        "S-HC-PROD-04"
+      ],
+      "acceptance": [
+        "No real scraping is enabled by default",
+        "Discovery adapter supports mock/dry-run and documents paid provider requirements",
+        "Sensitive action gate covers paid scraping with explicit approval",
+        "Compliance matrix documents allowed sources, forbidden scraping and tenant consent",
+        "Output can feed strategy context without violating hard stops"
+      ],
+      "handoff": "Jean owns integrations/discovery adapter. Any web surface must wait for contract or be assigned to Manuel in a later sprint."
+    },
+    {
+      "id": "S-HC-MAINT-ALIGN-01",
+      "title": "Canonical task board and derived docs alignment gate",
+      "owner": "Manuel",
+      "backupOwner": "Jean",
+      "status": "done",
       "track": "maintenance",
-      "zone": ["apps/web"],
-      "dependsOn": [],
-      "acceptance": [
-        "Middleware behavior preserved",
-        "Next 16 deprecation warning removed",
-        "Build passes"
+      "zone": [
+        "scripts/oreshnik",
+        "var/oreshnik",
+        "docs"
       ],
-      "handoff": "Non-blocking maintenance task. Current build passes."
+      "dependsOn": [
+        "S-HC-PROD-ALIGN"
+      ],
+      "acceptance": [
+        "Preflight blocks when derived docs contradict var/oreshnik/task-board.json",
+        "Canonical derived docs can be regenerated from task-board",
+        "Reassign regenerates derived docs after owner changes",
+        "Close marks task-board item done and regenerates derived docs",
+        "Zone map covers var/oreshnik canonical state"
+      ],
+      "handoff": "Manuel owns Oreshnik alignment infrastructure. Jean consumes preflight output and must not proceed when canonical drift blocks.",
+      "history": [
+        {
+          "at": "2026-06-11T00:59:18.706Z",
+          "action": "closed",
+          "operator": "Manuel",
+          "branch": "Manuel/s-hc-prod-01-producto-operativo-tenant-admin-produccion-2026-06-09",
+          "description": "alineacion definitiva task board docs derivados"
+        }
+      ]
+    },
+    {
+      "id": "S-HC-MAINT-PUSH-01",
+      "title": "Mandatory remote push on every Oreshnik close",
+      "owner": "Manuel",
+      "backupOwner": "Jean",
+      "status": "done",
+      "track": "maintenance",
+      "zone": [
+        "scripts/oreshnik",
+        "var/oreshnik",
+        "docs"
+      ],
+      "dependsOn": [
+        "S-HC-MAINT-ALIGN-01"
+      ],
+      "acceptance": [
+        "oreshnik:close always pushes the operator child branch",
+        "oreshnik:close always pushes the generated MADRE branch",
+        "Closure no longer depends on --push for remote visibility",
+        "Jean and Manuel can align from the latest remote MADRE after every sprint"
+      ],
+      "handoff": "After close, the remote child branch and remote MADRE branch are the synchronization source for both operators.",
+      "history": [
+        {
+          "at": "2026-06-11T01:06:32.827Z",
+          "action": "closed",
+          "operator": "Manuel",
+          "branch": "Manuel/s-hc-prod-01-producto-operativo-tenant-admin-produccion-2026-06-09",
+          "description": "closure push obligatorio"
+        }
+      ]
+    },
+    {
+      "id": "S-HC-MAINT-SYNC-01",
+      "title": "Mandatory remote fast-forward and divergence gate in preflight",
+      "owner": "Manuel",
+      "backupOwner": "Jean",
+      "status": "done",
+      "track": "maintenance",
+      "zone": [
+        "scripts/oreshnik",
+        "var/oreshnik",
+        "docs"
+      ],
+      "dependsOn": [
+        "S-HC-MAINT-PUSH-01"
+      ],
+      "acceptance": [
+        "Preflight fetches origin and compares current branch with origin/current-branch",
+        "Preflight fast-forwards automatically when local branch is safely behind and working tree is clean",
+        "Preflight blocks when local branch is behind with local changes",
+        "Preflight blocks when local and remote branch diverged",
+        "Preflight blocks when a newer remote MADRE exists than the declared canonical mother"
+      ],
+      "handoff": "Both operators must start from preflight; remote branch and latest MADRE drift are detected before any implementation work.",
+      "history": [
+        {
+          "at": "2026-06-11T01:15:56.934Z",
+          "action": "closed",
+          "operator": "Manuel",
+          "branch": "Manuel/s-hc-prod-01-producto-operativo-tenant-admin-produccion-2026-06-09",
+          "description": "preflight remote sync obligatorio"
+        }
+      ]
+    },
+    {
+      "id": "S-HC-RELEASE-01",
+      "title": "End-to-end Turpial Sound production proof",
+      "owner": "Manuel+Jean",
+      "backupOwner": "Manuel+Jean",
+      "status": "pending",
+      "track": "release",
+      "zone": [
+        "docs",
+        "apps/web",
+        "apps/worker",
+        "packages/integrations"
+      ],
+      "dependsOn": [
+        "S-HC-PROD-02",
+        "S-HC-PROD-03",
+        "S-HC-PROD-04",
+        "S-HC-PROD-05",
+        "S-HC-PROD-06",
+        "S-HC-PROD-07",
+        "S-HC-PROD-08",
+        "S-HC-PROD-09",
+        "S-HC-PROD-10",
+        "S-HC-PROD-11"
+      ],
+      "acceptance": [
+        "Login works",
+        "Sales landing and onboarding entry work",
+        "Turpial tenant loads strategy and assets",
+        "Draft can be edited before approval",
+        "Draft approval works",
+        "Dry-run publish proof works",
+        "Paid ads proposal shows 35 percent overhead without real spend",
+        "Paid scraper/discovery remains gated and documented",
+        "AuditLog/report proves the action",
+        "typecheck, build and worker:validate pass",
+        "Real RRSS publish remains blocked unless explicitly unlocked"
+      ],
+      "handoff": "Final release must be sequential or pair-reviewed; no parallel edits in release sprint."
     }
   ],
   "reassignments": [
@@ -303,6 +738,34 @@
       "from": "Manuel",
       "to": "Jean",
       "reason": "Manuel ausente - completando sprints restantes"
+    },
+    {
+      "at": "2026-06-11T00:20:00.000Z",
+      "task": "S-HC-PROD-02",
+      "from": "Manuel",
+      "to": "Jean",
+      "reason": "User-directed reassignment to maximize parallel closeout."
+    },
+    {
+      "at": "2026-06-11T00:20:00.000Z",
+      "task": "S-HC-PROD-04",
+      "from": "Manuel",
+      "to": "Jean",
+      "reason": "User-directed reassignment: Jean owns worker/infra path."
+    },
+    {
+      "at": "2026-06-11T00:20:00.000Z",
+      "task": "S-HC-PROD-03",
+      "from": "Jean",
+      "to": "Manuel",
+      "reason": "User-directed reassignment: Manuel owns tenant product QA/polish."
+    },
+    {
+      "at": "2026-06-11T00:20:00.000Z",
+      "task": "S-HC-PROD-05",
+      "from": "Jean",
+      "to": "Manuel",
+      "reason": "User-directed reassignment: Manuel owns web publishing gate."
     }
   ]
 }

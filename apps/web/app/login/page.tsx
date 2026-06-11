@@ -41,15 +41,16 @@ function LoginForm() {
 
       <form onSubmit={handleSubmit} className="login-form">
         <label className="login-label">
-          Email
+          Usuario o email
           <input
-            type="email"
+            type="text"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
             autoFocus
             className="login-input"
-            placeholder="tu@email.com"
+            placeholder="mvera"
+            autoComplete="username"
           />
         </label>
 
@@ -62,6 +63,7 @@ function LoginForm() {
             required
             className="login-input"
             placeholder="******"
+            autoComplete="current-password"
           />
         </label>
 

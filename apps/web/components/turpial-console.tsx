@@ -33,7 +33,7 @@ type View = "overview" | "queue" | "strategy" | "intake" | "bot";
 
 function assetUrl(path?: string) {
   if (!path) return "";
-  return `/api/tenant-assets/${path.replace(/^content\/inbox\//, "")}`;
+  return `/tenant-assets/turpial/${path.replace(/^content\/inbox\//, "")}`;
 }
 
 function channelLabel(item: QueueItem) {

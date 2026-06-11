@@ -1,13 +1,10 @@
 ---
 type: master-dashboard
 project: "HeptaCore"
-status: mvp-technical-preproduction
-phase: "MVP tecnico pre-produccion: web console, auth, approvals, reports, readiness, worker dry-run and Turpial tenant seed"
-last_updated: "2026-06-09"
-mother_branch: "MADRE/v14-integration-all-code-2026-06-09"
-production_branch: "master"
-production_commit_detected: "000ce31"
-production_url: "https://heptacore.vercel.app"
+status: active-production
+phase: "Canonical Oreshnik task board governs current assignments"
+last_updated: "2026-06-11T01:29:30.649Z"
+mother_branch: "MADRE/v20-s-hc-maint-sync-01-preflight-remote-sync-obligatorio-2026-06-11"
 tags:
   - "#central"
   - "#status/live-source"
@@ -18,101 +15,68 @@ tags:
 
 # HeptaCore - Dashboard Canonico
 
-> Documento canonico. Si hay conflicto entre documentos, este manda hasta que se cierre un sprint con Oreshnik.
+> Fuente operativa: `var/oreshnik/task-board.json`. Los documentos de colaborador y status son derivados y deben ser regenerados si cambian las asignaciones.
 
 ## Estado Actual
 
-HeptaCore ya no se considera foundation pura. El repositorio esta en MVP tecnico pre-produccion.
-
-| Area | Estado |
+| Campo | Valor |
 |---|---|
-| Base productiva/pre-productiva | `master` / `origin/master` |
-| Commit productivo detectado | `000ce31` |
-| URL Vercel | `https://heptacore.vercel.app` |
-| Tenant piloto | `turpial-sound` |
-| Web console | Implementada con login, dashboard, queue, checklist, reportes y readiness |
-| Auth/RBAC/Audit | Implementado como baseline con Auth.js credentials, memberships y audit log |
-| Prisma schema | Implementado y validado |
-| Worker RRSS | Codigo BullMQ/Redis + dry-run existente |
-| Meta adapters | Solo mock/sandbox |
-| Publicacion RRSS real | Bloqueada por diseno |
-| Campanas pagas | Bloqueadas por diseno |
-| Scraping real | Bloqueado por diseno |
+| Task board actualizado | 2026-06-11T01:15:56.934Z |
+| Rama madre | MADRE/v20-s-hc-maint-sync-01-preflight-remote-sync-obligatorio-2026-06-11 |
+| Publicacion RRSS real | Bloqueada hasta aprobacion explicita |
+| Campaign spend | Bloqueado |
+| Real scraping | Bloqueado |
 
-## Rama Madre y Ramas Hijas
+## Orden de Ejecucion
 
-| Tipo | Convencion | Uso |
+- Wave 1 parallel: Jean S-HC-PROD-02, Manuel S-HC-PROD-03 (LLM provider adapter + Turpial tenant QA)
+- Wave 2 parallel: Jean S-HC-PROD-04, Manuel S-HC-PROD-05 after S-HC-PROD-03
+- Wave 3 parallel: Jean S-HC-PROD-09/S-HC-PROD-11, Manuel S-HC-PROD-07/S-HC-PROD-08/S-HC-PROD-10 after core proof
+- Wave 4 sequential: S-HC-PROD-06 control bus/dashboard after PROD-02/03/04/05/07/08/09/10/11
+- Final: S-HC-RELEASE-01 end-to-end Turpial Sound production proof
+
+## Tareas Abiertas
+
+| Sprint | Estado | Owner | Scope | Depende de |
+|---|---|---|---|---|
+| S-HC-PROD-02 | ready | Jean | Production DB/Auth/env and Turpial seed smoke | S-HC-PROD-ALIGN |
+| S-HC-PROD-03 | ready | Manuel | LLM provider adapter plus Turpial tenant functional QA and UX polish | S-HC-PROD-ALIGN |
+| S-HC-PROD-04 | pending | Jean | Worker, Redis and persistent dry-run processing | S-HC-PROD-02 |
+| S-HC-PROD-05 | pending | Manuel | Publishing gate UI, AuditLog and rollback proof | S-HC-PROD-03 |
+| S-HC-PROD-06 | pending | Manuel | Oreshnik operator dashboard and canonical task board | S-HC-PROD-02, S-HC-PROD-03, S-HC-PROD-04, S-HC-PROD-05, S-HC-PROD-07, S-HC-PROD-08, S-HC-PROD-09, S-HC-PROD-10, S-HC-PROD-11 |
+| S-HC-PROD-07 | pending | Manuel | Sales landing, client onboarding and login entry | S-HC-PROD-03 |
+| S-HC-PROD-08 | pending | Manuel | Draft editor and post modification workflow | S-HC-PROD-03 |
+| S-HC-PROD-09 | pending | Jean | Paid ads campaign engine with 35 percent overhead gate | S-HC-PROD-04 |
+| S-HC-PROD-10 | pending | Manuel | Paid ads management UI and tenant billing surface | S-HC-PROD-05, S-HC-PROD-09 |
+| S-HC-PROD-11 | pending | Jean | Paid scraper compliance and controlled discovery adapter | S-HC-PROD-04 |
+| S-HC-RELEASE-01 | pending | Manuel+Jean | End-to-end Turpial Sound production proof | S-HC-PROD-02, S-HC-PROD-03, S-HC-PROD-04, S-HC-PROD-05, S-HC-PROD-06, S-HC-PROD-07, S-HC-PROD-08, S-HC-PROD-09, S-HC-PROD-10, S-HC-PROD-11 |
+
+## Ready Ahora
+
+| Sprint | Owner | Scope |
 |---|---|---|
-| Base productiva/pre-productiva | `master` | Rama desplegable actual |
-| Madre docs/integracion | `MADRE/vN-sprint-desc-fecha` | Documentacion y/o integracion generada por Oreshnik |
-| Madre vigente detectada | `MADRE/v14-integration-all-code-2026-06-09` | Integracion de codigo + docs |
-| Hija Manuel | `Manuel/sprint-desc-fecha` | Trabajo de Manuel |
-| Hija Jean | `Jean/sprint-desc-fecha` | Trabajo de Jean |
+| S-HC-PROD-02 | Jean | Production DB/Auth/env and Turpial seed smoke |
+| S-HC-PROD-03 | Manuel | LLM provider adapter plus Turpial tenant functional QA and UX polish |
 
-## Sprints Cerrados
+## Pendientes Bloqueados por Dependencias
 
-| Sprint | Estado | Scope |
-|---|---|---|
-| S-HC-00 | Cerrado | Foundation baseline |
-| S-HC-01 | Cerrado | Console dashboard, onboarding/checklist, draft queue |
-| S-HC-02 | Cerrado | Turpial importer and Prisma seed |
-| S-HC-03 | Cerrado | Strategy runner |
-| S-HC-04 | Cerrado | Auth, RBAC, tenant guards, audit baseline |
-| S-HC-05 | Cerrado | Approval queue and human gates |
-| S-HC-06 | Cerrado | Worker queue BullMQ/Redis + dry-run jobs |
-| S-HC-07 | Cerrado | Reports dashboard |
-| S-HC-08 | Cerrado | Meta adapter sandbox/mock |
-| S-HC-09 | Cerrado | Publish readiness gate |
-
-## Pendientes y Bloqueos
-
-| Prioridad | Item | Estado | Nota |
+| Sprint | Owner | Scope | Depende de |
 |---|---|---|---|
-| P0 | Configurar env productivo/pre-productivo | Pendiente | DB, Auth.js, URL canonica y encryption fuera de git |
-| P0 | Migraciones + seed en DB productiva | Pendiente | Admin y tenant `turpial-sound` deben existir en la DB real |
-| P0 | Worker hosting persistente | Pendiente | BullMQ necesita Redis y proceso fuera de Vercel serverless |
-| P0 | S-HC-PUB-01 dry-run desde UI | Pendiente | Un draft aprobado, sin publicar real |
-| P0 | Publicacion RRSS real | Bloqueada | Requiere aprobacion explicita, adapters reales, credenciales oficiales y rollback |
-| P1 | Migrar `middleware.ts` a `proxy` | Pendiente | Next 16 lo recomienda; build actual pasa |
-| P1 | Observability worker/web | Pendiente | Logs operativos y alertas |
-| P2 | WhatsApp reports | Pendiente | Solo despues de estabilizar pre-produccion |
+| S-HC-PROD-04 | Jean | Worker, Redis and persistent dry-run processing | S-HC-PROD-02 |
+| S-HC-PROD-05 | Manuel | Publishing gate UI, AuditLog and rollback proof | S-HC-PROD-03 |
+| S-HC-PROD-06 | Manuel | Oreshnik operator dashboard and canonical task board | S-HC-PROD-02, S-HC-PROD-03, S-HC-PROD-04, S-HC-PROD-05, S-HC-PROD-07, S-HC-PROD-08, S-HC-PROD-09, S-HC-PROD-10, S-HC-PROD-11 |
+| S-HC-PROD-07 | Manuel | Sales landing, client onboarding and login entry | S-HC-PROD-03 |
+| S-HC-PROD-08 | Manuel | Draft editor and post modification workflow | S-HC-PROD-03 |
+| S-HC-PROD-09 | Jean | Paid ads campaign engine with 35 percent overhead gate | S-HC-PROD-04 |
+| S-HC-PROD-10 | Manuel | Paid ads management UI and tenant billing surface | S-HC-PROD-05, S-HC-PROD-09 |
+| S-HC-PROD-11 | Jean | Paid scraper compliance and controlled discovery adapter | S-HC-PROD-04 |
+| S-HC-RELEASE-01 | Manuel+Jean | End-to-end Turpial Sound production proof | S-HC-PROD-02, S-HC-PROD-03, S-HC-PROD-04, S-HC-PROD-05, S-HC-PROD-06, S-HC-PROD-07, S-HC-PROD-08, S-HC-PROD-09, S-HC-PROD-10, S-HC-PROD-11 |
 
 ## Reglas Activas
 
 - No publicar en redes reales desde HeptaCore sin aprobacion explicita.
-- No conectar adapters reales de Meta en tareas de alineacion documental.
-- No pedir, mostrar ni commitear credenciales reales.
+- No pedir ni commitear credenciales reales.
 - No ejecutar scraping real.
 - No gastar en campanas.
-- No trabajar directo en ramas madre salvo flujos Oreshnik de cierre/sync.
-- No cerrar sprint sin actualizar vault, task board y validaciones.
-- No usar Vercel serverless como worker persistente BullMQ.
-
-## Validaciones Base
-
-| Check | Comando | Estado esperado |
-|---|---|---|
-| TypeScript | `npm run typecheck` | PASS |
-| Build | `npm run build` | PASS |
-| Worker Turpial | `npm run worker:validate` | PASS, 29/29 drafts y 46/46 assets |
-| Prisma validate | `npx prisma validate --schema packages/db/prisma/schema.prisma` | PASS |
-| Diff hygiene | `git diff --check` | PASS |
-
-## Navegacion
-
-- [[METODOLOGIA/METODOLOGIA_ORESHNIK_HEPTACORE]]
-- [[METODOLOGIA/INSTRUCCION_APERTURA_SESION]]
-- [[SPRINTS/PLAN_MAESTRO_SPRINTS]]
-- [[SPRINTS/PLAN_PARALELO_MANUEL_JEAN]]
-- [[METODOLOGIA/RESILIENCIA_REASIGNACION]]
-- [[DEPLOY/RUTA_CRITICA_TENANT_TURPIAL]]
-- [[COLABORADORES/ESTADO_MANUEL]]
-- [[COLABORADORES/ESTADO_JEAN]]
-- [[ARQUITECTURA/HEPTACORE_SYSTEM_MAP]]
-- [[PRODUCT/STATUS_BOARD]]
-- [[PRODUCT/AUDITORIA_HOLISTICA_2026-06-09]]
-- [[PRODUCT/POSTMORTEM_2026-06-09_VERCEL_BUILD]]
-
----
-
-Ultima actualizacion: 2026-06-09 | Operador: Jean | Sprint: canonical alignment | Rama: `Jean/s-hc-canonical-alignment-2026-06-09`
+- No cerrar sprint sin actualizar vault, handoff y validaciones.
+- No pisar trabajo del otro operador: usar preflight, zone check y canonical check.

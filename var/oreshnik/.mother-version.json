@@ -1,16 +1,80 @@
 {
-    "current":  "MADRE/v14-integration-all-code-2026-06-09",
-    "branches":  [
-                     {
-                         "previous":  "MADRE/v11-s-hc-09-publish-readiness-gate-2026-06-09",
-                         "sprint":  "INTEGRATION",
-                         "operator":  "Manuel",
-                         "name":  "MADRE/v14-integration-all-code-2026-06-09",
-                         "description":  "Full integration mother — Jean\u0027s 9 sprints code + latest docs + Oreshnik infrastructure",
-                         "version":  14,
-                         "at":  "2026-06-09T21:06:00.000Z",
-                         "date":  "2026-06-09"
-                     }
-                 ],
-    "version":  14
+  "current": "MADRE/v20-s-hc-maint-sync-01-preflight-remote-sync-obligatorio-2026-06-11",
+  "branches": [
+    {
+      "previous": "MADRE/v11-s-hc-09-publish-readiness-gate-2026-06-09",
+      "sprint": "INTEGRATION",
+      "operator": "Manuel",
+      "name": "MADRE/v14-integration-all-code-2026-06-09",
+      "description": "Full integration mother ï¿½ Jean's 9 sprints code + latest docs + Oreshnik infrastructure",
+      "version": 14,
+      "at": "2026-06-09T21:06:00.000Z",
+      "date": "2026-06-09"
+    },
+    {
+      "version": 15,
+      "name": "MADRE/v15-s-hc-prod-01-producto-operativo-tenant-admin-produccion-2026-06-09",
+      "sprint": "S-HC-PROD-01",
+      "operator": "Manuel",
+      "date": "2026-06-09",
+      "at": "2026-06-09T23:30:43.747Z",
+      "previous": "MADRE/v14-integration-all-code-2026-06-09",
+      "description": "producto operativo tenant admin produccion"
+    },
+    {
+      "version": 16,
+      "name": "MADRE/v16-s-hc-prod-01-producto-operativo-tenant-admin-produccion-2026-06-09",
+      "sprint": "S-HC-PROD-01",
+      "operator": "Manuel",
+      "date": "2026-06-09",
+      "at": "2026-06-09T23:31:37.871Z",
+      "previous": "MADRE/v15-s-hc-prod-01-producto-operativo-tenant-admin-produccion-2026-06-09",
+      "description": "producto operativo tenant admin produccion"
+    },
+    {
+      "version": 17,
+      "name": "MADRE/v17-s-hc-prod-align-alineacion-oreshnik-middleware-manual-usuario-2026-06-10",
+      "sprint": "S-HC-PROD-ALIGN",
+      "operator": "Manuel",
+      "date": "2026-06-10",
+      "at": "2026-06-10T23:54:43.089Z",
+      "previous": "MADRE/v16-s-hc-prod-01-producto-operativo-tenant-admin-produccion-2026-06-09",
+      "description": "alineacion oreshnik middleware manual usuario"
+    },
+    {
+      "version": 18,
+      "name": "MADRE/v18-s-hc-maint-align-01-alineacion-definitiva-task-board-docs-derivados-2026-06-11",
+      "sprint": "S-HC-MAINT-ALIGN-01",
+      "operator": "Manuel",
+      "date": "2026-06-11",
+      "at": "2026-06-11T00:59:18.706Z",
+      "previous": "MADRE/v17-s-hc-prod-align-alineacion-oreshnik-middleware-manual-usuario-2026-06-10",
+      "description": "alineacion definitiva task board docs derivados"
+    },
+    {
+      "version": 19,
+      "name": "MADRE/v19-s-hc-maint-push-01-closure-push-obligatorio-2026-06-11",
+      "sprint": "S-HC-MAINT-PUSH-01",
+      "operator": "Manuel",
+      "date": "2026-06-11",
+      "at": "2026-06-11T01:06:32.827Z",
+      "previous": "MADRE/v18-s-hc-maint-align-01-alineacion-definitiva-task-board-docs-derivados-2026-06-11",
+      "description": "closure push obligatorio"
+    },
+    {
+      "version": 20,
+      "name": "MADRE/v20-s-hc-maint-sync-01-preflight-remote-sync-obligatorio-2026-06-11",
+      "sprint": "S-HC-MAINT-SYNC-01",
+      "operator": "Manuel",
+      "date": "2026-06-11",
+      "at": "2026-06-11T01:15:56.934Z",
+      "previous": "MADRE/v19-s-hc-maint-push-01-closure-push-obligatorio-2026-06-11",
+      "description": "preflight remote sync obligatorio"
+    }
+  ],
+  "version": 20,
+  "effective": "MADRE/v19-s-hc-maint-push-01-closure-push-obligatorio-2026-06-11",
+  "effectiveRef": "origin/MADRE/v19-s-hc-maint-push-01-closure-push-obligatorio-2026-06-11",
+  "declaredMissing": false,
+  "discoveredVersion": 14
 }

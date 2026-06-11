@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
-import { dirname, join } from "node:path";
+import { join } from "node:path";
 import {
   CENTRAL_DOC,
   EVENTS_DIR,
@@ -12,9 +12,12 @@ import {
   hasFlag,
   log,
   nowVet,
-  readMother,
+  readJson,
+  resolveMother,
   resolveOperator,
+  ROOT,
   sanitize,
+  sh,
   writeJson,
   writeMother
 } from "./lib.mjs";
@@ -22,18 +25,18 @@ import {
 const sprint = getArg("--sprint");
 const operator = resolveOperator(getArg("--operator"));
 const desc = getArg("--desc", "cierre");
-const push = hasFlag("--push");
 const force = hasFlag("--force");
 
 if (!sprint) {
-  console.error("Usage: node scripts/oreshnik/close-sprint.mjs --sprint SXX --operator Jean|Manuel --desc \"desc\" [--push] [--force]");
+  console.error("Usage: node scripts/oreshnik/close-sprint.mjs --sprint SXX --operator Jean|Manuel --desc \"desc\" [--force]");
   process.exit(2);
 }
 
 const vet = nowVet();
 const branch = currentBranch();
-const mother = readMother();
-const newVersion = (mother.version || 1) + 1;
+git(["fetch", "origin", "--prune", "--quiet"], { allowFail: true });
+const mother = resolveMother();
+const newVersion = Math.max(mother.version || 1, mother.discoveredVersion || 0) + 1;
 const newMother = `MADRE/v${newVersion}-${sanitize(sprint)}-${sanitize(desc)}-${vet.date}`;
 
 console.log("");
@@ -43,6 +46,7 @@ log("INFO", `Sprint: ${sprint}`);
 log("INFO", `Operator: ${operator}`);
 log("INFO", `Branch: ${branch}`);
 log("INFO", `Current mother: ${mother.current}`);
+if (mother.declaredMissing) log("WARN", `Declared mother missing; closing from effective mother ${mother.effective}.`);
 log("INFO", `Next mother: ${newMother}`);
 
 if (!new RegExp(`^${operator}/`, "i").test(branch) && !force) {
@@ -59,6 +63,7 @@ if (secretChanges.length > 0) {
   process.exit(1);
 }
 
+updateTaskBoard();
 updateVaultDocs();
 
 mkdirSync(EVENTS_DIR, { recursive: true });
@@ -95,8 +100,19 @@ const nextMotherData = {
   ]
 };
 writeMother(nextMotherData);
+sh(`node scripts/oreshnik/canonical-check.mjs --fix --sprint ${sprint} --operator ${operator}`, { fatal: true });
 
-git(["add", "docs/obsidian-vault", "docs/07_handoffs", "var/oreshnik/.mother-version.json", "var/sprint-events"], { allowFail: false });
+git([
+  "add",
+  "docs/obsidian-vault",
+  "docs/07_handoffs",
+  "scripts/oreshnik",
+  "package.json",
+  "package-lock.json",
+  "var/oreshnik/.mother-version.json",
+  "var/oreshnik/task-board.json",
+  "var/sprint-events"
+], { allowFail: false });
 const stagedAfter = git(["diff", "--cached", "--name-only"], { allowFail: true }).output;
 if (!stagedAfter) {
   log("WARN", "No staged documentation changes.");
@@ -105,45 +121,12 @@ if (!stagedAfter) {
   log("OK", "Closure documentation committed on child branch.");
 }
 
-const motherExists = git(["rev-parse", "--verify", mother.current], { allowFail: true }).ok;
-if (motherExists) {
-  git(["checkout", mother.current], { allowFail: false });
-  git(["checkout", "-b", newMother], { allowFail: false });
-  const base = git(["merge-base", "HEAD", branch], { allowFail: true }).output || mother.current;
-  const merge = git(["diff", "--name-only", `${base}...${branch}`, "--", "docs/obsidian-vault", "docs/07_handoffs"], { allowFail: true }).output;
-  if (merge) {
-    const result = git(["show", `${branch}:docs/obsidian-vault/00_CENTRAL_HEPTACORE.md`], { allowFail: true });
-    if (result.ok) writeFileSafe(CENTRAL_DOC, result.output);
-    git(["checkout", branch, "--", "docs/obsidian-vault", "docs/07_handoffs"], { allowFail: true });
-  }
-  writeMother(nextMotherData);
-  writeJson(eventPath, {
-    sprint,
-    operator,
-    status: "CERRADO",
-    date: vet.date,
-    at: vet.iso,
-    branch,
-    previousMother: mother.current,
-    nextMother: newMother,
-    description: desc
-  });
-  git(["add", "docs/obsidian-vault", "docs/07_handoffs", "var/oreshnik/.mother-version.json", "var/sprint-events"], { allowFail: false });
-  if (git(["diff", "--cached", "--name-only"], { allowFail: true }).output) {
-    git(["commit", "-m", `docs(mother): integrate ${sprint} - ${operator}`], { allowFail: false });
-    log("OK", `Created local mother branch ${newMother}.`);
-  }
-  if (push) {
-    git(["push", "origin", branch], { allowFail: false });
-    git(["push", "origin", newMother], { allowFail: false });
-    log("OK", "Pushed child branch and mother branch.");
-  } else {
-    log("WARN", "Push skipped. Re-run with --push when ready.");
-  }
-  git(["checkout", branch], { allowFail: false });
-} else {
-  log("WARN", `Mother '${mother.current}' does not exist locally. Recorded closure metadata only.`);
-}
+git(["checkout", "-b", newMother, branch], { allowFail: false });
+log("OK", `Created local mother branch ${newMother} from ${branch}.`);
+git(["push", "origin", branch], { allowFail: false });
+git(["push", "origin", newMother], { allowFail: false });
+log("OK", "Pushed child branch and mother branch.");
+git(["checkout", branch], { allowFail: false });
 
 console.log("");
 console.log(`${colors.green}${colors.bold}SPRINT CLOSED: ${sprint}${colors.reset}`);
@@ -170,6 +153,29 @@ function updateVaultDocs() {
   }
 }
 
+function updateTaskBoard() {
+  const absoluteBoardPath = join(ROOT, "var", "oreshnik", "task-board.json");
+  const board = readJson(absoluteBoardPath, null);
+  const task = board?.tasks?.find((item) => item.id === sprint);
+  if (!task) {
+    log("WARN", `Sprint ${sprint} not found in var/oreshnik/task-board.json; closure event will still be recorded.`);
+    return;
+  }
+
+  task.status = "done";
+  task.history = task.history || [];
+  task.history.push({
+    at: vet.iso,
+    action: "closed",
+    operator,
+    branch,
+    description: desc
+  });
+  board.updatedAt = vet.iso;
+  writeJson(absoluteBoardPath, board);
+  log("OK", `Task board marked ${sprint} as done.`);
+}
+
 function replaceOrInsertFrontmatter(content, key, value) {
   const line = `${key}: "${value}"`;
   const regex = new RegExp(`^${key}:\\s*".*"$`, "m");
@@ -184,7 +190,3 @@ function appendIfMissing(currentContent, path, addition) {
   else writeFileSync(path, `${currentContent.trimEnd()}\n${addition}`, "utf8");
 }
 
-function writeFileSafe(path, content) {
-  mkdirSync(dirname(path), { recursive: true });
-  writeFileSync(path, content, "utf8");
-}

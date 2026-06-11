@@ -4,6 +4,7 @@ import { join } from "node:path";
 import {
   colors,
   currentBranch,
+  discoverLatestMother,
   getArg,
   git,
   isMotherBranch,
@@ -11,6 +12,7 @@ import {
   nonIgnoredDirtyFiles,
   nowVet,
   readMother,
+  resolveMother,
   resolveOperator,
   ROOT,
   RUNS_DIR,
@@ -24,7 +26,7 @@ const sprint = getArg("--sprint");
 const operator = resolveOperator(getArg("--operator"));
 const desc = getArg("--desc", "sprint");
 const vet = nowVet();
-const mother = readMother();
+let mother = readMother();
 
 console.log("");
 console.log(`${colors.bold}==============================================${colors.reset}`);
@@ -35,8 +37,8 @@ console.log("");
 
 let blockers = 0;
 let warnings = 0;
-const branch = currentBranch();
-const dirty = nonIgnoredDirtyFiles();
+let branch = currentBranch();
+let dirty = nonIgnoredDirtyFiles();
 
 log("INFO", `Operator: ${operator}`);
 log("INFO", `Sprint: ${sprint || "not specified"}`);
@@ -44,18 +46,29 @@ log("INFO", `Current branch: ${branch}`);
 log("INFO", `Dynamic mother: ${mother.current} (v${mother.version})`);
 
 console.log("");
-log("INFO", "1/7 Git fetch and mother availability");
+log("INFO", "1/9 Remote sync and mother availability");
 git(["fetch", "origin", "--prune", "--quiet"], { allowFail: true });
+const remoteSync = syncCurrentBranch();
+if (remoteSync.blocked) blockers++;
+branch = currentBranch();
+dirty = nonIgnoredDirtyFiles();
+
+mother = resolveMother();
+const latestMother = discoverLatestMother();
+if (latestMother && latestMother.version > (mother.version || 0)) {
+  log("FAIL", `Remote mother ${latestMother.name} is newer than declared ${mother.current}. Sync from latest mother before working.`);
+  blockers++;
+}
 const originMother = git(["rev-parse", "--verify", `origin/${mother.current}`], { allowFail: true });
 const localMother = git(["rev-parse", "--verify", mother.current], { allowFail: true });
 if (originMother.ok || localMother.ok) log("OK", "Mother branch is available locally or remotely.");
 else {
-  log("WARN", `Mother branch '${mother.current}' not found yet. This is acceptable before first shared mother is pushed.`);
+  log("WARN", `Mother branch '${mother.current}' not found yet. Effective mother: ${mother.effective}.`);
   warnings++;
 }
 
 console.log("");
-log("INFO", "2/7 Working tree");
+log("INFO", "2/9 Working tree");
 if (dirty.length > 0) {
   log("WARN", `${dirty.length} changed file(s). Preflight will not auto-switch branches while dirty.`);
   warnings++;
@@ -64,7 +77,7 @@ if (dirty.length > 0) {
 }
 
 console.log("");
-log("INFO", "3/7 Branch management");
+log("INFO", "3/9 Branch management");
 if (sprint) {
   const expected = `${operator}/${sanitize(sprint)}-${sanitize(desc)}-${today()}`;
   if (isMotherBranch(branch)) {
@@ -93,10 +106,11 @@ if (sprint) {
 }
 
 console.log("");
-log("INFO", "4/7 Zone check");
+log("INFO", "4/9 Zone check");
 if (sprint) {
-  const zone = sh(`node scripts/oreshnik/zone-check.mjs --sprint ${sprint}`);
-  if (zone.includes("[ FAIL")) {
+  const zone = sh(`node scripts/oreshnik/zone-check.mjs --sprint ${sprint} --operator ${operator}`);
+  const zonePlain = zone.replace(/\x1b\[[0-9;]*m/g, "");
+  if (zonePlain.includes("[ FAIL")) {
     console.log(zone);
     blockers++;
   } else {
@@ -107,7 +121,20 @@ if (sprint) {
 }
 
 console.log("");
-log("INFO", "5/7 Environment and secrets");
+log("INFO", "5/9 Canonical assignment/doc alignment");
+{
+  const canonical = sh(`node scripts/oreshnik/canonical-check.mjs --sprint ${sprint || ""} --operator ${operator}`);
+  const canonicalPlain = canonical.replace(/\x1b\[[0-9;]*m/g, "");
+  if (canonicalPlain.includes("[ FAIL")) {
+    console.log(canonical);
+    blockers++;
+  } else {
+    console.log(canonical);
+  }
+}
+
+console.log("");
+log("INFO", "6/9 Environment and secrets");
 const forbidden = dirty.filter((file) => /^\.env($|\.)/.test(file) && !file.endsWith(".example"));
 if (forbidden.length > 0) {
   forbidden.forEach((file) => log("FAIL", `Secret-like file changed: ${file}`));
@@ -122,20 +149,25 @@ else {
 }
 
 console.log("");
-log("INFO", "6/7 Build checks available");
+log("INFO", "7/9 Build checks available");
 const pkg = existsSync(join(ROOT, "package.json"));
 const prisma = existsSync(join(ROOT, "packages", "db", "prisma", "schema.prisma"));
 if (pkg) log("OK", "package.json present.");
 if (prisma) log("OK", "Prisma schema present.");
 
 console.log("");
-log("INFO", "7/7 Session ledger");
+log("INFO", "8/9 Remote alignment summary");
+log("OK", remoteSync.message);
+
+console.log("");
+log("INFO", "9/9 Session ledger");
 mkdirSync(RUNS_DIR, { recursive: true });
 writeJson(join(RUNS_DIR, ".last-preflight.json"), {
   sprint: sprint || null,
   operator,
   branch,
   mother: mother.current,
+  effectiveMother: mother.effective,
   dirtyCount: dirty.length,
   blockers,
   warnings,
@@ -161,3 +193,50 @@ if (blockers > 0) {
 
 console.log(`${warnings > 0 ? colors.yellow : colors.green}${colors.bold}[ORESHNIK] OK${colors.reset}`);
 console.log(`Close command: node scripts/oreshnik/close-sprint.mjs --sprint ${sprint || "SXX"} --operator ${operator} --desc "${desc}"`);
+
+function syncCurrentBranch() {
+  if (!branch || branch === "DETACHED") {
+    log("WARN", "Detached HEAD; cannot compare against origin branch.");
+    warnings++;
+    return { blocked: false, message: "Detached HEAD; remote branch sync skipped." };
+  }
+
+  const remoteRef = `origin/${branch}`;
+  const remoteExists = git(["rev-parse", "--verify", remoteRef], { allowFail: true });
+  if (!remoteExists.ok) {
+    log("WARN", `Remote branch ${remoteRef} not found yet. It will be created on close.`);
+    warnings++;
+    return { blocked: false, message: `Remote branch ${remoteRef} not found.` };
+  }
+
+  const localSha = git(["rev-parse", "HEAD"], { allowFail: false }).output;
+  const remoteSha = git(["rev-parse", remoteRef], { allowFail: false }).output;
+  if (localSha === remoteSha) {
+    log("OK", `Local branch is aligned with ${remoteRef}.`);
+    return { blocked: false, message: `Local branch aligned with ${remoteRef}.` };
+  }
+
+  const base = git(["merge-base", "HEAD", remoteRef], { allowFail: true }).output;
+  if (!base) {
+    log("FAIL", `Cannot find merge base with ${remoteRef}. Manual review required.`);
+    return { blocked: true, message: `No merge base with ${remoteRef}.` };
+  }
+
+  if (base === localSha) {
+    if (dirty.length > 0) {
+      log("FAIL", `Local branch is behind ${remoteRef}, but working tree has ${dirty.length} changed file(s). Commit/stash first.`);
+      return { blocked: true, message: `Behind ${remoteRef}; dirty tree prevents fast-forward.` };
+    }
+    git(["merge", "--ff-only", remoteRef], { allowFail: false });
+    log("OK", `Fast-forwarded local branch from ${remoteRef}.`);
+    return { blocked: false, message: `Fast-forwarded from ${remoteRef}.` };
+  }
+
+  if (base === remoteSha) {
+    log("OK", `Local branch is ahead of ${remoteRef}; close will push it.`);
+    return { blocked: false, message: `Local branch ahead of ${remoteRef}.` };
+  }
+
+  log("FAIL", `Local branch diverged from ${remoteRef}. Rebase/merge manually before working.`);
+  return { blocked: true, message: `Diverged from ${remoteRef}.` };
+}
