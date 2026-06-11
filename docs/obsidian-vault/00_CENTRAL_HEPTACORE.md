@@ -3,8 +3,8 @@ type: master-dashboard
 project: "HeptaCore"
 status: active-production
 phase: "Canonical Oreshnik task board governs current assignments"
-last_updated: "2026-06-11T01:59:24.493Z"
-mother_branch: "MADRE/v27-s-hc-maint-close-spawn-01-limpiar-warning-cierre-spawn-2026-06-11"
+last_updated: "2026-06-11T02:44:34.563Z"
+mother_branch: "MADRE/v28-s-hc-prod-03-llm-provider-adapter-plus-turpial-tenant-qa-ux-p-2026-06-11"
 tags:
   - "#central"
   - "#status/live-source"
@@ -21,8 +21,8 @@ tags:
 
 | Campo | Valor |
 |---|---|
-| Task board actualizado | 2026-06-11T01:58:57.325Z |
-| Rama madre | MADRE/v27-s-hc-maint-close-spawn-01-limpiar-warning-cierre-spawn-2026-06-11 |
+| Task board actualizado | 2026-06-11T02:44:03.210Z |
+| Rama madre | MADRE/v28-s-hc-prod-03-llm-provider-adapter-plus-turpial-tenant-qa-ux-p-2026-06-11 |
 | Publicacion RRSS real | Bloqueada hasta aprobacion explicita |
 | Campaign spend | Bloqueado |
 | Real scraping | Bloqueado |
@@ -39,7 +39,6 @@ tags:
 
 | Sprint | Estado | Owner | Scope | Depende de |
 |---|---|---|---|---|
-| S-HC-PROD-03 | ready | Manuel | LLM provider adapter plus Turpial tenant functional QA and UX polish | S-HC-PROD-ALIGN |
 | S-HC-PROD-05 | pending | Manuel | Publishing gate UI, AuditLog and rollback proof | S-HC-PROD-03 |
 | S-HC-PROD-06 | pending | Manuel | Oreshnik operator dashboard and canonical task board | S-HC-PROD-02, S-HC-PROD-03, S-HC-PROD-04, S-HC-PROD-05, S-HC-PROD-07, S-HC-PROD-08, S-HC-PROD-09, S-HC-PROD-10, S-HC-PROD-11 |
 | S-HC-PROD-07 | pending | Manuel | Sales landing, client onboarding and login entry | S-HC-PROD-03 |
@@ -51,7 +50,7 @@ tags:
 
 | Sprint | Owner | Scope |
 |---|---|---|
-| S-HC-PROD-03 | Manuel | LLM provider adapter plus Turpial tenant functional QA and UX polish |
+| Ninguno | - | - |
 
 ## Pendientes Bloqueados por Dependencias
 

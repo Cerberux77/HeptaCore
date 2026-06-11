@@ -1,8 +1,8 @@
 ---
 type: sprint-plan
 project: "HeptaCore"
-last_updated: "2026-06-11T01:58:57.325Z"
-mother_branch: "MADRE/v27-s-hc-maint-close-spawn-01-limpiar-warning-cierre-spawn-2026-06-11"
+last_updated: "2026-06-11T02:44:03.210Z"
+mother_branch: "MADRE/v28-s-hc-prod-03-llm-provider-adapter-plus-turpial-tenant-qa-ux-p-2026-06-11"
 tags:
   - "#sprints"
   - "#manuel"
@@ -496,3 +496,14 @@ Ver [[PLAN_PARALELO_MANUEL_JEAN]] para distribucion de carga, backups y reasigna
 | Estado | CERRADO |
 | Madre docs | `MADRE/v27-s-hc-maint-close-spawn-01-limpiar-warning-cierre-spawn-2026-06-11` |
 | Descripcion | limpiar warning cierre spawn |
+
+
+## Cierre S-HC-PROD-03 - 2026-06-11
+
+| Campo | Valor |
+|---|---|
+| Operador | Manuel |
+| Rama | `Manuel/s-hc-prod-01-producto-operativo-tenant-admin-produccion-2026-06-09` |
+| Estado | CERRADO |
+| Madre docs | `MADRE/v28-s-hc-prod-03-llm-provider-adapter-plus-turpial-tenant-qa-ux-p-2026-06-11` |
+| Descripcion | LLM provider adapter plus Turpial tenant QA UX polish |

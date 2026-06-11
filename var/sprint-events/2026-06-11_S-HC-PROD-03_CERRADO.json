@@ -1,0 +1,16 @@
+{
+  "sprint": "S-HC-PROD-03",
+  "operator": "Manuel",
+  "status": "CERRADO",
+  "date": "2026-06-11",
+  "at": "2026-06-11T02:44:03.210Z",
+  "branch": "Manuel/s-hc-prod-01-producto-operativo-tenant-admin-produccion-2026-06-09",
+  "previousMother": "MADRE/v27-s-hc-maint-close-spawn-01-limpiar-warning-cierre-spawn-2026-06-11",
+  "nextMother": "MADRE/v28-s-hc-prod-03-llm-provider-adapter-plus-turpial-tenant-qa-ux-p-2026-06-11",
+  "description": "LLM provider adapter plus Turpial tenant QA UX polish",
+  "changedFiles": [
+    ".env.example",
+    "packages/agents/src/index.ts",
+    "packages/agents/src/strategy-runner.ts"
+  ]
+}

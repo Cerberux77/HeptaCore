@@ -2,7 +2,7 @@
 type: collaborator-status
 project: "HeptaCore"
 operator: "Manuel"
-last_updated: "2026-06-11T01:59:24.493Z"
+last_updated: "2026-06-11T02:44:34.563Z"
 generated_by: "Oreshnik canonical-check"
 source: "var/oreshnik/task-board.json"
 ---
@@ -15,7 +15,7 @@ source: "var/oreshnik/task-board.json"
 
 | Sprint | Scope | Depende de |
 |---|---|---|
-| S-HC-PROD-03 | LLM provider adapter plus Turpial tenant functional QA and UX polish | S-HC-PROD-ALIGN |
+| Ninguno | - | - |
 
 ## Pending
 
@@ -29,21 +29,6 @@ source: "var/oreshnik/task-board.json"
 | S-HC-RELEASE-01 | End-to-end Turpial Sound production proof | S-HC-PROD-02, S-HC-PROD-03, S-HC-PROD-04, S-HC-PROD-05, S-HC-PROD-06, S-HC-PROD-07, S-HC-PROD-08, S-HC-PROD-09, S-HC-PROD-10, S-HC-PROD-11 |
 
 ## Detalle de Aceptacion
-
-### S-HC-PROD-03 - LLM provider adapter plus Turpial tenant functional QA and UX polish
-
-Estado: `ready`
-
-- LLM provider adapter interface exists with deterministic fallback for offline/dev
-- Initial provider is selected by environment variable without committing secrets
-- Tenant-specific strategy generation can consume Turpial intake/assets/context
-- Generated strategy output is structured and auditable before drafts are approved
-- Tenant console renders strategy, assets, queue, calendar, reports and readiness
-- Approve/reject flow works in UI
-- No overlap with Jean DB/Auth/env work
-- Manual user path documented for Turpial Sound
-
-Zonas: `packages/agents`, `apps/web/components/dashboard-console.tsx`, `apps/web/components/admin-console.tsx`, `apps/web/lib/dashboard.ts`, `docs`
 
 ### S-HC-PROD-05 - Publishing gate UI, AuditLog and rollback proof
 

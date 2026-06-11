@@ -1,6 +1,6 @@
 {
   "project": "HeptaCore",
-  "updatedAt": "2026-06-11T01:58:57.325Z",
+  "updatedAt": "2026-06-11T02:44:03.210Z",
   "resiliencePolicy": "If an owner is unavailable for more than one working block or blocks the critical path, backupOwner may take over after recording reassignment.",
   "closurePolicy": "No sprint may be closed until acceptance criteria, base tests, sprint-specific tests, docs/handoff, and Oreshnik zone checks pass. See docs/obsidian-vault/METODOLOGIA/ORQUESTACION_AGENTES_HEPTACORE.md.",
   "baseTestMatrix": [
@@ -340,7 +340,7 @@
       "title": "LLM provider adapter plus Turpial tenant functional QA and UX polish",
       "owner": "Manuel",
       "backupOwner": "Jean",
-      "status": "ready",
+      "status": "done",
       "track": "tenant-strategy-product",
       "zone": [
         "packages/agents",
@@ -362,7 +362,16 @@
         "No overlap with Jean DB/Auth/env work",
         "Manual user path documented for Turpial Sound"
       ],
-      "handoff": "Manuel owns packages/agents and tenant UX/product QA. Jean should not edit packages/agents, dashboard-console or admin-console during this sprint."
+      "handoff": "Manuel owns packages/agents and tenant UX/product QA. Jean should not edit packages/agents, dashboard-console or admin-console during this sprint.",
+      "history": [
+        {
+          "at": "2026-06-11T02:44:03.210Z",
+          "action": "closed",
+          "operator": "Manuel",
+          "branch": "Manuel/s-hc-prod-01-producto-operativo-tenant-admin-produccion-2026-06-09",
+          "description": "LLM provider adapter plus Turpial tenant QA UX polish"
+        }
+      ]
     },
     {
       "id": "S-HC-PROD-04",

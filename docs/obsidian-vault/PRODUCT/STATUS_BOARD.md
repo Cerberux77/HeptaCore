@@ -1,7 +1,7 @@
 ---
 type: status-board
 project: "HeptaCore"
-last_updated: "2026-06-11T01:59:24.493Z"
+last_updated: "2026-06-11T02:44:34.563Z"
 generated_by: "Oreshnik canonical-check"
 source: "var/oreshnik/task-board.json"
 ---
@@ -22,7 +22,6 @@ source: "var/oreshnik/task-board.json"
 
 | Sprint | Estado | Owner | Scope | Depende de |
 |---|---|---|---|---|
-| S-HC-PROD-03 | ready | Manuel | LLM provider adapter plus Turpial tenant functional QA and UX polish | S-HC-PROD-ALIGN |
 | S-HC-PROD-05 | pending | Manuel | Publishing gate UI, AuditLog and rollback proof | S-HC-PROD-03 |
 | S-HC-PROD-06 | pending | Manuel | Oreshnik operator dashboard and canonical task board | S-HC-PROD-02, S-HC-PROD-03, S-HC-PROD-04, S-HC-PROD-05, S-HC-PROD-07, S-HC-PROD-08, S-HC-PROD-09, S-HC-PROD-10, S-HC-PROD-11 |
 | S-HC-PROD-07 | pending | Manuel | Sales landing, client onboarding and login entry | S-HC-PROD-03 |
@@ -34,7 +33,6 @@ source: "var/oreshnik/task-board.json"
 
 | Sprint | Estado | Scope | Depende de |
 |---|---|---|---|
-| S-HC-PROD-03 | ready | LLM provider adapter plus Turpial tenant functional QA and UX polish | S-HC-PROD-ALIGN |
 | S-HC-PROD-05 | pending | Publishing gate UI, AuditLog and rollback proof | S-HC-PROD-03 |
 | S-HC-PROD-06 | pending | Oreshnik operator dashboard and canonical task board | S-HC-PROD-02, S-HC-PROD-03, S-HC-PROD-04, S-HC-PROD-05, S-HC-PROD-07, S-HC-PROD-08, S-HC-PROD-09, S-HC-PROD-10, S-HC-PROD-11 |
 | S-HC-PROD-07 | pending | Sales landing, client onboarding and login entry | S-HC-PROD-03 |
@@ -72,6 +70,7 @@ source: "var/oreshnik/task-board.json"
 | S-HC-08 | Jean | Meta adapter sandbox design |
 | S-HC-09 | Jean | First tenant publish readiness gate |
 | S-HC-PROD-02 | Jean | Production DB/Auth/env and Turpial seed smoke |
+| S-HC-PROD-03 | Manuel | LLM provider adapter plus Turpial tenant functional QA and UX polish |
 | S-HC-PROD-04 | Jean | Worker, Redis and persistent dry-run processing |
 | S-HC-PROD-09 | Jean | Paid ads campaign engine with 35 percent overhead gate |
 | S-HC-PROD-11 | Jean | Paid scraper compliance and controlled discovery adapter |
