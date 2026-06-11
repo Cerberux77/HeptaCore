@@ -1,7 +1,13 @@
 {
   "project": "HeptaCore",
-  "updatedAt": "2026-06-09T20:14:05.336Z",
+  "updatedAt": "2026-06-11T00:20:00.000Z",
   "resiliencePolicy": "If an owner is unavailable for more than one working block or blocks the critical path, backupOwner may take over after recording reassignment.",
+  "currentExecutionOrder": [
+    "Wave 1 parallel: Jean S-HC-PROD-02, Manuel S-HC-PROD-03",
+    "Wave 2 parallel: Jean S-HC-PROD-04, Manuel S-HC-PROD-05 after S-HC-PROD-03",
+    "Wave 3 sequential: S-HC-PROD-06 control bus/dashboard after PROD-02/03/04/05",
+    "Final: S-HC-RELEASE-01 end-to-end Turpial Sound production proof"
+  ],
   "tasks": [
     {
       "id": "S-HC-00",
@@ -279,6 +285,170 @@
           "reason": "Manuel ausente - completando sprints restantes"
         }
       ]
+    },
+    {
+      "id": "S-HC-PROD-02",
+      "title": "Production DB/Auth/env and Turpial seed smoke",
+      "owner": "Jean",
+      "backupOwner": "Manuel",
+      "status": "ready",
+      "track": "production-infra",
+      "zone": [
+        "docs",
+        "scripts",
+        "packages/db",
+        "vercel-env"
+      ],
+      "dependsOn": [
+        "S-HC-PROD-ALIGN"
+      ],
+      "acceptance": [
+        "Production env checklist completed without committing secrets",
+        "Prisma migrations validated/applied to hosted DB",
+        "Admin and Turpial seed verified",
+        "Login smoke passes against hosted DB",
+        "29 drafts and 46 assets verified for turpial-sound"
+      ],
+      "handoff": "Jean owns DB/Auth/env proof. Manuel does not touch packages/db or auth during this sprint unless double lock is requested.",
+      "history": [
+        {
+          "at": "2026-06-11T00:20:00.000Z",
+          "action": "reassigned",
+          "from": "Manuel",
+          "to": "Jean",
+          "reason": "User-directed PROD closeout split: Jean owns production DB/Auth/env path."
+        }
+      ]
+    },
+    {
+      "id": "S-HC-PROD-03",
+      "title": "Turpial tenant functional QA and UX polish",
+      "owner": "Manuel",
+      "backupOwner": "Jean",
+      "status": "ready",
+      "track": "tenant-product",
+      "zone": [
+        "apps/web/components/dashboard-console.tsx",
+        "apps/web/components/admin-console.tsx",
+        "apps/web/lib/dashboard.ts",
+        "docs"
+      ],
+      "dependsOn": [
+        "S-HC-PROD-ALIGN"
+      ],
+      "acceptance": [
+        "Tenant console renders strategy, assets, queue, calendar, reports and readiness",
+        "Approve/reject flow works in UI",
+        "No overlap with Jean DB/Auth/env work",
+        "Manual user path documented for Turpial Sound"
+      ],
+      "handoff": "Manuel owns tenant UX/product QA. Jean should not edit dashboard-console/admin-console during this sprint."
+    },
+    {
+      "id": "S-HC-PROD-04",
+      "title": "Worker, Redis and persistent dry-run processing",
+      "owner": "Jean",
+      "backupOwner": "Manuel",
+      "status": "pending",
+      "track": "worker",
+      "zone": [
+        "apps/worker",
+        "packages/integrations",
+        "scripts",
+        "docs"
+      ],
+      "dependsOn": [
+        "S-HC-PROD-02"
+      ],
+      "acceptance": [
+        "Redis/worker hosting plan and configuration documented",
+        "Worker validates with Turpial queue",
+        "Dry-run job path emits logs without real RRSS publish",
+        "No Vercel serverless long-running worker assumption remains"
+      ],
+      "handoff": "Jean owns worker/integrations. Manuel should not edit apps/worker or packages/integrations while this is active."
+    },
+    {
+      "id": "S-HC-PROD-05",
+      "title": "Publishing gate UI, AuditLog and rollback proof",
+      "owner": "Manuel",
+      "backupOwner": "Jean",
+      "status": "pending",
+      "track": "publishing-gate",
+      "zone": [
+        "apps/web/app/api/publishing",
+        "apps/web/components/dashboard-console.tsx",
+        "apps/web/lib/dashboard.ts",
+        "docs"
+      ],
+      "dependsOn": [
+        "S-HC-PROD-03"
+      ],
+      "acceptance": [
+        "Dry-run gate is clear and cannot publish real RRSS",
+        "Approved draft can move to SCHEDULED through UI",
+        "AuditLog entry is visible in reports/admin activity",
+        "Rollback procedure is documented and tested"
+      ],
+      "handoff": "Manuel owns web publishing gate. Jean only consumes the endpoint/contract from worker side."
+    },
+    {
+      "id": "S-HC-PROD-06",
+      "title": "Oreshnik operator dashboard and canonical task board",
+      "owner": "Manuel",
+      "backupOwner": "Jean",
+      "status": "pending",
+      "track": "control-bus",
+      "zone": [
+        "scripts/oreshnik",
+        "var/oreshnik",
+        "var/sprint-events",
+        "docs"
+      ],
+      "dependsOn": [
+        "S-HC-PROD-02",
+        "S-HC-PROD-03",
+        "S-HC-PROD-04",
+        "S-HC-PROD-05"
+      ],
+      "acceptance": [
+        "Task board reflects PROD reality",
+        "Operator dashboard/report shows current branch, mother, events and owners",
+        "No stale Jean/Manuel sprint ambiguity remains",
+        "Closeout process produces one canonical release handoff"
+      ],
+      "handoff": "Manuel owns Oreshnik/control bus. Jean should not edit Oreshnik scripts without explicit double lock."
+    },
+    {
+      "id": "S-HC-RELEASE-01",
+      "title": "End-to-end Turpial Sound production proof",
+      "owner": "Manuel+Jean",
+      "backupOwner": "Manuel+Jean",
+      "status": "pending",
+      "track": "release",
+      "zone": [
+        "docs",
+        "apps/web",
+        "apps/worker",
+        "packages/integrations"
+      ],
+      "dependsOn": [
+        "S-HC-PROD-02",
+        "S-HC-PROD-03",
+        "S-HC-PROD-04",
+        "S-HC-PROD-05",
+        "S-HC-PROD-06"
+      ],
+      "acceptance": [
+        "Login works",
+        "Turpial tenant loads strategy and assets",
+        "Draft approval works",
+        "Dry-run publish proof works",
+        "AuditLog/report proves the action",
+        "typecheck, build and worker:validate pass",
+        "Real RRSS publish remains blocked unless explicitly unlocked"
+      ],
+      "handoff": "Final release must be sequential or pair-reviewed; no parallel edits in release sprint."
     }
   ],
   "reassignments": [
@@ -316,6 +486,34 @@
       "from": "Manuel",
       "to": "Jean",
       "reason": "Manuel ausente - completando sprints restantes"
+    },
+    {
+      "at": "2026-06-11T00:20:00.000Z",
+      "task": "S-HC-PROD-02",
+      "from": "Manuel",
+      "to": "Jean",
+      "reason": "User-directed reassignment to maximize parallel closeout."
+    },
+    {
+      "at": "2026-06-11T00:20:00.000Z",
+      "task": "S-HC-PROD-04",
+      "from": "Manuel",
+      "to": "Jean",
+      "reason": "User-directed reassignment: Jean owns worker/infra path."
+    },
+    {
+      "at": "2026-06-11T00:20:00.000Z",
+      "task": "S-HC-PROD-03",
+      "from": "Jean",
+      "to": "Manuel",
+      "reason": "User-directed reassignment: Manuel owns tenant product QA/polish."
+    },
+    {
+      "at": "2026-06-11T00:20:00.000Z",
+      "task": "S-HC-PROD-05",
+      "from": "Jean",
+      "to": "Manuel",
+      "reason": "User-directed reassignment: Manuel owns web publishing gate."
     }
   ]
 }
