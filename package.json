@@ -22,6 +22,7 @@
     "oreshnik:preflight": "node scripts/oreshnik/preflight.mjs",
     "oreshnik:status": "node scripts/oreshnik/status.mjs",
     "oreshnik:sync": "node scripts/oreshnik/sync-from-mother.mjs",
+    "oreshnik:sync:latest": "node scripts/oreshnik/sync-latest-mother.mjs",
     "oreshnik:close": "node scripts/oreshnik/close-sprint.mjs",
     "oreshnik:canonical": "node scripts/oreshnik/canonical-check.mjs",
     "oreshnik:zone": "node scripts/oreshnik/zone-check.mjs",

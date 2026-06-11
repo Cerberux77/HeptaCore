@@ -2,7 +2,7 @@
 type: collaborator-status
 project: "HeptaCore"
 operator: "Manuel"
-last_updated: "2026-06-11T01:50:31.947Z"
+last_updated: "2026-06-11T01:53:02.675Z"
 generated_by: "Oreshnik canonical-check"
 source: "var/oreshnik/task-board.json"
 ---
@@ -17,6 +17,7 @@ source: "var/oreshnik/task-board.json"
 |---|---|---|
 | S-HC-PROD-03 | LLM provider adapter plus Turpial tenant functional QA and UX polish | S-HC-PROD-ALIGN |
 | S-HC-MAINT-CLOSE-GATE-01 | Automatic closure validation gate before Oreshnik close | S-HC-MAINT-SYNC-01 |
+| S-HC-MAINT-MOTHER-SYNC-01 | Automatic canonical merge for newer MADRE branches | S-HC-MAINT-SYNC-01 |
 
 ## Pending
 
@@ -113,6 +114,18 @@ Estado: `ready`
 - oreshnik:close runs typecheck, build and worker validation before closing
 - oreshnik:close stops before docs, commit or push if any validation fails
 - oreshnik:close announces that all validations passed before proceeding
+
+Zonas: `scripts/oreshnik`, `var/oreshnik`, `docs`
+
+### S-HC-MAINT-MOTHER-SYNC-01 - Automatic canonical merge for newer MADRE branches
+
+Estado: `ready`
+
+- Preflight attempts automatic sync when a newer remote MADRE exists and the working tree is clean
+- Canonical task-board conflicts are merged by task id
+- Derived docs are regenerated instead of manually resolved
+- Non-canonical code conflicts still block for human review
+- Operators stop seeing repeated conflicts in generated docs
 
 Zonas: `scripts/oreshnik`, `var/oreshnik`, `docs`
 
