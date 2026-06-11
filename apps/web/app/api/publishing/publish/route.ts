@@ -18,13 +18,15 @@ export async function POST(req: Request) {
   const draftId = String(body?.draftId ?? "");
   const mode = String(body?.mode ?? "dry-run");
   const manualApproval = body?.manualApproval === true;
-  const allowRealPublish = process.env.BOT_ALLOW_REAL_PUBLISH === "true";
-  const isDryRun = process.env.BOT_DRY_RUN === "true" || mode === "dry-run";
+  const hardStop = process.env.PUBLISHING_HARD_STOP !== "false";
+  const realEnabled = process.env.PUBLISHING_REAL_ENABLED === "true";
+  const requireManual = process.env.PUBLISHING_REQUIRE_MANUAL_APPROVAL !== "false";
+  const isDryRun = hardStop || mode === "dry-run" || !realEnabled;
 
-  if (!allowRealPublish && mode !== "dry-run") {
-    return NextResponse.json({ error: "Real publishing is blocked by product hard stop. Set BOT_ALLOW_REAL_PUBLISH=true to enable." }, { status: 403 });
+  if (!realEnabled && mode !== "dry-run") {
+    return NextResponse.json({ error: "Real publishing blocked. Set PUBLISHING_REAL_ENABLED=true and PUBLISHING_HARD_STOP=false to enable." }, { status: 403 });
   }
-  if (!manualApproval) {
+  if (requireManual && !manualApproval) {
     return NextResponse.json({ error: "Manual approval gate is required." }, { status: 400 });
   }
   if (!tenantSlug || !draftId) {
