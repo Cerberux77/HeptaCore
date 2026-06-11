@@ -1,6 +1,6 @@
 {
   "project": "HeptaCore",
-  "updatedAt": "2026-06-11T01:15:56.934Z",
+  "updatedAt": "2026-06-11T01:44:03.976Z",
   "resiliencePolicy": "If an owner is unavailable for more than one working block or blocks the critical path, backupOwner may take over after recording reassignment.",
   "closurePolicy": "No sprint may be closed until acceptance criteria, base tests, sprint-specific tests, docs/handoff, and Oreshnik zone checks pass. See docs/obsidian-vault/METODOLOGIA/ORQUESTACION_AGENTES_HEPTACORE.md.",
   "baseTestMatrix": [
@@ -299,7 +299,7 @@
       "title": "Production DB/Auth/env and Turpial seed smoke",
       "owner": "Jean",
       "backupOwner": "Manuel",
-      "status": "ready",
+      "status": "done",
       "track": "production-infra",
       "zone": [
         "docs",
@@ -325,6 +325,13 @@
           "from": "Manuel",
           "to": "Jean",
           "reason": "User-directed PROD closeout split: Jean owns production DB/Auth/env path."
+        },
+        {
+          "at": "2026-06-11T01:44:03.976Z",
+          "action": "closed",
+          "operator": "Jean",
+          "branch": "Jean/s-hc-canonical-alignment-2026-06-09",
+          "description": "production-db-auth-env-turpial-seed-smoke"
         }
       ]
     },

@@ -1,5 +1,5 @@
 {
-  "current": "MADRE/v20-s-hc-maint-sync-01-preflight-remote-sync-obligatorio-2026-06-11",
+  "current": "MADRE/v21-s-hc-prod-02-production-db-auth-env-turpial-seed-smoke-2026-06-11",
   "branches": [
     {
       "previous": "MADRE/v11-s-hc-09-publish-readiness-gate-2026-06-09",
@@ -70,11 +70,21 @@
       "at": "2026-06-11T01:15:56.934Z",
       "previous": "MADRE/v19-s-hc-maint-push-01-closure-push-obligatorio-2026-06-11",
       "description": "preflight remote sync obligatorio"
+    },
+    {
+      "version": 21,
+      "name": "MADRE/v21-s-hc-prod-02-production-db-auth-env-turpial-seed-smoke-2026-06-11",
+      "sprint": "S-HC-PROD-02",
+      "operator": "Jean",
+      "date": "2026-06-11",
+      "at": "2026-06-11T01:44:03.976Z",
+      "previous": "MADRE/v20-s-hc-maint-sync-01-preflight-remote-sync-obligatorio-2026-06-11",
+      "description": "production-db-auth-env-turpial-seed-smoke"
     }
   ],
-  "version": 20,
-  "effective": "MADRE/v19-s-hc-maint-push-01-closure-push-obligatorio-2026-06-11",
-  "effectiveRef": "origin/MADRE/v19-s-hc-maint-push-01-closure-push-obligatorio-2026-06-11",
+  "version": 21,
+  "effective": "MADRE/v20-s-hc-maint-sync-01-preflight-remote-sync-obligatorio-2026-06-11",
+  "effectiveRef": "origin/MADRE/v20-s-hc-maint-sync-01-preflight-remote-sync-obligatorio-2026-06-11",
   "declaredMissing": false,
   "discoveredVersion": 14
 }

@@ -2,7 +2,7 @@
 type: collaborator-status
 project: "HeptaCore"
 operator: "Jean"
-last_updated: "2026-06-11T01:29:30.649Z"
+last_updated: "2026-06-11T01:44:06.401Z"
 generated_by: "Oreshnik canonical-check"
 source: "var/oreshnik/task-board.json"
 ---
@@ -15,7 +15,7 @@ source: "var/oreshnik/task-board.json"
 
 | Sprint | Scope | Depende de |
 |---|---|---|
-| S-HC-PROD-02 | Production DB/Auth/env and Turpial seed smoke | S-HC-PROD-ALIGN |
+| Ninguno | - | - |
 
 ## Pending
 
@@ -27,18 +27,6 @@ source: "var/oreshnik/task-board.json"
 | S-HC-RELEASE-01 | End-to-end Turpial Sound production proof | S-HC-PROD-02, S-HC-PROD-03, S-HC-PROD-04, S-HC-PROD-05, S-HC-PROD-06, S-HC-PROD-07, S-HC-PROD-08, S-HC-PROD-09, S-HC-PROD-10, S-HC-PROD-11 |
 
 ## Detalle de Aceptacion
-
-### S-HC-PROD-02 - Production DB/Auth/env and Turpial seed smoke
-
-Estado: `ready`
-
-- Production env checklist completed without committing secrets
-- Prisma migrations validated/applied to hosted DB
-- Admin and Turpial seed verified
-- Login smoke passes against hosted DB
-- 29 drafts and 46 assets verified for turpial-sound
-
-Zonas: `docs`, `scripts`, `packages/db`, `vercel-env`
 
 ### S-HC-PROD-04 - Worker, Redis and persistent dry-run processing
 

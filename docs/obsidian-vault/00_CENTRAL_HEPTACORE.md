@@ -3,8 +3,8 @@ type: master-dashboard
 project: "HeptaCore"
 status: active-production
 phase: "Canonical Oreshnik task board governs current assignments"
-last_updated: "2026-06-11T01:29:30.649Z"
-mother_branch: "MADRE/v20-s-hc-maint-sync-01-preflight-remote-sync-obligatorio-2026-06-11"
+last_updated: "2026-06-11T01:44:06.401Z"
+mother_branch: "MADRE/v21-s-hc-prod-02-production-db-auth-env-turpial-seed-smoke-2026-06-11"
 tags:
   - "#central"
   - "#status/live-source"
@@ -21,8 +21,8 @@ tags:
 
 | Campo | Valor |
 |---|---|
-| Task board actualizado | 2026-06-11T01:15:56.934Z |
-| Rama madre | MADRE/v20-s-hc-maint-sync-01-preflight-remote-sync-obligatorio-2026-06-11 |
+| Task board actualizado | 2026-06-11T01:44:03.976Z |
+| Rama madre | MADRE/v21-s-hc-prod-02-production-db-auth-env-turpial-seed-smoke-2026-06-11 |
 | Publicacion RRSS real | Bloqueada hasta aprobacion explicita |
 | Campaign spend | Bloqueado |
 | Real scraping | Bloqueado |
@@ -39,7 +39,6 @@ tags:
 
 | Sprint | Estado | Owner | Scope | Depende de |
 |---|---|---|---|---|
-| S-HC-PROD-02 | ready | Jean | Production DB/Auth/env and Turpial seed smoke | S-HC-PROD-ALIGN |
 | S-HC-PROD-03 | ready | Manuel | LLM provider adapter plus Turpial tenant functional QA and UX polish | S-HC-PROD-ALIGN |
 | S-HC-PROD-04 | pending | Jean | Worker, Redis and persistent dry-run processing | S-HC-PROD-02 |
 | S-HC-PROD-05 | pending | Manuel | Publishing gate UI, AuditLog and rollback proof | S-HC-PROD-03 |
@@ -55,7 +54,6 @@ tags:
 
 | Sprint | Owner | Scope |
 |---|---|---|
-| S-HC-PROD-02 | Jean | Production DB/Auth/env and Turpial seed smoke |
 | S-HC-PROD-03 | Manuel | LLM provider adapter plus Turpial tenant functional QA and UX polish |
 
 ## Pendientes Bloqueados por Dependencias
