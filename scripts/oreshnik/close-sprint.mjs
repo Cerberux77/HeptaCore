@@ -25,11 +25,10 @@ import {
 const sprint = getArg("--sprint");
 const operator = resolveOperator(getArg("--operator"));
 const desc = getArg("--desc", "cierre");
-const push = hasFlag("--push");
 const force = hasFlag("--force");
 
 if (!sprint) {
-  console.error("Usage: node scripts/oreshnik/close-sprint.mjs --sprint SXX --operator Jean|Manuel --desc \"desc\" [--push] [--force]");
+  console.error("Usage: node scripts/oreshnik/close-sprint.mjs --sprint SXX --operator Jean|Manuel --desc \"desc\" [--force]");
   process.exit(2);
 }
 
@@ -124,13 +123,9 @@ if (!stagedAfter) {
 
 git(["checkout", "-b", newMother, branch], { allowFail: false });
 log("OK", `Created local mother branch ${newMother} from ${branch}.`);
-if (push) {
-  git(["push", "origin", branch], { allowFail: false });
-  git(["push", "origin", newMother], { allowFail: false });
-  log("OK", "Pushed child branch and mother branch.");
-} else {
-  log("WARN", "Push skipped. Re-run with --push when ready.");
-}
+git(["push", "origin", branch], { allowFail: false });
+git(["push", "origin", newMother], { allowFail: false });
+log("OK", "Pushed child branch and mother branch.");
 git(["checkout", branch], { allowFail: false });
 
 console.log("");

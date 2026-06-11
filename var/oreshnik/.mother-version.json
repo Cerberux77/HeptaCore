@@ -1,5 +1,5 @@
 {
-  "current": "MADRE/v18-s-hc-maint-align-01-alineacion-definitiva-task-board-docs-derivados-2026-06-11",
+  "current": "MADRE/v19-s-hc-maint-push-01-closure-push-obligatorio-2026-06-11",
   "branches": [
     {
       "previous": "MADRE/v11-s-hc-09-publish-readiness-gate-2026-06-09",
@@ -50,11 +50,21 @@
       "at": "2026-06-11T00:59:18.706Z",
       "previous": "MADRE/v17-s-hc-prod-align-alineacion-oreshnik-middleware-manual-usuario-2026-06-10",
       "description": "alineacion definitiva task board docs derivados"
+    },
+    {
+      "version": 19,
+      "name": "MADRE/v19-s-hc-maint-push-01-closure-push-obligatorio-2026-06-11",
+      "sprint": "S-HC-MAINT-PUSH-01",
+      "operator": "Manuel",
+      "date": "2026-06-11",
+      "at": "2026-06-11T01:06:32.827Z",
+      "previous": "MADRE/v18-s-hc-maint-align-01-alineacion-definitiva-task-board-docs-derivados-2026-06-11",
+      "description": "closure push obligatorio"
     }
   ],
-  "version": 18,
-  "effective": "MADRE/v17-s-hc-prod-align-alineacion-oreshnik-middleware-manual-usuario-2026-06-10",
-  "effectiveRef": "origin/MADRE/v17-s-hc-prod-align-alineacion-oreshnik-middleware-manual-usuario-2026-06-10",
+  "version": 19,
+  "effective": "MADRE/v18-s-hc-maint-align-01-alineacion-definitiva-task-board-docs-derivados-2026-06-11",
+  "effectiveRef": "MADRE/v18-s-hc-maint-align-01-alineacion-definitiva-task-board-docs-derivados-2026-06-11",
   "declaredMissing": false,
   "discoveredVersion": 14
 }

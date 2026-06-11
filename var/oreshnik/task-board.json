@@ -1,6 +1,6 @@
 {
   "project": "HeptaCore",
-  "updatedAt": "2026-06-11T00:59:18.706Z",
+  "updatedAt": "2026-06-11T01:06:32.827Z",
   "resiliencePolicy": "If an owner is unavailable for more than one working block or blocks the critical path, backupOwner may take over after recording reassignment.",
   "closurePolicy": "No sprint may be closed until acceptance criteria, base tests, sprint-specific tests, docs/handoff, and Oreshnik zone checks pass. See docs/obsidian-vault/METODOLOGIA/ORQUESTACION_AGENTES_HEPTACORE.md.",
   "baseTestMatrix": [
@@ -594,6 +594,38 @@
           "operator": "Manuel",
           "branch": "Manuel/s-hc-prod-01-producto-operativo-tenant-admin-produccion-2026-06-09",
           "description": "alineacion definitiva task board docs derivados"
+        }
+      ]
+    },
+    {
+      "id": "S-HC-MAINT-PUSH-01",
+      "title": "Mandatory remote push on every Oreshnik close",
+      "owner": "Manuel",
+      "backupOwner": "Jean",
+      "status": "done",
+      "track": "maintenance",
+      "zone": [
+        "scripts/oreshnik",
+        "var/oreshnik",
+        "docs"
+      ],
+      "dependsOn": [
+        "S-HC-MAINT-ALIGN-01"
+      ],
+      "acceptance": [
+        "oreshnik:close always pushes the operator child branch",
+        "oreshnik:close always pushes the generated MADRE branch",
+        "Closure no longer depends on --push for remote visibility",
+        "Jean and Manuel can align from the latest remote MADRE after every sprint"
+      ],
+      "handoff": "After close, the remote child branch and remote MADRE branch are the synchronization source for both operators.",
+      "history": [
+        {
+          "at": "2026-06-11T01:06:32.827Z",
+          "action": "closed",
+          "operator": "Manuel",
+          "branch": "Manuel/s-hc-prod-01-producto-operativo-tenant-admin-produccion-2026-06-09",
+          "description": "closure push obligatorio"
         }
       ]
     },

@@ -1,7 +1,7 @@
 ---
 type: status-board
 project: "HeptaCore"
-last_updated: "2026-06-11T00:59:21.832Z"
+last_updated: "2026-06-11T01:06:35.969Z"
 generated_by: "Oreshnik canonical-check"
 source: "var/oreshnik/task-board.json"
 ---
@@ -80,3 +80,4 @@ source: "var/oreshnik/task-board.json"
 | S-HC-08 | Jean | Meta adapter sandbox design |
 | S-HC-09 | Jean | First tenant publish readiness gate |
 | S-HC-MAINT-ALIGN-01 | Manuel | Canonical task board and derived docs alignment gate |
+| S-HC-MAINT-PUSH-01 | Manuel | Mandatory remote push on every Oreshnik close |
