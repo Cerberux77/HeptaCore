@@ -1,7 +1,7 @@
 ---
 type: status-board
 project: "HeptaCore"
-last_updated: "2026-06-11T01:56:16.650Z"
+last_updated: "2026-06-11T01:59:24.493Z"
 generated_by: "Oreshnik canonical-check"
 source: "var/oreshnik/task-board.json"
 ---
@@ -80,3 +80,4 @@ source: "var/oreshnik/task-board.json"
 | S-HC-MAINT-SYNC-01 | Manuel | Mandatory remote fast-forward and divergence gate in preflight |
 | S-HC-MAINT-CLOSE-GATE-01 | Manuel | Automatic closure validation gate before Oreshnik close |
 | S-HC-MAINT-MOTHER-SYNC-01 | Manuel | Automatic canonical merge for newer MADRE branches |
+| S-HC-MAINT-CLOSE-SPAWN-01 | Manuel | Remove shell warning from closure validation gate |

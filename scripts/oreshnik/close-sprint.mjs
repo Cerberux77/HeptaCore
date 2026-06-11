@@ -143,40 +143,32 @@ function runClosureValidationGate() {
   const checks = [
     {
       name: "Canonical task-board/docs alignment",
-      command: "node",
-      args: ["scripts/oreshnik/canonical-check.mjs", "--sprint", sprint, "--operator", operator]
+      command: `node scripts/oreshnik/canonical-check.mjs --sprint ${sprint} --operator ${operator}`
     },
     {
       name: "Zone check",
-      command: "node",
-      args: ["scripts/oreshnik/zone-check.mjs", "--sprint", sprint, "--operator", operator]
+      command: `node scripts/oreshnik/zone-check.mjs --sprint ${sprint} --operator ${operator}`
     },
     {
       name: "TypeScript typecheck",
-      command: "npm",
-      args: ["run", "typecheck"]
+      command: "npm run typecheck"
     },
     {
       name: "Production build",
-      command: "npm",
-      args: ["run", "build"]
+      command: "npm run build"
     },
     {
       name: "Worker validation",
-      command: "npm",
-      args: ["run", "worker:validate"]
+      command: "npm run worker:validate"
     }
   ];
 
   for (const check of checks) {
     log("INFO", `Running ${check.name}...`);
-    const result = spawnSync(check.command, check.args, {
-      cwd: ROOT,
-      stdio: "inherit",
-      shell: process.platform === "win32"
-    });
+    const result = runCommand(check.command);
 
     if (result.status !== 0) {
+      if (result.error) log("FAIL", result.error.message);
       log("FAIL", `${check.name} failed. Sprint closure stopped before docs, commit or push.`);
       process.exit(result.status || 1);
     }
@@ -185,6 +177,20 @@ function runClosureValidationGate() {
   }
 
   log("OK", "All closure validations passed. Proceeding with Oreshnik close, commit and mandatory push.");
+}
+
+function runCommand(command) {
+  if (process.platform === "win32") {
+    return spawnSync("cmd.exe", ["/d", "/s", "/c", command], {
+      cwd: ROOT,
+      stdio: "inherit"
+    });
+  }
+
+  return spawnSync("sh", ["-lc", command], {
+    cwd: ROOT,
+    stdio: "inherit"
+  });
 }
 
 function updateVaultDocs() {
