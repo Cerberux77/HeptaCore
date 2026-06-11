@@ -1,5 +1,5 @@
 {
-  "current": "MADRE/v24-s-hc-prod-11-paid-scraper-compliance-controlled-discovery-ada-2026-06-11",
+  "current": "MADRE/v27-s-hc-maint-close-spawn-01-limpiar-warning-cierre-spawn-2026-06-11",
   "branches": [
     {
       "previous": "MADRE/v11-s-hc-09-publish-readiness-gate-2026-06-09",
@@ -110,11 +110,41 @@
       "at": "2026-06-11T01:52:08.355Z",
       "previous": "MADRE/v23-s-hc-prod-09-paid-ads-campaign-engine-35pct-overhead-gate-2026-06-11",
       "description": "paid-scraper-compliance-controlled-discovery-adapter"
+    },
+    {
+      "version": 25,
+      "name": "MADRE/v25-s-hc-maint-close-gate-01-cierre-automatico-con-validaciones-2026-06-11",
+      "sprint": "S-HC-MAINT-CLOSE-GATE-01",
+      "operator": "Manuel",
+      "date": "2026-06-11",
+      "at": "2026-06-11T01:54:31.352Z",
+      "previous": "MADRE/v24-s-hc-prod-11-paid-scraper-compliance-controlled-discovery-ada-2026-06-11",
+      "description": "cierre automatico con validaciones"
+    },
+    {
+      "version": 26,
+      "name": "MADRE/v26-s-hc-maint-mother-sync-01-sync-automatico-de-madres-canonicas-2026-06-11",
+      "sprint": "S-HC-MAINT-MOTHER-SYNC-01",
+      "operator": "Manuel",
+      "date": "2026-06-11",
+      "at": "2026-06-11T01:55:49.971Z",
+      "previous": "MADRE/v25-s-hc-maint-close-gate-01-cierre-automatico-con-validaciones-2026-06-11",
+      "description": "sync automatico de madres canonicas"
+    },
+    {
+      "version": 27,
+      "name": "MADRE/v27-s-hc-maint-close-spawn-01-limpiar-warning-cierre-spawn-2026-06-11",
+      "sprint": "S-HC-MAINT-CLOSE-SPAWN-01",
+      "operator": "Manuel",
+      "date": "2026-06-11",
+      "at": "2026-06-11T01:58:57.325Z",
+      "previous": "MADRE/v26-s-hc-maint-mother-sync-01-sync-automatico-de-madres-canonicas-2026-06-11",
+      "description": "limpiar warning cierre spawn"
     }
   ],
-  "version": 24,
-  "effective": "MADRE/v23-s-hc-prod-09-paid-ads-campaign-engine-35pct-overhead-gate-2026-06-11",
-  "effectiveRef": "origin/MADRE/v23-s-hc-prod-09-paid-ads-campaign-engine-35pct-overhead-gate-2026-06-11",
+  "version": 27,
+  "effective": "MADRE/v26-s-hc-maint-mother-sync-01-sync-automatico-de-madres-canonicas-2026-06-11",
+  "effectiveRef": "origin/MADRE/v26-s-hc-maint-mother-sync-01-sync-automatico-de-madres-canonicas-2026-06-11",
   "declaredMissing": false,
   "discoveredVersion": 14
 }

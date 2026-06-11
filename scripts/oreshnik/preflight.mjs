@@ -56,8 +56,22 @@ dirty = nonIgnoredDirtyFiles();
 mother = resolveMother();
 const latestMother = discoverLatestMother();
 if (latestMother && latestMother.version > (mother.version || 0)) {
-  log("FAIL", `Remote mother ${latestMother.name} is newer than declared ${mother.current}. Sync from latest mother before working.`);
-  blockers++;
+  if (dirty.length > 0) {
+    log("FAIL", `Remote mother ${latestMother.name} is newer than declared ${mother.current}, but working tree is dirty. Commit/stash first.`);
+    blockers++;
+  } else {
+    log("WARN", `Remote mother ${latestMother.name} is newer than declared ${mother.current}. Attempting automatic canonical sync.`);
+    const sync = sh("node scripts/oreshnik/sync-latest-mother.mjs");
+    console.log(sync);
+    const syncPlain = sync.replace(/\x1b\[[0-9;]*m/g, "");
+    if (syncPlain.includes("[ FAIL")) {
+      blockers++;
+    } else {
+      mother = resolveMother();
+      branch = currentBranch();
+      dirty = nonIgnoredDirtyFiles();
+    }
+  }
 }
 const originMother = git(["rev-parse", "--verify", `origin/${mother.current}`], { allowFail: true });
 const localMother = git(["rev-parse", "--verify", mother.current], { allowFail: true });
