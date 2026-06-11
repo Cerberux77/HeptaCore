@@ -2,6 +2,13 @@
   "project": "HeptaCore",
   "updatedAt": "2026-06-11T00:30:00.000Z",
   "resiliencePolicy": "If an owner is unavailable for more than one working block or blocks the critical path, backupOwner may take over after recording reassignment.",
+  "closurePolicy": "No sprint may be closed until acceptance criteria, base tests, sprint-specific tests, docs/handoff, and Oreshnik zone checks pass. See docs/obsidian-vault/METODOLOGIA/ORQUESTACION_AGENTES_HEPTACORE.md.",
+  "baseTestMatrix": [
+    "npm run typecheck",
+    "npm run build",
+    "npm run worker:validate",
+    "npm run oreshnik:zone -- --sprint <SPRINT> --operator <OPERATOR>"
+  ],
   "currentExecutionOrder": [
     "Wave 1 parallel: Jean S-HC-PROD-02, Manuel S-HC-PROD-03 (LLM provider adapter + Turpial tenant QA)",
     "Wave 2 parallel: Jean S-HC-PROD-04, Manuel S-HC-PROD-05 after S-HC-PROD-03",
