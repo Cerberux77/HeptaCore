@@ -1,8 +1,8 @@
 ---
 type: sprint-plan
 project: "HeptaCore"
-last_updated: "2026-06-11T01:15:56.934Z"
-mother_branch: "MADRE/v20-s-hc-maint-sync-01-preflight-remote-sync-obligatorio-2026-06-11"
+last_updated: "2026-06-11T01:44:03.976Z"
+mother_branch: "MADRE/v21-s-hc-prod-02-production-db-auth-env-turpial-seed-smoke-2026-06-11"
 tags:
   - "#sprints"
   - "#manuel"
@@ -419,3 +419,14 @@ Ver [[PLAN_PARALELO_MANUEL_JEAN]] para distribucion de carga, backups y reasigna
 | Estado | CERRADO |
 | Madre docs | `MADRE/v20-s-hc-maint-sync-01-preflight-remote-sync-obligatorio-2026-06-11` |
 | Descripcion | preflight remote sync obligatorio |
+
+
+## Cierre S-HC-PROD-02 - 2026-06-11
+
+| Campo | Valor |
+|---|---|
+| Operador | Jean |
+| Rama | `Jean/s-hc-canonical-alignment-2026-06-09` |
+| Estado | CERRADO |
+| Madre docs | `MADRE/v21-s-hc-prod-02-production-db-auth-env-turpial-seed-smoke-2026-06-11` |
+| Descripcion | production-db-auth-env-turpial-seed-smoke |

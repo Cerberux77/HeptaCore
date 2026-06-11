@@ -3,13 +3,13 @@
 ## Stack
 
 - Web: Next.js App Router with TypeScript.
+- Auth: Auth.js / NextAuth credentials provider with bcrypt password hashes.
 - Worker: Node.js workspace app, tenant-aware, dry-run by default.
 - DB: PostgreSQL with Prisma.
-- Queues: BullMQ + Redis in the next implementation sprint.
-- Auth: Better Auth, Clerk, or Auth.js after deciding deployment target.
-- Storage: S3-compatible object storage.
+- Queues: BullMQ + Redis code exists; production worker needs persistent hosting outside Vercel serverless.
+- Storage: local tenant assets for the Turpial seed; S3-compatible object storage remains the expected production direction.
 - AI orchestration: `packages/agents` first, with provider adapters later.
-- Integrations: official APIs first, scraping disabled by default.
+- Integrations: mock Meta adapters exist for sandbox/dry-run. Real adapters remain blocked until explicit approval.
 
 ## Multi-Tenancy
 
@@ -27,6 +27,14 @@ Future:
 - Enterprise tenants may move to dedicated database/schema.
 - Secrets are never treated as normal tenant data. They belong in KMS/secret manager or encrypted vault rows.
 
+## Deployment Boundary
+
+`master` / `origin/master` is the closest productive/pre-productive base and the branch used by the current Vercel deploy flow. Vercel can host the web app, but BullMQ workers require Redis and a persistent process host such as Railway, Fly.io, a VPS, or another worker-capable platform.
+
 ## Sensitive Actions
 
-The default mode is `draft_only`. Real publishing, campaign spend, paid scraping, sensitive replies, credential changes, bulk messages, and deletion require explicit approval.
+The default mode is draft/dry-run. Real publishing, campaign spend, paid scraping, sensitive replies, credential changes, bulk messages, and deletion require explicit approval.
+
+## Known Platform Debt
+
+Next 16 warns that `middleware.ts` is deprecated and recommends migrating to `proxy`. This is a follow-up technical task because the current build passes and the warning is not blocking pre-production alignment.

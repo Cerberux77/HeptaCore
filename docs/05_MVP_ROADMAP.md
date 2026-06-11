@@ -1,43 +1,36 @@
 # MVP Roadmap
 
-## Sprint 1: Foundation
+## Current Position
 
-- Monorepo.
-- Next.js landing.
-- Worker migrated into `apps/worker`.
-- Prisma schema.
-- Agent contracts.
-- Turpial tenant seed.
+HeptaCore is now an MVP tecnico pre-produccion, not a pure foundation repo. The canonical deployable base is `master` / `origin/master`.
 
-## Sprint 2: Usable Console
+## Closed / Implemented
 
-- Auth decision and setup.
-- Tenant switcher.
-- Onboarding form.
-- Asset checklist.
-- Draft queue UI.
-- Approval queue UI.
-- Turpial import script into DB.
+| Sprint | Status | Notes |
+|---|---|---|
+| S-HC-00 | Closed | Monorepo, docs, Prisma baseline, worker seed, Oreshnik baseline. |
+| S-HC-01 | Closed | Console/dashboard, checklist, draft queue UI. |
+| S-HC-02 | Closed | Turpial seed/import path and DB service layer baseline. |
+| S-HC-03 | Closed | Strategy runner. |
+| S-HC-04 | Closed | Auth, RBAC, tenant guards, audit baseline. |
+| S-HC-05 | Closed | Approval queue and human gates. |
+| S-HC-06 | Closed | BullMQ/Redis worker queue code and dry-run jobs. |
+| S-HC-07 | Closed | Reports dashboard and daily summary data. |
+| S-HC-08 | Closed | Meta adapter sandbox/mock layer. |
+| S-HC-09 | Closed | Publish readiness gate. |
 
-## Sprint 3: Agent Execution
+## Pending / Blocked
 
-- Strategy generation.
-- Network priority recommendation.
-- Calendar and draft generation.
-- Response suggestion with escalation.
-- Daily report generation.
+| Item | Status | Reason |
+|---|---|---|
+| Production env setup | Pending | Vercel needs DB/auth/encryption variables. |
+| Production migrations and seeds | Pending | Admin and `turpial-sound` must be seeded in production DB. |
+| Worker hosting | Pending | BullMQ needs Redis and persistent hosting outside Vercel serverless. |
+| S-HC-PUB-01 dry-run from UI | Pending | Needs a controlled endpoint/action and explicit human gate. |
+| Real RRSS publishing | Blocked by design | Requires approval, official credentials, real adapters, rollback plan, and dry-run proof. |
+| Real campaign spend | Blocked by design | Requires explicit approval and budget controls. |
+| Paid scraping | Blocked by design | Requires compliance review and explicit approval. |
 
-## Sprint 4: Integrations
+## Recommended Next Sprint
 
-- Meta official API adapter in sandbox/dry-run first.
-- Metrics ingestion.
-- Email reports.
-- WhatsApp reporting via approved provider.
-
-## Not Yet
-
-- Autopilot full.
-- Real campaign spend.
-- Paid scraping.
-- Bulk messaging.
-- Dedicated DB per tenant.
+S-HC-PUB-01 should remain dry-run only: add a controlled web action for one approved Turpial draft, keep real publication disabled, record audit logs, and document rollback.
