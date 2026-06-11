@@ -1,7 +1,7 @@
 ---
 type: status-board
 project: "HeptaCore"
-last_updated: "2026-06-11T01:50:05.708Z"
+last_updated: "2026-06-11T01:52:10.150Z"
 generated_by: "Oreshnik canonical-check"
 source: "var/oreshnik/task-board.json"
 ---
@@ -28,7 +28,6 @@ source: "var/oreshnik/task-board.json"
 | S-HC-PROD-07 | pending | Manuel | Sales landing, client onboarding and login entry | S-HC-PROD-03 |
 | S-HC-PROD-08 | pending | Manuel | Draft editor and post modification workflow | S-HC-PROD-03 |
 | S-HC-PROD-10 | pending | Manuel | Paid ads management UI and tenant billing surface | S-HC-PROD-05, S-HC-PROD-09 |
-| S-HC-PROD-11 | pending | Jean | Paid scraper compliance and controlled discovery adapter | S-HC-PROD-04 |
 | S-HC-RELEASE-01 | pending | Manuel+Jean | End-to-end Turpial Sound production proof | S-HC-PROD-02, S-HC-PROD-03, S-HC-PROD-04, S-HC-PROD-05, S-HC-PROD-06, S-HC-PROD-07, S-HC-PROD-08, S-HC-PROD-09, S-HC-PROD-10, S-HC-PROD-11 |
 
 ## Asignacion Manuel
@@ -47,7 +46,6 @@ source: "var/oreshnik/task-board.json"
 
 | Sprint | Estado | Scope | Depende de |
 |---|---|---|---|
-| S-HC-PROD-11 | pending | Paid scraper compliance and controlled discovery adapter | S-HC-PROD-04 |
 | S-HC-RELEASE-01 | pending | End-to-end Turpial Sound production proof | S-HC-PROD-02, S-HC-PROD-03, S-HC-PROD-04, S-HC-PROD-05, S-HC-PROD-06, S-HC-PROD-07, S-HC-PROD-08, S-HC-PROD-09, S-HC-PROD-10, S-HC-PROD-11 |
 
 ## Hard Stops Vigentes
@@ -76,6 +74,7 @@ source: "var/oreshnik/task-board.json"
 | S-HC-PROD-02 | Jean | Production DB/Auth/env and Turpial seed smoke |
 | S-HC-PROD-04 | Jean | Worker, Redis and persistent dry-run processing |
 | S-HC-PROD-09 | Jean | Paid ads campaign engine with 35 percent overhead gate |
+| S-HC-PROD-11 | Jean | Paid scraper compliance and controlled discovery adapter |
 | S-HC-MAINT-ALIGN-01 | Manuel | Canonical task board and derived docs alignment gate |
 | S-HC-MAINT-PUSH-01 | Manuel | Mandatory remote push on every Oreshnik close |
 | S-HC-MAINT-SYNC-01 | Manuel | Mandatory remote fast-forward and divergence gate in preflight |

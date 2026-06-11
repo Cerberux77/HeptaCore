@@ -1,5 +1,5 @@
 {
-  "current": "MADRE/v23-s-hc-prod-09-paid-ads-campaign-engine-35pct-overhead-gate-2026-06-11",
+  "current": "MADRE/v24-s-hc-prod-11-paid-scraper-compliance-controlled-discovery-ada-2026-06-11",
   "branches": [
     {
       "previous": "MADRE/v11-s-hc-09-publish-readiness-gate-2026-06-09",
@@ -100,11 +100,21 @@
       "at": "2026-06-11T01:50:03.894Z",
       "previous": "MADRE/v22-s-hc-prod-04-worker-redis-persistent-dryrun-processing-2026-06-11",
       "description": "paid-ads-campaign-engine-35pct-overhead-gate"
+    },
+    {
+      "version": 24,
+      "name": "MADRE/v24-s-hc-prod-11-paid-scraper-compliance-controlled-discovery-ada-2026-06-11",
+      "sprint": "S-HC-PROD-11",
+      "operator": "Jean",
+      "date": "2026-06-11",
+      "at": "2026-06-11T01:52:08.355Z",
+      "previous": "MADRE/v23-s-hc-prod-09-paid-ads-campaign-engine-35pct-overhead-gate-2026-06-11",
+      "description": "paid-scraper-compliance-controlled-discovery-adapter"
     }
   ],
-  "version": 23,
-  "effective": "MADRE/v22-s-hc-prod-04-worker-redis-persistent-dryrun-processing-2026-06-11",
-  "effectiveRef": "origin/MADRE/v22-s-hc-prod-04-worker-redis-persistent-dryrun-processing-2026-06-11",
+  "version": 24,
+  "effective": "MADRE/v23-s-hc-prod-09-paid-ads-campaign-engine-35pct-overhead-gate-2026-06-11",
+  "effectiveRef": "origin/MADRE/v23-s-hc-prod-09-paid-ads-campaign-engine-35pct-overhead-gate-2026-06-11",
   "declaredMissing": false,
   "discoveredVersion": 14
 }

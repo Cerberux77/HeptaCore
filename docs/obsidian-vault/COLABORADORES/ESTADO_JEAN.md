@@ -2,7 +2,7 @@
 type: collaborator-status
 project: "HeptaCore"
 operator: "Jean"
-last_updated: "2026-06-11T01:50:05.708Z"
+last_updated: "2026-06-11T01:52:10.150Z"
 generated_by: "Oreshnik canonical-check"
 source: "var/oreshnik/task-board.json"
 ---
@@ -21,22 +21,9 @@ source: "var/oreshnik/task-board.json"
 
 | Sprint | Scope | Depende de |
 |---|---|---|
-| S-HC-PROD-11 | Paid scraper compliance and controlled discovery adapter | S-HC-PROD-04 |
 | S-HC-RELEASE-01 | End-to-end Turpial Sound production proof | S-HC-PROD-02, S-HC-PROD-03, S-HC-PROD-04, S-HC-PROD-05, S-HC-PROD-06, S-HC-PROD-07, S-HC-PROD-08, S-HC-PROD-09, S-HC-PROD-10, S-HC-PROD-11 |
 
 ## Detalle de Aceptacion
-
-### S-HC-PROD-11 - Paid scraper compliance and controlled discovery adapter
-
-Estado: `pending`
-
-- No real scraping is enabled by default
-- Discovery adapter supports mock/dry-run and documents paid provider requirements
-- Sensitive action gate covers paid scraping with explicit approval
-- Compliance matrix documents allowed sources, forbidden scraping and tenant consent
-- Output can feed strategy context without violating hard stops
-
-Zonas: `packages/integrations`, `apps/worker`, `packages/core`, `docs`
 
 ### S-HC-RELEASE-01 - End-to-end Turpial Sound production proof
 

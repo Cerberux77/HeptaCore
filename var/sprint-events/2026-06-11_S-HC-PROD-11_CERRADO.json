@@ -1,0 +1,19 @@
+{
+  "sprint": "S-HC-PROD-11",
+  "operator": "Jean",
+  "status": "CERRADO",
+  "date": "2026-06-11",
+  "at": "2026-06-11T01:52:08.355Z",
+  "branch": "Jean/s-hc-canonical-alignment-2026-06-09",
+  "previousMother": "MADRE/v23-s-hc-prod-09-paid-ads-campaign-engine-35pct-overhead-gate-2026-06-11",
+  "nextMother": "MADRE/v24-s-hc-prod-11-paid-scraper-compliance-controlled-discovery-ada-2026-06-11",
+  "description": "paid-scraper-compliance-controlled-discovery-adapter",
+  "changedFiles": [
+    ".env.example",
+    "apps/worker/src/queue/client.ts",
+    "apps/worker/src/queue/index.ts",
+    "apps/worker/src/queue/types.ts",
+    "apps/worker/src/queue/worker.ts",
+    "packages/integrations/src/index.ts"
+  ]
+}
