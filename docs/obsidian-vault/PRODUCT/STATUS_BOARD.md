@@ -1,7 +1,7 @@
 ---
 type: status-board
 project: "HeptaCore"
-last_updated: "2026-06-11T22:47:18.109Z"
+last_updated: "2026-06-12T00:05:37.363Z"
 generated_by: "Oreshnik canonical-check"
 source: "var/oreshnik/task-board.json"
 ---
@@ -77,4 +77,5 @@ source: "var/oreshnik/task-board.json"
 | S-HC-MAINT-CLOSE-GATE-01 | Manuel | Automatic closure validation gate before Oreshnik close |
 | S-HC-MAINT-MOTHER-SYNC-01 | Manuel | Automatic canonical merge for newer MADRE branches |
 | S-HC-MAINT-CLOSE-SPAWN-01 | Manuel | Remove shell warning from closure validation gate |
+| S-HC-JEAN-ALIGN | Jean | Oreshnik + Worker alignment (Plan Maestro Sprint 10/11) |
 | S-HC-RELEASE-01 | Manuel+Jean | End-to-end Turpial Sound production proof |

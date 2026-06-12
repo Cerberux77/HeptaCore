@@ -1,0 +1,22 @@
+{
+  "sprint": "S-HC-JEAN-ALIGN",
+  "operator": "Jean",
+  "status": "CERRADO",
+  "date": "2026-06-12",
+  "at": "2026-06-12T00:05:16.836Z",
+  "branch": "Jean/s-hc-prod-01-producto-operativo-tenant-admin-produccion-2026-06-09",
+  "previousMother": "MADRE/v38-s-hc-release-02-trial-payment-cta-qa-bot-cost-table-2026-06-11",
+  "nextMother": "MADRE/v39-s-hc-jean-align-oreshnik-worker-alignment-2026-06-12",
+  "description": "oreshnik-worker-alignment",
+  "changedFiles": [
+    "docs/obsidian-vault/00_CENTRAL_HEPTACORE.md",
+    "docs/obsidian-vault/COLABORADORES/ESTADO_JEAN.md",
+    "docs/obsidian-vault/COLABORADORES/ESTADO_MANUEL.md",
+    "docs/obsidian-vault/PRODUCT/STATUS_BOARD.md",
+    "scripts/oreshnik/close-sprint.mjs",
+    "scripts/oreshnik/lib.mjs",
+    "scripts/oreshnik/preflight.mjs",
+    "scripts/oreshnik/zone-check.mjs",
+    "var/oreshnik/task-board.json"
+  ]
+}
