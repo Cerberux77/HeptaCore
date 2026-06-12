@@ -1,5 +1,5 @@
 {
-  "current": "MADRE/v41-s-hc-00-foundation-baseline-commit-2026-06-12",
+  "current": "MADRE/v42-s-hc-02-turpial-importer-and-prisma-seed-2026-06-12",
   "branches": [
     {
       "previous": "MADRE/v11-s-hc-09-publish-readiness-gate-2026-06-09",
@@ -280,11 +280,21 @@
       "at": "2026-06-12T04:30:20.302Z",
       "previous": "MADRE/v40-s-hc-prod-01-proxy-next-js-16-middleware-landing-premium-hc-d-2026-06-12",
       "description": "foundation baseline commit"
+    },
+    {
+      "version": 42,
+      "name": "MADRE/v42-s-hc-02-turpial-importer-and-prisma-seed-2026-06-12",
+      "sprint": "S-HC-02",
+      "operator": "Jean",
+      "date": "2026-06-12",
+      "at": "2026-06-12T04:32:55.688Z",
+      "previous": "MADRE/v41-s-hc-00-foundation-baseline-commit-2026-06-12",
+      "description": "turpial importer and prisma seed"
     }
   ],
-  "version": 41,
-  "effective": "MADRE/v40-s-hc-prod-01-proxy-next-js-16-middleware-landing-premium-hc-d-2026-06-12",
-  "effectiveRef": "origin/MADRE/v40-s-hc-prod-01-proxy-next-js-16-middleware-landing-premium-hc-d-2026-06-12",
+  "version": 42,
+  "effective": "MADRE/v41-s-hc-00-foundation-baseline-commit-2026-06-12",
+  "effectiveRef": "origin/MADRE/v41-s-hc-00-foundation-baseline-commit-2026-06-12",
   "declaredMissing": false,
   "discoveredVersion": 14
 }

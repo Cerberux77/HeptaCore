@@ -1,8 +1,8 @@
 ---
 type: sprint-plan
 project: "HeptaCore"
-last_updated: "2026-06-12T04:30:20.302Z"
-mother_branch: "MADRE/v41-s-hc-00-foundation-baseline-commit-2026-06-12"
+last_updated: "2026-06-12T04:32:55.688Z"
+mother_branch: "MADRE/v42-s-hc-02-turpial-importer-and-prisma-seed-2026-06-12"
 tags:
   - "#sprints"
   - "#manuel"
@@ -760,3 +760,14 @@ npm run oreshnik:preflight -- --sprint S-HC-JEAN-ALIGN --operator Jean --desc "a
 | Estado | CERRADO |
 | Madre docs | `MADRE/v41-s-hc-00-foundation-baseline-commit-2026-06-12` |
 | Descripcion | foundation baseline commit |
+
+
+## Cierre S-HC-02 - 2026-06-12
+
+| Campo | Valor |
+|---|---|
+| Operador | Jean |
+| Rama | `Manuel/s-hc-prod-01-producto-operativo-tenant-admin-produccion-2026-06-09` |
+| Estado | CERRADO |
+| Madre docs | `MADRE/v42-s-hc-02-turpial-importer-and-prisma-seed-2026-06-12` |
+| Descripcion | turpial importer and prisma seed |
