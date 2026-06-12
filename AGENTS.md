@@ -56,3 +56,20 @@ Do not work directly on the mother branch except through Oreshnik close/sync flo
 - No credentials in git.
 - No Prisma/schema/auth/security changes without double lock.
 - No sprint closure without vault updates.
+- Before `vercel deploy --prod` or any production deploy, run `npm run oreshnik:preflight` and verify drift step 10/10 is clean.
+
+## Drift Detection
+
+When work exceeds the planned sprint scope, register ad-hoc changes:
+
+```bash
+# Check current drift status
+npm run oreshnik:drift -- --check
+
+# Register drift silently (auto-assigns S-HC-DRIFT-NNN)
+npm run oreshnik:drift -- --operator Manuel --mode silent --desc "que hiciste"
+```
+
+Preflight step 10/10 warns when unregistered changes are detected. Drift entries link to the mother branch on sprint close for traceability.
+
+Oreshnik drift **no es automatico** — no hay git hooks ni watchers. Todo agente debe invocar `oreshnik:preflight` al iniciar y `oreshnik:drift` al detectar desborde de scope.
