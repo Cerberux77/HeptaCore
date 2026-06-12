@@ -73,3 +73,23 @@ npm run oreshnik:drift -- --operator Manuel --mode silent --desc "que hiciste"
 Preflight step 10/10 warns when unregistered changes are detected. Drift entries link to the mother branch on sprint close for traceability.
 
 Oreshnik drift **no es automatico** — no hay git hooks ni watchers. Todo agente debe invocar `oreshnik:preflight` al iniciar y `oreshnik:drift` al detectar desborde de scope.
+
+## Pre-Push Drift Hook
+
+A non-blocking git pre-push hook warns when uncommitted files exceed the drift threshold:
+
+```bash
+# Install once per clone
+npm run oreshnik:hook:install
+```
+
+The hook fires on every `git push` and:
+- Scans working tree for uncommitted changes outside `var/oreshnik/`
+- Scores them (file count, new files, deleted, critical zones)
+- If score >= 3, prints a yellow warning with the `npm run oreshnik:drift` command
+- NEVER blocks the push — advisory only
+
+To test the hook manually:
+```bash
+node scripts/oreshnik/hooks/pre-push-check.mjs
+```
