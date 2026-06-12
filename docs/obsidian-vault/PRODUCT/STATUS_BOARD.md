@@ -1,7 +1,7 @@
 ---
 type: status-board
 project: "HeptaCore"
-last_updated: "2026-06-12T04:33:48.367Z"
+last_updated: "2026-06-12T05:01:24.197Z"
 generated_by: "Oreshnik canonical-check"
 source: "var/oreshnik/task-board.json"
 ---
@@ -79,3 +79,4 @@ source: "var/oreshnik/task-board.json"
 | S-HC-MAINT-CLOSE-SPAWN-01 | Manuel | Remove shell warning from closure validation gate |
 | S-HC-JEAN-ALIGN | Jean | Oreshnik + Worker alignment (Plan Maestro Sprint 10/11) |
 | S-HC-RELEASE-01 | Manuel+Jean | End-to-end Turpial Sound production proof |
+| S-HC-DRIFT-001 | Manuel | sprint |
