@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 620 128" role="img" aria-label="HeptaCore">
+  <rect width="620" height="128" fill="none"/>
+  <g transform="translate(12 12)">
+    <rect width="104" height="104" rx="22" fill="#0a0a0a"/>
+    <circle cx="52" cy="52" r="27" fill="none" stroke="#0dc5b8" stroke-width="7"/>
+    <circle cx="52" cy="52" r="8" fill="#f2f2f2"/>
+    <path d="M52 14v20M52 70v20M14 52h20M70 52h20M25 25l14 14M65 65l14 14M79 25L65 39M39 65L25 79" stroke="#d7b56d" stroke-width="5" stroke-linecap="round"/>
+  </g>
+  <text x="142" y="78" fill="#f2f2f2" font-family="Inter, Arial, sans-serif" font-size="52" font-weight="700" letter-spacing="8">HEPTACORE</text>
+</svg>
