@@ -1,0 +1,17 @@
+#!/bin/sh
+# ──────────────────────────────────────────────────────────────────
+# HeptaCore Oreshnik Pre-Push Drift Hook
+# NON-BLOCKING: warns about unregistered drift, never stops a push.
+# ──────────────────────────────────────────────────────────────────
+
+REPO_ROOT="$(cd "$(dirname "$0")/../../.." && pwd)"
+CHECK_SCRIPT="$REPO_ROOT/scripts/oreshnik/hooks/pre-push-check.mjs"
+
+# Consume stdin that git sends (refs being pushed)
+while read local_ref local_sha remote_ref remote_sha; do
+  :
+done
+
+node "$CHECK_SCRIPT" 2>/dev/null
+
+exit 0

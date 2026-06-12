@@ -32,6 +32,7 @@
     "brand:generate": "node scripts/generate-brand-assets.mjs",
     "oreshnik:drift": "node scripts/oreshnik/drift.mjs",
     "oreshnik:drift:check": "node scripts/oreshnik/drift.mjs --check",
+    "oreshnik:hook:install": "node -e \"const{cpSync}=require('fs');cpSync('scripts/oreshnik/hooks/pre-push','.git/hooks/pre-push');console.log('Pre-push drift hook installed.')\"",
     "deploy": "npx vercel deploy --prod --yes",
     "deploy:hook": "node -e \"fetch('https://api.vercel.com/v1/integrations/deploy/prj_flQUZNW03oOnxANUfH8pIQRvNoP7/yZQrdWODLs',{method:'POST'}).then(r=>r.json()).then(d=>{console.log(d.message||'Deploy triggered:',d.status);if(d.job)console.log('Job ID:',d.job.id)}).catch(e=>console.error(e))\"",
     "push:deploy": "git push origin master && npm run deploy"
