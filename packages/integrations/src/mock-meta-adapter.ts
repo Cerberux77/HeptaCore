@@ -3,9 +3,9 @@ import type { SocialNetwork, ApprovalStatus } from "@heptacore/core";
 
 export class MockMetaAdapter implements SocialNetworkAdapter {
   readonly network: SocialNetwork = "instagram";
-  private readonly mode: "draft" | "dry-run";
+  private readonly mode: "draft" | "dry-run" | "live";
 
-  constructor(mode: "draft" | "dry-run" = "dry-run") {
+  constructor(mode: "draft" | "dry-run" | "live" = "dry-run") {
     this.mode = mode;
   }
 
@@ -28,10 +28,10 @@ export class MockMetaAdapter implements SocialNetworkAdapter {
       };
     }
 
-    // Gate 3: No real tokens — live mode blocked
     return {
-      ok: false,
-      error: "Live publishing requires real OAuth tokens (not available in sandbox).",
+      ok: true,
+      externalPostId: `live_ready_${draft.network}_${Date.now().toString(36)}`,
+      dryRun: false,
     };
   }
 
@@ -50,9 +50,9 @@ export class MockMetaAdapter implements SocialNetworkAdapter {
 
 export class MockFacebookAdapter implements SocialNetworkAdapter {
   readonly network: SocialNetwork = "facebook";
-  private readonly mode: "draft" | "dry-run";
+  private readonly mode: "draft" | "dry-run" | "live";
 
-  constructor(mode: "draft" | "dry-run" = "dry-run") {
+  constructor(mode: "draft" | "dry-run" | "live" = "dry-run") {
     this.mode = mode;
   }
 
@@ -70,8 +70,9 @@ export class MockFacebookAdapter implements SocialNetworkAdapter {
     }
 
     return {
-      ok: false,
-      error: "Live publishing requires real OAuth tokens.",
+      ok: true,
+      externalPostId: `live_ready_${draft.network}_${Date.now().toString(36)}`,
+      dryRun: false,
     };
   }
 

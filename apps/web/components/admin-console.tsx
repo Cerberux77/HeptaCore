@@ -67,14 +67,22 @@ function TenantLlmSection({ slug, name }: { slug: string; name: string }) {
         <Bot size={14} /> LLM
       </button>
       {open && (
-        <div className="tenant-row" style={{ background: "var(--hc-bone)", marginTop: 6, padding: 10, borderRadius: 8, flexDirection: "column", alignItems: "stretch", gap: 8 }}>
-          <strong style={{ fontSize: 12 }}>{name} - Configuracion LLM</strong>
-          <label style={{ fontSize: 11, display: "flex", gap: 6, alignItems: "center" }}>
-            Provider:
+        <div className="modal-layer" role="dialog" aria-modal="true" aria-label={`Configuracion LLM ${name}`}>
+          <button className="modal-backdrop" onClick={() => setOpen(false)} aria-label="Cerrar configuracion LLM" />
+          <div className="modal-panel">
+            <div className="modal-head">
+              <div>
+                <span className="section-label">Admin LLM</span>
+                <h2>{name}</h2>
+              </div>
+              <button className="icon-button" onClick={() => setOpen(false)} aria-label="Cerrar"><X size={18} /></button>
+            </div>
+            <div className="modal-body">
+          <label>
+            Provider
             <select
               value={config.provider}
               onChange={(e) => setConfig({ ...config, provider: e.target.value })}
-              style={{ padding: "4px 8px", borderRadius: 4, border: "1px solid var(--hc-line)", fontSize: 11 }}
             >
               <option value="deterministic">Deterministico (sin API)</option>
               <option value="openai">OpenAI</option>
@@ -85,29 +93,27 @@ function TenantLlmSection({ slug, name }: { slug: string; name: string }) {
           </label>
           {config.provider !== "deterministic" && (
             <>
-              <label style={{ fontSize: 11, display: "flex", gap: 6, alignItems: "center" }}>
-                Model:
+              <label>
+                Modelo
                 <input
                   value={config.model}
                   onChange={(e) => setConfig({ ...config, model: e.target.value })}
                   placeholder="gpt-4o-mini"
-                  style={{ padding: "4px 8px", borderRadius: 4, border: "1px solid var(--hc-line)", fontSize: 11, flex: 1 }}
                 />
               </label>
-              <label style={{ fontSize: 11, display: "flex", gap: 6, alignItems: "center" }}>
-                API Key:
+              <label>
+                API Key
                 <input
                   type="password"
                   value={config.apiKey}
                   onChange={(e) => setConfig({ ...config, apiKey: e.target.value })}
                   placeholder="sk-..."
-                  style={{ padding: "4px 8px", borderRadius: 4, border: "1px solid var(--hc-line)", fontSize: 11, flex: 1 }}
                 />
               </label>
             </>
           )}
-          <label style={{ fontSize: 11, display: "flex", gap: 6, alignItems: "center" }}>
-            <TrendingUp size={12} /> Overhead:
+          <label>
+            <span><TrendingUp size={12} /> Overhead</span>
             <input
               type="number"
               step="0.1"
@@ -115,15 +121,14 @@ function TenantLlmSection({ slug, name }: { slug: string; name: string }) {
               max="10.0"
               value={overheadFactor}
               onChange={(e) => setOverheadFactor(parseFloat(e.target.value) || 2.0)}
-              style={{ padding: "4px 8px", borderRadius: 4, border: "1px solid var(--hc-line)", fontSize: 11, width: 70 }}
             />
-            <span style={{ fontSize: 10, color: "var(--hc-fog)" }}>x</span>
             <small style={{ fontSize: 10, color: "var(--hc-fog)" }}>
               (Utilidad: {((overheadFactor - 1) * 100).toFixed(0)}%)
             </small>
           </label>
           <AdminPricingTable overheadFactor={overheadFactor} />
-          <div style={{ display: "flex", gap: 6 }}>
+            </div>
+            <div className="modal-actions">
             <button onClick={saveConfig} disabled={loading} style={{ fontSize: 11, padding: "4px 10px", borderRadius: 4, background: "var(--hc-teal)", color: "#fff", border: "none" }}>
               <Save size={12} /> {loading ? "Guardando..." : "Guardar"}
             </button>
@@ -131,6 +136,7 @@ function TenantLlmSection({ slug, name }: { slug: string; name: string }) {
             <button onClick={() => setOpen(false)} style={{ fontSize: 11, padding: "4px 10px", borderRadius: 4, border: "1px solid var(--hc-line)", background: "var(--hc-bone)" }}>
               <X size={12} /> Cerrar
             </button>
+            </div>
           </div>
         </div>
       )}
@@ -261,7 +267,7 @@ export function AdminConsole({ data }: { data: AdminDashboardData }) {
               </div>
             )}
             <div style={{ padding: "8px 14px", fontSize: 12, color: "var(--hc-fog)", borderTop: "1px solid var(--hc-line)" }}>
-              Gasto real bloqueado. Sin ejecucion sin aprobacion. 35% overhead transparente.
+              Gasto real exige aprobacion, presupuesto y credenciales de plataforma. 35% overhead transparente.
             </div>
           </section>
 

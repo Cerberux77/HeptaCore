@@ -14,10 +14,18 @@ const adapter = new PrismaPg(pool);
 const prisma = new PrismaClient({ adapter });
 
 const TENANT_SLUG = "turpial-sound";
-const CHANNEL_MAP = { instagram: "INSTAGRAM", facebook: "FACEBOOK" };
-const FORMAT_MAP = {
-  feed: "feed", reel: "reel", story: "story", carousel: "carousel"
+const CHANNEL_MAP = {
+  instagram: "INSTAGRAM",
+  facebook: "FACEBOOK",
+  youtube: "YOUTUBE",
+  tiktok: "TIKTOK",
+  linkedin: "LINKEDIN",
 };
+const FORMAT_MAP = {
+  feed: "feed", reel: "reel", story: "story", carousel: "carousel",
+  short: "short", video: "video", vertical_video: "vertical_video", document: "document"
+};
+const SELECTED_NETWORKS = ["INSTAGRAM", "FACEBOOK", "YOUTUBE", "TIKTOK", "LINKEDIN"];
 
 function cuid() {
   return `c${Date.now().toString(36)}${Math.random().toString(36).slice(2, 10)}`;
@@ -68,7 +76,7 @@ if (!existingProfile) {
       industry: "Musica, estudio de grabacion, salas de ensayo y marketplace",
       geography: "Caracas, Venezuela",
       toneOfVoice: ["tecnico", "cercano", "confiable", "comunidad musical"],
-      socialChannels: ["instagram", "facebook"],
+      socialChannels: SELECTED_NETWORKS,
       servicesProducts: ["estudio", "salas de ensayo", "produccion musical", "marketplace"],
       targetAudience: ["bandas", "solistas", "productores", "compradores de equipos"],
       assetAvailability: { localAssets: true, count: 46 },
@@ -77,9 +85,18 @@ if (!existingProfile) {
     },
   });
   console.log("BrandProfile created");
+} else {
+  await prisma.brandProfile.update({
+    where: { id: existingProfile.id },
+    data: {
+      socialChannels: SELECTED_NETWORKS,
+      publishingPermissions: { realPublishing: true, dryRun: true, requiresManualApproval: true },
+      updatedAt: new Date(),
+    },
+  });
 }
 
-for (const network of ["INSTAGRAM", "FACEBOOK"]) {
+for (const network of SELECTED_NETWORKS) {
   const existing = await prisma.socialAccount.findFirst({ where: { tenantId: tenant.id, network } });
   if (!existing) {
     await prisma.socialAccount.create({
@@ -104,7 +121,61 @@ console.log(`Social accounts: ${Object.keys(accountByNetwork).join(", ")}`);
 
 // 3. Create ContentPillars from queue data pillars
 const pillarSet = new Set();
-const queue = JSON.parse(readFileSync(join(TURPIAL, "queue", "publication-queue.json"), "utf8"));
+const importedQueue = JSON.parse(readFileSync(join(TURPIAL, "queue", "publication-queue.json"), "utf8"));
+const supplementalQueue = [
+  {
+    id: "yt_short_01",
+    channel: "youtube",
+    format: "short",
+    pilar: "autoridad_semantica",
+    status: "draft",
+    title: "Que hace distinto a un estudio profesional",
+    caption: "En los primeros 30 segundos: acustica, criterio tecnico y flujo completo de grabacion a mezcla en Turpial Sound.",
+    cta: "Reserva una visita por WhatsApp",
+    hashtags: ["#TurpialSound", "#EstudioDeGrabacion", "#Caracas", "#ProduccionMusical"],
+    sourceDoc: "strategy_extension_multired",
+    notes: "YouTube Short: abrir con respuesta directa y mostrar consola/sala.",
+    riskLevel: "low",
+    requiresHumanReview: false,
+    selectedAssetPath: "content/inbox/reels/tour-estudio.mp4",
+    scheduledFor: "2026-07-02",
+  },
+  {
+    id: "tt_video_01",
+    channel: "tiktok",
+    format: "vertical_video",
+    pilar: "descubrimiento_visual",
+    status: "draft",
+    title: "Tres detalles que se notan al grabar en sala tratada",
+    caption: "Hook: si tu demo suena opaca, mira estos 3 detalles de una sala preparada.",
+    cta: "Escribe para reservar",
+    hashtags: ["#TurpialSound", "#MusicosCaracas", "#HomeStudio", "#Grabacion"],
+    sourceDoc: "strategy_extension_multired",
+    notes: "TikTok: ritmo rapido, texto en pantalla y closeups de equipo.",
+    riskLevel: "low",
+    requiresHumanReview: false,
+    selectedAssetPath: "content/inbox/reels/closeup-consola.mp4",
+    scheduledFor: "2026-07-03",
+  },
+  {
+    id: "li_post_01",
+    channel: "linkedin",
+    format: "feed",
+    pilar: "confianza_negocio",
+    status: "draft",
+    title: "Operacion protegida para marketplace musical",
+    caption: "Turpial Sound combina estudio, comunidad y marketplace con operacion protegida: confianza antes de volumen.",
+    cta: "Conversemos sobre alianzas",
+    hashtags: ["#TurpialSound", "#Marketplace", "#Musica", "#Operacion"],
+    sourceDoc: "strategy_extension_multired",
+    notes: "LinkedIn: enfoque negocio, confianza y proceso.",
+    riskLevel: "medium",
+    requiresHumanReview: true,
+    selectedAssetPath: "content/inbox/marketplace/operacion-protegida.png",
+    scheduledFor: "2026-07-04",
+  },
+];
+const queue = [...importedQueue, ...supplementalQueue];
 for (const item of queue) {
   if (item.pilar) pillarSet.add(item.pilar);
 }
@@ -179,8 +250,14 @@ console.log(`Assets: ${Object.keys(assetMap).length}`);
 let draftCount = 0;
 const existingDrafts = await prisma.contentDraft.count({ where: { tenantId: tenant.id } });
 if (existingDrafts > 0) {
-  console.log(`ContentDrafts already present: ${existingDrafts}. Skipping draft import.`);
-} else for (const item of queue) {
+  console.log(`ContentDrafts already present: ${existingDrafts}. Importing only missing multired drafts.`);
+}
+for (const item of queue) {
+  if (existingDrafts > 0) {
+    const exists = await prisma.contentDraft.findFirst({ where: { tenantId: tenant.id, source: item.sourceDoc || null, title: item.title } });
+    const isSupplemental = supplementalQueue.some((draft) => draft.id === item.id);
+    if (!isSupplemental || exists) continue;
+  }
   const channel = CHANNEL_MAP[item.channel] || "INSTAGRAM";
   const networkAccount = accountByNetwork[channel];
   const pillar = item.pilar ? pillarMap[item.pilar] : null;

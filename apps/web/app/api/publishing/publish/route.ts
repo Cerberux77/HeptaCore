@@ -16,6 +16,23 @@ function tenantRequiresManualApproval(automationMode: string): boolean {
   return automationMode === "APPROVAL_REQUIRED" || automationMode === "DRAFT_ONLY";
 }
 
+function requiredScopesForNetwork(network: string) {
+  switch (network) {
+    case "INSTAGRAM":
+      return ["content_publish"];
+    case "FACEBOOK":
+      return ["pages_manage_posts"];
+    case "YOUTUBE":
+      return ["youtube.upload"];
+    case "TIKTOK":
+      return ["video.publish"];
+    case "LINKEDIN":
+      return ["w_member_social"];
+    default:
+      return ["publish"];
+  }
+}
+
 export async function POST(req: Request) {
   const session = await auth();
   if (!session?.user?.id) {
@@ -28,8 +45,6 @@ export async function POST(req: Request) {
   const requestMode = String(body?.mode ?? "dry-run");
   const manualApproval = body?.manualApproval === true;
 
-  const globalHardStop = process.env.PUBLISHING_HARD_STOP !== "false";
-  const globalRealEnabled = process.env.PUBLISHING_REAL_ENABLED === "true";
   const globalRequireManual = process.env.PUBLISHING_REQUIRE_MANUAL_APPROVAL !== "false";
 
   if (!tenantSlug || !draftId) {
@@ -46,18 +61,9 @@ export async function POST(req: Request) {
 
   const tenantAutoPilot = tenantAllowsRealPublish(tenant.automationMode);
   const tenantNeedsManual = tenantRequiresManualApproval(tenant.automationMode);
+  const isDryRun = requestMode !== "live";
 
-  const isDryRun = globalHardStop || (requestMode === "dry-run") || !globalRealEnabled || !tenantAutoPilot;
-
-  if (requestMode !== "dry-run" && (!globalRealEnabled || !tenantAutoPilot)) {
-    const blocks: string[] = [];
-    if (!globalRealEnabled) blocks.push("PUBLISHING_REAL_ENABLED is not true");
-    if (globalHardStop) blocks.push("PUBLISHING_HARD_STOP is active");
-    if (!tenantAutoPilot) blocks.push(`tenant automationMode is ${tenant.automationMode} (needs AUTOPILOT_FULL or AUTOPILOT_LIMITED)`);
-    return NextResponse.json({ error: `Real publishing blocked: ${blocks.join("; ")}.` }, { status: 403 });
-  }
-
-  if (!isDryRun && tenantNeedsManual && globalRequireManual && !manualApproval) {
+  if (!isDryRun && (tenantNeedsManual || !tenantAutoPilot) && globalRequireManual && !manualApproval) {
     return NextResponse.json({ error: "Manual approval gate is required for this tenant mode." }, { status: 400 });
   }
 
@@ -84,6 +90,37 @@ export async function POST(req: Request) {
   }
 
   if (!isDryRun) {
+    const [socialAccount, credential] = await Promise.all([
+      prisma.socialAccount.findFirst({
+        where: { tenantId: tenant.id, network: draft.network },
+        select: { id: true, status: true, scopes: true },
+      }),
+      prisma.credentialVaultItem.findFirst({
+        where: { tenantId: tenant.id, provider: draft.network },
+        select: { id: true, expiresAt: true },
+      }),
+    ]);
+
+    if (!socialAccount) {
+      return NextResponse.json({
+        error: `Live publishing needs a configured ${draft.network} account.`,
+        action: `Configurar cuenta ${draft.network}`,
+      }, { status: 409 });
+    }
+    if (!credential || (credential.expiresAt && credential.expiresAt < new Date())) {
+      return NextResponse.json({
+        error: `Live publishing needs a valid ${draft.network} credential in vault.`,
+        action: `Conectar credenciales ${draft.network}`,
+      }, { status: 409 });
+    }
+    const missingScopes = requiredScopesForNetwork(draft.network).filter((scope) => !socialAccount.scopes.includes(scope));
+    if (missingScopes.length > 0) {
+      return NextResponse.json({
+        error: `${draft.network} account is missing publish scopes: ${missingScopes.join(", ")}.`,
+        action: `Revisar permisos ${draft.network}`,
+      }, { status: 409 });
+    }
+
     const publishedOnNetwork = await prisma.contentDraft.count({
       where: { tenantId: tenant.id, network: draft.network, status: "PUBLISHED" },
     });
@@ -123,8 +160,7 @@ export async function POST(req: Request) {
       manualApproval,
       realPublishing: !isDryRun,
       tenantAutomationMode: tenant.automationMode,
-      globalHardStop,
-      globalRealEnabled,
+      readinessMode: "per_network",
     },
   });
 

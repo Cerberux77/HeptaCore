@@ -15,6 +15,15 @@ import {
 
 export const dynamic = "force-dynamic";
 
+function normalizeNetworks(value: unknown, fallback: string[]) {
+  const allowed = new Set(["instagram", "facebook", "tiktok", "youtube", "linkedin", "x"]);
+  if (!Array.isArray(value)) return fallback;
+  const networks = value
+    .map((network) => String(network).toLowerCase())
+    .filter((network, index, arr) => allowed.has(network) && arr.indexOf(network) === index);
+  return networks.length > 0 ? networks : fallback;
+}
+
 export async function POST(req: Request) {
   const session = await auth();
   if (!session?.user?.id) {
@@ -51,19 +60,60 @@ export async function POST(req: Request) {
       orderBy: { createdAt: "desc" },
       select: { name: true, description: true },
     });
-    const brandProfile = await prisma.brandProfile.findFirst({
-      where: { tenantId: tenant.id },
-      select: { targetAudience: true },
-    });
+    const [brandProfile, socialAccounts] = await Promise.all([
+      prisma.brandProfile.findFirst({
+        where: { tenantId: tenant.id },
+        select: { targetAudience: true, socialChannels: true },
+      }),
+      prisma.socialAccount.findMany({
+        where: { tenantId: tenant.id },
+        select: { network: true },
+      }),
+    ]);
+    const selectedNetworks = normalizeNetworks(
+      body.preferredNetworks ?? brandProfile?.socialChannels,
+      socialAccounts.length > 0
+        ? socialAccounts.map((account) => account.network.toLowerCase())
+        : ["instagram", "facebook"],
+    );
+
+    const audience = Array.isArray(brandProfile?.targetAudience)
+      ? (brandProfile.targetAudience as unknown[]).map(String).join(", ")
+      : typeof brandProfile?.targetAudience === "string"
+        ? brandProfile.targetAudience
+        : "general audience";
 
     intake = {
       tenantId: tenant.id,
       businessName: existing?.name ?? tenant.name,
       offer: existing?.description ?? `${tenant.name} services`,
       market: "social media marketing",
-      audience: brandProfile?.targetAudience ?? "general audience",
+      audience,
       constraints: body.constraints ?? [],
-      preferredNetworks: body.preferredNetworks ?? ["instagram", "facebook"],
+      preferredNetworks: selectedNetworks,
+    };
+  }
+
+  if (body.preferredNetworks && intake) {
+    intake = {
+      ...intake,
+      preferredNetworks: normalizeNetworks(body.preferredNetworks, intake.preferredNetworks ?? ["instagram", "facebook"]),
+    };
+  }
+
+  if (!intake) {
+    const brandProfile = await prisma.brandProfile.findFirst({
+      where: { tenantId: tenant.id },
+      select: { targetAudience: true },
+    });
+    intake = {
+      tenantId: tenant.id,
+      businessName: tenant.name,
+      offer: `${tenant.name} services`,
+      market: "social media marketing",
+      audience: String(brandProfile?.targetAudience ?? "general audience"),
+      constraints: body.constraints ?? [],
+      preferredNetworks: normalizeNetworks(body.preferredNetworks, ["instagram", "facebook"]),
     };
   }
 

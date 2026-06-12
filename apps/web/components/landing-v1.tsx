@@ -49,7 +49,7 @@ const contacts = [
   [MapPin, "Caracas", "Operacion remota y tenant Turpial Sound", "#top"],
 ] as const;
 
-export function LandingV1() {
+export function LandingV1({ loginHref = "/login" }: { loginHref?: string }) {
   return (
     <main className="hc-premium-landing" id="top">
       <header className="hc-premium-nav" aria-label="Principal">
@@ -62,7 +62,7 @@ export function LandingV1() {
           <a href="#pricing">Precio</a>
           <a href="#contact">Contacto</a>
         </nav>
-        <Link href="/login" className="hc-premium-login">Entrar a la consola</Link>
+        <Link href={loginHref} className="hc-premium-login">Entrar a la consola</Link>
       </header>
 
       <section className="hc-premium-hero">
@@ -76,7 +76,7 @@ export function LandingV1() {
               que un negocio pueda operar sus redes con control real, no con promesas automaticas.
             </p>
             <div className="hc-premium-actions">
-              <Link href="/login" className="hc-premium-primary">Entrar a la consola <ArrowRight size={18} /></Link>
+              <Link href={loginHref} className="hc-premium-primary">Entrar a la consola <ArrowRight size={18} /></Link>
               <a href="https://wa.me/584168017844" target="_blank" rel="noopener" className="hc-premium-secondary">
                 Solicitar invitacion <UserPlus size={18} />
               </a>
@@ -103,7 +103,7 @@ export function LandingV1() {
               <div><span>Guardrails</span><strong>ON</strong></div>
             </div>
             <div className="hc-console-row"><Clock3 size={16} /><span>Proximo dry-run preparado</span><strong>09:30</strong></div>
-            <div className="hc-console-row"><LockKeyhole size={16} /><span>Publicacion real</span><strong>bloqueada</strong></div>
+            <div className="hc-console-row"><LockKeyhole size={16} /><span>Publicacion real</span><strong>por readiness</strong></div>
           </div>
         </div>
       </section>
@@ -152,9 +152,9 @@ export function LandingV1() {
               <li><Check size={16} /> Registro por invitacion</li>
               <li><Check size={16} /> Dashboard por rol</li>
               <li><Check size={16} /> Drafts, assets y calendario</li>
-              <li><Check size={16} /> Publicacion real bloqueada hasta aprobacion</li>
+              <li><Check size={16} /> Publicacion real por red con aprobacion y credenciales</li>
             </ul>
-            <Link href="/login" className="hc-premium-primary">Entrar a la consola <Send size={17} /></Link>
+            <Link href={loginHref} className="hc-premium-primary">Entrar a la consola <Send size={17} /></Link>
           </article>
         </div>
       </section>
@@ -176,7 +176,7 @@ export function LandingV1() {
       <footer className="hc-premium-footer">
         <div><strong>HEPTACORE</strong><span>Inteligencia multidimensional para marketing operado.</span></div>
         <div><a href="#features">Sistema</a><a href="#process">Proceso</a><a href="#pricing">Precio</a></div>
-        <div><Link href="/login">Entrar a la consola</Link><a href="https://wa.me/584168017844" target="_blank" rel="noopener">WhatsApp</a></div>
+        <div><Link href={loginHref}>Entrar a la consola</Link><a href="https://wa.me/584168017844" target="_blank" rel="noopener">WhatsApp</a></div>
       </footer>
     </main>
   );

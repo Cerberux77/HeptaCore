@@ -37,6 +37,38 @@ const PILLARS = [
   { key: "cta_direct", label: "Llamado a la accion", formats: ["story", "reel"] },
 ];
 
+function formatsForNetwork(network: SocialNetwork) {
+  switch (network) {
+    case "instagram":
+      return ["feed", "reel", "story", "carousel"];
+    case "facebook":
+      return ["feed", "carousel", "long_form"];
+    case "youtube":
+      return ["short", "video", "community"];
+    case "tiktok":
+      return ["vertical_video", "trend_adaptation", "behind_the_scenes"];
+    case "linkedin":
+      return ["feed", "document", "case_note", "short_video"];
+    case "x":
+      return ["post", "thread"];
+    default:
+      return ["feed"];
+  }
+}
+
+function pillarForNetwork(network: SocialNetwork, day: number) {
+  if (network === "youtube") {
+    return { key: "semantic_authority", label: "Autoridad semantica / primeros 30 segundos", formats: ["short", "video"] };
+  }
+  if (network === "tiktok") {
+    return { key: "discovery_hook", label: "Descubrimiento / hook visual", formats: ["vertical_video"] };
+  }
+  if (network === "linkedin") {
+    return { key: "business_trust", label: "Autoridad de negocio / confianza", formats: ["feed", "document"] };
+  }
+  return PILLARS[day % PILLARS.length];
+}
+
 export function reframeOffer(intake: ClientIntake) {
   const networks = recommendNetworks(intake);
   const primary = networks[0]?.network ?? "instagram";
@@ -61,12 +93,8 @@ export function reframeOffer(intake: ClientIntake) {
     channels: networks.map((n) => ({
       network: n.network,
       priority: n.priority,
-      cadence: n.canStartImmediately ? "3-5 posts/semana" : "1-2 posts/semana",
-      formats: n.network === "instagram"
-        ? ["feed", "reel", "story", "carousel"]
-        : n.network === "facebook"
-          ? ["feed", "carousel"]
-          : ["feed"],
+      cadence: n.network === "instagram" || n.network === "facebook" ? "3-5 posts/semana" : "1-3 piezas/semana",
+      formats: formatsForNetwork(n.network),
     })),
     assetChecklist: buildMinimumIntakeChecklist(networks.map((n) => n.network)),
   };
@@ -78,19 +106,27 @@ export function generateDraftPlan(
 ): DraftPlanItem[] {
   const networks = recommendNetworks(intake);
   const active = networks.filter((n) => n.canStartImmediately).map((n) => n.network);
+  const activeNetworks = active.length > 0 ? active : networks.slice(0, 2).map((n) => n.network);
   const plan: DraftPlanItem[] = [];
 
   for (let day = 0; day < dayCount; day++) {
-    const network = active[day % active.length] as SocialNetwork;
-    const pillar = PILLARS[day % PILLARS.length];
+    const network = activeNetworks[day % activeNetworks.length] as SocialNetwork;
+    const pillar = pillarForNetwork(network, day);
+    const availableFormats = formatsForNetwork(network);
 
-    const format = pillar.formats.includes("reel") && day % 3 === 0
+    const format = network === "youtube"
+      ? (day % 3 === 0 ? "video" : "short")
+      : network === "tiktok"
+        ? "vertical_video"
+        : network === "linkedin"
+          ? (day % 2 === 0 ? "feed" : "document")
+          : pillar.formats.includes("reel") && day % 3 === 0
       ? "reel"
       : pillar.formats.includes("story") && day % 4 === 0
         ? "story"
         : pillar.formats.includes("carousel") && day % 5 === 0
           ? "carousel"
-          : "feed";
+          : availableFormats[0] ?? "feed";
 
     plan.push({
       network,

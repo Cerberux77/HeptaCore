@@ -37,6 +37,16 @@ import type { TrialStatus } from "../lib/trial";
 type View = "overview" | "strategy" | "queue" | "assets" | "calendar" | "checklist" | "reports" | "readiness";
 type CalendarView = "list" | "week" | "month";
 
+const SUPPORTED_NETWORKS = ["INSTAGRAM", "FACEBOOK", "YOUTUBE", "TIKTOK", "LINKEDIN"] as const;
+const NETWORK_LABELS: Record<string, string> = {
+  INSTAGRAM: "Instagram",
+  FACEBOOK: "Facebook",
+  YOUTUBE: "YouTube",
+  TIKTOK: "TikTok",
+  LINKEDIN: "LinkedIn",
+  X: "X",
+};
+
 function assetUrl(path: string | null | undefined) {
   if (!path) return "";
   return `/tenant-assets/turpial/${path.replace(/^content\/inbox\//, "")}`;
@@ -52,20 +62,24 @@ function getPlatformFrameClass(item: DraftQueueItem) {
   if (ch === "instagram" && (fmt === "story" || fmt === "reel")) return "frame-ig-vertical";
   if (ch === "instagram" && fmt === "feed") return "frame-ig-square";
   if (ch === "instagram" && fmt === "carousel") return "frame-ig-portrait";
-  if (ch === "tiktok" || ch === "youtube") return "frame-ig-vertical";
+  if (ch === "tiktok" || (ch === "youtube" && (fmt === "short" || fmt === "vertical_video"))) return "frame-ig-vertical";
+  if (ch === "youtube") return "frame-youtube";
+  if (ch === "linkedin") return "frame-linkedin";
   return "frame-facebook";
+}
+
+function isVideoAsset(item: DraftQueueItem | { asset?: { path: string | null; kind: string } | null }) {
+  const path = item.asset?.path?.toLowerCase() ?? "";
+  return item.asset?.kind === "VIDEO" || path.endsWith(".mp4") || path.endsWith(".mov") || path.endsWith(".webm");
 }
 
 function Thumb({ item }: { item: DraftQueueItem }) {
   const url = assetUrl(item.asset?.path);
   if (url) {
-    return (
-      <img
-        src={url}
-        alt={item.title}
-        className={item.asset?.kind === "VIDEO" ? "thumb thumb-video" : "thumb"}
-      />
-    );
+    if (isVideoAsset(item)) {
+      return <video src={url} className="thumb thumb-video" muted playsInline preload="metadata" />;
+    }
+    return <img src={url} alt={item.title} className="thumb" />;
   }
   return <div className="thumb fallback"><ImageIcon size={20} /></div>;
 }
@@ -184,7 +198,10 @@ export function DashboardConsole({
   const [assetPickerOpen, setAssetPickerOpen] = useState(false);
   const [assetReplacing, setAssetReplacing] = useState(false);
   const [paymentModalOpen, setPaymentModalOpen] = useState(false);
+  const [networkSaving, setNetworkSaving] = useState(false);
   const selected = localQueue.find((i) => i.id === selectedId) ?? localQueue[0];
+  const activeNetworks = metrics?.tenant.activeNetworks?.length ? metrics.tenant.activeNetworks : ["INSTAGRAM", "FACEBOOK"];
+  const missingCoreNetworks = SUPPORTED_NETWORKS.filter((network) => !activeNetworks.includes(network));
 
   const pendingReview = localQueue.filter(
     (i) => i.status !== "PUBLISHED" && (i.requiresReview || i.riskLevel !== "low"),
@@ -207,7 +224,7 @@ export function DashboardConsole({
     setPublishState("loading");
     setPublishMessage("");
     try {
-      const effectiveMode = tenantAutoPilot ? publishMode : "dry-run";
+      const effectiveMode = publishMode;
       const res = await fetch("/api/publishing/publish", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -285,6 +302,7 @@ export function DashboardConsole({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           tenantSlug,
+          preferredNetworks: activeNetworks.map((network) => network.toLowerCase()),
           providerConfig: { provider: llmProvider, model: llmModel, apiKey: llmApiKey },
         }),
       });
@@ -296,6 +314,26 @@ export function DashboardConsole({
       setStrategyResult(data);
     } finally {
       setStrategyGenerating(false);
+    }
+  }
+
+  async function handleEnableMissingNetworks() {
+    if (missingCoreNetworks.length === 0) return;
+    setNetworkSaving(true);
+    try {
+      const res = await fetch("/api/tenant-networks", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ tenantSlug, networks: missingCoreNetworks }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.ok) {
+        alert(data.error || "No se pudieron activar las redes.");
+        return;
+      }
+      window.location.reload();
+    } finally {
+      setNetworkSaving(false);
     }
   }
 
@@ -376,7 +414,7 @@ export function DashboardConsole({
         <div className="tenant-switcher">
           <span>Workspace</span>
           <strong>{metrics?.tenant.name ?? "Turpial Sound"}</strong>
-          <small>Instagram + Facebook / {metrics?.tenant.mode ?? "draft"}</small>
+          <small>{activeNetworks.map((network) => NETWORK_LABELS[network] ?? network).join(" + ")} / {metrics?.tenant.mode ?? "draft"}</small>
         </div>
         <nav className="app-nav">
           <NavButton icon={<Gauge size={17} />} active={view === "overview"} onClick={() => setView("overview")}>Operaciones</NavButton>
@@ -396,7 +434,7 @@ export function DashboardConsole({
               ? "Autopilot completo. Publicacion real habilitada sin gates manuales."
               : metrics?.tenant.mode === "AUTOPILOT_LIMITED"
                 ? "Autopilot limitado. Publicacion real con gates minimos de seguridad."
-                : "Modo revision. Publicacion real bloqueada. Todo pasa por aprobacion humana."}
+                : "Modo revision. Dry-run disponible; live depende de readiness por red."}
           </span>
         </div>
       </aside>
@@ -553,8 +591,8 @@ export function DashboardConsole({
                 )}
                 {(metrics?.tenant.mode === "DRAFT_ONLY" || metrics?.tenant.mode === "APPROVAL_REQUIRED") && (
                   <>
-                    <li>OAuth real de Meta pendiente.</li>
-                    <li>Publicacion real bloqueada hasta aprobacion humana.</li>
+                    <li>Live depende de credenciales y permisos por red.</li>
+                    <li>La aprobacion humana habilita pruebas reales cuando la red esta completa.</li>
                   </>
                 )}
                 <li>Respuestas delicadas requieren cola de revision.</li>
@@ -569,43 +607,71 @@ export function DashboardConsole({
             <section className="work-panel span-2">
               <PanelTitle icon={<Bot size={17} />} title="Generar estrategia con IA" />
               <div style={{ padding: 14 }}>
+                <div className="network-scope">
+                  <div>
+                    <span className="section-label">RRSS en alcance</span>
+                    <strong>{activeNetworks.map((network) => NETWORK_LABELS[network] ?? network).join(" / ")}</strong>
+                    <small>El LLM adapta narrativa, formatos, campana, CTAs y assets a cada red seleccionada.</small>
+                  </div>
+                  {missingCoreNetworks.length > 0 && (
+                    <button className="tool-button" onClick={handleEnableMissingNetworks} disabled={networkSaving}>
+                      <Check size={14} />
+                      {networkSaving ? "Activando..." : `Incorporar ${missingCoreNetworks.map((network) => NETWORK_LABELS[network]).join(", ")}`}
+                    </button>
+                  )}
+                </div>
                 <button onClick={() => setLlmOpen(!llmOpen)} style={{ marginBottom: 12, fontSize: 12, padding: "6px 14px", borderRadius: 6, border: "1px solid var(--hc-line)", background: "var(--hc-bone)", color: "var(--hc-ink)" }}>
                   <Settings2 size={14} style={{ verticalAlign: "middle", marginRight: 4 }} />
-                  {llmOpen ? "Ocultar configuracion LLM" : "Configurar LLM"}
+                  Configurar LLM
                 </button>
                 {llmOpen && (
-                  <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 12, padding: 10, background: "var(--hc-bone)", borderRadius: 8 }}>
-                    <label style={{ fontSize: 12, color: "var(--hc-fog)" }}>
-                      Provider:
-                      <select value={llmProvider} onChange={(e) => setLlmProvider(e.target.value)} style={{ marginLeft: 8, padding: "4px 8px", borderRadius: 4, border: "1px solid var(--hc-line)", fontSize: 12 }}>
-                        <option value="deterministic">Deterministico (sin API)</option>
-                        <option value="openai">OpenAI</option>
-                        <option value="anthropic">Anthropic (Claude)</option>
-                        <option value="gemini">Gemini</option>
-                        <option value="deepseek">DeepSeek</option>
-                      </select>
-                    </label>
-                    {llmProvider !== "deterministic" && (
-                      <>
-                        <label style={{ fontSize: 12, color: "var(--hc-fog)" }}>
-                          Modelo:
-                          <input value={llmModel} onChange={(e) => setLlmModel(e.target.value)} placeholder={llmProvider === "openai" ? "gpt-4o" : llmProvider === "anthropic" ? "claude-3-5-haiku-latest" : llmProvider === "gemini" ? "gemini-2.0-flash" : "deepseek-chat"} style={{ marginLeft: 8, padding: "4px 8px", borderRadius: 4, border: "1px solid var(--hc-line)", fontSize: 12, width: 220 }} />
+                  <div className="modal-layer" role="dialog" aria-modal="true" aria-label="Configuracion LLM">
+                    <button className="modal-backdrop" onClick={() => setLlmOpen(false)} aria-label="Cerrar configuracion LLM" />
+                    <div className="modal-panel">
+                      <div className="modal-head">
+                        <div>
+                          <span className="section-label">Admin</span>
+                          <h2>Configuracion LLM</h2>
+                        </div>
+                        <button className="icon-button" onClick={() => setLlmOpen(false)} aria-label="Cerrar">
+                          <X size={18} />
+                        </button>
+                      </div>
+                      <div className="modal-body">
+                        <label>
+                          Provider
+                          <select value={llmProvider} onChange={(e) => setLlmProvider(e.target.value)}>
+                            <option value="deterministic">Deterministico (sin API)</option>
+                            <option value="openai">OpenAI</option>
+                            <option value="anthropic">Anthropic (Claude)</option>
+                            <option value="gemini">Gemini</option>
+                            <option value="deepseek">DeepSeek</option>
+                          </select>
                         </label>
-                        <label style={{ fontSize: 12, color: "var(--hc-fog)" }}>
-                          API Key:
-                          <input type="password" value={llmApiKey} onChange={(e) => setLlmApiKey(e.target.value)} placeholder="sk-..." style={{ marginLeft: 8, padding: "4px 8px", borderRadius: 4, border: "1px solid var(--hc-line)", fontSize: 12, width: 320 }} />
-                        </label>
-                      </>
-                    )}
+                        {llmProvider !== "deterministic" && (
+                          <>
+                            <label>
+                              Modelo
+                              <input value={llmModel} onChange={(e) => setLlmModel(e.target.value)} placeholder={llmProvider === "openai" ? "gpt-4o" : llmProvider === "anthropic" ? "claude-3-5-haiku-latest" : llmProvider === "gemini" ? "gemini-2.0-flash" : "deepseek-chat"} />
+                            </label>
+                            <label>
+                              API Key
+                              <input type="password" value={llmApiKey} onChange={(e) => setLlmApiKey(e.target.value)} placeholder="sk-..." />
+                            </label>
+                            <LlmCostEstimate provider={llmProvider} model={llmModel} />
+                          </>
+                        )}
+                      </div>
+                      <div className="modal-actions">
+                        <button className="tool-button" onClick={() => setLlmOpen(false)}>Listo</button>
+                      </div>
+                    </div>
                   </div>
                 )}
                 <button className="primary-action" onClick={handleGenerateStrategy} disabled={strategyGenerating} style={{ fontSize: 14, padding: "10px 24px" }}>
                   <Bot size={18} style={{ marginRight: 6 }} />
                   {strategyGenerating ? "Generando estrategia..." : "Generar estrategia"}
                 </button>
-                {llmProvider !== "deterministic" && (
-                  <LlmCostEstimate provider={llmProvider} model={llmModel} />
-                )}
                 {strategyResult && (
                   <div style={{ marginTop: 12, padding: 10, background: "var(--hc-bone)", borderRadius: 8, fontSize: 12 }}>
                     <strong style={{ color: "var(--hc-teal)" }}>Estrategia generada con: {strategyResult.provider}</strong>
@@ -752,11 +818,15 @@ export function DashboardConsole({
                 </div>
                 <div className={`platform-preview ${getPlatformFrameClass(selected)}`}>
                   <div className="platform-chrome">
-                    <span>{selected.network.charAt(0).toUpperCase() + selected.network.slice(1)}</span>
+                    <span>{NETWORK_LABELS[selected.network] ?? selected.network}</span>
                     <strong>{selected.format}</strong>
                   </div>
                   <div className="platform-media">
-                    <img src={assetUrl(selected.asset?.path)} alt={selected.title} />
+                    {isVideoAsset(selected) ? (
+                      <video src={assetUrl(selected.asset?.path)} controls preload="metadata" />
+                    ) : (
+                      <img src={assetUrl(selected.asset?.path)} alt={selected.title} />
+                    )}
                   </div>
                   <div className="platform-caption">
                     <strong>{metrics?.tenant.name ?? "Tenant"}</strong>
@@ -883,6 +953,29 @@ export function DashboardConsole({
 
         {view === "assets" && (
           <div className="strategy-grid">
+            {Array.isArray(readiness?.networks) && (
+              <section className="work-panel span-2">
+                <PanelTitle icon={<AlertTriangle size={17} />} title="Assets y configuraciones pendientes" />
+                <div className="network-readiness-grid">
+                  {readiness.networks
+                    .filter((network: any) => !network.liveReady)
+                    .map((network: any) => (
+                      <article key={network.network} className="network-card">
+                        <div>
+                          <strong>{NETWORK_LABELS[network.network] ?? network.network}</strong>
+                          <small>{network.action}</small>
+                        </div>
+                        <p><strong>Formato:</strong> {network.requirements?.formats}</p>
+                        <p><strong>Activo:</strong> {network.requirements?.asset}</p>
+                        <p><strong>Guideline:</strong> {network.requirements?.guideline}</p>
+                      </article>
+                    ))}
+                  {readiness.networks.every((network: any) => network.liveReady) && (
+                    <p style={{ padding: 14 }}>Todas las redes seleccionadas tienen readiness live completo.</p>
+                  )}
+                </div>
+              </section>
+            )}
             <section className="work-panel">
               <PanelTitle icon={<PackageSearch size={17} />} title="Especificaciones por plataforma" />
               <div style={{ padding: 14 }}>
@@ -920,6 +1013,14 @@ export function DashboardConsole({
                     <li>Thumbnail: 1280x720 JPG</li>
                   </ul>
                 </div>
+                <div style={{ marginTop: 12 }}>
+                  <strong style={{ fontSize: 13 }}>LinkedIn</strong>
+                  <ul className="dense-list" style={{ marginTop: 4 }}>
+                    <li>Post: imagen 1200x627 JPG/PNG</li>
+                    <li>Documento: PDF o carrusel exportado</li>
+                    <li>Video: MP4 horizontal o cuadrado, enfoque negocio/confianza</li>
+                  </ul>
+                </div>
               </div>
             </section>
             <section className="work-panel">
@@ -928,7 +1029,11 @@ export function DashboardConsole({
                 {assets.map((asset) => (
                   <div className="market-card" key={asset.id}>
                     {asset.path ? (
-                      <img src={assetUrl(asset.path)} alt={asset.filename} className="asset-tile" />
+                      asset.kind === "VIDEO" || asset.path.toLowerCase().endsWith(".mp4") ? (
+                        <video src={assetUrl(asset.path)} className="asset-tile" controls preload="metadata" />
+                      ) : (
+                        <img src={assetUrl(asset.path)} alt={asset.filename} className="asset-tile" />
+                      )
                     ) : (
                       <div className="asset-tile asset-empty"><PackageSearch size={22} /></div>
                     )}
@@ -1184,19 +1289,40 @@ export function DashboardConsole({
                     </li>
                   ))}
                 </ul>
-                {tenantAutoPilot && (
-                  <label className="gate-check" style={{ marginBottom: 10, display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
-                    <span style={{ fontSize: 13, color: "var(--hc-ink)" }}>Modo de publicacion:</span>
-                    <select
-                      value={publishMode}
-                      onChange={(e) => setPublishMode(e.target.value as "dry-run" | "live")}
-                      style={{ padding: "6px 10px", borderRadius: 6, border: "1px solid var(--hc-line)", fontSize: 13 }}
-                    >
-                      <option value="dry-run">Dry-run (prueba sin publicar)</option>
-                      <option value="live">Publicacion real en redes</option>
-                    </select>
-                  </label>
+                {Array.isArray(readiness.networks) && (
+                  <>
+                    <h3 style={{ marginTop: 14 }}>Readiness por red</h3>
+                    <div className="network-readiness-grid">
+                      {readiness.networks.map((network: any) => (
+                        <article key={network.network} className={network.liveReady ? "network-card ready" : "network-card"}>
+                          <div>
+                            <strong>{NETWORK_LABELS[network.network] ?? network.network}</strong>
+                            <small>{network.liveReady ? "Lista para live" : network.action}</small>
+                          </div>
+                          <div className="network-checks">
+                            <span className={network.accountReady ? "ok" : ""}>Cuenta</span>
+                            <span className={network.authReady ? "ok" : ""}>Token</span>
+                            <span className={network.assetsReady ? "ok" : ""}>Assets</span>
+                            <span className={network.approvedDrafts > 0 ? "ok" : ""}>Drafts {network.approvedDrafts}</span>
+                          </div>
+                          <p>{network.requirements?.asset}</p>
+                          <p>{network.requirements?.guideline}</p>
+                        </article>
+                      ))}
+                    </div>
+                  </>
                 )}
+                <label className="gate-check" style={{ marginBottom: 10, display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+                  <span style={{ fontSize: 13, color: "var(--hc-ink)" }}>Modo de publicacion:</span>
+                  <select
+                    value={publishMode}
+                    onChange={(e) => setPublishMode(e.target.value as "dry-run" | "live")}
+                    style={{ padding: "6px 10px", borderRadius: 6, border: "1px solid var(--hc-line)", fontSize: 13 }}
+                  >
+                    <option value="dry-run">Dry-run (prueba sin publicar)</option>
+                    <option value="live">Publicacion real en redes</option>
+                  </select>
+                </label>
                 <div className="publish-gate">
                   {tenantNeedsManual && (
                     <label className="gate-check">
@@ -1205,7 +1331,7 @@ export function DashboardConsole({
                         checked={manualApproval}
                         onChange={(event) => setManualApproval(event.target.checked)}
                       />
-                      Manuel aprueba ejecutar este dry-run controlado. No se publicara en redes reales.
+                      Manuel aprueba ejecutar este {publishMode === "live" ? "intento de publicacion real" : "dry-run controlado"}.
                     </label>
                   )}
                   {tenantAutoPilot && publishMode === "live" && (
@@ -1221,16 +1347,12 @@ export function DashboardConsole({
                   <button
                     className="primary-action"
                     onClick={handlePublish}
-                    disabled={
-                      publishState === "loading" ||
-                      !firstApproved ||
-                      (!manualApproval && (tenantNeedsManual || (tenantAutoPilot && publishMode === "live")))
-                    }
+                    disabled={publishState === "loading" || !firstApproved || (!manualApproval && (tenantNeedsManual || publishMode === "live"))}
                   >
                     <LockKeyhole size={16} />
                     {publishState === "loading"
                       ? "Ejecutando..."
-                      : tenantAutoPilot && publishMode === "live"
+                      : publishMode === "live"
                         ? "Publicar en redes reales"
                         : "Ejecutar dry-run"}
                   </button>

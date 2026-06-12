@@ -52,11 +52,11 @@ export function recommendNetworks(input: Pick<ClientIntake, "preferredNetworks" 
   return ordered.map((network, index) => ({
     network,
     priority: index + 1,
-    canStartImmediately: network === "instagram" || network === "facebook",
+    canStartImmediately: preferred.includes(network),
     rationale:
       network === "instagram" || network === "facebook"
         ? "Canal MVP prioritario para validacion visual, comunidad y Meta Business Suite."
-        : "Canal recomendado para expansion una vez cubiertos assets y cadencia base."
+        : "Canal incorporado al alcance del tenant; requiere narrativa, assets y configuracion propios."
   }));
 }
 

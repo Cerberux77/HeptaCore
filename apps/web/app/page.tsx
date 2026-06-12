@@ -12,7 +12,7 @@ export default async function Home() {
     cookieStore.has("__Secure-authjs.session-token") ||
     cookieStore.has("next-auth.session-token") ||
     cookieStore.has("__Secure-next-auth.session-token");
-  const session = hasSessionCookie ? await auth() : null;
+  const session = hasSessionCookie ? await auth().catch(() => null) : null;
 
   if (session?.user?.id) {
     if (session.user?.memberships?.some((m) => m.role === "SUPER_ADMIN")) redirect("/admin");

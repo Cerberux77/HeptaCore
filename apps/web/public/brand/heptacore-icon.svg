@@ -1,6 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="HeptaCore">
-  <rect width="128" height="128" rx="24" fill="#0a0a0a"/>
-  <circle cx="64" cy="64" r="32" fill="none" stroke="#0dc5b8" stroke-width="8"/>
-  <circle cx="64" cy="64" r="10" fill="#f2f2f2"/>
-  <path d="M64 18v24M64 86v24M18 64h24M86 64h24M32 32l17 17M79 79l17 17M96 32L79 49M49 79L32 96" stroke="#d7b56d" stroke-width="6" stroke-linecap="round"/>
-</svg>

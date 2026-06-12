@@ -11,6 +11,7 @@ export function proxy(req: NextRequest) {
 
   if (
     path === "/" ||
+    path === "/admin" ||
     path === "/login" ||
     path === "/register" ||
     path === "/recover" ||

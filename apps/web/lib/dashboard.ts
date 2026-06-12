@@ -9,6 +9,7 @@ export type DashboardMetrics = {
     name: string;
     plan: string;
     mode: string;
+    activeNetworks: string[];
   };
   counts: {
     totalDrafts: number;
@@ -119,12 +120,87 @@ export type AdminDashboardData = {
   }>;
 };
 
+export type NetworkReadinessItem = {
+  network: string;
+  selected: boolean;
+  accountReady: boolean;
+  authReady: boolean;
+  assetsReady: boolean;
+  approvedDrafts: number;
+  liveReady: boolean;
+  action: string;
+  requirements: {
+    formats: string;
+    asset: string;
+    guideline: string;
+  };
+};
+
+const NETWORK_REQUIREMENTS: Record<string, NetworkReadinessItem["requirements"]> = {
+  INSTAGRAM: {
+    formats: "Feed 1:1, carrusel, story y reel 9:16",
+    asset: "JPG/PNG 1080x1080 o MP4 1080x1920",
+    guideline: "Vitrina visual, comunidad, prueba social y llamados a WhatsApp.",
+  },
+  FACEBOOK: {
+    formats: "Feed, carrusel y posts largos",
+    asset: "JPG/PNG 1200x630 o imagen horizontal",
+    guideline: "Confianza local, explicación de servicios, marketplace y conversación.",
+  },
+  YOUTUBE: {
+    formats: "Shorts 9:16 y videos 16:9",
+    asset: "MP4 1080x1920 o 1920x1080 con mensaje clave en los primeros 30 segundos",
+    guideline: "Autoridad semántica: responder intención de búsqueda desde el inicio.",
+  },
+  TIKTOK: {
+    formats: "Video vertical corto",
+    asset: "MP4 1080x1920, 15-45 segundos",
+    guideline: "Hook rápido, backstage, procesos de estudio y demostraciones claras.",
+  },
+  LINKEDIN: {
+    formats: "Post profesional, documento o video corto",
+    asset: "JPG/PNG 1200x627 o MP4 horizontal/corto",
+    guideline: "Autoridad, operación protegida, negocio, confianza y casos.",
+  },
+  X: {
+    formats: "Post corto e hilo",
+    asset: "Imagen opcional 1200x675",
+    guideline: "Ideas breves, anuncios, aprendizajes y distribución de contenido.",
+  },
+};
+
+const DEFAULT_TURPIAL_NETWORKS = ["INSTAGRAM", "FACEBOOK", "YOUTUBE", "TIKTOK", "LINKEDIN"];
+
+function normalizeNetworkList(value: unknown, fallback: string[] = []) {
+  if (!Array.isArray(value)) return fallback;
+  return value
+    .map((network) => String(network).toUpperCase())
+    .filter((network, index, arr) => Object.hasOwn(NETWORK_REQUIREMENTS, network) && arr.indexOf(network) === index);
+}
+
 export const getDashboardMetrics = cache(
   async (tenantSlug: string): Promise<DashboardMetrics | null> => {
     const tenant = await prisma.tenant.findFirst({
       where: { slug: tenantSlug },
     });
     if (!tenant) return null;
+
+    const defaultNetworks = tenantSlug === "turpial-sound" ? DEFAULT_TURPIAL_NETWORKS : [];
+
+    const [profileNetworks, accounts] = await Promise.all([
+      prisma.brandProfile.findFirst({
+        where: { tenantId: tenant.id },
+        select: { socialChannels: true },
+      }),
+      prisma.socialAccount.findMany({
+        where: { tenantId: tenant.id },
+        select: { network: true },
+      }),
+    ]);
+    const activeNetworks = normalizeNetworkList(
+      profileNetworks?.socialChannels,
+      accounts.length ? accounts.map((account) => account.network) : defaultNetworks,
+    );
 
     const [
       totalDrafts,
@@ -176,6 +252,7 @@ export const getDashboardMetrics = cache(
         name: tenant.name,
         plan: tenant.plan,
         mode: tenant.automationMode,
+        activeNetworks,
       },
       counts: {
         totalDrafts,
@@ -367,17 +444,23 @@ export async function getChecklist(tenantSlug: string) {
   const [project, profile, accounts, credentials, minDrafts] = await Promise.all([
     prisma.project.findFirst({ where: { tenantId: tenant.id } }),
     prisma.brandProfile.findFirst({ where: { tenantId: tenant.id } }),
-    prisma.socialAccount.count({ where: { tenantId: tenant.id } }),
-    prisma.credentialVaultItem.count({ where: { tenantId: tenant.id } }),
+    prisma.socialAccount.findMany({ where: { tenantId: tenant.id }, select: { network: true } }),
+    prisma.credentialVaultItem.findMany({ where: { tenantId: tenant.id }, select: { provider: true } }),
     prisma.contentDraft.count({ where: { tenantId: tenant.id, status: "APPROVED" } }),
   ]);
+  const selectedNetworks = normalizeNetworkList(
+    profile?.socialChannels,
+    accounts.length ? accounts.map((account) => account.network) : tenantSlug === "turpial-sound" ? DEFAULT_TURPIAL_NETWORKS : [],
+  );
+  const credentialProviders = new Set(credentials.map((item) => item.provider.toUpperCase()));
 
   return [
     { label: "Perfil de marca completado", done: !!profile },
     { label: "Proyecto definido", done: !!project },
-    { label: "Cuentas sociales conectadas", done: accounts > 0 },
+    { label: `Redes seleccionadas: ${selectedNetworks.join(", ") || "pendiente"}`, done: selectedNetworks.length > 0 },
+    { label: "Cuentas sociales configuradas para redes seleccionadas", done: selectedNetworks.every((network) => accounts.some((account) => account.network === network)) },
     { label: "Al menos 1 draft aprobado", done: minDrafts > 0 },
-    { label: "Credenciales OAuth configuradas", done: credentials > 0 },
+    { label: "Credenciales OAuth configuradas por red a publicar en real", done: selectedNetworks.some((network) => credentialProviders.has(network)) },
     { label: "Voz de marca y CTA definidos", done: !!profile },
     { label: "Assets validados", done: minDrafts > 0 },
     { label: "Ventanas horarias configuradas", done: minDrafts > 0 },
@@ -424,27 +507,67 @@ export async function getReadinessReport(tenantSlug: string) {
   });
   if (!tenant) return null;
 
-  const [approved, scheduled, published, credentials, assetsLinked] = await Promise.all([
+  const [approved, scheduled, published, credentials, assetsLinked, profile, accounts, draftsByNetwork, assetsByNetwork] = await Promise.all([
     prisma.contentDraft.count({ where: { tenantId: tenant.id, status: "APPROVED" } }),
     prisma.contentDraft.count({ where: { tenantId: tenant.id, status: "SCHEDULED" } }),
     prisma.contentDraft.count({ where: { tenantId: tenant.id, status: "PUBLISHED" } }),
-    prisma.credentialVaultItem.count({ where: { tenantId: tenant.id } }),
+    prisma.credentialVaultItem.findMany({ where: { tenantId: tenant.id }, select: { provider: true } }),
     prisma.contentDraft.count({ where: { tenantId: tenant.id, status: "APPROVED", assets: { some: {} } } }),
+    prisma.brandProfile.findFirst({ where: { tenantId: tenant.id }, select: { socialChannels: true } }),
+    prisma.socialAccount.findMany({ where: { tenantId: tenant.id }, select: { network: true, status: true } }),
+    prisma.contentDraft.groupBy({ by: ["network"], where: { tenantId: tenant.id, status: "APPROVED" }, _count: true }),
+    prisma.contentDraft.groupBy({ by: ["network"], where: { tenantId: tenant.id, assets: { some: {} } }, _count: true }),
   ]);
+
+  const selectedNetworks = normalizeNetworkList(
+    profile?.socialChannels,
+    accounts.length ? accounts.map((account) => account.network) : tenantSlug === "turpial-sound" ? DEFAULT_TURPIAL_NETWORKS : [],
+  );
+  const credentialProviders = new Set(credentials.map((item) => item.provider.toUpperCase()));
+  const approvedByNetwork = new Map<string, number>(draftsByNetwork.map((item) => [String(item.network), item._count]));
+  const assetDraftsByNetwork = new Map<string, number>(assetsByNetwork.map((item) => [String(item.network), item._count]));
+  const networkReadiness: NetworkReadinessItem[] = selectedNetworks.map((network) => {
+    const account = accounts.find((item) => item.network === network);
+    const accountReady = !!account;
+    const authReady = credentialProviders.has(network);
+    const approvedDrafts = approvedByNetwork.get(network) ?? 0;
+    const assetsReady = (assetDraftsByNetwork.get(network) ?? 0) > 0;
+    const liveReady = accountReady && authReady && assetsReady && approvedDrafts > 0;
+    const action = !accountReady
+      ? `Configurar cuenta ${network}`
+      : !authReady
+        ? `Conectar credenciales ${network}`
+        : !assetsReady
+          ? `Subir asset compatible ${network}`
+          : approvedDrafts === 0
+            ? `Aprobar draft ${network}`
+            : "Lista para publicacion real";
+    return {
+      network,
+      selected: true,
+      accountReady,
+      authReady,
+      assetsReady,
+      approvedDrafts,
+      liveReady,
+      action,
+      requirements: NETWORK_REQUIREMENTS[network],
+    };
+  });
 
   const gates = [
     { label: "Al menos 1 draft aprobado", passed: approved > 0 },
     { label: "Draft aprobado con asset vinculado", passed: assetsLinked > 0 },
-    { label: "Credenciales OAuth del tenant en vault", passed: credentials > 0 },
-    { label: "Sin publicaciones reales previas (dry-run)", passed: published === 0 },
-    { label: "Modo dry-run activo", passed: true },
+    { label: "Redes seleccionadas en estrategia del tenant", passed: selectedNetworks.length > 0 },
+    { label: "Dry-run disponible para todas las redes seleccionadas", passed: selectedNetworks.length > 0 },
+    { label: "Credenciales por red para publicacion real", passed: networkReadiness.some((network) => network.authReady) },
     { label: "Sin credenciales reales en git", passed: true },
     { label: "Approval queue funcional", passed: true },
     { label: "Dry-run ejecutable desde la web", passed: true },
   ];
 
-  const allPassed = gates.every((g) => g.passed);
-  const livePublishingReady = credentials > 0 && scheduled > 0;
+  const allPassed = approved > 0 && assetsLinked > 0 && selectedNetworks.length > 0;
+  const livePublishingReady = networkReadiness.some((network) => network.liveReady);
 
   return {
     tenantName: tenant.name,
@@ -452,17 +575,20 @@ export async function getReadinessReport(tenantSlug: string) {
     allPassed,
     dryRunReady: allPassed,
     livePublishingReady,
+    networks: networkReadiness,
     approvedDrafts: approved,
     scheduledDrafts: scheduled,
-    credentialCount: credentials,
+    credentialCount: credentials.length,
     summary: allPassed
-      ? "Listo para publicar en modo dry-run. Sin riesgo de publicacion real."
-      : "Faltan gates de seguridad. No publicar.",
+      ? livePublishingReady
+        ? "Dry-run listo y al menos una red completa para prueba real."
+        : "Dry-run listo. Publicacion real pendiente por configuracion de red."
+      : "Faltan gates operativos antes del dry-run.",
     rollbackPlan: [
-      "1. Verificar BOT_DRY_RUN=true en .env",
-      "2. Cancelar todos los jobs en Redis (queue:clean)",
-      "3. Revertir drafts a DRAFT desde SCHEDULED",
-      "4. Verificar que no hay externalPostId en drafts",
+      "1. Pausar jobs de la red afectada",
+      "2. Revertir drafts a APPROVED o DRAFT segun auditoria",
+      "3. Verificar externalPostId y resultado del proveedor",
+      "4. Registrar incidencia en audit log del tenant",
     ],
   };
 }

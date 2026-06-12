@@ -1,6 +1,6 @@
 {
   "project": "HeptaCore",
-  "updatedAt": "2026-06-12T04:56:32.932Z",
+  "updatedAt": "2026-06-12T07:16:29.270Z",
   "resiliencePolicy": "If an owner is unavailable for more than one working block or blocks the critical path, backupOwner may take over after recording reassignment.",
   "closurePolicy": "No sprint may be closed until acceptance criteria, base tests, sprint-specific tests, docs/handoff, and Oreshnik zone checks pass. See docs/obsidian-vault/METODOLOGIA/ORQUESTACION_AGENTES_HEPTACORE.md.",
   "baseTestMatrix": [
@@ -971,6 +971,41 @@
           "operator": "Manuel",
           "mode": "silent",
           "description": "sprint"
+        }
+      ]
+    },
+    {
+      "id": "S-HC-DRIFT-002",
+      "title": "Codex multi-RRSS refactor, readiness gates, UI fixes, migrations, vercelignore",
+      "owner": "Manuel",
+      "backupOwner": "Manuel",
+      "status": "done",
+      "track": "ad-hoc",
+      "zone": [
+        "apps/web",
+        "packages/agents",
+        "packages/integrations",
+        "scripts/seed-turpial.mjs",
+        "scripts/verify-prod-smoke.mjs",
+        ".vercelignore",
+        "VECTORS/",
+        "\"apps/web",
+        "packages/db"
+      ],
+      "dependsOn": [
+        "S-HC-PROD-01"
+      ],
+      "acceptance": [
+        "Ad-hoc: Codex multi-RRSS refactor, readiness gates, UI fixes, migrations, vercelignore"
+      ],
+      "handoff": "Drift registered via preflight on 2026-06-12. Mode: silent.",
+      "history": [
+        {
+          "at": "2026-06-12T07:16:29.270Z",
+          "action": "drift-recorded",
+          "operator": "Manuel",
+          "mode": "silent",
+          "description": "Codex multi-RRSS refactor, readiness gates, UI fixes, migrations, vercelignore"
         }
       ]
     }
