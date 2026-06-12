@@ -1,5 +1,5 @@
 {
-  "current": "MADRE/v39-s-hc-jean-align-oreshnik-worker-alignment-2026-06-12",
+  "current": "MADRE/v40-s-hc-prod-01-proxy-next-js-16-middleware-landing-premium-hc-d-2026-06-12",
   "branches": [
     {
       "previous": "MADRE/v11-s-hc-09-publish-readiness-gate-2026-06-09",
@@ -260,11 +260,21 @@
       "at": "2026-06-12T00:05:16.836Z",
       "previous": "MADRE/v38-s-hc-release-02-trial-payment-cta-qa-bot-cost-table-2026-06-11",
       "description": "oreshnik-worker-alignment"
+    },
+    {
+      "version": 40,
+      "name": "MADRE/v40-s-hc-prod-01-proxy-next-js-16-middleware-landing-premium-hc-d-2026-06-12",
+      "sprint": "S-HC-PROD-01",
+      "operator": "Manuel",
+      "date": "2026-06-12",
+      "at": "2026-06-12T04:25:19.799Z",
+      "previous": "MADRE/v39-s-hc-jean-align-oreshnik-worker-alignment-2026-06-12",
+      "description": "proxy Next.js 16 middleware, landing premium hc-dark, brand asset package regen"
     }
   ],
-  "version": 39,
-  "effective": "MADRE/v38-s-hc-release-02-trial-payment-cta-qa-bot-cost-table-2026-06-11",
-  "effectiveRef": "origin/MADRE/v38-s-hc-release-02-trial-payment-cta-qa-bot-cost-table-2026-06-11",
+  "version": 40,
+  "effective": "MADRE/v39-s-hc-jean-align-oreshnik-worker-alignment-2026-06-12",
+  "effectiveRef": "origin/MADRE/v39-s-hc-jean-align-oreshnik-worker-alignment-2026-06-12",
   "declaredMissing": false,
   "discoveredVersion": 14
 }
