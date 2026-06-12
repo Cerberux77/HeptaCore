@@ -34,6 +34,23 @@ export function hasFlag(name) {
   return process.argv.includes(name);
 }
 
+export function resolveArgs() {
+  // Windows/PowerShell quirk: the first `--flag` after node's `--` separator may
+  // be consumed by the shell bridge, resulting in bare positional values:
+  // `preflight.mjs S-HC-X Jean desc` instead of `--sprint S-HC-X --operator Jean --desc desc`.
+  // When named flags are missing, fall back to positional arg order.
+  const namedSprint = getArg("--sprint") || getArg("-s");
+  const namedOperator = getArg("--operator");
+  const namedDesc = getArg("--desc");
+
+  const posArgs = process.argv.slice(2).filter((a) => !a.startsWith("-"));
+  return {
+    sprint: namedSprint || posArgs[0] || "",
+    operator: resolveOperator(namedOperator || posArgs[1] || ""),
+    desc: namedDesc || posArgs[2] || "sprint"
+  };
+}
+
 export function git(args, options = {}) {
   const result = spawnSync("git", args, { cwd: ROOT, encoding: "utf8" });
   if (result.status !== 0 && !options.allowFail) {

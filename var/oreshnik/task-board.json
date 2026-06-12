@@ -1,6 +1,6 @@
 {
   "project": "HeptaCore",
-  "updatedAt": "2026-06-11T03:19:41.362Z",
+  "updatedAt": "2026-06-12T00:05:16.836Z",
   "resiliencePolicy": "If an owner is unavailable for more than one working block or blocks the critical path, backupOwner may take over after recording reassignment.",
   "closurePolicy": "No sprint may be closed until acceptance criteria, base tests, sprint-specific tests, docs/handoff, and Oreshnik zone checks pass. See docs/obsidian-vault/METODOLOGIA/ORQUESTACION_AGENTES_HEPTACORE.md.",
   "baseTestMatrix": [
@@ -843,6 +843,39 @@
           "operator": "Manuel",
           "branch": "Manuel/s-hc-prod-01-producto-operativo-tenant-admin-produccion-2026-06-09",
           "description": "limpiar warning cierre spawn"
+        }
+      ]
+    },
+    {
+      "id": "S-HC-JEAN-ALIGN",
+      "title": "Oreshnik + Worker alignment (Plan Maestro Sprint 10/11)",
+      "owner": "Jean",
+      "backupOwner": "Manuel",
+      "status": "done",
+      "track": "maintenance",
+      "zone": [
+        "scripts/oreshnik",
+        "apps/worker",
+        "docs"
+      ],
+      "dependsOn": [
+        "S-HC-PROD-06"
+      ],
+      "acceptance": [
+        "obsidian-guard PASS",
+        "worker:validate 29/29 drafts, 46/46 assets",
+        "typecheck todos los workspaces PASS",
+        "preflight captura --sprint en Windows/PowerShell",
+        "resolveArgs() cross-platform en close-sprint y zone-check"
+      ],
+      "handoff": "Jean owns Oreshnik/worker alignment. Scope: obsidian-guard.mjs, preflight.mjs, close-sprint.mjs, zone-check.mjs, package.json.",
+      "history": [
+        {
+          "at": "2026-06-12T00:05:16.836Z",
+          "action": "closed",
+          "operator": "Jean",
+          "branch": "Jean/s-hc-prod-01-producto-operativo-tenant-admin-produccion-2026-06-09",
+          "description": "oreshnik-worker-alignment"
         }
       ]
     },

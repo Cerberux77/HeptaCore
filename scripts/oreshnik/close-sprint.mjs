@@ -8,14 +8,13 @@ import {
   VAULT_DIR,
   colors,
   currentBranch,
-  getArg,
   git,
   hasFlag,
   log,
   nowVet,
   readJson,
+  resolveArgs,
   resolveMother,
-  resolveOperator,
   ROOT,
   sanitize,
   sh,
@@ -23,9 +22,7 @@ import {
   writeMother
 } from "./lib.mjs";
 
-const sprint = getArg("--sprint");
-const operator = resolveOperator(getArg("--operator"));
-const desc = getArg("--desc", "cierre");
+const { sprint, operator, desc } = resolveArgs();
 const force = hasFlag("--force");
 
 if (!sprint) {

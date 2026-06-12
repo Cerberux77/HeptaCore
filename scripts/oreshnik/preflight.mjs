@@ -5,15 +5,14 @@ import {
   colors,
   currentBranch,
   discoverLatestMother,
-  getArg,
   git,
   isMotherBranch,
   log,
   nonIgnoredDirtyFiles,
   nowVet,
   readMother,
+  resolveArgs,
   resolveMother,
-  resolveOperator,
   ROOT,
   RUNS_DIR,
   sanitize,
@@ -22,9 +21,7 @@ import {
   writeJson
 } from "./lib.mjs";
 
-const sprint = getArg("--sprint");
-const operator = resolveOperator(getArg("--operator"));
-const desc = getArg("--desc", "sprint");
+const { sprint, operator, desc } = resolveArgs();
 const vet = nowVet();
 let mother = readMother();
 

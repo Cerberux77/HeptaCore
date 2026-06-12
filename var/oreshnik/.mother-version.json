@@ -1,5 +1,5 @@
 {
-  "current": "MADRE/v38-s-hc-release-02-trial-payment-cta-qa-bot-cost-table-2026-06-11",
+  "current": "MADRE/v39-s-hc-jean-align-oreshnik-worker-alignment-2026-06-12",
   "branches": [
     {
       "previous": "MADRE/v11-s-hc-09-publish-readiness-gate-2026-06-09",
@@ -250,11 +250,21 @@
       "at": "2026-06-11T22:46:21.193Z",
       "previous": "MADRE/v37-s-hc-release-02-pricing-overhead-cost-tracking-2026-06-11",
       "description": "trial-payment-cta-qa-bot-cost-table"
+    },
+    {
+      "version": 39,
+      "name": "MADRE/v39-s-hc-jean-align-oreshnik-worker-alignment-2026-06-12",
+      "sprint": "S-HC-JEAN-ALIGN",
+      "operator": "Jean",
+      "date": "2026-06-12",
+      "at": "2026-06-12T00:05:16.836Z",
+      "previous": "MADRE/v38-s-hc-release-02-trial-payment-cta-qa-bot-cost-table-2026-06-11",
+      "description": "oreshnik-worker-alignment"
     }
   ],
-  "version": 38,
-  "effective": "MADRE/v37-s-hc-release-02-pricing-overhead-cost-tracking-2026-06-11",
-  "effectiveRef": "origin/MADRE/v37-s-hc-release-02-pricing-overhead-cost-tracking-2026-06-11",
+  "version": 39,
+  "effective": "MADRE/v38-s-hc-release-02-trial-payment-cta-qa-bot-cost-table-2026-06-11",
+  "effectiveRef": "origin/MADRE/v38-s-hc-release-02-trial-payment-cta-qa-bot-cost-table-2026-06-11",
   "declaredMissing": false,
   "discoveredVersion": 14
 }

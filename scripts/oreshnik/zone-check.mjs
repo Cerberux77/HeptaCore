@@ -1,10 +1,9 @@
 #!/usr/bin/env node
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
-import { currentBranch, getArg, git, log, porcelainPath, resolveMother, resolveOperator, ROOT, statusPorcelain } from "./lib.mjs";
+import { currentBranch, getArg, git, log, porcelainPath, resolveArgs, resolveMother, ROOT, statusPorcelain } from "./lib.mjs";
 
-const sprint = getArg("--sprint") || getArg("-s");
-const operator = resolveOperator(getArg("--operator"));
+const { sprint, operator, desc: _desc } = resolveArgs();
 const branch = getArg("--branch") || currentBranch();
 const zoneMapPath = join(ROOT, "docs", "07_handoffs", "zone-map.json");
 

@@ -1,8 +1,8 @@
 ---
 type: sprint-plan
 project: "HeptaCore"
-last_updated: "2026-06-11T22:46:21.193Z"
-mother_branch: "MADRE/v38-s-hc-release-02-trial-payment-cta-qa-bot-cost-table-2026-06-11"
+last_updated: "2026-06-12T00:05:16.836Z"
+mother_branch: "MADRE/v39-s-hc-jean-align-oreshnik-worker-alignment-2026-06-12"
 tags:
   - "#sprints"
   - "#manuel"
@@ -727,3 +727,14 @@ npm run worker:validate
 npm run oreshnik:obsidian-guard -- --force
 npm run oreshnik:preflight -- --sprint S-HC-JEAN-ALIGN --operator Jean --desc "alineacion-sprint-10-oreshnik-worker"
 ```
+
+
+## Cierre S-HC-JEAN-ALIGN - 2026-06-12
+
+| Campo | Valor |
+|---|---|
+| Operador | Jean |
+| Rama | `Jean/s-hc-prod-01-producto-operativo-tenant-admin-produccion-2026-06-09` |
+| Estado | CERRADO |
+| Madre docs | `MADRE/v39-s-hc-jean-align-oreshnik-worker-alignment-2026-06-12` |
+| Descripcion | oreshnik-worker-alignment |
