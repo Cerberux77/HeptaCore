@@ -10,6 +10,7 @@ import {
   log,
   nonIgnoredDirtyFiles,
   nowVet,
+  porcelainPath,
   readMother,
   resolveArgs,
   resolveMother,
@@ -17,6 +18,7 @@ import {
   RUNS_DIR,
   sanitize,
   sh,
+  statusPorcelain,
   today,
   writeJson
 } from "./lib.mjs";
@@ -201,6 +203,21 @@ writeFileSync(join(RUNS_DIR, ".session-start"), vet.iso, "utf8");
 log("OK", "Preflight ledger updated.");
 
 console.log("");
+log("INFO", "10/10 Drift detection");
+if (dirty.length > 0) {
+  const score = computeDriftScoreLocal(dirty);
+  if (score >= 3) {
+    console.log(`  ${colors.yellow}${colors.bold}[DRIFT WARN ]${colors.reset} Score ${score}/10 — ${dirty.length} file(s) outside sprint scope.`);
+    console.log(`  ${colors.yellow}              Register: npm run oreshnik:drift -- --operator ${operator} --mode silent${colors.reset}`);
+    warnings++;
+  } else {
+    log("OK", `Minor changes (score ${score}/10) — below drift threshold.`);
+  }
+} else {
+  log("OK", "Clean tree — nothing to drift.");
+}
+
+console.log("");
 console.log(`${colors.bold}PRE-FLIGHT RESULT${colors.reset}`);
 console.log(`  Blockers:  ${blockers}`);
 console.log(`  Warnings:  ${warnings}`);
@@ -263,4 +280,26 @@ function syncCurrentBranch() {
 
   log("FAIL", `Local branch diverged from ${remoteRef}. Rebase/merge manually before working.`);
   return { blocked: true, message: `Diverged from ${remoteRef}.` };
+}
+
+function computeDriftScoreLocal(files) {
+  const count = files.length;
+  let score = 0;
+  if (count >= 10) score += 3;
+  else if (count >= 5) score += 2;
+  else if (count >= 1) score += 1;
+
+  const statuses = statusPorcelain();
+  const lines = statuses.map((line) => ({ status: line.slice(0, 2).trim(), file: porcelainPath(line) }));
+  const newFiles = lines.filter((f) => !f.file.startsWith("var/oreshnik/") && (f.status === "??" || f.status === "A")).length;
+  if (newFiles > 0) score += 2;
+
+  const deleted = lines.filter((f) => !f.file.startsWith("var/oreshnik/") && f.status === "D").length;
+  if (deleted > 0) score += 2;
+
+  const critical = [/^packages\/db\//, /^\.env($|\.)/, /^apps\/web\/middleware\./, /^apps\/web\/proxy\./, /^package\.json$/, /^apps\/web\/app\/api\/auth\//, /^apps\/web\/lib\/auth/, /^packages\/db\/prisma\//];
+  const criticalCount = files.filter((file) => critical.some((p) => p.test(file))).length;
+  if (criticalCount > 0) score += 2;
+
+  return Math.min(score, 10);
 }

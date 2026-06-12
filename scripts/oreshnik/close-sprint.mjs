@@ -61,6 +61,9 @@ if (secretChanges.length > 0) {
   process.exit(1);
 }
 
+const driftReport = checkDriftOrphans();
+if (driftReport) console.log(driftReport);
+
 runClosureValidationGate();
 updateTaskBoard();
 updateVaultDocs();
@@ -249,5 +252,31 @@ function appendIfMissing(currentContent, path, addition) {
   const marker = addition.split("\n")[1];
   if (currentContent.includes(marker)) writeFileSync(path, currentContent, "utf8");
   else writeFileSync(path, `${currentContent.trimEnd()}\n${addition}`, "utf8");
+}
+
+function checkDriftOrphans() {
+  const driftLogPath = join(ROOT, "var", "oreshnik", "drift-log.json");
+  if (!existsSync(driftLogPath)) return null;
+  const driftLog = readJson(driftLogPath, { entries: [] });
+  const orphans = driftLog.entries.filter((e) => !e.motherBranch && e.parentBranch === branch);
+  if (orphans.length === 0) return null;
+  const msg = `\n  ${colors.yellow}${colors.bold}[DRIFT]${colors.reset} ${orphans.length} ad-hoc drift(s) associated with this branch:`;
+  for (const o of orphans) {
+    console.log(`  ${colors.yellow}[DRIFT WARN ]${colors.reset} ${o.id} — ${o.title} (${o.fileCount} files, ${o.date})`);
+  }
+  log("WARN", `${orphans.length} drift(s) will be linked to mother ${newMother}.`);
+
+  for (const entry of orphans) {
+    entry.motherBranch = newMother;
+    entry.resolvedAt = vet.iso;
+    entry.resolvedBy = operator;
+  }
+  driftLog.entries = driftLog.entries.map((e) => {
+    const orphan = orphans.find((o) => o.id === e.id);
+    return orphan || e;
+  });
+  writeJson(driftLogPath, driftLog);
+  log("OK", "Drift entries linked to mother branch.");
+  return null;
 }
 
