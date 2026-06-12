@@ -3,8 +3,8 @@ type: master-dashboard
 project: "HeptaCore"
 status: active-production
 phase: "Canonical Oreshnik task board governs current assignments"
-last_updated: "2026-06-12T04:26:51.321Z"
-mother_branch: "MADRE/v40-s-hc-prod-01-proxy-next-js-16-middleware-landing-premium-hc-d-2026-06-12"
+last_updated: "2026-06-12T04:31:48.938Z"
+mother_branch: "MADRE/v41-s-hc-00-foundation-baseline-commit-2026-06-12"
 tags:
   - "#central"
   - "#status/live-source"
@@ -21,8 +21,8 @@ tags:
 
 | Campo | Valor |
 |---|---|
-| Task board actualizado | 2026-06-12T00:05:16.836Z |
-| Rama madre | MADRE/v40-s-hc-prod-01-proxy-next-js-16-middleware-landing-premium-hc-d-2026-06-12 |
+| Task board actualizado | 2026-06-12T04:30:20.302Z |
+| Rama madre | MADRE/v41-s-hc-00-foundation-baseline-commit-2026-06-12 |
 | Publicacion RRSS real | Bloqueada hasta aprobacion explicita |
 | Campaign spend | Bloqueado |
 | Real scraping | Bloqueado |

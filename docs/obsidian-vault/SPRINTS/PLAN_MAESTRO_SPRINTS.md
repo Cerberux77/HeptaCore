@@ -1,8 +1,8 @@
 ---
 type: sprint-plan
 project: "HeptaCore"
-last_updated: "2026-06-12T04:25:19.799Z"
-mother_branch: "MADRE/v40-s-hc-prod-01-proxy-next-js-16-middleware-landing-premium-hc-d-2026-06-12"
+last_updated: "2026-06-12T04:30:20.302Z"
+mother_branch: "MADRE/v41-s-hc-00-foundation-baseline-commit-2026-06-12"
 tags:
   - "#sprints"
   - "#manuel"
@@ -749,3 +749,14 @@ npm run oreshnik:preflight -- --sprint S-HC-JEAN-ALIGN --operator Jean --desc "a
 | Estado | CERRADO |
 | Madre docs | `MADRE/v40-s-hc-prod-01-proxy-next-js-16-middleware-landing-premium-hc-d-2026-06-12` |
 | Descripcion | proxy Next.js 16 middleware, landing premium hc-dark, brand asset package regen |
+
+
+## Cierre S-HC-00 - 2026-06-12
+
+| Campo | Valor |
+|---|---|
+| Operador | Manuel |
+| Rama | `Manuel/s-hc-prod-01-producto-operativo-tenant-admin-produccion-2026-06-09` |
+| Estado | CERRADO |
+| Madre docs | `MADRE/v41-s-hc-00-foundation-baseline-commit-2026-06-12` |
+| Descripcion | foundation baseline commit |
