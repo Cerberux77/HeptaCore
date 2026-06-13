@@ -1,6 +1,6 @@
 {
   "project": "HeptaCore",
-  "updatedAt": "2026-06-13T19:09:24.966Z",
+  "updatedAt": "2026-06-13T19:59:37.029Z",
   "resiliencePolicy": "If an owner is unavailable for more than one working block or blocks the critical path, backupOwner may take over after recording reassignment.",
   "closurePolicy": "No sprint may be closed until acceptance criteria, base tests, sprint-specific tests, docs/handoff, and Oreshnik zone checks pass. See docs/obsidian-vault/METODOLOGIA/ORQUESTACION_AGENTES_HEPTACORE.md.",
   "baseTestMatrix": [
@@ -1030,49 +1030,9 @@
       ]
     },
     {
-      "id": "tarea-para-turpialsound-y-mantis-embeber-videos",
-      "title": "tarea para turpialsound y mantis, Embeber Videos Semánticos: Crear y embeber videos de 30 segundos en cada subpágina de TurpialMarket y Turpialsound esto va a quedar como una tarea dentro de heptacore",
-      "owner": "architect",
-      "status": "ready",
-      "track": "S-HC",
-      "zone": [],
-      "acceptance": [
-        "diff verificable, tests"
-      ],
-      "handoff": "docs/07_handoffs/handoff-architect-2026-06-13.md",
-      "history": [
-        {
-          "at": "2026-06-13T19:09:24.964Z",
-          "action": "injected",
-          "operator": "architect",
-          "description": "Injected from notes ingestion. Evidence: code"
-        }
-      ]
-    },
-    {
-      "id": "configurar-sprints-oreshnik-configurar-los-spri",
-      "title": "Configurar Sprints oreshnik: Configurar los sprints en el sistema oreshnik para gestionar desde una capa superior cada tenant, el sistema oreshnik debe quedar diseñado con capacidad multitenant para g",
-      "owner": "architect",
-      "status": "ready",
-      "track": "S-HC",
-      "zone": [],
-      "acceptance": [
-        "diff verificable, tests"
-      ],
-      "handoff": "docs/07_handoffs/handoff-architect-2026-06-13.md",
-      "history": [
-        {
-          "at": "2026-06-13T19:09:24.964Z",
-          "action": "injected",
-          "operator": "architect",
-          "description": "Injected from notes ingestion. Evidence: code"
-        }
-      ]
-    },
-    {
       "id": "eliminar-restricciones-publicaci-n-en-heptacore",
       "title": "Eliminar Restricciones Publicación en heptacore: Eliminar los bloqueos estrictos en el panel de administración. Habilitar la autorización necesaria para realizar publicaciones manuales de contenido.",
-      "owner": "architect",
+      "owner": "Jean",
       "status": "ready",
       "track": "S-HC",
       "zone": [],
@@ -1092,7 +1052,7 @@
     {
       "id": "hay-algo-que-no-entiendo-y-que-necesito-que-me-r",
       "title": "Hay algo que no entiendo y que necesito que me respondas respecto a heptacore. al momento de entrar en el dashboard del tenant, en este caso turpialsoun desde el dashboard en heptacore, hay un car cli",
-      "owner": "architect",
+      "owner": "Jean",
       "status": "ready",
       "track": "S-HC",
       "zone": [],
@@ -1112,7 +1072,7 @@
     {
       "id": "en-la-cola-de-draft-de-heptacore-algunos-draft",
       "title": "en la cola de draft de heptacore, algunos draft me dan la opcion de aprobar, otros ya no me dan la opcion, posiblemente porque ya los aprobe, pero en el card “aprobados” aparecen 0 “listos para public",
-      "owner": "architect",
+      "owner": "Jean",
       "status": "ready",
       "track": "S-HC",
       "zone": [],
@@ -1132,7 +1092,7 @@
     {
       "id": "en-heptacore-quiero-agregar-la-posibilidad-de-in",
       "title": "En heptacore quiero agregar la posibilidad de incorporar una nueva publicacion, debe funcionar asi: va a ser una opcion “agregar publicacion” al darle a ese boton un modal me solicita el activo o acti",
-      "owner": "architect",
+      "owner": "Jean",
       "status": "ready",
       "track": "S-HC",
       "zone": [],
@@ -1152,7 +1112,7 @@
     {
       "id": "el-proceso-de-carga-de-activos-en-heptacore-en",
       "title": "el proceso de carga de activos en heptacore  en el boton de activos, tiene una seccion de **Assets y configuraciones pendientes**  que indica de manera general como debe ser el formato de archivo para",
-      "owner": "architect",
+      "owner": "Jean",
       "status": "ready",
       "track": "S-HC",
       "zone": [],
@@ -1172,7 +1132,7 @@
     {
       "id": "en-la-seccion-de-asstes-de-heptacore-debe-existi",
       "title": "en la seccion de asstes de heptacore debe existir la posibilidad de reemplazar un archivo por otro, cambiar nombre, si cambia el nombre la estrategia lo debe reemplazar como corresponda.",
-      "owner": "architect",
+      "owner": "Jean",
       "status": "ready",
       "track": "S-HC",
       "zone": [],
@@ -1192,7 +1152,7 @@
     {
       "id": "el-card-proximo-primer-hito-en-heptacore-d",
       "title": "el card “proximo” “primer hito” en heptacore , debe ser dinamico es decir indicar el estado de la siguiente publicacion, no se a que se riefiere con primer hito, revisar eso y proponer.",
-      "owner": "architect",
+      "owner": "Jean",
       "status": "ready",
       "track": "S-HC",
       "zone": [],
@@ -1212,7 +1172,7 @@
     {
       "id": "en-el-cronograma-de-heptacore-que-significa-el",
       "title": "en el cronograma de heptacore, que significa el chip “low” que funcion real tiene? incluye in microtexto con hoover que lo explique y que permita una accion para cambiar ese estado o resolverlo.",
-      "owner": "architect",
+      "owner": "Jean",
       "status": "ready",
       "track": "S-HC",
       "zone": [],
@@ -1232,7 +1192,7 @@
     {
       "id": "en-heptacore-la-seccion-checklist-no-se-si-esta",
       "title": "en heptacore  la seccion checklist no se si esta funcionando debinadmente, por ejemplo estoy viendo que requiere “al menos un draft aprobado” pero ya he aprobado varios y no puedo publicar. tambien fa",
-      "owner": "architect",
+      "owner": "Jean",
       "status": "ready",
       "track": "S-HC",
       "zone": [],
@@ -1252,7 +1212,7 @@
     {
       "id": "en-heptacore-dashboard-reportes-quisiera-algo",
       "title": "en heptacore, dashboard, reportes, quisiera algo mas visual, replantealo",
-      "owner": "architect",
+      "owner": "Jean",
       "status": "ready",
       "track": "S-HC",
       "zone": [],
@@ -1272,7 +1232,7 @@
     {
       "id": "en-publicacion-heptacore-muestra-cards-de-readi",
       "title": "en publicacion, heptacore muestra cards de readiness, pero los que no estan completados, por ejemplo “draft 0” o “token”, “cuenta”, “assets” si faltan, deben ser cliqueables y llevarme al sitio donde ",
-      "owner": "architect",
+      "owner": "Manuel",
       "status": "ready",
       "track": "S-HC",
       "zone": [],
@@ -1292,7 +1252,7 @@
     {
       "id": "en-el-dashboard-de-admn-global-en-heptacore-los",
       "title": "en el dashboard de admn global en heptacore los cards de estado no son clickables ni llevan a la seccion donde debo supervisar la accion o ejecutarla esto debe resolverse. el modo approval\\_required n",
-      "owner": "architect",
+      "owner": "Manuel",
       "status": "ready",
       "track": "S-HC",
       "zone": [],
@@ -1312,7 +1272,7 @@
     {
       "id": "para-heptacore-implementar-la-posibilidad-de-ed",
       "title": "para heptacore: Implementar la posibilidad de editar y gestionar publicaciones directamente dentro de la cola de borradores. esta mejora se hizo pero los cambios no se estan guardando. se ve cuando lo",
-      "owner": "architect",
+      "owner": "Manuel",
       "status": "ready",
       "track": "S-HC",
       "zone": [],
@@ -1332,7 +1292,7 @@
     {
       "id": "en-heptacore-eliminar-bloqueos-desactivar-los-b",
       "title": "en heptacore Eliminar bloqueos: Desactivar los bloqueos manuales para habilitar el flujo de publicación real hacia el entorno de producción.",
-      "owner": "architect",
+      "owner": "Manuel",
       "status": "ready",
       "track": "S-HC",
       "zone": [],
@@ -1352,7 +1312,7 @@
     {
       "id": "implementar-inicio-de-heptacore-se-debe-cambia",
       "title": "Implementar inicio de heptacore : se debe cambiar la regla que impide que al entrar en la pagina en producción me lleva directamente al dashboard, creo que ocurre porque la cookie no caduca *\\*valida ",
-      "owner": "architect",
+      "owner": "Manuel",
       "status": "ready",
       "track": "S-HC",
       "zone": [],
