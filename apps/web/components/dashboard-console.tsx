@@ -1241,9 +1241,9 @@ export function DashboardConsole({
               <PanelTitle icon={<BarChart3 size={17} />} title={`Reporte: ${report.tenantName}`} />
               <div style={{ padding: 14 }}>
                 <div className="status-strip" style={{ marginBottom: 14 }}>
-                  <StatusCard label="Total drafts" value={report.total} note="en cola" />
-                  <StatusCard label="Requieren revision" value={report.needsReview} note="humanos" tone="warn" />
-                  <StatusCard label="Sin assets" value={report.pendingAssets} note="bloqueados" tone={report.pendingAssets > 0 ? "warn" : "ok"} />
+                  <StatusCard label="Total drafts" value={report.total} note="en cola" onClick={() => setView("queue")} />
+                  <StatusCard label="Requieren revision" value={report.needsReview} note="humanos" tone="warn" onClick={() => setView("queue")} />
+                  <StatusCard label="Sin assets" value={report.pendingAssets} note="bloqueados" tone={report.pendingAssets > 0 ? "warn" : "ok"} onClick={() => setView("assets")} />
                 </div>
                 <h3>Por estado</h3>
                 <div className="tag-row" style={{ marginBottom: 14 }}>

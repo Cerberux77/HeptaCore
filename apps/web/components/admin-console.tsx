@@ -148,21 +148,41 @@ function StatusCard({
   label,
   value,
   note,
+  tone,
+  onClick,
 }: {
   label: string;
   value: string | number;
   note: string;
+  tone?: "ok" | "warn";
+  onClick?: () => void;
 }) {
+  const cls = tone === "ok" ? "status-ok" : tone === "warn" ? "status-warn" : "";
   return (
-    <div className="status-card">
+    <button
+      className={`status-card ${cls}`}
+      onClick={onClick}
+      style={{
+        cursor: onClick ? "pointer" : "default",
+        border: "none",
+        background: "var(--hc-surface)",
+        textAlign: "left",
+        width: "100%",
+        fontFamily: "inherit",
+      }}
+    >
       <span>{label}</span>
       <strong>{value}</strong>
       <small>{note}</small>
-    </div>
+    </button>
   );
 }
 
 export function AdminConsole({ data }: { data: AdminDashboardData }) {
+  function scrollToSection(id: string) {
+    document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+  }
+
   return (
     <main className="app-shell">
       <aside className="app-sidebar">
@@ -198,15 +218,15 @@ export function AdminConsole({ data }: { data: AdminDashboardData }) {
         </header>
 
         <section className="status-strip">
-          <StatusCard label="Tenants" value={data.totals.tenants} note="cuentas activas" />
-          <StatusCard label="Drafts" value={data.totals.drafts} note="contenido total" />
-          <StatusCard label="Aprobados" value={data.totals.approved} note="listos para dry-run" />
-          <StatusCard label="Activos" value={data.totals.assets} note="assets cargados" />
-          <StatusCard label="Revision" value={data.totals.pendingReview} note="requieren criterio" />
+          <StatusCard label="Tenants" value={data.totals.tenants} note="cuentas activas" onClick={() => scrollToSection("tenants-section")} />
+          <StatusCard label="Drafts" value={data.totals.drafts} note="contenido total" onClick={() => scrollToSection("tenants-section")} />
+          <StatusCard label="Aprobados" value={data.totals.approved} note="listos para dry-run" onClick={() => scrollToSection("tenants-section")} />
+          <StatusCard label="Activos" value={data.totals.assets} note="assets cargados" tone="ok" onClick={() => scrollToSection("campaigns-section")} />
+          <StatusCard label="Revision" value={data.totals.pendingReview} note="requieren criterio" tone="warn" onClick={() => scrollToSection("activity-section")} />
         </section>
 
         <div className="strategy-grid">
-          <section className="work-panel span-2">
+          <section className="work-panel span-2" id="tenants-section">
             <div className="panel-title">
               <span><Building2 size={17} /> Tenants</span>
             </div>
@@ -236,7 +256,7 @@ export function AdminConsole({ data }: { data: AdminDashboardData }) {
             </div>
           </section>
 
-          <section className="work-panel span-2">
+          <section className="work-panel span-2" id="campaigns-section">
             <div className="panel-title">
               <span><DollarSign size={17} /> Campanas pagas</span>
             </div>
@@ -271,7 +291,7 @@ export function AdminConsole({ data }: { data: AdminDashboardData }) {
             </div>
           </section>
 
-          <section className="work-panel span-2">
+          <section className="work-panel span-2" id="activity-section">
             <div className="panel-title">
               <span><BarChart3 size={17} /> Actividad reciente</span>
             </div>

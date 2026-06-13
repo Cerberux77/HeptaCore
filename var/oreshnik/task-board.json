@@ -1,6 +1,6 @@
 {
   "project": "HeptaCore",
-  "updatedAt": "2026-06-13T19:59:37.029Z",
+  "updatedAt": "2026-06-13T21:24:02.495Z",
   "resiliencePolicy": "If an owner is unavailable for more than one working block or blocks the critical path, backupOwner may take over after recording reassignment.",
   "closurePolicy": "No sprint may be closed until acceptance criteria, base tests, sprint-specific tests, docs/handoff, and Oreshnik zone checks pass. See docs/obsidian-vault/METODOLOGIA/ORQUESTACION_AGENTES_HEPTACORE.md.",
   "baseTestMatrix": [
@@ -34,7 +34,8 @@
     "implementar-inicio-de-heptacore-se-debe-cambia",
     "para-heptacore-interactuar-tableros-configurar",
     "para-heptacore-incluir-hora-incorporar-el-par-m",
-    "el-modal-de-admin-llm-en-heptacore-debe-tener-un"
+    "el-modal-de-admin-llm-en-heptacore-debe-tener-un",
+    "como-publica-heptacore-posts-programados-si-estoy-offline"
   ],
   "tasks": [
     {
@@ -1386,6 +1387,33 @@
           "action": "injected",
           "operator": "architect",
           "description": "Injected from notes ingestion. Evidence: ui"
+        }
+      ]
+    },
+    {
+      "id": "como-publica-heptacore-posts-programados-si-estoy-offline",
+      "title": "confirma o explica como va a ser la publicacion de un determinado post programado segun calendario si estoy offline? se supone que el sistema debe publicar desde la pagina tomando los assets y estrategia y horarios en la pagina web, pero me queda la duda porque no tengo cron definido en ese repo, no quiero pagar por un servicio de terceros, como lo resuelve heptacore que opciones tengo cual es tu propuesta",
+      "owner": "Jean",
+      "status": "ready",
+      "track": "S-HC",
+      "zone": [
+        "apps/web",
+        "apps/worker",
+        "packages/db"
+      ],
+      "acceptance": [
+        "Explicar el mecanismo de publicacion programada offline",
+        "Identificar si hay o no cron/scheduler en el repo",
+        "Proponer opciones sin servicios de terceros (cron en worker, vercel cron, github actions)",
+        "Validar que el tenant puede programar sin depender de estar online"
+      ],
+      "handoff": "docs/07_handoffs/handoff-architect-2026-06-13.md",
+      "history": [
+        {
+          "at": "2026-06-13T21:24:02.494Z",
+          "action": "injected",
+          "operator": "architect",
+          "description": "Injected from manual sprint addition. Evidence: architecture"
         }
       ]
     }
