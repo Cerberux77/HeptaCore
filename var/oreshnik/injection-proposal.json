@@ -5,22 +5,6 @@
   "injectionPolicy": "proposal_only",
   "proposedTasks": [
     {
-      "taskId": "tarea-para-turpialsound-y-mantis-embeber-videos",
-      "title": "tarea para turpialsound y mantis, Embeber Videos Semánticos: Crear y embeber videos de 30 segundos en cada subpágina de TurpialMarket y Turpialsound esto va a quedar como una tarea dentro de heptacore",
-      "owner": "architect",
-      "priority": "medium",
-      "evidenceType": "code",
-      "evidenceExpectation": "diff verificable, tests"
-    },
-    {
-      "taskId": "configurar-sprints-oreshnik-configurar-los-spri",
-      "title": "Configurar Sprints oreshnik: Configurar los sprints en el sistema oreshnik para gestionar desde una capa superior cada tenant, el sistema oreshnik debe quedar diseñado con capacidad multitenant para g",
-      "owner": "architect",
-      "priority": "medium",
-      "evidenceType": "code",
-      "evidenceExpectation": "diff verificable, tests"
-    },
-    {
       "taskId": "eliminar-restricciones-publicaci-n-en-heptacore",
       "title": "Eliminar Restricciones Publicación en heptacore: Eliminar los bloqueos estrictos en el panel de administración. Habilitar la autorización necesaria para realizar publicaciones manuales de contenido.",
       "owner": "architect",
