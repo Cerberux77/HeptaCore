@@ -228,5 +228,7 @@ export async function GET(req: NextRequest) {
     }, { status: 500 });
   }
 
-  return NextResponse.redirect(`/tenant/${tenantSlug}?oauth=instagram_connected`);
+  const successUrl = new URL(`/tenant/${tenantSlug}`, req.url);
+  successUrl.searchParams.set("oauth", "instagram_connected");
+  return NextResponse.redirect(successUrl);
 }
