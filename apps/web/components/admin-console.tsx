@@ -25,12 +25,39 @@ type LlmConfigState = {
   apiKey: string;
 };
 
+const MODEL_RATES: Record<string, number> = {
+  "gpt-4o": 0.0140,
+  "gpt-4o-mini": 0.00084,
+  "gpt-4.1": 0.0120,
+  "gpt-4.1-mini": 0.0024,
+  "gpt-4.1-nano": 0.00056,
+  "o3-mini": 0.0062,
+  "claude-3-5-haiku": 0.00544,
+  "claude-3-5-sonnet": 0.0204,
+  "claude-3-7-sonnet": 0.0204,
+  "gemini-2.0-flash": 0.00056,
+  "gemini-2.5-pro": 0.0130,
+  "deepseek-chat": 0.00045,
+  "deepseek-reasoner": 0.00304,
+};
+
+function getModelRate(provider: string, model: string): number {
+  const key = model.toLowerCase().replace(/\./g, "-").replace(/\s+/g, "-");
+  const direct = MODEL_RATES[key];
+  if (direct) return direct;
+  // Guess rate from model tier
+  if (model.includes("mini") || model.includes("nano") || model.includes("flash") || model.includes("haiku")) return 0.001;
+  if (model.includes("4o") || model.includes("sonnet") || model.includes("pro")) return 0.015;
+  return 0.005;
+}
+
 function TenantLlmSection({ slug, name }: { slug: string; name: string }) {
   const [open, setOpen] = useState(false);
   const [config, setConfig] = useState<LlmConfigState>({ provider: "deterministic", model: "", apiKey: "" });
   const [overheadFactor, setOverheadFactor] = useState(2.0);
   const [loading, setLoading] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [costSim, setCostSim] = useState<null | { provider: string; model: string; estTokens: number; estOutput: number; apiCost: number; tenantCost: number }>(null);
 
   async function loadConfig() {
     setOpen(!open);
@@ -127,6 +154,43 @@ function TenantLlmSection({ slug, name }: { slug: string; name: string }) {
             </small>
           </label>
           <AdminPricingTable overheadFactor={overheadFactor} />
+              <div style={{ marginTop: 10, paddingTop: 10, borderTop: "1px solid var(--hc-line)" }}>
+                <button
+                  onClick={() => {
+                    const rate = getModelRate(config.provider, config.model);
+                    const estTokens = 8000;
+                    const estOutput = 3000;
+                    const apiCost = estTokens * rate + estOutput * rate * 2;
+                    setCostSim({
+                      provider: config.provider,
+                      model: config.model || "default",
+                      estTokens,
+                      estOutput,
+                      apiCost,
+                      tenantCost: apiCost * overheadFactor,
+                    });
+                  }}
+                  style={{ fontSize: 12, padding: "6px 14px", borderRadius: 6, border: "1px solid var(--hc-line)", background: "var(--hc-bone)", color: "var(--hc-ink)", cursor: "pointer" }}
+                >
+                  <DollarSign size={14} style={{ verticalAlign: "middle", marginRight: 4 }} />
+                  Simular costo de estrategia
+                </button>
+                {costSim && (
+                  <div style={{ marginTop: 8, padding: "8px 10px", background: "var(--hc-surface)", borderRadius: 6, fontSize: 11 }}>
+                    <strong style={{ color: "var(--hc-teal)" }}>Estimacion {costSim.provider}/{costSim.model}</strong>
+                    <div style={{ display: "flex", gap: 16, marginTop: 4, flexWrap: "wrap" }}>
+                      <span>~{costSim.estTokens.toLocaleString()} tokens prompt + ~{costSim.estOutput.toLocaleString()} completion</span>
+                      <span>API: <strong>${costSim.apiCost.toFixed(4)}</strong></span>
+                      <span style={{ color: "var(--hc-teal)", fontWeight: 700 }}>
+                        Tenant x{overheadFactor}: <strong>${costSim.tenantCost.toFixed(4)} USD</strong>
+                      </span>
+                    </div>
+                    <small style={{ color: "var(--hc-fog)", display: "block", marginTop: 2 }}>
+                      Basado en estrategia tipica (8K prompt + 3K completion). El costo real varia segun el tenant.
+                    </small>
+                  </div>
+                )}
+              </div>
             </div>
             <div className="modal-actions">
             <button onClick={saveConfig} disabled={loading} style={{ fontSize: 11, padding: "4px 10px", borderRadius: 4, background: "var(--hc-teal)", color: "#fff", border: "none" }}>
