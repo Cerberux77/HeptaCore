@@ -127,29 +127,6 @@ export async function POST(req: Request) {
 
   const now = new Date();
 
-  if (requestMode === "dry_run") {
-    await auditLog({
-      tenantId: tenant.id,
-      actorId: session.user.id,
-      action: "publish_dry_run_validated",
-      target: `draft:${draft.id}`,
-      metadata: {
-        tenant: tenant.name,
-        title: draft.title,
-        network: draft.network,
-        format: draft.format,
-        tenantAutomationMode: tenant.automationMode,
-      },
-    });
-
-    return NextResponse.json({
-      ok: true,
-      mode: "dry_run",
-      message: "Validation passed. No job created.",
-      draftId: draft.id,
-    });
-  }
-
   if (requestMode === "scheduled") {
     const scheduledFor = scheduledAt ?? draft.scheduledFor ?? new Date(Date.now() + 3600000);
 
@@ -197,9 +174,8 @@ export async function POST(req: Request) {
     });
   }
 
-  // === IMMEDIATE MODE ===
+  // === GATES: provider, account, credential, asset, token ===
 
-  // Gate: provider implementation
   if (draft.network !== "INSTAGRAM") {
     return NextResponse.json({
       code: "LIVE_PROVIDER_NOT_IMPLEMENTED",
@@ -207,7 +183,6 @@ export async function POST(req: Request) {
     }, { status: 501 });
   }
 
-  // Gate: SocialAccount
   const socialAccount = await prisma.socialAccount.findFirst({
     where: { tenantId: tenant.id, network: "INSTAGRAM" },
     select: { id: true, status: true, scopes: true, externalAccountId: true },
@@ -229,7 +204,6 @@ export async function POST(req: Request) {
     }, { status: 409 });
   }
 
-  // Gate: CredentialVaultItem (most recent first)
   const credential = await prisma.credentialVaultItem.findFirst({
     where: { tenantId: tenant.id, provider: "INSTAGRAM", label: "instagram_oauth" },
     select: { id: true, encryptedBlob: true, expiresAt: true },
@@ -243,7 +217,6 @@ export async function POST(req: Request) {
     }, { status: 409 });
   }
 
-  // Gate: Trial limit
   const publishedOnInstagram = await prisma.contentDraft.count({
     where: { tenantId: tenant.id, network: "INSTAGRAM", status: "PUBLISHED" },
   });
@@ -255,7 +228,6 @@ export async function POST(req: Request) {
     }, { status: 409 });
   }
 
-  // Gate: public asset URL
   const primaryAsset = draft.assets.find((a) => a.role === "primary") ?? draft.assets[0];
   const assetPath = resolveAssetPath(primaryAsset.asset);
   if (!assetPath) {
@@ -275,7 +247,6 @@ export async function POST(req: Request) {
     }, { status: 409 });
   }
 
-  // Decrypt token
   let accessToken: string;
   try {
     const decrypted = decryptJson<{ access_token: string }>(credential.encryptedBlob);
@@ -289,7 +260,6 @@ export async function POST(req: Request) {
     }, { status: 409 });
   }
 
-  // igUserId from social account
   const igUserId = socialAccount.externalAccountId;
   if (!igUserId) {
     return NextResponse.json({
@@ -299,11 +269,42 @@ export async function POST(req: Request) {
     }, { status: 409 });
   }
 
-  // Determine media type from asset
   const isVideo = primaryAsset.asset.kind === "VIDEO";
   const mediaType = isVideo ? "VIDEO" as const : "IMAGE" as const;
 
-  // Attempt real publish to Meta
+  // === DRY RUN: preflight passed, no Meta call ===
+
+  if (requestMode === "dry_run") {
+    await auditLog({
+      tenantId: tenant.id,
+      actorId: session.user.id,
+      action: "publish_dry_run_technical_validated",
+      target: `draft:${draft.id}`,
+      metadata: {
+        tenant: tenant.name,
+        title: draft.title,
+        network: draft.network,
+        format: draft.format,
+        mediaUrl,
+        mediaType,
+        igUserId,
+        tenantAutomationMode: tenant.automationMode,
+      },
+    });
+
+    return NextResponse.json({
+      ok: true,
+      mode: "dry_run",
+      message: "Technical preflight passed. No provider call executed.",
+      draftId: draft.id,
+      mediaUrl,
+      mediaType,
+      igUserId,
+      tenantAutomationMode: tenant.automationMode,
+    });
+  }
+
+  // === IMMEDIATE: attempt real publish to Meta ===
   let publishResult: { externalPostId: string; providerResponse: unknown };
   try {
     publishResult = await publishInstagramMedia({
