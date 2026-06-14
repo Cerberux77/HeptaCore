@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
-import { LandingV1 } from "../components/landing-v1";
+import { CodexLanding } from "../components/codex-landing";
 import { auth } from "../lib/auth";
 
 const DEFAULT_TENANT = "turpial-sound";
@@ -19,5 +19,5 @@ export default async function Home() {
     redirect(`/tenant/${DEFAULT_TENANT}`);
   }
 
-  return <LandingV1 />;
+  return <CodexLanding />;
 }
