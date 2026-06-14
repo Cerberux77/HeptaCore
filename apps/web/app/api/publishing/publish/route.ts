@@ -183,11 +183,24 @@ export async function POST(req: Request) {
     }, { status: 501 });
   }
 
-  const socialAccount = await prisma.socialAccount.findFirst({
-    where: { tenantId: tenant.id, network: "INSTAGRAM" },
-    select: { id: true, status: true, scopes: true, externalAccountId: true },
-  });
-  if (!socialAccount || socialAccount.status !== "connected") {
+  let socialAccount: { id: string; status: string; scopes: string[]; externalAccountId: string | null } | null = null;
+
+  if (draft.socialAccountId) {
+    socialAccount = await prisma.socialAccount.findFirst({
+      where: { id: draft.socialAccountId, tenantId: tenant.id, network: "INSTAGRAM", status: "connected" },
+      select: { id: true, status: true, scopes: true, externalAccountId: true },
+    });
+  }
+
+  if (!socialAccount) {
+    socialAccount = await prisma.socialAccount.findFirst({
+      where: { tenantId: tenant.id, network: "INSTAGRAM", status: "connected" },
+      select: { id: true, status: true, scopes: true, externalAccountId: true },
+      orderBy: { updatedAt: "desc" },
+    });
+  }
+
+  if (!socialAccount) {
     return NextResponse.json({
       code: "LIVE_BLOCKED_NO_SOCIAL_ACCOUNT",
       error: "No connected Instagram account. Connect via Settings > Social Accounts.",
