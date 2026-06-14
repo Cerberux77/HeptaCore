@@ -441,12 +441,13 @@ export async function getChecklist(tenantSlug: string) {
   });
   if (!tenant) return [];
 
-  const [project, profile, accounts, credentials, minDrafts, assetCount] = await Promise.all([
+  const [project, profile, accounts, credentials, minDrafts, scheduledCount, assetCount] = await Promise.all([
     prisma.project.findFirst({ where: { tenantId: tenant.id } }),
     prisma.brandProfile.findFirst({ where: { tenantId: tenant.id } }),
     prisma.socialAccount.findMany({ where: { tenantId: tenant.id }, select: { network: true } }),
     prisma.credentialVaultItem.findMany({ where: { tenantId: tenant.id }, select: { provider: true } }),
     prisma.contentDraft.count({ where: { tenantId: tenant.id, status: "APPROVED" } }),
+    prisma.contentDraft.count({ where: { tenantId: tenant.id, scheduledFor: { not: null } } }),
     prisma.asset.count({ where: { tenantId: tenant.id } }),
   ]);
   const selectedNetworks = normalizeNetworkList(
@@ -461,10 +462,10 @@ export async function getChecklist(tenantSlug: string) {
     { label: `Redes seleccionadas: ${selectedNetworks.join(", ") || "pendiente"}`, done: selectedNetworks.length > 0 },
     { label: "Cuentas sociales configuradas para redes seleccionadas", done: selectedNetworks.every((network) => accounts.some((account) => account.network === network)) },
     { label: "Al menos 1 draft aprobado", done: minDrafts > 0 },
-    { label: "Credenciales OAuth configuradas por red a publicar en real", done: selectedNetworks.some((network) => credentialProviders.has(network)) },
+    { label: "Credenciales OAuth configuradas por red a publicar en real", done: selectedNetworks.every((network) => credentialProviders.has(network)) },
     { label: "Voz de marca y CTA definidos", done: !!profile?.toneOfVoice },
     { label: `Assets cargados (${assetCount})`, done: assetCount > 0 },
-    { label: "Ventanas horarias configuradas", done: minDrafts > 0 },
+    { label: `Ventanas horarias configuradas (${scheduledCount})`, done: scheduledCount > 0 },
   ];
 }
 

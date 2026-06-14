@@ -18,6 +18,11 @@ export async function POST(
     return NextResponse.json({ error: "Draft not found" }, { status: 404 });
   }
 
+  const allowedStatuses = ["DRAFT", "NEEDS_REVIEW", "REJECTED"];
+  if (!allowedStatuses.includes(draft.status)) {
+    return NextResponse.json({ error: `Cannot approve draft in status ${draft.status}` }, { status: 409 });
+  }
+
   // RBAC: check if user has approval role in this tenant
   const membership = await prisma.membership.findFirst({
     where: { tenantId: draft.tenantId, userId: session.user.id },

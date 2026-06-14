@@ -8,6 +8,8 @@ export const dynamic = "force-dynamic";
 
 const PUBLISH_ROLES = ["OWNER", "ADMIN", "APPROVER", "PUBLISHER", "SUPER_ADMIN", "TENANT_ADMIN"];
 
+type PublishMode = "dry_run" | "scheduled" | "immediate";
+
 function tenantAllowsRealPublish(automationMode: string): boolean {
   return automationMode === "AUTOPILOT_FULL" || automationMode === "AUTOPILOT_LIMITED";
 }
@@ -33,6 +35,40 @@ function requiredScopesForNetwork(network: string) {
   }
 }
 
+async function validateLiveGates(tenantId: string, network: string) {
+  const net = network as any;
+  const [socialAccount, credential] = await Promise.all([
+    prisma.socialAccount.findFirst({
+      where: { tenantId, network: net },
+      select: { id: true, status: true, scopes: true },
+    }),
+    prisma.credentialVaultItem.findFirst({
+      where: { tenantId, provider: network },
+      select: { id: true, expiresAt: true },
+    }),
+  ]);
+
+  if (!socialAccount) {
+    return { ok: false, error: `Live publishing needs a configured ${network} account.`, action: `Configurar cuenta ${network}` };
+  }
+  if (!credential || (credential.expiresAt && credential.expiresAt < new Date())) {
+    return { ok: false, error: `Live publishing needs a valid ${network} credential in vault.`, action: `Conectar credenciales ${network}` };
+  }
+  const missingScopes = requiredScopesForNetwork(network).filter((scope) => !socialAccount.scopes.includes(scope));
+  if (missingScopes.length > 0) {
+    return { ok: false, error: `${network} account is missing publish scopes: ${missingScopes.join(", ")}.`, action: `Revisar permisos ${network}` };
+  }
+
+  const publishedOnNetwork = await prisma.contentDraft.count({
+    where: { tenantId, network: net, status: "PUBLISHED" },
+  });
+  if (publishedOnNetwork >= TRIAL_POSTS_PER_NETWORK) {
+    return { ok: false, error: `Trial limit reached: ${publishedOnNetwork}/${TRIAL_POSTS_PER_NETWORK} posts published on ${network}. Payment required.` };
+  }
+
+  return { ok: true };
+}
+
 export async function POST(req: Request) {
   const session = await auth();
   if (!session?.user?.id) {
@@ -42,13 +78,17 @@ export async function POST(req: Request) {
   const body = await req.json().catch(() => null);
   const tenantSlug = String(body?.tenantSlug ?? "");
   const draftId = String(body?.draftId ?? "");
-  const requestMode = String(body?.mode ?? "dry-run");
+  const requestMode = (body?.mode ?? "dry_run") as PublishMode;
   const manualApproval = body?.manualApproval === true;
-
-  const globalRequireManual = false; // Manual approval gate disabled for production flow
+  const scheduledAt = body?.scheduledAt ? new Date(body.scheduledAt) : null;
 
   if (!tenantSlug || !draftId) {
     return NextResponse.json({ error: "tenantSlug and draftId are required." }, { status: 400 });
+  }
+
+  const validModes: PublishMode[] = ["dry_run", "scheduled", "immediate"];
+  if (!validModes.includes(requestMode)) {
+    return NextResponse.json({ error: `Invalid mode: ${requestMode}. Use dry_run, scheduled, or immediate.` }, { status: 400 });
   }
 
   const tenant = await prisma.tenant.findFirst({
@@ -59,11 +99,9 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Tenant not found." }, { status: 404 });
   }
 
-  const tenantAutoPilot = tenantAllowsRealPublish(tenant.automationMode);
   const tenantNeedsManual = tenantRequiresManualApproval(tenant.automationMode);
-  const isDryRun = requestMode !== "live";
 
-  if (!isDryRun && (tenantNeedsManual || !tenantAutoPilot) && globalRequireManual && !manualApproval) {
+  if ((requestMode === "scheduled" || requestMode === "immediate") && tenantNeedsManual && !manualApproval) {
     return NextResponse.json({ error: "Manual approval gate is required for this tenant mode." }, { status: 400 });
   }
 
@@ -89,67 +127,121 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Draft has no linked assets." }, { status: 409 });
   }
 
-  if (!isDryRun) {
-    const [socialAccount, credential] = await Promise.all([
-      prisma.socialAccount.findFirst({
-        where: { tenantId: tenant.id, network: draft.network },
-        select: { id: true, status: true, scopes: true },
-      }),
-      prisma.credentialVaultItem.findFirst({
-        where: { tenantId: tenant.id, provider: draft.network },
-        select: { id: true, expiresAt: true },
-      }),
-    ]);
-
-    if (!socialAccount) {
-      return NextResponse.json({
-        error: `Live publishing needs a configured ${draft.network} account.`,
-        action: `Configurar cuenta ${draft.network}`,
-      }, { status: 409 });
-    }
-    if (!credential || (credential.expiresAt && credential.expiresAt < new Date())) {
-      return NextResponse.json({
-        error: `Live publishing needs a valid ${draft.network} credential in vault.`,
-        action: `Conectar credenciales ${draft.network}`,
-      }, { status: 409 });
-    }
-    const missingScopes = requiredScopesForNetwork(draft.network).filter((scope) => !socialAccount.scopes.includes(scope));
-    if (missingScopes.length > 0) {
-      return NextResponse.json({
-        error: `${draft.network} account is missing publish scopes: ${missingScopes.join(", ")}.`,
-        action: `Revisar permisos ${draft.network}`,
-      }, { status: 409 });
-    }
-
-    const publishedOnNetwork = await prisma.contentDraft.count({
-      where: { tenantId: tenant.id, network: draft.network, status: "PUBLISHED" },
-    });
-    if (publishedOnNetwork >= TRIAL_POSTS_PER_NETWORK) {
-      return NextResponse.json({
-        error: `Trial limit reached: ${publishedOnNetwork}/${TRIAL_POSTS_PER_NETWORK} posts published on ${draft.network}. Payment required to continue publishing.`,
-      }, { status: 402 });
+  if (requestMode === "scheduled" || requestMode === "immediate") {
+    const gate = await validateLiveGates(tenant.id, draft.network);
+    if (!gate.ok) {
+      return NextResponse.json(gate, { status: 409 });
     }
   }
 
-  const externalPostId = isDryRun
-    ? `dryrun_${draft.network.toLowerCase()}_${Date.now().toString(36)}`
-    : `live_${draft.network.toLowerCase()}_${Date.now().toString(36)}`;
-  const scheduledFor = draft.scheduledFor ?? new Date();
-  const newStatus = isDryRun ? "SCHEDULED" : "PUBLISHED";
+  const now = new Date();
+
+  if (requestMode === "dry_run") {
+    await auditLog({
+      tenantId: tenant.id,
+      actorId: session.user.id,
+      action: "publish_dry_run_validated",
+      target: `draft:${draft.id}`,
+      metadata: {
+        tenant: tenant.name,
+        title: draft.title,
+        network: draft.network,
+        format: draft.format,
+        tenantAutomationMode: tenant.automationMode,
+      },
+    });
+
+    return NextResponse.json({
+      ok: true,
+      mode: "dry_run",
+      message: "Validation passed. No job created.",
+      draftId: draft.id,
+    });
+  }
+
+  if (requestMode === "scheduled") {
+    const scheduledFor = scheduledAt ?? draft.scheduledFor ?? new Date(Date.now() + 3600000);
+
+    await prisma.contentDraft.update({
+      where: { id: draft.id },
+      data: { status: "SCHEDULED", scheduledFor },
+    });
+
+    const jobId = `pj_${draft.id}_${Date.now().toString(36)}`;
+    await prisma.publishingJob.create({
+      data: {
+        id: jobId,
+        tenantId: tenant.id,
+        postId: draft.id,
+        provider: draft.network as any,
+        status: "SCHEDULED",
+        scheduledFor,
+        updatedAt: new Date(),
+      },
+    });
+
+    await auditLog({
+      tenantId: tenant.id,
+      actorId: session.user.id,
+      action: "publish_scheduled",
+      target: `draft:${draft.id}`,
+      metadata: {
+        tenant: tenant.name,
+        title: draft.title,
+        network: draft.network,
+        format: draft.format,
+        scheduledFor: scheduledFor.toISOString(),
+        jobId,
+        tenantAutomationMode: tenant.automationMode,
+      },
+    });
+
+    return NextResponse.json({
+      ok: true,
+      mode: "scheduled",
+      status: "SCHEDULED",
+      draftId: draft.id,
+      jobId,
+      scheduledFor: scheduledFor.toISOString(),
+    });
+  }
+
+  // immediate
+  const externalPostId = `live_${draft.network.toLowerCase()}_${Date.now().toString(36)}`;
 
   await prisma.contentDraft.update({
     where: { id: draft.id },
+    data: { status: "PUBLISHED", publishedAt: now, externalPostId },
+  });
+
+  const jobId = `pj_${draft.id}_${Date.now().toString(36)}`;
+  await prisma.publishingJob.create({
     data: {
-      status: newStatus,
-      scheduledFor,
+      id: jobId,
+      tenantId: tenant.id,
+      postId: draft.id,
+      provider: draft.network as any,
+      status: "PUBLISHED",
+      scheduledFor: null,
+      updatedAt: new Date(),
+    },
+  });
+
+  await prisma.publishingResult.create({
+    data: {
+      id: `pr_${jobId}`,
+      jobId,
+      provider: draft.network as any,
       externalPostId,
+      ok: true,
+      response: { manual: true, immediate: true },
     },
   });
 
   await auditLog({
     tenantId: tenant.id,
     actorId: session.user.id,
-    action: isDryRun ? "publish_dry_run_scheduled" : "publish_live_completed",
+    action: "publish_immediate",
     target: `draft:${draft.id}`,
     metadata: {
       tenant: tenant.name,
@@ -158,17 +250,14 @@ export async function POST(req: Request) {
       format: draft.format,
       externalPostId,
       manualApproval,
-      realPublishing: !isDryRun,
       tenantAutomationMode: tenant.automationMode,
-      readinessMode: "per_network",
     },
   });
 
   return NextResponse.json({
     ok: true,
-    dryRun: isDryRun,
-    realPublish: !isDryRun,
-    status: newStatus,
+    mode: "immediate",
+    status: "PUBLISHED",
     draftId: draft.id,
     externalPostId,
   });

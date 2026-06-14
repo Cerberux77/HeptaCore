@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import {
   AlertTriangle,
   BarChart3,
@@ -18,6 +18,7 @@ import {
   LockKeyhole,
   MessageSquareText,
   PackageSearch,
+  Pencil,
   Settings2,
   ShieldCheck,
   TrendingUp,
@@ -100,9 +101,23 @@ function Thumb({ item }: { item: DraftQueueItem }) {
   return <div className="thumb fallback"><ImageIcon size={20} /></div>;
 }
 
-function Risk({ level }: { level: string }) {
+function Risk({ level, onAction }: { level: string; onAction?: () => void }) {
   const cls = level === "low" ? "risk-low" : level === "medium" ? "risk-medium" : "risk-high";
-  return <span className={`risk ${cls}`}>{level}</span>;
+  const explain = {
+    low: "Bajo riesgo: contenido apto para publicacion automatica sin revision humana",
+    medium: "Riesgo medio: requiere revision ligera antes de publicar",
+    high: "Riesgo alto: requiere revision humana obligatoria antes de publicar",
+  }[level] ?? level;
+  return (
+    <span
+      className={`risk ${cls} risk-chip`}
+      title={explain}
+      onClick={onAction}
+      style={{ cursor: onAction ? "pointer" : "default" }}
+    >
+      {level}
+    </span>
+  );
 }
 
 function PanelTitle({
@@ -187,7 +202,7 @@ export function DashboardConsole({
   const [selectedId, setSelectedId] = useState(queue[0]?.id ?? "");
   const [localQueue, setLocalQueue] = useState(queue);
   const [manualApproval, setManualApproval] = useState(false);
-  const [publishMode, setPublishMode] = useState<"dry-run" | "live">("dry-run");
+  const [publishMode, setPublishMode] = useState<"dry_run" | "scheduled" | "immediate">("dry_run");
   const tenantAutoPilot =
     metrics?.tenant.mode === "AUTOPILOT_FULL" || metrics?.tenant.mode === "AUTOPILOT_LIMITED";
   const tenantNeedsManual =
@@ -216,6 +231,18 @@ export function DashboardConsole({
   const [paymentModalOpen, setPaymentModalOpen] = useState(false);
   const [networkSaving, setNetworkSaving] = useState(false);
   const [strategyTimezone, setStrategyTimezone] = useState("America/Caracas");
+  const [renamingAssetId, setRenamingAssetId] = useState("");
+  const [renameFilename, setRenameFilename] = useState("");
+  const [renameSaving, setRenameSaving] = useState(false);
+  const [newPubOpen, setNewPubOpen] = useState(false);
+  const [newPubTitle, setNewPubTitle] = useState("");
+  const [newPubCaption, setNewPubCaption] = useState("");
+  const [newPubNetwork, setNewPubNetwork] = useState("INSTAGRAM");
+  const [newPubAssetId, setNewPubAssetId] = useState("");
+  const [newPubSaving, setNewPubSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [uploadFile, setUploadFile] = useState<File | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const selected = localQueue.find((i) => i.id === selectedId) ?? localQueue[0];
   const activeNetworks = metrics?.tenant.activeNetworks?.length ? metrics.tenant.activeNetworks : ["INSTAGRAM", "FACEBOOK"];
   const missingCoreNetworks = SUPPORTED_NETWORKS.filter((network) => !activeNetworks.includes(network));
@@ -228,7 +255,12 @@ export function DashboardConsole({
     .sort((a, b) => (a.scheduledFor ?? "").localeCompare(b.scheduledFor ?? ""));
   const readyNow = scheduled.slice(0, 5);
 
-  const nextDate = scheduled[0]?.scheduledFor?.slice(5) ?? "--";
+  const nextItem = scheduled[0] ?? null;
+  const nextDate = nextItem?.scheduledFor?.slice(5) ?? "--";
+  const nextTitle = nextItem?.title ? (nextItem.title.length > 25 ? nextItem.title.slice(0, 25) + "…" : nextItem.title) : null;
+  const nextNote = nextItem
+    ? `${nextItem.network} · ${nextItem.status === "APPROVED" ? "Listo" : nextItem.status === "NEEDS_REVIEW" ? "Pendiente revision" : nextItem.status}`
+    : "No hay programados";
 
   const updateLocalStatus = useCallback((id: string, newStatus: string) => {
     setLocalQueue((prev) => prev.map((d) => (d.id === id ? { ...d, status: newStatus } : d)));
@@ -258,12 +290,14 @@ export function DashboardConsole({
         setPublishMessage(data.error || "No se pudo ejecutar la publicacion.");
         return;
       }
-      updateLocalStatus(firstApproved.id, data.realPublish ? "PUBLISHED" : "SCHEDULED");
+      updateLocalStatus(firstApproved.id, data.mode === "immediate" ? "PUBLISHED" : data.mode === "scheduled" ? "SCHEDULED" : "APPROVED");
       setPublishState("done");
       setPublishMessage(
-        data.realPublish
+        data.mode === "immediate"
           ? `Publicado en vivo: ${firstApproved.title}.`
-          : `Dry-run registrado para ${firstApproved.title}.`,
+          : data.mode === "scheduled"
+            ? `Programado: ${firstApproved.title} (${data.scheduledFor ? new Date(data.scheduledFor).toLocaleString() : "pronto"}).`
+            : `Dry-run validado: ${firstApproved.title}.`,
       );
     } catch (error) {
       setPublishState("error");
@@ -430,6 +464,75 @@ export function DashboardConsole({
     }
   }
 
+  async function handleNewPublication() {
+    if (!newPubTitle.trim()) return;
+    setNewPubSaving(true);
+    try {
+      const res = await fetch("/api/drafts/new", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: newPubTitle.trim(),
+          caption: newPubCaption.trim(),
+          network: newPubNetwork,
+          assetId: newPubAssetId || undefined,
+          tenantSlug,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.ok) {
+        alert(data.error || "Error al crear publicacion");
+        return;
+      }
+      window.location.reload();
+    } finally {
+      setNewPubSaving(false);
+    }
+  }
+
+  async function handleUploadAsset() {
+    if (!uploadFile) return;
+    setUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", uploadFile);
+      formData.append("tenantSlug", tenantSlug);
+      const res = await fetch("/api/assets/upload", { method: "POST", body: formData });
+      const data = await res.json();
+      if (!res.ok || !data.ok) {
+        alert(data.error || "Error al subir asset");
+        return;
+      }
+      window.location.reload();
+    } finally {
+      setUploading(false);
+      setUploadFile(null);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  }
+
+  async function handleRenameAsset(assetId: string) {
+    if (!renameFilename.trim()) return;
+    setRenameSaving(true);
+    try {
+      const res = await fetch(`/api/assets/${assetId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ filename: renameFilename.trim() }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.ok) {
+        alert(data.error || "Error al renombrar asset");
+        return;
+      }
+      window.location.reload();
+    } finally {
+      setRenameSaving(false);
+      setRenamingAssetId("");
+      setRenameFilename("");
+    }
+  }
+
   return (
     <main className="app-shell">
       <aside className="app-sidebar">
@@ -471,6 +574,9 @@ export function DashboardConsole({
             <h1>Control de RRSS y APROBACIONES</h1>
           </div>
           <div className="header-actions">
+            <button className="tool-button" onClick={() => setNewPubOpen(true)}>
+              <FileText size={16} /> Nueva publicacion
+            </button>
             {adminMode && (
               <a className="tool-button" href="/admin">
                 <ShieldCheck size={16} /> Admin
@@ -488,7 +594,7 @@ export function DashboardConsole({
             <StatusCard label="Pendientes" value={pendingReview.length} note="requieren criterio" tone="warn" onClick={() => setView("queue")} />
             <StatusCard label="Aprobados" value={metrics.counts.approved} note="listos para publicar" onClick={() => setView("readiness")} />
             <StatusCard label="Assets" value={metrics.counts.totalAssets} note="importados" tone="ok" onClick={() => setView("assets")} />
-            <StatusCard label="Proximo" value={nextDate} note="primer hito" onClick={() => setView("calendar")} />
+            <StatusCard label="Proximo" value={nextTitle ?? nextDate} note={nextNote} onClick={() => setView("calendar")} />
           </section>
         )}
         {trial && !trial.trialActive && (
@@ -539,6 +645,52 @@ export function DashboardConsole({
                 >
                   Contactar por WhatsApp
                 </a>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {newPubOpen && (
+          <div className="modal-layer" role="dialog" aria-modal="true" aria-label="Nueva publicacion">
+            <button className="modal-backdrop" onClick={() => setNewPubOpen(false)} aria-label="Cerrar" />
+            <div className="modal-panel">
+              <div className="modal-head">
+                <div>
+                  <span className="section-label">Publicacion</span>
+                  <h2>Nueva publicacion</h2>
+                </div>
+                <button className="icon-button" onClick={() => setNewPubOpen(false)} aria-label="Cerrar">
+                  <X size={18} />
+                </button>
+              </div>
+              <div className="modal-body">
+                <label>
+                  Titulo
+                  <input value={newPubTitle} onChange={(e) => setNewPubTitle(e.target.value)} placeholder="Titulo de la publicacion" />
+                </label>
+                <label>
+                  Caption
+                  <textarea value={newPubCaption} onChange={(e) => setNewPubCaption(e.target.value)} placeholder="Texto del post (opcional)" rows={3} />
+                </label>
+                <label>
+                  Red
+                  <select value={newPubNetwork} onChange={(e) => setNewPubNetwork(e.target.value)}>
+                    {activeNetworks.map((n) => <option key={n} value={n}>{n}</option>)}
+                  </select>
+                </label>
+                <label>
+                  Asset (opcional)
+                  <select value={newPubAssetId} onChange={(e) => setNewPubAssetId(e.target.value)}>
+                    <option value="">Sin asset</option>
+                    {assets.map((a) => <option key={a.id} value={a.id}>{a.filename}</option>)}
+                  </select>
+                </label>
+              </div>
+              <div className="modal-actions">
+                <button className="tool-button" onClick={() => setNewPubOpen(false)}>Cancelar</button>
+                <button className="primary-action" onClick={handleNewPublication} disabled={newPubSaving || !newPubTitle.trim()} style={{ fontSize: 13, padding: "6px 14px" }}>
+                  {newPubSaving ? "Creando..." : "Crear publicacion"}
+                </button>
               </div>
             </div>
           </div>
@@ -888,9 +1040,9 @@ export function DashboardConsole({
                   <div style={{ padding: "8px 8px 4px 8px", background: "var(--hc-bone)", borderTop: "1px solid var(--hc-line)" }}>
                     <strong style={{ fontSize: 11 }}>Seleccionar nuevo asset:</strong>
                     <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 6, maxHeight: 160, overflowY: "auto" }}>
-                      {assets
-                        .filter((a) => a.id !== selected.asset?.filename || true)
-                        .slice(0, 20)
+                       {assets
+                         .filter((a) => a.filename !== selected.asset?.filename)
+                         .slice(0, 20)
                         .map((asset) => (
                           <button
                             key={asset.id}
@@ -977,7 +1129,7 @@ export function DashboardConsole({
                     </button>
                   </div>
                 )}
-                {!editMode && (selected.status === "DRAFT" || selected.status === "NEEDS_REVIEW" ? (
+                {!editMode && (selected.status === "DRAFT" || selected.status === "NEEDS_REVIEW" || selected.status === "REJECTED" ? (
                   <ApprovalActions draftId={selected.id} onStatusChange={(s) => updateLocalStatus(selected.id, s)} />
                 ) : (
                   <div className="approval-actions">
@@ -1065,6 +1217,23 @@ export function DashboardConsole({
             </section>
             <section className="work-panel">
               <PanelTitle icon={<PackageSearch size={17} />} title="Activos del tenant" />
+              <div style={{ display: "flex", gap: 8, padding: "0 4px 8px 4px", alignItems: "center" }}>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*,video/mp4,audio/*,.pdf"
+                  onChange={(e) => setUploadFile(e.target.files?.[0] ?? null)}
+                  style={{ fontSize: 11 }}
+                />
+                <button
+                  onClick={handleUploadAsset}
+                  disabled={uploading || !uploadFile}
+                  className="primary-action"
+                  style={{ fontSize: 12, padding: "4px 12px" }}
+                >
+                  {uploading ? "Subiendo..." : "Subir"}
+                </button>
+              </div>
               <div className="market-grid">
                 {assets.map((asset) => (
                   <div className="market-card" key={asset.id}>
@@ -1077,7 +1246,28 @@ export function DashboardConsole({
                     ) : (
                       <div className="asset-tile asset-empty"><PackageSearch size={22} /></div>
                     )}
-                    <strong>{asset.filename}</strong>
+                    {renamingAssetId === asset.id ? (
+                      <div style={{ display: "flex", gap: 4, marginTop: 4 }}>
+                        <input
+                          autoFocus
+                          style={{ flex: 1, padding: "3px 6px", borderRadius: 4, border: "1px solid var(--hc-line)", fontSize: 12 }}
+                          value={renameFilename}
+                          onChange={(e) => setRenameFilename(e.target.value)}
+                          onKeyDown={(e) => { if (e.key === "Enter") handleRenameAsset(asset.id); if (e.key === "Escape") setRenamingAssetId(""); }}
+                        />
+                        <button onClick={() => handleRenameAsset(asset.id)} disabled={renameSaving} style={{ padding: "3px 8px", borderRadius: 4, border: "1px solid var(--hc-line)", background: "var(--hc-ink)", color: "#fff", cursor: "pointer", fontSize: 11 }}>{renameSaving ? "..." : "Guardar"}</button>
+                        <button onClick={() => { setRenamingAssetId(""); setRenameFilename(""); }} style={{ padding: "3px 8px", borderRadius: 4, border: "1px solid var(--hc-line)", background: "var(--hc-bone)", cursor: "pointer", fontSize: 11 }}>Cancelar</button>
+                      </div>
+                    ) : (
+                      <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                        <strong>{asset.filename}</strong>
+                        <button
+                          onClick={() => { setRenamingAssetId(asset.id); setRenameFilename(asset.filename); }}
+                          title="Renombrar"
+                          style={{ background: "none", border: "none", cursor: "pointer", padding: 0, color: "var(--hc-fog)", fontSize: 12 }}
+                        ><Pencil size={12} /></button>
+                      </div>
+                    )}
                     <small>{asset.kind} / {asset.rightsStatus} / {asset.draftCount} drafts</small>
                   </div>
                 ))}
@@ -1209,7 +1399,8 @@ export function DashboardConsole({
                         const d = item.scheduledFor ? new Date(item.scheduledFor) : null;
                         return d && d.getDate() === day;
                       });
-                      return (
+
+  return (
                         <div
                           key={day}
                           style={{
@@ -1286,16 +1477,35 @@ export function DashboardConsole({
                   <StatusCard label="Sin assets" value={report.pendingAssets} note="bloqueados" tone={report.pendingAssets > 0 ? "warn" : "ok"} onClick={() => setView("assets")} />
                 </div>
                 <h3>Por estado</h3>
-                <div className="tag-row" style={{ marginBottom: 14 }}>
-                  {report.byStatus.map((s: any) => (
-                    <span key={s.status}>{s.status}: {s.count}</span>
-                  ))}
+                <div style={{ display: "flex", gap: 6, marginBottom: 14, flexWrap: "wrap" }}>
+                  {report.byStatus.map((s: any) => {
+                    const pct = report.total > 0 ? Math.round((s.count / report.total) * 100) : 0;
+                    return (
+                      <div key={s.status} style={{ flex: "1 1 100px", minWidth: 80 }}>
+                        <div style={{ fontSize: 10, color: "var(--hc-fog)", marginBottom: 2 }}>{s.status}</div>
+                        <div style={{ background: "var(--hc-bone)", borderRadius: 4, height: 8, overflow: "hidden" }}>
+                          <div style={{ width: `${pct}%`, height: "100%", background: "var(--hc-teal)", borderRadius: 4, transition: "width .3s" }} />
+                        </div>
+                        <div style={{ fontSize: 11, fontWeight: 600, marginTop: 2 }}>{s.count}</div>
+                      </div>
+                    );
+                  })}
                 </div>
                 <h3>Por red</h3>
-                <div className="tag-row" style={{ marginBottom: 14 }}>
-                  {report.byNetwork.map((n: any) => (
-                    <span key={n.network}>{n.network}: {n.count}</span>
-                  ))}
+                <div style={{ display: "flex", gap: 6, marginBottom: 14, flexWrap: "wrap" }}>
+                  {report.byNetwork.map((n: any) => {
+                    const max = Math.max(...report.byNetwork.map((x: any) => x.count), 1);
+                    const pct = Math.round((n.count / max) * 100);
+                    return (
+                      <div key={n.network} style={{ flex: "1 1 80px", minWidth: 60 }}>
+                        <div style={{ fontSize: 10, color: "var(--hc-fog)", marginBottom: 2 }}>{n.network}</div>
+                        <div style={{ background: "var(--hc-bone)", borderRadius: 4, height: 8, overflow: "hidden" }}>
+                          <div style={{ width: `${pct}%`, height: "100%", background: pct >= 80 ? "var(--hc-teal)" : pct >= 40 ? "var(--hc-warn)" : "var(--hc-fog)", borderRadius: 4, transition: "width .3s" }} />
+                        </div>
+                        <div style={{ fontSize: 11, fontWeight: 600, marginTop: 2 }}>{n.count}</div>
+                      </div>
+                    );
+                  })}
                 </div>
                 <h3>Actividad reciente</h3>
                 <ul className="dense-list">
@@ -1356,11 +1566,12 @@ export function DashboardConsole({
                   <span style={{ fontSize: 13, color: "var(--hc-ink)" }}>Modo de publicacion:</span>
                   <select
                     value={publishMode}
-                    onChange={(e) => setPublishMode(e.target.value as "dry-run" | "live")}
+                    onChange={(e) => setPublishMode(e.target.value as "dry_run" | "scheduled" | "immediate")}
                     style={{ padding: "6px 10px", borderRadius: 6, border: "1px solid var(--hc-line)", fontSize: 13 }}
                   >
-                    <option value="dry-run">Dry-run (prueba sin publicar)</option>
-                    <option value="live">Publicacion real en redes</option>
+                    <option value="dry_run">Dry-run (validar, no publicar)</option>
+                    <option value="scheduled">Programar (cron publica despues)</option>
+                    <option value="immediate">Inmediata (publicar ahora)</option>
                   </select>
                 </label>
                 <div className="publish-gate">
@@ -1371,10 +1582,10 @@ export function DashboardConsole({
                         checked={manualApproval}
                         onChange={(event) => setManualApproval(event.target.checked)}
                       />
-                      Manuel aprueba ejecutar este {publishMode === "live" ? "intento de publicacion real" : "dry-run controlado"}.
+                      Manuel aprueba ejecutar este {publishMode === "immediate" ? "intento de publicacion real" : publishMode === "scheduled" ? "intento de programacion" : "dry-run controlado"}.
                     </label>
                   )}
-                  {tenantAutoPilot && publishMode === "live" && (
+                  {tenantAutoPilot && publishMode === "immediate" && (
                     <label className="gate-check">
                       <input
                         type="checkbox"
@@ -1392,9 +1603,11 @@ export function DashboardConsole({
                     <LockKeyhole size={16} />
                     {publishState === "loading"
                       ? "Ejecutando..."
-                      : publishMode === "live"
+                      : publishMode === "immediate"
                         ? "Publicar en redes reales"
-                        : "Ejecutar dry-run"}
+                        : publishMode === "scheduled"
+                          ? "Programar publicacion"
+                          : "Ejecutar dry-run"}
                   </button>
                   <small>
                     {firstApproved

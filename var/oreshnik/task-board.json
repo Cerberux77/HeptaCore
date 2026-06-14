@@ -1,6 +1,6 @@
 {
   "project": "HeptaCore",
-  "updatedAt": "2026-06-14T01:59:52.693Z",
+  "updatedAt": "2026-06-14T08:39:53.687Z",
   "resiliencePolicy": "If an owner is unavailable for more than one working block or blocks the critical path, backupOwner may take over after recording reassignment.",
   "closurePolicy": "No sprint may be closed until acceptance criteria, base tests, sprint-specific tests, docs/handoff, and Oreshnik zone checks pass. See docs/obsidian-vault/METODOLOGIA/ORQUESTACION_AGENTES_HEPTACORE.md.",
   "baseTestMatrix": [
@@ -1034,7 +1034,7 @@
       "id": "eliminar-restricciones-publicaci-n-en-heptacore",
       "title": "Eliminar Restricciones Publicación en heptacore: Eliminar los bloqueos estrictos en el panel de administración. Habilitar la autorización necesaria para realizar publicaciones manuales de contenido.",
       "owner": "Jean",
-      "status": "ready",
+      "status": "done",
       "track": "S-HC",
       "zone": [],
       "acceptance": [
@@ -1047,6 +1047,11 @@
           "action": "injected",
           "operator": "architect",
           "description": "Injected from notes ingestion. Evidence: code"
+        },
+        {
+          "action": "done",
+          "at": "2026-06-14T08:39:33.486Z",
+          "by": "Manuel (code review + fixes)"
         }
       ]
     },
@@ -1054,7 +1059,7 @@
       "id": "hay-algo-que-no-entiendo-y-que-necesito-que-me-r",
       "title": "Hay algo que no entiendo y que necesito que me respondas respecto a heptacore. al momento de entrar en el dashboard del tenant, en este caso turpialsoun desde el dashboard en heptacore, hay un car cli",
       "owner": "Jean",
-      "status": "ready",
+      "status": "done",
       "track": "S-HC",
       "zone": [],
       "acceptance": [
@@ -1067,6 +1072,11 @@
           "action": "injected",
           "operator": "architect",
           "description": "Injected from notes ingestion. Evidence: ui"
+        },
+        {
+          "action": "done",
+          "at": "2026-06-14T08:39:33.487Z",
+          "by": "Manuel (code review + fixes)"
         }
       ]
     },
@@ -1074,7 +1084,7 @@
       "id": "en-la-cola-de-draft-de-heptacore-algunos-draft",
       "title": "en la cola de draft de heptacore, algunos draft me dan la opcion de aprobar, otros ya no me dan la opcion, posiblemente porque ya los aprobe, pero en el card “aprobados” aparecen 0 “listos para public",
       "owner": "Jean",
-      "status": "ready",
+      "status": "done",
       "track": "S-HC",
       "zone": [],
       "acceptance": [
@@ -1087,6 +1097,11 @@
           "action": "injected",
           "operator": "architect",
           "description": "Injected from notes ingestion. Evidence: ui"
+        },
+        {
+          "action": "done",
+          "at": "2026-06-14T08:39:33.487Z",
+          "by": "Manuel (code review + fixes)"
         }
       ]
     },
@@ -1094,7 +1109,7 @@
       "id": "en-heptacore-quiero-agregar-la-posibilidad-de-in",
       "title": "En heptacore quiero agregar la posibilidad de incorporar una nueva publicacion, debe funcionar asi: va a ser una opcion “agregar publicacion” al darle a ese boton un modal me solicita el activo o acti",
       "owner": "Jean",
-      "status": "ready",
+      "status": "done",
       "track": "S-HC",
       "zone": [],
       "acceptance": [
@@ -1107,6 +1122,11 @@
           "action": "injected",
           "operator": "architect",
           "description": "Injected from notes ingestion. Evidence: ui"
+        },
+        {
+          "action": "done",
+          "at": "2026-06-14T08:39:33.487Z",
+          "by": "Manuel (code review + fixes)"
         }
       ]
     },
@@ -1114,7 +1134,7 @@
       "id": "el-proceso-de-carga-de-activos-en-heptacore-en",
       "title": "el proceso de carga de activos en heptacore  en el boton de activos, tiene una seccion de **Assets y configuraciones pendientes**  que indica de manera general como debe ser el formato de archivo para",
       "owner": "Jean",
-      "status": "ready",
+      "status": "done",
       "track": "S-HC",
       "zone": [],
       "acceptance": [
@@ -1127,6 +1147,11 @@
           "action": "injected",
           "operator": "architect",
           "description": "Injected from notes ingestion. Evidence: ui"
+        },
+        {
+          "action": "done",
+          "at": "2026-06-14T08:39:33.487Z",
+          "by": "Manuel (code review + fixes)"
         }
       ]
     },
@@ -1134,7 +1159,7 @@
       "id": "en-la-seccion-de-asstes-de-heptacore-debe-existi",
       "title": "en la seccion de asstes de heptacore debe existir la posibilidad de reemplazar un archivo por otro, cambiar nombre, si cambia el nombre la estrategia lo debe reemplazar como corresponda.",
       "owner": "Jean",
-      "status": "ready",
+      "status": "done",
       "track": "S-HC",
       "zone": [],
       "acceptance": [
@@ -1147,6 +1172,11 @@
           "action": "injected",
           "operator": "architect",
           "description": "Injected from notes ingestion. Evidence: code"
+        },
+        {
+          "action": "done",
+          "at": "2026-06-14T08:39:33.487Z",
+          "by": "Manuel (code review + fixes)"
         }
       ]
     },
@@ -1154,7 +1184,7 @@
       "id": "el-card-proximo-primer-hito-en-heptacore-d",
       "title": "el card “proximo” “primer hito” en heptacore , debe ser dinamico es decir indicar el estado de la siguiente publicacion, no se a que se riefiere con primer hito, revisar eso y proponer.",
       "owner": "Jean",
-      "status": "ready",
+      "status": "done",
       "track": "S-HC",
       "zone": [],
       "acceptance": [
@@ -1167,6 +1197,11 @@
           "action": "injected",
           "operator": "architect",
           "description": "Injected from notes ingestion. Evidence: ui"
+        },
+        {
+          "action": "done",
+          "at": "2026-06-14T08:39:33.487Z",
+          "by": "Manuel (code review + fixes)"
         }
       ]
     },
@@ -1174,7 +1209,7 @@
       "id": "en-el-cronograma-de-heptacore-que-significa-el",
       "title": "en el cronograma de heptacore, que significa el chip “low” que funcion real tiene? incluye in microtexto con hoover que lo explique y que permita una accion para cambiar ese estado o resolverlo.",
       "owner": "Jean",
-      "status": "ready",
+      "status": "done",
       "track": "S-HC",
       "zone": [],
       "acceptance": [
@@ -1187,6 +1222,11 @@
           "action": "injected",
           "operator": "architect",
           "description": "Injected from notes ingestion. Evidence: code"
+        },
+        {
+          "action": "done",
+          "at": "2026-06-14T08:39:33.487Z",
+          "by": "Manuel (code review + fixes)"
         }
       ]
     },
@@ -1194,7 +1234,7 @@
       "id": "en-heptacore-la-seccion-checklist-no-se-si-esta",
       "title": "en heptacore  la seccion checklist no se si esta funcionando debinadmente, por ejemplo estoy viendo que requiere “al menos un draft aprobado” pero ya he aprobado varios y no puedo publicar. tambien fa",
       "owner": "Jean",
-      "status": "ready",
+      "status": "done",
       "track": "S-HC",
       "zone": [],
       "acceptance": [
@@ -1207,6 +1247,11 @@
           "action": "injected",
           "operator": "architect",
           "description": "Injected from notes ingestion. Evidence: ui"
+        },
+        {
+          "action": "done",
+          "at": "2026-06-14T08:39:33.487Z",
+          "by": "Manuel (code review + fixes)"
         }
       ]
     },
@@ -1214,7 +1259,7 @@
       "id": "en-heptacore-dashboard-reportes-quisiera-algo",
       "title": "en heptacore, dashboard, reportes, quisiera algo mas visual, replantealo",
       "owner": "Jean",
-      "status": "ready",
+      "status": "done",
       "track": "S-HC",
       "zone": [],
       "acceptance": [
@@ -1227,6 +1272,11 @@
           "action": "injected",
           "operator": "architect",
           "description": "Injected from notes ingestion. Evidence: ui"
+        },
+        {
+          "action": "done",
+          "at": "2026-06-14T08:39:33.487Z",
+          "by": "Manuel (code review + fixes)"
         }
       ]
     },
@@ -1450,7 +1500,7 @@
       "id": "como-publica-heptacore-posts-programados-si-estoy-offline",
       "title": "confirma o explica como va a ser la publicacion de un determinado post programado segun calendario si estoy offline? se supone que el sistema debe publicar desde la pagina tomando los assets y estrategia y horarios en la pagina web, pero me queda la duda porque no tengo cron definido en ese repo, no quiero pagar por un servicio de terceros, como lo resuelve heptacore que opciones tengo cual es tu propuesta",
       "owner": "Jean",
-      "status": "ready",
+      "status": "done",
       "track": "S-HC",
       "zone": [
         "apps/web",
@@ -1470,6 +1520,38 @@
           "action": "injected",
           "operator": "architect",
           "description": "Injected from manual sprint addition. Evidence: architecture"
+        },
+        {
+          "action": "done",
+          "at": "2026-06-14T08:39:33.487Z",
+          "by": "Manuel (code review + fixes)"
+        }
+      ]
+    },
+    {
+      "id": "S-HC-DRIFT-003",
+      "title": "Sistema de publicacion con 3 modos (dry_run/scheduled/immediate), 24 crons Vercel Hobby compatibles, cron publisher con idempotencia transaccional, QA + fixes de 11 tareas Jean (checklist, asset rename/upload, risk tooltip, nueva publicacion modal, reports visual, milestone dinamico, restricciones estructurales)",
+      "owner": "Manuel",
+      "backupOwner": "Manuel",
+      "status": "done",
+      "track": "ad-hoc",
+      "zone": [
+        "apps/web",
+        "vercel.json",
+        "docs/07_handoffs"
+      ],
+      "dependsOn": [],
+      "acceptance": [
+        "Ad-hoc: Sistema de publicacion con 3 modos (dry_run/scheduled/immediate), 24 crons Vercel Hobby compatibles, cron publisher con idempotencia transaccional, QA + fixes de 11 tareas Jean (checklist, asset rename/upload, risk tooltip, nueva publicacion modal, reports visual, milestone dinamico, restricciones estructurales)"
+      ],
+      "handoff": "Drift registered via preflight on 2026-06-14. Mode: silent.",
+      "history": [
+        {
+          "at": "2026-06-14T08:39:53.687Z",
+          "action": "drift-recorded",
+          "operator": "Manuel",
+          "mode": "silent",
+          "description": "Sistema de publicacion con 3 modos (dry_run/scheduled/immediate), 24 crons Vercel Hobby compatibles, cron publisher con idempotencia transaccional, QA + fixes de 11 tareas Jean (checklist, asset rename/upload, risk tooltip, nueva publicacion modal, reports visual, milestone dinamico, restricciones estructurales)"
         }
       ]
     }

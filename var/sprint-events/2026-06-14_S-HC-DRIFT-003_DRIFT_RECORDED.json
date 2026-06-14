@@ -1,0 +1,30 @@
+{
+  "id": "S-HC-DRIFT-003",
+  "title": "Sistema de publicacion con 3 modos (dry_run/scheduled/immediate), 24 crons Vercel Hobby compatibles, cron publisher con idempotencia transaccional, QA + fixes de 11 tareas Jean (checklist, asset rename/upload, risk tooltip, nueva publicacion modal, reports visual, milestone dinamico, restricciones estructurales)",
+  "operator": "Manuel",
+  "status": "recorded",
+  "mode": "silent",
+  "parentSprint": "UNKNOWN",
+  "parentBranch": "Architect/jean-pendientes-2026-06-14-jean-tiene-11-tareas-ready-para-revision-2026-06-14",
+  "date": "2026-06-14",
+  "at": "2026-06-14T08:39:53.687Z",
+  "description": "Sistema de publicacion con 3 modos (dry_run/scheduled/immediate), 24 crons Vercel Hobby compatibles, cron publisher con idempotencia transaccional, QA + fixes de 11 tareas Jean (checklist, asset rename/upload, risk tooltip, nueva publicacion modal, reports visual, milestone dinamico, restricciones estructurales)",
+  "zones": [
+    "apps/web",
+    "vercel.json",
+    "docs/07_handoffs"
+  ],
+  "changedFiles": [
+    "M apps/web/app/api/drafts/[id]/approve/route.ts",
+    "M apps/web/app/api/publishing/publish/route.ts",
+    "M apps/web/app/globals.css",
+    "M apps/web/components/dashboard-console.tsx",
+    "M apps/web/lib/dashboard.ts",
+    "M vercel.json",
+    "?? apps/web/app/api/assets/",
+    "?? apps/web/app/api/cron/",
+    "?? apps/web/app/api/drafts/new/",
+    "?? docs/07_handoffs/handoff-Jean-2026-06-14.md"
+  ],
+  "fileCount": 10
+}

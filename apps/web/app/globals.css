@@ -235,6 +235,11 @@ p {
   border: 1px solid var(--hc-line);
   border-radius: 8px;
   background: var(--hc-panel);
+  transition: border-color .15s, box-shadow .15s;
+}
+.status-card:hover {
+  border-color: var(--hc-teal);
+  box-shadow: 0 0 0 1px rgba(11, 117, 111, .12);
 }
 .status-card span {
   color: var(--hc-fog);
