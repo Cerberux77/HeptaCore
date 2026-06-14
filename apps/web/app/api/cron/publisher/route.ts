@@ -47,12 +47,14 @@ function tenantAssetSlug(tenantSlug: string): string {
 }
 
 function buildPublicAssetUrl(tenantSlug: string, assetPath: string): string | null {
-  const base =
+  const raw =
     process.env.APP_PUBLIC_URL ||
     process.env.NEXT_PUBLIC_APP_URL ||
     process.env.NEXTAUTH_URL ||
     process.env.VERCEL_URL ||
     null;
+
+  const base = raw?.replace(/\r/g, "").replace(/\n/g, "").trim().replace(/\/+$/, "");
 
   if (!base) return null;
 
@@ -69,7 +71,11 @@ function buildPublicAssetUrl(tenantSlug: string, assetPath: string): string | nu
 
   const folder = tenantAssetSlug(tenantSlug);
   const encodedPath = assetPath.split("/").map((s) => encodeURIComponent(s)).join("/");
-  return `${origin}/tenant-assets/${folder}/${encodedPath}`;
+  const url = `${origin}/tenant-assets/${folder}/${encodedPath}`;
+
+  if (url.includes("\r") || url.includes("\n")) return null;
+
+  return url;
 }
 
 async function tryRealPublish(job: JobRecord): Promise<PublishOutcome> {
