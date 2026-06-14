@@ -171,9 +171,25 @@ export async function GET(req: NextRequest) {
       }
     });
   } catch (err) {
+    const error = err as {
+      name?: string;
+      message?: string;
+      code?: string;
+      meta?: unknown;
+      stack?: string;
+    };
+
+    console.error("[instagram_callback_save_failed]", {
+      name: error?.name,
+      message: error?.message,
+      code: error?.code,
+      meta: error?.meta,
+    });
+
     return NextResponse.json({
       ok: false,
       error: "Failed to save Instagram connection. Please try again.",
+      code: "INSTAGRAM_CONNECTION_SAVE_FAILED",
     }, { status: 500 });
   }
 
