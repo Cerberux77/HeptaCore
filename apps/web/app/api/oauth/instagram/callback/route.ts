@@ -3,6 +3,17 @@ import { NextRequest } from "next/server";
 import { prisma } from "../../../../../lib/prisma";
 import { encryptJson } from "../../../../../lib/token-vault";
 
+function formatOAuthError(resJson: unknown, status: number): string {
+  const err = (resJson as Record<string, unknown>)?.error as Record<string, unknown> | undefined;
+  if (!err) return `HTTP ${status}: unknown error`;
+  const parts: string[] = [];
+  if (err.message) parts.push(String(err.message));
+  if (err.type) parts.push(`type=${err.type}`);
+  if (err.code) parts.push(`code=${err.code}`);
+  if (err.error_subcode) parts.push(`subcode=${err.error_subcode}`);
+  return parts.join(" | ") || `HTTP ${status}: error without details`;
+}
+
 export async function GET(req: NextRequest) {
   const code = req.nextUrl.searchParams.get("code");
   const state = req.nextUrl.searchParams.get("state") || "";
@@ -19,6 +30,7 @@ export async function GET(req: NextRequest) {
 
   const appId = process.env.INSTAGRAM_APP_ID;
   const appSecret = process.env.INSTAGRAM_APP_SECRET;
+  const clientSecret = process.env.INSTAGRAM_CLIENT_SECRET || appSecret;
   const redirectUri = process.env.INSTAGRAM_REDIRECT_URI || `https://heptacore.vercel.app/api/oauth/instagram/callback`;
 
   if (!appId || !appSecret) {
@@ -39,7 +51,8 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "Tenant not found for the given state", ok: false }, { status: 404 });
   }
 
-  let tokenData;
+  // Step 1: exchange code for short-lived token
+  let shortTokenData;
   try {
     const tokenRes = await fetch("https://api.instagram.com/oauth/access_token", {
       method: "POST",
@@ -53,29 +66,80 @@ export async function GET(req: NextRequest) {
       }),
     });
 
-    tokenData = await tokenRes.json();
+    shortTokenData = await tokenRes.json();
 
-    if (!tokenRes.ok || !tokenData.access_token) {
+    if (!tokenRes.ok || !shortTokenData.access_token) {
+      const msg = formatOAuthError(shortTokenData, tokenRes.status);
+      console.error("[instagram_callback_exchange_failed]", { status: tokenRes.status, error: msg });
       return NextResponse.json({
         ok: false,
         error: "Token exchange failed. Please try connecting again.",
       }, { status: 400 });
     }
   } catch (err) {
+    console.error("[instagram_callback_exchange_error]", { message: err instanceof Error ? err.message : "unknown" });
     return NextResponse.json({
       ok: false,
       error: "OAuth provider communication failed. Please try again.",
     }, { status: 502 });
   }
 
-  const accessToken = tokenData.access_token as string;
-  const userId = tokenData.user_id ? String(tokenData.user_id) : undefined;
+  const shortAccessToken = shortTokenData.access_token as string;
+  const userId = shortTokenData.user_id ? String(shortTokenData.user_id) : undefined;
+
+  // Step 2: exchange short-lived token for long-lived token
+  if (!clientSecret) {
+    return NextResponse.json({
+      ok: false,
+      error: "Instagram client secret not configured for long-lived token exchange.",
+    }, { status: 500 });
+  }
+
+  let longLivedData;
+  try {
+    const exchangeUrl = new URL("https://graph.instagram.com/access_token");
+    exchangeUrl.searchParams.set("grant_type", "ig_exchange_token");
+    exchangeUrl.searchParams.set("client_secret", clientSecret);
+    exchangeUrl.searchParams.set("access_token", shortAccessToken);
+
+    const exchangeRes = await fetch(exchangeUrl.toString(), {
+      signal: AbortSignal.timeout(15000),
+    });
+
+    longLivedData = await exchangeRes.json();
+
+    if (!exchangeRes.ok || !longLivedData.access_token) {
+      const msg = formatOAuthError(longLivedData, exchangeRes.status);
+      console.error("[instagram_callback_long_lived_failed]", { status: exchangeRes.status, error: msg });
+      return NextResponse.json({
+        ok: false,
+        error: "Failed to obtain long-lived token. Please try connecting again.",
+      }, { status: 400 });
+    }
+  } catch (err) {
+    console.error("[instagram_callback_long_lived_error]", { message: err instanceof Error ? err.message : "unknown" });
+    return NextResponse.json({
+      ok: false,
+      error: "Long-lived token exchange failed. Please try again.",
+    }, { status: 502 });
+  }
+
+  const longAccessToken = longLivedData.access_token as string;
+  const expiresInSec = typeof longLivedData.expires_in === "number" ? longLivedData.expires_in : undefined;
+  const tokenType = (longLivedData.token_type as string) || "bearer";
+
+  const expiresAt = expiresInSec
+    ? new Date(Date.now() + expiresInSec * 1000)
+    : new Date(Date.now() + 60 * 24 * 60 * 60 * 1000);
 
   let encryptedBlob: Buffer;
   try {
     encryptedBlob = encryptJson({
-      access_token: accessToken,
+      access_token: longAccessToken,
+      token_type: tokenType,
+      expires_in: expiresInSec,
       user_id: userId,
+      provider: "INSTAGRAM",
       obtained_at: new Date().toISOString(),
     });
   } catch {
@@ -91,7 +155,7 @@ export async function GET(req: NextRequest) {
           label: "instagram_oauth",
           encryptedBlob: new Uint8Array(encryptedBlob),
           keyVersion: "v1",
-          expiresAt: new Date(Date.now() + 60 * 24 * 60 * 60 * 1000),
+          expiresAt,
         },
       });
 
@@ -184,7 +248,7 @@ export async function GET(req: NextRequest) {
             socialAccountId,
             connectedAt: now,
             updatedAt: now,
-            expiresAt: new Date(Date.now() + 60 * 24 * 60 * 60 * 1000),
+            expiresAt,
           },
         });
       } else {
@@ -200,7 +264,7 @@ export async function GET(req: NextRequest) {
             socialAccountId,
             connectedAt: now,
             updatedAt: now,
-            expiresAt: new Date(Date.now() + 60 * 24 * 60 * 60 * 1000),
+            expiresAt,
           },
         });
       }
