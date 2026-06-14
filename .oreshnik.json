@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "project": {
+    "name": "HeptaCore",
+    "mainBranch": "master"
+  },
+  "operators": [
+    { "id": "manuel", "name": "Manuel Vera", "email": "manuel@heptacore.dev" },
+    { "id": "jean", "name": "Jean", "email": "jean@heptacore.dev" }
+  ],
+  "validation": {
+    "gates": [
+      { "name": "typecheck", "command": "npm", "args": ["run", "typecheck"], "timeoutSeconds": 120 },
+      { "name": "build", "command": "npm", "args": ["run", "build"], "timeoutSeconds": 300 },
+      { "name": "worker", "command": "npm", "args": ["run", "worker:validate"], "timeoutSeconds": 120 }
+    ]
+  }
+}
