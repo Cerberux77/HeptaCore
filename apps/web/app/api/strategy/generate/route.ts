@@ -156,6 +156,8 @@ export async function POST(req: Request) {
     context.offer = parsed.data.offer;
     context.market = parsed.data.market;
     context.audience = parsed.data.audience;
+    if (body.timezone) (context as Record<string, unknown>).timezone = body.timezone;
+    (context as Record<string, unknown>).currentTime = new Date().toLocaleTimeString("es", { timeZone: body.timezone || "America/Caracas", hour: "2-digit", minute: "2-digit" });
   } catch (err) {
     console.warn("Could not load tenant context for strategy generation:", err instanceof Error ? err.message : err);
   }

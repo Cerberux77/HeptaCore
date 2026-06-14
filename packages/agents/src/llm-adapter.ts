@@ -333,6 +333,10 @@ function buildUserPrompt(intake: ClientIntake, context?: Partial<TurpialContext>
     if (context.constraints?.length) {
       parts.push(`\nRestricciones adicionales: ${context.constraints.join(", ")}`);
     }
+    const tz = (context as Record<string, unknown>).timezone as string | undefined;
+    const ct = (context as Record<string, unknown>).currentTime as string | undefined;
+    if (tz) parts.push(`\nZona horaria del cliente: ${tz} (hora local: ${ct || "N/A"}). Ajusta el plan de publicacion a esta zona horaria.`);
+    if (tz) parts.push(`Considera las horas pico de la audiencia en ${tz} para optimizar el alcance.`);
   }
 
   parts.push("\nDevuelve el JSON con la estrategia completa.");

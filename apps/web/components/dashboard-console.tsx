@@ -38,6 +38,22 @@ type View = "overview" | "strategy" | "queue" | "assets" | "calendar" | "checkli
 type CalendarView = "list" | "week" | "month";
 
 const SUPPORTED_NETWORKS = ["INSTAGRAM", "FACEBOOK", "YOUTUBE", "TIKTOK", "LINKEDIN"] as const;
+
+const TIMEZONES = [
+  { value: "America/Caracas", label: "Venezuela (UTC-4)" },
+  { value: "America/Bogota", label: "Colombia (UTC-5)" },
+  { value: "America/Lima", label: "Peru (UTC-5)" },
+  { value: "America/Santiago", label: "Chile (UTC-4/-3)" },
+  { value: "America/Argentina/Buenos_Aires", label: "Argentina (UTC-3)" },
+  { value: "America/Mexico_City", label: "Mexico (UTC-6)" },
+  { value: "America/New_York", label: "US Eastern (UTC-5/-4)" },
+  { value: "America/Chicago", label: "US Central (UTC-6/-5)" },
+  { value: "America/Denver", label: "US Mountain (UTC-7/-6)" },
+  { value: "America/Los_Angeles", label: "US Pacific (UTC-8/-7)" },
+  { value: "Europe/Madrid", label: "Espana (UTC+1/+2)" },
+  { value: "Europe/London", label: "UK (UTC+0/+1)" },
+  { value: "UTC", label: "UTC" },
+] as const;
 const NETWORK_LABELS: Record<string, string> = {
   INSTAGRAM: "Instagram",
   FACEBOOK: "Facebook",
@@ -199,6 +215,7 @@ export function DashboardConsole({
   const [assetReplacing, setAssetReplacing] = useState(false);
   const [paymentModalOpen, setPaymentModalOpen] = useState(false);
   const [networkSaving, setNetworkSaving] = useState(false);
+  const [strategyTimezone, setStrategyTimezone] = useState("America/Caracas");
   const selected = localQueue.find((i) => i.id === selectedId) ?? localQueue[0];
   const activeNetworks = metrics?.tenant.activeNetworks?.length ? metrics.tenant.activeNetworks : ["INSTAGRAM", "FACEBOOK"];
   const missingCoreNetworks = SUPPORTED_NETWORKS.filter((network) => !activeNetworks.includes(network));
@@ -304,6 +321,7 @@ export function DashboardConsole({
           tenantSlug,
           preferredNetworks: activeNetworks.map((network) => network.toLowerCase()),
           providerConfig: { provider: llmProvider, model: llmModel, apiKey: llmApiKey },
+          timezone: strategyTimezone,
         }),
       });
       const data = await res.json();
@@ -668,6 +686,21 @@ export function DashboardConsole({
                     </div>
                   </div>
                 )}
+                <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 12 }}>
+                  <span style={{ fontSize: 12, color: "var(--hc-fog)" }}>Zona horaria:</span>
+                  <select
+                    value={strategyTimezone}
+                    onChange={(e) => setStrategyTimezone(e.target.value)}
+                    style={{ fontSize: 12, padding: "4px 8px", borderRadius: 6, border: "1px solid var(--hc-line)", background: "var(--hc-bone)", color: "var(--hc-ink)" }}
+                  >
+                    {TIMEZONES.map((tz) => (
+                      <option key={tz.value} value={tz.value}>{tz.label}</option>
+                    ))}
+                  </select>
+                  <small style={{ color: "var(--hc-fog)" }}>
+                    {new Date().toLocaleTimeString("es", { timeZone: strategyTimezone, hour: "2-digit", minute: "2-digit" })}
+                  </small>
+                </div>
                 <button className="primary-action" onClick={handleGenerateStrategy} disabled={strategyGenerating} style={{ fontSize: 14, padding: "10px 24px" }}>
                   <Bot size={18} style={{ marginRight: 6 }} />
                   {strategyGenerating ? "Generando estrategia..." : "Generar estrategia"}
