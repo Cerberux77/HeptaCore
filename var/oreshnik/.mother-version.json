@@ -1,5 +1,5 @@
 {
-  "current": "MADRE/v43-s-hc-prod-01-drift-system-2026-06-12",
+  "current": "MADRE/v44-s-hc-maint-align-01-qa-review-fixes-de-11-tareas-jean-sistema-de-pub-2026-06-14",
   "branches": [
     {
       "previous": "MADRE/v11-s-hc-09-publish-readiness-gate-2026-06-09",
@@ -300,11 +300,21 @@
       "at": "2026-06-12T04:59:01.819Z",
       "previous": "MADRE/v42-s-hc-02-turpial-importer-and-prisma-seed-2026-06-12",
       "description": "drift system"
+    },
+    {
+      "version": 44,
+      "name": "MADRE/v44-s-hc-maint-align-01-qa-review-fixes-de-11-tareas-jean-sistema-de-pub-2026-06-14",
+      "sprint": "S-HC-MAINT-ALIGN-01",
+      "operator": "Manuel",
+      "date": "2026-06-14",
+      "at": "2026-06-14T08:47:00.166Z",
+      "previous": "MADRE/v43-s-hc-prod-01-drift-system-2026-06-12",
+      "description": "QA review + fixes de 11 tareas Jean, sistema de publicacion 3 modos, 24 crons Vercel Hobby compatibles, cron publisher idempotente"
     }
   ],
-  "version": 43,
-  "effective": "MADRE/v42-s-hc-02-turpial-importer-and-prisma-seed-2026-06-12",
-  "effectiveRef": "origin/MADRE/v42-s-hc-02-turpial-importer-and-prisma-seed-2026-06-12",
+  "version": 44,
+  "effective": "MADRE/v43-s-hc-prod-01-drift-system-2026-06-12",
+  "effectiveRef": "origin/MADRE/v43-s-hc-prod-01-drift-system-2026-06-12",
   "declaredMissing": false,
   "discoveredVersion": 14
 }

@@ -1,8 +1,8 @@
 ---
 type: sprint-plan
 project: "HeptaCore"
-last_updated: "2026-06-12T04:59:01.819Z"
-mother_branch: "MADRE/v43-s-hc-prod-01-drift-system-2026-06-12"
+last_updated: "2026-06-14T08:47:00.166Z"
+mother_branch: "MADRE/v44-s-hc-maint-align-01-qa-review-fixes-de-11-tareas-jean-sistema-de-pub-2026-06-14"
 tags:
   - "#sprints"
   - "#manuel"
@@ -782,3 +782,14 @@ npm run oreshnik:preflight -- --sprint S-HC-JEAN-ALIGN --operator Jean --desc "a
 | Estado | CERRADO |
 | Madre docs | `MADRE/v43-s-hc-prod-01-drift-system-2026-06-12` |
 | Descripcion | drift system |
+
+
+## Cierre S-HC-MAINT-ALIGN-01 - 2026-06-14
+
+| Campo | Valor |
+|---|---|
+| Operador | Manuel |
+| Rama | `Architect/jean-pendientes-2026-06-14-jean-tiene-11-tareas-ready-para-revision-2026-06-14` |
+| Estado | CERRADO |
+| Madre docs | `MADRE/v44-s-hc-maint-align-01-qa-review-fixes-de-11-tareas-jean-sistema-de-pub-2026-06-14` |
+| Descripcion | QA review + fixes de 11 tareas Jean, sistema de publicacion 3 modos, 24 crons Vercel Hobby compatibles, cron publisher idempotente |
