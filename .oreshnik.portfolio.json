@@ -1,0 +1,27 @@
+{
+  "version": 1,
+  "portfolio": {
+    "id": "heptacore",
+    "name": "HeptaCore Platform",
+    "sourceNote": "var/oreshnik/injection-proposal.json",
+    "continuityDocPath": "docs/obsidian-vault/00_CENTRAL_HEPTACORE.md"
+  },
+  "projects": [
+    {
+      "projectId": "heptacore",
+      "displayName": "HeptaCore",
+      "repoPath": ".",
+      "defaultBranch": "master",
+      "operators": ["Manuel", "Jean"],
+      "taskBoardPath": "var/oreshnik/task-board.json",
+      "zoneMapPath": "docs/07_handoffs/zone-map.json",
+      "validationGates": [
+        { "name": "typecheck", "command": "npm", "args": ["run", "typecheck"], "timeoutSeconds": 120 },
+        { "name": "build", "command": "npm", "args": ["run", "build"], "timeoutSeconds": 300 },
+        { "name": "worker:validate", "command": "npm", "args": ["run", "worker:validate"], "timeoutSeconds": 120 }
+      ],
+      "injectionPolicy": "direct_with_approval",
+      "priority": "critical"
+    }
+  ]
+}
