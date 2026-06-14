@@ -220,7 +220,7 @@ export function AdminConsole({ data }: { data: AdminDashboardData }) {
         <section className="status-strip">
           <StatusCard label="Tenants" value={data.totals.tenants} note="cuentas activas" onClick={() => scrollToSection("tenants-section")} />
           <StatusCard label="Drafts" value={data.totals.drafts} note="contenido total" onClick={() => scrollToSection("tenants-section")} />
-          <StatusCard label="Aprobados" value={data.totals.approved} note="listos para dry-run" onClick={() => scrollToSection("tenants-section")} />
+          <StatusCard label="Aprobados" value={data.totals.approved} note="listos para publicar" onClick={() => scrollToSection("tenants-section")} />
           <StatusCard label="Activos" value={data.totals.assets} note="assets cargados" tone="ok" onClick={() => scrollToSection("campaigns-section")} />
           <StatusCard label="Revision" value={data.totals.pendingReview} note="requieren criterio" tone="warn" onClick={() => scrollToSection("activity-section")} />
         </section>

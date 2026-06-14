@@ -1331,7 +1331,7 @@ export function DashboardConsole({
                         checked={manualApproval}
                         onChange={(event) => setManualApproval(event.target.checked)}
                       />
-                      Manuel aprueba ejecutar este {publishMode === "live" ? "intento de publicacion real" : "dry-run controlado"}.
+                      Apruebo ejecutar esta {publishMode === "live" ? "publicacion real en redes" : "prueba controlada sin publicar"}.
                     </label>
                   )}
                   {tenantAutoPilot && publishMode === "live" && (
