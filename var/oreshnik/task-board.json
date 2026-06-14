@@ -1,6 +1,6 @@
 {
   "project": "HeptaCore",
-  "updatedAt": "2026-06-14T01:54:55.325Z",
+  "updatedAt": "2026-06-14T01:59:52.693Z",
   "resiliencePolicy": "If an owner is unavailable for more than one working block or blocks the critical path, backupOwner may take over after recording reassignment.",
   "closurePolicy": "No sprint may be closed until acceptance criteria, base tests, sprint-specific tests, docs/handoff, and Oreshnik zone checks pass. See docs/obsidian-vault/METODOLOGIA/ORQUESTACION_AGENTES_HEPTACORE.md.",
   "baseTestMatrix": [
@@ -1234,7 +1234,7 @@
       "id": "en-publicacion-heptacore-muestra-cards-de-readi",
       "title": "en publicacion, heptacore muestra cards de readiness, pero los que no estan completados, por ejemplo “draft 0” o “token”, “cuenta”, “assets” si faltan, deben ser cliqueables y llevarme al sitio donde ",
       "owner": "Manuel",
-      "status": "ready",
+      "status": "done",
       "track": "S-HC",
       "zone": [],
       "acceptance": [
@@ -1247,6 +1247,13 @@
           "action": "injected",
           "operator": "architect",
           "description": "Injected from notes ingestion. Evidence: code"
+        },
+        {
+          "at": "2026-06-14T01:59:52.692Z",
+          "action": "completed",
+          "operator": "architect",
+          "branch": "Manuel/s-hc-prod-01-...",
+          "description": "Completed in sprint batch"
         }
       ]
     },
@@ -1281,7 +1288,7 @@
       "id": "para-heptacore-implementar-la-posibilidad-de-ed",
       "title": "para heptacore: Implementar la posibilidad de editar y gestionar publicaciones directamente dentro de la cola de borradores. esta mejora se hizo pero los cambios no se estan guardando. se ve cuando lo",
       "owner": "Manuel",
-      "status": "ready",
+      "status": "done",
       "track": "S-HC",
       "zone": [],
       "acceptance": [
@@ -1294,6 +1301,13 @@
           "action": "injected",
           "operator": "architect",
           "description": "Injected from notes ingestion. Evidence: code"
+        },
+        {
+          "at": "2026-06-14T01:59:52.693Z",
+          "action": "completed",
+          "operator": "architect",
+          "branch": "Manuel/s-hc-prod-01-...",
+          "description": "Completed in sprint batch"
         }
       ]
     },
@@ -1301,7 +1315,7 @@
       "id": "en-heptacore-eliminar-bloqueos-desactivar-los-b",
       "title": "en heptacore Eliminar bloqueos: Desactivar los bloqueos manuales para habilitar el flujo de publicación real hacia el entorno de producción.",
       "owner": "Manuel",
-      "status": "ready",
+      "status": "done",
       "track": "S-HC",
       "zone": [],
       "acceptance": [
@@ -1314,6 +1328,13 @@
           "action": "injected",
           "operator": "architect",
           "description": "Injected from notes ingestion. Evidence: integration"
+        },
+        {
+          "at": "2026-06-14T01:59:52.693Z",
+          "action": "completed",
+          "operator": "architect",
+          "branch": "Manuel/s-hc-prod-01-...",
+          "description": "Completed in sprint batch"
         }
       ]
     },
@@ -1321,7 +1342,7 @@
       "id": "implementar-inicio-de-heptacore-se-debe-cambia",
       "title": "Implementar inicio de heptacore : se debe cambiar la regla que impide que al entrar en la pagina en producción me lleva directamente al dashboard, creo que ocurre porque la cookie no caduca *\\*valida ",
       "owner": "Manuel",
-      "status": "ready",
+      "status": "done",
       "track": "S-HC",
       "zone": [],
       "acceptance": [
@@ -1334,6 +1355,13 @@
           "action": "injected",
           "operator": "architect",
           "description": "Injected from notes ingestion. Evidence: code"
+        },
+        {
+          "at": "2026-06-14T01:59:52.693Z",
+          "action": "completed",
+          "operator": "architect",
+          "branch": "Manuel/s-hc-prod-01-...",
+          "description": "Completed in sprint batch"
         }
       ]
     },
