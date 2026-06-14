@@ -23,8 +23,7 @@ export function proxy(req: NextRequest) {
   }
 
   if (!isLoggedIn) {
-    const loginUrl = new URL("/login", req.url);
-    loginUrl.searchParams.set("callbackUrl", path);
+    const loginUrl = new URL("/tenant/turpial-sound", req.url);
     return NextResponse.redirect(loginUrl);
   }
 

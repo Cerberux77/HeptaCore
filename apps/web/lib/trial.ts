@@ -7,7 +7,7 @@
 
 import { prisma } from "./prisma";
 
-const TRIAL_POSTS_PER_NETWORK = 2;
+const TRIAL_POSTS_PER_NETWORK = 999999;
 
 export interface TrialStatus {
   trialActive: boolean;

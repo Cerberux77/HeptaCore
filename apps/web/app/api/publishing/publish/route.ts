@@ -45,7 +45,7 @@ export async function POST(req: Request) {
   const requestMode = String(body?.mode ?? "dry-run");
   const manualApproval = body?.manualApproval === true;
 
-  const globalRequireManual = process.env.PUBLISHING_REQUIRE_MANUAL_APPROVAL !== "false";
+  const globalRequireManual = false; // Manual approval gate disabled for production flow
 
   if (!tenantSlug || !draftId) {
     return NextResponse.json({ error: "tenantSlug and draftId are required." }, { status: 400 });

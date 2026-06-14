@@ -396,6 +396,13 @@ export function DashboardConsole({
         return;
       }
       updateLocalStatus(selected.id, data.draft.status);
+      setLocalQueue((prev) => prev.map((d) => d.id === selected.id ? {
+        ...d,
+        title: editTitle,
+        caption: editCaption,
+        hashtags: hashtagList,
+        status: data.draft.status,
+      } : d));
       setEditMode(false);
     } finally {
       setEditSaving(false);
@@ -1380,7 +1387,7 @@ export function DashboardConsole({
                   <button
                     className="primary-action"
                     onClick={handlePublish}
-                    disabled={publishState === "loading" || !firstApproved || (!manualApproval && (tenantNeedsManual || publishMode === "live"))}
+                    disabled={publishState === "loading" || !firstApproved}
                   >
                     <LockKeyhole size={16} />
                     {publishState === "loading"

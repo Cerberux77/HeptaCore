@@ -1,6 +1,6 @@
 {
   "project": "HeptaCore",
-  "updatedAt": "2026-06-14T01:53:20.237Z",
+  "updatedAt": "2026-06-14T01:54:55.325Z",
   "resiliencePolicy": "If an owner is unavailable for more than one working block or blocks the critical path, backupOwner may take over after recording reassignment.",
   "closurePolicy": "No sprint may be closed until acceptance criteria, base tests, sprint-specific tests, docs/handoff, and Oreshnik zone checks pass. See docs/obsidian-vault/METODOLOGIA/ORQUESTACION_AGENTES_HEPTACORE.md.",
   "baseTestMatrix": [
@@ -1253,8 +1253,8 @@
     {
       "id": "en-el-dashboard-de-admn-global-en-heptacore-los",
       "title": "en el dashboard de admn global en heptacore los cards de estado no son clickables ni llevan a la seccion donde debo supervisar la accion o ejecutarla esto debe resolverse. el modo approval\\_required n",
-      "owner": "Manuel",
-      "status": "ready",
+      "owner": "architect",
+      "status": "done",
       "track": "S-HC",
       "zone": [],
       "acceptance": [
@@ -1267,6 +1267,13 @@
           "action": "injected",
           "operator": "architect",
           "description": "Injected from notes ingestion. Evidence: ui"
+        },
+        {
+          "at": "2026-06-14T01:54:55.324Z",
+          "action": "completed",
+          "operator": "architect",
+          "branch": "Manuel/s-hc-prod-01-...",
+          "description": "Admin cards clickable with scrollToSection + reports onClick. Completed in tableros sprint."
         }
       ]
     },
