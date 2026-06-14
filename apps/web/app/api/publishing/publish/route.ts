@@ -223,15 +223,40 @@ export async function POST(req: Request) {
     }, { status: 409 });
   }
 
+  const oauthConnection = await prisma.oAuthConnection.findFirst({
+    where: {
+      tenantId: tenant.id,
+      provider: "INSTAGRAM",
+      status: "connected",
+      socialAccountId: socialAccount.id,
+      tokenRef: { not: null },
+    },
+    orderBy: { updatedAt: "desc" },
+    select: { id: true, tokenRef: true, expiresAt: true, updatedAt: true, socialAccountId: true },
+  });
+  if (!oauthConnection || !oauthConnection.tokenRef) {
+    return NextResponse.json({
+      code: "LIVE_BLOCKED_NO_CREDENTIAL",
+      error: "No active Instagram OAuth connection found. Reconnect via OAuth.",
+      action: "Reconectar Instagram desde Settings.",
+    }, { status: 409 });
+  }
+  if (oauthConnection.expiresAt && oauthConnection.expiresAt < now) {
+    return NextResponse.json({
+      code: "LIVE_BLOCKED_NO_CREDENTIAL",
+      error: "Instagram OAuth connection is expired. Reconnect via OAuth.",
+      action: "Reconectar Instagram desde Settings.",
+    }, { status: 409 });
+  }
+
   const credential = await prisma.credentialVaultItem.findFirst({
-    where: { tenantId: tenant.id, provider: "INSTAGRAM", label: "instagram_oauth" },
+    where: { id: oauthConnection.tokenRef, tenantId: tenant.id, provider: "INSTAGRAM", label: "instagram_oauth" },
     select: { id: true, encryptedBlob: true, expiresAt: true },
-    orderBy: { createdAt: "desc" },
   });
   if (!credential || (credential.expiresAt && credential.expiresAt < now)) {
     return NextResponse.json({
       code: "LIVE_BLOCKED_NO_CREDENTIAL",
-      error: "No valid Instagram credential found. Reconnect via OAuth.",
+      error: "No valid Instagram credential found for the active OAuth connection. Reconnect via OAuth.",
       action: "Reconectar Instagram desde Settings.",
     }, { status: 409 });
   }
