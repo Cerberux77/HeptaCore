@@ -1,6 +1,6 @@
 {
   "project": "HeptaCore",
-  "updatedAt": "2026-06-14T01:09:46.254Z",
+  "updatedAt": "2026-06-14T01:53:20.237Z",
   "resiliencePolicy": "If an owner is unavailable for more than one working block or blocks the critical path, backupOwner may take over after recording reassignment.",
   "closurePolicy": "No sprint may be closed until acceptance criteria, base tests, sprint-specific tests, docs/handoff, and Oreshnik zone checks pass. See docs/obsidian-vault/METODOLOGIA/ORQUESTACION_AGENTES_HEPTACORE.md.",
   "baseTestMatrix": [
@@ -1388,7 +1388,7 @@
       "id": "el-modal-de-admin-llm-en-heptacore-debe-tener-un",
       "title": "el modal de admin llm en heptacore debe tener un boton que permita simular el costo aproximado de la creacion de una estrategia, debe leer los datos cargados del tenant, analizar el producto, y estima",
       "owner": "architect",
-      "status": "ready",
+      "status": "done",
       "track": "S-HC",
       "zone": [],
       "acceptance": [
@@ -1401,6 +1401,13 @@
           "action": "injected",
           "operator": "architect",
           "description": "Injected from notes ingestion. Evidence: ui"
+        },
+        {
+          "at": "2026-06-14T01:53:20.236Z",
+          "action": "completed",
+          "operator": "architect",
+          "branch": "Manuel/s-hc-prod-01-producto-operativo-tenant-admin-produccion-2026-06-09",
+          "description": "Cost simulator button in admin LLM modal with model rate lookup"
         }
       ]
     },
