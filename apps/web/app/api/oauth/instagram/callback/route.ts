@@ -95,11 +95,6 @@ export async function GET(req: NextRequest) {
         },
       });
 
-      const existingAccount = await tx.socialAccount.findFirst({
-        where: { tenantId: tenant.id, network: "INSTAGRAM" },
-        select: { id: true },
-      });
-
       const scopes = [
         "instagram_business_basic",
         "instagram_business_manage_messages",
@@ -109,28 +104,68 @@ export async function GET(req: NextRequest) {
 
       let socialAccountId: string;
 
-      if (existingAccount) {
-        await tx.socialAccount.update({
-          where: { id: existingAccount.id },
-          data: {
-            status: "connected",
-            externalAccountId: userId,
-            scopes,
-            updatedAt: new Date(),
-          },
+      if (userId) {
+        const exact = await tx.socialAccount.findFirst({
+          where: { tenantId: tenant.id, network: "INSTAGRAM", externalAccountId: userId },
+          select: { id: true },
         });
-        socialAccountId = existingAccount.id;
+
+        if (exact) {
+          await tx.socialAccount.update({
+            where: { id: exact.id },
+            data: { status: "connected", scopes, updatedAt: new Date() },
+          });
+          socialAccountId = exact.id;
+        } else {
+          const fallback = await tx.socialAccount.findFirst({
+            where: { tenantId: tenant.id, network: "INSTAGRAM", externalAccountId: null },
+            select: { id: true },
+            orderBy: { createdAt: "desc" },
+          });
+
+          if (fallback) {
+            await tx.socialAccount.update({
+              where: { id: fallback.id },
+              data: { status: "connected", externalAccountId: userId, scopes, updatedAt: new Date() },
+            });
+            socialAccountId = fallback.id;
+          } else {
+            const created = await tx.socialAccount.create({
+              data: {
+                tenantId: tenant.id,
+                network: "INSTAGRAM",
+                status: "connected",
+                externalAccountId: userId,
+                scopes,
+              },
+            });
+            socialAccountId = created.id;
+          }
+        }
       } else {
-        const created = await tx.socialAccount.create({
-          data: {
-            tenantId: tenant.id,
-            network: "INSTAGRAM",
-            status: "connected",
-            externalAccountId: userId,
-            scopes,
-          },
+        const fallback = await tx.socialAccount.findFirst({
+          where: { tenantId: tenant.id, network: "INSTAGRAM", externalAccountId: null },
+          select: { id: true },
+          orderBy: { createdAt: "desc" },
         });
-        socialAccountId = created.id;
+
+        if (fallback) {
+          await tx.socialAccount.update({
+            where: { id: fallback.id },
+            data: { status: "connected", scopes, updatedAt: new Date() },
+          });
+          socialAccountId = fallback.id;
+        } else {
+          const created = await tx.socialAccount.create({
+            data: {
+              tenantId: tenant.id,
+              network: "INSTAGRAM",
+              status: "connected",
+              scopes,
+            },
+          });
+          socialAccountId = created.id;
+        }
       }
 
       const existingOAuth = await tx.oAuthConnection.findFirst({
