@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-import path from "node:path";
 import { prisma } from "../../../../lib/prisma";
 import { auditLog } from "../../../../lib/audit";
 import { decryptJson } from "../../../../lib/token-vault";
@@ -35,13 +34,19 @@ type PublishOutcome =
   | { kind: "blocked"; reason: string }
   | { kind: "attempted"; error: string };
 
-function resolveAssetFileName(asset: { storageKey?: string | null; sourcePath?: string | null; filename: string }): string {
-  if (asset.storageKey) return path.basename(asset.storageKey);
-  if (asset.sourcePath) return path.basename(asset.sourcePath);
-  return asset.filename;
+function resolveAssetPath(asset: { storageKey?: string | null; sourcePath?: string | null; filename: string }): string | null {
+  const raw = asset.storageKey || asset.sourcePath || asset.filename;
+  if (!raw) return null;
+  const normalized = raw.replace(/\\/g, "/").replace(/^\/+/, "");
+  if (normalized.includes("..")) return null;
+  return normalized;
 }
 
-function buildPublicAssetUrl(tenantSlug: string, assetFileName: string): string | null {
+function tenantAssetSlug(tenantSlug: string): string {
+  return tenantSlug === "turpial-sound" ? "turpial" : tenantSlug;
+}
+
+function buildPublicAssetUrl(tenantSlug: string, assetPath: string): string | null {
   const base =
     process.env.APP_PUBLIC_URL ||
     process.env.NEXT_PUBLIC_APP_URL ||
@@ -62,7 +67,9 @@ function buildPublicAssetUrl(tenantSlug: string, assetFileName: string): string 
     origin = `https://${base}`;
   }
 
-  return `${origin}/api/tenant-assets/${encodeURIComponent(tenantSlug)}/${encodeURIComponent(assetFileName)}`;
+  const folder = tenantAssetSlug(tenantSlug);
+  const encodedPath = assetPath.split("/").map((s) => encodeURIComponent(s)).join("/");
+  return `${origin}/tenant-assets/${folder}/${encodedPath}`;
 }
 
 async function tryRealPublish(job: JobRecord): Promise<PublishOutcome> {
@@ -84,7 +91,10 @@ async function tryRealPublish(job: JobRecord): Promise<PublishOutcome> {
   }
 
   const primaryAsset = draft.assets.find((a) => a.role === "primary") ?? draft.assets[0];
-  const assetFileName = resolveAssetFileName(primaryAsset.asset);
+  const assetPath = resolveAssetPath(primaryAsset.asset);
+  if (!assetPath) {
+    return { kind: "blocked", reason: "Cannot resolve asset path. Ensure storageKey or sourcePath is set." };
+  }
 
   let tenantSlug = job.tenant?.slug;
   if (!tenantSlug) {
@@ -98,7 +108,7 @@ async function tryRealPublish(job: JobRecord): Promise<PublishOutcome> {
     return { kind: "blocked", reason: "Tenant slug not found." };
   }
 
-  const mediaUrl = buildPublicAssetUrl(tenantSlug, assetFileName);
+  const mediaUrl = buildPublicAssetUrl(tenantSlug, assetPath);
   if (!mediaUrl) {
     return { kind: "blocked", reason: "Cannot construct public HTTPS asset URL. Set APP_PUBLIC_URL or NEXT_PUBLIC_APP_URL." };
   }

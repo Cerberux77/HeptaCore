@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-import path from "node:path";
 import { auth } from "../../../../lib/auth";
 import { auditLog } from "../../../../lib/audit";
 import { prisma } from "../../../../lib/prisma";
@@ -36,13 +35,19 @@ function checkScopes(required: string[], actual: string[]): string[] {
   );
 }
 
-function resolveAssetFileName(asset: { storageKey?: string | null; sourcePath?: string | null; filename: string }): string {
-  if (asset.storageKey) return path.basename(asset.storageKey);
-  if (asset.sourcePath) return path.basename(asset.sourcePath);
-  return asset.filename;
+function resolveAssetPath(asset: { storageKey?: string | null; sourcePath?: string | null; filename: string }): string | null {
+  const raw = asset.storageKey || asset.sourcePath || asset.filename;
+  if (!raw) return null;
+  const normalized = raw.replace(/\\/g, "/").replace(/^\/+/, "");
+  if (normalized.includes("..")) return null;
+  return normalized;
 }
 
-function buildPublicAssetUrl(tenantSlug: string, assetFileName: string): string | null {
+function tenantAssetSlug(tenantSlug: string): string {
+  return tenantSlug === "turpial-sound" ? "turpial" : tenantSlug;
+}
+
+function buildPublicAssetUrl(tenantSlug: string, assetPath: string): string | null {
   const base =
     process.env.APP_PUBLIC_URL ||
     process.env.NEXT_PUBLIC_APP_URL ||
@@ -63,7 +68,9 @@ function buildPublicAssetUrl(tenantSlug: string, assetFileName: string): string 
     origin = `https://${base}`;
   }
 
-  return `${origin}/api/tenant-assets/${encodeURIComponent(tenantSlug)}/${encodeURIComponent(assetFileName)}`;
+  const folder = tenantAssetSlug(tenantSlug);
+  const encodedPath = assetPath.split("/").map((s) => encodeURIComponent(s)).join("/");
+  return `${origin}/tenant-assets/${folder}/${encodedPath}`;
 }
 
 export async function POST(req: Request) {
@@ -250,8 +257,15 @@ export async function POST(req: Request) {
 
   // Gate: public asset URL
   const primaryAsset = draft.assets.find((a) => a.role === "primary") ?? draft.assets[0];
-  const assetFileName = resolveAssetFileName(primaryAsset.asset);
-  const mediaUrl = buildPublicAssetUrl(tenantSlug, assetFileName);
+  const assetPath = resolveAssetPath(primaryAsset.asset);
+  if (!assetPath) {
+    return NextResponse.json({
+      code: "LIVE_BLOCKED_ASSET_NOT_PUBLIC",
+      error: "Instagram live publishing requires a public HTTPS asset URL.",
+      action: "Sube un asset con URL pública o configura APP_PUBLIC_URL/NEXT_PUBLIC_APP_URL.",
+    }, { status: 409 });
+  }
+  const mediaUrl = buildPublicAssetUrl(tenantSlug, assetPath);
 
   if (!mediaUrl) {
     return NextResponse.json({
