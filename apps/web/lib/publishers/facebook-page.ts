@@ -68,7 +68,19 @@ async function publishToFacebookPage(input: PublishInput): Promise<PublishResult
       throw new Error(`Facebook page video publish failed: ${formatMetaError(json, res.status)}`);
     }
 
-    return { externalPostId: json.id as string, providerResponse: { video: true, status: res.status } };
+    const videoId = json.id as string;
+    const postId = json.post_id as string | undefined;
+    const externalPostId = postId || videoId;
+
+    return {
+      externalPostId,
+      providerResponse: {
+        type: "video",
+        status: res.status,
+        postId: postId ?? null,
+        videoId,
+      },
+    };
   }
 
   // Image post to /photos
@@ -90,7 +102,19 @@ async function publishToFacebookPage(input: PublishInput): Promise<PublishResult
     throw new Error(`Facebook page photo publish failed: ${formatMetaError(json, res.status)}`);
   }
 
-  return { externalPostId: json.id as string, providerResponse: { photo: true, status: res.status } };
+  const photoId = json.id as string;
+  const postId = json.post_id as string | undefined;
+  const externalPostId = postId || photoId;
+
+  return {
+    externalPostId,
+    providerResponse: {
+      type: "photo",
+      status: res.status,
+      postId: postId ?? null,
+      photoId,
+    },
+  };
 }
 
 export const facebookPagePublisher: Publisher = {
