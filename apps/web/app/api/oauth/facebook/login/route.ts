@@ -32,7 +32,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "Missing tenant parameter", ok: false }, { status: 400 });
   }
 
-  const clientId = process.env.FACEBOOK_CLIENT_ID || process.env.META_APP_ID;
+  const clientId = process.env.FACEBOOK_CLIENT_ID;
   if (!clientId) {
     return NextResponse.json({ error: "Facebook OAuth not configured", ok: false }, { status: 500 });
   }

@@ -65,9 +65,9 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "Missing tenant slug in state parameter", ok: false }, { status: 400 });
   }
 
-  const clientId = process.env.FACEBOOK_CLIENT_ID || process.env.META_APP_ID;
-  const clientSecret = process.env.FACEBOOK_CLIENT_SECRET || process.env.META_APP_SECRET;
-  const envPageId = process.env.FACEBOOK_PAGE_ID || process.env.META_PAGE_ID || undefined;
+  const clientId = process.env.FACEBOOK_CLIENT_ID;
+  const clientSecret = process.env.FACEBOOK_CLIENT_SECRET;
+  const envPageId = process.env.FACEBOOK_PAGE_ID || undefined;
 
   if (!clientId || !clientSecret) {
     return NextResponse.json({ error: "Facebook OAuth not configured", ok: false }, { status: 500 });
@@ -205,6 +205,48 @@ export async function GET(req: NextRequest) {
   // We don't use the long user token — only the page token
   const pageAccessToken = selectedPage.access_token;
 
+  // Step 5: validate page token via debug_token
+  const requiredScopes = ["pages_show_list", "pages_read_engagement", "pages_manage_posts"];
+
+  try {
+    const debugUrl = new URL("https://graph.facebook.com/v25.0/debug_token");
+    debugUrl.searchParams.set("input_token", pageAccessToken);
+    debugUrl.searchParams.set("access_token", `${clientId}|${clientSecret}`);
+
+    const debugRes = await fetch(debugUrl.toString());
+    const debugJson = await debugRes.json();
+    const debugData = (debugJson as Record<string, unknown>)?.data as Record<string, unknown> | undefined;
+
+    if (!debugRes.ok || !debugData || debugData.is_valid !== true) {
+      const msg = formatOAuthError(debugJson, debugRes.status);
+      console.error("[facebook_callback_debug_token_failed]", { status: debugRes.status, error: msg });
+      return NextResponse.json({
+        ok: false,
+        code: "FACEBOOK_PAGE_TOKEN_INVALID",
+        error: "Page access token validation failed. The token is not valid.",
+        action: "Reconnect your Facebook account.",
+      }, { status: 409 });
+    }
+
+    const grantedScopes: string[] = Array.isArray(debugData.scopes) ? (debugData.scopes as string[]) : [];
+    const missingScopes = requiredScopes.filter((s) => !grantedScopes.includes(s));
+
+    if (missingScopes.length > 0) {
+      console.error("[facebook_callback_scopes_missing]", { missingScopes, grantedScopes });
+      return NextResponse.json({
+        ok: false,
+        code: "FACEBOOK_REQUIRED_SCOPES_MISSING",
+        error: `Missing required scopes: ${missingScopes.join(", ")}.`,
+        missingScopes,
+        grantedScopes,
+        action: "Reconnect Facebook with the correct permissions.",
+      }, { status: 409 });
+    }
+  } catch (err) {
+    console.error("[facebook_callback_debug_token_error]", { message: err instanceof Error ? err.message : "unknown" });
+    return NextResponse.json({ ok: false, error: "Failed to validate page token. Please try again." }, { status: 502 });
+  }
+
   // Calculate expiresAt
   const expiresAt = userExpiresIn
     ? new Date(Date.now() + userExpiresIn * 1000)
@@ -224,7 +266,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "Credential encryption failed", ok: false }, { status: 500 });
   }
 
-  const scopes = ["pages_show_list", "pages_read_engagement", "pages_manage_posts"];
+  const scopes = requiredScopes;
 
   try {
     await prisma.$transaction(async (tx) => {
