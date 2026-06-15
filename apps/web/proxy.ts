@@ -10,6 +10,9 @@ function isPublicPath(path: string): boolean {
   if (path === "/admin") return true;
   if (path === "/icon.svg") return true;
   if (path === "/favicon.ico") return true;
+  if (path === "/privacy") return true;
+  if (path === "/terms") return true;
+  if (path === "/data-deletion") return true;
   if (path === "/api/assistant") return true;
   if (path.startsWith("/brand/")) return true;
   if (path.startsWith("/_next/")) return true;
