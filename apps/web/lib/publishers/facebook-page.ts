@@ -97,6 +97,6 @@ export const facebookPagePublisher: Publisher = {
   network: "FACEBOOK",
   capabilities,
   credentialLabel: "facebook_page_oauth",
-  requiredScopes: ["pages_manage_posts", "pages_read_engagement"],
+  requiredScopes: ["pages_show_list", "pages_read_engagement", "pages_manage_posts"],
   publish: publishToFacebookPage,
 };
