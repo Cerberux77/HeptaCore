@@ -31,8 +31,24 @@ export async function publishInstagramMedia(
   const apiVersion = process.env.INSTAGRAM_GRAPH_API_VERSION || "v25.0";
   const baseUrl = `https://graph.instagram.com/${apiVersion}`;
 
+  // Identity check via /me — resolves the authenticated user, not a stored ID
+  const meRes = await fetch(`${baseUrl}/me?fields=id,username,account_type,media_count&access_token=${encodeURIComponent(accessToken)}`);
+
+  const meJson = await meRes.json();
+
+  if (!meRes.ok || !meJson.id) {
+    throw new Error(`Instagram identity check failed: ${formatMetaError(meJson, meRes.status)}`);
+  }
+
+  const authenticatedUserId = meJson.id as string;
+  const username = meJson.username as string | undefined;
+  const accountType = meJson.account_type as string | undefined;
+  const mediaCount = meJson.media_count as number | undefined;
+  const storedIdMismatch = igUserId !== authenticatedUserId;
+
   const isVideo = mediaType === "VIDEO";
 
+  // Create media container via /me/media
   const createParams = new URLSearchParams();
   createParams.append("caption", caption);
   createParams.append("access_token", accessToken);
@@ -44,7 +60,7 @@ export async function publishInstagramMedia(
     createParams.append("image_url", mediaUrl);
   }
 
-  const createRes = await fetch(`${baseUrl}/${igUserId}/media`, {
+  const createRes = await fetch(`${baseUrl}/me/media`, {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
     body: createParams.toString(),
@@ -58,11 +74,12 @@ export async function publishInstagramMedia(
 
   const containerId = createJson.id as string;
 
+  // Publish via /me/media_publish
   const publishParams = new URLSearchParams();
   publishParams.append("creation_id", containerId);
   publishParams.append("access_token", accessToken);
 
-  const publishRes = await fetch(`${baseUrl}/${igUserId}/media_publish`, {
+  const publishRes = await fetch(`${baseUrl}/me/media_publish`, {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
     body: publishParams.toString(),
@@ -76,6 +93,14 @@ export async function publishInstagramMedia(
 
   return {
     externalPostId: publishJson.id as string,
-    providerResponse: { containerId, status: publishRes.status },
+    providerResponse: {
+      authenticatedUserId,
+      username,
+      accountType,
+      mediaCount,
+      storedIdMismatch,
+      containerId,
+      status: publishRes.status,
+    },
   };
 }
