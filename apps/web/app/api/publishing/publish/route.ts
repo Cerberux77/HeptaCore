@@ -4,30 +4,13 @@ import { auditLog } from "../../../../lib/audit";
 import { prisma } from "../../../../lib/prisma";
 import { TRIAL_POSTS_PER_NETWORK } from "../../../../lib/trial";
 import { decryptJson } from "../../../../lib/token-vault";
-import { publishInstagramMedia } from "../../../../lib/instagram-publisher";
+import { getPublisher, PublishInput } from "../../../../lib/publishers";
 
 export const dynamic = "force-dynamic";
 
 const PUBLISH_ROLES = ["OWNER", "ADMIN", "APPROVER", "PUBLISHER", "SUPER_ADMIN", "TENANT_ADMIN"];
 
 type PublishMode = "dry_run" | "scheduled" | "immediate";
-
-function requiredScopesForNetwork(network: string) {
-  switch (network) {
-    case "INSTAGRAM":
-      return ["instagram_business_content_publish"];
-    case "FACEBOOK":
-      return ["pages_manage_posts"];
-    case "YOUTUBE":
-      return ["youtube.upload"];
-    case "TIKTOK":
-      return ["video.publish"];
-    case "LINKEDIN":
-      return ["w_member_social"];
-    default:
-      return ["publish"];
-  }
-}
 
 function checkScopes(required: string[], actual: string[]): string[] {
   return required.filter(
@@ -127,11 +110,9 @@ export async function POST(req: Request) {
   if (draft.status !== "APPROVED") {
     return NextResponse.json({ error: `Draft must be APPROVED. Current status: ${draft.status}.` }, { status: 409 });
   }
-  if (draft.assets.length === 0) {
-    return NextResponse.json({ error: "Draft has no linked assets." }, { status: 409 });
-  }
 
   const now = new Date();
+  const network = draft.network;
 
   if (requestMode === "scheduled") {
     const scheduledFor = scheduledAt ?? draft.scheduledFor ?? new Date(Date.now() + 3600000);
@@ -147,7 +128,7 @@ export async function POST(req: Request) {
         id: jobId,
         tenantId: tenant.id,
         postId: draft.id,
-        provider: draft.network as any,
+        provider: network as any,
         status: "SCHEDULED",
         scheduledFor,
         updatedAt: new Date(),
@@ -162,7 +143,7 @@ export async function POST(req: Request) {
       metadata: {
         tenant: tenant.name,
         title: draft.title,
-        network: draft.network,
+        network,
         format: draft.format,
         scheduledFor: scheduledFor.toISOString(),
         jobId,
@@ -182,25 +163,33 @@ export async function POST(req: Request) {
 
   // === GATES: provider, account, credential, asset, token ===
 
-  if (draft.network !== "INSTAGRAM") {
+  const publisher = getPublisher(network);
+  if (!publisher) {
     return NextResponse.json({
       code: "LIVE_PROVIDER_NOT_IMPLEMENTED",
-      error: `Live publishing for ${draft.network} is not yet implemented. Only INSTAGRAM is supported.`,
+      error: `Live publishing for ${network} is not yet implemented.`,
     }, { status: 501 });
   }
 
+  // Asset gate (skip for text-only capable publishers with no assets)
+  const needsAsset = !publisher.capabilities.textOnly || draft.assets.length > 0;
+  if (needsAsset && draft.assets.length === 0) {
+    return NextResponse.json({ error: "Draft has no linked assets." }, { status: 409 });
+  }
+
+  // SocialAccount gate
   let socialAccount: { id: string; status: string; scopes: string[]; externalAccountId: string | null } | null = null;
 
   if (draft.socialAccountId) {
     socialAccount = await prisma.socialAccount.findFirst({
-      where: { id: draft.socialAccountId, tenantId: tenant.id, network: "INSTAGRAM", status: "connected" },
+      where: { id: draft.socialAccountId, tenantId: tenant.id, network: network as any, status: "connected" },
       select: { id: true, status: true, scopes: true, externalAccountId: true },
     });
   }
 
   if (!socialAccount) {
     socialAccount = await prisma.socialAccount.findFirst({
-      where: { tenantId: tenant.id, network: "INSTAGRAM", status: "connected" },
+      where: { tenantId: tenant.id, network: network as any, status: "connected" },
       select: { id: true, status: true, scopes: true, externalAccountId: true },
       orderBy: { updatedAt: "desc" },
     });
@@ -209,24 +198,25 @@ export async function POST(req: Request) {
   if (!socialAccount) {
     return NextResponse.json({
       code: "LIVE_BLOCKED_NO_SOCIAL_ACCOUNT",
-      error: "No connected Instagram account. Connect via Settings > Social Accounts.",
-      action: "Conectar cuenta de Instagram desde Settings.",
+      error: `No connected ${network} account. Connect via Settings.`,
+      action: `Conectar cuenta ${network} desde Settings.`,
     }, { status: 409 });
   }
 
-  const missingScopes = checkScopes(requiredScopesForNetwork("INSTAGRAM"), socialAccount.scopes);
+  const missingScopes = checkScopes(publisher.requiredScopes, socialAccount.scopes);
   if (missingScopes.length > 0) {
     return NextResponse.json({
       code: "LIVE_BLOCKED_MISSING_SCOPES",
-      error: `Instagram account is missing required scopes: ${missingScopes.join(", ")}.`,
+      error: `${network} account is missing required scopes: ${missingScopes.join(", ")}.`,
       action: "Reconectar la cuenta con los permisos correctos.",
     }, { status: 409 });
   }
 
+  // OAuthConnection gate
   const oauthConnection = await prisma.oAuthConnection.findFirst({
     where: {
       tenantId: tenant.id,
-      provider: "INSTAGRAM",
+      provider: network as any,
       status: "connected",
       socialAccountId: socialAccount.id,
       tokenRef: { not: null },
@@ -237,60 +227,72 @@ export async function POST(req: Request) {
   if (!oauthConnection || !oauthConnection.tokenRef) {
     return NextResponse.json({
       code: "LIVE_BLOCKED_NO_CREDENTIAL",
-      error: "No active Instagram OAuth connection found. Reconnect via OAuth.",
-      action: "Reconectar Instagram desde Settings.",
+      error: `No active ${network} OAuth connection found. Reconnect via OAuth.`,
+      action: `Reconectar ${network} desde Settings.`,
     }, { status: 409 });
   }
   if (oauthConnection.expiresAt && oauthConnection.expiresAt < now) {
     return NextResponse.json({
       code: "LIVE_BLOCKED_NO_CREDENTIAL",
-      error: "Instagram OAuth connection is expired. Reconnect via OAuth.",
-      action: "Reconectar Instagram desde Settings.",
+      error: `${network} OAuth connection is expired. Reconnect via OAuth.`,
+      action: `Reconectar ${network} desde Settings.`,
     }, { status: 409 });
   }
 
+  // CredentialVaultItem gate
   const credential = await prisma.credentialVaultItem.findFirst({
-    where: { id: oauthConnection.tokenRef, tenantId: tenant.id, provider: "INSTAGRAM", label: "instagram_oauth" },
+    where: { id: oauthConnection.tokenRef, tenantId: tenant.id, provider: network as any, label: publisher.credentialLabel },
     select: { id: true, encryptedBlob: true, expiresAt: true },
   });
   if (!credential || (credential.expiresAt && credential.expiresAt < now)) {
     return NextResponse.json({
       code: "LIVE_BLOCKED_NO_CREDENTIAL",
-      error: "No valid Instagram credential found for the active OAuth connection. Reconnect via OAuth.",
-      action: "Reconectar Instagram desde Settings.",
+      error: `No valid ${network} credential found for the active OAuth connection. Reconnect via OAuth.`,
+      action: `Reconectar ${network} desde Settings.`,
     }, { status: 409 });
   }
 
-  const publishedOnInstagram = await prisma.contentDraft.count({
-    where: { tenantId: tenant.id, network: "INSTAGRAM", status: "PUBLISHED" },
+  // Trial limit gate
+  const publishedOnNetwork = await prisma.contentDraft.count({
+    where: { tenantId: tenant.id, network: network as any, status: "PUBLISHED" },
   });
-  if (publishedOnInstagram >= TRIAL_POSTS_PER_NETWORK) {
+  if (publishedOnNetwork >= TRIAL_POSTS_PER_NETWORK) {
     return NextResponse.json({
       code: "LIVE_BLOCKED_TRIAL_LIMIT",
-      error: `Trial limit reached: ${publishedOnInstagram}/${TRIAL_POSTS_PER_NETWORK} posts published on Instagram.`,
+      error: `Trial limit reached: ${publishedOnNetwork}/${TRIAL_POSTS_PER_NETWORK} posts published on ${network}.`,
       action: "Actualizar plan para desbloquear publicaciones.",
     }, { status: 409 });
   }
 
-  const primaryAsset = draft.assets.find((a) => a.role === "primary") ?? draft.assets[0];
-  const assetPath = resolveAssetPath(primaryAsset.asset);
-  if (!assetPath) {
-    return NextResponse.json({
-      code: "LIVE_BLOCKED_ASSET_NOT_PUBLIC",
-      error: "Instagram live publishing requires a public HTTPS asset URL.",
-      action: "Sube un asset con URL pública o configura APP_PUBLIC_URL/NEXT_PUBLIC_APP_URL.",
-    }, { status: 409 });
-  }
-  const mediaUrl = buildPublicAssetUrl(tenantSlug, assetPath);
+  // Asset URL gate (only if asset is needed)
+  let mediaUrl: string | undefined | null;
+  let mediaType: "IMAGE" | "VIDEO" | undefined;
+  const primaryAsset = needsAsset ? (draft.assets.find((a) => a.role === "primary") ?? draft.assets[0]) : null;
 
-  if (!mediaUrl) {
-    return NextResponse.json({
-      code: "LIVE_BLOCKED_ASSET_NOT_PUBLIC",
-      error: "Instagram live publishing requires a public HTTPS asset URL.",
-      action: "Sube un asset con URL pública o configura APP_PUBLIC_URL/NEXT_PUBLIC_APP_URL.",
-    }, { status: 409 });
+  if (primaryAsset) {
+    const assetPath = resolveAssetPath(primaryAsset.asset);
+    if (!assetPath) {
+      return NextResponse.json({
+        code: "LIVE_BLOCKED_ASSET_NOT_PUBLIC",
+        error: "Live publishing requires a public HTTPS asset URL.",
+        action: "Sube un asset con URL pública o configura APP_PUBLIC_URL/NEXT_PUBLIC_APP_URL.",
+      }, { status: 409 });
+    }
+    mediaUrl = buildPublicAssetUrl(tenantSlug, assetPath);
+
+    if (!mediaUrl) {
+      return NextResponse.json({
+        code: "LIVE_BLOCKED_ASSET_NOT_PUBLIC",
+        error: "Live publishing requires a public HTTPS asset URL.",
+        action: "Sube un asset con URL pública o configura APP_PUBLIC_URL/NEXT_PUBLIC_APP_URL.",
+      }, { status: 409 });
+    }
+
+    const isVideo = primaryAsset.asset.kind === "VIDEO";
+    mediaType = isVideo ? "VIDEO" : "IMAGE";
   }
 
+  // Decrypt token
   let accessToken: string;
   try {
     const decrypted = decryptJson<{ access_token: string }>(credential.encryptedBlob);
@@ -299,24 +301,22 @@ export async function POST(req: Request) {
   } catch {
     return NextResponse.json({
       code: "LIVE_BLOCKED_DECRYPT_FAILED",
-      error: "Failed to decrypt Instagram credential. Reconnect via OAuth.",
-      action: "Reconectar Instagram desde Settings.",
+      error: `Failed to decrypt ${network} credential. Reconnect via OAuth.`,
+      action: `Reconectar ${network} desde Settings.`,
     }, { status: 409 });
   }
 
-  const igUserId = socialAccount.externalAccountId;
-  if (!igUserId) {
+  // Target ID
+  const targetId = socialAccount.externalAccountId;
+  if (!targetId) {
     return NextResponse.json({
-      code: "LIVE_BLOCKED_NO_IG_USER_ID",
-      error: "Instagram account is missing external account ID. Reconnect via OAuth.",
-      action: "Reconectar Instagram desde Settings.",
+      code: "LIVE_BLOCKED_NO_TARGET_ID",
+      error: `${network} account is missing external account ID. Reconnect via OAuth.`,
+      action: `Reconectar ${network} desde Settings.`,
     }, { status: 409 });
   }
 
-  const isVideo = primaryAsset.asset.kind === "VIDEO";
-  const mediaType = isVideo ? "VIDEO" as const : "IMAGE" as const;
-
-  // === DRY RUN: preflight passed, no Meta call ===
+  // === DRY RUN: preflight passed, no provider call ===
 
   if (requestMode === "dry_run") {
     await auditLog({
@@ -327,11 +327,12 @@ export async function POST(req: Request) {
       metadata: {
         tenant: tenant.name,
         title: draft.title,
-        network: draft.network,
+        network,
         format: draft.format,
-        mediaUrl,
-        mediaType,
-        igUserId,
+        mediaUrl: mediaUrl ?? null,
+        mediaType: mediaType ?? null,
+        targetId,
+        capabilities: publisher.capabilities,
         tenantAutomationMode: tenant.automationMode,
       },
     });
@@ -341,25 +342,28 @@ export async function POST(req: Request) {
       mode: "dry_run",
       message: "Technical preflight passed. No provider call executed.",
       draftId: draft.id,
-      mediaUrl,
-      mediaType,
-      igUserId,
+      mediaUrl: mediaUrl ?? null,
+      mediaType: mediaType ?? null,
+      targetId,
+      capabilities: publisher.capabilities,
       tenantAutomationMode: tenant.automationMode,
     });
   }
 
-  // === IMMEDIATE: attempt real publish to Meta ===
+  // === IMMEDIATE: attempt real publish ===
+  const publishInput: PublishInput = {
+    targetId,
+    accessToken,
+    mediaUrl,
+    caption: draft.caption || draft.title,
+    mediaType,
+  };
+
   let publishResult: { externalPostId: string; providerResponse: unknown };
   try {
-    publishResult = await publishInstagramMedia({
-      igUserId,
-      accessToken,
-      mediaUrl,
-      caption: draft.caption || draft.title,
-      mediaType,
-    });
+    publishResult = await publisher.publish(publishInput);
   } catch (err) {
-    const errorMsg = err instanceof Error ? err.message : "Instagram publish failed";
+    const errorMsg = err instanceof Error ? err.message : `${network} publish failed`;
 
     const jobId = `pj_${draft.id}_${Date.now().toString(36)}`;
     await prisma.publishingJob.create({
@@ -367,7 +371,7 @@ export async function POST(req: Request) {
         id: jobId,
         tenantId: tenant.id,
         postId: draft.id,
-        provider: draft.network as any,
+        provider: network as any,
         status: "FAILED",
         scheduledFor: null,
         attempts: 1,
@@ -380,7 +384,7 @@ export async function POST(req: Request) {
       data: {
         id: `pr_${jobId}`,
         jobId,
-        provider: "INSTAGRAM",
+        provider: network as any,
         ok: false,
         response: { error: errorMsg },
       },
@@ -394,7 +398,7 @@ export async function POST(req: Request) {
       metadata: {
         tenant: tenant.name,
         title: draft.title,
-        network: draft.network,
+        network,
         format: draft.format,
         error: errorMsg.slice(0, 500),
       },
@@ -404,13 +408,13 @@ export async function POST(req: Request) {
       ok: false,
       mode: "immediate",
       code: "LIVE_PUBLISH_FAILED",
-      error: `Instagram publish failed: ${errorMsg}`,
+      error: `${network} publish failed: ${errorMsg}`,
       action: "Revisa la configuración, credenciales y URL del asset.",
       draftId: draft.id,
     }, { status: 502 });
   }
 
-  // Success: Meta returned a real ID
+  // Success: provider returned a real ID
   const externalPostId = publishResult.externalPostId;
 
   await prisma.contentDraft.update({
@@ -424,7 +428,7 @@ export async function POST(req: Request) {
       id: jobId,
       tenantId: tenant.id,
       postId: draft.id,
-      provider: draft.network as any,
+      provider: network as any,
       status: "PUBLISHED",
       scheduledFor: null,
       updatedAt: new Date(),
@@ -435,7 +439,7 @@ export async function POST(req: Request) {
     data: {
       id: `pr_${jobId}`,
       jobId,
-      provider: "INSTAGRAM",
+      provider: network as any,
       externalPostId,
       ok: true,
       response: publishResult.providerResponse as any,
@@ -450,7 +454,7 @@ export async function POST(req: Request) {
     metadata: {
       tenant: tenant.name,
       title: draft.title,
-      network: draft.network,
+      network,
       format: draft.format,
       externalPostId,
       providerResponse: publishResult.providerResponse,

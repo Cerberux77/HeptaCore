@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "../../../../lib/prisma";
 import { auditLog } from "../../../../lib/audit";
 import { decryptJson } from "../../../../lib/token-vault";
-import { publishInstagramMedia } from "../../../../lib/instagram-publisher";
+import { getPublisher, PublishInput } from "../../../../lib/publishers";
 
 export const dynamic = "force-dynamic";
 
@@ -79,8 +79,10 @@ function buildPublicAssetUrl(tenantSlug: string, assetPath: string): string | nu
 }
 
 async function tryRealPublish(job: JobRecord): Promise<PublishOutcome> {
-  if (job.provider !== "INSTAGRAM") {
-    return { kind: "blocked", reason: `Provider ${job.provider} is not implemented for live publishing. Only INSTAGRAM is supported.` };
+  const network = job.provider;
+  const publisher = getPublisher(network);
+  if (!publisher) {
+    return { kind: "blocked", reason: `Provider ${network} is not implemented for live publishing.` };
   }
 
   if (!job.draft) {
@@ -92,42 +94,93 @@ async function tryRealPublish(job: JobRecord): Promise<PublishOutcome> {
     include: { assets: { include: { asset: true } } },
   });
 
-  if (!draft || draft.assets.length === 0) {
+  if (!draft) {
+    return { kind: "blocked", reason: "Draft not found." };
+  }
+
+  const needsAsset = !publisher.capabilities.textOnly || draft.assets.length > 0;
+  if (needsAsset && draft.assets.length === 0) {
     return { kind: "blocked", reason: "Draft has no linked assets." };
   }
 
-  const primaryAsset = draft.assets.find((a) => a.role === "primary") ?? draft.assets[0];
-  const assetPath = resolveAssetPath(primaryAsset.asset);
-  if (!assetPath) {
-    return { kind: "blocked", reason: "Cannot resolve asset path. Ensure storageKey or sourcePath is set." };
+  let mediaUrl: string | undefined | null;
+  let mediaType: "IMAGE" | "VIDEO" | undefined;
+  const primaryAsset = needsAsset ? (draft.assets.find((a) => a.role === "primary") ?? draft.assets[0]) : null;
+
+  if (primaryAsset) {
+    const assetPath = resolveAssetPath(primaryAsset.asset);
+    if (!assetPath) {
+      return { kind: "blocked", reason: "Cannot resolve asset path. Ensure storageKey or sourcePath is set." };
+    }
+
+    let tenantSlug = job.tenant?.slug;
+    if (!tenantSlug) {
+      const tenant = await prisma.tenant.findFirst({
+        where: { id: job.tenantId },
+        select: { slug: true },
+      });
+      tenantSlug = tenant?.slug;
+    }
+    if (!tenantSlug) {
+      return { kind: "blocked", reason: "Tenant slug not found." };
+    }
+
+    mediaUrl = buildPublicAssetUrl(tenantSlug, assetPath);
+    if (!mediaUrl) {
+      return { kind: "blocked", reason: "Cannot construct public HTTPS asset URL." };
+    }
+
+    const isVideo = primaryAsset.asset.kind === "VIDEO";
+    mediaType = isVideo ? "VIDEO" : "IMAGE";
   }
 
-  let tenantSlug = job.tenant?.slug;
-  if (!tenantSlug) {
-    const tenant = await prisma.tenant.findFirst({
-      where: { id: job.tenantId },
-      select: { slug: true },
-    });
-    tenantSlug = tenant?.slug;
-  }
-  if (!tenantSlug) {
-    return { kind: "blocked", reason: "Tenant slug not found." };
+  // SocialAccount
+  const socialAccount = await prisma.socialAccount.findFirst({
+    where: { tenantId: job.tenantId, network: network as any, status: "connected" },
+    select: { id: true, externalAccountId: true, scopes: true },
+    orderBy: { updatedAt: "desc" },
+  });
+
+  const targetId = socialAccount?.externalAccountId;
+  if (!targetId) {
+    return { kind: "blocked", reason: `${network} account missing external account ID. Reconnect via OAuth.` };
   }
 
-  const mediaUrl = buildPublicAssetUrl(tenantSlug, assetPath);
-  if (!mediaUrl) {
-    return { kind: "blocked", reason: "Cannot construct public HTTPS asset URL. Set APP_PUBLIC_URL or NEXT_PUBLIC_APP_URL." };
+  const hasRequiredScope = publisher.requiredScopes.every(
+    (s) => socialAccount.scopes.includes(s) || socialAccount.scopes.includes(s.replace("instagram_business_", ""))
+  );
+  if (!hasRequiredScope) {
+    return { kind: "blocked", reason: `${network} account is missing required publish scopes.` };
   }
 
-  // Look up most recent credential
+  // OAuthConnection
+  const oauthConnection = await prisma.oAuthConnection.findFirst({
+    where: {
+      tenantId: job.tenantId,
+      provider: network as any,
+      status: "connected",
+      socialAccountId: socialAccount.id,
+      tokenRef: { not: null },
+    },
+    orderBy: { updatedAt: "desc" },
+    select: { id: true, tokenRef: true, expiresAt: true },
+  });
+
+  if (!oauthConnection || !oauthConnection.tokenRef) {
+    return { kind: "blocked", reason: `No active ${network} OAuth connection.` };
+  }
+  if (oauthConnection.expiresAt && oauthConnection.expiresAt < new Date()) {
+    return { kind: "blocked", reason: `${network} OAuth connection expired.` };
+  }
+
+  // Credential
   const credential = await prisma.credentialVaultItem.findFirst({
-    where: { tenantId: job.tenantId, provider: "INSTAGRAM", label: "instagram_oauth" },
+    where: { id: oauthConnection.tokenRef, tenantId: job.tenantId, provider: network as any, label: publisher.credentialLabel },
     select: { id: true, encryptedBlob: true, expiresAt: true },
-    orderBy: { createdAt: "desc" },
   });
 
   if (!credential || (credential.expiresAt && credential.expiresAt < new Date())) {
-    return { kind: "blocked", reason: "No valid Instagram credential in vault. Reconnect via OAuth." };
+    return { kind: "blocked", reason: `No valid ${network} credential.` };
   }
 
   let accessToken: string;
@@ -136,38 +189,22 @@ async function tryRealPublish(job: JobRecord): Promise<PublishOutcome> {
     accessToken = decrypted.access_token;
     if (!accessToken) throw new Error("missing access_token");
   } catch {
-    return { kind: "blocked", reason: "Failed to decrypt Instagram credential." };
+    return { kind: "blocked", reason: `Failed to decrypt ${network} credential.` };
   }
 
-  const socialAccount = await prisma.socialAccount.findFirst({
-    where: { tenantId: job.tenantId, network: "INSTAGRAM" },
-    select: { externalAccountId: true, scopes: true },
-  });
-
-  const igUserId = socialAccount?.externalAccountId;
-  if (!igUserId) {
-    return { kind: "blocked", reason: "Instagram account missing external account ID. Reconnect via OAuth." };
-  }
-
-  const hasPublishScope = socialAccount.scopes.includes("instagram_business_content_publish") || socialAccount.scopes.includes("content_publish");
-  if (!hasPublishScope) {
-    return { kind: "blocked", reason: "Instagram account is missing publish scope (instagram_business_content_publish)." };
-  }
-
-  const isVideo = primaryAsset.asset.kind === "VIDEO";
-  const mediaType = isVideo ? "VIDEO" as const : "IMAGE" as const;
+  const publishInput: PublishInput = {
+    targetId,
+    accessToken,
+    mediaUrl,
+    caption: draft.caption || draft.title,
+    mediaType,
+  };
 
   try {
-    const result = await publishInstagramMedia({
-      igUserId,
-      accessToken,
-      mediaUrl,
-      caption: draft.caption || draft.title,
-      mediaType,
-    });
+    const result = await publisher.publish(publishInput);
     return { kind: "success", externalPostId: result.externalPostId, providerResponse: result.providerResponse };
   } catch (err) {
-    return { kind: "attempted", error: err instanceof Error ? err.message : "Instagram publish failed" };
+    return { kind: "attempted", error: err instanceof Error ? err.message : `${network} publish failed` };
   }
 }
 
