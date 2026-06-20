@@ -64,9 +64,16 @@ const NETWORK_LABELS: Record<string, string> = {
   X: "X",
 };
 
-function assetUrl(path: string | null | undefined) {
+function tenantAssetSlug(tenantSlug: string): string {
+  return tenantSlug === "turpial-sound" ? "turpial" : tenantSlug;
+}
+
+function assetUrl(path: string | null | undefined, slug: string) {
   if (!path) return "";
-  return `/tenant-assets/turpial/${path.replace(/^content\/inbox\//, "")}`;
+  const folder = tenantAssetSlug(slug);
+  const cleanPath = path.replace(/^content\/inbox\//, "").replace(/\\/g, "/");
+  if (cleanPath.includes("..")) return "";
+  return `/tenant-assets/${folder}/${cleanPath}`;
 }
 
 function channelLabel(item: DraftQueueItem) {
@@ -90,8 +97,8 @@ function isVideoAsset(item: DraftQueueItem | { asset?: { path: string | null; ki
   return item.asset?.kind === "VIDEO" || path.endsWith(".mp4") || path.endsWith(".mov") || path.endsWith(".webm");
 }
 
-function Thumb({ item }: { item: DraftQueueItem }) {
-  const url = assetUrl(item.asset?.path);
+function Thumb({ item, slug }: { item: DraftQueueItem; slug: string }) {
+  const url = assetUrl(item.asset?.path, slug);
   if (url) {
     if (isVideoAsset(item)) {
       return <video src={url} className="thumb thumb-video" muted playsInline preload="metadata" />;
@@ -724,7 +731,7 @@ export function DashboardConsole({
               <div className="compact-queue">
                 {readyNow.map((item) => (
                   <button key={item.id} className="compact-row" onClick={() => { setSelectedId(item.id); setView("queue"); }}>
-                    <Thumb item={item} />
+                    <Thumb item={item} slug={tenantSlug} />
                     <span>
                       <small>{channelLabel(item)} / {item.scheduledFor}</small>
                       <strong>{item.title}</strong>
@@ -754,7 +761,7 @@ export function DashboardConsole({
                       <strong>{selected.format}</strong>
                     </div>
                     <div className="platform-media">
-                      <img src={assetUrl(selected.asset?.path)} alt={selected.title} />
+                      <img src={assetUrl(selected.asset?.path, tenantSlug)} alt={selected.title} />
                     </div>
                     <div className="platform-caption">
                       <strong>{metrics?.tenant.name ?? "Tenant"}</strong>
@@ -980,7 +987,7 @@ export function DashboardConsole({
                       onClick={() => setSelectedId(item.id)}
                       style={{ width: "100%", textAlign: "left" }}
                     >
-                      <Thumb item={item} />
+                      <Thumb item={item} slug={tenantSlug} />
                       <span>
                         <small>{channelLabel(item)} / {item.scheduledFor}</small>
                         <strong>{item.title}</strong>
@@ -1036,9 +1043,9 @@ export function DashboardConsole({
                   </div>
                   <div className="platform-media">
                     {isVideoAsset(selected) ? (
-                      <video src={assetUrl(selected.asset?.path)} controls preload="metadata" />
+                      <video src={assetUrl(selected.asset?.path, tenantSlug)} controls preload="metadata" />
                     ) : (
-                      <img src={assetUrl(selected.asset?.path)} alt={selected.title} />
+                      <img src={assetUrl(selected.asset?.path, tenantSlug)} alt={selected.title} />
                     )}
                   </div>
                   <div className="platform-caption">
@@ -1084,7 +1091,7 @@ export function DashboardConsole({
                             }}
                           >
                             {asset.path ? (
-                              <img src={assetUrl(asset.path)} alt={asset.filename} style={{ width: 60, height: 60, objectFit: "cover", borderRadius: 3 }} />
+                              <img src={assetUrl(asset.path, tenantSlug)} alt={asset.filename} style={{ width: 60, height: 60, objectFit: "cover", borderRadius: 3 }} />
                             ) : (
                               <div style={{ width: 60, height: 60, display: "flex", alignItems: "center", justifyContent: "center", background: "var(--hc-bone)", borderRadius: 3 }}>
                                 <PackageSearch size={18} />
@@ -1260,9 +1267,9 @@ export function DashboardConsole({
                   <div className="market-card" key={asset.id}>
                     {asset.path ? (
                       asset.kind === "VIDEO" || asset.path.toLowerCase().endsWith(".mp4") ? (
-                        <video src={assetUrl(asset.path)} className="asset-tile" controls preload="metadata" />
+                        <video src={assetUrl(asset.path, tenantSlug)} className="asset-tile" controls preload="metadata" />
                       ) : (
-                        <img src={assetUrl(asset.path)} alt={asset.filename} className="asset-tile" />
+                        <img src={assetUrl(asset.path, tenantSlug)} alt={asset.filename} className="asset-tile" />
                       )
                     ) : (
                       <div className="asset-tile asset-empty"><PackageSearch size={22} /></div>
