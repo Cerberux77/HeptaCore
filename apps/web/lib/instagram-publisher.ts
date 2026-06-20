@@ -23,7 +23,7 @@ interface WaitForReadyInput {
   containerId: string;
   accessToken: string;
   apiVersion: string;
-  fetchFn?: typeof fetch;
+  deadlineMs: number;
 }
 
 interface WaitForReadyResult {
@@ -47,20 +47,18 @@ function formatMetaError(resJson: unknown, status: number): string {
 export async function waitForInstagramContainerReady(
   input: WaitForReadyInput
 ): Promise<WaitForReadyResult> {
-  const { containerId, accessToken, apiVersion } = input;
+  const { containerId, accessToken, apiVersion, deadlineMs } = input;
   const baseUrl = `https://graph.instagram.com/${apiVersion}`;
   const maxAttempts = 12;
-  const maxTotalMs = 50000;
-  const startTime = Date.now();
 
   for (let attempt = 0; attempt < maxAttempts; attempt++) {
-    if (Date.now() - startTime > maxTotalMs) {
+    if (Date.now() > deadlineMs) {
       throw new Error(
-        `INSTAGRAM_CONTAINER_PROCESSING_TIMEOUT: container ${containerId} not ready after ${maxTotalMs}ms`
+        `INSTAGRAM_CONTAINER_PROCESSING_TIMEOUT: deadline reached for container ${containerId}`
       );
     }
 
-    const delay = Math.min(1000 * Math.pow(1.5, attempt), 10000);
+    const delay = Math.min(1000 * Math.pow(1.5, attempt), 8000);
 
     const res = await fetch(
       `${baseUrl}/${containerId}?fields=status_code,status&access_token=${encodeURIComponent(accessToken)}`
@@ -145,11 +143,15 @@ export async function publishInstagramMedia(
 
   const containerId = createJson.id as string;
 
+  // Single global deadline shared by initial readiness, repoll, and retry
+  const publishDeadline = Date.now() + 50000;
+
   // Wait for container readiness before publishing
   const ready = await waitForInstagramContainerReady({
     containerId,
     accessToken,
     apiVersion,
+    deadlineMs: publishDeadline,
   });
 
   if (!ready.ready) {
@@ -191,6 +193,7 @@ export async function publishInstagramMedia(
         containerId,
         accessToken,
         apiVersion,
+        deadlineMs: publishDeadline,
       });
 
       if (!reReady.ready) {

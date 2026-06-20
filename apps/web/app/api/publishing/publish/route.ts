@@ -9,6 +9,7 @@ import { buildImmediateJobId, buildScheduledJobId, checkExistingJobForRetry, che
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
+export const maxDuration = 60;
 
 const PUBLISH_ROLES = ["OWNER", "ADMIN", "APPROVER", "PUBLISHER", "SUPER_ADMIN", "TENANT_ADMIN"];
 

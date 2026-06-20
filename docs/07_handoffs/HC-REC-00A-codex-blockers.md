@@ -1,36 +1,53 @@
 # Codex Promotion Blockers — S-HC-REC-00A
 
 Date: 2026-06-20
-Veredict: CHANGES_REQUIRED_BEFORE_PROMOTION
+Veredict: CHANGES_REQUIRED_BEFORE_PROMOTION (resolved in B.4A / B.4A.1 / B.4B)
 Sprint: S-HC-REC-00A
 Operator: Manuel
 Branch: manuel/s-hc-rec-00a-ui-publishing-baseline
-HEAD: c339530
+HEAD: 667437e (pending B.4B commit)
 
 ## Status
 
-FUNCTIONALLY_VERIFIED_BUT_NOT_PROMOTION_READY
+AWAITING_CODEX_FINAL_REVIEW_AFTER_B4B
 
-Facebook and Instagram published successfully from production UI. Codex audit identified three P1 blockers that must be resolved before promotion.
+All P1 blockers from audit resolved. Staged deployment pending B.4B completion.
 
-## P1 Blockers
+## Resolved P1 Blockers
 
 ### 1. Race: scheduled vs immediate claim
-
-- Immediate path claims draft via `updateMany` (APPROVED -> SCHEDULED).
-- Scheduled path uses direct `update` without conditional check.
-- Race: scheduled request that read APPROVED before immediate claim can still succeed and create a PublishingJob. Cron may later re-publish.
+- Both paths use atomic `updateMany where {status: APPROVED}`.
+- Immediate uses `buildImmediateJobId`, scheduled uses `buildScheduledJobId` with timestamp.
+- Cron uses `updateMany where {id, status: "SCHEDULED"}` on PublishingJob.
 
 ### 2. Manual approval reusable
+- `useEffect([selectedId, publishMode])` resets approval, state, and message.
+- Controls frozen during loading.
+- Stale responses ignored via requestId.
 
-- `manualApproval` boolean persists across draft changes and mode changes.
-- Approval given for draft A with mode `immediate` remains true when switching to draft B or `scheduled`.
+### 3. Provider success persistence failure
+- PublishingResult persisted first, ContentDraft second, each independently wrapped.
+- Failure returns HTTP 202 with `providerConfirmed: true` and externalPostId.
+- Draft NEVER reverted to APPROVED after providerConfirmed.
+- Legacy + immediate job IDs checked before claim.
 
-### 3. Provider success persistence failure window
+### 4. Cron hardening
+- `checkCronJobEligibility()` validates: draft status, network match, externalPostId absence, result absence, scheduledFor, immediate pre-attempt exclusion.
+- Atomic claim via `updateMany where {id, status: "SCHEDULED"}` transitions to PUBLISHED before provider call.
 
-- Provider returns `externalPostId` successfully.
-- If persistence (draft update, job update, result insert) fails after provider success, the current code reverts draft to APPROVED via the error catch.
-- This loses the externalPostId and allows duplicate publishing.
+### 5. Instagram container readiness
+- `waitForInstagramContainerReady` with single global deadline (50s).
+- Polls `status_code` with backoff 1s-8s, max 12 attempts.
+- 9007 post-readiness: repoll same containerId, single retry.
+
+### 6. Serverless budget
+- `maxDuration: 60` on publish route (Vercel Pro limit).
+- Instagram polling: 50s deadline, 10s margin for auth/DB/persistence.
+
+## Staged Deployments
+
+- dpl_5LwY9FoBZjS9D2u5mpi1rhq5NFJJ (B.3 durability)
+- Production: dpl_8iKrhoJMEsrTLWfgzCQyVPD1saEM (heptacore.vercel.app)
 
 ## P2/P3 Deferred
 
@@ -38,18 +55,12 @@ Facebook and Instagram published successfully from production UI. Codex audit id
 |---|---|
 | next lint (deprecated in Next.js 16) | S-HC-PROD-06 |
 | npm vulnerabilities | S-HC-PROD-06 |
-| Global asset deduplication | Asset lifecycle sprint |
-| Worker Redis persistent | S-HC-PROD-05 |
-| Scheduling E2E complete | S-HC-PROD-05 |
-| Oreshnik dashboard | S-OR-REC-00B / S-HC-REC-00C |
-| YouTube / LinkedIn publishers | Future |
-
-## Staged Deployments
-
-- dpl_7HmrdvsbPY5CqhJjPF3HsW9Wornw (B.2.2 candidate, superseded)
-- dpl_9ukgvjwgqu2U6Gqk8rH7fCyL6856 (B.2.4 Instagram fix)
-- Production: dpl_8iKrhoJMEsrTLWfgzCQyVPD1saEM (heptacore.vercel.app still active)
+| Worker Redis / scheduling robusto | S-HC-PROD-05 |
+| Asset deduplication | Asset lifecycle sprint |
+| Oreshnik task board | S-OR-REC-00B / S-HC-REC-00C |
+| Turpial E2E final | S-HC-PUB-01 |
 
 ## Rule
 
 Do not close Oreshnik until S-OR-REC-00B and S-HC-REC-00C fix the command layer.
+Do not promote to production without Codex approval.
