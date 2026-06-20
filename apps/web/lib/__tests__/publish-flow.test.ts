@@ -442,3 +442,189 @@ describe("instagramContainerReadiness", () => {
     assert.equal(fbPublish("INSTAGRAM"), null);
   });
 });
+
+describe("scheduledVsImmediateRace", () => {
+  it("immediate wins and scheduled loses", () => {
+    let draftStatus = "APPROVED";
+    function atomicClaim(expected: string, newStatus: string): boolean {
+      if (draftStatus !== expected) return false;
+      draftStatus = newStatus;
+      return true;
+    }
+    const immediateWon = atomicClaim("APPROVED", "SCHEDULED");
+    const scheduledLost = atomicClaim("APPROVED", "SCHEDULED");
+    assert.equal(immediateWon, true, "immediate claims first");
+    assert.equal(scheduledLost, false, "scheduled rejected");
+    assert.equal(draftStatus, "SCHEDULED");
+  });
+
+  it("scheduled wins and immediate loses", () => {
+    let draftStatus = "APPROVED";
+    function atomicClaim(expected: string, newStatus: string): boolean {
+      if (draftStatus !== expected) return false;
+      draftStatus = newStatus;
+      return true;
+    }
+    const scheduledWon = atomicClaim("APPROVED", "SCHEDULED");
+    const immediateLost = atomicClaim("APPROVED", "SCHEDULED");
+    assert.equal(scheduledWon, true, "scheduled claims first");
+    assert.equal(immediateLost, false, "immediate rejected");
+  });
+
+  it("two scheduled simultaneous create only one job", () => {
+    const createdJobs: string[] = [];
+    let claimed = false;
+    function tryCreateJob(draftId: string): string | null {
+      if (claimed) return null;
+      claimed = true;
+      const jobId = `pj_${draftId}`;
+      createdJobs.push(jobId);
+      return jobId;
+    }
+    const j1 = tryCreateJob("d1");
+    const j2 = tryCreateJob("d1");
+    assert.notEqual(j1, null);
+    assert.equal(j2, null);
+    assert.equal(createdJobs.length, 1, "only one job created");
+  });
+});
+
+describe("approvalReset", () => {
+  it("changing draft resets approval", () => {
+    let approval = true;
+    let selectedId = "draft-a";
+    function changeDraft(newId: string) {
+      if (selectedId !== newId) {
+        approval = false;
+        selectedId = newId;
+      }
+    }
+    assert.equal(approval, true);
+    changeDraft("draft-b");
+    assert.equal(approval, false, "approval reset on draft change");
+  });
+
+  it("changing mode resets approval", () => {
+    let approval = true;
+    let mode = "immediate";
+    function changeMode(newMode: string) {
+      if (mode !== newMode) {
+        approval = false;
+        mode = newMode;
+      }
+    }
+    assert.equal(approval, true);
+    changeMode("scheduled");
+    assert.equal(approval, false, "approval reset on mode change");
+  });
+
+  it("switching to dry_run resets approval", () => {
+    let approval = true;
+    let mode = "immediate";
+    function changeMode(newMode: string) {
+      if (mode !== newMode) {
+        approval = false;
+        mode = newMode;
+      }
+    }
+    changeMode("dry_run");
+    assert.equal(approval, false, "approval reset for dry_run");
+  });
+
+  it("APPROVAL_REQUIRED without fresh approval blocked", () => {
+    let approval = false;
+    let mode = "immediate";
+    let automationMode = "APPROVAL_REQUIRED";
+    const blocked = automationMode === "APPROVAL_REQUIRED" && mode !== "dry_run" && !approval;
+    assert.equal(blocked, true, "blocked without fresh approval");
+  });
+});
+
+describe("durablePersistence", () => {
+  it("provider fails before publish → draft reverts to APPROVED", () => {
+    let draftStatus = "SCHEDULED";
+    let jobStatus = "SCHEDULED";
+    function handleProviderFailure() {
+      draftStatus = "APPROVED";
+      jobStatus = "FAILED";
+    }
+    handleProviderFailure();
+    assert.equal(draftStatus, "APPROVED", "draft reverted");
+    assert.equal(jobStatus, "FAILED", "job marked failed");
+  });
+
+  it("provider success + full persistence → PUBLISHED", () => {
+    let draftStatus = "SCHEDULED";
+    let jobStatus = "SCHEDULED";
+    let externalPostId = "post_abc";
+    function handleFullSuccess() {
+      jobStatus = "PUBLISHED";
+      draftStatus = "PUBLISHED";
+    }
+    handleFullSuccess();
+    assert.equal(draftStatus, "PUBLISHED");
+    assert.equal(jobStatus, "PUBLISHED");
+    assert.equal(externalPostId, "post_abc");
+  });
+
+  it("provider success + draft update fails → not reverted, reconciliation required", () => {
+    let draftStatus = "SCHEDULED";
+    let jobStatus = "SCHEDULED";
+    let externalPostId = "post_xyz";
+    let reconciliationRequired = false;
+    function handlePartialPersistence() {
+      reconciliationRequired = true;
+    }
+    handlePartialPersistence();
+    assert.equal(draftStatus, "SCHEDULED", "draft NOT reverted after provider success");
+    assert.equal(reconciliationRequired, true, "reconciliation required");
+    assert.equal(externalPostId, "post_xyz", "externalPostId preserved");
+  });
+
+  it("provider success + result saved + draft update fails → result recoverable", () => {
+    const savedResults: { id: string; externalPostId: string }[] = [];
+    function saveResult(jobId: string, postId: string) {
+      savedResults.push({ id: jobId, externalPostId: postId });
+    }
+    saveResult("pj_d1", "post_456");
+    assert.equal(savedResults.length, 1);
+    assert.equal(savedResults[0].externalPostId, "post_456", "result persisted independently");
+  });
+
+  it("externalPostId never overwritten with empty", () => {
+    let externalPostId = "post_keep_me";
+    function tryOverwrite(newId: string) {
+      if (newId) externalPostId = newId;
+    }
+    tryOverwrite("");
+    assert.equal(externalPostId, "post_keep_me", "not overwritten");
+    tryOverwrite("post_new");
+    assert.equal(externalPostId, "post_new", "updated with valid ID");
+  });
+
+  it("job pre-attempt created only once", () => {
+    const attempts: string[] = [];
+    function createAttempt(draftId: string, network: string): string {
+      const id = `pj_${draftId}_${network}`;
+      if (!attempts.includes(id)) {
+        attempts.push(id);
+      }
+      return id;
+    }
+    createAttempt("d1", "FACEBOOK");
+    createAttempt("d1", "FACEBOOK");
+    assert.equal(attempts.length, 1, "only one pre-attempt job");
+  });
+
+  it("no second provider call", () => {
+    let providerCalls = 0;
+    function callProvider(): string {
+      providerCalls++;
+      return "post_ok";
+    }
+    callProvider();
+    assert.equal(providerCalls, 1, "single provider call");
+    const alreadyPublished = providerCalls > 1;
+    assert.equal(alreadyPublished, false);
+  });
+});

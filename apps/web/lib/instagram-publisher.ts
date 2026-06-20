@@ -50,7 +50,7 @@ export async function waitForInstagramContainerReady(
   const { containerId, accessToken, apiVersion } = input;
   const baseUrl = `https://graph.instagram.com/${apiVersion}`;
   const maxAttempts = 12;
-  const maxTotalMs = 65000;
+  const maxTotalMs = 50000;
   const startTime = Date.now();
 
   for (let attempt = 0; attempt < maxAttempts; attempt++) {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   AlertTriangle,
   BarChart3,
@@ -216,6 +216,13 @@ export function DashboardConsole({
     metrics?.tenant.mode === "APPROVAL_REQUIRED" || metrics?.tenant.mode === "DRAFT_ONLY";
   const [publishState, setPublishState] = useState<"idle" | "loading" | "published" | "scheduled" | "dry_run_ok" | "blocked" | "failed">("idle");
   const [publishMessage, setPublishMessage] = useState("");
+
+  useEffect(() => {
+    setManualApproval(false);
+    setPublishState("idle");
+    setPublishMessage("");
+  }, [selectedId, publishMode]);
+
   const [editMode, setEditMode] = useState(false);
   const [editTitle, setEditTitle] = useState("");
   const [editCaption, setEditCaption] = useState("");
