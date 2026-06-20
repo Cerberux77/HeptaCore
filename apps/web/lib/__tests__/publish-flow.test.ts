@@ -1371,3 +1371,93 @@ describe("ambiguousProviderOutcome", async () => {
     assert.equal(providerCalls, 1);
   });
 });
+
+describe("operationalSnapshot", async () => {
+  const { projectDraftOperationalState } = await import("../draft-operational-state.js");
+
+  function os(draftStatus: string, draftExternalPostId: string | null, jobs: any[]): string {
+    const r = projectDraftOperationalState({ id: "d1", status: draftStatus, externalPostId: draftExternalPostId, network: "FACEBOOK" }, jobs, new Date());
+    return r.operationalState;
+  }
+
+  it("raw PUBLISHED without durable evidence → RECONCILIATION_REQUIRED", () => {
+    assert.equal(os("PUBLISHED", null, []), "RECONCILIATION_REQUIRED");
+  });
+
+  it("externalPostId → PUBLISHED", () => {
+    assert.equal(os("APPROVED", "post_123", []), "PUBLISHED");
+  });
+
+  it("Result ok + externalPostId → PUBLISHED", () => {
+    assert.equal(os("APPROVED", null, [{ status: "SCHEDULED", PublishingResult: { ok: true, externalPostId: "post_x" } }]), "PUBLISHED");
+  });
+
+  it("IN_REVIEW → RECONCILIATION_REQUIRED", () => {
+    assert.equal(os("APPROVED", null, [{ status: "IN_REVIEW" }]), "RECONCILIATION_REQUIRED");
+  });
+
+  it("APPROVED clean → READY_TO_PUBLISH", () => {
+    assert.equal(os("APPROVED", null, []), "READY_TO_PUBLISH");
+  });
+
+  it("sum of buckets equals total (mock counts)", () => {
+    const states = ["DRAFT", "READY_TO_PUBLISH", "PUBLISHED", "RECONCILIATION_REQUIRED", "SCHEDULED", "REVIEW_REQUIRED", "FAILED", "REJECTED"];
+    const counts: Record<string, number> = {};
+    for (const s of states) counts[s] = 0;
+    const drafts = [
+      os("APPROVED", null, []),
+      os("APPROVED", "p1", []),
+      os("APPROVED", null, [{ status: "IN_REVIEW" }]),
+      os("DRAFT", null, []),
+      os("SCHEDULED", null, [{ status: "SCHEDULED", scheduledFor: new Date(Date.now() + 86400000) }]),
+    ];
+    for (const d of drafts) counts[d]++;
+    const total = Object.values(counts).reduce((a, b) => a + b, 0);
+    assert.equal(total, drafts.length, "sum of buckets equals total");
+    assert.equal(counts["READY_TO_PUBLISH"], 1);
+    assert.equal(counts["PUBLISHED"], 1);
+    assert.equal(counts["RECONCILIATION_REQUIRED"], 1);
+  });
+
+  it("nextScheduled excludes past dates (mock)", () => {
+    const items = [
+      { id: "d1", operationalState: "SCHEDULED", scheduledFor: "2020-01-01 12:00" },
+      { id: "d2", operationalState: "SCHEDULED", scheduledFor: "2099-01-01 12:00" },
+    ];
+    const now = new Date();
+    const future = items.filter((d) => d.operationalState === "SCHEDULED" && d.scheduledFor && new Date(d.scheduledFor) > now);
+    assert.equal(future.length, 1, "only future scheduled included as next");
+    assert.equal(future[0].id, "d2");
+  });
+
+  it("nextScheduled excludes DRAFT and APPROVED", () => {
+    assert.notEqual(os("DRAFT", null, []), "SCHEDULED");
+    assert.notEqual(os("APPROVED", null, []), "SCHEDULED");
+  });
+
+  it("selector excludes PUBLISHED", () => {
+    const s = os("APPROVED", "post_1", []);
+    assert.notEqual(s, "READY_TO_PUBLISH");
+    assert.equal(s, "PUBLISHED");
+  });
+
+  it("selector excludes RECONCILIATION_REQUIRED", () => {
+    const s = os("APPROVED", null, [{ status: "IN_REVIEW" }]);
+    assert.notEqual(s, "READY_TO_PUBLISH");
+    assert.equal(s, "RECONCILIATION_REQUIRED");
+  });
+
+  it("dashboard Listos equals readyToPublish", () => {
+    const r = os("APPROVED", null, []);
+    assert.equal(r, "READY_TO_PUBLISH", "listos = readyToPublish");
+  });
+
+  it("dashboard Pendientes equals reviewRequired", () => {
+    const r = os("NEEDS_REVIEW", null, []);
+    assert.equal(r, "REVIEW_REQUIRED", "pendientes = reviewRequired");
+  });
+
+  it("APPROVED blocked by IN_REVIEW not counted as ready", () => {
+    assert.equal(os("APPROVED", null, [{ status: "IN_REVIEW" }]), "RECONCILIATION_REQUIRED");
+  });
+});

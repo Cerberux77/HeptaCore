@@ -37,7 +37,7 @@ export interface DraftProjectionInput {
 }
 
 export interface JobProjectionInput {
-  id: string;
+  id?: string;
   status: string;
   provider?: string;
   scheduledFor?: Date | string | null;

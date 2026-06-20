@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   AlertTriangle,
   BarChart3,
@@ -216,6 +217,7 @@ export function DashboardConsole({
   const [selectedId, setSelectedIdRaw] = useState(queue[0]?.id ?? "");
   const [publishDraftId, setPublishDraftId] = useState("");
   const [localQueue, setLocalQueue] = useState(queue);
+  const router = useRouter();
   const [manualApproval, setManualApproval] = useState(false);
   const [publishMode, setPublishMode] = useState<"dry_run" | "scheduled" | "immediate">("dry_run");
   const tenantAutoPilot =
@@ -369,12 +371,15 @@ export function DashboardConsole({
         setPublishState("reconciliation_required");
         const extIdPart = data.externalPostId ? ` ID externo: ${data.externalPostId}.` : "";
         setPublishMessage(`${data.error}${extIdPart} ${data.action}`);
+        router.refresh();
         return;
       }
 
       if (data.providerOutcomeUnknown === true || data.status === "RECONCILIATION_REQUIRED" || data.code === "LIVE_RECONCILIATION_REQUIRED") {
         setPublishState("reconciliation_required");
-        setPublishMessage(data.action || data.error || "Resultado ambiguo. No vuelva a publicar.");
+        setPublishMessage(data.action || data.error || "Meta pudo haber publicado. El intento quedo bloqueado para reconciliacion.");
+        router.refresh();
+        return;
         return;
       }
 
@@ -401,6 +406,9 @@ export function DashboardConsole({
             ? `Programado: ${target.title} (${data.scheduledFor ? new Date(data.scheduledFor).toLocaleString() : "pronto"}).`
             : `Dry-run validado: ${target.title}.`,
       );
+      if (data.mode === "immediate" || data.mode === "scheduled") {
+        router.refresh();
+      }
     } catch (error) {
       setPublishState("failed");
       setPublishMessage(error instanceof Error ? error.message : "Error de red.");
@@ -703,8 +711,10 @@ export function DashboardConsole({
         {metrics && (
           <section className="status-strip">
             <StatusCard label="Total" value={metrics.counts.totalDrafts} note="drafts en DB" onClick={() => setView("queue")} />
-            <StatusCard label="Pendientes" value={pendingReview.length} note="requieren criterio" tone="warn" onClick={() => setView("queue")} />
-            <StatusCard label="Aprobados"               value={metrics.counts.readyToPublish} note="listos para publicar" onClick={() => setView("readiness")} />
+            <StatusCard label="Pendientes" value={metrics.counts.reviewRequired} note="requieren criterio" tone="warn" onClick={() => setView("queue")} />
+            <StatusCard label="Listos" value={metrics.counts.readyToPublish} note="listos para publicar" onClick={() => setView("readiness")} />
+            <StatusCard label="Por reconciliar" value={metrics.counts.reconciliationRequired} note="requieren verificacion" tone="warn" onClick={() => setView("queue")} />
+            <StatusCard label="Publicados" value={metrics.counts.published} note="en Meta" tone="ok" onClick={() => setView("calendar")} />
             <StatusCard label="Assets" value={metrics.counts.totalAssets} note="importados" tone="ok" onClick={() => setView("assets")} />
             <StatusCard label="Proximo" value={nextTitle ?? nextDate} note={nextNote} onClick={() => setView("calendar")} />
           </section>
