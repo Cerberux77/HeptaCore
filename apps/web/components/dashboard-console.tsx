@@ -214,7 +214,7 @@ export function DashboardConsole({
     metrics?.tenant.mode === "AUTOPILOT_FULL" || metrics?.tenant.mode === "AUTOPILOT_LIMITED";
   const tenantNeedsManual =
     metrics?.tenant.mode === "APPROVAL_REQUIRED" || metrics?.tenant.mode === "DRAFT_ONLY";
-  const [publishState, setPublishState] = useState<"idle" | "loading" | "done" | "error">("idle");
+  const [publishState, setPublishState] = useState<"idle" | "loading" | "published" | "scheduled" | "dry_run_ok" | "blocked" | "failed">("idle");
   const [publishMessage, setPublishMessage] = useState("");
   const [editMode, setEditMode] = useState(false);
   const [editTitle, setEditTitle] = useState("");
@@ -301,14 +301,20 @@ export function DashboardConsole({
       });
       const data = await res.json();
       if (!res.ok || !data.ok) {
-        setPublishState("error");
-        setPublishMessage(data.error || "No se pudo ejecutar la publicacion.");
+        setPublishState(data.code === "LIVE_BLOCKED_TRIAL_LIMIT" || data.code?.startsWith("LIVE_BLOCKED") ? "blocked" : "failed");
+        setPublishMessage(data.error || data.action || "No se pudo ejecutar la publicacion.");
         return;
       }
       const newStatus = data.mode === "immediate" ? "PUBLISHED" : data.mode === "scheduled" ? "SCHEDULED" : "APPROVED";
       const extra = data.externalPostId ? { externalPostId: data.externalPostId } as Partial<DraftQueueItem> : {};
       updateLocalStatus(publishTarget.id, newStatus, extra);
-      setPublishState("done");
+      if (data.mode === "dry_run") {
+        setPublishState("dry_run_ok");
+      } else if (data.mode === "scheduled") {
+        setPublishState("scheduled");
+      } else {
+        setPublishState("published");
+      }
       const externalIdPart = data.externalPostId ? ` (ID: ${data.externalPostId})` : "";
       setPublishMessage(
         data.mode === "immediate"
@@ -318,7 +324,7 @@ export function DashboardConsole({
             : `Dry-run validado: ${publishTarget.title}.`,
       );
     } catch (error) {
-      setPublishState("error");
+      setPublishState("failed");
       setPublishMessage(error instanceof Error ? error.message : "Error de red.");
     }
   }
@@ -1647,7 +1653,7 @@ export function DashboardConsole({
                     <small style={{ color: "var(--hc-sand)", display: "block", marginTop: 6 }}>{publishEligibility.reason}</small>
                   )}
                   {publishMessage && (
-                    <p className={publishState === "error" ? "login-error" : "publish-ok"}>
+                    <p className={publishState === "failed" || publishState === "blocked" ? "login-error" : "publish-ok"}>
                       {publishMessage}
                     </p>
                   )}
