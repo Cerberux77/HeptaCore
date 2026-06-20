@@ -7,6 +7,7 @@ import { checkCronJobEligibility } from "../../../../lib/publishing-execution";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
+export const maxDuration = 60;
 
 const CRON_SECRET = process.env.CRON_SECRET ?? "heptacore-cron-secret";
 const BATCH_LIMIT = 50;
@@ -108,7 +109,7 @@ async function tryRealPublish(job: JobRecord): Promise<PublishOutcome> {
   const isImmediatePreAttempt = !job.scheduledFor;
 
   const eligibility = checkCronJobEligibility({
-    jobStatus: "SCHEDULED",
+    jobStatus: "IN_REVIEW",
     scheduledFor: job.scheduledFor,
     attempts: job.attempts,
     maxAttempts: MAX_ATTEMPTS,
@@ -257,7 +258,7 @@ export async function GET(req: Request) {
     try {
       const claimed = await prisma.publishingJob.updateMany({
         where: { id: job.id, status: "SCHEDULED" },
-        data: { status: "PUBLISHED", attempts: { increment: 1 } },
+        data: { status: "IN_REVIEW", attempts: { increment: 1 } },
       });
 
       if (claimed.count === 0) {

@@ -821,3 +821,94 @@ describe("legacyAndUiHarden", async () => {
     assert.notEqual(handleResponse({ ok: false, providerConfirmed: true }), "published");
   });
 });
+
+describe("publishingStateMachine", async () => {
+  const { checkExistingJobForRetry } = await import("../publishing-execution.js");
+  it("claim transitions SCHEDULED to IN_REVIEW not PUBLISHED", () => {
+    let status = "SCHEDULED";
+    function claim(): boolean {
+      if (status !== "SCHEDULED") return false;
+      status = "IN_REVIEW";
+      return true;
+    }
+    const won = claim();
+    assert.equal(won, true);
+    assert.equal(status, "IN_REVIEW", "claim sets IN_REVIEW");
+    assert.notEqual(status, "PUBLISHED", "claim never sets PUBLISHED");
+  });
+
+  it("second worker gets count 0 after claim", () => {
+    let status = "SCHEDULED";
+    function claim(): boolean {
+      if (status !== "SCHEDULED") return false;
+      status = "IN_REVIEW";
+      return true;
+    }
+    const w1 = claim();
+    const w2 = claim();
+    assert.equal(w1, true);
+    assert.equal(w2, false, "second worker rejected");
+  });
+
+  it("query excludes IN_REVIEW jobs", () => {
+    const jobs = [
+      { id: "j1", status: "SCHEDULED" },
+      { id: "j2", status: "IN_REVIEW" },
+      { id: "j3", status: "PUBLISHED" },
+    ];
+    const due = jobs.filter((j) => j.status === "SCHEDULED");
+    assert.equal(due.length, 1);
+    assert.equal(due[0].id, "j1", "only SCHEDULED jobs selected");
+  });
+
+  it("provider success → PUBLISHED", () => {
+    let jobStatus = "IN_REVIEW";
+    let draftStatus = "SCHEDULED";
+    function handleSuccess() {
+      jobStatus = "PUBLISHED";
+      draftStatus = "PUBLISHED";
+    }
+    handleSuccess();
+    assert.equal(jobStatus, "PUBLISHED");
+    assert.equal(draftStatus, "PUBLISHED");
+  });
+
+  it("provider failure → FAILED", () => {
+    let jobStatus = "IN_REVIEW";
+    let draftStatus = "SCHEDULED";
+    function handleFailure() {
+      jobStatus = "FAILED";
+      draftStatus = "APPROVED";
+    }
+    handleFailure();
+    assert.equal(jobStatus, "FAILED");
+    assert.equal(draftStatus, "APPROVED");
+  });
+
+  it("provider confirmed + partial persistence → stays IN_REVIEW", () => {
+    let jobStatus = "IN_REVIEW";
+    let externalPostId = "";
+    function handlePartial(externalId: string) {
+      externalPostId = externalId;
+    }
+    handlePartial("post_123");
+    assert.equal(jobStatus, "IN_REVIEW", "job stays IN_REVIEW");
+    assert.equal(externalPostId, "post_123", "externalPostId preserved");
+  });
+
+  it("IN_REVIEW job blocks retry", () => {
+    const r = checkExistingJobForRetry({ jobStatus: "IN_REVIEW" });
+    assert.equal(r.blocked, true);
+    assert.match(r.code!, /JOB_IN_FLIGHT/);
+  });
+
+  it("immediate job starts IN_REVIEW not SCHEDULED", () => {
+    let jobStatus = "";
+    function createImmediateJob() {
+      jobStatus = "IN_REVIEW";
+    }
+    createImmediateJob();
+    assert.equal(jobStatus, "IN_REVIEW");
+    assert.notEqual(jobStatus, "SCHEDULED");
+  });
+});

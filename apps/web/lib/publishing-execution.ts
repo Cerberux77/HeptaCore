@@ -33,8 +33,12 @@ export function checkExistingJobForRetry(params: {
     return { blocked: true, reason: "Ya existe un resultado exitoso con externalPostId. Requiere reconciliacion.", code: "LIVE_BLOCKED_RESULT_EXISTS" };
   }
 
+  if (jobStatus === "IN_REVIEW") {
+    return { blocked: true, reason: "El draft tiene un job en ejecucion o pendiente de reconciliacion.", code: "LIVE_BLOCKED_JOB_IN_FLIGHT" };
+  }
+
   if (jobStatus === "SCHEDULED") {
-    return { blocked: true, reason: "El draft tiene un job activo. Verifica si ya esta programado o en ejecucion.", code: "LIVE_BLOCKED_JOB_ACTIVE" };
+    return { blocked: true, reason: "El draft tiene un job activo programado.", code: "LIVE_BLOCKED_JOB_ACTIVE" };
   }
 
   return { blocked: false };
@@ -87,8 +91,8 @@ export function checkCronJobEligibility(params: {
 }): CronJobEligibility {
   const { jobStatus, scheduledFor, attempts, maxAttempts, draftExists, draftStatus, draftNetwork, jobProvider, draftExternalPostId, resultOk, resultExternalPostId, isImmediatePreAttempt } = params;
 
-  if (jobStatus !== "SCHEDULED") {
-    return { eligible: false, reason: "Job no longer SCHEDULED." };
+  if (jobStatus !== "SCHEDULED" && jobStatus !== "IN_REVIEW") {
+    return { eligible: false, reason: `Job status ${jobStatus}, expected SCHEDULED or IN_REVIEW.` };
   }
 
   if (isImmediatePreAttempt) {
