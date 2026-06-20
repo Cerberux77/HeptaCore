@@ -3,10 +3,11 @@ import { auth } from "../../../../lib/auth";
 import { auditLog } from "../../../../lib/audit";
 import { prisma } from "../../../../lib/prisma";
 import { TRIAL_POSTS_PER_NETWORK } from "../../../../lib/trial";
-import { decryptJson } from "../../../../lib/token-vault";
+import { resolveAndDecryptOAuthCredential } from "../../../../lib/credential-resolver";
 import { getPublisher, PublishInput } from "../../../../lib/publishers";
 
 export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
 
 const PUBLISH_ROLES = ["OWNER", "ADMIN", "APPROVER", "PUBLISHER", "SUPER_ADMIN", "TENANT_ADMIN"];
 
@@ -212,45 +213,26 @@ export async function POST(req: Request) {
     }, { status: 409 });
   }
 
-  // OAuthConnection gate
-  const oauthConnection = await prisma.oAuthConnection.findFirst({
-    where: {
-      tenantId: tenant.id,
-      provider: network as any,
-      status: "connected",
-      socialAccountId: socialAccount.id,
-      tokenRef: { not: null },
-    },
-    orderBy: { updatedAt: "desc" },
-    select: { id: true, tokenRef: true, expiresAt: true, updatedAt: true, socialAccountId: true },
+  // Credential resolution via shared resolver (follows tokenRef exclusively)
+  const credentialResolution = await resolveAndDecryptOAuthCredential({
+    tenantId: tenant.id,
+    provider: network,
+    socialAccountId: socialAccount.id,
+    credentialLabel: publisher.credentialLabel,
   });
-  if (!oauthConnection || !oauthConnection.tokenRef) {
+
+  if (!credentialResolution.ok) {
     return NextResponse.json({
-      code: "LIVE_BLOCKED_NO_CREDENTIAL",
-      error: `No active ${network} OAuth connection found. Reconnect via OAuth.`,
-      action: `Reconectar ${network} desde Settings.`,
-    }, { status: 409 });
-  }
-  if (oauthConnection.expiresAt && oauthConnection.expiresAt < now) {
-    return NextResponse.json({
-      code: "LIVE_BLOCKED_NO_CREDENTIAL",
-      error: `${network} OAuth connection is expired. Reconnect via OAuth.`,
+      code: credentialResolution.code,
+      error: credentialResolution.error,
       action: `Reconectar ${network} desde Settings.`,
     }, { status: 409 });
   }
 
-  // CredentialVaultItem gate
-  const credential = await prisma.credentialVaultItem.findFirst({
-    where: { id: oauthConnection.tokenRef, tenantId: tenant.id, provider: network as any, label: publisher.credentialLabel },
-    select: { id: true, encryptedBlob: true, expiresAt: true },
-  });
-  if (!credential || (credential.expiresAt && credential.expiresAt < now)) {
-    return NextResponse.json({
-      code: "LIVE_BLOCKED_NO_CREDENTIAL",
-      error: `No valid ${network} credential found for the active OAuth connection. Reconnect via OAuth.`,
-      action: `Reconectar ${network} desde Settings.`,
-    }, { status: 409 });
-  }
+  const accessToken = credentialResolution.accessToken;
+  const targetId = credentialResolution.providerUserId;
+  const credentialId = credentialResolution.credentialId;
+  const connectionId = credentialResolution.connectionId;
 
   // Trial limit gate
   const publishedOnNetwork = await prisma.contentDraft.count({
@@ -290,30 +272,6 @@ export async function POST(req: Request) {
 
     const isVideo = primaryAsset.asset.kind === "VIDEO";
     mediaType = isVideo ? "VIDEO" : "IMAGE";
-  }
-
-  // Decrypt token
-  let accessToken: string;
-  try {
-    const decrypted = decryptJson<{ access_token: string }>(credential.encryptedBlob);
-    accessToken = decrypted.access_token;
-    if (!accessToken) throw new Error("missing access_token");
-  } catch {
-    return NextResponse.json({
-      code: "LIVE_BLOCKED_DECRYPT_FAILED",
-      error: `Failed to decrypt ${network} credential. Reconnect via OAuth.`,
-      action: `Reconectar ${network} desde Settings.`,
-    }, { status: 409 });
-  }
-
-  // Target ID
-  const targetId = socialAccount.externalAccountId;
-  if (!targetId) {
-    return NextResponse.json({
-      code: "LIVE_BLOCKED_NO_TARGET_ID",
-      error: `${network} account is missing external account ID. Reconnect via OAuth.`,
-      action: `Reconectar ${network} desde Settings.`,
-    }, { status: 409 });
   }
 
   // === DRY RUN: preflight passed, no provider call ===

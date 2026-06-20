@@ -1,10 +1,11 @@
 import { NextResponse } from "next/server";
 import { prisma } from "../../../../lib/prisma";
 import { auditLog } from "../../../../lib/audit";
-import { decryptJson } from "../../../../lib/token-vault";
+import { resolveAndDecryptOAuthCredential } from "../../../../lib/credential-resolver";
 import { getPublisher, PublishInput } from "../../../../lib/publishers";
 
 export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
 
 const CRON_SECRET = process.env.CRON_SECRET ?? "heptacore-cron-secret";
 const BATCH_LIMIT = 50;
@@ -153,44 +154,19 @@ async function tryRealPublish(job: JobRecord): Promise<PublishOutcome> {
     return { kind: "blocked", reason: `${network} account is missing required publish scopes.` };
   }
 
-  // OAuthConnection
-  const oauthConnection = await prisma.oAuthConnection.findFirst({
-    where: {
-      tenantId: job.tenantId,
-      provider: network as any,
-      status: "connected",
-      socialAccountId: socialAccount.id,
-      tokenRef: { not: null },
-    },
-    orderBy: { updatedAt: "desc" },
-    select: { id: true, tokenRef: true, expiresAt: true },
+  // Credential resolution via shared resolver
+  const credentialResolution = await resolveAndDecryptOAuthCredential({
+    tenantId: job.tenantId,
+    provider: network,
+    socialAccountId: socialAccount.id,
+    credentialLabel: publisher.credentialLabel,
   });
 
-  if (!oauthConnection || !oauthConnection.tokenRef) {
-    return { kind: "blocked", reason: `No active ${network} OAuth connection.` };
-  }
-  if (oauthConnection.expiresAt && oauthConnection.expiresAt < new Date()) {
-    return { kind: "blocked", reason: `${network} OAuth connection expired.` };
+  if (!credentialResolution.ok) {
+    return { kind: "blocked", reason: `${network} credential: ${credentialResolution.error}` };
   }
 
-  // Credential
-  const credential = await prisma.credentialVaultItem.findFirst({
-    where: { id: oauthConnection.tokenRef, tenantId: job.tenantId, provider: network as any, label: publisher.credentialLabel },
-    select: { id: true, encryptedBlob: true, expiresAt: true },
-  });
-
-  if (!credential || (credential.expiresAt && credential.expiresAt < new Date())) {
-    return { kind: "blocked", reason: `No valid ${network} credential.` };
-  }
-
-  let accessToken: string;
-  try {
-    const decrypted = decryptJson<{ access_token: string }>(credential.encryptedBlob);
-    accessToken = decrypted.access_token;
-    if (!accessToken) throw new Error("missing access_token");
-  } catch {
-    return { kind: "blocked", reason: `Failed to decrypt ${network} credential.` };
-  }
+  const accessToken = credentialResolution.accessToken;
 
   const publishInput: PublishInput = {
     targetId,

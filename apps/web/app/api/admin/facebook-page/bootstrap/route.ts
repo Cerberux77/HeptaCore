@@ -1,9 +1,10 @@
 import { NextResponse } from "next/server";
 import { auth } from "../../../../../lib/auth";
 import { prisma } from "../../../../../lib/prisma";
-import { encryptJson } from "../../../../../lib/token-vault";
+import { decryptJson, encryptJson } from "../../../../../lib/token-vault";
 
 export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
 
 const ADMIN_ROLES = ["SUPER_ADMIN", "TENANT_ADMIN", "OWNER", "ADMIN"];
 
@@ -240,6 +241,31 @@ export async function POST(req: Request) {
         connectionId = created.id;
       }
     });
+
+    // Decrypt probe: verify credential can be read by the publisher
+    try {
+      const saved = await prisma.credentialVaultItem.findUnique({
+        where: { id: credentialId! },
+        select: { encryptedBlob: true },
+      });
+      if (!saved?.encryptedBlob) {
+        throw new Error("Credential blob missing after save");
+      }
+      const decrypted = decryptJson<{ access_token: string }>(saved.encryptedBlob);
+      if (!decrypted?.access_token) {
+        throw new Error("Decrypt probe returned empty access_token");
+      }
+    } catch (probeErr) {
+      console.error("[facebook_bootstrap_decrypt_probe_failed]", {
+        credentialId: credentialId!,
+        message: probeErr instanceof Error ? probeErr.message : "unknown",
+      });
+      return NextResponse.json({
+        ok: false,
+        code: "FACEBOOK_DECRYPT_PROBE_FAILED",
+        error: "Credential saved but decrypt probe failed. Key mismatch or format error.",
+      }, { status: 500 });
+    }
 
     return NextResponse.json({
       ok: true,
