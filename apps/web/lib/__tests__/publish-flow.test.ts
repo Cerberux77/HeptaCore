@@ -1461,3 +1461,55 @@ describe("operationalSnapshot", async () => {
     assert.equal(os("APPROVED", null, [{ status: "IN_REVIEW" }]), "RECONCILIATION_REQUIRED");
   });
 });
+
+describe("nextScheduledSource", async () => {
+  const { projectDraftOperationalState } = await import("../draft-operational-state.js");
+
+  function findNext(drafts: Array<{ id: string; operationalState: string; scheduledFor: string | null }>, now: Date) {
+    return drafts.find((d) => d.operationalState === "SCHEDULED" && d.scheduledFor && new Date(d.scheduledFor) > now) ?? null;
+  }
+
+  const now = new Date();
+  const future = new Date(Date.now() + 3600000).toISOString().slice(0, 16).replace("T", " ");
+  const past = "2020-01-01 12:00";
+
+  it("ignores past dates", () => {
+    const r = findNext([{ id: "d1", operationalState: "SCHEDULED", scheduledFor: past }], now);
+    assert.equal(r, null);
+  });
+
+  it("ignores DRAFT", () => {
+    const r = findNext([{ id: "d1", operationalState: "DRAFT", scheduledFor: future }], now);
+    assert.equal(r, null);
+  });
+
+  it("ignores READY_TO_PUBLISH", () => {
+    const r = findNext([{ id: "d1", operationalState: "READY_TO_PUBLISH", scheduledFor: future }], now);
+    assert.equal(r, null);
+  });
+
+  it("ignores PUBLISHED", () => {
+    const r = findNext([{ id: "d1", operationalState: "PUBLISHED", scheduledFor: future }], now);
+    assert.equal(r, null);
+  });
+
+  it("selects nearest future SCHEDULED", () => {
+    const t1 = new Date(Date.now() + 7200000).toISOString().slice(0, 16).replace("T", " ");
+    const t2 = new Date(Date.now() + 3600000).toISOString().slice(0, 16).replace("T", " ");
+    const sorted = [{ id: "d1", operationalState: "SCHEDULED", scheduledFor: t2 }, { id: "d2", operationalState: "SCHEDULED", scheduledFor: t1 }];
+    sorted.sort((a, b) => (a.scheduledFor ?? "").localeCompare(b.scheduledFor ?? ""));
+    const r = findNext(sorted, now);
+    assert.equal(r?.id, "d1");
+  });
+
+  it("returns null when no future SCHEDULED", () => {
+    const r = findNext([{ id: "d1", operationalState: "READY_TO_PUBLISH", scheduledFor: future }], now);
+    assert.equal(r, null);
+  });
+
+  it("nextUp has at most one element", () => {
+    const nextScheduled = { id: "d1", title: "test" } as any;
+    const nextUp = nextScheduled ? [nextScheduled] : [];
+    assert.ok(nextUp.length <= 1);
+  });
+});

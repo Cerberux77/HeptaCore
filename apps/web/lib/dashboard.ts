@@ -286,7 +286,7 @@ export const getDashboardMetrics = cache(
       prisma.contentDraft.groupBy({ by: ["pillar"], where: { tenantId: tenant.id, pillar: { not: null } }, _count: true, orderBy: { _count: { pillar: "desc" } } }),
     ]);
 
-    const nextUp = snapshot.drafts.filter((d) => d.operationalState === "SCHEDULED" && d.scheduledFor).slice(0, 10);
+    const nextUp = snapshot.nextScheduled ? [snapshot.nextScheduled] : [];
 
     return {
       tenant: { id: tenant.id, slug: tenant.slug, name: tenant.name, plan: tenant.plan, mode: tenant.automationMode, activeNetworks },

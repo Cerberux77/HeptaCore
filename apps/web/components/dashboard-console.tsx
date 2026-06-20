@@ -285,13 +285,9 @@ export function DashboardConsole({
     .filter((i) => i.status !== "PUBLISHED")
     .sort((a, b) => (a.scheduledFor ?? "").localeCompare(b.scheduledFor ?? ""));
   const readyNow = scheduled.slice(0, 5);
-
-  const nextItem = scheduled[0] ?? null;
-  const nextDate = nextItem?.scheduledFor?.slice(5) ?? "--";
-  const nextTitle = nextItem?.title ? (nextItem.title.length > 25 ? nextItem.title.slice(0, 25) + "…" : nextItem.title) : null;
-  const nextNote = nextItem
-    ? `${nextItem.network} · ${nextItem.status === "APPROVED" ? "Listo" : nextItem.status === "NEEDS_REVIEW" ? "Pendiente revision" : nextItem.status}`
-    : "No hay programados";
+  const nextItem = metrics?.nextUp?.[0] ?? null;
+  const nextTitle = nextItem ? (nextItem.title.length > 25 ? `${nextItem.title.slice(0, 25)}…` : nextItem.title) : "Sin proximas";
+  const nextNote = nextItem ? `${nextItem.network} · SCHEDULED · ${nextItem.scheduledFor ?? ""}` : "No hay publicaciones futuras programadas";
 
   const mergeLocalDraft = useCallback((patch: DraftQueuePatch) => {
     setLocalQueue((prev) => mergeDraftQueueItem(prev, patch));
@@ -414,16 +410,6 @@ export function DashboardConsole({
       setPublishMessage(error instanceof Error ? error.message : "Error de red.");
     }
   }
-
-  const publishEligibility = !selected
-    ? { eligible: false as const, reason: "No hay draft seleccionado. Selecciona uno en la cola.", target: null }
-    : selected.status === "PUBLISHED"
-      ? { eligible: false as const, reason: "Este draft ya fue publicado. No puede volver a publicarse.", target: null }
-      : publishMode === "immediate" && selected.status !== "APPROVED"
-        ? { eligible: false as const, reason: `El draft debe estar APROBADO para publicacion inmediata. Estado actual: ${selected.status}.`, target: null }
-        : publishMode === "scheduled" && selected.status !== "APPROVED"
-          ? { eligible: false as const, reason: `El draft debe estar APROBADO para programar. Estado actual: ${selected.status}.`, target: null }
-          : { eligible: true as const, reason: "", target: selected };
 
   function startEdit() {
     setEditTitle(selected?.title ?? "");
@@ -558,6 +544,7 @@ export function DashboardConsole({
         status: data.draft.status,
       } : d));
       setEditMode(false);
+      router.refresh();
     } finally {
       setEditSaving(false);
     }
@@ -716,7 +703,7 @@ export function DashboardConsole({
             <StatusCard label="Por reconciliar" value={metrics.counts.reconciliationRequired} note="requieren verificacion" tone="warn" onClick={() => setView("queue")} />
             <StatusCard label="Publicados" value={metrics.counts.published} note="en Meta" tone="ok" onClick={() => setView("calendar")} />
             <StatusCard label="Assets" value={metrics.counts.totalAssets} note="importados" tone="ok" onClick={() => setView("assets")} />
-            <StatusCard label="Proximo" value={nextTitle ?? nextDate} note={nextNote} onClick={() => setView("calendar")} />
+            <StatusCard label="Proximo" value={nextTitle} note={nextNote} onClick={() => setView("calendar")} />
           </section>
         )}
         {trial && !trial.trialActive && (
