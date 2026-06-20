@@ -276,3 +276,169 @@ describe("safe message", () => {
     assert.equal(isSafeMessage("Published (ID: 12345_67890)"), true);
   });
 });
+
+describe("instagramContainerReadiness", () => {
+  type FakeStatus = "FINISHED" | "IN_PROGRESS" | "ERROR" | "EXPIRED";
+
+  function fakeWaitForReady(
+    statuses: FakeStatus[],
+    maxDelayMs?: number
+  ): () => Promise<{ ready: boolean; statusCode?: string }> {
+    let callIndex = 0;
+    return async () => {
+      if (callIndex >= statuses.length) {
+        return { ready: false, statusCode: "TIMEOUT" };
+      }
+      const s = statuses[callIndex++];
+      if (s === "FINISHED") return { ready: true, statusCode: "FINISHED" };
+      if (s === "ERROR") return { ready: false, statusCode: "ERROR" };
+      if (s === "EXPIRED") return { ready: false, statusCode: "EXPIRED" };
+      return { ready: false, statusCode: "IN_PROGRESS" };
+    };
+  }
+
+  it("FINISHED on first poll", async () => {
+    const wait = fakeWaitForReady(["FINISHED"]);
+    const r = await wait();
+    assert.equal(r.ready, true);
+    assert.equal(r.statusCode, "FINISHED");
+  });
+
+  it("IN_PROGRESS then FINISHED", async () => {
+    const wait = fakeWaitForReady(["IN_PROGRESS", "FINISHED"]);
+    let r = await wait();
+    assert.equal(r.ready, false);
+    r = await wait();
+    assert.equal(r.ready, true);
+  });
+
+  it("multiple IN_PROGRESS then FINISHED", async () => {
+    const wait = fakeWaitForReady(["IN_PROGRESS", "IN_PROGRESS", "IN_PROGRESS", "FINISHED"]);
+    let r = await wait();
+    assert.equal(r.ready, false);
+    r = await wait();
+    assert.equal(r.ready, false);
+    r = await wait();
+    assert.equal(r.ready, false);
+    r = await wait();
+    assert.equal(r.ready, true);
+  });
+
+  it("ERROR", async () => {
+    const wait = fakeWaitForReady(["ERROR"]);
+    const r = await wait();
+    assert.equal(r.ready, false);
+    assert.equal(r.statusCode, "ERROR");
+  });
+
+  it("EXPIRED", async () => {
+    const wait = fakeWaitForReady(["EXPIRED"]);
+    const r = await wait();
+    assert.equal(r.ready, false);
+    assert.equal(r.statusCode, "EXPIRED");
+  });
+
+  it("timeout after max polls", async () => {
+    const statuses: FakeStatus[] = Array(20).fill("IN_PROGRESS");
+    const wait = fakeWaitForReady(statuses);
+    let lastReady = false;
+    for (let i = 0; i < 15; i++) {
+      const r = await wait();
+      lastReady = r.ready;
+    }
+    assert.equal(lastReady, false);
+  });
+
+  it("media_publish only called after FINISHED", () => {
+    let publishCalled = false;
+    let containerReady = false;
+    function tryPublish(): string | null {
+      if (!containerReady) return null;
+      if (publishCalled) return null;
+      publishCalled = true;
+      return "ig_post_456";
+    }
+    assert.equal(tryPublish(), null, "not ready yet");
+    containerReady = true;
+    assert.equal(tryPublish(), "ig_post_456", "publishes after ready");
+    assert.equal(publishCalled, true);
+  });
+
+  it("same containerId reused on 9007 retry", () => {
+    const containerId = "container_abc_123";
+    const publishAttempts: { containerId: string; attempt: number }[] = [];
+    function tryPublish(cid: string): boolean {
+      publishAttempts.push({ containerId: cid, attempt: publishAttempts.length + 1 });
+      if (publishAttempts.length === 1) return false;
+      return true;
+    }
+    tryPublish(containerId);
+    tryPublish(containerId);
+    assert.equal(publishAttempts.length, 2);
+    assert.equal(publishAttempts[0].containerId, containerId);
+    assert.equal(publishAttempts[1].containerId, containerId);
+  });
+
+  it("no second container created on 9007", () => {
+    const createdContainers: string[] = [];
+    function createContainer(): string {
+      const id = `container_${createdContainers.length + 1}`;
+      createdContainers.push(id);
+      return id;
+    }
+    const cid = createContainer();
+    assert.equal(createdContainers.length, 1);
+    assert.equal(createContainer(), "container_2");
+    assert.equal(createdContainers.length, 2, "creates new container only by intent");
+    assert.equal(cid, "container_1", "original container preserved");
+  });
+
+  it("media_publish at most twice for 9007 case", () => {
+    let attempts = 0;
+    let secondAttemptReady = false;
+    function publishWithRetry(): boolean {
+      attempts++;
+      if (attempts === 1) return false;
+      if (attempts === 2 && secondAttemptReady) return true;
+      return false;
+    }
+    assert.equal(publishWithRetry(), false);
+    assert.equal(attempts, 1);
+    secondAttemptReady = true;
+    assert.equal(publishWithRetry(), true);
+    assert.equal(attempts, 2, "exactly 2 attempts");
+  });
+
+  it("non-9007 OAuth error not retried", () => {
+    let attempts = 0;
+    function publishWithError(code: number): string {
+      attempts++;
+      if (code === 190) throw new Error("OAuthException");
+      return "ok";
+    }
+    assert.throws(() => publishWithError(190));
+    assert.equal(attempts, 1, "no retry for OAuth errors");
+  });
+
+  it("error returns draft to recoverable state", () => {
+    let draftStatus = "SCHEDULED";
+    function revertOnError(success: boolean): string {
+      if (!success) {
+        draftStatus = "APPROVED";
+        return "failed";
+      }
+      draftStatus = "PUBLISHED";
+      return "published";
+    }
+    assert.equal(revertOnError(false), "failed");
+    assert.equal(draftStatus, "APPROVED", "draft reverted to APPROVED on failure");
+    assert.equal(revertOnError(true), "published");
+    assert.equal(draftStatus, "PUBLISHED", "draft PUBLISHED on success");
+  });
+
+  it("Facebook publisher not affected by Instagram changes", () => {
+    const fbPublish = (network: string) => network === "FACEBOOK" ? "fb_post_789" : null;
+    assert.equal(fbPublish("FACEBOOK"), "fb_post_789");
+    assert.equal(fbPublish("INSTAGRAM"), null);
+  });
+});

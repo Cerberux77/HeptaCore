@@ -11,6 +11,26 @@ interface PublishInstagramMediaOutput {
   providerResponse: unknown;
 }
 
+type ContainerStatus = "IN_PROGRESS" | "FINISHED" | "ERROR" | "EXPIRED";
+
+interface ContainerStatusResponse {
+  id: string;
+  status_code: ContainerStatus;
+  status?: string;
+}
+
+interface WaitForReadyInput {
+  containerId: string;
+  accessToken: string;
+  apiVersion: string;
+  fetchFn?: typeof fetch;
+}
+
+interface WaitForReadyResult {
+  ready: boolean;
+  statusCode?: ContainerStatus;
+}
+
 function formatMetaError(resJson: unknown, status: number): string {
   const err = (resJson as Record<string, unknown>)?.error as Record<string, unknown> | undefined;
   if (!err) return `HTTP ${status}: unknown error`;
@@ -22,6 +42,57 @@ function formatMetaError(resJson: unknown, status: number): string {
   const fbtrace = (resJson as Record<string, unknown>)?.fbtrace_id;
   if (fbtrace) parts.push(`trace=${fbtrace}`);
   return parts.join(" | ") || `HTTP ${status}: error without details`;
+}
+
+export async function waitForInstagramContainerReady(
+  input: WaitForReadyInput
+): Promise<WaitForReadyResult> {
+  const { containerId, accessToken, apiVersion } = input;
+  const baseUrl = `https://graph.instagram.com/${apiVersion}`;
+  const maxAttempts = 12;
+  const maxTotalMs = 65000;
+  const startTime = Date.now();
+
+  for (let attempt = 0; attempt < maxAttempts; attempt++) {
+    if (Date.now() - startTime > maxTotalMs) {
+      throw new Error(
+        `INSTAGRAM_CONTAINER_PROCESSING_TIMEOUT: container ${containerId} not ready after ${maxTotalMs}ms`
+      );
+    }
+
+    const delay = Math.min(1000 * Math.pow(1.5, attempt), 10000);
+
+    const res = await fetch(
+      `${baseUrl}/${containerId}?fields=status_code,status&access_token=${encodeURIComponent(accessToken)}`
+    );
+    const json = (await res.json()) as ContainerStatusResponse;
+
+    if (!res.ok || !json.status_code) {
+      throw new Error(
+        `Instagram container status check failed: ${formatMetaError(json, res.status)}`
+      );
+    }
+
+    const status = json.status_code as ContainerStatus;
+
+    if (status === "FINISHED") {
+      return { ready: true, statusCode: "FINISHED" };
+    }
+
+    if (status === "ERROR") {
+      return { ready: false, statusCode: "ERROR" };
+    }
+
+    if (status === "EXPIRED") {
+      return { ready: false, statusCode: "EXPIRED" };
+    }
+
+    await new Promise<void>((resolve) => setTimeout(resolve, delay));
+  }
+
+  throw new Error(
+    `INSTAGRAM_CONTAINER_PROCESSING_TIMEOUT: container ${containerId} exceeded max attempts`
+  );
 }
 
 export async function publishInstagramMedia(
@@ -74,21 +145,74 @@ export async function publishInstagramMedia(
 
   const containerId = createJson.id as string;
 
-  // Publish via /me/media_publish
-  const publishParams = new URLSearchParams();
-  publishParams.append("creation_id", containerId);
-  publishParams.append("access_token", accessToken);
-
-  const publishRes = await fetch(`${baseUrl}/me/media_publish`, {
-    method: "POST",
-    headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    body: publishParams.toString(),
+  // Wait for container readiness before publishing
+  const ready = await waitForInstagramContainerReady({
+    containerId,
+    accessToken,
+    apiVersion,
   });
 
-  const publishJson = await publishRes.json();
+  if (!ready.ready) {
+    throw new Error(
+      `Instagram container not publishable: ${ready.statusCode ?? "unknown status"} (container: ${containerId})`
+    );
+  }
 
-  if (!publishRes.ok || !publishJson.id) {
-    throw new Error(`Instagram media publish failed: ${formatMetaError(publishJson, publishRes.status)}`);
+  // Publish via /me/media_publish with 9007 retry guard
+  let publishRes: Response;
+  let publishJson: Record<string, unknown>;
+
+  const doPublish = async (): Promise<{ res: Response; json: Record<string, unknown> }> => {
+    const publishParams = new URLSearchParams();
+    publishParams.append("creation_id", containerId);
+    publishParams.append("access_token", accessToken);
+
+    const res = await fetch(`${baseUrl}/me/media_publish`, {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: publishParams.toString(),
+    });
+
+    const json = (await res.json()) as Record<string, unknown>;
+    return { res, json };
+  };
+
+  const firstAttempt = await doPublish();
+  publishRes = firstAttempt.res;
+  publishJson = firstAttempt.json;
+
+  if (!publishRes.ok) {
+    const errCode = (publishJson as Record<string, unknown>)?.error as Record<string, unknown> | undefined;
+    const code = errCode?.code as number | undefined;
+    const subcode = errCode?.error_subcode as number | undefined;
+
+    if (code === 9007 && subcode === 2207027) {
+      const reReady = await waitForInstagramContainerReady({
+        containerId,
+        accessToken,
+        apiVersion,
+      });
+
+      if (!reReady.ready) {
+        throw new Error(
+          `Instagram container still not ready on retry: ${reReady.statusCode ?? "unknown"} (container: ${containerId})`
+        );
+      }
+
+      const secondAttempt = await doPublish();
+      publishRes = secondAttempt.res;
+      publishJson = secondAttempt.json;
+
+      if (!publishRes.ok) {
+        throw new Error(
+          `Instagram media publish failed on retry: ${formatMetaError(publishJson, publishRes.status)}`
+        );
+      }
+    } else {
+      throw new Error(
+        `Instagram media publish failed: ${formatMetaError(publishJson, publishRes.status)}`
+      );
+    }
   }
 
   return {
