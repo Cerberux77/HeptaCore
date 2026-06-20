@@ -34,6 +34,8 @@ export type DashboardMetrics = {
   pillars: Array<{ name: string; count: number }>;
 };
 
+import { isDraftActuallyPublishable } from "./publishing-execution";
+
 export type DraftQueueItem = {
   id: string;
   title: string;
@@ -48,6 +50,8 @@ export type DraftQueueItem = {
   hashtags: string[];
   cta: string | null;
   source: string | null;
+  publishEligibility?: "READY" | "RECONCILIATION_REQUIRED" | "PUBLISHED" | "NOT_APPROVED";
+  publishBlockedReason?: string;
   asset: { filename: string; path: string | null; kind: string } | null;
 };
 
@@ -399,6 +403,7 @@ export const getDraftQueue = cache(
         format: true,
         pillar: true,
         status: true,
+        externalPostId: true,
         riskLevel: true,
         requiresReview: true,
         scheduledFor: true,
@@ -409,28 +414,58 @@ export const getDraftQueue = cache(
       },
     });
 
-    return drafts.map((d) => ({
-      id: d.id,
-      title: d.title,
-      caption: d.caption,
-      network: d.network,
-      format: d.format,
-      pillar: d.pillar,
-      status: d.status,
-      riskLevel: d.riskLevel,
-      requiresReview: d.requiresReview,
-      scheduledFor: d.scheduledFor?.toISOString().slice(0, 16).replace("T", " ") ?? null,
-      hashtags: d.hashtags,
-      cta: d.cta,
-      source: d.source,
-      asset: d.assets[0]?.asset
-        ? {
-            filename: d.assets[0].asset.filename,
-            path: d.assets[0].asset.sourcePath,
-            kind: d.assets[0].asset.kind,
-          }
-        : null,
-    }));
+    const draftIds = drafts.map((d) => d.id);
+
+    const activeJobs = await prisma.publishingJob.findMany({
+      where: {
+        postId: { in: draftIds },
+        status: { in: ["IN_REVIEW", "PUBLISHED"] },
+      },
+      select: {
+        postId: true,
+        status: true,
+        PublishingResult: { select: { ok: true, externalPostId: true } },
+      },
+    });
+
+    const jobByDraftId = new Map(activeJobs.map((j) => [j.postId!, j]));
+
+    return drafts.map((d) => {
+      const job = jobByDraftId.get(d.id);
+      const eligibility = isDraftActuallyPublishable({
+        draftStatus: d.status,
+        draftExternalPostId: d.externalPostId,
+        hasInReviewJob: job?.status === "IN_REVIEW",
+        hasPublishedJob: job?.status === "PUBLISHED",
+        hasPublishedResult: job?.PublishingResult?.ok === true,
+        hasResultExternalPostId: !!job?.PublishingResult?.externalPostId,
+      });
+
+      return {
+        id: d.id,
+        title: d.title,
+        caption: d.caption,
+        network: d.network,
+        format: d.format,
+        pillar: d.pillar,
+        status: d.status,
+        publishEligibility: eligibility.eligibility,
+        publishBlockedReason: eligibility.blockedReason,
+        riskLevel: d.riskLevel,
+        requiresReview: d.requiresReview,
+        scheduledFor: d.scheduledFor?.toISOString().slice(0, 16).replace("T", " ") ?? null,
+        hashtags: d.hashtags,
+        cta: d.cta,
+        source: d.source,
+        asset: d.assets[0]?.asset
+          ? {
+              filename: d.assets[0].asset.filename,
+              path: d.assets[0].asset.sourcePath,
+              kind: d.assets[0].asset.kind,
+            }
+          : null,
+      };
+    });
   },
 );
 

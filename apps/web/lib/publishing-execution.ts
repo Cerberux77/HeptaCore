@@ -96,6 +96,38 @@ export function reconcileDurableProviderSuccess(params: {
   return { shouldReconcile: true, shouldCallProvider: false, reason: "Provider confirmed. Reconcile locally without re-publishing." };
 }
 
+export type PublishEligibility = "READY" | "RECONCILIATION_REQUIRED" | "PUBLISHED" | "NOT_APPROVED";
+
+export interface PublishEligibilityCheck {
+  eligibility: PublishEligibility;
+  blockedReason?: string;
+}
+
+export function isDraftActuallyPublishable(params: {
+  draftStatus: string;
+  draftExternalPostId?: string | null;
+  hasPublishedResult?: boolean;
+  hasInReviewJob?: boolean;
+  hasResultExternalPostId?: boolean;
+  hasPublishedJob?: boolean;
+}): PublishEligibilityCheck {
+  const { draftStatus, draftExternalPostId, hasPublishedResult, hasInReviewJob, hasResultExternalPostId, hasPublishedJob } = params;
+
+  if (draftExternalPostId || hasPublishedResult || hasPublishedJob) {
+    return { eligibility: "PUBLISHED" };
+  }
+
+  if (draftStatus !== "APPROVED") {
+    return { eligibility: "NOT_APPROVED" };
+  }
+
+  if (hasInReviewJob || hasResultExternalPostId) {
+    return { eligibility: "RECONCILIATION_REQUIRED", blockedReason: "Existe un intento de publicacion activo con resultado incierto." };
+  }
+
+  return { eligibility: "READY" };
+}
+
 export function checkLegacyJobId(draftId: string, network: string): string {
   return `pj_${draftId}_${network}`;
 }

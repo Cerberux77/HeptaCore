@@ -300,7 +300,7 @@ export function DashboardConsole({
   }, [mergeLocalDraft]);
 
   const approvedDrafts = useMemo(
-    () => localQueue.filter((draft) => draft.status === "APPROVED"),
+    () => localQueue.filter((draft) => draft.publishEligibility === "READY" || (draft.status === "APPROVED" && !draft.publishEligibility)),
     [localQueue],
   );
 

@@ -3,6 +3,7 @@ import { prisma } from "../../../../lib/prisma";
 import { auditLog } from "../../../../lib/audit";
 import { resolveAndDecryptOAuthCredential } from "../../../../lib/credential-resolver";
 import { getPublisher, PublishInput } from "../../../../lib/publishers";
+import { ProviderError } from "../../../../lib/publishers/types";
 import { checkCronJobEligibility, hasDurableProviderSuccess, isPublicationDurablyCommitted } from "../../../../lib/publishing-execution";
 import { commitConfirmedPublication, recordUnconfirmedProviderFailure } from "../../../../lib/publishing-finalization";
 
@@ -36,7 +37,8 @@ interface JobRecord {
 type PublishOutcome =
   | { kind: "success"; externalPostId: string; providerResponse: unknown }
   | { kind: "blocked"; reason: string }
-  | { kind: "attempted"; error: string };
+  | { kind: "attempted"; error: string }
+  | { kind: "ambiguous"; error: string };
 
 function resolveAssetPath(asset: { storageKey?: string | null; sourcePath?: string | null; filename: string }): string | null {
   const raw = asset.storageKey || asset.sourcePath || asset.filename;
@@ -209,6 +211,9 @@ async function tryRealPublish(job: JobRecord): Promise<PublishOutcome> {
     const result = await publisher.publish(publishInput);
     return { kind: "success", externalPostId: result.externalPostId, providerResponse: result.providerResponse };
   } catch (err) {
+    if (err instanceof ProviderError && err.isAmbiguous) {
+      return { kind: "ambiguous", error: err instanceof Error ? err.message : `${network} publish failed` };
+    }
     return { kind: "attempted", error: err instanceof Error ? err.message : `${network} publish failed` };
   }
 }
@@ -315,6 +320,19 @@ export async function GET(req: Request) {
             });
           } catch {}
         }
+      } else if (outcome.kind === "ambiguous") {
+        failed++;
+        const msg = outcome.error;
+        results.push(`AMBIGUOUS ${job.id}: ${msg}`);
+        try {
+          await auditLog({
+            tenantId: job.tenantId,
+            actorId: "system",
+            action: "auto_publish_ambiguous",
+            target: `draft:${job.postId}`,
+            metadata: { title: job.draft?.title ?? "untitled", network: job.provider, error: msg.slice(0, 500) },
+          });
+        } catch {}
       } else if (outcome.kind === "attempted") {
         failed++;
         const msg = outcome.error;
