@@ -262,14 +262,22 @@ export function DashboardConsole({
     ? `${nextItem.network} · ${nextItem.status === "APPROVED" ? "Listo" : nextItem.status === "NEEDS_REVIEW" ? "Pendiente revision" : nextItem.status}`
     : "No hay programados";
 
-  const updateLocalStatus = useCallback((id: string, newStatus: string) => {
-    setLocalQueue((prev) => prev.map((d) => (d.id === id ? { ...d, status: newStatus } : d)));
+  const updateLocalStatus = useCallback((id: string, newStatus: string, extra?: Partial<DraftQueueItem>) => {
+    setLocalQueue((prev) => prev.map((d) => (d.id === id ? { ...d, status: newStatus, ...extra } : d)));
   }, []);
 
-  const firstApproved = localQueue.find((item) => item.status === "APPROVED");
+  function resolvePublishTarget(): DraftQueueItem | null {
+    if (!selected) return null;
+    if (selected.status === "PUBLISHED") return null;
+    if (publishMode === "immediate" && selected.status !== "APPROVED") return null;
+    if (publishMode === "scheduled" && selected.status !== "APPROVED") return null;
+    return selected;
+  }
+
+  const publishTarget = resolvePublishTarget();
 
   async function handlePublish() {
-    if (!firstApproved) return;
+    if (!publishTarget) return;
     setPublishState("loading");
     setPublishMessage("");
     try {
@@ -279,7 +287,7 @@ export function DashboardConsole({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           tenantSlug,
-          draftId: firstApproved.id,
+          draftId: publishTarget.id,
           manualApproval: manualApproval || tenantAutoPilot,
           mode: effectiveMode,
         }),
@@ -290,20 +298,33 @@ export function DashboardConsole({
         setPublishMessage(data.error || "No se pudo ejecutar la publicacion.");
         return;
       }
-      updateLocalStatus(firstApproved.id, data.mode === "immediate" ? "PUBLISHED" : data.mode === "scheduled" ? "SCHEDULED" : "APPROVED");
+      const newStatus = data.mode === "immediate" ? "PUBLISHED" : data.mode === "scheduled" ? "SCHEDULED" : "APPROVED";
+      const extra = data.externalPostId ? { externalPostId: data.externalPostId } as Partial<DraftQueueItem> : {};
+      updateLocalStatus(publishTarget.id, newStatus, extra);
       setPublishState("done");
+      const externalIdPart = data.externalPostId ? ` (ID: ${data.externalPostId})` : "";
       setPublishMessage(
         data.mode === "immediate"
-          ? `Publicado en vivo: ${firstApproved.title}.`
+          ? `Publicado en vivo: ${publishTarget.title}.${externalIdPart}`
           : data.mode === "scheduled"
-            ? `Programado: ${firstApproved.title} (${data.scheduledFor ? new Date(data.scheduledFor).toLocaleString() : "pronto"}).`
-            : `Dry-run validado: ${firstApproved.title}.`,
+            ? `Programado: ${publishTarget.title} (${data.scheduledFor ? new Date(data.scheduledFor).toLocaleString() : "pronto"}).`
+            : `Dry-run validado: ${publishTarget.title}.`,
       );
     } catch (error) {
       setPublishState("error");
       setPublishMessage(error instanceof Error ? error.message : "Error de red.");
     }
   }
+
+  const publishEligibility = !selected
+    ? { eligible: false as const, reason: "No hay draft seleccionado. Selecciona uno en la cola.", target: null }
+    : selected.status === "PUBLISHED"
+      ? { eligible: false as const, reason: "Este draft ya fue publicado. No puede volver a publicarse.", target: null }
+      : publishMode === "immediate" && selected.status !== "APPROVED"
+        ? { eligible: false as const, reason: `El draft debe estar APROBADO para publicacion inmediata. Estado actual: ${selected.status}.`, target: null }
+        : publishMode === "scheduled" && selected.status !== "APPROVED"
+          ? { eligible: false as const, reason: `El draft debe estar APROBADO para programar. Estado actual: ${selected.status}.`, target: null }
+          : { eligible: true as const, reason: "", target: selected };
 
   function startEdit() {
     setEditTitle(selected?.title ?? "");
@@ -1598,7 +1619,7 @@ export function DashboardConsole({
                   <button
                     className="primary-action"
                     onClick={handlePublish}
-                    disabled={publishState === "loading" || !firstApproved}
+                    disabled={publishState === "loading" || !publishEligibility.eligible}
                   >
                     <LockKeyhole size={16} />
                     {publishState === "loading"
@@ -1609,11 +1630,15 @@ export function DashboardConsole({
                           ? "Programar publicacion"
                           : "Ejecutar dry-run"}
                   </button>
-                  <small>
-                    {firstApproved
-                      ? `Siguiente draft aprobado: ${firstApproved.title}`
-                      : "No hay drafts aprobados para ejecutar."}
-                  </small>
+                  {publishEligibility.target && (
+                    <small style={{ marginTop: 6, display: "block" }}>
+                      Draft seleccionado: <strong>{publishEligibility.target.title}</strong> ({publishEligibility.target.id})<br />
+                      Red: {NETWORK_LABELS[publishEligibility.target.network] ?? publishEligibility.target.network} · Estado: {publishEligibility.target.status} · Modo: {publishMode}
+                    </small>
+                  )}
+                  {!publishEligibility.eligible && (
+                    <small style={{ color: "var(--hc-sand)", display: "block", marginTop: 6 }}>{publishEligibility.reason}</small>
+                  )}
                   {publishMessage && (
                     <p className={publishState === "error" ? "login-error" : "publish-ok"}>
                       {publishMessage}
