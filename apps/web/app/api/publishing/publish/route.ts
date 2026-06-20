@@ -6,6 +6,7 @@ import { TRIAL_POSTS_PER_NETWORK } from "../../../../lib/trial";
 import { resolveAndDecryptOAuthCredential } from "../../../../lib/credential-resolver";
 import { getPublisher, PublishInput } from "../../../../lib/publishers";
 import { buildImmediateJobId, buildScheduledJobId, checkExistingJobForRetry, checkLegacyJobId, getAllPossibleJobIds } from "../../../../lib/publishing-execution";
+import { finalizeConfirmedPublication, recordUnconfirmedProviderFailure } from "../../../../lib/publishing-finalization";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -447,21 +448,17 @@ export async function POST(req: Request) {
   } catch (err) {
     const errorMsg = err instanceof Error ? err.message : `${network} publish failed`;
 
-    // Provider failed — revert draft to APPROVED
-    await prisma.contentDraft.updateMany({
-      where: { id: draft.id, tenantId: tenant.id, status: "SCHEDULED" },
-      data: { status: "APPROVED" },
-    });
-
-    await prisma.publishingJob.update({
-      where: { id: attemptJobId },
-      data: { status: "FAILED", lastError: errorMsg.slice(0, 500), updatedAt: new Date() },
-    });
-
-    await prisma.publishingResult.upsert({
-      where: { id: `pr_${attemptJobId}` },
-      create: { id: `pr_${attemptJobId}`, jobId: attemptJobId, provider: network as any, ok: false, response: { error: errorMsg } },
-      update: { ok: false, response: { error: errorMsg } },
+    // Provider failed — record via shared service
+    await prisma.$transaction(async (tx) => {
+      await recordUnconfirmedProviderFailure({
+        tx,
+        jobId: attemptJobId,
+        draftId: draft.id,
+        tenantId: tenant.id,
+        network,
+        errorMsg,
+        isMaxAttempts: true,
+      });
     });
 
     try {
@@ -484,50 +481,32 @@ export async function POST(req: Request) {
     }, { status: 502 });
   }
 
-  // Provider succeeded — persist result immediately
+  // Provider succeeded — finalize via shared transactional service
   const externalPostId = publishResult.externalPostId;
-  let resultPersisted = false;
-  let draftPersisted = false;
-  let jobPersisted = false;
 
-  try {
-    await prisma.publishingResult.upsert({
-      where: { id: `pr_${attemptJobId}` },
-      create: { id: `pr_${attemptJobId}`, jobId: attemptJobId, provider: network as any, externalPostId, ok: true, response: publishResult.providerResponse as any },
-      update: { externalPostId, ok: true, response: publishResult.providerResponse as any },
+  const finalizeResult = await prisma.$transaction(async (tx) => {
+    return finalizeConfirmedPublication({
+      tx,
+      jobId: attemptJobId,
+      draftId: draft.id,
+      tenantId: tenant.id,
+      network,
+      externalPostId,
+      providerResponse: publishResult.providerResponse,
     });
-    resultPersisted = true;
-  } catch {
-    // Result persistence failed — reconciliation required
-  }
-
-  try {
-    await prisma.contentDraft.update({
-      where: { id: draft.id },
-      data: { status: "PUBLISHED", publishedAt: now, externalPostId },
-    });
-    draftPersisted = true;
-  } catch {}
-
-  try {
-    await prisma.publishingJob.update({
-      where: { id: attemptJobId },
-      data: { status: "PUBLISHED", scheduledFor: null, updatedAt: new Date() },
-    });
-    jobPersisted = true;
-  } catch {}
+  });
 
   try {
     await auditLog({
       tenantId: tenant.id,
       actorId: session.user.id,
-      action: "publish_immediate_live",
+      action: finalizeResult.committed ? "publish_immediate_live" : "publish_immediate_live_reconciliation_needed",
       target: `draft:${draft.id}`,
-      metadata: { tenant: tenant.name, title: draft.title, network, format: draft.format, externalPostId, providerResponse: publishResult.providerResponse, tenantAutomationMode: tenant.automationMode },
+      metadata: { tenant: tenant.name, title: draft.title, network, format: draft.format, externalPostId, providerResponse: publishResult.providerResponse, tenantAutomationMode: tenant.automationMode, committed: finalizeResult.committed },
     });
   } catch {}
 
-  if (!resultPersisted || !draftPersisted) {
+  if (!finalizeResult.committed) {
     return NextResponse.json({
       ok: false,
       providerConfirmed: true,
@@ -535,7 +514,7 @@ export async function POST(req: Request) {
       status: "RECONCILIATION_REQUIRED",
       draftId: draft.id,
       externalPostId,
-      error: "El proveedor confirmo la publicacion, pero HeptaCore no completo toda la persistencia.",
+      error: "El proveedor confirmo la publicacion, pero HeptaCore no completo la persistencia. El job permanece IN_REVIEW.",
       action: "No vuelva a publicar. Requiere reconciliacion operativa.",
     }, { status: 202 });
   }

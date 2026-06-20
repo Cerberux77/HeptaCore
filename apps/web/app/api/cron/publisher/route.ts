@@ -4,6 +4,7 @@ import { auditLog } from "../../../../lib/audit";
 import { resolveAndDecryptOAuthCredential } from "../../../../lib/credential-resolver";
 import { getPublisher, PublishInput } from "../../../../lib/publishers";
 import { checkCronJobEligibility, hasDurableProviderSuccess, isPublicationDurablyCommitted } from "../../../../lib/publishing-execution";
+import { finalizeConfirmedPublication, recordUnconfirmedProviderFailure } from "../../../../lib/publishing-finalization";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -272,60 +273,51 @@ export async function GET(req: Request) {
       if (outcome.kind === "success") {
         published++;
         results.push(`OK ${job.id}: published (${job.provider}) externalId=${outcome.externalPostId}`);
-        const externalPostId = outcome.externalPostId;
 
-        let resultPersisted = false;
-        let draftPersisted = false;
-
-        // Step 1: Persist PublishingResult
-        try {
-          await prisma.publishingResult.upsert({
-            where: { jobId: job.id },
-            update: { ok: true, externalPostId, response: outcome.providerResponse as any },
-            create: { id: `pr_${job.id}`, jobId: job.id, provider: job.provider as any, externalPostId, ok: true, response: outcome.providerResponse as any },
+        const finalizeResult = await prisma.$transaction(async (tx) => {
+          return finalizeConfirmedPublication({
+            tx,
+            jobId: job.id,
+            draftId: job.postId ?? "",
+            tenantId: job.tenantId,
+            network: job.provider,
+            externalPostId: outcome.externalPostId,
+            providerResponse: outcome.providerResponse,
           });
-          resultPersisted = true;
-        } catch {}
+        });
 
-        // Step 2: Persist ContentDraft
-        if (job.postId && job.draft) {
+        if (finalizeResult.committed) {
           try {
-            await prisma.contentDraft.update({
-              where: { id: job.postId },
-              data: { status: "PUBLISHED", publishedAt: new Date(), externalPostId },
+            await auditLog({
+              tenantId: job.tenantId,
+              actorId: "system",
+              action: "auto_publish_live",
+              target: `draft:${job.postId}`,
+              metadata: {
+                title: job.draft?.title ?? "untitled",
+                network: job.provider,
+                externalPostId: outcome.externalPostId,
+                scheduledFor: job.scheduledFor,
+              },
             });
-            draftPersisted = true;
           } catch {}
         } else {
-          draftPersisted = true;
+          try {
+            await auditLog({
+              tenantId: job.tenantId,
+              actorId: "system",
+              action: "auto_publish_live_reconciliation_needed",
+              target: `draft:${job.postId}`,
+              metadata: {
+                title: job.draft?.title ?? "untitled",
+                network: job.provider,
+                externalPostId: outcome.externalPostId,
+                scheduledFor: job.scheduledFor,
+                code: finalizeResult.code,
+              },
+            });
+          } catch {}
         }
-
-        // Step 3: Only mark job PUBLISHED if result and draft are coherent
-        const durablyCommitted = isPublicationDurablyCommitted({ resultPersisted, draftPersisted, externalPostId });
-
-        if (durablyCommitted) {
-          await prisma.publishingJob.updateMany({
-            where: { id: job.id },
-            data: { status: "PUBLISHED" },
-          });
-        }
-
-        // Step 4: AuditLog best-effort (never changes job/draft/result)
-        try {
-          await auditLog({
-            tenantId: job.tenantId,
-            actorId: "system",
-            action: durablyCommitted ? "auto_publish_live" : "auto_publish_live_reconciliation_needed",
-            target: `draft:${job.postId}`,
-            metadata: {
-              title: job.draft?.title ?? "untitled",
-              network: job.provider,
-              externalPostId,
-              scheduledFor: job.scheduledFor,
-              durablyCommitted,
-            },
-          });
-        } catch {}
       } else if (outcome.kind === "attempted") {
         failed++;
         const msg = outcome.error;
@@ -343,18 +335,16 @@ export async function GET(req: Request) {
         });
 
         if (!alreadyHasSuccess) {
-          await prisma.publishingResult.upsert({
-            where: { jobId: job.id },
-            update: { ok: false, response: { error: msg } as any },
-            create: { id: `pr_${job.id}`, jobId: job.id, provider: job.provider as any, ok: false, response: { error: msg } },
-          });
-        }
-
-        const nextStatus = job.attempts + 1 >= MAX_ATTEMPTS ? "FAILED" : "SCHEDULED";
-        if (!alreadyHasSuccess) {
-          await prisma.publishingJob.updateMany({
-            where: { id: job.id },
-            data: { status: nextStatus, lastError: msg.slice(0, 500) },
+          await prisma.$transaction(async (tx) => {
+            await recordUnconfirmedProviderFailure({
+              tx,
+              jobId: job.id,
+              draftId: job.postId ?? "",
+              tenantId: job.tenantId,
+              network: job.provider,
+              errorMsg: msg,
+              isMaxAttempts: job.attempts + 1 >= MAX_ATTEMPTS,
+            });
           });
         }
 
@@ -367,7 +357,7 @@ export async function GET(req: Request) {
           } catch { /* best-effort */ }
         }
       } else {
-        // kind === "blocked" — preflight failure, do NOT mark draft FAILED
+        // kind === "blocked" — preflight failure
         failed++;
         const msg = outcome.reason;
         results.push(`BLOCKED ${job.id}: ${msg}`);
@@ -378,18 +368,16 @@ export async function GET(req: Request) {
         });
 
         if (!hasDurableProviderSuccess({ resultOk: existingResult?.ok, resultExternalPostId: existingResult?.externalPostId })) {
-          await prisma.publishingResult.upsert({
-            where: { jobId: job.id },
-            update: { ok: false, response: { error: msg } as any },
-            create: { id: `pr_${job.id}`, jobId: job.id, provider: job.provider as any, ok: false, response: { error: msg } },
-          });
-        }
-
-        const nextStatus = job.attempts + 1 >= MAX_ATTEMPTS ? "FAILED" : "SCHEDULED";
-        if (!hasDurableProviderSuccess({ resultOk: existingResult?.ok, resultExternalPostId: existingResult?.externalPostId })) {
-          await prisma.publishingJob.updateMany({
-            where: { id: job.id },
-            data: { status: nextStatus, lastError: msg.slice(0, 500) },
+          await prisma.$transaction(async (tx) => {
+            await recordUnconfirmedProviderFailure({
+              tx,
+              jobId: job.id,
+              draftId: job.postId ?? "",
+              tenantId: job.tenantId,
+              network: job.provider,
+              errorMsg: msg,
+              isMaxAttempts: job.attempts + 1 >= MAX_ATTEMPTS,
+            });
           });
         }
       }
@@ -409,10 +397,16 @@ export async function GET(req: Request) {
       });
 
       if (!alreadyHasSuccess) {
-        const nextStatus = job.attempts + 1 >= MAX_ATTEMPTS ? "FAILED" : "SCHEDULED";
-        await prisma.publishingJob.updateMany({
-          where: { id: job.id },
-          data: { status: nextStatus, attempts: job.attempts + 1, lastError: msg.slice(0, 500) },
+        await prisma.$transaction(async (tx) => {
+          await recordUnconfirmedProviderFailure({
+            tx,
+            jobId: job.id,
+            draftId: job.postId ?? "",
+            tenantId: job.tenantId,
+            network: job.provider,
+            errorMsg: msg,
+            isMaxAttempts: job.attempts + 1 >= MAX_ATTEMPTS,
+          });
         });
       }
     }
