@@ -628,3 +628,67 @@ describe("durablePersistence", () => {
     assert.equal(alreadyPublished, false);
   });
 });
+
+describe("productionPublishingExecution", async () => {
+  const {
+    buildImmediateJobId,
+    buildScheduledJobId,
+    checkExistingJobForRetry,
+  } = await import("../publishing-execution.js");
+
+  it("buildImmediateJobId is deterministic", () => {
+    const id1 = buildImmediateJobId("draft-abc", "FACEBOOK");
+    const id2 = buildImmediateJobId("draft-abc", "FACEBOOK");
+    assert.equal(id1, id2);
+    assert.match(id1, /^pj_immediate_/);
+  });
+
+  it("buildImmediateJobId distinguishes networks", () => {
+    const fb = buildImmediateJobId("d1", "FACEBOOK");
+    const ig = buildImmediateJobId("d1", "INSTAGRAM");
+    assert.notEqual(fb, ig);
+  });
+
+  it("buildScheduledJobId includes timestamp", () => {
+    const t1 = new Date("2026-06-20T12:00:00Z");
+    const t2 = new Date("2026-06-20T13:00:00Z");
+    const id1 = buildScheduledJobId("d1", "FACEBOOK", t1);
+    const id2 = buildScheduledJobId("d1", "FACEBOOK", t2);
+    assert.notEqual(id2, id1);
+    assert.match(id1, /^pj_scheduled_/);
+  });
+
+  it("checkExistingJobForRetry blocks PUBLISHED job", () => {
+    const r = checkExistingJobForRetry({ jobStatus: "PUBLISHED" });
+    assert.equal(r.blocked, true);
+    assert.match(r.code!, /JOB_PUBLISHED/);
+  });
+
+  it("checkExistingJobForRetry blocks existing result ok", () => {
+    const r = checkExistingJobForRetry({ resultOk: true, externalPostId: "post_1" });
+    assert.equal(r.blocked, true);
+    assert.match(r.code!, /RESULT_EXISTS/);
+  });
+
+  it("checkExistingJobForRetry blocks draft externalPostId", () => {
+    const r = checkExistingJobForRetry({ draftExternalPostId: "existing_post" });
+    assert.equal(r.blocked, true);
+    assert.match(r.code!, /EXISTING_POST_ID/);
+  });
+
+  it("checkExistingJobForRetry blocks active SCHEDULED job", () => {
+    const r = checkExistingJobForRetry({ jobStatus: "SCHEDULED" });
+    assert.equal(r.blocked, true);
+    assert.match(r.code!, /JOB_ACTIVE/);
+  });
+
+  it("checkExistingJobForRetry allows FAILED without externalPostId", () => {
+    const r = checkExistingJobForRetry({ jobStatus: "FAILED" });
+    assert.equal(r.blocked, false);
+  });
+
+  it("checkExistingJobForRetry allows no existing job", () => {
+    const r = checkExistingJobForRetry({});
+    assert.equal(r.blocked, false);
+  });
+});

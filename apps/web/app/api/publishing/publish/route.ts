@@ -5,6 +5,7 @@ import { prisma } from "../../../../lib/prisma";
 import { TRIAL_POSTS_PER_NETWORK } from "../../../../lib/trial";
 import { resolveAndDecryptOAuthCredential } from "../../../../lib/credential-resolver";
 import { getPublisher, PublishInput } from "../../../../lib/publishers";
+import { buildImmediateJobId, buildScheduledJobId, checkExistingJobForRetry } from "../../../../lib/publishing-execution";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -349,6 +350,32 @@ export async function POST(req: Request) {
 
   // === IMMEDIATE: attempt real publish ===
 
+  const attemptJobId = buildImmediateJobId(draft.id, network);
+
+  // Check for existing completed/in-flight state
+  const existingJob = await prisma.publishingJob.findUnique({
+    where: { id: attemptJobId },
+    select: { status: true, PublishingResult: { select: { ok: true, externalPostId: true } } },
+  });
+
+  const retryCheck = checkExistingJobForRetry({
+    jobStatus: existingJob?.status,
+    resultOk: existingJob?.PublishingResult?.ok,
+    externalPostId: existingJob?.PublishingResult?.externalPostId ?? undefined,
+    draftExternalPostId: draft.externalPostId,
+  });
+
+  if (retryCheck.blocked) {
+    return NextResponse.json({
+      ok: false,
+      mode: "immediate",
+      code: retryCheck.code ?? "LIVE_BLOCKED_RETRY",
+      error: retryCheck.reason ?? "No puede volver a publicarse.",
+      action: "Verifica el estado del draft y el job existente.",
+    }, { status: 409 });
+  }
+
+  // Atomic claim: only one request wins
   const claimed = await prisma.contentDraft.updateMany({
     where: { id: draft.id, status: "APPROVED" },
     data: { status: "SCHEDULED" },
@@ -362,15 +389,11 @@ export async function POST(req: Request) {
     }, { status: 409 });
   }
 
-  const attemptJobId = `pj_${draft.id}_${network}`;
-  let attemptJob = await prisma.publishingJob.findUnique({
-    where: { id: attemptJobId },
-    select: { id: true, status: true },
-  });
-
-  if (!attemptJob) {
-    attemptJob = await prisma.publishingJob.create({
-      data: {
+  // Create durable attempt job BEFORE provider call
+  try {
+    await prisma.publishingJob.upsert({
+      where: { id: attemptJobId },
+      create: {
         id: attemptJobId,
         tenantId: tenant.id,
         postId: draft.id,
@@ -379,8 +402,24 @@ export async function POST(req: Request) {
         scheduledFor: null,
         updatedAt: new Date(),
       },
-      select: { id: true, status: true },
+      update: {
+        status: "SCHEDULED",
+        scheduledFor: null,
+        attempts: { increment: 1 },
+        updatedAt: new Date(),
+      },
     });
+  } catch {
+    // Rollback claim
+    await prisma.contentDraft.updateMany({
+      where: { id: draft.id, tenantId: tenant.id, status: "SCHEDULED" },
+      data: { status: "APPROVED" },
+    });
+    return NextResponse.json({
+      code: "LIVE_BLOCKED_JOB_CREATION_FAILED",
+      error: "No se pudo crear el intento durable. El draft fue revertido.",
+      action: "Reintenta la operacion.",
+    }, { status: 500 });
   }
 
   const publishInput: PublishInput = {
@@ -397,14 +436,15 @@ export async function POST(req: Request) {
   } catch (err) {
     const errorMsg = err instanceof Error ? err.message : `${network} publish failed`;
 
+    // Provider failed — revert draft to APPROVED
     await prisma.contentDraft.updateMany({
-      where: { id: draft.id, status: "SCHEDULED" },
+      where: { id: draft.id, tenantId: tenant.id, status: "SCHEDULED" },
       data: { status: "APPROVED" },
     });
 
     await prisma.publishingJob.update({
       where: { id: attemptJobId },
-      data: { status: "FAILED", attempts: { increment: 1 }, lastError: errorMsg.slice(0, 500), updatedAt: new Date() },
+      data: { status: "FAILED", lastError: errorMsg.slice(0, 500), updatedAt: new Date() },
     });
 
     await prisma.publishingResult.upsert({
@@ -413,89 +453,81 @@ export async function POST(req: Request) {
       update: { ok: false, response: { error: errorMsg } },
     });
 
-    await auditLog({
-      tenantId: tenant.id,
-      actorId: session.user.id,
-      action: "publish_immediate_failed",
-      target: `draft:${draft.id}`,
-      metadata: {
-        tenant: tenant.name,
-        title: draft.title,
-        network,
-        format: draft.format,
-        error: errorMsg.slice(0, 500),
-      },
-    });
+    try {
+      await auditLog({
+        tenantId: tenant.id,
+        actorId: session.user.id,
+        action: "publish_immediate_failed",
+        target: `draft:${draft.id}`,
+        metadata: { tenant: tenant.name, title: draft.title, network, format: draft.format, error: errorMsg.slice(0, 500) },
+      });
+    } catch {}
 
     return NextResponse.json({
       ok: false,
       mode: "immediate",
       code: "LIVE_PUBLISH_FAILED",
       error: `${network} publish failed: ${errorMsg}`,
-      action: "Revisa la configuración, credenciales y URL del asset.",
+      action: "Revisa la configuracion, credenciales y URL del asset.",
       draftId: draft.id,
     }, { status: 502 });
   }
 
   // Provider succeeded — persist result immediately
   const externalPostId = publishResult.externalPostId;
+  let resultPersisted = false;
+  let draftPersisted = false;
+  let jobPersisted = false;
 
-  await prisma.publishingResult.upsert({
-    where: { id: `pr_${attemptJobId}` },
-    create: {
-      id: `pr_${attemptJobId}`,
-      jobId: attemptJobId,
-      provider: network as any,
-      externalPostId,
-      ok: true,
-      response: publishResult.providerResponse as any,
-    },
-    update: {
-      externalPostId,
-      ok: true,
-      response: publishResult.providerResponse as any,
-    },
-  });
+  try {
+    await prisma.publishingResult.upsert({
+      where: { id: `pr_${attemptJobId}` },
+      create: { id: `pr_${attemptJobId}`, jobId: attemptJobId, provider: network as any, externalPostId, ok: true, response: publishResult.providerResponse as any },
+      update: { externalPostId, ok: true, response: publishResult.providerResponse as any },
+    });
+    resultPersisted = true;
+  } catch {
+    // Result persistence failed — reconciliation required
+  }
 
-  // Persist draft and job
   try {
     await prisma.contentDraft.update({
       where: { id: draft.id },
       data: { status: "PUBLISHED", publishedAt: now, externalPostId },
     });
+    draftPersisted = true;
+  } catch {}
 
+  try {
     await prisma.publishingJob.update({
       where: { id: attemptJobId },
       data: { status: "PUBLISHED", scheduledFor: null, updatedAt: new Date() },
     });
-  } catch {
+    jobPersisted = true;
+  } catch {}
+
+  try {
+    await auditLog({
+      tenantId: tenant.id,
+      actorId: session.user.id,
+      action: "publish_immediate_live",
+      target: `draft:${draft.id}`,
+      metadata: { tenant: tenant.name, title: draft.title, network, format: draft.format, externalPostId, providerResponse: publishResult.providerResponse, tenantAutomationMode: tenant.automationMode },
+    });
+  } catch {}
+
+  if (!resultPersisted || !draftPersisted) {
     return NextResponse.json({
-      ok: true,
-      mode: "immediate",
+      ok: false,
+      providerConfirmed: true,
       code: "LIVE_RECONCILIATION_REQUIRED",
       status: "RECONCILIATION_REQUIRED",
       draftId: draft.id,
       externalPostId,
-      error: "El proveedor confirmo la publicacion pero HeptaCore no completo la persistencia. No vuelva a publicar. Requiere reconciliacion.",
-      action: "Contacta al operador para reconciliar el estado del draft.",
-    }, { status: 200 });
+      error: "El proveedor confirmo la publicacion, pero HeptaCore no completo toda la persistencia.",
+      action: "No vuelva a publicar. Requiere reconciliacion operativa.",
+    }, { status: 202 });
   }
-
-  await auditLog({
-    tenantId: tenant.id,
-    actorId: session.user.id,
-    action: "publish_immediate_live",
-    target: `draft:${draft.id}`,
-    metadata: {
-      tenant: tenant.name,
-      title: draft.title,
-      network,
-      format: draft.format,
-      externalPostId,
-      providerResponse: publishResult.providerResponse,
-      tenantAutomationMode: tenant.automationMode,
-    },
-  });
 
   return NextResponse.json({
     ok: true,
@@ -504,4 +536,5 @@ export async function POST(req: Request) {
     draftId: draft.id,
     externalPostId,
   });
+
 }

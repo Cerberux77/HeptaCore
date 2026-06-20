@@ -214,13 +214,15 @@ export function DashboardConsole({
     metrics?.tenant.mode === "AUTOPILOT_FULL" || metrics?.tenant.mode === "AUTOPILOT_LIMITED";
   const tenantNeedsManual =
     metrics?.tenant.mode === "APPROVAL_REQUIRED" || metrics?.tenant.mode === "DRAFT_ONLY";
-  const [publishState, setPublishState] = useState<"idle" | "loading" | "published" | "scheduled" | "dry_run_ok" | "blocked" | "failed">("idle");
+  const [publishState, setPublishState] = useState<"idle" | "loading" | "published" | "scheduled" | "dry_run_ok" | "blocked" | "failed" | "reconciliation_required">("idle");
   const [publishMessage, setPublishMessage] = useState("");
+  const activeRequestRef = useRef<{ draftId: string; mode: string; requestId: string } | null>(null);
 
   useEffect(() => {
     setManualApproval(false);
     setPublishState("idle");
     setPublishMessage("");
+    activeRequestRef.current = null;
   }, [selectedId, publishMode]);
 
   const [editMode, setEditMode] = useState(false);
@@ -292,21 +294,32 @@ export function DashboardConsole({
 
   async function handlePublish() {
     if (!publishTarget) return;
+    const requestDraftId = publishTarget.id;
+    const requestMode = publishMode;
+    const requestId = `${requestDraftId}_${requestMode}_${Date.now().toString(36)}`;
+    activeRequestRef.current = { draftId: requestDraftId, mode: requestMode, requestId };
     setPublishState("loading");
     setPublishMessage("");
     try {
-      const effectiveMode = publishMode;
       const res = await fetch("/api/publishing/publish", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           tenantSlug,
-          draftId: publishTarget.id,
+          draftId: requestDraftId,
           manualApproval: manualApproval || tenantAutoPilot,
-          mode: effectiveMode,
+          mode: requestMode,
         }),
       });
       const data = await res.json();
+
+      if (data.providerConfirmed === true && data.code === "LIVE_RECONCILIATION_REQUIRED") {
+        setPublishState("reconciliation_required");
+        const extIdPart = data.externalPostId ? ` ID externo: ${data.externalPostId}.` : "";
+        setPublishMessage(`${data.error}${extIdPart} ${data.action}`);
+        return;
+      }
+
       if (!res.ok || !data.ok) {
         setPublishState(data.code === "LIVE_BLOCKED_TRIAL_LIMIT" || data.code?.startsWith("LIVE_BLOCKED") ? "blocked" : "failed");
         setPublishMessage(data.error || data.action || "No se pudo ejecutar la publicacion.");
@@ -314,7 +327,7 @@ export function DashboardConsole({
       }
       const newStatus = data.mode === "immediate" ? "PUBLISHED" : data.mode === "scheduled" ? "SCHEDULED" : "APPROVED";
       const extra = data.externalPostId ? { externalPostId: data.externalPostId } as Partial<DraftQueueItem> : {};
-      updateLocalStatus(publishTarget.id, newStatus, extra);
+      updateLocalStatus(requestDraftId, newStatus, extra);
       if (data.mode === "dry_run") {
         setPublishState("dry_run_ok");
       } else if (data.mode === "scheduled") {
@@ -1608,6 +1621,7 @@ export function DashboardConsole({
                   <select
                     value={publishMode}
                     onChange={(e) => setPublishMode(e.target.value as "dry_run" | "scheduled" | "immediate")}
+                    disabled={publishState === "loading"}
                     style={{ padding: "6px 10px", borderRadius: 6, border: "1px solid var(--hc-line)", fontSize: 13 }}
                   >
                     <option value="dry_run">Dry-run (validar, no publicar)</option>
@@ -1622,6 +1636,7 @@ export function DashboardConsole({
                         type="checkbox"
                         checked={manualApproval}
                         onChange={(event) => setManualApproval(event.target.checked)}
+                        disabled={publishState === "loading"}
                       />
                       Manuel aprueba ejecutar este {publishMode === "immediate" ? "intento de publicacion real" : publishMode === "scheduled" ? "intento de programacion" : "dry-run controlado"}.
                     </label>
@@ -1632,6 +1647,7 @@ export function DashboardConsole({
                         type="checkbox"
                         checked={manualApproval}
                         onChange={(event) => setManualApproval(event.target.checked)}
+                        disabled={publishState === "loading"}
                       />
                       Confirmo que quiero publicar en redes reales. Esta accion no es reversible.
                     </label>
@@ -1660,7 +1676,7 @@ export function DashboardConsole({
                     <small style={{ color: "var(--hc-sand)", display: "block", marginTop: 6 }}>{publishEligibility.reason}</small>
                   )}
                   {publishMessage && (
-                    <p className={publishState === "failed" || publishState === "blocked" ? "login-error" : "publish-ok"}>
+                    <p className={publishState === "failed" || publishState === "blocked" || publishState === "reconciliation_required" ? "login-error" : "publish-ok"}>
                       {publishMessage}
                     </p>
                   )}
