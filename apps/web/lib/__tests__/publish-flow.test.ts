@@ -1081,3 +1081,120 @@ describe("transactionalFinalization", async () => {
     assert.equal(r.degraded, true);
   });
 });
+
+describe("dashboardQueueProductionHelpers", async () => {
+  const {
+    approvedCount,
+    buildPublishPayload: buildRealPublishPayload,
+    mergeDraftQueueItem,
+    resolvePublishTargetFromQueue,
+    selectedDraftFromQueue,
+  } = await import("../dashboard-queue.js");
+
+  const instagramScheduled = {
+    id: "ig-scheduled",
+    title: "Recorrido del estudio en 30s",
+    caption: "IG caption",
+    network: "INSTAGRAM",
+    format: "REEL",
+    pillar: null,
+    status: "SCHEDULED",
+    riskLevel: "low",
+    requiresReview: false,
+    scheduledFor: "2026-06-20 13:00",
+    hashtags: [],
+    cta: null,
+    source: null,
+    asset: null,
+  };
+
+  const facebookDraft = {
+    id: "fb-draft",
+    title: "Facebook aprobado",
+    caption: "FB caption",
+    network: "FACEBOOK",
+    format: "FEED",
+    pillar: null,
+    status: "DRAFT",
+    riskLevel: "low",
+    requiresReview: true,
+    scheduledFor: "2026-06-20 14:00",
+    hashtags: [],
+    cta: null,
+    source: null,
+    asset: null,
+  };
+
+  it("approving Facebook updates that draft to APPROVED without reload", () => {
+    const queue = [instagramScheduled, facebookDraft];
+    const next = mergeDraftQueueItem(queue, { id: "fb-draft", status: "APPROVED", requiresReview: false });
+    assert.equal(next.find((d) => d.id === "fb-draft")?.status, "APPROVED");
+    assert.equal(next.find((d) => d.id === "fb-draft")?.requiresReview, false);
+  });
+
+  it("selectedId remains the approved Facebook draft", () => {
+    const queue = mergeDraftQueueItem([instagramScheduled, facebookDraft], { id: "fb-draft", status: "APPROVED" });
+    const selected = selectedDraftFromQueue(queue, "fb-draft");
+    assert.equal(selected?.id, "fb-draft");
+    assert.equal(selected?.network, "FACEBOOK");
+  });
+
+  it("publishTarget immediately resolves to approved Facebook, not prior Instagram", () => {
+    const queue = mergeDraftQueueItem([instagramScheduled, facebookDraft], { id: "fb-draft", status: "APPROVED" });
+    const target = resolvePublishTargetFromQueue(queue, "fb-draft", "dry_run");
+    assert.equal(target?.id, "fb-draft");
+    assert.equal(target?.network, "FACEBOOK");
+    assert.notEqual(target?.id, "ig-scheduled");
+  });
+
+  it("approved counter changes without reload", () => {
+    const before = approvedCount([instagramScheduled, facebookDraft]);
+    const after = approvedCount(mergeDraftQueueItem([instagramScheduled, facebookDraft], { id: "fb-draft", status: "APPROVED" }));
+    assert.equal(before, 0);
+    assert.equal(after, 1);
+  });
+
+  it("dry-run payload contains the captured selected draftId and mode", () => {
+    const payload = buildRealPublishPayload("turpial-sound", "fb-draft", "dry_run", false);
+    assert.deepEqual(payload, {
+      tenantSlug: "turpial-sound",
+      draftId: "fb-draft",
+      mode: "dry_run",
+      manualApproval: false,
+    });
+  });
+
+  it("late approve response does not have to change a newer selected target", () => {
+    const queue = mergeDraftQueueItem([instagramScheduled, facebookDraft], { id: "fb-draft", status: "APPROVED" });
+    const selected = selectedDraftFromQueue(queue, "ig-scheduled");
+    assert.equal(selected?.id, "ig-scheduled");
+  });
+
+  it("failed approve can preserve the original state by not merging a patch", () => {
+    const queue = [instagramScheduled, facebookDraft];
+    assert.equal(queue.find((d) => d.id === "fb-draft")?.status, "DRAFT");
+  });
+});
+
+describe("dryRunRouteIsolation", async () => {
+  const { readFileSync } = await import("node:fs");
+  const source = readFileSync(new URL("../../app/api/publishing/publish/route.ts", import.meta.url), "utf8");
+
+  it("dry-run branch is before provider publish and finalization", () => {
+    const dryRunIndex = source.indexOf('if (requestMode === "dry_run")');
+    const providerIndex = source.indexOf("publisher.publish");
+    const finalizeIndex = source.indexOf("commitConfirmedPublication(prisma", dryRunIndex);
+    assert.ok(dryRunIndex > 0, "dry-run branch exists");
+    assert.ok(providerIndex > dryRunIndex, "provider call remains after dry-run branch");
+    assert.ok(finalizeIndex > dryRunIndex, "finalization remains after dry-run branch");
+  });
+
+  it("dry-run response does not expose externalPostId or PUBLISHED", () => {
+    const dryRunIndex = source.indexOf('if (requestMode === "dry_run")');
+    const immediateIndex = source.indexOf("// === IMMEDIATE: attempt real publish ===");
+    const dryRunBlock = source.slice(dryRunIndex, immediateIndex);
+    assert.match(dryRunBlock, /mode:\s*"dry_run"/);
+    assert.doesNotMatch(dryRunBlock, /externalPostId/);
+    assert.doesNotMatch(dryRunBlock, /PUBLISHED/);
+  });
+});

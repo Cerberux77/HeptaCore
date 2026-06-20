@@ -31,9 +31,25 @@ export async function POST(
     return NextResponse.json({ error: "Forbidden: approval role required" }, { status: 403 });
   }
 
-  await prisma.contentDraft.update({
+  const updated = await prisma.contentDraft.update({
     where: { id },
     data: { status: "APPROVED", requiresReview: false },
+    select: {
+      id: true,
+      title: true,
+      caption: true,
+      network: true,
+      format: true,
+      pillar: true,
+      status: true,
+      riskLevel: true,
+      requiresReview: true,
+      scheduledFor: true,
+      hashtags: true,
+      cta: true,
+      source: true,
+      assets: { take: 1, select: { asset: { select: { filename: true, sourcePath: true, kind: true } } } },
+    },
   });
 
   await prisma.approval.create({
@@ -54,5 +70,30 @@ export async function POST(
     metadata: { title: draft.title },
   });
 
-  return NextResponse.json({ ok: true, status: "APPROVED" });
+  return NextResponse.json({
+    ok: true,
+    status: "APPROVED",
+    draft: {
+      id: updated.id,
+      title: updated.title,
+      caption: updated.caption,
+      network: updated.network,
+      format: updated.format,
+      pillar: updated.pillar,
+      status: updated.status,
+      riskLevel: updated.riskLevel,
+      requiresReview: updated.requiresReview,
+      scheduledFor: updated.scheduledFor?.toISOString().slice(0, 16).replace("T", " ") ?? null,
+      hashtags: updated.hashtags,
+      cta: updated.cta,
+      source: updated.source,
+      asset: updated.assets[0]?.asset
+        ? {
+            filename: updated.assets[0].asset.filename,
+            path: updated.assets[0].asset.sourcePath,
+            kind: updated.assets[0].asset.kind,
+          }
+        : null,
+    },
+  });
 }

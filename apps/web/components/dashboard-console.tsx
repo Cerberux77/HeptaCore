@@ -33,6 +33,13 @@ import type {
   StrategySnapshot,
   TenantAssetItem,
 } from "../lib/dashboard";
+import {
+  buildPublishPayload,
+  mergeDraftQueueItem,
+  resolvePublishTargetFromQueue,
+  selectedDraftFromQueue,
+  type DraftQueuePatch,
+} from "../lib/dashboard-queue";
 import type { TrialStatus } from "../lib/trial";
 
 type View = "overview" | "strategy" | "queue" | "assets" | "calendar" | "checklist" | "reports" | "readiness";
@@ -264,7 +271,7 @@ export function DashboardConsole({
   const [uploading, setUploading] = useState(false);
   const [uploadFile, setUploadFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const selected = localQueue.find((i) => i.id === selectedId) ?? localQueue[0];
+  const selected = selectedDraftFromQueue(localQueue, selectedId);
   const activeNetworks = metrics?.tenant.activeNetworks?.length ? metrics.tenant.activeNetworks : ["INSTAGRAM", "FACEBOOK"];
   const missingCoreNetworks = SUPPORTED_NETWORKS.filter((network) => !activeNetworks.includes(network));
 
@@ -283,19 +290,15 @@ export function DashboardConsole({
     ? `${nextItem.network} · ${nextItem.status === "APPROVED" ? "Listo" : nextItem.status === "NEEDS_REVIEW" ? "Pendiente revision" : nextItem.status}`
     : "No hay programados";
 
-  const updateLocalStatus = useCallback((id: string, newStatus: string, extra?: Partial<DraftQueueItem>) => {
-    setLocalQueue((prev) => prev.map((d) => (d.id === id ? { ...d, status: newStatus, ...extra } : d)));
+  const mergeLocalDraft = useCallback((patch: DraftQueuePatch) => {
+    setLocalQueue((prev) => mergeDraftQueueItem(prev, patch));
   }, []);
 
-  function resolvePublishTarget(): DraftQueueItem | null {
-    if (!selected) return null;
-    if (selected.status === "PUBLISHED") return null;
-    if (publishMode === "immediate" && selected.status !== "APPROVED") return null;
-    if (publishMode === "scheduled" && selected.status !== "APPROVED") return null;
-    return selected;
-  }
+  const updateLocalStatus = useCallback((id: string, newStatus: string, extra?: Partial<DraftQueueItem>) => {
+    mergeLocalDraft({ id, status: newStatus, ...extra });
+  }, [mergeLocalDraft]);
 
-  const publishTarget = resolvePublishTarget();
+  const publishTarget = resolvePublishTargetFromQueue(localQueue, selectedId, publishMode);
 
   async function handlePublish() {
     if (!publishTarget) return;
@@ -309,12 +312,12 @@ export function DashboardConsole({
       const res = await fetch("/api/publishing/publish", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
+        body: JSON.stringify(buildPublishPayload(
           tenantSlug,
-          draftId: requestDraftId,
-          manualApproval: manualApproval || tenantAutoPilot,
-          mode: requestMode,
-        }),
+          requestDraftId,
+          requestMode,
+          manualApproval || tenantAutoPilot,
+        )),
       });
       const data = await res.json();
 
@@ -1193,7 +1196,17 @@ export function DashboardConsole({
                   </div>
                 )}
                 {!editMode && (selected.status === "DRAFT" || selected.status === "NEEDS_REVIEW" || selected.status === "REJECTED" ? (
-                  <ApprovalActions draftId={selected.id} onStatusChange={(s) => updateLocalStatus(selected.id, s)} />
+                  <ApprovalActions
+                    draftId={selected.id}
+                    onStatusChange={(patch) => {
+                      mergeLocalDraft(patch);
+                      setSelectedIdRaw(patch.id);
+                      setManualApproval(false);
+                      setPublishState("idle");
+                      setPublishMessage("");
+                      activeRequestRef.current = null;
+                    }}
+                  />
                 ) : (
                   <div className="approval-actions">
                     <span style={{ color: "var(--hc-fog)", fontSize: 12, padding: "8px 0" }}>
@@ -1744,7 +1757,7 @@ function ApprovalActions({
   onStatusChange,
 }: {
   draftId: string;
-  onStatusChange: (status: string) => void;
+  onStatusChange: (draft: DraftQueuePatch) => void;
 }) {
   const [loading, setLoading] = useState<"approve" | "reject" | null>(null);
 
@@ -1753,7 +1766,7 @@ function ApprovalActions({
     try {
       const res = await fetch(`/api/drafts/${draftId}/approve`, { method: "POST" });
       const data = await res.json();
-      if (data.ok) onStatusChange("APPROVED");
+      if (data.ok) onStatusChange(data.draft ?? { id: draftId, status: "APPROVED", requiresReview: false });
       else alert(data.error || "Error");
     } finally {
       setLoading(null);
@@ -1765,7 +1778,7 @@ function ApprovalActions({
     try {
       const res = await fetch(`/api/drafts/${draftId}/reject`, { method: "POST" });
       const data = await res.json();
-      if (data.ok) onStatusChange("REJECTED");
+      if (data.ok) onStatusChange(data.draft ?? { id: draftId, status: "REJECTED" });
       else alert(data.error || "Error");
     } finally {
       setLoading(null);
