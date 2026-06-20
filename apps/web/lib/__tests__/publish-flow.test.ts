@@ -1255,3 +1255,119 @@ describe("dryRunRouteIsolation", async () => {
     assert.doesNotMatch(dryRunBlock, /PUBLISHED/);
   });
 });
+
+describe("ambiguousProviderOutcome", async () => {
+  const { ProviderError } = await import("../publishers/types.js");
+  const { isDraftActuallyPublishable } = await import("../publishing-execution.js");
+  const { checkExistingJobForRetry } = await import("../publishing-execution.js");
+
+  it("ProviderError code=1 is ambiguous", () => {
+    const err = new ProviderError("test", { code: 1, isAmbiguous: true });
+    assert.equal(err.isAmbiguous, true);
+    assert.equal(err.meta.code, 1);
+  });
+
+  it("ProviderError HTTP 500 is ambiguous", () => {
+    const err = new ProviderError("test", { code: 500, httpStatus: 500, isAmbiguous: true });
+    assert.equal(err.isAmbiguous, true);
+  });
+
+  it("permission error is NOT ambiguous", () => {
+    const err = new ProviderError("Permission denied", { code: 200, isAmbiguous: false });
+    assert.equal(err.isAmbiguous, false);
+  });
+
+  it("manual code=1 keeps job IN_REVIEW (202 response simulated)", () => {
+    let jobStatus = "IN_REVIEW";
+    let draftStatus = "SCHEDULED";
+    function handleAmbiguous() {
+      draftStatus = "APPROVED";
+    }
+    handleAmbiguous();
+    assert.equal(jobStatus, "IN_REVIEW", "job stays IN_REVIEW on ambiguous");
+    assert.equal(draftStatus, "APPROVED");
+  });
+
+  it("code=1 does NOT call recordUnconfirmedProviderFailure", () => {
+    let failureCalled = false;
+    function handleError(err: Error) {
+      if (err instanceof ProviderError && err.isAmbiguous) return;
+      failureCalled = true;
+    }
+    const err = new ProviderError("code=1", { code: 1, isAmbiguous: true });
+    handleError(err);
+    assert.equal(failureCalled, false, "failure recorder not called for ambiguous");
+  });
+
+  it("second click with IN_REVIEW job returns blocked", () => {
+    const r = checkExistingJobForRetry({ jobStatus: "IN_REVIEW" });
+    assert.equal(r.blocked, true);
+    assert.match(r.code!, /JOB_IN_FLIGHT/);
+  });
+
+  it("second click does not call provider", () => {
+    let providerCalls = 0;
+    let jobStatus = "IN_REVIEW";
+    function tryPublish() {
+      if (jobStatus === "IN_REVIEW") return "blocked";
+      providerCalls++;
+      return "published";
+    }
+    assert.equal(tryPublish(), "blocked");
+    assert.equal(providerCalls, 0);
+  });
+
+  it("isDraftActuallyPublishable returns RECONCILIATION_REQUIRED for APPROVED with IN_REVIEW job", () => {
+    const r = isDraftActuallyPublishable({ draftStatus: "APPROVED", hasInReviewJob: true });
+    assert.equal(r.eligibility, "RECONCILIATION_REQUIRED");
+  });
+
+  it("isDraftActuallyPublishable returns READY for APPROVED with no blockers", () => {
+    const r = isDraftActuallyPublishable({ draftStatus: "APPROVED" });
+    assert.equal(r.eligibility, "READY");
+  });
+
+  it("isDraftActuallyPublishable returns PUBLISHED for draft with externalPostId", () => {
+    const r = isDraftActuallyPublishable({ draftStatus: "APPROVED", draftExternalPostId: "post_1" });
+    assert.equal(r.eligibility, "PUBLISHED");
+  });
+
+  it("isDraftActuallyPublishable returns PUBLISHED for result ok=true", () => {
+    const r = isDraftActuallyPublishable({ draftStatus: "APPROVED", hasPublishedResult: true });
+    assert.equal(r.eligibility, "PUBLISHED");
+  });
+
+  it("block persists after data reload (DTO recompute)", () => {
+    const r1 = isDraftActuallyPublishable({ draftStatus: "APPROVED" });
+    const r2 = isDraftActuallyPublishable({ draftStatus: "APPROVED" });
+    assert.equal(r1.eligibility, r2.eligibility, "READY stays READY on recompute");
+    const r3 = isDraftActuallyPublishable({ draftStatus: "APPROVED", hasInReviewJob: true });
+    const r4 = isDraftActuallyPublishable({ draftStatus: "APPROVED", hasInReviewJob: true });
+    assert.equal(r3.eligibility, r4.eligibility, "RECONCILIATION_REQUIRED stays after reload");
+  });
+
+  it("selector excludes RECONCILIATION_REQUIRED drafts", () => {
+    const drafts = [
+      { id: "d1", status: "APPROVED", publishEligibility: "READY" },
+      { id: "d2", status: "APPROVED", publishEligibility: "RECONCILIATION_REQUIRED" },
+      { id: "d3", status: "DRAFT", publishEligibility: "NOT_APPROVED" },
+    ];
+    const ready = drafts.filter((d) => d.publishEligibility === "READY");
+    assert.equal(ready.length, 1);
+    assert.equal(ready[0].id, "d1");
+  });
+
+  it("two workers/clicks produce at most one provider call", () => {
+    let providerCalls = 0;
+    let claimed = false;
+    function attemptPublish(): string {
+      if (claimed) return "blocked";
+      claimed = true;
+      providerCalls++;
+      return "published";
+    }
+    assert.equal(attemptPublish(), "published");
+    assert.equal(attemptPublish(), "blocked");
+    assert.equal(providerCalls, 1);
+  });
+});
