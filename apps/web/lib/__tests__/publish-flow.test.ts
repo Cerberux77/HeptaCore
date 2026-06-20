@@ -1082,6 +1082,63 @@ describe("transactionalFinalization", async () => {
   });
 });
 
+describe("publishTargetSelection", async () => {
+  const { selectedDraftFromQueue, resolvePublishTargetFromQueue } = await import("../dashboard-queue.js");
+
+  const igScheduled = { id: "d-ig", title: "IG Reel", status: "SCHEDULED", network: "INSTAGRAM" };
+  const fbApproved1 = { id: "d-fb-1", title: "FB Music Cost", status: "APPROVED", network: "FACEBOOK" };
+  const fbApproved2 = { id: "d-fb-2", title: "FB Budget", status: "APPROVED", network: "FACEBOOK" };
+  const published = { id: "d-pub", title: "Old", status: "PUBLISHED", network: "FACEBOOK" };
+
+  const queue = [igScheduled, fbApproved1, fbApproved2, published] as any[];
+
+  it("falls back to first APPROVED, not queue[0]", () => {
+    const target = selectedDraftFromQueue(queue, "non-existent");
+    assert.equal(target?.network, "FACEBOOK");
+    assert.notEqual(target?.status, "SCHEDULED");
+  });
+
+  it("never selects Instagram SCHEDULED as fallback", () => {
+    const queueIgFirst = [igScheduled, fbApproved1];
+    const target = selectedDraftFromQueue(queueIgFirst as any, "");
+    assert.notEqual(target?.network, "INSTAGRAM");
+  });
+
+  it("preserves explicitly selected Facebook APPROVED", () => {
+    const target = selectedDraftFromQueue(queue, "d-fb-1");
+    assert.equal(target?.id, "d-fb-1");
+    assert.equal(target?.status, "APPROVED");
+  });
+
+  it("rejects SCHEDULED draft in publish target", () => {
+    const t = resolvePublishTargetFromQueue(queue, "d-ig", "dry_run");
+    assert.notEqual(t?.id, "d-ig", "should not select SCHEDULED draft");
+    assert.equal(t?.status, "APPROVED", "should select first APPROVED instead");
+  });
+
+  it("dry_run target contains Facebook APPROVED id", () => {
+    const t = resolvePublishTargetFromQueue(queue, "", "dry_run");
+    assert.equal(t?.network, "FACEBOOK");
+    assert.equal(t?.status, "APPROVED");
+  });
+
+  it("dry_run target never contains Instagram SCHEDULED id", () => {
+    const t = resolvePublishTargetFromQueue(queue, "d-ig", "dry_run");
+    assert.notEqual(t?.id, "d-ig");
+  });
+
+  it("button disabled when no APPROVED drafts", () => {
+    const noApproved = [igScheduled, published];
+    const t = resolvePublishTargetFromQueue(noApproved as any, "", "dry_run");
+    assert.equal(t, null);
+  });
+
+  it("PUBLISHED draft rejected", () => {
+    const t = resolvePublishTargetFromQueue(queue, "d-pub", "dry_run");
+    assert.equal(t, null);
+  });
+});
+
 describe("dashboardQueueProductionHelpers", async () => {
   const {
     approvedCount,

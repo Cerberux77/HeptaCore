@@ -8,20 +8,20 @@ export function mergeDraftQueueItem(queue: DraftQueueItem[], patch: DraftQueuePa
 }
 
 export function selectedDraftFromQueue(queue: DraftQueueItem[], selectedId: string): DraftQueueItem | undefined {
-  return queue.find((draft) => draft.id === selectedId) ?? queue[0];
+  const match = queue.find((draft) => draft.id === selectedId);
+  if (match) return match;
+  return queue.find((draft) => draft.status === "APPROVED");
 }
 
 export function resolvePublishTargetFromQueue(
   queue: DraftQueueItem[],
   selectedId: string,
-  mode: PublishMode,
+  _mode: PublishMode,
 ): DraftQueueItem | null {
-  const selected = selectedDraftFromQueue(queue, selectedId);
-  if (!selected) return null;
-  if (selected.status === "PUBLISHED") return null;
-  if (mode === "immediate" && selected.status !== "APPROVED") return null;
-  if (mode === "scheduled" && selected.status !== "APPROVED") return null;
-  return selected;
+  const selected = queue.find((draft) => draft.id === selectedId);
+  if (selected && selected.status === "APPROVED") return selected;
+  if (selected?.status === "PUBLISHED") return null;
+  return queue.find((draft) => draft.status === "APPROVED") ?? null;
 }
 
 export function buildPublishPayload(
