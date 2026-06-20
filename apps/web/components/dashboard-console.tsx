@@ -300,7 +300,17 @@ export function DashboardConsole({
   }, [mergeLocalDraft]);
 
   const approvedDrafts = useMemo(
-    () => localQueue.filter((draft) => draft.publishEligibility === "READY" || (draft.status === "APPROVED" && !draft.publishEligibility)),
+    () => localQueue.filter((draft) => draft.operationalState === "READY_TO_PUBLISH"),
+    [localQueue],
+  );
+
+  const reconciliationDrafts = useMemo(
+    () => localQueue.filter((draft) => draft.operationalState === "RECONCILIATION_REQUIRED"),
+    [localQueue],
+  );
+
+  const reviewRequiredDrafts = useMemo(
+    () => localQueue.filter((draft) => draft.operationalState === "REVIEW_REQUIRED"),
     [localQueue],
   );
 
@@ -359,6 +369,12 @@ export function DashboardConsole({
         setPublishState("reconciliation_required");
         const extIdPart = data.externalPostId ? ` ID externo: ${data.externalPostId}.` : "";
         setPublishMessage(`${data.error}${extIdPart} ${data.action}`);
+        return;
+      }
+
+      if (data.providerOutcomeUnknown === true || data.status === "RECONCILIATION_REQUIRED" || data.code === "LIVE_RECONCILIATION_REQUIRED") {
+        setPublishState("reconciliation_required");
+        setPublishMessage(data.action || data.error || "Resultado ambiguo. No vuelva a publicar.");
         return;
       }
 

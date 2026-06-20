@@ -35,6 +35,7 @@ export type DashboardMetrics = {
 };
 
 import { isDraftActuallyPublishable } from "./publishing-execution";
+import { projectDraftOperationalState, type DraftOperationalState } from "./draft-operational-state";
 
 export type DraftQueueItem = {
   id: string;
@@ -44,6 +45,10 @@ export type DraftQueueItem = {
   format: string;
   pillar: string | null;
   status: string;
+  operationalState?: DraftOperationalState;
+  publishBlockedReason?: string;
+  duplicateIncident?: boolean;
+  externalPostId?: string | null;
   riskLevel: string;
   requiresReview: boolean;
   scheduledFor: string | null;
@@ -51,7 +56,6 @@ export type DraftQueueItem = {
   cta: string | null;
   source: string | null;
   publishEligibility?: "READY" | "RECONCILIATION_REQUIRED" | "PUBLISHED" | "NOT_APPROVED";
-  publishBlockedReason?: string;
   asset: { filename: string; path: string | null; kind: string } | null;
 };
 
@@ -417,28 +421,43 @@ export const getDraftQueue = cache(
     const draftIds = drafts.map((d) => d.id);
 
     const activeJobs = await prisma.publishingJob.findMany({
-      where: {
-        postId: { in: draftIds },
-        status: { in: ["IN_REVIEW", "PUBLISHED"] },
-      },
+      where: { postId: { in: draftIds } },
       select: {
+        id: true,
         postId: true,
         status: true,
+        provider: true,
+        attempts: true,
+        scheduledFor: true,
+        lastError: true,
         PublishingResult: { select: { ok: true, externalPostId: true } },
       },
     });
 
-    const jobByDraftId = new Map(activeJobs.map((j) => [j.postId!, j]));
+    const jobsByDraftId = new Map<string, typeof activeJobs>();
+    for (const job of activeJobs) {
+      const key = job.postId!;
+      if (!jobsByDraftId.has(key)) jobsByDraftId.set(key, []);
+      jobsByDraftId.get(key)!.push(job);
+    }
+
+    const now = new Date();
 
     return drafts.map((d) => {
-      const job = jobByDraftId.get(d.id);
+      const jobs = jobsByDraftId.get(d.id) ?? [];
+      const projection = projectDraftOperationalState(
+        { id: d.id, status: d.status, externalPostId: d.externalPostId, network: d.network, requiresReview: d.requiresReview, riskLevel: d.riskLevel, scheduledFor: d.scheduledFor },
+        jobs,
+        now,
+      );
+
       const eligibility = isDraftActuallyPublishable({
         draftStatus: d.status,
         draftExternalPostId: d.externalPostId,
-        hasInReviewJob: job?.status === "IN_REVIEW",
-        hasPublishedJob: job?.status === "PUBLISHED",
-        hasPublishedResult: job?.PublishingResult?.ok === true,
-        hasResultExternalPostId: !!job?.PublishingResult?.externalPostId,
+        hasInReviewJob: jobs.some((j) => j.status === "IN_REVIEW"),
+        hasPublishedJob: jobs.some((j) => j.status === "PUBLISHED"),
+        hasPublishedResult: jobs.some((j) => j.PublishingResult?.ok === true),
+        hasResultExternalPostId: jobs.some((j) => !!j.PublishingResult?.externalPostId),
       });
 
       return {
@@ -449,8 +468,11 @@ export const getDraftQueue = cache(
         format: d.format,
         pillar: d.pillar,
         status: d.status,
+        operationalState: projection.operationalState,
+        publishBlockedReason: projection.blockedReason ?? eligibility.blockedReason,
+        duplicateIncident: projection.duplicateIncident,
+        externalPostId: projection.externalPostId,
         publishEligibility: eligibility.eligibility,
-        publishBlockedReason: eligibility.blockedReason,
         riskLevel: d.riskLevel,
         requiresReview: d.requiresReview,
         scheduledFor: d.scheduledFor?.toISOString().slice(0, 16).replace("T", " ") ?? null,
@@ -458,14 +480,11 @@ export const getDraftQueue = cache(
         cta: d.cta,
         source: d.source,
         asset: d.assets[0]?.asset
-          ? {
-              filename: d.assets[0].asset.filename,
-              path: d.assets[0].asset.sourcePath,
-              kind: d.assets[0].asset.kind,
-            }
+          ? { filename: d.assets[0].asset.filename, path: d.assets[0].asset.sourcePath, kind: d.assets[0].asset.kind }
           : null,
       };
     });
+
   },
 );
 
