@@ -1,41 +1,20 @@
 import { cache } from "react";
 import { prisma } from "./prisma";
 import { getTrialStatus, type TrialStatus } from "./trial";
-
-export type DashboardMetrics = {
-  tenant: {
-    id: string;
-    slug: string;
-    name: string;
-    plan: string;
-    mode: string;
-    activeNetworks: string[];
-  };
-  counts: {
-    totalDrafts: number;
-    drafts: number;
-    approved: number;
-    needsReview: number;
-    scheduled: number;
-    published: number;
-    failed: number;
-    totalAssets: number;
-  };
-  nextUp: Array<{
-    id: string;
-    title: string;
-    network: string;
-    format: string;
-    status: string;
-    riskLevel: string;
-    scheduledFor: string | null;
-    assetPath: string | null;
-  }>;
-  pillars: Array<{ name: string; count: number }>;
-};
-
-import { isDraftActuallyPublishable } from "./publishing-execution";
 import { projectDraftOperationalState, type DraftOperationalState } from "./draft-operational-state";
+
+export interface OperCounts {
+  total: number; draft: number; reviewRequired: number; readyToPublish: number;
+  reconciliationRequired: number; scheduled: number; published: number;
+  failed: number; rejected: number; assets: number;
+}
+
+export interface TenantOperationalSnapshot {
+  drafts: DraftQueueItem[];
+  counts: OperCounts;
+  nextScheduled: DraftQueueItem | null;
+  byNetwork: Record<string, number>;
+}
 
 export type DraftQueueItem = {
   id: string;
@@ -58,6 +37,42 @@ export type DraftQueueItem = {
   publishEligibility?: "READY" | "RECONCILIATION_REQUIRED" | "PUBLISHED" | "NOT_APPROVED";
   asset: { filename: string; path: string | null; kind: string } | null;
 };
+
+export type DashboardMetrics = {
+  tenant: {
+    id: string;
+    slug: string;
+    name: string;
+    plan: string;
+    mode: string;
+    activeNetworks: string[];
+  };
+  counts: {
+    totalDrafts: number;
+    drafts: number;
+    reviewRequired: number;
+    readyToPublish: number;
+    reconciliationRequired: number;
+    scheduled: number;
+    published: number;
+    failed: number;
+    rejected: number;
+    totalAssets: number;
+  };
+  nextUp: Array<{
+    id: string;
+    title: string;
+    network: string;
+    format: string;
+    status: string;
+    riskLevel: string;
+    scheduledFor: string | null;
+    assetPath: string | null;
+  }>;
+  pillars: Array<{ name: string; count: number }>;
+};
+
+import { isDraftActuallyPublishable } from "./publishing-execution";
 
 export type TenantAssetItem = {
   id: string;
@@ -177,111 +192,104 @@ const NETWORK_REQUIREMENTS: Record<string, NetworkReadinessItem["requirements"]>
   },
 };
 
-const DEFAULT_TURPIAL_NETWORKS = ["INSTAGRAM", "FACEBOOK", "YOUTUBE", "TIKTOK", "LINKEDIN"];
+const DEFAULT_TURPIAL_NETWORKS = ["INSTAGRAM", "FACEBOOK", "YOUTUBE", "TIKTOK", "LINKEDIN"] as const;
 
-function normalizeNetworkList(value: unknown, fallback: string[] = []) {
-  if (!Array.isArray(value)) return fallback;
-  return value
-    .map((network) => String(network).toUpperCase())
-    .filter((network, index, arr) => Object.hasOwn(NETWORK_REQUIREMENTS, network) && arr.indexOf(network) === index);
+function normalizeNetworkList(
+  channels: unknown,
+  fallback: readonly string[],
+): string[] {
+  if (Array.isArray(channels)) {
+    const cleaned = channels.map((c: string) => c.toUpperCase()).filter((c: string) => SUPPORTED_NETWORKS.includes(c));
+    if (cleaned.length > 0) return cleaned;
+  }
+  if (Array.isArray(fallback)) return fallback.filter((f) => true) as string[];
+  return [];
 }
+
+const SUPPORTED_NETWORKS = ["INSTAGRAM", "FACEBOOK", "YOUTUBE", "TIKTOK", "LINKEDIN", "X"] as string[];
+
+function emptyCounts(): OperCounts {
+  return { total: 0, draft: 0, reviewRequired: 0, readyToPublish: 0, reconciliationRequired: 0, scheduled: 0, published: 0, failed: 0, rejected: 0, assets: 0 };
+}
+
+export async function getTenantOperationalSnapshot(tenantSlug: string): Promise<TenantOperationalSnapshot> {
+  const tenant = await prisma.tenant.findFirst({ where: { slug: tenantSlug }, select: { id: true } });
+  if (!tenant) return { drafts: [], counts: emptyCounts(), nextScheduled: null, byNetwork: {} };
+
+  const assets = await prisma.asset.findMany({ where: { tenantId: tenant.id }, select: { id: true } });
+  const drafts = await prisma.contentDraft.findMany({
+    where: { tenantId: tenant.id },
+    orderBy: { scheduledFor: "asc" },
+    select: { id: true, title: true, caption: true, network: true, format: true, pillar: true, status: true, externalPostId: true, riskLevel: true, requiresReview: true, scheduledFor: true, hashtags: true, cta: true, source: true, assets: { take: 1, select: { asset: { select: { filename: true, sourcePath: true, kind: true } } } } },
+  });
+
+  const draftIds = drafts.map((d) => d.id);
+  const allJobs = await prisma.publishingJob.findMany({
+    where: { postId: { in: draftIds } },
+    select: { id: true, postId: true, status: true, provider: true, attempts: true, scheduledFor: true, lastError: true, PublishingResult: { select: { ok: true, externalPostId: true } } },
+  });
+
+  const jobsByDraftId = new Map<string, typeof allJobs>();
+  for (const job of allJobs) { const key = job.postId!; if (!jobsByDraftId.has(key)) jobsByDraftId.set(key, []); jobsByDraftId.get(key)!.push(job); }
+
+  const now = new Date();
+  const counts = emptyCounts();
+  counts.assets = assets.length;
+  const byNetwork: Record<string, number> = {};
+
+  const projectedDrafts: DraftQueueItem[] = drafts.map((d) => {
+    const jobs = jobsByDraftId.get(d.id) ?? [];
+    const p = projectDraftOperationalState({ id: d.id, status: d.status, externalPostId: d.externalPostId, network: d.network, requiresReview: d.requiresReview, riskLevel: d.riskLevel, scheduledFor: d.scheduledFor }, jobs, now);
+    counts.total++;
+    if (p.operationalState === "DRAFT") counts.draft++;
+    else if (p.operationalState === "REVIEW_REQUIRED") counts.reviewRequired++;
+    else if (p.operationalState === "READY_TO_PUBLISH") counts.readyToPublish++;
+    else if (p.operationalState === "RECONCILIATION_REQUIRED") counts.reconciliationRequired++;
+    else if (p.operationalState === "SCHEDULED") counts.scheduled++;
+    else if (p.operationalState === "PUBLISHED") counts.published++;
+    else if (p.operationalState === "FAILED") counts.failed++;
+    else if (p.operationalState === "REJECTED") counts.rejected++;
+    const nw = NETWORK_LABELS[d.network] ?? d.network;
+    byNetwork[nw] = (byNetwork[nw] ?? 0) + 1;
+    return { id: d.id, title: d.title, caption: d.caption, network: d.network, format: d.format, pillar: d.pillar, status: d.status, operationalState: p.operationalState, publishBlockedReason: p.blockedReason, duplicateIncident: p.duplicateIncident, externalPostId: p.externalPostId, riskLevel: d.riskLevel, requiresReview: d.requiresReview, scheduledFor: d.scheduledFor?.toISOString().slice(0, 16).replace("T", " ") ?? null, hashtags: d.hashtags, cta: d.cta, source: d.source, asset: d.assets[0]?.asset ? { filename: d.assets[0].asset.filename, path: d.assets[0].asset.sourcePath, kind: d.assets[0].asset.kind } : null };
+  });
+
+  const nextScheduled = projectedDrafts.find((d) => d.operationalState === "SCHEDULED" && d.scheduledFor && new Date(d.scheduledFor) > now) ?? null;
+
+  return { drafts: projectedDrafts, counts, nextScheduled, byNetwork };
+}
+
+const NETWORK_LABELS: Record<string, string> = { INSTAGRAM: "Instagram", FACEBOOK: "Facebook", YOUTUBE: "YouTube", TIKTOK: "TikTok", LINKEDIN: "LinkedIn" };
 
 export const getDashboardMetrics = cache(
   async (tenantSlug: string): Promise<DashboardMetrics | null> => {
-    const tenant = await prisma.tenant.findFirst({
-      where: { slug: tenantSlug },
-    });
+    const tenant = await prisma.tenant.findFirst({ where: { slug: tenantSlug } });
     if (!tenant) return null;
+
+    const snapshot = await getTenantOperationalSnapshot(tenantSlug);
+    const { counts } = snapshot;
 
     const defaultNetworks = tenantSlug === "turpial-sound" ? DEFAULT_TURPIAL_NETWORKS : [];
 
     const [profileNetworks, accounts] = await Promise.all([
-      prisma.brandProfile.findFirst({
-        where: { tenantId: tenant.id },
-        select: { socialChannels: true },
-      }),
-      prisma.socialAccount.findMany({
-        where: { tenantId: tenant.id },
-        select: { network: true },
-      }),
+      prisma.brandProfile.findFirst({ where: { tenantId: tenant.id }, select: { socialChannels: true } }),
+      prisma.socialAccount.findMany({ where: { tenantId: tenant.id }, select: { network: true } }),
     ]);
     const activeNetworks = normalizeNetworkList(
       profileNetworks?.socialChannels,
-      accounts.length ? accounts.map((account) => account.network) : defaultNetworks,
+      accounts.length ? accounts.map((a) => a.network) : defaultNetworks,
     );
 
-    const [
-      totalDrafts,
-      drafts,
-      approved,
-      needsReview,
-      scheduled,
-      published,
-      failed,
-      totalAssets,
-      nextUp,
-      pillars,
-    ] = await Promise.all([
-      prisma.contentDraft.count({ where: { tenantId: tenant.id } }),
-      prisma.contentDraft.count({ where: { tenantId: tenant.id, status: "DRAFT" } }),
-      prisma.contentDraft.count({ where: { tenantId: tenant.id, status: "APPROVED" } }),
-      prisma.contentDraft.count({ where: { tenantId: tenant.id, status: "NEEDS_REVIEW" } }),
-      prisma.contentDraft.count({ where: { tenantId: tenant.id, status: "SCHEDULED" } }),
-      prisma.contentDraft.count({ where: { tenantId: tenant.id, status: "PUBLISHED" } }),
-      prisma.contentDraft.count({ where: { tenantId: tenant.id, status: "FAILED" } }),
-      prisma.asset.count({ where: { tenantId: tenant.id } }),
-      prisma.contentDraft.findMany({
-        where: { tenantId: tenant.id, status: { in: ["DRAFT", "APPROVED", "SCHEDULED"] } },
-        orderBy: { scheduledFor: "asc" },
-        take: 10,
-        select: {
-          id: true,
-          title: true,
-          network: true,
-          format: true,
-          status: true,
-          riskLevel: true,
-          scheduledFor: true,
-          assets: { take: 1, select: { asset: { select: { sourcePath: true } } } },
-        },
-      }),
-      prisma.contentDraft.groupBy({
-        by: ["pillar"],
-        where: { tenantId: tenant.id, pillar: { not: null } },
-        _count: true,
-        orderBy: { _count: { pillar: "desc" } },
-      }),
+    const [pillars] = await Promise.all([
+      prisma.contentDraft.groupBy({ by: ["pillar"], where: { tenantId: tenant.id, pillar: { not: null } }, _count: true, orderBy: { _count: { pillar: "desc" } } }),
     ]);
 
+    const nextUp = snapshot.drafts.filter((d) => d.operationalState === "SCHEDULED" && d.scheduledFor).slice(0, 10);
+
     return {
-      tenant: {
-        id: tenant.id,
-        slug: tenant.slug,
-        name: tenant.name,
-        plan: tenant.plan,
-        mode: tenant.automationMode,
-        activeNetworks,
-      },
-      counts: {
-        totalDrafts,
-        drafts,
-        approved,
-        needsReview,
-        scheduled,
-        published,
-        failed,
-        totalAssets,
-      },
-      nextUp: nextUp.map((d) => ({
-        id: d.id,
-        title: d.title,
-        network: d.network,
-        format: d.format,
-        status: d.status,
-        riskLevel: d.riskLevel,
-        scheduledFor: d.scheduledFor?.toISOString().slice(0, 16).replace("T", " ") ?? null,
-        assetPath: d.assets[0]?.asset.sourcePath ?? null,
-      })),
+      tenant: { id: tenant.id, slug: tenant.slug, name: tenant.name, plan: tenant.plan, mode: tenant.automationMode, activeNetworks },
+      counts: { totalDrafts: counts.total, drafts: counts.draft, reviewRequired: counts.reviewRequired, readyToPublish: counts.readyToPublish, reconciliationRequired: counts.reconciliationRequired, scheduled: counts.scheduled, published: counts.published, failed: counts.failed, rejected: counts.rejected, totalAssets: counts.assets },
+      nextUp: nextUp.map((d) => ({ id: d.id, title: d.title, network: d.network, format: d.format, status: d.status, riskLevel: d.riskLevel, scheduledFor: d.scheduledFor ?? null, assetPath: d.asset?.path ?? null })),
       pillars: pillars.map((p) => ({ name: p.pillar!, count: p._count })),
     };
   },

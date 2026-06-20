@@ -51,8 +51,7 @@ export function projectDraftOperationalState(
   jobs: JobProjectionInput[],
   now: Date,
 ): { operationalState: DraftOperationalState; blockedReason?: string; duplicateIncident: boolean; externalPostId?: string | null } {
-  const activeJobs = jobs.filter((j) => j.status === "IN_REVIEW" || j.status === "PUBLISHED" || j.status === "SCHEDULED");
-  const publishedJob = activeJobs.find((j) => j.status === "PUBLISHED");
+  const activeJobs = jobs.filter((j) => j.status === "IN_REVIEW" || j.status === "PUBLISHED" || j.status === "SCHEDULED" || j.status === "FAILED");
   const inReviewJob = activeJobs.find((j) => j.status === "IN_REVIEW");
   const scheduledJob = activeJobs.find((j) => j.status === "SCHEDULED");
 
@@ -60,43 +59,35 @@ export function projectDraftOperationalState(
   const resultExternalPostId = activeJobs.find((j) => j.PublishingResult?.externalPostId)?.PublishingResult?.externalPostId;
   const draftExternalPostId = draft.externalPostId;
 
-  const hasDurableSuccess = !!draftExternalPostId || (resultOk && !!resultExternalPostId) || (publishedJob && (draftExternalPostId || !!resultExternalPostId));
+  const hasDurableSuccess = !!draftExternalPostId || (resultOk && !!resultExternalPostId);
   const canonicalExternalPostId = draftExternalPostId ?? resultExternalPostId ?? null;
-  const multipleJobs = jobs.filter((j) => j.status === "PUBLISHED" || (j.PublishingResult?.ok === true)).length > 1;
+  const jobsWithSuccess = jobs.filter((j) => (j.status === "PUBLISHED" && j.PublishingResult?.externalPostId) || j.PublishingResult?.ok === true).length;
+  const duplicateIncident = jobsWithSuccess > 1;
 
-  // Published
-  if (draft.status === "PUBLISHED" || hasDurableSuccess) {
+  // Published — only with durable evidence
+  if (hasDurableSuccess) {
     return {
       operationalState: "PUBLISHED",
-      duplicateIncident: multipleJobs,
+      duplicateIncident,
       externalPostId: canonicalExternalPostId,
     };
   }
 
-  // Reconciliation required
-  if (inReviewJob) {
-    return {
-      operationalState: "RECONCILIATION_REQUIRED",
-      blockedReason: "Existe un intento de publicacion con resultado incierto.",
-      duplicateIncident: false,
-      externalPostId: canonicalExternalPostId,
-    };
-  }
-
+  // Reconciliation required — IN_REVIEW, incomplete durable, or raw PUBLISHED without evidence
   const incompleteDurable = (draft.status === "PUBLISHED" && !hasDurableSuccess)
-    || (resultExternalPostId && !hasDurableSuccess);
+    || (!!resultExternalPostId && !hasDurableSuccess);
 
-  if (incompleteDurable) {
+  if (inReviewJob || incompleteDurable || (draft.status === "PUBLISHED" && !hasDurableSuccess)) {
     return {
       operationalState: "RECONCILIATION_REQUIRED",
-      blockedReason: "Evidencia de publicacion incompleta.",
+      blockedReason: "El estado de publicacion requiere verificacion.",
       duplicateIncident: false,
       externalPostId: canonicalExternalPostId,
     };
   }
 
   // Scheduled
-  if (draft.status === "SCHEDULED" && scheduledJob) {
+  if (draft.status === "SCHEDULED" && scheduledJob && scheduledJob.scheduledFor) {
     return {
       operationalState: "SCHEDULED",
       duplicateIncident: false,
@@ -105,7 +96,7 @@ export function projectDraftOperationalState(
   }
 
   // Ready to publish
-  if (draft.status === "APPROVED" && !draftExternalPostId && !resultOk && !inReviewJob && !publishedJob) {
+  if (draft.status === "APPROVED" && !draftExternalPostId && !resultOk && !inReviewJob) {
     return {
       operationalState: "READY_TO_PUBLISH",
       duplicateIncident: false,

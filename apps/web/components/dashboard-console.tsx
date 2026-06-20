@@ -704,7 +704,7 @@ export function DashboardConsole({
           <section className="status-strip">
             <StatusCard label="Total" value={metrics.counts.totalDrafts} note="drafts en DB" onClick={() => setView("queue")} />
             <StatusCard label="Pendientes" value={pendingReview.length} note="requieren criterio" tone="warn" onClick={() => setView("queue")} />
-            <StatusCard label="Aprobados" value={metrics.counts.approved} note="listos para publicar" onClick={() => setView("readiness")} />
+            <StatusCard label="Aprobados"               value={metrics.counts.readyToPublish} note="listos para publicar" onClick={() => setView("readiness")} />
             <StatusCard label="Assets" value={metrics.counts.totalAssets} note="importados" tone="ok" onClick={() => setView("assets")} />
             <StatusCard label="Proximo" value={nextTitle ?? nextDate} note={nextNote} onClick={() => setView("calendar")} />
           </section>
