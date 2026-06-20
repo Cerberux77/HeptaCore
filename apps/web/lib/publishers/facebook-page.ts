@@ -1,4 +1,4 @@
-import { PublishInput, PublishResult, Publisher, PublisherCapabilities } from "./types";
+import { PublishInput, PublishResult, Publisher, PublisherCapabilities, ProviderError } from "./types";
 
 function formatMetaError(resJson: unknown, status: number): string {
   const err = (resJson as Record<string, unknown>)?.error as Record<string, unknown> | undefined;
@@ -43,7 +43,12 @@ async function publishToFacebookPage(input: PublishInput): Promise<PublishResult
     const json = await res.json();
 
     if (!res.ok || !json.id) {
-      throw new Error(`Facebook page feed publish failed: ${formatMetaError(json, res.status)}`);
+      const errMeta = (json as Record<string, unknown>)?.error as Record<string, unknown> | undefined;
+      const code = errMeta?.code as number | undefined;
+      const subcode = errMeta?.error_subcode as number | undefined;
+      const isAmbiguous = code === 1 || (res.status >= 500 && res.status < 600);
+      const msg = formatMetaError(json, res.status);
+      throw new ProviderError(msg, { code, subcode, fbtrace: (json as Record<string, unknown>)?.fbtrace_id as string | undefined, httpStatus: res.status, isAmbiguous });
     }
 
     return { externalPostId: json.id as string, providerResponse: { feed: true, status: res.status } };
@@ -65,7 +70,10 @@ async function publishToFacebookPage(input: PublishInput): Promise<PublishResult
     const json = await res.json();
 
     if (!res.ok || !json.id) {
-      throw new Error(`Facebook page video publish failed: ${formatMetaError(json, res.status)}`);
+      const errMeta = (json as Record<string, unknown>)?.error as Record<string, unknown> | undefined;
+      const code = errMeta?.code as number | undefined;
+      const isAmbiguous = code === 1 || (res.status >= 500 && res.status < 600);
+      throw new ProviderError(formatMetaError(json, res.status), { code, subcode: errMeta?.error_subcode as number | undefined, fbtrace: (json as Record<string, unknown>)?.fbtrace_id as string | undefined, httpStatus: res.status, isAmbiguous });
     }
 
     const videoId = json.id as string;
@@ -99,7 +107,10 @@ async function publishToFacebookPage(input: PublishInput): Promise<PublishResult
   const json = await res.json();
 
   if (!res.ok || !json.id) {
-    throw new Error(`Facebook page photo publish failed: ${formatMetaError(json, res.status)}`);
+    const errMeta = (json as Record<string, unknown>)?.error as Record<string, unknown> | undefined;
+    const code = errMeta?.code as number | undefined;
+    const isAmbiguous = code === 1 || (res.status >= 500 && res.status < 600);
+    throw new ProviderError(formatMetaError(json, res.status), { code, subcode: errMeta?.error_subcode as number | undefined, fbtrace: (json as Record<string, unknown>)?.fbtrace_id as string | undefined, httpStatus: res.status, isAmbiguous });
   }
 
   const photoId = json.id as string;

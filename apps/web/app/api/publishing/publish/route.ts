@@ -7,6 +7,7 @@ import { resolveAndDecryptOAuthCredential } from "../../../../lib/credential-res
 import { getPublisher, PublishInput } from "../../../../lib/publishers";
 import { buildImmediateJobId, buildScheduledJobId, checkExistingJobForRetry, checkLegacyJobId, getAllPossibleJobIds } from "../../../../lib/publishing-execution";
 import { commitConfirmedPublication, recordUnconfirmedProviderFailure } from "../../../../lib/publishing-finalization";
+import { ProviderError } from "../../../../lib/publishers/types";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -448,7 +449,29 @@ export async function POST(req: Request) {
   } catch (err) {
     const errorMsg = err instanceof Error ? err.message : `${network} publish failed`;
 
-    // Provider failed — record via shared service
+    if (err instanceof ProviderError && err.isAmbiguous) {
+      try {
+        await auditLog({
+          tenantId: tenant.id,
+          actorId: session.user.id,
+          action: "publish_immediate_failed_ambiguous",
+          target: `draft:${draft.id}`,
+          metadata: { tenant: tenant.name, title: draft.title, network, format: draft.format, error: errorMsg.slice(0, 500), code: err.meta.code, subcode: err.meta.subcode, fbtrace: err.meta.fbtrace },
+        });
+      } catch {}
+
+      return NextResponse.json({
+        ok: false,
+        providerConfirmed: false,
+        providerOutcomeUnknown: true,
+        code: "LIVE_RECONCILIATION_REQUIRED",
+        status: "RECONCILIATION_REQUIRED",
+        draftId: draft.id,
+        error: "Meta devolvio un resultado ambiguo. Verifique la pagina antes de reintentar.",
+        action: "No vuelva a publicar hasta verificar Facebook. El job permanece IN_REVIEW.",
+      }, { status: 202 });
+    }
+
     await prisma.$transaction(async (tx) => {
       await recordUnconfirmedProviderFailure({
         tx,
