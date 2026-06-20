@@ -214,6 +214,7 @@ export function DashboardConsole({
 }) {
   const [view, setView] = useState<View>("overview");
   const [selectedId, setSelectedIdRaw] = useState(queue[0]?.id ?? "");
+  const [publishDraftId, setPublishDraftId] = useState("");
   const [localQueue, setLocalQueue] = useState(queue);
   const [manualApproval, setManualApproval] = useState(false);
   const [publishMode, setPublishMode] = useState<"dry_run" | "scheduled" | "immediate">("dry_run");
@@ -298,11 +299,40 @@ export function DashboardConsole({
     mergeLocalDraft({ id, status: newStatus, ...extra });
   }, [mergeLocalDraft]);
 
-  const publishTarget = resolvePublishTargetFromQueue(localQueue, selectedId, publishMode);
+  const approvedDrafts = useMemo(
+    () => localQueue.filter((draft) => draft.status === "APPROVED"),
+    [localQueue],
+  );
+
+  const publishTarget = useMemo(
+    () => approvedDrafts.find((draft) => draft.id === publishDraftId) ?? approvedDrafts[0] ?? null,
+    [approvedDrafts, publishDraftId],
+  );
+
+  useEffect(() => {
+    setManualApproval(false);
+    setPublishState("idle");
+    setPublishMessage("");
+    activeRequestRef.current = null;
+  }, [selectedId]);
+
+  useEffect(() => {
+    setManualApproval(false);
+    setPublishState("idle");
+    setPublishMessage("");
+  }, [publishDraftId, publishMode]);
+
+  useEffect(() => {
+    const currentStillApproved = approvedDrafts.some((draft) => draft.id === publishDraftId);
+    if (!currentStillApproved) {
+      setPublishDraftId(approvedDrafts[0]?.id ?? "");
+    }
+  }, [approvedDrafts, publishDraftId]);
 
   async function handlePublish() {
-    if (!publishTarget) return;
-    const requestDraftId = publishTarget.id;
+    const target = publishTarget;
+    if (!target) return;
+    const requestDraftId = target.id;
     const requestMode = publishMode;
     const requestId = `${requestDraftId}_${requestMode}_${Date.now().toString(36)}`;
     activeRequestRef.current = { draftId: requestDraftId, mode: requestMode, requestId };
@@ -350,10 +380,10 @@ export function DashboardConsole({
       const externalIdPart = data.externalPostId ? ` (ID: ${data.externalPostId})` : "";
       setPublishMessage(
         data.mode === "immediate"
-          ? `Publicado en vivo: ${publishTarget.title}.${externalIdPart}`
+          ? `Publicado en vivo: ${target.title}.${externalIdPart}`
           : data.mode === "scheduled"
-            ? `Programado: ${publishTarget.title} (${data.scheduledFor ? new Date(data.scheduledFor).toLocaleString() : "pronto"}).`
-            : `Dry-run validado: ${publishTarget.title}.`,
+            ? `Programado: ${target.title} (${data.scheduledFor ? new Date(data.scheduledFor).toLocaleString() : "pronto"}).`
+            : `Dry-run validado: ${target.title}.`,
       );
     } catch (error) {
       setPublishState("failed");
@@ -1652,6 +1682,27 @@ export function DashboardConsole({
                   </select>
                 </label>
                 <div className="publish-gate">
+                  <label className="gate-check" style={{ marginBottom: 10, display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+                    <span style={{ fontSize: 13, color: "var(--hc-ink)" }}>Draft a publicar:</span>
+                    <select
+                      value={publishTarget?.id ?? ""}
+                      onChange={(e) => {
+                        setPublishDraftId(e.target.value);
+                        setManualApproval(false);
+                        setPublishState("idle");
+                        setPublishMessage("");
+                      }}
+                      disabled={publishState === "loading" || approvedDrafts.length === 0}
+                      style={{ padding: "6px 10px", borderRadius: 6, border: "1px solid var(--hc-line)", fontSize: 13, maxWidth: 320 }}
+                    >
+                      {approvedDrafts.length === 0 && <option value="">Sin drafts aprobados</option>}
+                      {approvedDrafts.map((draft) => (
+                        <option key={draft.id} value={draft.id}>
+                          {draft.title} — {NETWORK_LABELS[draft.network] ?? draft.network}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
                   {tenantNeedsManual && (
                     <label className="gate-check">
                       <input
@@ -1677,7 +1728,7 @@ export function DashboardConsole({
                   <button
                     className="primary-action"
                     onClick={handlePublish}
-                    disabled={publishState === "loading" || !publishEligibility.eligible}
+                    disabled={publishState === "loading" || !publishTarget}
                   >
                     <LockKeyhole size={16} />
                     {publishState === "loading"
@@ -1688,14 +1739,18 @@ export function DashboardConsole({
                           ? "Programar publicacion"
                           : "Ejecutar dry-run"}
                   </button>
-                  {publishEligibility.target && (
+                  {publishTarget && (
                     <small style={{ marginTop: 6, display: "block" }}>
-                      Draft seleccionado: <strong>{publishEligibility.target.title}</strong> ({publishEligibility.target.id})<br />
-                      Red: {NETWORK_LABELS[publishEligibility.target.network] ?? publishEligibility.target.network} · Estado: {publishEligibility.target.status} · Modo: {publishMode}
+                      Draft seleccionado: <strong>{publishTarget.title}</strong> ({publishTarget.id})<br />
+                      Red: {NETWORK_LABELS[publishTarget.network] ?? publishTarget.network} · Estado: {publishTarget.status} · Modo: {publishMode}
                     </small>
                   )}
-                  {!publishEligibility.eligible && (
-                    <small style={{ color: "var(--hc-sand)", display: "block", marginTop: 6 }}>{publishEligibility.reason}</small>
+                  {!publishTarget && (
+                    <small style={{ color: "var(--hc-sand)", display: "block", marginTop: 6 }}>
+                      {approvedDrafts.length === 0
+                        ? "No hay drafts APPROVED disponibles para publicar."
+                        : "Selecciona un draft aprobado arriba."}
+                    </small>
                   )}
                   {publishMessage && (
                     <p className={publishState === "failed" || publishState === "blocked" || publishState === "reconciliation_required" ? "login-error" : "publish-ok"}>
