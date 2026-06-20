@@ -115,6 +115,16 @@ export async function POST(req: Request) {
   const now = new Date();
   const network = draft.network;
 
+  const approvalRequired = tenant.automationMode === "APPROVAL_REQUIRED" || tenant.automationMode === "DRAFT_ONLY";
+
+  if (requestMode !== "dry_run" && approvalRequired && !manualApproval) {
+    return NextResponse.json({
+      code: "LIVE_BLOCKED_MANUAL_APPROVAL_REQUIRED",
+      error: "Este tenant requiere aprobacion manual explicita para publicar o programar.",
+      action: "Marca el checkbox de aprobacion manual antes de ejecutar.",
+    }, { status: 409 });
+  }
+
   if (requestMode === "scheduled") {
     const scheduledFor = scheduledAt ?? draft.scheduledFor ?? new Date(Date.now() + 3600000);
 
@@ -309,6 +319,20 @@ export async function POST(req: Request) {
   }
 
   // === IMMEDIATE: attempt real publish ===
+
+  const claimed = await prisma.contentDraft.updateMany({
+    where: { id: draft.id, status: "APPROVED" },
+    data: { status: "SCHEDULED" },
+  });
+
+  if (claimed.count === 0) {
+    return NextResponse.json({
+      code: "LIVE_BLOCKED_ALREADY_CLAIMED",
+      error: "Este draft ya fue reclamado en otra solicitud o cambio de estado.",
+      action: "Verifica si el draft ya fue publicado o programado por otra operacion concurrente.",
+    }, { status: 409 });
+  }
+
   const publishInput: PublishInput = {
     targetId,
     accessToken,
@@ -322,6 +346,11 @@ export async function POST(req: Request) {
     publishResult = await publisher.publish(publishInput);
   } catch (err) {
     const errorMsg = err instanceof Error ? err.message : `${network} publish failed`;
+
+    await prisma.contentDraft.updateMany({
+      where: { id: draft.id, status: "SCHEDULED" },
+      data: { status: "APPROVED" },
+    });
 
     const jobId = `pj_${draft.id}_${Date.now().toString(36)}`;
     await prisma.publishingJob.create({
