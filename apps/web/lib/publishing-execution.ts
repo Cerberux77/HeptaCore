@@ -59,6 +59,43 @@ export interface ProviderSuccessParams {
   now: Date;
 }
 
+export function isPublicationDurablyCommitted(params: {
+  resultPersisted: boolean;
+  draftPersisted: boolean;
+  externalPostId?: string;
+}): boolean {
+  const { resultPersisted, draftPersisted, externalPostId } = params;
+  return resultPersisted && draftPersisted && !!externalPostId;
+}
+
+export function hasDurableProviderSuccess(params: {
+  resultOk?: boolean;
+  resultExternalPostId?: string | null;
+  draftExternalPostId?: string | null;
+}): boolean {
+  const { resultOk, resultExternalPostId, draftExternalPostId } = params;
+  return (resultOk === true && !!resultExternalPostId) || !!draftExternalPostId;
+}
+
+export function reconcileDurableProviderSuccess(params: {
+  resultOk: boolean;
+  resultExternalPostId: string;
+  draftExternalPostId?: string | null;
+  jobStatus: string;
+}): { shouldReconcile: boolean; shouldCallProvider: boolean; reason?: string } {
+  const { resultOk, resultExternalPostId, draftExternalPostId, jobStatus } = params;
+
+  if (!resultOk || !resultExternalPostId) {
+    return { shouldReconcile: false, shouldCallProvider: false, reason: "No durable provider success evidence." };
+  }
+
+  if (draftExternalPostId === resultExternalPostId && jobStatus === "PUBLISHED") {
+    return { shouldReconcile: false, shouldCallProvider: false, reason: "Already fully persisted." };
+  }
+
+  return { shouldReconcile: true, shouldCallProvider: false, reason: "Provider confirmed. Reconcile locally without re-publishing." };
+}
+
 export function checkLegacyJobId(draftId: string, network: string): string {
   return `pj_${draftId}_${network}`;
 }
