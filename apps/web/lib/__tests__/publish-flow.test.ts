@@ -912,3 +912,172 @@ describe("publishingStateMachine", async () => {
     assert.notEqual(jobStatus, "SCHEDULED");
   });
 });
+
+describe("transactionalFinalization", async () => {
+  const { finalizeConfirmedPublicationTx } = await import("../publishing-finalization.js");
+  const { commitConfirmedPublication } = await import("../publishing-finalization.js");
+  const { recordUnconfirmedProviderFailure } = await import("../publishing-finalization.js");
+
+  type FakeStore = {
+    results: Record<string, { ok: boolean; externalPostId: string | null }>;
+    drafts: Record<string, { status: string; externalPostId: string | null; tenantId: string }>;
+    jobs: Record<string, { status: string; tenantId: string }>;
+  };
+
+  function makeFakeTx(initial: FakeStore): {
+    tx: any;
+    getStore: () => FakeStore;
+  } {
+    let store = JSON.parse(JSON.stringify(initial));
+
+    const tx = {
+      publishingResult: {
+        findUnique: async (q: any) => store.results[q.where.id] ?? null,
+        upsert: async (q: any) => {
+          store.results[q.where.id] = { ok: q.create.ok ?? q.update.ok ?? false, externalPostId: q.create.externalPostId ?? q.update.externalPostId ?? null };
+          return { ok: store.results[q.where.id].ok, externalPostId: store.results[q.where.id].externalPostId };
+        },
+      },
+      contentDraft: {
+        findUnique: async (q: any) => store.drafts[q.where.id] ?? null,
+        update: async (q: any) => {
+          const d = store.drafts[q.where.id];
+          if (!d) throw new Error("DRAFT NOT FOUND");
+          Object.assign(d, q.data);
+          return d;
+        },
+        updateMany: async (q: any) => {
+          const d = store.drafts[q.where.id!];
+          if (d && d.status === q.where?.status) {
+            Object.assign(d, q.data);
+            return { count: 1 };
+          }
+          return { count: 0 };
+        },
+      },
+      publishingJob: {
+        findUnique: async (q: any) => store.jobs[q.where.id] ?? null,
+        updateMany: async (q: any) => {
+          const j = store.jobs[q.where.id!];
+          if (j && j.status === q.where?.status) {
+            Object.assign(j, q.data);
+            return { count: 1 };
+          }
+          return { count: 0 };
+        },
+      },
+    };
+    return { tx, getStore: () => store };
+  }
+
+  function emptyStore(slug: string, jobStatus: string, draftStatus: string): FakeStore {
+    return {
+      results: {},
+      drafts: { "draft-1": { status: draftStatus, externalPostId: null, tenantId: slug } },
+      jobs: { "job-1": { status: jobStatus, tenantId: slug } },
+    };
+  }
+
+  it("order: Result first, then Draft, then Job", async () => {
+    const log: string[] = [];
+    const tx = {
+      publishingResult: {
+        findUnique: async () => null,
+        upsert: async () => { log.push("RESULT"); return { ok: true, externalPostId: "post_1" }; },
+      },
+      contentDraft: {
+        findUnique: async () => null,
+        update: async () => { log.push("DRAFT"); return { status: "PUBLISHED", externalPostId: "post_1" }; },
+        updateMany: async () => ({ count: 1 }),
+      },
+      publishingJob: {
+        findUnique: async () => null,
+        updateMany: async () => { log.push("JOB"); return { count: 1 }; },
+      },
+    };
+    await finalizeConfirmedPublicationTx({ tx, jobId: "job-1", draftId: "draft-1", tenantId: "t1", network: "FACEBOOK", externalPostId: "post_1", providerResponse: {} });
+    assert.deepEqual(log, ["RESULT", "DRAFT", "JOB"], "order must be Result→Draft→Job");
+  });
+
+  it("job is last write (JOB appears after RESULT and DRAFT)", async () => {
+    const calls: string[] = [];
+    const tx = {
+      publishingResult: { findUnique: async () => null, upsert: async () => { calls.push("R"); return { ok: true, externalPostId: "p1" }; } },
+      contentDraft: { findUnique: async () => null, update: async () => { calls.push("D"); return { status: "PUBLISHED", externalPostId: "p1" }; }, updateMany: async () => ({ count: 1 }) },
+      publishingJob: { findUnique: async () => null, updateMany: async () => { calls.push("J"); return { count: 1 }; } },
+    };
+    await finalizeConfirmedPublicationTx({ tx, jobId: "j1", draftId: "d1", tenantId: "t1", network: "FACEBOOK", externalPostId: "p1", providerResponse: {} });
+    assert.equal(calls[calls.length - 1], "J", "job must be the last write");
+  });
+
+  it("throws if job not IN_REVIEW", async () => {
+    const { tx } = makeFakeTx(emptyStore("t1", "SCHEDULED", "SCHEDULED"));
+    await assert.rejects(() =>
+      finalizeConfirmedPublicationTx({ tx, jobId: "job-1", draftId: "draft-1", tenantId: "t1", network: "FACEBOOK", externalPostId: "post_1", providerResponse: {} })
+    );
+  });
+
+  it("throws if result has conflicting externalPostId", async () => {
+    const tx: any = {
+      publishingResult: {
+        findUnique: async () => ({ ok: true, externalPostId: "old_post" }),
+        upsert: async () => ({ ok: true, externalPostId: "new_post" }),
+      },
+      contentDraft: { findUnique: async () => null, update: async () => ({ status: "PUBLISHED", externalPostId: "new_post" }), updateMany: async () => ({ count: 1 }) },
+      publishingJob: { findUnique: async () => null, updateMany: async () => ({ count: 1 }) },
+    };
+    await assert.rejects(() =>
+      finalizeConfirmedPublicationTx({ tx, jobId: "j1", draftId: "d1", tenantId: "t1", network: "FACEBOOK", externalPostId: "new_post", providerResponse: {} })
+    );
+  });
+
+  it("throws if draft has conflicting externalPostId", async () => {
+    const { tx } = makeFakeTx({ results: {}, drafts: { "draft-1": { status: "SCHEDULED", externalPostId: "old_draft", tenantId: "t1" } }, jobs: { "job-1": { status: "IN_REVIEW", tenantId: "t1" } } });
+    await assert.rejects(() =>
+      finalizeConfirmedPublicationTx({ tx, jobId: "job-1", draftId: "draft-1", tenantId: "t1", network: "FACEBOOK", externalPostId: "new_post", providerResponse: {} })
+    );
+  });
+
+  it("succeeds and returns committed=true", async () => {
+    const { tx, getStore } = makeFakeTx(emptyStore("t1", "IN_REVIEW", "SCHEDULED"));
+    const r = await finalizeConfirmedPublicationTx({ tx, jobId: "job-1", draftId: "draft-1", tenantId: "t1", network: "FACEBOOK", externalPostId: "post_1", providerResponse: {} });
+    assert.equal(r.committed, true);
+    assert.equal(getStore().jobs["job-1"].status, "PUBLISHED");
+    assert.equal(getStore().drafts["draft-1"].status, "PUBLISHED");
+  });
+
+  it("commitConfirmedPublication wrapper returns committed=false on throw", async () => {
+    const mockPrisma = {
+      $transaction: async (fn: (tx: any) => Promise<any>) => {
+        const { tx } = makeFakeTx(emptyStore("t1", "SCHEDULED", "SCHEDULED"));
+        return fn(tx);
+      },
+    };
+    const r = await commitConfirmedPublication(mockPrisma as any, {
+      jobId: "job-1", draftId: "draft-1", tenantId: "t1", network: "FACEBOOK", externalPostId: "post_1", providerResponse: {},
+    });
+    assert.equal(r.committed, false);
+    assert.equal(r.reconciliationRequired, true);
+    assert.equal(r.externalPostId, "post_1");
+  });
+
+  it("recordUnconfirmedProviderFailure does not degrade ok:true", async () => {
+    const tx: any = {
+      publishingResult: { findUnique: async () => ({ ok: true, externalPostId: "post_x" }), upsert: async () => {} },
+      contentDraft: { findUnique: async () => ({ externalPostId: null }), updateMany: async () => ({ count: 1 }) },
+      publishingJob: { findUnique: async () => ({ status: "IN_REVIEW" }), updateMany: async () => ({ count: 1 }) },
+    };
+    const r = await recordUnconfirmedProviderFailure({ tx, jobId: "job-1", draftId: "draft-1", tenantId: "t1", network: "FACEBOOK", errorMsg: "test", isMaxAttempts: true });
+    assert.equal(r.degraded, false);
+  });
+
+  it("recordUnconfirmedProviderFailure degrades only when no success evidence", async () => {
+    const tx: any = {
+      publishingResult: { findUnique: async () => null, upsert: async () => {} },
+      contentDraft: { findUnique: async () => ({ externalPostId: null }), updateMany: async () => ({ count: 1 }) },
+      publishingJob: { findUnique: async () => ({ status: "IN_REVIEW" }), updateMany: async () => ({ count: 1 }) },
+    };
+    const r = await recordUnconfirmedProviderFailure({ tx, jobId: "j1", draftId: "d1", tenantId: "t1", network: "FACEBOOK", errorMsg: "test", isMaxAttempts: true });
+    assert.equal(r.degraded, true);
+  });
+});

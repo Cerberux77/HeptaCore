@@ -1,8 +1,23 @@
-import type { PrismaClient } from "@prisma/client";
 import type { OAuthProvider } from "@prisma/client";
 
-export interface FinalizeParams {
-  tx: Omit<PrismaClient, "$connect" | "$disconnect" | "$on" | "$transaction" | "$use" | "$extends">;
+export interface TxClient {
+  publishingResult: {
+    findUnique(args: { where: { id: string }; select: { ok: boolean; externalPostId: boolean } }): Promise<{ ok: boolean; externalPostId: string | null } | null>;
+    upsert(args: { where: { id: string }; create: Record<string, unknown>; update: Record<string, unknown>; select: { ok: boolean; externalPostId: boolean } }): Promise<{ ok: boolean; externalPostId: string | null }>;
+  };
+  contentDraft: {
+    findUnique(args: { where: { id: string }; select: { externalPostId: boolean } }): Promise<{ externalPostId: string | null } | null>;
+    update(args: { where: { id: string; tenantId: string }; data: Record<string, unknown>; select: { status: boolean; externalPostId: boolean } }): Promise<{ status: string; externalPostId: string | null }>;
+    updateMany(args: { where: { id: string; tenantId?: string; status?: string }; data: Record<string, unknown> }): Promise<{ count: number }>;
+  };
+  publishingJob: {
+    findUnique(args: { where: { id: string }; select: { status: boolean } }): Promise<{ status: string } | null>;
+    updateMany(args: { where: { id: string; status?: string }; data: Record<string, unknown> }): Promise<{ count: number }>;
+  };
+}
+
+export interface FinalizeTxParams {
+  tx: TxClient;
   jobId: string;
   draftId: string;
   tenantId: string;
@@ -11,87 +26,97 @@ export interface FinalizeParams {
   providerResponse: unknown;
 }
 
-export interface FinalizeResult {
+export interface FinalizeTxResult {
+  committed: true;
+  externalPostId: string;
+}
+
+export async function finalizeConfirmedPublicationTx(params: FinalizeTxParams): Promise<FinalizeTxResult> {
+  const { tx, jobId, draftId, tenantId, network, externalPostId, providerResponse } = params;
+
+  if (!externalPostId) {
+    throw new Error("FINALIZE_INVALID: externalPostId is empty");
+  }
+
+  const resultId = `pr_${jobId}`;
+
+  // 1. PublishingResult — monotonic, never degrade ok:true
+  const existingResult = await tx.publishingResult.findUnique({ where: { id: resultId }, select: { ok: true, externalPostId: true } });
+
+  if (existingResult?.ok === true && existingResult?.externalPostId && existingResult.externalPostId !== externalPostId) {
+    throw new Error(`CONFLICT: result has different externalPostId (${existingResult.externalPostId} vs ${externalPostId})`);
+  }
+
+  const upsertedResult = await tx.publishingResult.upsert({
+    where: { id: resultId },
+    create: { id: resultId, jobId, provider: network as OAuthProvider, externalPostId, ok: true, response: providerResponse as any },
+    update: { externalPostId, ok: true, response: providerResponse as any },
+    select: { ok: true, externalPostId: true },
+  });
+
+  if (!upsertedResult.ok || upsertedResult.externalPostId !== externalPostId) {
+    throw new Error("FINALIZE_RESULT_VERIFY: result not committed with expected values");
+  }
+
+  // 2. ContentDraft — verify no conflicting externalPostId
+  const existingDraft = await tx.contentDraft.findUnique({ where: { id: draftId }, select: { externalPostId: true } });
+
+  if (existingDraft?.externalPostId && existingDraft.externalPostId !== externalPostId) {
+    throw new Error(`CONFLICT: draft has different externalPostId (${existingDraft.externalPostId} vs ${externalPostId})`);
+  }
+
+  const updatedDraft = await tx.contentDraft.update({
+    where: { id: draftId, tenantId },
+    data: { status: "PUBLISHED", publishedAt: new Date(), externalPostId },
+    select: { status: true, externalPostId: true },
+  });
+
+  if (updatedDraft.status !== "PUBLISHED" || updatedDraft.externalPostId !== externalPostId) {
+    throw new Error("FINALIZE_DRAFT_VERIFY: draft not committed with expected values");
+  }
+
+  // 3. PublishingJob — last write, must be IN_REVIEW
+  const jobCommit = await tx.publishingJob.updateMany({
+    where: { id: jobId, status: "IN_REVIEW" },
+    data: { status: "PUBLISHED", scheduledFor: null, updatedAt: new Date() },
+  });
+
+  if (jobCommit.count !== 1) {
+    throw new Error(`FINALIZE_JOB_PRECONDITION: job not IN_REVIEW (count=${jobCommit.count})`);
+  }
+
+  return { committed: true, externalPostId };
+}
+
+export interface CommitResult {
   committed: boolean;
   reconciliationRequired: boolean;
   externalPostId: string;
   code?: string;
 }
 
-export async function finalizeConfirmedPublication(params: FinalizeParams): Promise<FinalizeResult> {
-  const { tx, jobId, draftId, tenantId, network, externalPostId, providerResponse } = params;
-
-  if (!externalPostId) {
-    return { committed: false, reconciliationRequired: true, externalPostId: "", code: "LIVE_RECONCILIATION_REQUIRED" };
-  }
-
+export async function commitConfirmedPublication(
+  prisma: { $transaction(fn: (tx: any) => Promise<FinalizeTxResult>): Promise<FinalizeTxResult> },
+  params: Omit<FinalizeTxParams, "tx">
+): Promise<CommitResult> {
   try {
-    const resultId = `pr_${jobId}`;
+    const result = await prisma.$transaction((tx) =>
+      finalizeConfirmedPublicationTx({ tx, ...params })
+    );
 
-    // 1. Persist PublishingResult (monotonic — never degrade ok:true)
-    const existingResult = await tx.publishingResult.findUnique({
-      where: { id: resultId },
-      select: { ok: true, externalPostId: true },
-    });
-
-    if (existingResult?.ok === true && existingResult?.externalPostId && existingResult.externalPostId !== externalPostId) {
-      throw new Error(`CONFLICT: result has different externalPostId (${existingResult.externalPostId} vs ${externalPostId})`);
-    }
-
-    if (!existingResult || existingResult.ok !== true) {
-      await tx.publishingResult.upsert({
-        where: { id: resultId },
-        create: { id: resultId, jobId, provider: network as OAuthProvider, externalPostId, ok: true, response: providerResponse as any },
-        update: { externalPostId, ok: true, response: providerResponse as any },
-      });
-    }
-
-    // 2. Persist ContentDraft
-    const draft = await tx.contentDraft.findUnique({
-      where: { id: draftId },
-      select: { externalPostId: true },
-    });
-
-    if (draft?.externalPostId && draft.externalPostId !== externalPostId) {
-      throw new Error(`CONFLICT: draft has different externalPostId (${draft.externalPostId} vs ${externalPostId})`);
-    }
-
-    const updatedDraft = await tx.contentDraft.update({
-      where: { id: draftId, tenantId },
-      data: { status: "PUBLISHED", publishedAt: new Date(), externalPostId },
-      select: { status: true, externalPostId: true },
-    });
-
-    if (updatedDraft.status !== "PUBLISHED" || updatedDraft.externalPostId !== externalPostId) {
-      throw new Error("Draft update verification failed");
-    }
-
-    // 3. Persist PublishingJob — last write in transaction
-    const updatedJob = await tx.publishingJob.update({
-      where: { id: jobId },
-      data: { status: "PUBLISHED", scheduledFor: null, updatedAt: new Date() },
-      select: { status: true },
-    });
-
-    if (updatedJob.status !== "PUBLISHED") {
-      throw new Error("Job update verification failed");
-    }
-
-    // All writes confirmed — release savepoint
-    return { committed: true, reconciliationRequired: false, externalPostId };
+    return { committed: true, reconciliationRequired: false, externalPostId: result.externalPostId };
   } catch {
-    // Transaction rolled back — job stays IN_REVIEW
     return {
       committed: false,
       reconciliationRequired: true,
-      externalPostId,
+      externalPostId: params.externalPostId,
       code: "LIVE_RECONCILIATION_REQUIRED",
     };
   }
 }
 
 export interface RecordFailureParams {
-  tx: Omit<PrismaClient, "$connect" | "$disconnect" | "$on" | "$transaction" | "$use" | "$extends">;
+  tx: any;
   jobId: string;
   draftId: string;
   tenantId: string;
@@ -100,24 +125,34 @@ export interface RecordFailureParams {
   isMaxAttempts: boolean;
 }
 
-export async function recordUnconfirmedProviderFailure(params: RecordFailureParams): Promise<void> {
+export async function recordUnconfirmedProviderFailure(params: RecordFailureParams): Promise<{ degraded: boolean }> {
   const { tx, jobId, draftId, tenantId, network, errorMsg, isMaxAttempts } = params;
 
   const existingResult = await tx.publishingResult.findUnique({
     where: { id: `pr_${jobId}` },
     select: { ok: true, externalPostId: true },
-  });
+  }) as { ok: boolean; externalPostId: string | null } | null;
+
+  if (existingResult?.ok === true && existingResult.externalPostId) {
+    return { degraded: false };
+  }
 
   const draft = await tx.contentDraft.findUnique({
     where: { id: draftId },
     select: { externalPostId: true },
-  });
+  }) as { externalPostId: string | null } | null;
 
-  if (existingResult?.ok === true && existingResult.externalPostId) {
-    return;
-  }
   if (draft?.externalPostId) {
-    return;
+    return { degraded: false };
+  }
+
+  const job = await tx.publishingJob.findUnique({
+    where: { id: jobId },
+    select: { status: true },
+  }) as { status: string } | null;
+
+  if (job?.status === "PUBLISHED") {
+    return { degraded: false };
   }
 
   await tx.publishingResult.upsert({
@@ -136,4 +171,6 @@ export async function recordUnconfirmedProviderFailure(params: RecordFailurePara
     where: { id: jobId },
     data: { status: nextStatus as any, lastError: errorMsg.slice(0, 500) },
   });
+
+  return { degraded: true };
 }

@@ -4,7 +4,7 @@ import { auditLog } from "../../../../lib/audit";
 import { resolveAndDecryptOAuthCredential } from "../../../../lib/credential-resolver";
 import { getPublisher, PublishInput } from "../../../../lib/publishers";
 import { checkCronJobEligibility, hasDurableProviderSuccess, isPublicationDurablyCommitted } from "../../../../lib/publishing-execution";
-import { finalizeConfirmedPublication, recordUnconfirmedProviderFailure } from "../../../../lib/publishing-finalization";
+import { commitConfirmedPublication, recordUnconfirmedProviderFailure } from "../../../../lib/publishing-finalization";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -274,16 +274,13 @@ export async function GET(req: Request) {
         published++;
         results.push(`OK ${job.id}: published (${job.provider}) externalId=${outcome.externalPostId}`);
 
-        const finalizeResult = await prisma.$transaction(async (tx) => {
-          return finalizeConfirmedPublication({
-            tx,
-            jobId: job.id,
-            draftId: job.postId ?? "",
-            tenantId: job.tenantId,
-            network: job.provider,
-            externalPostId: outcome.externalPostId,
-            providerResponse: outcome.providerResponse,
-          });
+        const finalizeResult = await commitConfirmedPublication(prisma, {
+          jobId: job.id,
+          draftId: job.postId ?? "",
+          tenantId: job.tenantId,
+          network: job.provider,
+          externalPostId: outcome.externalPostId,
+          providerResponse: outcome.providerResponse,
         });
 
         if (finalizeResult.committed) {

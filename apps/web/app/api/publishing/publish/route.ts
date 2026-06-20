@@ -6,7 +6,7 @@ import { TRIAL_POSTS_PER_NETWORK } from "../../../../lib/trial";
 import { resolveAndDecryptOAuthCredential } from "../../../../lib/credential-resolver";
 import { getPublisher, PublishInput } from "../../../../lib/publishers";
 import { buildImmediateJobId, buildScheduledJobId, checkExistingJobForRetry, checkLegacyJobId, getAllPossibleJobIds } from "../../../../lib/publishing-execution";
-import { finalizeConfirmedPublication, recordUnconfirmedProviderFailure } from "../../../../lib/publishing-finalization";
+import { commitConfirmedPublication, recordUnconfirmedProviderFailure } from "../../../../lib/publishing-finalization";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -484,16 +484,13 @@ export async function POST(req: Request) {
   // Provider succeeded — finalize via shared transactional service
   const externalPostId = publishResult.externalPostId;
 
-  const finalizeResult = await prisma.$transaction(async (tx) => {
-    return finalizeConfirmedPublication({
-      tx,
-      jobId: attemptJobId,
-      draftId: draft.id,
-      tenantId: tenant.id,
-      network,
-      externalPostId,
-      providerResponse: publishResult.providerResponse,
-    });
+  const finalizeResult = await commitConfirmedPublication(prisma, {
+    jobId: attemptJobId,
+    draftId: draft.id,
+    tenantId: tenant.id,
+    network,
+    externalPostId,
+    providerResponse: publishResult.providerResponse,
   });
 
   try {
