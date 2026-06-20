@@ -55,13 +55,73 @@ export interface ProviderSuccessParams {
   now: Date;
 }
 
-export interface ReconciliationResponse {
-  ok: false;
-  providerConfirmed: true;
-  code: string;
-  status: string;
-  draftId: string;
-  externalPostId: string;
-  error: string;
-  action: string;
+export function checkLegacyJobId(draftId: string, network: string): string {
+  return `pj_${draftId}_${network}`;
+}
+
+export function getAllPossibleJobIds(draftId: string, network: string): string[] {
+  return [
+    checkLegacyJobId(draftId, network),
+    buildImmediateJobId(draftId, network),
+  ];
+}
+
+export interface CronJobEligibility {
+  eligible: boolean;
+  reason?: string;
+}
+
+export function checkCronJobEligibility(params: {
+  jobStatus: string;
+  scheduledFor: Date | null;
+  attempts: number;
+  maxAttempts: number;
+  draftExists: boolean;
+  draftStatus?: string;
+  draftNetwork?: string;
+  jobProvider: string;
+  draftExternalPostId?: string | null;
+  resultOk?: boolean;
+  resultExternalPostId?: string | null;
+  isImmediatePreAttempt: boolean;
+}): CronJobEligibility {
+  const { jobStatus, scheduledFor, attempts, maxAttempts, draftExists, draftStatus, draftNetwork, jobProvider, draftExternalPostId, resultOk, resultExternalPostId, isImmediatePreAttempt } = params;
+
+  if (jobStatus !== "SCHEDULED") {
+    return { eligible: false, reason: "Job no longer SCHEDULED." };
+  }
+
+  if (isImmediatePreAttempt) {
+    return { eligible: false, reason: "Immediate pre-attempt job, not for cron." };
+  }
+
+  if (!scheduledFor) {
+    return { eligible: false, reason: "scheduledFor is null (likely immediate pre-attempt)." };
+  }
+
+  if (attempts >= maxAttempts) {
+    return { eligible: false, reason: "Max attempts reached." };
+  }
+
+  if (!draftExists) {
+    return { eligible: false, reason: "Draft not found." };
+  }
+
+  if (draftStatus !== "SCHEDULED") {
+    return { eligible: false, reason: `Draft status ${draftStatus}, expected SCHEDULED.` };
+  }
+
+  if (draftNetwork !== jobProvider) {
+    return { eligible: false, reason: `Network mismatch: draft=${draftNetwork}, job=${jobProvider}.` };
+  }
+
+  if (draftExternalPostId) {
+    return { eligible: false, reason: "Draft already has externalPostId." };
+  }
+
+  if (resultOk && resultExternalPostId) {
+    return { eligible: false, reason: "Successful PublishingResult already exists." };
+  }
+
+  return { eligible: true };
 }

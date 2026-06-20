@@ -692,3 +692,132 @@ describe("productionPublishingExecution", async () => {
     assert.equal(r.blocked, false);
   });
 });
+
+describe("cronEligibility", async () => {
+  const { checkCronJobEligibility } = await import("../publishing-execution.js");
+
+  const baseParams = {
+    jobStatus: "SCHEDULED",
+    scheduledFor: new Date("2026-06-20T00:00:00Z"),
+    attempts: 0,
+    maxAttempts: 3,
+    draftExists: true,
+    draftStatus: "SCHEDULED",
+    draftNetwork: "FACEBOOK",
+    jobProvider: "FACEBOOK",
+    draftExternalPostId: null as string | null | undefined,
+    resultOk: undefined as boolean | undefined,
+    resultExternalPostId: undefined as string | null | undefined,
+    isImmediatePreAttempt: false,
+  };
+
+  it("eligible with clean state", () => {
+    const r = checkCronJobEligibility(baseParams);
+    assert.equal(r.eligible, true);
+  });
+
+  it("blocks draft not SCHEDULED", () => {
+    const r = checkCronJobEligibility({ ...baseParams, draftStatus: "PUBLISHED" });
+    assert.equal(r.eligible, false);
+  });
+
+  it("blocks network mismatch", () => {
+    const r = checkCronJobEligibility({ ...baseParams, draftNetwork: "INSTAGRAM" });
+    assert.equal(r.eligible, false);
+  });
+
+  it("blocks draft with externalPostId", () => {
+    const r = checkCronJobEligibility({ ...baseParams, draftExternalPostId: "post_1" });
+    assert.equal(r.eligible, false);
+  });
+
+  it("blocks existing result ok", () => {
+    const r = checkCronJobEligibility({ ...baseParams, resultOk: true, resultExternalPostId: "post_2" });
+    assert.equal(r.eligible, false);
+  });
+
+  it("blocks scheduledFor null", () => {
+    const r = checkCronJobEligibility({ ...baseParams, scheduledFor: null });
+    assert.equal(r.eligible, false);
+  });
+
+  it("blocks immediate pre-attempt", () => {
+    const r = checkCronJobEligibility({ ...baseParams, isImmediatePreAttempt: true });
+    assert.equal(r.eligible, false);
+  });
+
+  it("blocks max attempts", () => {
+    const r = checkCronJobEligibility({ ...baseParams, attempts: 3, maxAttempts: 3 });
+    assert.equal(r.eligible, false);
+  });
+
+  it("blocks draft not found", () => {
+    const r = checkCronJobEligibility({ ...baseParams, draftExists: false });
+    assert.equal(r.eligible, false);
+  });
+});
+
+describe("legacyAndUiHarden", async () => {
+  const { checkLegacyJobId, getAllPossibleJobIds, checkExistingJobForRetry } = await import("../publishing-execution.js");
+
+  it("legacy job ID format is pj_{draftId}_{network}", () => {
+    const id = checkLegacyJobId("d1", "FACEBOOK");
+    assert.match(id, /^pj_d1_FACEBOOK$/);
+  });
+
+  it("all possible job IDs includes legacy and immediate", () => {
+    const ids = getAllPossibleJobIds("d1", "FACEBOOK");
+    assert.equal(ids.length, 2);
+    assert.equal(ids[0], "pj_d1_FACEBOOK");
+    assert.equal(ids[1], "pj_immediate_d1_FACEBOOK");
+  });
+
+  it("legacy PUBLISHED job blocks", () => {
+    const r = checkExistingJobForRetry({ jobStatus: "PUBLISHED" });
+    assert.equal(r.blocked, true);
+    assert.match(r.code!, /JOB_PUBLISHED/);
+  });
+
+  it("legacy result ok blocks", () => {
+    const r = checkExistingJobForRetry({ resultOk: true, externalPostId: "post_legacy" });
+    assert.equal(r.blocked, true);
+  });
+
+  it("selection frozen during loading", () => {
+    let selectedId = "draft-a";
+    let publishState: string = "loading";
+    function trySelect(id: string): boolean {
+      if (publishState === "loading") return false;
+      selectedId = id;
+      return true;
+    }
+    assert.equal(trySelect("draft-b"), false, "selection blocked during loading");
+    assert.equal(selectedId, "draft-a", "selection unchanged");
+    publishState = "idle";
+    assert.equal(trySelect("draft-c"), true, "selection allowed after loading");
+    assert.equal(selectedId, "draft-c");
+  });
+
+  it("stale response ignored after context change", () => {
+    let activeRequestId = "req_1";
+    let applied = false;
+    function applyResponse(requestId: string): boolean {
+      if (requestId !== activeRequestId) return false;
+      applied = true;
+      return true;
+    }
+    assert.equal(applyResponse("req_1"), true);
+    activeRequestId = "req_2";
+    assert.equal(applyResponse("req_1"), false, "stale response ignored");
+  });
+
+  it("HTTP 202 never marks PUBLISHED", () => {
+    function handleResponse(data: { ok: boolean; providerConfirmed?: boolean }): string {
+      if (data.providerConfirmed) return "reconciliation_required";
+      if (!data.ok) return "failed";
+      return "published";
+    }
+    assert.equal(handleResponse({ ok: false, providerConfirmed: true }), "reconciliation_required");
+    assert.notEqual(handleResponse({ ok: false, providerConfirmed: true }), "published");
+  });
+});

@@ -5,7 +5,7 @@ import { prisma } from "../../../../lib/prisma";
 import { TRIAL_POSTS_PER_NETWORK } from "../../../../lib/trial";
 import { resolveAndDecryptOAuthCredential } from "../../../../lib/credential-resolver";
 import { getPublisher, PublishInput } from "../../../../lib/publishers";
-import { buildImmediateJobId, buildScheduledJobId, checkExistingJobForRetry } from "../../../../lib/publishing-execution";
+import { buildImmediateJobId, buildScheduledJobId, checkExistingJobForRetry, checkLegacyJobId, getAllPossibleJobIds } from "../../../../lib/publishing-execution";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -352,26 +352,36 @@ export async function POST(req: Request) {
 
   const attemptJobId = buildImmediateJobId(draft.id, network);
 
-  // Check for existing completed/in-flight state
-  const existingJob = await prisma.publishingJob.findUnique({
-    where: { id: attemptJobId },
-    select: { status: true, PublishingResult: { select: { ok: true, externalPostId: true } } },
+  // Check for existing completed/in-flight state (legacy + new IDs)
+  const allJobIds = getAllPossibleJobIds(draft.id, network);
+  const existingJobs = await prisma.publishingJob.findMany({
+    where: { id: { in: allJobIds } },
+    select: { id: true, status: true, scheduledFor: true, PublishingResult: { select: { ok: true, externalPostId: true } } },
   });
 
-  const retryCheck = checkExistingJobForRetry({
-    jobStatus: existingJob?.status,
-    resultOk: existingJob?.PublishingResult?.ok,
-    externalPostId: existingJob?.PublishingResult?.externalPostId ?? undefined,
-    draftExternalPostId: draft.externalPostId,
+  const blockingJob = existingJobs.find((j) => {
+    const check = checkExistingJobForRetry({
+      jobStatus: j.status,
+      resultOk: j.PublishingResult?.ok,
+      externalPostId: j.PublishingResult?.externalPostId ?? undefined,
+      draftExternalPostId: draft.externalPostId,
+    });
+    return check.blocked;
   });
 
-  if (retryCheck.blocked) {
+  if (blockingJob) {
+    const check = checkExistingJobForRetry({
+      jobStatus: blockingJob.status,
+      resultOk: blockingJob.PublishingResult?.ok,
+      externalPostId: blockingJob.PublishingResult?.externalPostId ?? undefined,
+      draftExternalPostId: draft.externalPostId,
+    });
     return NextResponse.json({
       ok: false,
       mode: "immediate",
-      code: retryCheck.code ?? "LIVE_BLOCKED_RETRY",
-      error: retryCheck.reason ?? "No puede volver a publicarse.",
-      action: "Verifica el estado del draft y el job existente.",
+      code: check.code ?? "LIVE_BLOCKED_RETRY",
+      error: check.reason ?? "No puede volver a publicarse.",
+      action: "Verifica el estado del draft y jobs existentes.",
     }, { status: 409 });
   }
 

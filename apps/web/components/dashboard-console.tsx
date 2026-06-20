@@ -206,7 +206,7 @@ export function DashboardConsole({
   trial?: TrialStatus;
 }) {
   const [view, setView] = useState<View>("overview");
-  const [selectedId, setSelectedId] = useState(queue[0]?.id ?? "");
+  const [selectedId, setSelectedIdRaw] = useState(queue[0]?.id ?? "");
   const [localQueue, setLocalQueue] = useState(queue);
   const [manualApproval, setManualApproval] = useState(false);
   const [publishMode, setPublishMode] = useState<"dry_run" | "scheduled" | "immediate">("dry_run");
@@ -217,6 +217,11 @@ export function DashboardConsole({
   const [publishState, setPublishState] = useState<"idle" | "loading" | "published" | "scheduled" | "dry_run_ok" | "blocked" | "failed" | "reconciliation_required">("idle");
   const [publishMessage, setPublishMessage] = useState("");
   const activeRequestRef = useRef<{ draftId: string; mode: string; requestId: string } | null>(null);
+
+  const setSelectedId = useCallback((id: string) => {
+    if (publishState === "loading") return;
+    setSelectedIdRaw(id);
+  }, [publishState]);
 
   useEffect(() => {
     setManualApproval(false);
@@ -312,6 +317,10 @@ export function DashboardConsole({
         }),
       });
       const data = await res.json();
+
+      if (activeRequestRef.current?.requestId !== requestId) {
+        return;
+      }
 
       if (data.providerConfirmed === true && data.code === "LIVE_RECONCILIATION_REQUIRED") {
         setPublishState("reconciliation_required");

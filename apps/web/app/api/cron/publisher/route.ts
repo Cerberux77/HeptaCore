@@ -3,6 +3,7 @@ import { prisma } from "../../../../lib/prisma";
 import { auditLog } from "../../../../lib/audit";
 import { resolveAndDecryptOAuthCredential } from "../../../../lib/credential-resolver";
 import { getPublisher, PublishInput } from "../../../../lib/publishers";
+import { checkCronJobEligibility } from "../../../../lib/publishing-execution";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -92,11 +93,37 @@ async function tryRealPublish(job: JobRecord): Promise<PublishOutcome> {
 
   const draft = await prisma.contentDraft.findFirst({
     where: { id: job.draft.id, tenantId: job.tenantId },
-    include: { assets: { include: { asset: true } } },
+    select: { id: true, status: true, network: true, externalPostId: true, caption: true, title: true, format: true, assets: { include: { asset: true } } },
   });
 
   if (!draft) {
     return { kind: "blocked", reason: "Draft not found." };
+  }
+
+  const resultCheck = await prisma.publishingResult.findFirst({
+    where: { jobId: job.id, ok: true },
+    select: { externalPostId: true },
+  });
+
+  const isImmediatePreAttempt = !job.scheduledFor;
+
+  const eligibility = checkCronJobEligibility({
+    jobStatus: "SCHEDULED",
+    scheduledFor: job.scheduledFor,
+    attempts: job.attempts,
+    maxAttempts: MAX_ATTEMPTS,
+    draftExists: true,
+    draftStatus: draft.status,
+    draftNetwork: draft.network,
+    jobProvider: network,
+    draftExternalPostId: draft.externalPostId,
+    resultOk: resultCheck ? true : undefined,
+    resultExternalPostId: resultCheck?.externalPostId ?? undefined,
+    isImmediatePreAttempt,
+  });
+
+  if (!eligibility.eligible) {
+    return { kind: "blocked", reason: eligibility.reason ?? "Cron eligibility check failed." };
   }
 
   const needsAsset = !publisher.capabilities.textOnly || draft.assets.length > 0;
