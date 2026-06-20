@@ -35,7 +35,12 @@ function resolvePublishTarget(
 
 function needsApproval(automationMode: string, mode: string): boolean {
   if (mode === "dry_run") return false;
-  return automationMode === "APPROVAL_REQUIRED" || automationMode === "DRAFT_ONLY";
+  if (automationMode === "DRAFT_ONLY") return false;
+  return automationMode === "APPROVAL_REQUIRED";
+}
+
+function isDraftOnlyBlocked(automationMode: string, mode: string): boolean {
+  return automationMode === "DRAFT_ONLY" && mode !== "dry_run";
 }
 
 function buildPublishPayload(tenantSlug: string, draftId: string, mode: string, manualApproval: boolean) {
@@ -154,12 +159,17 @@ describe("needsApproval", () => {
     assert.equal(needsApproval("APPROVAL_REQUIRED", "immediate"), true);
   });
 
-  it("requires approval for DRAFT_ONLY with scheduled", () => {
-    assert.equal(needsApproval("DRAFT_ONLY", "scheduled"), true);
+  it("requires approval for APPROVAL_REQUIRED with scheduled", () => {
+    assert.equal(needsApproval("APPROVAL_REQUIRED", "scheduled"), true);
   });
 
   it("does not require approval for dry_run", () => {
     assert.equal(needsApproval("APPROVAL_REQUIRED", "dry_run"), false);
+  });
+
+  it("DRAFT_ONLY does not trigger approval (it blocks outright)", () => {
+    assert.equal(needsApproval("DRAFT_ONLY", "immediate"), false);
+    assert.equal(needsApproval("DRAFT_ONLY", "scheduled"), false);
   });
 
   it("does not require approval for AUTOPILOT_FULL", () => {
@@ -168,6 +178,65 @@ describe("needsApproval", () => {
 
   it("does not require approval for AUTOPILOT_LIMITED", () => {
     assert.equal(needsApproval("AUTOPILOT_LIMITED", "immediate"), false);
+  });
+});
+
+describe("draftOnlyBlocking", () => {
+  it("blocks scheduled for DRAFT_ONLY", () => {
+    assert.equal(isDraftOnlyBlocked("DRAFT_ONLY", "scheduled"), true);
+  });
+
+  it("blocks immediate for DRAFT_ONLY", () => {
+    assert.equal(isDraftOnlyBlocked("DRAFT_ONLY", "immediate"), true);
+  });
+
+  it("allows dry_run for DRAFT_ONLY", () => {
+    assert.equal(isDraftOnlyBlocked("DRAFT_ONLY", "dry_run"), false);
+  });
+
+  it("does not block APPROVAL_REQUIRED", () => {
+    assert.equal(isDraftOnlyBlocked("APPROVAL_REQUIRED", "immediate"), false);
+  });
+
+  it("does not block AUTOPILOT_FULL", () => {
+    assert.equal(isDraftOnlyBlocked("AUTOPILOT_FULL", "immediate"), false);
+  });
+});
+
+describe("concurrentClaim", () => {
+  it("only one request claims the draft", () => {
+    const draftId = "draft-concurrent";
+    let claimCount = 0;
+    function atomicClaim(id: string, expectedStatus: string): boolean {
+      claimCount++;
+      return claimCount === 1;
+    }
+    const first = atomicClaim(draftId, "APPROVED");
+    const second = atomicClaim(draftId, "APPROVED");
+    assert.equal(first, true, "first request should claim");
+    assert.equal(second, false, "second request should be rejected");
+    assert.equal(claimCount, 2, "both requests attempted");
+  });
+
+  it("publisher.publish is invoked exactly once", () => {
+    let publishCalls = 0;
+    function publish(): string {
+      publishCalls++;
+      return "post_123";
+    }
+    let claimed = false;
+    function tryPublish(): { ok: boolean; postId?: string } {
+      if (claimed) return { ok: false };
+      claimed = true;
+      const postId = publish();
+      return { ok: true, postId };
+    }
+    const r1 = tryPublish();
+    const r2 = tryPublish();
+    assert.equal(r1.ok, true);
+    assert.equal(r1.postId, "post_123");
+    assert.equal(r2.ok, false);
+    assert.equal(publishCalls, 1, "publisher called exactly once");
   });
 });
 

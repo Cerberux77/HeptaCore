@@ -115,7 +115,16 @@ export async function POST(req: Request) {
   const now = new Date();
   const network = draft.network;
 
-  const approvalRequired = tenant.automationMode === "APPROVAL_REQUIRED" || tenant.automationMode === "DRAFT_ONLY";
+  const draftOnly = tenant.automationMode === "DRAFT_ONLY";
+  const approvalRequired = tenant.automationMode === "APPROVAL_REQUIRED";
+
+  if (requestMode !== "dry_run" && draftOnly) {
+    return NextResponse.json({
+      code: "LIVE_BLOCKED_DRAFT_ONLY_MODE",
+      error: "Este tenant esta en modo DRAFT_ONLY. Solo se permite dry-run.",
+      action: "Cambia el modo de automatizacion del tenant para publicar o programar.",
+    }, { status: 409 });
+  }
 
   if (requestMode !== "dry_run" && approvalRequired && !manualApproval) {
     return NextResponse.json({
