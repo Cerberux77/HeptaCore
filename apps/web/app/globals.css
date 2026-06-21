@@ -425,6 +425,7 @@ p {
 .platform-media {
   display: grid;
   place-items: center;
+  position: relative;
   width: 100%;
   background: #0d0d0d;
 }
@@ -435,6 +436,39 @@ p {
   height: 100%;
   object-fit: contain;
 }
+.platform-empty {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  min-height: 180px;
+  color: var(--hc-fog);
+}
+.carousel-controls {
+  display: grid;
+  grid-template-columns: 32px 1fr 32px;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-top: 1px solid var(--hc-line);
+  color: var(--hc-fog);
+  font-size: 12px;
+  text-align: center;
+}
+.story-safe-areas {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.story-safe-areas span {
+  position: absolute;
+  border: 1px dashed rgba(255, 255, 255, .68);
+  background: rgba(8, 8, 8, .16);
+}
+.story-safe-top { top: 0; left: 0; right: 0; height: 13%; }
+.story-safe-bottom { left: 0; right: 0; bottom: 0; height: 16%; }
+.story-safe-left { top: 13%; bottom: 16%; left: 0; width: 5%; }
+.story-safe-right { top: 13%; bottom: 16%; right: 0; width: 5%; }
 .frame-ig-square .platform-media {
   aspect-ratio: 1 / 1;
 }
@@ -576,6 +610,125 @@ p {
 .queue-scroll {
   max-height: calc(100vh - 242px);
   overflow: auto;
+}
+.format-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 8px;
+  border: 1px solid var(--hc-line);
+  border-radius: 8px;
+  background: var(--hc-surface);
+}
+.format-toolbar label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  color: var(--hc-fog);
+  font-size: 11px;
+  font-weight: 700;
+}
+.format-toolbar select {
+  max-width: 240px;
+  min-width: 180px;
+  padding: 6px 10px;
+  border: 1px solid var(--hc-line);
+  border-radius: 6px;
+  background: #fff;
+  color: var(--hc-ink);
+  font: inherit;
+}
+.format-toolbar small {
+  color: var(--hc-fog);
+  font-size: 11px;
+  white-space: nowrap;
+}
+.asset-manifest {
+  display: grid;
+  gap: 6px;
+  padding: 8px;
+  border-top: 1px solid var(--hc-line);
+  background: var(--hc-bone);
+}
+.asset-manifest-head,
+.asset-manifest-row {
+  display: grid;
+  align-items: center;
+  gap: 8px;
+}
+.asset-manifest-head {
+  grid-template-columns: 1fr auto;
+}
+.asset-manifest-head strong {
+  font-size: 12px;
+}
+.asset-manifest-row {
+  grid-template-columns: 28px minmax(0, 1fr) minmax(90px, 120px) auto;
+  padding: 6px;
+  border: 1px solid var(--hc-line);
+  border-radius: 6px;
+  background: var(--hc-panel);
+}
+.asset-manifest-row strong {
+  overflow: hidden;
+  color: var(--hc-ink);
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.asset-manifest-row small {
+  overflow: hidden;
+  color: var(--hc-fog);
+  font-size: 10px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.asset-order {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 999px;
+  background: var(--hc-ink);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 800;
+}
+.asset-actions {
+  display: flex;
+  gap: 4px;
+}
+.icon-button.danger {
+  color: var(--hc-danger);
+}
+.validation-stack {
+  display: grid;
+  gap: 5px;
+  padding: 8px;
+}
+.validation-stack small {
+  color: var(--hc-fog);
+  font-size: 11px;
+}
+.validation-error,
+.validation-warning {
+  margin: 0;
+  padding: 7px 9px;
+  border-radius: 6px;
+  font-size: 12px;
+  line-height: 1.35;
+}
+.validation-error {
+  border: 1px solid rgba(170, 40, 40, .25);
+  background: rgba(170, 40, 40, .08);
+  color: #8f1f1f;
+}
+.validation-warning {
+  border: 1px solid rgba(174, 112, 30, .28);
+  background: rgba(174, 112, 30, .1);
+  color: #825414;
 }
 
 .strategy-grid,
@@ -949,6 +1102,25 @@ textarea { min-height: 84px; resize: vertical; }
   .compact-row > svg,
   .queue-card .risk {
     display: none;
+  }
+  .format-toolbar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .format-toolbar label,
+  .format-toolbar select {
+    width: 100%;
+    max-width: none;
+  }
+  .asset-manifest-row {
+    grid-template-columns: 28px minmax(0, 1fr);
+  }
+  .asset-manifest-row small,
+  .asset-actions {
+    grid-column: 2;
+  }
+  .asset-actions {
+    flex-wrap: wrap;
   }
   .thumb { width: 44px; height: 44px; }
   .wordmark { font-size: 10px; letter-spacing: .2em; }

@@ -69,6 +69,7 @@ export async function POST(req: Request) {
       sourcePath: relativePath,
       storageKey: relativePath,
       mimeType: file.type,
+      metadata: { sizeBytes: file.size },
       rightsStatus: "needs_review",
     },
   });

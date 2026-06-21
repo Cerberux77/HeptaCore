@@ -5,9 +5,10 @@ import { prisma } from "../../../../lib/prisma";
 import { TRIAL_POSTS_PER_NETWORK } from "../../../../lib/trial";
 import { resolveAndDecryptOAuthCredential } from "../../../../lib/credential-resolver";
 import { getPublisher, PublishInput } from "../../../../lib/publishers";
-import { buildImmediateJobId, buildScheduledJobId, checkExistingJobForRetry, checkLegacyJobId, getAllPossibleJobIds } from "../../../../lib/publishing-execution";
+import { buildImmediateJobId, checkExistingJobForRetry, getAllPossibleJobIds } from "../../../../lib/publishing-execution";
 import { commitConfirmedPublication, recordUnconfirmedProviderFailure } from "../../../../lib/publishing-finalization";
 import { ProviderError } from "../../../../lib/publishers/types";
+import { buildMultiformatDryRun, normalizeAssetManifest, normalizePublishingFormat } from "../../../../lib/publishing-formats";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -116,13 +117,63 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: `Draft must be APPROVED. Current status: ${draft.status}.` }, { status: 409 });
   }
 
-  const now = new Date();
   const network = draft.network;
+  const format = normalizePublishingFormat(network, draft.format);
+  const orderedAssets = normalizeAssetManifest(draft.assets, (asset) => {
+    if (!asset) return null;
+    const assetPath = resolveAssetPath(asset);
+    return assetPath ? buildPublicAssetUrl(tenantSlug, assetPath) : null;
+  });
 
   const draftOnly = tenant.automationMode === "DRAFT_ONLY";
   const approvalRequired = tenant.automationMode === "APPROVAL_REQUIRED";
 
-  if (requestMode !== "dry_run" && draftOnly) {
+  if (requestMode === "dry_run") {
+    const dryRun = buildMultiformatDryRun(format, orderedAssets);
+
+    await auditLog({
+      tenantId: tenant.id,
+      actorId: session.user.id,
+      action: "publish_dry_run_multiformat_validated",
+      target: `draft:${draft.id}`,
+      metadata: {
+        tenant: tenant.name,
+        title: draft.title,
+        network,
+        format,
+        valid: dryRun.valid,
+        errorCodes: dryRun.errors.map((error) => error.code),
+        warningCodes: dryRun.warnings.map((warning) => warning.code),
+        assetIds: orderedAssets.map((asset) => asset.id),
+        tenantAutomationMode: tenant.automationMode,
+      },
+    });
+
+    return NextResponse.json({
+      ok: dryRun.valid,
+      mode: "dry_run",
+      message: dryRun.valid
+        ? "Multiformat dry-run passed. No provider call executed."
+        : "Multiformat dry-run found blocking validation errors. No provider call executed.",
+      draftId: draft.id,
+      valid: dryRun.valid,
+      errors: dryRun.errors,
+      warnings: dryRun.warnings,
+      format: dryRun.format,
+      assets: dryRun.assets,
+      previewData: dryRun.previewData,
+    });
+  }
+
+  if (format === "INSTAGRAM_CAROUSEL" || format === "INSTAGRAM_STORY") {
+    return NextResponse.json({
+      code: "LIVE_BLOCKED_FORMAT_PREVIEW_ONLY",
+      error: `${format} is available for preview and dry-run only in this sprint.`,
+      action: "Use dry-run for Carousel or Story. Real publishing remains disabled for this format.",
+    }, { status: 409 });
+  }
+
+  if (draftOnly) {
     return NextResponse.json({
       code: "LIVE_BLOCKED_DRAFT_ONLY_MODE",
       error: "Este tenant esta en modo DRAFT_ONLY. Solo se permite dry-run.",
@@ -130,7 +181,7 @@ export async function POST(req: Request) {
     }, { status: 409 });
   }
 
-  if (requestMode !== "dry_run" && approvalRequired && !manualApproval) {
+  if (approvalRequired && !manualApproval) {
     return NextResponse.json({
       code: "LIVE_BLOCKED_MANUAL_APPROVAL_REQUIRED",
       error: "Este tenant requiere aprobacion manual explicita para publicar o programar.",
@@ -188,7 +239,7 @@ export async function POST(req: Request) {
         tenant: tenant.name,
         title: draft.title,
         network,
-        format: draft.format,
+        format,
         scheduledFor: scheduledFor.toISOString(),
         jobId,
         tenantAutomationMode: tenant.automationMode,
@@ -317,40 +368,6 @@ export async function POST(req: Request) {
     mediaType = isVideo ? "VIDEO" : "IMAGE";
   }
 
-  // === DRY RUN: preflight passed, no provider call ===
-
-  if (requestMode === "dry_run") {
-    await auditLog({
-      tenantId: tenant.id,
-      actorId: session.user.id,
-      action: "publish_dry_run_technical_validated",
-      target: `draft:${draft.id}`,
-      metadata: {
-        tenant: tenant.name,
-        title: draft.title,
-        network,
-        format: draft.format,
-        mediaUrl: mediaUrl ?? null,
-        mediaType: mediaType ?? null,
-        targetId,
-        capabilities: publisher.capabilities,
-        tenantAutomationMode: tenant.automationMode,
-      },
-    });
-
-    return NextResponse.json({
-      ok: true,
-      mode: "dry_run",
-      message: "Technical preflight passed. No provider call executed.",
-      draftId: draft.id,
-      mediaUrl: mediaUrl ?? null,
-      mediaType: mediaType ?? null,
-      targetId,
-      capabilities: publisher.capabilities,
-      tenantAutomationMode: tenant.automationMode,
-    });
-  }
-
   // === IMMEDIATE: attempt real publish ===
 
   const attemptJobId = buildImmediateJobId(draft.id, network);
@@ -456,7 +473,7 @@ export async function POST(req: Request) {
           actorId: session.user.id,
           action: "publish_immediate_failed_ambiguous",
           target: `draft:${draft.id}`,
-          metadata: { tenant: tenant.name, title: draft.title, network, format: draft.format, error: errorMsg.slice(0, 500), code: err.meta.code, subcode: err.meta.subcode, fbtrace: err.meta.fbtrace },
+          metadata: { tenant: tenant.name, title: draft.title, network, format, error: errorMsg.slice(0, 500), code: err.meta.code, subcode: err.meta.subcode, fbtrace: err.meta.fbtrace },
         });
       } catch {}
 
@@ -490,7 +507,7 @@ export async function POST(req: Request) {
         actorId: session.user.id,
         action: "publish_immediate_failed",
         target: `draft:${draft.id}`,
-        metadata: { tenant: tenant.name, title: draft.title, network, format: draft.format, error: errorMsg.slice(0, 500) },
+        metadata: { tenant: tenant.name, title: draft.title, network, format, error: errorMsg.slice(0, 500) },
       });
     } catch {}
 
@@ -522,7 +539,7 @@ export async function POST(req: Request) {
       actorId: session.user.id,
       action: finalizeResult.committed ? "publish_immediate_live" : "publish_immediate_live_reconciliation_needed",
       target: `draft:${draft.id}`,
-      metadata: { tenant: tenant.name, title: draft.title, network, format: draft.format, externalPostId, providerResponse: publishResult.providerResponse, tenantAutomationMode: tenant.automationMode, committed: finalizeResult.committed },
+      metadata: { tenant: tenant.name, title: draft.title, network, format, externalPostId, providerResponse: publishResult.providerResponse, tenantAutomationMode: tenant.automationMode, committed: finalizeResult.committed },
     });
   } catch {}
 

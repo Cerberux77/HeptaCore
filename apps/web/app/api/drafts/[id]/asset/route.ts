@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { auth } from "../../../../../lib/auth";
 import { prisma } from "../../../../../lib/prisma";
 import { auditLog } from "../../../../../lib/audit";
+import { normalizeAssetManifest, roleForAssetOrder } from "../../../../../lib/publishing-formats";
 
 export async function PUT(
   req: Request,
@@ -13,12 +14,15 @@ export async function PUT(
   }
 
   const { id } = await params;
-  const body = await req.json().catch(() => null);
-  if (!body || typeof body.assetId !== "string") {
-    return NextResponse.json({ error: "assetId is required" }, { status: 400 });
+  const body = await req.json().catch(() => null) as { assetId?: string; assetIds?: unknown[] } | null;
+  if (!body || (typeof body.assetId !== "string" && !Array.isArray(body.assetIds))) {
+    return NextResponse.json({ error: "assetId or assetIds is required" }, { status: 400 });
   }
 
-  const { assetId } = body as { assetId: string };
+  const requestedAssetIds: string[] = Array.isArray(body.assetIds)
+    ? body.assetIds.map((value: unknown) => String(value)).filter(Boolean)
+    : [String(body.assetId)];
+  const assetIds: string[] = Array.from(new Set(requestedAssetIds));
 
   const draft = await prisma.contentDraft.findUnique({
     where: { id },
@@ -35,31 +39,37 @@ export async function PUT(
     return NextResponse.json({ error: "Forbidden: editor role required" }, { status: 403 });
   }
 
-  const newAsset = await prisma.asset.findFirst({
-    where: { id: assetId, tenantId: draft.tenantId },
-  });
-  if (!newAsset) {
-    return NextResponse.json({ error: "Asset not found in this tenant" }, { status: 404 });
+  const newAssets = assetIds.length > 0
+    ? await prisma.asset.findMany({
+        where: { id: { in: assetIds }, tenantId: draft.tenantId },
+      })
+    : [];
+  if (newAssets.length !== assetIds.length) {
+    return NextResponse.json({ error: "One or more assets were not found in this tenant" }, { status: 404 });
   }
 
   const oldAssets = draft.assets;
   const oldAssetIds = oldAssets.map((da: { assetId: string }) => da.assetId);
 
-  if (oldAssetIds.includes(assetId)) {
+  if (!Array.isArray(body.assetIds) && oldAssetIds.includes(assetIds[0])) {
     return NextResponse.json({ error: "Asset already linked to this draft" }, { status: 409 });
   }
 
-  await prisma.contentDraftAsset.deleteMany({
-    where: { draftId: id },
-  });
+  await prisma.$transaction(async (tx) => {
+    await tx.contentDraftAsset.deleteMany({
+      where: { draftId: id },
+    });
 
-  await prisma.contentDraftAsset.create({
-    data: {
-      id: crypto.randomUUID(),
-      draftId: id,
-      assetId,
-      role: "primary",
-    },
+    if (assetIds.length > 0) {
+      await tx.contentDraftAsset.createMany({
+        data: assetIds.map((assetId, index) => ({
+          id: crypto.randomUUID(),
+          draftId: id,
+          assetId,
+          role: roleForAssetOrder(index + 1),
+        })),
+      });
+    }
   });
 
   if (draft.status === "APPROVED") {
@@ -77,22 +87,31 @@ export async function PUT(
     metadata: {
       title: draft.title,
       previousAssetIds: oldAssetIds,
-      newAssetId: assetId,
+      newAssetIds: assetIds,
       previousFilenames: oldAssets.map((da: { asset: { filename: string } }) => da.asset.filename),
-      newFilename: newAsset.filename,
+      newFilenames: newAssets.map((asset) => asset.filename),
     },
   });
+
+  const updatedLinks = await prisma.contentDraftAsset.findMany({
+    where: { draftId: id },
+    include: { asset: true },
+  });
+  const orderedAssets = normalizeAssetManifest(updatedLinks, (asset) => asset?.sourcePath ?? asset?.storageKey ?? null);
 
   return NextResponse.json({
     ok: true,
     draftId: id,
     previousAssetIds: oldAssetIds,
-    newAsset: {
-      id: newAsset.id,
-      filename: newAsset.filename,
-      kind: newAsset.kind,
-      path: newAsset.sourcePath,
-    },
+    assets: orderedAssets,
+    newAsset: orderedAssets[0]
+      ? {
+          id: orderedAssets[0].id,
+          filename: orderedAssets[0].filename,
+          kind: orderedAssets[0].kind,
+          path: orderedAssets[0].url,
+        }
+      : null,
     statusChanged: draft.status === "APPROVED",
   });
 }

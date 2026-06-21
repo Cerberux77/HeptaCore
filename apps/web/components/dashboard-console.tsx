@@ -4,10 +4,13 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   AlertTriangle,
+  ArrowDown,
+  ArrowUp,
   BarChart3,
   Bot,
   CalendarDays,
   Check,
+  ChevronLeft,
   ChevronRight,
   Circle,
   ClipboardList,
@@ -23,6 +26,7 @@ import {
   Settings2,
   ShieldCheck,
   TrendingUp,
+  Trash2,
   X,
 } from "lucide-react";
 import { HeptaCoreWordmark } from "./heptacore-mark";
@@ -43,6 +47,14 @@ import {
 } from "../lib/dashboard-queue";
 import { calendarDisplayState } from "../lib/calendar-state";
 import type { TrialStatus } from "../lib/trial";
+import {
+  MULTIFORMAT_VALUES,
+  PUBLISHING_FORMAT_CONFIGS,
+  validateFormatAssets,
+  type DraftFormatAsset,
+  type MultiformatDryRunResult,
+  type PublishingFormat,
+} from "../lib/publishing-formats";
 
 type View = "overview" | "strategy" | "queue" | "assets" | "calendar" | "checklist" | "reports" | "readiness";
 type CalendarView = "list" | "week" | "month";
@@ -79,6 +91,7 @@ function tenantAssetSlug(tenantSlug: string): string {
 
 function assetUrl(path: string | null | undefined, slug: string) {
   if (!path) return "";
+  if (path.startsWith("http://") || path.startsWith("https://") || path.startsWith("/")) return path;
   const folder = tenantAssetSlug(slug);
   const cleanPath = path.replace(/^content\/inbox\//, "").replace(/\\/g, "/");
   if (cleanPath.includes("..")) return "";
@@ -86,35 +99,129 @@ function assetUrl(path: string | null | undefined, slug: string) {
 }
 
 function channelLabel(item: DraftQueueItem) {
-  return `${item.network} / ${item.format}`;
+  return `${NETWORK_LABELS[item.network] ?? item.network} / ${PUBLISHING_FORMAT_CONFIGS[item.format]?.label ?? item.format}`;
 }
 
 function getPlatformFrameClass(item: DraftQueueItem) {
+  if (item.format === "INSTAGRAM_STORY") return "frame-ig-vertical";
+  if (item.format === "INSTAGRAM_CAROUSEL") return "frame-ig-portrait";
+  if (item.format === "INSTAGRAM_FEED") return "frame-ig-square";
+  if (item.format === "FACEBOOK_FEED") return "frame-facebook";
   const ch = item.network.toLowerCase();
-  const fmt = item.format?.toLowerCase() ?? "feed";
-  if (ch === "instagram" && (fmt === "story" || fmt === "reel")) return "frame-ig-vertical";
-  if (ch === "instagram" && fmt === "feed") return "frame-ig-square";
-  if (ch === "instagram" && fmt === "carousel") return "frame-ig-portrait";
+  const fmt = String(item.format ?? "").toLowerCase();
   if (ch === "tiktok" || (ch === "youtube" && (fmt === "short" || fmt === "vertical_video"))) return "frame-ig-vertical";
   if (ch === "youtube") return "frame-youtube";
   if (ch === "linkedin") return "frame-linkedin";
   return "frame-facebook";
 }
 
-function isVideoAsset(item: DraftQueueItem | { asset?: { path: string | null; kind: string } | null }) {
-  const path = item.asset?.path?.toLowerCase() ?? "";
-  return item.asset?.kind === "VIDEO" || path.endsWith(".mp4") || path.endsWith(".mov") || path.endsWith(".webm");
+function isVideoPath(path?: string | null, kind?: string | null, mimeType?: string | null) {
+  const cleanPath = path?.toLowerCase() ?? "";
+  return kind === "VIDEO" || mimeType?.startsWith("video/") || cleanPath.endsWith(".mp4") || cleanPath.endsWith(".mov") || cleanPath.endsWith(".webm");
+}
+
+function assetLabel(asset: DraftFormatAsset) {
+  return asset.filename ?? asset.id;
 }
 
 function Thumb({ item, slug }: { item: DraftQueueItem; slug: string }) {
-  const url = assetUrl(item.asset?.path, slug);
+  const first = item.assets?.[0];
+  const url = assetUrl(first?.url ?? item.asset?.path, slug);
   if (url) {
-    if (isVideoAsset(item)) {
+    if (isVideoPath(first?.url ?? item.asset?.path, first?.kind ?? item.asset?.kind, first?.mimeType)) {
       return <video src={url} className="thumb thumb-video" muted playsInline preload="metadata" />;
     }
     return <img src={url} alt={item.title} className="thumb" />;
   }
   return <div className="thumb fallback"><ImageIcon size={20} /></div>;
+}
+
+function PlatformPreview({
+  item,
+  tenantSlug,
+  tenantName,
+  captionOverride,
+  carouselIndex,
+  setCarouselIndex,
+}: {
+  item: DraftQueueItem;
+  tenantSlug: string;
+  tenantName: string;
+  captionOverride?: string;
+  carouselIndex: number;
+  setCarouselIndex: (index: number) => void;
+}) {
+  const assets = item.assets?.length ? item.assets : item.asset ? [{
+    id: item.asset.filename,
+    url: item.asset.path,
+    filename: item.asset.filename,
+    mimeType: null,
+    width: null,
+    height: null,
+    sizeBytes: null,
+    order: 1,
+    kind: item.asset.kind,
+  }] : [];
+  const activeIndex = item.format === "INSTAGRAM_CAROUSEL"
+    ? Math.min(Math.max(carouselIndex, 0), Math.max(assets.length - 1, 0))
+    : 0;
+  const activeAsset = assets[activeIndex];
+  const activeUrl = assetUrl(activeAsset?.url, tenantSlug);
+  const caption = captionOverride ?? item.caption;
+  const config = PUBLISHING_FORMAT_CONFIGS[item.format];
+
+  return (
+    <div className={`platform-preview ${getPlatformFrameClass(item)}`}>
+      <div className="platform-chrome">
+        <span>{NETWORK_LABELS[item.network] ?? item.network}</span>
+        <strong>{config?.label ?? item.format}</strong>
+      </div>
+      <div className="platform-media">
+        {activeUrl ? (
+          isVideoPath(activeAsset?.url, activeAsset?.kind, activeAsset?.mimeType) ? (
+            <video src={activeUrl} controls preload="metadata" />
+          ) : (
+            <img src={activeUrl} alt={activeAsset ? assetLabel(activeAsset) : item.title} />
+          )
+        ) : (
+          <div className="platform-empty"><ImageIcon size={24} /></div>
+        )}
+        {item.format === "INSTAGRAM_STORY" && (
+          <div className="story-safe-areas" aria-hidden="true">
+            <span className="story-safe-top" />
+            <span className="story-safe-bottom" />
+            <span className="story-safe-left" />
+            <span className="story-safe-right" />
+          </div>
+        )}
+      </div>
+      {item.format === "INSTAGRAM_CAROUSEL" && (
+        <div className="carousel-controls">
+          <button
+            className="icon-button"
+            onClick={() => setCarouselIndex(Math.max(activeIndex - 1, 0))}
+            disabled={activeIndex === 0}
+            aria-label="Asset anterior"
+          >
+            <ChevronLeft size={16} />
+          </button>
+          <span>{assets.length ? `${activeIndex + 1} / ${assets.length}` : "0 / 0"}</span>
+          <button
+            className="icon-button"
+            onClick={() => setCarouselIndex(Math.min(activeIndex + 1, assets.length - 1))}
+            disabled={activeIndex >= assets.length - 1}
+            aria-label="Asset siguiente"
+          >
+            <ChevronRight size={16} />
+          </button>
+        </div>
+      )}
+      <div className="platform-caption">
+        <strong>{tenantName}</strong>
+        <span>{caption}</span>
+      </div>
+    </div>
+  );
 }
 
 function Risk({ level, onAction }: { level: string; onAction?: () => void }) {
@@ -227,6 +334,8 @@ export function DashboardConsole({
     metrics?.tenant.mode === "APPROVAL_REQUIRED" || metrics?.tenant.mode === "DRAFT_ONLY";
   const [publishState, setPublishState] = useState<"idle" | "loading" | "published" | "scheduled" | "dry_run_ok" | "blocked" | "failed" | "reconciliation_required">("idle");
   const [publishMessage, setPublishMessage] = useState("");
+  const [dryRunResult, setDryRunResult] = useState<MultiformatDryRunResult | null>(null);
+  const [carouselIndex, setCarouselIndex] = useState(0);
   const activeRequestRef = useRef<{ draftId: string; mode: string; requestId: string } | null>(null);
 
   const setSelectedId = useCallback((id: string) => {
@@ -238,6 +347,7 @@ export function DashboardConsole({
     setManualApproval(false);
     setPublishState("idle");
     setPublishMessage("");
+    setDryRunResult(null);
     activeRequestRef.current = null;
   }, [selectedId, publishMode]);
 
@@ -259,6 +369,7 @@ export function DashboardConsole({
   const [strategyGenerating, setStrategyGenerating] = useState(false);
   const [strategyResult, setStrategyResult] = useState<null | { provider: string; strategy: any; cost?: any }>(null);
   const [assetPickerOpen, setAssetPickerOpen] = useState(false);
+  const [assetPickerTarget, setAssetPickerTarget] = useState<{ mode: "add" | "replace"; order?: number }>({ mode: "replace", order: 1 });
   const [assetReplacing, setAssetReplacing] = useState(false);
   const [paymentModalOpen, setPaymentModalOpen] = useState(false);
   const [networkSaving, setNetworkSaving] = useState(false);
@@ -269,13 +380,14 @@ export function DashboardConsole({
   const [newPubOpen, setNewPubOpen] = useState(false);
   const [newPubTitle, setNewPubTitle] = useState("");
   const [newPubCaption, setNewPubCaption] = useState("");
-  const [newPubNetwork, setNewPubNetwork] = useState("INSTAGRAM");
+  const [newPubFormat, setNewPubFormat] = useState<PublishingFormat>("INSTAGRAM_FEED");
   const [newPubAssetId, setNewPubAssetId] = useState("");
   const [newPubSaving, setNewPubSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [uploadFile, setUploadFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const selected = selectedDraftFromQueue(localQueue, selectedId);
+  const selectedValidation = selected ? validateFormatAssets(selected.format, selected.assets ?? []) : null;
   const activeNetworks = metrics?.tenant.activeNetworks?.length ? metrics.tenant.activeNetworks : ["INSTAGRAM", "FACEBOOK"];
   const missingCoreNetworks = SUPPORTED_NETWORKS.filter((network) => !activeNetworks.includes(network));
 
@@ -322,6 +434,7 @@ export function DashboardConsole({
     setManualApproval(false);
     setPublishState("idle");
     setPublishMessage("");
+    setDryRunResult(null);
     activeRequestRef.current = null;
   }, [selectedId]);
 
@@ -329,7 +442,12 @@ export function DashboardConsole({
     setManualApproval(false);
     setPublishState("idle");
     setPublishMessage("");
+    setDryRunResult(null);
   }, [publishDraftId, publishMode]);
+
+  useEffect(() => {
+    setCarouselIndex(0);
+  }, [selectedId, selected?.assets?.length, selected?.format]);
 
   useEffect(() => {
     const currentStillApproved = approvedDrafts.some((draft) => draft.id === publishDraftId);
@@ -361,6 +479,17 @@ export function DashboardConsole({
       const data = await res.json();
 
       if (activeRequestRef.current?.requestId !== requestId) {
+        return;
+      }
+
+      if (data.mode === "dry_run" && data.previewData) {
+        setDryRunResult(data as MultiformatDryRunResult);
+        setPublishState(data.valid ? "dry_run_ok" : "blocked");
+        setPublishMessage(
+          data.valid
+            ? `Dry-run validado: ${target.title}. Sin llamadas a provider.`
+            : `Dry-run bloqueado: ${(data.errors ?? []).length} error(es), ${(data.warnings ?? []).length} warning(s). Sin llamadas a provider.`,
+        );
         return;
       }
 
@@ -551,25 +680,89 @@ export function DashboardConsole({
     }
   }
 
-  async function handleReplaceAsset(newAssetId: string) {
+  async function handleFormatChange(format: PublishingFormat) {
+    if (!selected) return;
+    const previousFormat = selected.format;
+    const nextNetwork = PUBLISHING_FORMAT_CONFIGS[format].platform;
+    mergeLocalDraft({ id: selected.id, format, network: nextNetwork });
+    try {
+      const res = await fetch(`/api/drafts/${selected.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ format }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.ok) {
+        alert(data.error || "Error al cambiar formato");
+        mergeLocalDraft({ id: selected.id, format: previousFormat, network: selected.network });
+        return;
+      }
+      mergeLocalDraft({ id: selected.id, format, network: nextNetwork, status: data.draft.status });
+      setDryRunResult(null);
+      router.refresh();
+    } catch (error) {
+      mergeLocalDraft({ id: selected.id, format: previousFormat, network: selected.network });
+      alert(error instanceof Error ? error.message : "Error de red");
+    }
+  }
+
+  async function handleUpdateDraftAssets(nextAssetIds: string[]) {
     if (!selected) return;
     setAssetReplacing(true);
     try {
       const res = await fetch(`/api/drafts/${selected.id}/asset`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ assetId: newAssetId }),
+        body: JSON.stringify({ assetIds: nextAssetIds }),
       });
       const data = await res.json();
       if (!res.ok || !data.ok) {
-        alert(data.error || "Error al reemplazar asset");
+        alert(data.error || "Error al actualizar assets");
         return;
       }
-      window.location.reload();
+      const first = data.assets?.[0];
+      mergeLocalDraft({
+        id: selected.id,
+        assets: data.assets ?? [],
+        asset: first ? { filename: first.filename ?? first.id, path: first.url, kind: first.kind ?? "IMAGE" } : null,
+        status: data.statusChanged ? "NEEDS_REVIEW" : selected.status,
+        requiresReview: data.statusChanged ? true : selected.requiresReview,
+      });
+      setDryRunResult(null);
     } finally {
       setAssetReplacing(false);
       setAssetPickerOpen(false);
     }
+  }
+
+  async function handlePickAsset(assetId: string) {
+    if (!selected) return;
+    const currentIds = (selected.assets ?? []).map((asset) => asset.id);
+    if (assetPickerTarget.mode === "add") {
+      await handleUpdateDraftAssets([...currentIds, assetId]);
+      return;
+    }
+    const index = Math.max((assetPickerTarget.order ?? 1) - 1, 0);
+    const next = currentIds.length ? [...currentIds] : [];
+    next[index] = assetId;
+    await handleUpdateDraftAssets(next.filter(Boolean));
+  }
+
+  async function handleRemoveDraftAsset(order: number) {
+    if (!selected) return;
+    const next = (selected.assets ?? []).filter((asset) => asset.order !== order).map((asset) => asset.id);
+    await handleUpdateDraftAssets(next);
+  }
+
+  async function handleMoveDraftAsset(order: number, direction: "up" | "down") {
+    if (!selected) return;
+    const assets = [...(selected.assets ?? [])].sort((a, b) => a.order - b.order);
+    const index = assets.findIndex((asset) => asset.order === order);
+    const swapIndex = direction === "up" ? index - 1 : index + 1;
+    if (index < 0 || swapIndex < 0 || swapIndex >= assets.length) return;
+    const next = [...assets];
+    [next[index], next[swapIndex]] = [next[swapIndex], next[index]];
+    await handleUpdateDraftAssets(next.map((asset) => asset.id));
   }
 
   async function handleNewPublication() {
@@ -582,7 +775,8 @@ export function DashboardConsole({
         body: JSON.stringify({
           title: newPubTitle.trim(),
           caption: newPubCaption.trim(),
-          network: newPubNetwork,
+          network: PUBLISHING_FORMAT_CONFIGS[newPubFormat].platform,
+          format: newPubFormat,
           assetId: newPubAssetId || undefined,
           tenantSlug,
         }),
@@ -783,9 +977,17 @@ export function DashboardConsole({
                   <textarea value={newPubCaption} onChange={(e) => setNewPubCaption(e.target.value)} placeholder="Texto del post (opcional)" rows={3} />
                 </label>
                 <label>
-                  Red
-                  <select value={newPubNetwork} onChange={(e) => setNewPubNetwork(e.target.value)}>
-                    {activeNetworks.map((n) => <option key={n} value={n}>{n}</option>)}
+                  Formato
+                  <select
+                    value={newPubFormat}
+                    onChange={(e) => {
+                      const format = e.target.value as PublishingFormat;
+                      setNewPubFormat(format);
+                    }}
+                  >
+                    {MULTIFORMAT_VALUES
+                      .filter((format) => activeNetworks.includes(PUBLISHING_FORMAT_CONFIGS[format].platform))
+                      .map((format) => <option key={format} value={format}>{PUBLISHING_FORMAT_CONFIGS[format].label}</option>)}
                   </select>
                 </label>
                 <label>
@@ -837,19 +1039,13 @@ export function DashboardConsole({
                     </div>
                     <Risk level={selected.riskLevel} />
                   </div>
-                  <div className={`platform-preview ${getPlatformFrameClass(selected)}`}>
-                    <div className="platform-chrome">
-                      <span>{selected.network.charAt(0).toUpperCase() + selected.network.slice(1)}</span>
-                      <strong>{selected.format}</strong>
-                    </div>
-                    <div className="platform-media">
-                      <img src={assetUrl(selected.asset?.path, tenantSlug)} alt={selected.title} />
-                    </div>
-                    <div className="platform-caption">
-                      <strong>{metrics?.tenant.name ?? "Tenant"}</strong>
-                      <span>{selected.caption}</span>
-                    </div>
-                  </div>
+                  <PlatformPreview
+                    item={selected}
+                    tenantSlug={tenantSlug}
+                    tenantName={metrics?.tenant.name ?? "Tenant"}
+                    carouselIndex={carouselIndex}
+                    setCarouselIndex={setCarouselIndex}
+                  />
                   <div className="caption-box">{selected.caption}</div>
                 </div>
               )}
@@ -1118,45 +1314,93 @@ export function DashboardConsole({
                   </div>
                   <Risk level={selected.riskLevel} />
                 </div>
-                <div className={`platform-preview ${getPlatformFrameClass(selected)}`}>
-                  <div className="platform-chrome">
-                    <span>{NETWORK_LABELS[selected.network] ?? selected.network}</span>
-                    <strong>{selected.format}</strong>
-                  </div>
-                  <div className="platform-media">
-                    {isVideoAsset(selected) ? (
-                      <video src={assetUrl(selected.asset?.path, tenantSlug)} controls preload="metadata" />
-                    ) : (
-                      <img src={assetUrl(selected.asset?.path, tenantSlug)} alt={selected.title} />
-                    )}
-                  </div>
-                  <div className="platform-caption">
-                    <strong>{metrics?.tenant.name ?? "Tenant"}</strong>
-                    <span>{editMode ? editCaption : selected.caption}</span>
-                  </div>
+                <div className="format-toolbar">
+                  <label>
+                    <span>Formato</span>
+                    <select value={selected.format} onChange={(event) => handleFormatChange(event.target.value as PublishingFormat)}>
+                      {MULTIFORMAT_VALUES
+                        .filter((format) => activeNetworks.includes(PUBLISHING_FORMAT_CONFIGS[format].platform))
+                        .map((format) => (
+                          <option key={format} value={format}>{PUBLISHING_FORMAT_CONFIGS[format].label}</option>
+                        ))}
+                    </select>
+                  </label>
+                  <small>
+                    Assets {selected.assets?.length ?? 0} / {PUBLISHING_FORMAT_CONFIGS[selected.format].assetRule.max}
+                  </small>
                 </div>
-                <div style={{ padding: 8, display: "flex", alignItems: "center", gap: 8 }}>
-                  <span style={{ fontSize: 11, color: "var(--hc-fog)" }}>
-                    Asset: <strong>{selected.asset?.filename ?? "Sin asset"}</strong> ({selected.asset?.kind ?? "N/A"})
-                  </span>
-                  <button
-                    onClick={() => setAssetPickerOpen(!assetPickerOpen)}
-                    style={{ fontSize: 11, padding: "3px 10px", borderRadius: 4, border: "1px solid var(--hc-line)", background: "var(--hc-bone)", color: "var(--hc-ink)", cursor: "pointer" }}
-                  >
-                    Reemplazar
-                  </button>
+                <PlatformPreview
+                  item={selected}
+                  tenantSlug={tenantSlug}
+                  tenantName={metrics?.tenant.name ?? "Tenant"}
+                  captionOverride={editMode ? editCaption : selected.caption}
+                  carouselIndex={carouselIndex}
+                  setCarouselIndex={setCarouselIndex}
+                />
+                <div className="asset-manifest">
+                  <div className="asset-manifest-head">
+                    <strong>Assets ordenados</strong>
+                    <button
+                      className="tool-button"
+                      onClick={() => {
+                        setAssetPickerTarget({ mode: "add" });
+                        setAssetPickerOpen(!assetPickerOpen || assetPickerTarget.mode !== "add");
+                      }}
+                      disabled={assetReplacing || (selected.assets?.length ?? 0) >= PUBLISHING_FORMAT_CONFIGS[selected.format].assetRule.max}
+                    >
+                      <ImageIcon size={14} /> Agregar
+                    </button>
+                  </div>
+                  {(selected.assets ?? []).map((asset, index) => (
+                    <div className="asset-manifest-row" key={`${asset.id}-${asset.order}`}>
+                      <span className="asset-order">{asset.order}</span>
+                      <strong>{assetLabel(asset)}</strong>
+                      <small>{asset.mimeType ?? asset.kind ?? "metadata pendiente"}</small>
+                      <div className="asset-actions">
+                        <button className="icon-button" onClick={() => handleMoveDraftAsset(asset.order, "up")} disabled={index === 0 || assetReplacing} aria-label="Mover asset arriba">
+                          <ArrowUp size={14} />
+                        </button>
+                        <button className="icon-button" onClick={() => handleMoveDraftAsset(asset.order, "down")} disabled={index === (selected.assets?.length ?? 0) - 1 || assetReplacing} aria-label="Mover asset abajo">
+                          <ArrowDown size={14} />
+                        </button>
+                        <button
+                          className="icon-button"
+                          onClick={() => {
+                            setAssetPickerTarget({ mode: "replace", order: asset.order });
+                            setAssetPickerOpen(!assetPickerOpen || assetPickerTarget.order !== asset.order || assetPickerTarget.mode !== "replace");
+                          }}
+                          disabled={assetReplacing}
+                          aria-label="Reemplazar asset"
+                        >
+                          <Settings2 size={14} />
+                        </button>
+                        <button className="icon-button danger" onClick={() => handleRemoveDraftAsset(asset.order)} disabled={assetReplacing} aria-label="Eliminar asset">
+                          <Trash2 size={14} />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                  {(selected.assets?.length ?? 0) === 0 && <p>Sin assets vinculados.</p>}
                 </div>
+                {selectedValidation && (selectedValidation.errors.length > 0 || selectedValidation.warnings.length > 0) && (
+                  <div className="validation-stack">
+                    {selectedValidation.errors.map((error) => <p className="validation-error" key={`${error.code}-${error.assetId ?? "draft"}`}>{error.message}</p>)}
+                    {selectedValidation.warnings.map((warning) => <p className="validation-warning" key={`${warning.code}-${warning.assetId ?? "draft"}`}>{warning.message}</p>)}
+                  </div>
+                )}
                 {assetPickerOpen && (
                   <div style={{ padding: "8px 8px 4px 8px", background: "var(--hc-bone)", borderTop: "1px solid var(--hc-line)" }}>
-                    <strong style={{ fontSize: 11 }}>Seleccionar nuevo asset:</strong>
+                    <strong style={{ fontSize: 11 }}>
+                      {assetPickerTarget.mode === "add" ? "Agregar asset:" : `Reemplazar asset #${assetPickerTarget.order ?? 1}:`}
+                    </strong>
                     <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 6, maxHeight: 160, overflowY: "auto" }}>
                        {assets
-                         .filter((a) => a.filename !== selected.asset?.filename)
+                         .filter((a) => assetPickerTarget.mode === "replace" || !(selected.assets ?? []).some((current) => current.id === a.id))
                          .slice(0, 20)
                         .map((asset) => (
                           <button
                             key={asset.id}
-                            onClick={() => handleReplaceAsset(asset.id)}
+                            onClick={() => handlePickAsset(asset.id)}
                             disabled={assetReplacing}
                             style={{
                               display: "flex",
@@ -1770,6 +2014,15 @@ export function DashboardConsole({
                     <p className={publishState === "failed" || publishState === "blocked" || publishState === "reconciliation_required" ? "login-error" : "publish-ok"}>
                       {publishMessage}
                     </p>
+                  )}
+                  {dryRunResult && (
+                    <div className="validation-stack">
+                      <small>
+                        Dry-run: {dryRunResult.format} / {dryRunResult.assets.map((asset) => `#${asset.order} ${assetLabel(asset)}`).join(", ") || "sin assets"}
+                      </small>
+                      {dryRunResult.errors.map((error) => <p className="validation-error" key={`dry-${error.code}-${error.assetId ?? "draft"}`}>{error.message}</p>)}
+                      {dryRunResult.warnings.map((warning) => <p className="validation-warning" key={`dry-${warning.code}-${warning.assetId ?? "draft"}`}>{warning.message}</p>)}
+                    </div>
                   )}
                 </div>
                 <h3 style={{ marginTop: 14 }}>Plan de rollback</h3>
