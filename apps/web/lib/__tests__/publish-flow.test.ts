@@ -1234,6 +1234,7 @@ describe("dashboardQueueProductionHelpers", async () => {
     approvedCount,
     buildPublishPayload: buildRealPublishPayload,
     mergeDraftQueueItem,
+    readApprovalResponse,
     resolvePublishTargetFromQueue,
     selectedDraftFromQueue,
   } = await import("../dashboard-queue.js");
@@ -1276,20 +1277,40 @@ describe("dashboardQueueProductionHelpers", async () => {
 
   it("approving Facebook updates that draft to APPROVED without reload", () => {
     const queue = [instagramScheduled, facebookDraft];
-    const next = mergeDraftQueueItem(queue, { id: "fb-draft", status: "APPROVED", requiresReview: false });
+    const next = mergeDraftQueueItem(queue, { id: "fb-draft", status: "APPROVED", requiresReview: false, operationalState: "READY_TO_PUBLISH" });
     assert.equal(next.find((d) => d.id === "fb-draft")?.status, "APPROVED");
     assert.equal(next.find((d) => d.id === "fb-draft")?.requiresReview, false);
+    assert.equal(next.find((d) => d.id === "fb-draft")?.operationalState, "READY_TO_PUBLISH");
+  });
+
+  it("approve response parser consumes the endpoint success shape", async () => {
+    const result = await readApprovalResponse(new Response(JSON.stringify({
+      ok: true,
+      draft: { id: "fb-draft", status: "APPROVED", operationalState: "READY_TO_PUBLISH" },
+    }), { status: 200 }), "fb-draft");
+    assert.equal(result.ok, true);
+    if (result.ok) {
+      assert.equal(result.draft.id, "fb-draft");
+      assert.equal(result.draft.status, "APPROVED");
+      assert.equal(result.draft.operationalState, "READY_TO_PUBLISH");
+    }
+  });
+
+  it("approve error response is returned inline without throwing", async () => {
+    const result = await readApprovalResponse(new Response("not-json", { status: 500 }), "fb-draft");
+    assert.equal(result.ok, false);
+    if (!result.ok) assert.match(result.error, /No se pudo aprobar/);
   });
 
   it("selectedId remains the approved Facebook draft", () => {
-    const queue = mergeDraftQueueItem([instagramScheduled, facebookDraft], { id: "fb-draft", status: "APPROVED" });
+    const queue = mergeDraftQueueItem([instagramScheduled, facebookDraft], { id: "fb-draft", status: "APPROVED", operationalState: "READY_TO_PUBLISH" });
     const selected = selectedDraftFromQueue(queue, "fb-draft");
     assert.equal(selected?.id, "fb-draft");
     assert.equal(selected?.network, "FACEBOOK");
   });
 
   it("publishTarget immediately resolves to approved Facebook, not prior Instagram", () => {
-    const queue = mergeDraftQueueItem([instagramScheduled, facebookDraft], { id: "fb-draft", status: "APPROVED" });
+    const queue = mergeDraftQueueItem([instagramScheduled, facebookDraft], { id: "fb-draft", status: "APPROVED", operationalState: "READY_TO_PUBLISH" });
     const target = resolvePublishTargetFromQueue(queue, "fb-draft", "dry_run");
     assert.equal(target?.id, "fb-draft");
     assert.equal(target?.network, "FACEBOOK");
@@ -1314,7 +1335,7 @@ describe("dashboardQueueProductionHelpers", async () => {
   });
 
   it("late approve response does not have to change a newer selected target", () => {
-    const queue = mergeDraftQueueItem([instagramScheduled, facebookDraft], { id: "fb-draft", status: "APPROVED" });
+    const queue = mergeDraftQueueItem([instagramScheduled, facebookDraft], { id: "fb-draft", status: "APPROVED", operationalState: "READY_TO_PUBLISH" });
     const selected = selectedDraftFromQueue(queue, "ig-scheduled");
     assert.equal(selected?.id, "ig-scheduled");
   });
@@ -1325,9 +1346,32 @@ describe("dashboardQueueProductionHelpers", async () => {
   });
 });
 
+describe("draftApproveRouteContract", async () => {
+  const { readFileSync } = await import("node:fs");
+  const source = readFileSync(new URL("../../app/api/drafts/[id]/approve/route.ts", import.meta.url), "utf8");
+
+  it("approve route persists APPROVED without changing DB side effects", () => {
+    assert.match(source, /data:\s*{\s*status:\s*"APPROVED",\s*requiresReview:\s*false\s*}/);
+  });
+
+  it("approve route returns the shape consumed by the dashboard", () => {
+    assert.match(source, /ok:\s*true/);
+    assert.match(source, /draft:\s*{/);
+    assert.match(source, /status:\s*updated\.status/);
+    assert.match(source, /operationalState:\s*"READY_TO_PUBLISH"/);
+  });
+});
+
 describe("dryRunRouteIsolation", async () => {
   const { readFileSync } = await import("node:fs");
   const source = readFileSync(new URL("../../app/api/publishing/publish/route.ts", import.meta.url), "utf8");
+
+  it("dry-run still requires a previously APPROVED draft", () => {
+    const statusGateIndex = source.indexOf('if (draft.status !== "APPROVED")');
+    const dryRunIndex = source.indexOf('if (requestMode === "dry_run")');
+    assert.ok(statusGateIndex > 0, "APPROVED gate exists");
+    assert.ok(dryRunIndex > statusGateIndex, "dry-run remains behind APPROVED gate");
+  });
 
   it("dry-run branch is before provider publish and finalization", () => {
     const dryRunIndex = source.indexOf('if (requestMode === "dry_run")');

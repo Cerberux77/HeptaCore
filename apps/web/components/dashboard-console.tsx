@@ -41,6 +41,7 @@ import type {
 import {
   buildPublishPayload,
   mergeDraftQueueItem,
+  readApprovalResponse,
   resolvePublishTargetFromQueue,
   selectedDraftFromQueue,
   type DraftQueuePatch,
@@ -2082,20 +2083,30 @@ function ApprovalActions({
   onStatusChange: (draft: DraftQueuePatch) => void;
 }) {
   const [loading, setLoading] = useState<"approve" | "reject" | null>(null);
+  const [message, setMessage] = useState<{ kind: "success" | "error"; text: string } | null>(null);
 
   async function handleApprove() {
+    if (loading !== null) return;
     setLoading("approve");
+    setMessage(null);
     try {
       const res = await fetch(`/api/drafts/${draftId}/approve`, { method: "POST" });
-      const data = await res.json();
-      if (data.ok) onStatusChange(data.draft ?? { id: draftId, status: "APPROVED", requiresReview: false });
-      else alert(data.error || "Error");
+      const result = await readApprovalResponse(res, draftId);
+      if (!result.ok) {
+        setMessage({ kind: "error", text: result.error });
+        return;
+      }
+      onStatusChange(result.draft);
+      setMessage({ kind: "success", text: "Draft aprobado." });
+    } catch (error) {
+      setMessage({ kind: "error", text: error instanceof Error ? error.message : "Error de red." });
     } finally {
       setLoading(null);
     }
   }
 
   async function handleReject() {
+    if (loading !== null) return;
     setLoading("reject");
     try {
       const res = await fetch(`/api/drafts/${draftId}/reject`, { method: "POST" });
@@ -2117,6 +2128,11 @@ function ApprovalActions({
         <X size={16} />
         {loading === "reject" ? "Rechazando..." : "Rechazar"}
       </button>
+      {message && (
+        <span style={{ color: message.kind === "success" ? "var(--hc-teal)" : "var(--hc-red)", fontSize: 12 }}>
+          {message.text}
+        </span>
+      )}
     </div>
   );
 }
