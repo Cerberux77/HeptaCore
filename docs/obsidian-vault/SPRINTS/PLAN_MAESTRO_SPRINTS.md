@@ -1,8 +1,8 @@
 ---
 type: sprint-plan
 project: "HeptaCore"
-last_updated: "2026-06-21T04:30:00.000Z"
-mother_branch: "MADRE/v44-s-hc-maint-align-01-qa-review-fixes-de-11-tareas-jean-sistema-de-pub-2026-06-14"
+last_updated: "2026-06-21T04:47:49.577Z"
+mother_branch: "MADRE/v45-s-hc-rec-00c-canonical-integration-after-recovery-2026-06-21"
 tags:
   - "#sprints"
   - "#manuel"
@@ -843,3 +843,14 @@ Jean queda fuera de la ruta critica. Responsabilidades pendientes reasignadas te
 - `apps/web/app/login/**` → Manuel
 - `apps/web/lib/tenant-auth.ts` → Manuel
 - Scripts de verificacion OAuth (`scripts/verify-turpial-*.mjs`) → Manuel
+
+
+## Cierre S-HC-REC-00C - 2026-06-21
+
+| Campo | Valor |
+|---|---|
+| Operador | Manuel |
+| Rama | `Manuel/s-hc-rec-00c-canonical-integration` |
+| Estado | CERRADO |
+| Madre docs | `MADRE/v45-s-hc-rec-00c-canonical-integration-after-recovery-2026-06-21` |
+| Descripcion | canonical integration after recovery |
