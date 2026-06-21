@@ -76,7 +76,7 @@ type: master-dashboard
 project: "HeptaCore"
 status: active-production
 phase: "Canonical Oreshnik task board governs current assignments"
-last_updated: "2026-06-21T05:40:00.370Z"
+last_updated: "2026-06-21T05:54:29.386Z"
 mother_branch: "MADRE/v45-s-hc-rec-00c-canonical-integration-after-recovery-2026-06-21"
 tags:
   - "#central"
@@ -100,7 +100,7 @@ tags:
 - Fase completada: Baseline de publicacion recuperado y estabilizado (S-HC-REC-00A, SHA 2fd9e249). Facebook e Instagram publican realmente desde la UI con durabilidad transaccional.
 - Fase completada: Integracion canonica (S-HC-REC-00C, SHA 0877376). Documentacion del repositorio actualizada.
 - Fase completada: Oreshnik command layer ready (0.2.0-alpha.0). Reconcile check/write operational.
-- Siguiente fase (parallel): S-HC-PUB-02 multiformato + S-HC-PUB-03 assets multi-tenant.
+- Siguiente fase (parallel): S-HC-PUB-02-MULTIFORMAT-PREVIEW + S-HC-PUB-03-MULTITENANT-ASSETS.
 - Jean fuera de ruta critica. Responsabilidades pendientes reasignadas temporalmente a Manuel y al agente principal.
 
 ## Tareas Abiertas
@@ -108,11 +108,11 @@ tags:
 | Sprint | Estado | Owner | Scope | Depende de |
 |---|---|---|---|---|
 | S-HC-REC-00B | cancelled | Manuel | Facebook duplicate cleanup | - |
-| S-HC-PUB-02-MULTIFORMAT | pending | Manuel | Multiformat publishing: Instagram Carousel, Stories, Facebook preview, asset manifest | S-HC-REC-00C |
-| S-HC-PUB-03-ASSETS | pending | Manuel | Multi-tenant asset management: upload, replace, reorganize across tenants | S-HC-REC-00C |
-| S-HC-PUB-04-CRON | pending | Manuel | Scheduled cron batch publishing with timezone-aware scheduling | S-HC-PUB-02-MULTIFORMAT |
-| S-HC-PUB-05-RECONCILE | pending | Manuel | Operational reconciliation automation for ambiguous provider outcomes | S-HC-PUB-02-MULTIFORMAT, S-HC-PUB-04-CRON |
-| S-HC-OBS-01 | pending | Manuel | Observability: structured logging, metrics dashboard, alert thresholds | S-HC-PUB-04-CRON |
+| S-HC-PUB-02-MULTIFORMAT-PREVIEW | pending | Manuel | Multiformat preview and dry-run: Instagram Carousel, Stories, Facebook preview, asset manifest | S-HC-REC-00C |
+| S-HC-PUB-03-MULTITENANT-ASSETS | pending | Manuel | Multi-tenant asset management: upload, replace, reorganize across tenants | S-HC-REC-00C |
+| S-HC-PUB-04-HOURLY-BATCH-CRON | pending | Manuel | Scheduled cron batch publishing with timezone-aware scheduling | S-HC-PUB-02-MULTIFORMAT-PREVIEW, S-HC-PUB-03-MULTITENANT-ASSETS |
+| S-HC-PUB-05-RECONCILE | pending | Manuel | Operational reconciliation automation for ambiguous provider outcomes | S-HC-PUB-02-MULTIFORMAT-PREVIEW, S-HC-PUB-04-HOURLY-BATCH-CRON |
+| S-HC-OBS-01 | pending | Manuel | Observability: structured logging, metrics dashboard, alert thresholds | S-HC-PUB-04-HOURLY-BATCH-CRON |
 | S-HC-COMM-01-SIGNUP | pending | Manuel | Self-service tenant signup with trial gate and onboarding flow | S-HC-REC-00C |
 | S-HC-COMM-02-BILLING | pending | Manuel | Tenant billing: plan selection, usage tracking, payment integration | S-HC-COMM-01-SIGNUP |
 | S-HC-TEN-02-CEPEG | pending | Manuel | CEPEQ tenant onboarding: brand, assets, network configuration | S-HC-COMM-01-SIGNUP |
@@ -127,11 +127,11 @@ tags:
 
 | Sprint | Owner | Scope | Depende de |
 |---|---|---|---|
-| S-HC-PUB-02-MULTIFORMAT | Manuel | Multiformat publishing: Instagram Carousel, Stories, Facebook preview, asset manifest | S-HC-REC-00C |
-| S-HC-PUB-03-ASSETS | Manuel | Multi-tenant asset management: upload, replace, reorganize across tenants | S-HC-REC-00C |
-| S-HC-PUB-04-CRON | Manuel | Scheduled cron batch publishing with timezone-aware scheduling | S-HC-PUB-02-MULTIFORMAT |
-| S-HC-PUB-05-RECONCILE | Manuel | Operational reconciliation automation for ambiguous provider outcomes | S-HC-PUB-02-MULTIFORMAT, S-HC-PUB-04-CRON |
-| S-HC-OBS-01 | Manuel | Observability: structured logging, metrics dashboard, alert thresholds | S-HC-PUB-04-CRON |
+| S-HC-PUB-02-MULTIFORMAT-PREVIEW | Manuel | Multiformat preview and dry-run: Instagram Carousel, Stories, Facebook preview, asset manifest | S-HC-REC-00C |
+| S-HC-PUB-03-MULTITENANT-ASSETS | Manuel | Multi-tenant asset management: upload, replace, reorganize across tenants | S-HC-REC-00C |
+| S-HC-PUB-04-HOURLY-BATCH-CRON | Manuel | Scheduled cron batch publishing with timezone-aware scheduling | S-HC-PUB-02-MULTIFORMAT-PREVIEW, S-HC-PUB-03-MULTITENANT-ASSETS |
+| S-HC-PUB-05-RECONCILE | Manuel | Operational reconciliation automation for ambiguous provider outcomes | S-HC-PUB-02-MULTIFORMAT-PREVIEW, S-HC-PUB-04-HOURLY-BATCH-CRON |
+| S-HC-OBS-01 | Manuel | Observability: structured logging, metrics dashboard, alert thresholds | S-HC-PUB-04-HOURLY-BATCH-CRON |
 | S-HC-COMM-01-SIGNUP | Manuel | Self-service tenant signup with trial gate and onboarding flow | S-HC-REC-00C |
 | S-HC-COMM-02-BILLING | Manuel | Tenant billing: plan selection, usage tracking, payment integration | S-HC-COMM-01-SIGNUP |
 | S-HC-TEN-02-CEPEG | Manuel | CEPEQ tenant onboarding: brand, assets, network configuration | S-HC-COMM-01-SIGNUP |

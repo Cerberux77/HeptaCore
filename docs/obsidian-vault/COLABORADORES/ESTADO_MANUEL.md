@@ -51,7 +51,7 @@ Zonas: `apps/web`, `apps/web/lib/publishers`, `packages/integrations`
 type: collaborator-status
 project: "HeptaCore"
 operator: "Manuel"
-last_updated: "2026-06-21T05:40:00.374Z"
+last_updated: "2026-06-21T05:54:29.389Z"
 generated_by: "Oreshnik canonical-check"
 source: "var/oreshnik/task-board.json"
 ---
@@ -70,11 +70,11 @@ source: "var/oreshnik/task-board.json"
 
 | Sprint | Scope | Depende de |
 |---|---|---|
-| S-HC-PUB-02-MULTIFORMAT | Multiformat publishing: Instagram Carousel, Stories, Facebook preview, asset manifest | S-HC-REC-00C |
-| S-HC-PUB-03-ASSETS | Multi-tenant asset management: upload, replace, reorganize across tenants | S-HC-REC-00C |
-| S-HC-PUB-04-CRON | Scheduled cron batch publishing with timezone-aware scheduling | S-HC-PUB-02-MULTIFORMAT |
-| S-HC-PUB-05-RECONCILE | Operational reconciliation automation for ambiguous provider outcomes | S-HC-PUB-02-MULTIFORMAT, S-HC-PUB-04-CRON |
-| S-HC-OBS-01 | Observability: structured logging, metrics dashboard, alert thresholds | S-HC-PUB-04-CRON |
+| S-HC-PUB-02-MULTIFORMAT-PREVIEW | Multiformat preview and dry-run: Instagram Carousel, Stories, Facebook preview, asset manifest | S-HC-REC-00C |
+| S-HC-PUB-03-MULTITENANT-ASSETS | Multi-tenant asset management: upload, replace, reorganize across tenants | S-HC-REC-00C |
+| S-HC-PUB-04-HOURLY-BATCH-CRON | Scheduled cron batch publishing with timezone-aware scheduling | S-HC-PUB-02-MULTIFORMAT-PREVIEW, S-HC-PUB-03-MULTITENANT-ASSETS |
+| S-HC-PUB-05-RECONCILE | Operational reconciliation automation for ambiguous provider outcomes | S-HC-PUB-02-MULTIFORMAT-PREVIEW, S-HC-PUB-04-HOURLY-BATCH-CRON |
+| S-HC-OBS-01 | Observability: structured logging, metrics dashboard, alert thresholds | S-HC-PUB-04-HOURLY-BATCH-CRON |
 | S-HC-COMM-01-SIGNUP | Self-service tenant signup with trial gate and onboarding flow | S-HC-REC-00C |
 | S-HC-COMM-02-BILLING | Tenant billing: plan selection, usage tracking, payment integration | S-HC-COMM-01-SIGNUP |
 | S-HC-TEN-02-CEPEG | CEPEQ tenant onboarding: brand, assets, network configuration | S-HC-COMM-01-SIGNUP |
@@ -89,7 +89,7 @@ Estado: `cancelled`
 
 Zonas: -
 
-### S-HC-PUB-02-MULTIFORMAT - Multiformat publishing: Instagram Carousel, Stories, Facebook preview, asset manifest
+### S-HC-PUB-02-MULTIFORMAT-PREVIEW - Multiformat preview and dry-run: Instagram Carousel, Stories, Facebook preview, asset manifest
 
 Estado: `pending`
 
@@ -102,7 +102,7 @@ Estado: `pending`
 
 Zonas: `apps/web`, `apps/web/lib/publishers`, `packages/integrations`
 
-### S-HC-PUB-03-ASSETS - Multi-tenant asset management: upload, replace, reorganize across tenants
+### S-HC-PUB-03-MULTITENANT-ASSETS - Multi-tenant asset management: upload, replace, reorganize across tenants
 
 Estado: `pending`
 
@@ -114,7 +114,7 @@ Estado: `pending`
 
 Zonas: `apps/web/app/api/tenant-assets`, `apps/web/components`, `packages/core`
 
-### S-HC-PUB-04-CRON - Scheduled cron batch publishing with timezone-aware scheduling
+### S-HC-PUB-04-HOURLY-BATCH-CRON - Scheduled cron batch publishing with timezone-aware scheduling
 
 Estado: `pending`
 

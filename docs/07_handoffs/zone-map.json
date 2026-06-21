@@ -5,7 +5,7 @@
   "zones": {
     "packages/db/**": {
       "owner": "Manuel+Agent",
-      "lock": "double_jean_manuel",
+      "lock": "double_manuel_agent",
       "sprints": [
         "*",
         "S-HC-RELEASE-02"
@@ -249,7 +249,7 @@
     },
     "packages/integrations/**": {
       "owner": "Manuel+Agent",
-      "lock": "double_jean_manuel",
+      "lock": "double_manuel_agent",
       "sprints": [
         "*"
       ],

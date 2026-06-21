@@ -18,7 +18,7 @@
     "Fase completada: Baseline de publicacion recuperado y estabilizado (S-HC-REC-00A, SHA 2fd9e249). Facebook e Instagram publican realmente desde la UI con durabilidad transaccional.",
     "Fase completada: Integracion canonica (S-HC-REC-00C, SHA 0877376). Documentacion del repositorio actualizada.",
     "Fase completada: Oreshnik command layer ready (0.2.0-alpha.0). Reconcile check/write operational.",
-    "Siguiente fase (parallel): S-HC-PUB-02 multiformato + S-HC-PUB-03 assets multi-tenant.",
+    "Siguiente fase (parallel): S-HC-PUB-02-MULTIFORMAT-PREVIEW + S-HC-PUB-03-MULTITENANT-ASSETS.",
     "Jean fuera de ruta critica. Responsabilidades pendientes reasignadas temporalmente a Manuel y al agente principal."
   ],
   "jeanReassignment": {
@@ -135,8 +135,8 @@
       ]
     },
     {
-      "id": "S-HC-PUB-02-MULTIFORMAT",
-      "title": "Multiformat publishing: Instagram Carousel, Stories, Facebook preview, asset manifest",
+      "id": "S-HC-PUB-02-MULTIFORMAT-PREVIEW",
+      "title": "Multiformat preview and dry-run: Instagram Carousel, Stories, Facebook preview, asset manifest",
       "owner": "Manuel",
       "backupOwner": "Manuel",
       "status": "pending",
@@ -153,7 +153,7 @@
       ]
     },
     {
-      "id": "S-HC-PUB-03-ASSETS",
+      "id": "S-HC-PUB-03-MULTITENANT-ASSETS",
       "title": "Multi-tenant asset management: upload, replace, reorganize across tenants",
       "owner": "Manuel",
       "backupOwner": "Manuel",
@@ -170,14 +170,14 @@
       ]
     },
     {
-      "id": "S-HC-PUB-04-CRON",
+      "id": "S-HC-PUB-04-HOURLY-BATCH-CRON",
       "title": "Scheduled cron batch publishing with timezone-aware scheduling",
       "owner": "Manuel",
       "backupOwner": "Manuel",
       "status": "pending",
       "track": "publishing",
       "zone": ["apps/web/app/api/cron", "apps/worker", "packages/core"],
-      "dependsOn": ["S-HC-PUB-02-MULTIFORMAT"],
+      "dependsOn": ["S-HC-PUB-02-MULTIFORMAT-PREVIEW", "S-HC-PUB-03-MULTITENANT-ASSETS"],
       "acceptance": [
         "Batch cron processes multiple scheduled posts",
         "Timezone-aware scheduling per tenant",
@@ -194,7 +194,7 @@
       "status": "pending",
       "track": "publishing",
       "zone": ["apps/web/lib/publishing-finalization.ts", "apps/web/lib/draft-operational-state.ts", "packages/core"],
-      "dependsOn": ["S-HC-PUB-02-MULTIFORMAT", "S-HC-PUB-04-CRON"],
+      "dependsOn": ["S-HC-PUB-02-MULTIFORMAT-PREVIEW", "S-HC-PUB-04-HOURLY-BATCH-CRON"],
       "acceptance": [
         "Automatic reconciliation for Case A (Result ok + externalPostId + incomplete Draft)",
         "Alert-only for Case B (Draft.externalPostId present + Result absent)",
@@ -210,7 +210,7 @@
       "status": "pending",
       "track": "observability",
       "zone": ["apps/web", "packages/core", "docs"],
-      "dependsOn": ["S-HC-PUB-04-CRON"],
+      "dependsOn": ["S-HC-PUB-04-HOURLY-BATCH-CRON"],
       "acceptance": [
         "Structured logging with correlation IDs",
         "Publishing metrics dashboard (attempts, failures, latency)",
