@@ -56,7 +56,7 @@ export function membershipWritePlan(existingRole, requestedRole) {
 }
 
 export async function ensureUserAccess({ pool, email, tenantSlug, role }) {
-  if (!email || !email.includes("@")) throw new Error("--email is required");
+  if (!email) throw new Error("--email is required");
   if (!tenantSlug) throw new Error("--tenant is required");
   if (!ROLES.has(role)) throw new Error(`--role must be one of: ${Array.from(ROLES).join(", ")}`);
 

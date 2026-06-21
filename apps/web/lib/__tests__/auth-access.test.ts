@@ -116,4 +116,20 @@ describe("ensure-user-access tool", async () => {
     assert.equal(second.membership.role, "TENANT_ADMIN");
     assert.equal(maskEmail("manuel@example.com"), "ml****@example.com");
   });
+
+  it("accepts legacy identifiers stored in User.email", async () => {
+    const pool = {
+      async query(sql: string, params: unknown[]) {
+        if (sql.includes('from "User"')) return { rows: [{ id: "user-legacy", email: String(params[0]) }] };
+        if (sql.includes('from "Tenant"')) return { rows: [{ id: "tenant-legacy", slug: params[0], name: "Tenant" }] };
+        if (sql.includes('from "Membership"') && sql.startsWith("select")) return { rows: [] };
+        if (sql.startsWith("insert")) return { rows: [{ id: String(params[0]), role: "TENANT_ADMIN" }] };
+        throw new Error(`Unexpected SQL: ${sql}`);
+      },
+    };
+
+    const result = await ensureUserAccess({ pool, email: "mvera", tenantSlug: "turpial-sound", role: "TENANT_ADMIN" });
+    assert.equal(result.action, "created");
+    assert.equal(result.user.email, "mvera");
+  });
 });
