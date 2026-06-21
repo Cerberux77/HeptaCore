@@ -76,7 +76,7 @@ type: master-dashboard
 project: "HeptaCore"
 status: active-production
 phase: "Canonical Oreshnik task board governs current assignments"
-last_updated: "2026-06-21T06:01:19.630Z"
+last_updated: "2026-06-21T06:06:33.067Z"
 mother_branch: "MADRE/v45-s-hc-rec-00c-canonical-integration-after-recovery-2026-06-21"
 tags:
   - "#central"
@@ -100,8 +100,9 @@ tags:
 - Fase completada: S-HC-REC-00A — baseline de publicacion recuperado y estabilizado (SHA 2fd9e249). Facebook e Instagram publican realmente desde la UI con durabilidad transaccional.
 - Fase completada: S-HC-REC-00C — integracion canonica en master (SHA e1fef06). Documentacion y Oreshnik alineados.
 - Fase completada: oreshnik-cli@0.2.0-alpha.0 publicado. reconcile --check/--write operacional.
-- Fase activa (parallel wave 1): S-HC-PUB-02-MULTIFORMAT-PREVIEW + S-HC-COMM-01-SELF-SERVICE-SIGNUP.
-- Jean fuera de ruta critica. Responsabilidades reasignadas a Manuel+Agent.
+- Fase activa (un sprint por vez): S-HC-PUB-02-MULTIFORMAT-PREVIEW.
+- S-HC-COMM-01-SELF-SERVICE-SIGNUP permanece pendiente. S-HC-PUB-03-MULTITENANT-ASSETS depende de PUB-02.
+- Jean fuera de ruta critica. Responsabilidades reasignadas a Manuel.
 
 ## Tareas Abiertas
 

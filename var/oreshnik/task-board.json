@@ -17,23 +17,24 @@
     "Fase completada: S-HC-REC-00A — baseline de publicacion recuperado y estabilizado (SHA 2fd9e249). Facebook e Instagram publican realmente desde la UI con durabilidad transaccional.",
     "Fase completada: S-HC-REC-00C — integracion canonica en master (SHA e1fef06). Documentacion y Oreshnik alineados.",
     "Fase completada: oreshnik-cli@0.2.0-alpha.0 publicado. reconcile --check/--write operacional.",
-    "Fase activa (parallel wave 1): S-HC-PUB-02-MULTIFORMAT-PREVIEW + S-HC-COMM-01-SELF-SERVICE-SIGNUP.",
-    "Jean fuera de ruta critica. Responsabilidades reasignadas a Manuel+Agent."
+    "Fase activa (un sprint por vez): S-HC-PUB-02-MULTIFORMAT-PREVIEW.",
+    "S-HC-COMM-01-SELF-SERVICE-SIGNUP permanece pendiente. S-HC-PUB-03-MULTITENANT-ASSETS depende de PUB-02.",
+    "Jean fuera de ruta critica. Responsabilidades reasignadas a Manuel."
   ],
   "jeanReassignment": {
     "effective": "2026-06-21",
-    "reason": "Jean fuera de ruta critica. Permanece en catalogo de operadores; responsabilidades activas reasignadas a Manuel+Agent.",
+    "reason": "Jean fuera de ruta critica. Permanece en catalogo de operadores; responsabilidades activas reasignadas a Manuel.",
     "transferredZones": {
-      "package.json": "Manuel+Agent (double_manuel_agent)",
-      "package-lock.json": "Manuel+Agent (double_manuel_agent)",
-      "prisma.config.ts": "Manuel+Agent (double_manuel_agent)",
-      "packages/db/**": "Manuel+Agent (double_manuel_agent)",
-      "packages/integrations/**": "Manuel+Agent (double_manuel_agent)",
-      "apps/web/app/tenants/**": "Manuel+Agent",
-      "apps/web/components/turpial-console.tsx": "Manuel+Agent",
-      "apps/web/lib/turpial.ts": "Manuel+Agent",
-      "scripts/seed-turpial-*.mjs": "Manuel+Agent",
-      "scripts/verify-turpial-*.mjs": "Manuel+Agent"
+      "package.json": "Manuel (manuel_exclusive)",
+      "package-lock.json": "Manuel (manuel_exclusive)",
+      "prisma.config.ts": "Manuel (manuel_exclusive)",
+      "packages/db/**": "Manuel (manuel_exclusive)",
+      "packages/integrations/**": "Manuel (manuel_exclusive)",
+      "apps/web/app/tenants/**": "Manuel (manuel_exclusive)",
+      "apps/web/components/turpial-console.tsx": "Manuel (manuel_exclusive)",
+      "apps/web/lib/turpial.ts": "Manuel (manuel_exclusive)",
+      "scripts/seed-turpial-*.mjs": "Manuel (manuel_exclusive)",
+      "scripts/verify-turpial-*.mjs": "Manuel (manuel_exclusive)"
     }
   },
   "productionState": {
@@ -368,8 +369,8 @@
       "at": "2026-06-21T06:00:00.000Z",
       "task": "*",
       "from": "Jean",
-      "to": "Manuel+Agent",
-      "reason": "Jean fuera de ruta critica. Responsabilidades pendientes reasignadas temporalmente a Manuel+Agent."
+      "to": "Manuel",
+      "reason": "Jean fuera de ruta critica. Responsabilidades pendientes reasignadas temporalmente a Manuel."
     }
   ]
 }

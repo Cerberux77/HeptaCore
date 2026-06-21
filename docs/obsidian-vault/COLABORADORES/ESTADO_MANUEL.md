@@ -51,7 +51,7 @@ Zonas: `apps/web`, `apps/web/lib/publishers`, `packages/integrations`
 type: collaborator-status
 project: "HeptaCore"
 operator: "Manuel"
-last_updated: "2026-06-21T06:01:19.634Z"
+last_updated: "2026-06-21T06:06:33.071Z"
 generated_by: "Oreshnik canonical-check"
 source: "var/oreshnik/task-board.json"
 ---
