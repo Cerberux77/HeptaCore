@@ -87,6 +87,7 @@ export async function POST(
       hashtags: updated.hashtags,
       cta: updated.cta,
       source: updated.source,
+      operationalState: "READY_TO_PUBLISH",
       asset: updated.assets[0]?.asset
         ? {
             filename: updated.assets[0].asset.filename,

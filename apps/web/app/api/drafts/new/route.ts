@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { auth } from "../../../../lib/auth";
 import { prisma } from "../../../../lib/prisma";
 import { auditLog } from "../../../../lib/audit";
+import { formatNetwork, MULTIFORMAT_VALUES, normalizePublishingFormat } from "../../../../lib/publishing-formats";
 
 export async function POST(req: Request) {
   const session = await auth();
@@ -14,7 +15,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "title is required" }, { status: 400 });
   }
 
-  const { title, caption = "", network, format = "FEED", assetId, tenantSlug } = body as {
+  const { title, caption = "", network, format = "INSTAGRAM_FEED", assetId, tenantSlug } = body as {
     title: string;
     caption?: string;
     network?: string;
@@ -23,12 +24,18 @@ export async function POST(req: Request) {
     tenantSlug?: string;
   };
 
-  if (!tenantSlug || !network) {
-    return NextResponse.json({ error: "tenantSlug and network are required" }, { status: 400 });
+  if (!tenantSlug) {
+    return NextResponse.json({ error: "tenantSlug is required" }, { status: 400 });
   }
 
   const validNetworks = ["INSTAGRAM", "FACEBOOK", "TIKTOK", "YOUTUBE", "LINKEDIN", "X"];
-  if (!validNetworks.includes(network)) {
+  const normalizedFormat = normalizePublishingFormat(network ?? "INSTAGRAM", format);
+  if (!MULTIFORMAT_VALUES.includes(normalizedFormat)) {
+    return NextResponse.json({ error: "Invalid publishing format" }, { status: 400 });
+  }
+  const normalizedNetwork = formatNetwork(normalizedFormat);
+
+  if (!validNetworks.includes(normalizedNetwork)) {
     return NextResponse.json({ error: "Invalid network" }, { status: 400 });
   }
 
@@ -50,8 +57,8 @@ export async function POST(req: Request) {
   const draft = await prisma.contentDraft.create({
     data: {
       tenantId: tenant.id,
-      network: network as any,
-      format,
+      network: normalizedNetwork as any,
+      format: normalizedFormat,
       title: title.trim(),
       caption: (caption ?? "").trim(),
       hashtags: [],
@@ -77,7 +84,7 @@ export async function POST(req: Request) {
     actorId: session.user.id,
     action: "draft_created",
     target: `draft:${draft.id}`,
-    metadata: { title: draft.title, network },
+    metadata: { title: draft.title, network: normalizedNetwork, format: normalizedFormat },
   });
 
   return NextResponse.json({ ok: true, draft });

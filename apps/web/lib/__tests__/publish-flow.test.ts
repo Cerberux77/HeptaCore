@@ -277,6 +277,96 @@ describe("safe message", () => {
   });
 });
 
+describe("multiformatPublishingModel", async () => {
+  const {
+    buildMultiformatDryRun,
+    buildPreviewData,
+    normalizeAssetManifest,
+    normalizePublishingFormat,
+    validateFormatAssets,
+  } = await import("../publishing-formats.js");
+
+  const imageSquare = {
+    id: "asset-1",
+    url: "/tenant-assets/turpial/a.jpg",
+    filename: "a.jpg",
+    mimeType: "image/jpeg",
+    width: 1080,
+    height: 1080,
+    sizeBytes: 500_000,
+    order: 1,
+  };
+
+  it("maps legacy draft formats to feed by network", () => {
+    assert.equal(normalizePublishingFormat("INSTAGRAM", "FEED"), "INSTAGRAM_FEED");
+    assert.equal(normalizePublishingFormat("INSTAGRAM", "POST"), "INSTAGRAM_FEED");
+    assert.equal(normalizePublishingFormat("FACEBOOK", "FEED"), "FACEBOOK_FEED");
+  });
+
+  it("preserves carousel asset order from roles", () => {
+    const ordered = normalizeAssetManifest([
+      { role: "asset_003", assetId: "c", asset: { id: "c", filename: "c.jpg", sourcePath: "c.jpg", storageKey: null, mimeType: "image/jpeg", kind: "IMAGE", metadata: { width: 1080, height: 1080 } } },
+      { role: "primary", assetId: "a", asset: { id: "a", filename: "a.jpg", sourcePath: "a.jpg", storageKey: null, mimeType: "image/jpeg", kind: "IMAGE", metadata: { width: 1080, height: 1080 } } },
+      { role: "asset_002", assetId: "b", asset: { id: "b", filename: "b.jpg", sourcePath: "b.jpg", storageKey: null, mimeType: "image/jpeg", kind: "IMAGE", metadata: { width: 1080, height: 1080 } } },
+    ]);
+    assert.deepEqual(ordered.map((asset) => asset.id), ["a", "b", "c"]);
+    assert.deepEqual(ordered.map((asset) => asset.order), [1, 2, 3]);
+  });
+
+  it("rejects carousel by quantity and MIME type", () => {
+    const oneAsset = validateFormatAssets("INSTAGRAM_CAROUSEL", [imageSquare]);
+    assert.equal(oneAsset.valid, false);
+    assert.ok(oneAsset.errors.some((error) => error.code === "ASSET_COUNT_MIN"));
+
+    const badMime = validateFormatAssets("INSTAGRAM_CAROUSEL", [
+      imageSquare,
+      { ...imageSquare, id: "asset-2", order: 2, mimeType: "application/pdf" },
+    ]);
+    assert.equal(badMime.valid, false);
+    assert.ok(badMime.errors.some((error) => error.code === "ASSET_MIME"));
+  });
+
+  it("accepts valid 9:16 story", () => {
+    const story = validateFormatAssets("INSTAGRAM_STORY", [{
+      ...imageSquare,
+      id: "story-1",
+      filename: "story.jpg",
+      width: 1080,
+      height: 1920,
+    }]);
+    assert.equal(story.valid, true);
+  });
+
+  it("rejects story by dimensions, MIME, or duration", () => {
+    const bad = validateFormatAssets("INSTAGRAM_STORY", [{
+      id: "story-bad",
+      url: "/tenant-assets/turpial/story.mov",
+      filename: "story.mov",
+      mimeType: "video/quicktime",
+      width: 1080,
+      height: 1080,
+      sizeBytes: 500_000,
+      durationSeconds: 90,
+      order: 1,
+    }]);
+    assert.equal(bad.valid, false);
+    assert.ok(bad.errors.some((error) => error.code === "ASSET_ASPECT_RATIO"));
+    assert.ok(bad.errors.some((error) => error.code === "ASSET_DURATION"));
+
+    const badMime = validateFormatAssets("INSTAGRAM_STORY", [{ ...imageSquare, mimeType: "application/pdf" }]);
+    assert.ok(badMime.errors.some((error) => error.code === "ASSET_MIME"));
+  });
+
+  it("builds dry-run and preview from the same format and ordered assets", () => {
+    const assets = [imageSquare, { ...imageSquare, id: "asset-2", order: 2, filename: "b.jpg" }];
+    const dryRun = buildMultiformatDryRun("INSTAGRAM_CAROUSEL", assets);
+    const preview = buildPreviewData("INSTAGRAM_CAROUSEL", assets);
+    assert.equal(dryRun.format, preview.format);
+    assert.deepEqual(dryRun.assets.map((asset) => asset.id), preview.assets.map((asset) => asset.id));
+    assert.equal(dryRun.previewData.format, dryRun.format);
+  });
+});
+
 describe("instagramContainerReadiness", () => {
   type FakeStatus = "FINISHED" | "IN_PROGRESS" | "ERROR" | "EXPIRED";
 
@@ -1144,6 +1234,7 @@ describe("dashboardQueueProductionHelpers", async () => {
     approvedCount,
     buildPublishPayload: buildRealPublishPayload,
     mergeDraftQueueItem,
+    readApprovalResponse,
     resolvePublishTargetFromQueue,
     selectedDraftFromQueue,
   } = await import("../dashboard-queue.js");
@@ -1153,7 +1244,7 @@ describe("dashboardQueueProductionHelpers", async () => {
     title: "Recorrido del estudio en 30s",
     caption: "IG caption",
     network: "INSTAGRAM",
-    format: "REEL",
+    format: "INSTAGRAM_FEED",
     pillar: null,
     status: "SCHEDULED",
     riskLevel: "low",
@@ -1163,14 +1254,15 @@ describe("dashboardQueueProductionHelpers", async () => {
     cta: null,
     source: null,
     asset: null,
-  };
+    assets: [],
+  } as any;
 
   const facebookDraft = {
     id: "fb-draft",
     title: "Facebook aprobado",
     caption: "FB caption",
     network: "FACEBOOK",
-    format: "FEED",
+    format: "FACEBOOK_FEED",
     pillar: null,
     status: "DRAFT",
     riskLevel: "low",
@@ -1180,24 +1272,45 @@ describe("dashboardQueueProductionHelpers", async () => {
     cta: null,
     source: null,
     asset: null,
-  };
+    assets: [],
+  } as any;
 
   it("approving Facebook updates that draft to APPROVED without reload", () => {
     const queue = [instagramScheduled, facebookDraft];
-    const next = mergeDraftQueueItem(queue, { id: "fb-draft", status: "APPROVED", requiresReview: false });
+    const next = mergeDraftQueueItem(queue, { id: "fb-draft", status: "APPROVED", requiresReview: false, operationalState: "READY_TO_PUBLISH" });
     assert.equal(next.find((d) => d.id === "fb-draft")?.status, "APPROVED");
     assert.equal(next.find((d) => d.id === "fb-draft")?.requiresReview, false);
+    assert.equal(next.find((d) => d.id === "fb-draft")?.operationalState, "READY_TO_PUBLISH");
+  });
+
+  it("approve response parser consumes the endpoint success shape", async () => {
+    const result = await readApprovalResponse(new Response(JSON.stringify({
+      ok: true,
+      draft: { id: "fb-draft", status: "APPROVED", operationalState: "READY_TO_PUBLISH" },
+    }), { status: 200 }), "fb-draft");
+    assert.equal(result.ok, true);
+    if (result.ok) {
+      assert.equal(result.draft.id, "fb-draft");
+      assert.equal(result.draft.status, "APPROVED");
+      assert.equal(result.draft.operationalState, "READY_TO_PUBLISH");
+    }
+  });
+
+  it("approve error response is returned inline without throwing", async () => {
+    const result = await readApprovalResponse(new Response("not-json", { status: 500 }), "fb-draft");
+    assert.equal(result.ok, false);
+    if (!result.ok) assert.match(result.error, /No se pudo aprobar/);
   });
 
   it("selectedId remains the approved Facebook draft", () => {
-    const queue = mergeDraftQueueItem([instagramScheduled, facebookDraft], { id: "fb-draft", status: "APPROVED" });
+    const queue = mergeDraftQueueItem([instagramScheduled, facebookDraft], { id: "fb-draft", status: "APPROVED", operationalState: "READY_TO_PUBLISH" });
     const selected = selectedDraftFromQueue(queue, "fb-draft");
     assert.equal(selected?.id, "fb-draft");
     assert.equal(selected?.network, "FACEBOOK");
   });
 
   it("publishTarget immediately resolves to approved Facebook, not prior Instagram", () => {
-    const queue = mergeDraftQueueItem([instagramScheduled, facebookDraft], { id: "fb-draft", status: "APPROVED" });
+    const queue = mergeDraftQueueItem([instagramScheduled, facebookDraft], { id: "fb-draft", status: "APPROVED", operationalState: "READY_TO_PUBLISH" });
     const target = resolvePublishTargetFromQueue(queue, "fb-draft", "dry_run");
     assert.equal(target?.id, "fb-draft");
     assert.equal(target?.network, "FACEBOOK");
@@ -1222,7 +1335,7 @@ describe("dashboardQueueProductionHelpers", async () => {
   });
 
   it("late approve response does not have to change a newer selected target", () => {
-    const queue = mergeDraftQueueItem([instagramScheduled, facebookDraft], { id: "fb-draft", status: "APPROVED" });
+    const queue = mergeDraftQueueItem([instagramScheduled, facebookDraft], { id: "fb-draft", status: "APPROVED", operationalState: "READY_TO_PUBLISH" });
     const selected = selectedDraftFromQueue(queue, "ig-scheduled");
     assert.equal(selected?.id, "ig-scheduled");
   });
@@ -1233,23 +1346,62 @@ describe("dashboardQueueProductionHelpers", async () => {
   });
 });
 
+describe("draftApproveRouteContract", async () => {
+  const { readFileSync } = await import("node:fs");
+  const source = readFileSync(new URL("../../app/api/drafts/[id]/approve/route.ts", import.meta.url), "utf8");
+
+  it("approve route persists APPROVED without changing DB side effects", () => {
+    assert.match(source, /data:\s*{\s*status:\s*"APPROVED",\s*requiresReview:\s*false\s*}/);
+  });
+
+  it("approve route returns the shape consumed by the dashboard", () => {
+    assert.match(source, /ok:\s*true/);
+    assert.match(source, /draft:\s*{/);
+    assert.match(source, /status:\s*updated\.status/);
+    assert.match(source, /operationalState:\s*"READY_TO_PUBLISH"/);
+  });
+});
+
 describe("dryRunRouteIsolation", async () => {
   const { readFileSync } = await import("node:fs");
   const source = readFileSync(new URL("../../app/api/publishing/publish/route.ts", import.meta.url), "utf8");
 
+  it("dry-run still requires a previously APPROVED draft", () => {
+    const statusGateIndex = source.indexOf('if (draft.status !== "APPROVED")');
+    const dryRunIndex = source.indexOf('if (requestMode === "dry_run")');
+    assert.ok(statusGateIndex > 0, "APPROVED gate exists");
+    assert.ok(dryRunIndex > statusGateIndex, "dry-run remains behind APPROVED gate");
+  });
+
   it("dry-run branch is before provider publish and finalization", () => {
     const dryRunIndex = source.indexOf('if (requestMode === "dry_run")');
+    const getPublisherIndex = source.indexOf("getPublisher(network)");
+    const credentialIndex = source.indexOf("resolveAndDecryptOAuthCredential({", dryRunIndex);
     const providerIndex = source.indexOf("publisher.publish");
     const finalizeIndex = source.indexOf("commitConfirmedPublication(prisma", dryRunIndex);
     assert.ok(dryRunIndex > 0, "dry-run branch exists");
+    assert.ok(getPublisherIndex > dryRunIndex, "publisher registry remains after dry-run branch");
+    assert.ok(credentialIndex > dryRunIndex, "credential resolution remains after dry-run branch");
     assert.ok(providerIndex > dryRunIndex, "provider call remains after dry-run branch");
     assert.ok(finalizeIndex > dryRunIndex, "finalization remains after dry-run branch");
   });
 
+  it("dry-run branch returns multiformat payload before provider calls", () => {
+    const dryRunIndex = source.indexOf('if (requestMode === "dry_run")');
+    const getPublisherIndex = source.indexOf("getPublisher(network)");
+    const dryRunBlock = source.slice(dryRunIndex, getPublisherIndex);
+    assert.match(dryRunBlock, /valid:\s*dryRun\.valid/);
+    assert.match(dryRunBlock, /errors:\s*dryRun\.errors/);
+    assert.match(dryRunBlock, /warnings:\s*dryRun\.warnings/);
+    assert.match(dryRunBlock, /previewData:\s*dryRun\.previewData/);
+    assert.doesNotMatch(dryRunBlock, /publisher\.publish/);
+    assert.doesNotMatch(dryRunBlock, /resolveAndDecryptOAuthCredential/);
+  });
+
   it("dry-run response does not expose externalPostId or PUBLISHED", () => {
     const dryRunIndex = source.indexOf('if (requestMode === "dry_run")');
-    const immediateIndex = source.indexOf("// === IMMEDIATE: attempt real publish ===");
-    const dryRunBlock = source.slice(dryRunIndex, immediateIndex);
+    const liveFormatGateIndex = source.indexOf('if (format === "INSTAGRAM_CAROUSEL"', dryRunIndex);
+    const dryRunBlock = source.slice(dryRunIndex, liveFormatGateIndex);
     assert.match(dryRunBlock, /mode:\s*"dry_run"/);
     assert.doesNotMatch(dryRunBlock, /externalPostId/);
     assert.doesNotMatch(dryRunBlock, /PUBLISHED/);

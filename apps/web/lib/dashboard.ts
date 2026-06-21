@@ -2,6 +2,7 @@ import { cache } from "react";
 import { prisma } from "./prisma";
 import { getTrialStatus, type TrialStatus } from "./trial";
 import { projectDraftOperationalState, type DraftOperationalState } from "./draft-operational-state";
+import { normalizeAssetManifest, normalizePublishingFormat, type DraftFormatAsset, type PublishingFormat } from "./publishing-formats";
 
 export interface OperCounts {
   total: number; draft: number; reviewRequired: number; readyToPublish: number;
@@ -21,7 +22,7 @@ export type DraftQueueItem = {
   title: string;
   caption: string;
   network: string;
-  format: string;
+  format: PublishingFormat;
   pillar: string | null;
   status: string;
   operationalState?: DraftOperationalState;
@@ -36,6 +37,12 @@ export type DraftQueueItem = {
   source: string | null;
   publishEligibility?: "READY" | "RECONCILIATION_REQUIRED" | "PUBLISHED" | "NOT_APPROVED";
   asset: { filename: string; path: string | null; kind: string } | null;
+  assets?: DraftFormatAsset[];
+  validation?: {
+    valid: boolean;
+    errors: Array<{ code: string; message: string; assetId?: string }>;
+    warnings: Array<{ code: string; message: string; assetId?: string }>;
+  };
 };
 
 export type DashboardMetrics = {
@@ -79,6 +86,7 @@ export type TenantAssetItem = {
   filename: string;
   kind: string;
   path: string | null;
+  mimeType: string | null;
   rightsStatus: string;
   draftCount: number;
 };
@@ -222,7 +230,39 @@ export async function getTenantOperationalSnapshot(tenantSlug: string): Promise<
   const drafts = await prisma.contentDraft.findMany({
     where: { tenantId: tenant.id },
     orderBy: { scheduledFor: "asc" },
-    select: { id: true, title: true, caption: true, network: true, format: true, pillar: true, status: true, externalPostId: true, riskLevel: true, requiresReview: true, scheduledFor: true, hashtags: true, cta: true, source: true, assets: { take: 1, select: { asset: { select: { filename: true, sourcePath: true, kind: true } } } } },
+    select: {
+      id: true,
+      title: true,
+      caption: true,
+      network: true,
+      format: true,
+      pillar: true,
+      status: true,
+      externalPostId: true,
+      riskLevel: true,
+      requiresReview: true,
+      scheduledFor: true,
+      hashtags: true,
+      cta: true,
+      source: true,
+      assets: {
+        select: {
+          role: true,
+          assetId: true,
+          asset: {
+            select: {
+              id: true,
+              filename: true,
+              sourcePath: true,
+              storageKey: true,
+              mimeType: true,
+              kind: true,
+              metadata: true,
+            },
+          },
+        },
+      },
+    },
   });
 
   const draftIds = drafts.map((d) => d.id);
@@ -253,7 +293,9 @@ export async function getTenantOperationalSnapshot(tenantSlug: string): Promise<
     else if (p.operationalState === "REJECTED") counts.rejected++;
     const nw = NETWORK_LABELS[d.network] ?? d.network;
     byNetwork[nw] = (byNetwork[nw] ?? 0) + 1;
-    return { id: d.id, title: d.title, caption: d.caption, network: d.network, format: d.format, pillar: d.pillar, status: d.status, operationalState: p.operationalState, publishBlockedReason: p.blockedReason, duplicateIncident: p.duplicateIncident, externalPostId: p.externalPostId, riskLevel: d.riskLevel, requiresReview: d.requiresReview, scheduledFor: d.scheduledFor?.toISOString().slice(0, 16).replace("T", " ") ?? null, hashtags: d.hashtags, cta: d.cta, source: d.source, asset: d.assets[0]?.asset ? { filename: d.assets[0].asset.filename, path: d.assets[0].asset.sourcePath, kind: d.assets[0].asset.kind } : null };
+    const format = normalizePublishingFormat(d.network, d.format);
+    const orderedAssets = mapDraftAssets(d.assets);
+    return { id: d.id, title: d.title, caption: d.caption, network: d.network, format, pillar: d.pillar, status: d.status, operationalState: p.operationalState, publishBlockedReason: p.blockedReason, duplicateIncident: p.duplicateIncident, externalPostId: p.externalPostId, riskLevel: d.riskLevel, requiresReview: d.requiresReview, scheduledFor: d.scheduledFor?.toISOString().slice(0, 16).replace("T", " ") ?? null, hashtags: d.hashtags, cta: d.cta, source: d.source, asset: legacyPrimaryAsset(orderedAssets), assets: orderedAssets };
   });
 
   const nextScheduled = projectedDrafts.find((d) => d.operationalState === "SCHEDULED" && d.scheduledFor && new Date(d.scheduledFor) > now) ?? null;
@@ -262,6 +304,29 @@ export async function getTenantOperationalSnapshot(tenantSlug: string): Promise<
 }
 
 const NETWORK_LABELS: Record<string, string> = { INSTAGRAM: "Instagram", FACEBOOK: "Facebook", YOUTUBE: "YouTube", TIKTOK: "TikTok", LINKEDIN: "LinkedIn" };
+
+function mapDraftAssets(
+  assets: Array<{
+    role: string | null;
+    assetId?: string;
+    asset: {
+      id: string;
+      filename: string;
+      sourcePath: string | null;
+      storageKey: string | null;
+      mimeType: string | null;
+      kind: string;
+      metadata: unknown;
+    };
+  }>,
+): DraftFormatAsset[] {
+  return normalizeAssetManifest(assets, (asset) => asset?.sourcePath ?? asset?.storageKey ?? null);
+}
+
+function legacyPrimaryAsset(assets: DraftFormatAsset[]): DraftQueueItem["asset"] {
+  const first = assets[0];
+  return first ? { filename: first.filename ?? first.id, path: first.url, kind: first.kind ?? "IMAGE" } : null;
+}
 
 export const getDashboardMetrics = cache(
   async (tenantSlug: string): Promise<DashboardMetrics | null> => {
@@ -312,6 +377,7 @@ export async function getTenantAssets(tenantSlug: string): Promise<TenantAssetIt
       filename: true,
       kind: true,
       sourcePath: true,
+      mimeType: true,
       rightsStatus: true,
       _count: { select: { drafts: true } },
     },
@@ -322,6 +388,7 @@ export async function getTenantAssets(tenantSlug: string): Promise<TenantAssetIt
     filename: asset.filename,
     kind: asset.kind,
     path: asset.sourcePath,
+    mimeType: asset.mimeType,
     rightsStatus: asset.rightsStatus,
     draftCount: asset._count.drafts,
   }));
@@ -440,7 +507,23 @@ export const getDraftQueue = cache(
         hashtags: true,
         cta: true,
         source: true,
-        assets: { take: 1, select: { asset: { select: { filename: true, sourcePath: true, kind: true } } } },
+        assets: {
+          select: {
+            role: true,
+            assetId: true,
+            asset: {
+              select: {
+                id: true,
+                filename: true,
+                sourcePath: true,
+                storageKey: true,
+                mimeType: true,
+                kind: true,
+                metadata: true,
+              },
+            },
+          },
+        },
       },
     });
 
@@ -486,12 +569,15 @@ export const getDraftQueue = cache(
         hasResultExternalPostId: jobs.some((j) => !!j.PublishingResult?.externalPostId),
       });
 
+      const format = normalizePublishingFormat(d.network, d.format);
+      const orderedAssets = mapDraftAssets(d.assets);
+
       return {
         id: d.id,
         title: d.title,
         caption: d.caption,
         network: d.network,
-        format: d.format,
+        format,
         pillar: d.pillar,
         status: d.status,
         operationalState: projection.operationalState,
@@ -505,9 +591,8 @@ export const getDraftQueue = cache(
         hashtags: d.hashtags,
         cta: d.cta,
         source: d.source,
-        asset: d.assets[0]?.asset
-          ? { filename: d.assets[0].asset.filename, path: d.assets[0].asset.sourcePath, kind: d.assets[0].asset.kind }
-          : null,
+        asset: legacyPrimaryAsset(orderedAssets),
+        assets: orderedAssets,
       };
     });
 

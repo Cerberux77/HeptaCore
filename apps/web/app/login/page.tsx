@@ -4,10 +4,11 @@ import { signIn } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
 import { Suspense, useState, type FormEvent } from "react";
 import Link from "next/link";
+import { normalizeAuthRedirectUrl, sanitizeInternalCallbackUrl } from "../../lib/access-routing";
 
 function LoginForm() {
   const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get("callbackUrl") || "/";
+  const callbackUrl = sanitizeInternalCallbackUrl(searchParams.get("callbackUrl"));
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -32,7 +33,7 @@ function LoginForm() {
       return;
     }
 
-    window.location.href = callbackUrl;
+    window.location.href = normalizeAuthRedirectUrl(result?.url, callbackUrl, window.location.origin);
   }
 
   return (
@@ -42,7 +43,7 @@ function LoginForm() {
 
       <form onSubmit={handleSubmit} className="login-form">
         <label className="login-label">
-          Usuario o email
+          Correo electrónico
           <input
             type="text"
             value={email}
@@ -50,7 +51,7 @@ function LoginForm() {
             required
             autoFocus
             className="login-input"
-            placeholder="mvera"
+            placeholder="identificador registrado"
             autoComplete="username"
           />
         </label>

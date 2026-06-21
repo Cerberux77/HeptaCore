@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { auth } from "../../../../lib/auth";
 import { prisma } from "../../../../lib/prisma";
 import { auditLog } from "../../../../lib/audit";
+import { formatNetwork, MULTIFORMAT_VALUES, normalizePublishingFormat } from "../../../../lib/publishing-formats";
 
 export async function PUT(
   req: Request,
@@ -30,7 +31,7 @@ export async function PUT(
     return NextResponse.json({ error: "Request body is required" }, { status: 400 });
   }
 
-  const allowedFields = ["title", "caption", "cta", "hashtags", "riskLevel", "requiresReview", "scheduledFor"] as const;
+  const allowedFields = ["title", "caption", "cta", "hashtags", "riskLevel", "requiresReview", "scheduledFor", "format"] as const;
   const updateData: Record<string, unknown> = {};
   const before: Record<string, unknown> = {};
   const changed: string[] = [];
@@ -38,7 +39,17 @@ export async function PUT(
   for (const field of allowedFields) {
     if (body[field] !== undefined) {
       const prev = draft[field as keyof typeof draft];
-      updateData[field] = body[field];
+      if (field === "format") {
+        const requestedFormat = String(body[field] ?? "").trim().toUpperCase();
+        if (!MULTIFORMAT_VALUES.includes(requestedFormat as any)) {
+          return NextResponse.json({ error: "Invalid publishing format" }, { status: 400 });
+        }
+        const format = normalizePublishingFormat(draft.network, requestedFormat);
+        updateData.format = format;
+        updateData.network = formatNetwork(format);
+      } else {
+        updateData[field] = body[field];
+      }
       before[field] = prev;
       changed.push(field);
     }
@@ -49,7 +60,7 @@ export async function PUT(
   }
 
   const wasApproved = draft.status === "APPROVED";
-  if (wasApproved && (changed.includes("title") || changed.includes("caption") || changed.includes("cta") || changed.includes("hashtags"))) {
+  if (wasApproved && (changed.includes("title") || changed.includes("caption") || changed.includes("cta") || changed.includes("hashtags") || changed.includes("format"))) {
     updateData.status = "NEEDS_REVIEW";
     updateData.requiresReview = true;
   }

@@ -1,6 +1,6 @@
 {
   "project": "HeptaCore",
-  "updatedAt": "2026-06-21T06:00:00.000Z",
+  "updatedAt": "2026-06-21T19:08:48.084Z",
   "productionSha": "2fd9e24929ffe1022cf9521ed0f13888f30accbd",
   "productionUrl": "https://heptacore.vercel.app",
   "canonicalBranch": "master",
@@ -52,11 +52,25 @@
       "backupOwner": "Jean",
       "status": "done",
       "track": "foundation",
-      "zone": ["repo", "docs", "oreshnik"],
+      "zone": [
+        "repo",
+        "docs",
+        "oreshnik"
+      ],
       "dependsOn": [],
-      "acceptance": ["Initial monorepo committed", "Oreshnik vault operational", "Build/typecheck pass"],
+      "acceptance": [
+        "Initial monorepo committed",
+        "Oreshnik vault operational",
+        "Build/typecheck pass"
+      ],
       "history": [
-        { "at": "2026-06-12T04:30:20.302Z", "action": "closed", "operator": "Manuel", "branch": "Manuel/s-hc-prod-01-producto-operativo-tenant-admin-produccion-2026-06-09", "description": "foundation baseline commit" }
+        {
+          "at": "2026-06-12T04:30:20.302Z",
+          "action": "closed",
+          "operator": "Manuel",
+          "branch": "Manuel/s-hc-prod-01-producto-operativo-tenant-admin-produccion-2026-06-09",
+          "description": "foundation baseline commit"
+        }
       ]
     },
     {
@@ -66,11 +80,28 @@
       "backupOwner": "Jean",
       "status": "done",
       "track": "product-ui",
-      "zone": ["apps/web", "packages/ui", "packages/agents"],
-      "dependsOn": ["S-HC-00"],
-      "acceptance": ["Tenant dashboard route", "Onboarding form mock", "Input checklist", "Draft queue screen"],
+      "zone": [
+        "apps/web",
+        "packages/ui",
+        "packages/agents"
+      ],
+      "dependsOn": [
+        "S-HC-00"
+      ],
+      "acceptance": [
+        "Tenant dashboard route",
+        "Onboarding form mock",
+        "Input checklist",
+        "Draft queue screen"
+      ],
       "history": [
-        { "at": "2026-06-09T19:56:42.980Z", "action": "reassigned", "from": "Manuel", "to": "Jean", "reason": "Manuel ausente - ruta critica bloqueada" }
+        {
+          "at": "2026-06-09T19:56:42.980Z",
+          "action": "reassigned",
+          "from": "Manuel",
+          "to": "Jean",
+          "reason": "Manuel ausente - ruta critica bloqueada"
+        }
       ]
     },
     {
@@ -80,11 +111,28 @@
       "backupOwner": "Manuel",
       "status": "done",
       "track": "data",
-      "zone": ["packages/db", "examples/tenants/turpial", "scripts"],
-      "dependsOn": ["S-HC-00"],
-      "acceptance": ["Seed tenant", "Import assets metadata", "Import publication queue", "No real credentials"],
+      "zone": [
+        "packages/db",
+        "examples/tenants/turpial",
+        "scripts"
+      ],
+      "dependsOn": [
+        "S-HC-00"
+      ],
+      "acceptance": [
+        "Seed tenant",
+        "Import assets metadata",
+        "Import publication queue",
+        "No real credentials"
+      ],
       "history": [
-        { "at": "2026-06-12T04:32:55.688Z", "action": "closed", "operator": "Jean", "branch": "Manuel/s-hc-prod-01-producto-operativo-tenant-admin-produccion-2026-06-09", "description": "turpial importer and prisma seed" }
+        {
+          "at": "2026-06-12T04:32:55.688Z",
+          "action": "closed",
+          "operator": "Jean",
+          "branch": "Manuel/s-hc-prod-01-producto-operativo-tenant-admin-produccion-2026-06-09",
+          "description": "turpial importer and prisma seed"
+        }
       ]
     },
     {
@@ -94,7 +142,11 @@
       "backupOwner": "Manuel",
       "status": "done",
       "track": "recovery",
-      "zone": ["apps/web", "docs/07_handoffs", "docs/obsidian-vault"],
+      "zone": [
+        "apps/web",
+        "docs/07_handoffs",
+        "docs/obsidian-vault"
+      ],
       "dependsOn": [],
       "acceptance": [
         "Facebook e Instagram publican realmente desde la UI con durabilidad transaccional",
@@ -104,7 +156,13 @@
       ],
       "handoff": "docs/07_handoffs/HC-REC-00A-codex-blockers.md",
       "history": [
-        { "at": "2026-06-21T04:30:00.000Z", "action": "closed", "operator": "Manuel", "branch": "manuel/s-hc-rec-00a-ui-publishing-baseline", "description": "Baseline de publicacion recuperado y estabilizado" }
+        {
+          "at": "2026-06-21T04:30:00.000Z",
+          "action": "closed",
+          "operator": "Manuel",
+          "branch": "manuel/s-hc-rec-00a-ui-publishing-baseline",
+          "description": "Baseline de publicacion recuperado y estabilizado"
+        }
       ]
     },
     {
@@ -117,7 +175,12 @@
       "zone": [],
       "dependsOn": [],
       "history": [
-        { "at": "2026-06-21T04:30:00.000Z", "action": "cancelled", "operator": "Manuel", "description": "Manuel elimino manualmente el duplicado en Facebook" }
+        {
+          "at": "2026-06-21T04:30:00.000Z",
+          "action": "cancelled",
+          "operator": "Manuel",
+          "description": "Manuel elimino manualmente el duplicado en Facebook"
+        }
       ]
     },
     {
@@ -127,15 +190,28 @@
       "backupOwner": "Manuel",
       "status": "done",
       "track": "recovery",
-      "zone": ["docs/obsidian-vault", "docs/07_handoffs", "README.md", "var/oreshnik"],
-      "dependsOn": ["S-HC-REC-00A"],
+      "zone": [
+        "docs/obsidian-vault",
+        "docs/07_handoffs",
+        "README.md",
+        "var/oreshnik"
+      ],
+      "dependsOn": [
+        "S-HC-REC-00A"
+      ],
       "acceptance": [
         "Baseline productivo 2fd9e249 integrado en master via merge",
         "Oreshnik cerrado con exito",
         "oreshnik-cli@0.2.0-alpha.0 operacional"
       ],
       "history": [
-        { "at": "2026-06-21T05:15:00.000Z", "action": "closed", "operator": "Manuel", "branch": "Manuel/s-hc-rec-00c-canonical-integration", "description": "canonical integration after recovery" }
+        {
+          "at": "2026-06-21T05:15:00.000Z",
+          "action": "closed",
+          "operator": "Manuel",
+          "branch": "Manuel/s-hc-rec-00c-canonical-integration",
+          "description": "canonical integration after recovery"
+        }
       ]
     },
     {
@@ -143,10 +219,16 @@
       "title": "Multiformat preview and dry-run: format model, asset manifest, platform previews, validations",
       "owner": "Manuel",
       "backupOwner": "Manuel",
-      "status": "pending",
+      "status": "done",
       "track": "publishing",
-      "zone": ["apps/web", "apps/web/lib/publishers", "packages/integrations"],
-      "dependsOn": ["S-HC-REC-00C"],
+      "zone": [
+        "apps/web",
+        "apps/web/lib/publishers",
+        "packages/integrations"
+      ],
+      "dependsOn": [
+        "S-HC-REC-00C"
+      ],
       "acceptance": [
         "Modelo de formatos (Carousel, Story, Feed) con reglas de validacion por plataforma",
         "Asset manifest requerido por formato (count, aspect ratio, resolution, duration)",
@@ -157,6 +239,15 @@
         "Validaciones de assets pre-dry-run (formato, peso, dimensiones)",
         "Dry-run completo sin llamadas al proveedor",
         "Cero publicacion real de Carousel ni Stories en este sprint"
+      ],
+      "history": [
+        {
+          "at": "2026-06-21T19:08:48.084Z",
+          "action": "closed",
+          "operator": "Manuel",
+          "branch": "Manuel/s-hc-pub-02-closeout",
+          "description": "multiformat previews, deterministic auth, approval UI and dry-run QA completed"
+        }
       ]
     },
     {
@@ -166,8 +257,14 @@
       "backupOwner": "Manuel",
       "status": "pending",
       "track": "publishing",
-      "zone": ["apps/web/app/api/tenant-assets", "apps/web/components", "packages/core"],
-      "dependsOn": ["S-HC-PUB-02-MULTIFORMAT-PREVIEW"],
+      "zone": [
+        "apps/web/app/api/tenant-assets",
+        "apps/web/components",
+        "packages/core"
+      ],
+      "dependsOn": [
+        "S-HC-PUB-02-MULTIFORMAT-PREVIEW"
+      ],
       "acceptance": [
         "Asset upload con tenant scoping",
         "Asset replacement preserva audit log",
@@ -183,8 +280,15 @@
       "backupOwner": "Manuel",
       "status": "pending",
       "track": "publishing",
-      "zone": ["apps/web/app/api/cron", "apps/worker", "packages/core"],
-      "dependsOn": ["S-HC-PUB-02-MULTIFORMAT-PREVIEW", "S-HC-PUB-03-MULTITENANT-ASSETS"],
+      "zone": [
+        "apps/web/app/api/cron",
+        "apps/worker",
+        "packages/core"
+      ],
+      "dependsOn": [
+        "S-HC-PUB-02-MULTIFORMAT-PREVIEW",
+        "S-HC-PUB-03-MULTITENANT-ASSETS"
+      ],
       "acceptance": [
         "Batch cron procesa multiples posts programados por hora",
         "Timezone-aware scheduling per tenant",
@@ -200,8 +304,14 @@
       "backupOwner": "Manuel",
       "status": "pending",
       "track": "publishing",
-      "zone": ["apps/web/lib/publishing-finalization.ts", "apps/web/lib/draft-operational-state.ts", "packages/core"],
-      "dependsOn": ["S-HC-PUB-04-HOURLY-BATCH-CRON"],
+      "zone": [
+        "apps/web/lib/publishing-finalization.ts",
+        "apps/web/lib/draft-operational-state.ts",
+        "packages/core"
+      ],
+      "dependsOn": [
+        "S-HC-PUB-04-HOURLY-BATCH-CRON"
+      ],
       "acceptance": [
         "Automatic reconciliation for Case A (Result ok + externalPostId + incomplete Draft)",
         "Alert-only for Case B (Draft.externalPostId present + Result absent)",
@@ -216,8 +326,14 @@
       "backupOwner": "Manuel",
       "status": "pending",
       "track": "observability",
-      "zone": ["apps/web", "packages/core", "docs"],
-      "dependsOn": ["S-HC-PUB-05-RECONCILIATION-OPS"],
+      "zone": [
+        "apps/web",
+        "packages/core",
+        "docs"
+      ],
+      "dependsOn": [
+        "S-HC-PUB-05-RECONCILIATION-OPS"
+      ],
       "acceptance": [
         "Structured logging with correlation IDs",
         "Publishing metrics dashboard (attempts, failures, latency)",
@@ -232,8 +348,15 @@
       "backupOwner": "Manuel",
       "status": "pending",
       "track": "commercial",
-      "zone": ["apps/web/app/register", "apps/web/app/api/auth", "packages/db", "apps/web/components"],
-      "dependsOn": ["S-HC-REC-00C"],
+      "zone": [
+        "apps/web/app/register",
+        "apps/web/app/api/auth",
+        "packages/db",
+        "apps/web/components"
+      ],
+      "dependsOn": [
+        "S-HC-REC-00C"
+      ],
       "acceptance": [
         "Self-service registration with email verification",
         "Trial tenant creation with default config",
@@ -248,8 +371,14 @@
       "backupOwner": "Manuel",
       "status": "pending",
       "track": "commercial",
-      "zone": ["apps/web/app/api/billing", "packages/db", "apps/web/components"],
-      "dependsOn": ["S-HC-COMM-01-SELF-SERVICE-SIGNUP"],
+      "zone": [
+        "apps/web/app/api/billing",
+        "packages/db",
+        "apps/web/components"
+      ],
+      "dependsOn": [
+        "S-HC-COMM-01-SELF-SERVICE-SIGNUP"
+      ],
       "acceptance": [
         "Plan selection (Free, Pro, Agency)",
         "Usage tracking (posts, assets, tenants)",
@@ -264,8 +393,15 @@
       "backupOwner": "Manuel",
       "status": "pending",
       "track": "tenant-onboarding",
-      "zone": ["examples/tenants/cepeg", "apps/web", "packages/db"],
-      "dependsOn": ["S-HC-PUB-03-MULTITENANT-ASSETS", "S-HC-COMM-01-SELF-SERVICE-SIGNUP"],
+      "zone": [
+        "examples/tenants/cepeg",
+        "apps/web",
+        "packages/db"
+      ],
+      "dependsOn": [
+        "S-HC-PUB-03-MULTITENANT-ASSETS",
+        "S-HC-COMM-01-SELF-SERVICE-SIGNUP"
+      ],
       "acceptance": [
         "CEPEG tenant seeded with brand identity",
         "Asset upload and organization for CEPEG",
@@ -280,12 +416,34 @@
       "backupOwner": "Manuel",
       "status": "done",
       "track": "production-infra",
-      "zone": ["docs", "scripts", "packages/db", "vercel-env"],
-      "dependsOn": ["S-HC-PROD-ALIGN"],
-      "acceptance": ["Production env checklist completed", "29 drafts and 46 assets verified"],
+      "zone": [
+        "docs",
+        "scripts",
+        "packages/db",
+        "vercel-env"
+      ],
+      "dependsOn": [
+        "S-HC-PROD-ALIGN"
+      ],
+      "acceptance": [
+        "Production env checklist completed",
+        "29 drafts and 46 assets verified"
+      ],
       "history": [
-        { "at": "2026-06-11T00:20:00.000Z", "action": "reassigned", "from": "Manuel", "to": "Jean", "reason": "User-directed PROD closeout split" },
-        { "at": "2026-06-11T01:44:03.976Z", "action": "closed", "operator": "Jean", "branch": "Jean/s-hc-canonical-alignment-2026-06-09", "description": "production-db-auth-env-turpial-seed-smoke" }
+        {
+          "at": "2026-06-11T00:20:00.000Z",
+          "action": "reassigned",
+          "from": "Manuel",
+          "to": "Jean",
+          "reason": "User-directed PROD closeout split"
+        },
+        {
+          "at": "2026-06-11T01:44:03.976Z",
+          "action": "closed",
+          "operator": "Jean",
+          "branch": "Jean/s-hc-canonical-alignment-2026-06-09",
+          "description": "production-db-auth-env-turpial-seed-smoke"
+        }
       ]
     },
     {
@@ -295,8 +453,21 @@
       "backupOwner": "Manuel+Jean",
       "status": "done",
       "track": "release",
-      "zone": ["docs", "apps/web", "apps/worker", "packages/integrations"],
-      "dependsOn": ["S-HC-PROD-02", "S-HC-PROD-03", "S-HC-PROD-04", "S-HC-PROD-05", "S-HC-PROD-06", "S-HC-PROD-07", "S-HC-PROD-08"],
+      "zone": [
+        "docs",
+        "apps/web",
+        "apps/worker",
+        "packages/integrations"
+      ],
+      "dependsOn": [
+        "S-HC-PROD-02",
+        "S-HC-PROD-03",
+        "S-HC-PROD-04",
+        "S-HC-PROD-05",
+        "S-HC-PROD-06",
+        "S-HC-PROD-07",
+        "S-HC-PROD-08"
+      ],
       "acceptance": [
         "Login works",
         "Turpial tenant loads strategy and assets",
@@ -307,7 +478,13 @@
         "156 tests"
       ],
       "history": [
-        { "at": "2026-06-11T03:19:41.362Z", "action": "closed", "operator": "Manuel", "branch": "Manuel/s-hc-prod-01-producto-operativo-tenant-admin-produccion-2026-06-09", "description": "E2E Turpial Sound production proof" }
+        {
+          "at": "2026-06-11T03:19:41.362Z",
+          "action": "closed",
+          "operator": "Manuel",
+          "branch": "Manuel/s-hc-prod-01-producto-operativo-tenant-admin-produccion-2026-06-09",
+          "description": "E2E Turpial Sound production proof"
+        }
       ]
     },
     {
@@ -317,10 +494,21 @@
       "backupOwner": "Manuel",
       "status": "done",
       "track": "ad-hoc",
-      "zone": ["package.json", "scripts/oreshnik"],
-      "dependsOn": ["S-HC-PROD-01"],
+      "zone": [
+        "package.json",
+        "scripts/oreshnik"
+      ],
+      "dependsOn": [
+        "S-HC-PROD-01"
+      ],
       "history": [
-        { "at": "2026-06-12T04:56:32.932Z", "action": "drift-recorded", "operator": "Manuel", "mode": "silent", "description": "sprint" }
+        {
+          "at": "2026-06-12T04:56:32.932Z",
+          "action": "drift-recorded",
+          "operator": "Manuel",
+          "mode": "silent",
+          "description": "sprint"
+        }
       ]
     },
     {
@@ -330,10 +518,22 @@
       "backupOwner": "Manuel",
       "status": "done",
       "track": "ad-hoc",
-      "zone": ["apps/web", "packages/agents", "packages/integrations"],
-      "dependsOn": ["S-HC-PROD-01"],
+      "zone": [
+        "apps/web",
+        "packages/agents",
+        "packages/integrations"
+      ],
+      "dependsOn": [
+        "S-HC-PROD-01"
+      ],
       "history": [
-        { "at": "2026-06-12T07:16:29.270Z", "action": "drift-recorded", "operator": "Manuel", "mode": "silent", "description": "Codex multi-RRSS refactor" }
+        {
+          "at": "2026-06-12T07:16:29.270Z",
+          "action": "drift-recorded",
+          "operator": "Manuel",
+          "mode": "silent",
+          "description": "Codex multi-RRSS refactor"
+        }
       ]
     },
     {
@@ -343,10 +543,20 @@
       "backupOwner": "Manuel",
       "status": "done",
       "track": "ad-hoc",
-      "zone": ["apps/web", "vercel.json", "docs/07_handoffs"],
+      "zone": [
+        "apps/web",
+        "vercel.json",
+        "docs/07_handoffs"
+      ],
       "dependsOn": [],
       "history": [
-        { "at": "2026-06-14T08:39:53.687Z", "action": "drift-recorded", "operator": "Manuel", "mode": "silent", "description": "Sistema de publicacion con 3 modos, 24 crons Vercel, cron publisher idempotente" }
+        {
+          "at": "2026-06-14T08:39:53.687Z",
+          "action": "drift-recorded",
+          "operator": "Manuel",
+          "mode": "silent",
+          "description": "Sistema de publicacion con 3 modos, 24 crons Vercel, cron publisher idempotente"
+        }
       ]
     }
   ],
