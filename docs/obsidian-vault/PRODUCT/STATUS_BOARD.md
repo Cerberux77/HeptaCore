@@ -73,7 +73,7 @@ source: "var/oreshnik/task-board.json"
 ---
 type: status-board
 project: "HeptaCore"
-last_updated: "2026-06-21T05:54:29.392Z"
+last_updated: "2026-06-21T06:01:19.639Z"
 generated_by: "Oreshnik canonical-check"
 source: "var/oreshnik/task-board.json"
 ---
@@ -84,25 +84,25 @@ source: "var/oreshnik/task-board.json"
 
 ## Orden de Ejecucion Actual
 
-- Fase completada: Baseline de publicacion recuperado y estabilizado (S-HC-REC-00A, SHA 2fd9e249). Facebook e Instagram publican realmente desde la UI con durabilidad transaccional.
-- Fase completada: Integracion canonica (S-HC-REC-00C, SHA 0877376). Documentacion del repositorio actualizada.
-- Fase completada: Oreshnik command layer ready (0.2.0-alpha.0). Reconcile check/write operational.
-- Siguiente fase (parallel): S-HC-PUB-02-MULTIFORMAT-PREVIEW + S-HC-PUB-03-MULTITENANT-ASSETS.
-- Jean fuera de ruta critica. Responsabilidades pendientes reasignadas temporalmente a Manuel y al agente principal.
+- Fase completada: S-HC-REC-00A — baseline de publicacion recuperado y estabilizado (SHA 2fd9e249). Facebook e Instagram publican realmente desde la UI con durabilidad transaccional.
+- Fase completada: S-HC-REC-00C — integracion canonica en master (SHA e1fef06). Documentacion y Oreshnik alineados.
+- Fase completada: oreshnik-cli@0.2.0-alpha.0 publicado. reconcile --check/--write operacional.
+- Fase activa (parallel wave 1): S-HC-PUB-02-MULTIFORMAT-PREVIEW + S-HC-COMM-01-SELF-SERVICE-SIGNUP.
+- Jean fuera de ruta critica. Responsabilidades reasignadas a Manuel+Agent.
 
 ## Tareas Ready/Pending
 
 | Sprint | Estado | Owner | Scope | Depende de |
 |---|---|---|---|---|
 | S-HC-REC-00B | cancelled | Manuel | Facebook duplicate cleanup | - |
-| S-HC-PUB-02-MULTIFORMAT-PREVIEW | pending | Manuel | Multiformat preview and dry-run: Instagram Carousel, Stories, Facebook preview, asset manifest | S-HC-REC-00C |
-| S-HC-PUB-03-MULTITENANT-ASSETS | pending | Manuel | Multi-tenant asset management: upload, replace, reorganize across tenants | S-HC-REC-00C |
-| S-HC-PUB-04-HOURLY-BATCH-CRON | pending | Manuel | Scheduled cron batch publishing with timezone-aware scheduling | S-HC-PUB-02-MULTIFORMAT-PREVIEW, S-HC-PUB-03-MULTITENANT-ASSETS |
-| S-HC-PUB-05-RECONCILE | pending | Manuel | Operational reconciliation automation for ambiguous provider outcomes | S-HC-PUB-02-MULTIFORMAT-PREVIEW, S-HC-PUB-04-HOURLY-BATCH-CRON |
-| S-HC-OBS-01 | pending | Manuel | Observability: structured logging, metrics dashboard, alert thresholds | S-HC-PUB-04-HOURLY-BATCH-CRON |
-| S-HC-COMM-01-SIGNUP | pending | Manuel | Self-service tenant signup with trial gate and onboarding flow | S-HC-REC-00C |
-| S-HC-COMM-02-BILLING | pending | Manuel | Tenant billing: plan selection, usage tracking, payment integration | S-HC-COMM-01-SIGNUP |
-| S-HC-TEN-02-CEPEG | pending | Manuel | CEPEQ tenant onboarding: brand, assets, network configuration | S-HC-COMM-01-SIGNUP |
+| S-HC-PUB-02-MULTIFORMAT-PREVIEW | pending | Manuel | Multiformat preview and dry-run: format model, asset manifest, platform previews, validations | S-HC-REC-00C |
+| S-HC-PUB-03-MULTITENANT-ASSETS | pending | Manuel | Multi-tenant asset management: upload, replace, reorganize across tenants | S-HC-PUB-02-MULTIFORMAT-PREVIEW |
+| S-HC-PUB-04-HOURLY-BATCH-CRON | pending | Manuel | Hourly batch cron publishing with timezone-aware scheduling | S-HC-PUB-02-MULTIFORMAT-PREVIEW, S-HC-PUB-03-MULTITENANT-ASSETS |
+| S-HC-PUB-05-RECONCILIATION-OPS | pending | Manuel | Operational reconciliation automation for ambiguous provider outcomes | S-HC-PUB-04-HOURLY-BATCH-CRON |
+| S-HC-OBS-01-PUBLISHING-OBSERVABILITY | pending | Manuel | Publishing observability: structured logging, metrics dashboard, alert thresholds | S-HC-PUB-05-RECONCILIATION-OPS |
+| S-HC-COMM-01-SELF-SERVICE-SIGNUP | pending | Manuel | Self-service tenant signup with trial gate and onboarding flow | S-HC-REC-00C |
+| S-HC-COMM-02-BILLING-ACTIVATION | pending | Manuel | Tenant billing activation: plan selection, usage tracking, payment integration | S-HC-COMM-01-SELF-SERVICE-SIGNUP |
+| S-HC-TEN-02-CEPEG-ONBOARDING | pending | Manuel | CEPEG tenant onboarding: brand, assets, network configuration | S-HC-PUB-03-MULTITENANT-ASSETS, S-HC-COMM-01-SELF-SERVICE-SIGNUP |
 
 ## Hard Stops Vigentes
 

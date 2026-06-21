@@ -14,16 +14,16 @@
       "notes": "Prisma schema, migrations and DB access require coordination. Reasignado: Jean fuera de ruta critica (REC-00C), Manuel + agente principal con doble lock."
     },
     "package.json": {
-      "owner": "Jean+Manuel",
-      "lock": "double_jean_manuel",
+      "owner": "Manuel+Agent",
+      "lock": "double_manuel_agent",
       "sprints": [
         "*"
       ],
       "criticality": "high"
     },
     "package-lock.json": {
-      "owner": "Jean+Manuel",
-      "lock": "double_jean_manuel",
+      "owner": "Manuel+Agent",
+      "lock": "double_manuel_agent",
       "sprints": [
         "*"
       ],
@@ -46,8 +46,8 @@
       "criticality": "medium"
     },
     "prisma.config.ts": {
-      "owner": "Jean+Manuel",
-      "lock": "double_jean_manuel",
+      "owner": "Manuel+Agent",
+      "lock": "double_manuel_agent",
       "sprints": [
         "*"
       ],
@@ -184,13 +184,31 @@
       "notes": "Dashboard general, Oreshnik lane. Jean NO tocar."
     },
     "apps/web/app/tenants/**": {
-      "owner": "Jean",
-      "lock": "jean_exclusive",
+      "owner": "Manuel+Agent",
+      "lock": "manuel_exclusive",
       "sprints": [
         "S-HC-PROD-03"
       ],
       "criticality": "medium",
-      "notes": "Tenant console turpial-sound."
+      "notes": "Tenant console. Reasignado de Jean a Manuel+Agent (REC-00C)."
+    },
+    "apps/web/components/turpial-console.tsx": {
+      "owner": "Manuel+Agent",
+      "lock": "manuel_exclusive",
+      "sprints": [
+        "S-HC-PROD-03"
+      ],
+      "criticality": "medium",
+      "notes": "Turpial console UI. Reasignado de Jean a Manuel+Agent (REC-00C)."
+    },
+    "apps/web/lib/turpial.ts": {
+      "owner": "Manuel+Agent",
+      "lock": "manuel_exclusive",
+      "sprints": [
+        "S-HC-PROD-03"
+      ],
+      "criticality": "medium",
+      "notes": "Turpial data layer. Reasignado de Jean a Manuel+Agent (REC-00C)."
     },
     "apps/web/app/api/oauth/**": {
       "owner": "Manuel",
@@ -291,13 +309,13 @@
       "notes": "Task board, preflight ledger and canonical Oreshnik state."
     },
     "scripts/seed-turpial-*.mjs": {
-      "owner": "Jean",
-      "lock": "jean_exclusive",
+      "owner": "Manuel+Agent",
+      "lock": "manuel_exclusive",
       "sprints": [
         "S-HC-02"
       ],
       "criticality": "medium",
-      "notes": "Seed scripts Turpial."
+      "notes": "Seed scripts Turpial. Reasignado de Jean a Manuel+Agent (REC-00C)."
     },
     "scripts/verify-turpial-*.mjs": {
       "owner": "Manuel",

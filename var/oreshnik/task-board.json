@@ -1,42 +1,45 @@
 {
   "project": "HeptaCore",
-  "updatedAt": "2026-06-21T05:30:00.000Z",
+  "updatedAt": "2026-06-21T06:00:00.000Z",
   "productionSha": "2fd9e24929ffe1022cf9521ed0f13888f30accbd",
   "productionUrl": "https://heptacore.vercel.app",
   "canonicalBranch": "master",
-  "canonicalSha": "0877376d7aa6be09486fa60a17b31cb13fd5c0d6",
+  "canonicalSha": "e1fef06df6409dd7d2b15cfacf2259bcbf36760e",
   "oreshnikVersion": "0.2.0-alpha.0",
   "resiliencePolicy": "If an owner is unavailable for more than one working block or blocks the critical path, backupOwner may take over after recording reassignment.",
   "closurePolicy": "No sprint may be closed until acceptance criteria, base tests, sprint-specific tests, docs/handoff, and Oreshnik zone checks pass.",
   "baseTestMatrix": [
     "npm run typecheck",
     "npm run build",
-    "npm run worker:validate",
-    "npm run oreshnik:zone -- --sprint <SPRINT> --operator <OPERATOR>"
+    "npm run worker:validate"
   ],
   "currentExecutionOrder": [
-    "Fase completada: Baseline de publicacion recuperado y estabilizado (S-HC-REC-00A, SHA 2fd9e249). Facebook e Instagram publican realmente desde la UI con durabilidad transaccional.",
-    "Fase completada: Integracion canonica (S-HC-REC-00C, SHA 0877376). Documentacion del repositorio actualizada.",
-    "Fase completada: Oreshnik command layer ready (0.2.0-alpha.0). Reconcile check/write operational.",
-    "Siguiente fase (parallel): S-HC-PUB-02-MULTIFORMAT-PREVIEW + S-HC-PUB-03-MULTITENANT-ASSETS.",
-    "Jean fuera de ruta critica. Responsabilidades pendientes reasignadas temporalmente a Manuel y al agente principal."
+    "Fase completada: S-HC-REC-00A — baseline de publicacion recuperado y estabilizado (SHA 2fd9e249). Facebook e Instagram publican realmente desde la UI con durabilidad transaccional.",
+    "Fase completada: S-HC-REC-00C — integracion canonica en master (SHA e1fef06). Documentacion y Oreshnik alineados.",
+    "Fase completada: oreshnik-cli@0.2.0-alpha.0 publicado. reconcile --check/--write operacional.",
+    "Fase activa (parallel wave 1): S-HC-PUB-02-MULTIFORMAT-PREVIEW + S-HC-COMM-01-SELF-SERVICE-SIGNUP.",
+    "Jean fuera de ruta critica. Responsabilidades reasignadas a Manuel+Agent."
   ],
   "jeanReassignment": {
     "effective": "2026-06-21",
-    "reason": "Jean fuera de ruta critica. Responsabilidades pendientes reasignadas temporalmente a Manuel y al agente principal.",
+    "reason": "Jean fuera de ruta critica. Permanece en catalogo de operadores; responsabilidades activas reasignadas a Manuel+Agent.",
     "transferredZones": {
-      "apps/worker/**": "Manuel (lectura/escritura)",
-      "packages/integrations/**": "Manuel + agente principal (doble lock)",
-      "packages/db/**": "Manuel + agente principal (doble lock)",
-      "apps/web/app/login/**": "Manuel",
-      "apps/web/lib/tenant-auth.ts": "Manuel",
-      "scripts/verify-turpial-*.mjs": "Manuel"
+      "package.json": "Manuel+Agent (double_manuel_agent)",
+      "package-lock.json": "Manuel+Agent (double_manuel_agent)",
+      "prisma.config.ts": "Manuel+Agent (double_manuel_agent)",
+      "packages/db/**": "Manuel+Agent (double_manuel_agent)",
+      "packages/integrations/**": "Manuel+Agent (double_manuel_agent)",
+      "apps/web/app/tenants/**": "Manuel+Agent",
+      "apps/web/components/turpial-console.tsx": "Manuel+Agent",
+      "apps/web/lib/turpial.ts": "Manuel+Agent",
+      "scripts/seed-turpial-*.mjs": "Manuel+Agent",
+      "scripts/verify-turpial-*.mjs": "Manuel+Agent"
     }
   },
   "productionState": {
     "facebook": "Operativo. Publica realmente desde la UI. Token permanente. Page: Turpial Sound (1129437930248909).",
     "instagram": "Operativo. Publica realmente desde la UI. Media container readiness verificado.",
-    "errors": "Errores ambiguos del proveedor quedan bloqueados sin retry automatico. Reconciliacion manual requerida via IN_REVIEW.",
+    "errors": "Errores ambiguos del proveedor quedan bloqueados sin retry automatico.",
     "tests": 156,
     "vercelCrons": "24 slots diarios configurados. Cron publisher idempotente."
   },
@@ -96,7 +99,7 @@
         "Facebook e Instagram publican realmente desde la UI con durabilidad transaccional",
         "Errores ambiguos bloqueados sin retry automatico",
         "156 tests (155 publish-flow + 1 calendar-state)",
-        "Produccion estable en SHA 2fd9e24929ffe1022cf9521ed0f13888f30accbd"
+        "Produccion estable en SHA 2fd9e249"
       ],
       "handoff": "docs/07_handoffs/HC-REC-00A-codex-blockers.md",
       "history": [
@@ -128,7 +131,7 @@
       "acceptance": [
         "Baseline productivo 2fd9e249 integrado en master via merge",
         "Oreshnik cerrado con exito",
-        "SHA canonico master: 0877376d7aa6be09486fa60a17b31cb13fd5c0d6"
+        "oreshnik-cli@0.2.0-alpha.0 operacional"
       ],
       "history": [
         { "at": "2026-06-21T05:15:00.000Z", "action": "closed", "operator": "Manuel", "branch": "Manuel/s-hc-rec-00c-canonical-integration", "description": "canonical integration after recovery" }
@@ -136,7 +139,7 @@
     },
     {
       "id": "S-HC-PUB-02-MULTIFORMAT-PREVIEW",
-      "title": "Multiformat preview and dry-run: Instagram Carousel, Stories, Facebook preview, asset manifest",
+      "title": "Multiformat preview and dry-run: format model, asset manifest, platform previews, validations",
       "owner": "Manuel",
       "backupOwner": "Manuel",
       "status": "pending",
@@ -144,12 +147,15 @@
       "zone": ["apps/web", "apps/web/lib/publishers", "packages/integrations"],
       "dependsOn": ["S-HC-REC-00C"],
       "acceptance": [
-        "Instagram Carousel publishing",
-        "Instagram Stories publishing",
-        "Required asset manifest and validation",
-        "Visual dry-run per platform",
-        "Facebook preview with caption",
-        "Reuse idempotency and durable finalization"
+        "Modelo de formatos (Carousel, Story, Feed) con reglas de validacion por plataforma",
+        "Asset manifest requerido por formato (count, aspect ratio, resolution, duration)",
+        "Instagram Feed preview visual con caption, orden y safe area",
+        "Instagram Carousel preview navegable con transiciones",
+        "Instagram Story preview vertical con crop simulado",
+        "Facebook preview con caption, link preview y formato nativo",
+        "Validaciones de assets pre-dry-run (formato, peso, dimensiones)",
+        "Dry-run completo sin llamadas al proveedor",
+        "Cero publicacion real de Carousel ni Stories en este sprint"
       ]
     },
     {
@@ -160,10 +166,10 @@
       "status": "pending",
       "track": "publishing",
       "zone": ["apps/web/app/api/tenant-assets", "apps/web/components", "packages/core"],
-      "dependsOn": ["S-HC-REC-00C"],
+      "dependsOn": ["S-HC-PUB-02-MULTIFORMAT-PREVIEW"],
       "acceptance": [
-        "Asset upload with tenant scoping",
-        "Asset replacement preserves audit log",
+        "Asset upload con tenant scoping",
+        "Asset replacement preserva audit log",
         "Asset reorganization (move, rename, delete)",
         "Multi-format validation (images, video)",
         "Preview before publish"
@@ -171,7 +177,7 @@
     },
     {
       "id": "S-HC-PUB-04-HOURLY-BATCH-CRON",
-      "title": "Scheduled cron batch publishing with timezone-aware scheduling",
+      "title": "Hourly batch cron publishing with timezone-aware scheduling",
       "owner": "Manuel",
       "backupOwner": "Manuel",
       "status": "pending",
@@ -179,22 +185,22 @@
       "zone": ["apps/web/app/api/cron", "apps/worker", "packages/core"],
       "dependsOn": ["S-HC-PUB-02-MULTIFORMAT-PREVIEW", "S-HC-PUB-03-MULTITENANT-ASSETS"],
       "acceptance": [
-        "Batch cron processes multiple scheduled posts",
+        "Batch cron procesa multiples posts programados por hora",
         "Timezone-aware scheduling per tenant",
         "Rate limiting per platform",
-        "Failure isolation (one post fails, others proceed)",
-        "Cron idempotency preserved"
+        "Failure isolation (un post falla, los demas continuan)",
+        "Cron idempotency preservada"
       ]
     },
     {
-      "id": "S-HC-PUB-05-RECONCILE",
+      "id": "S-HC-PUB-05-RECONCILIATION-OPS",
       "title": "Operational reconciliation automation for ambiguous provider outcomes",
       "owner": "Manuel",
       "backupOwner": "Manuel",
       "status": "pending",
       "track": "publishing",
       "zone": ["apps/web/lib/publishing-finalization.ts", "apps/web/lib/draft-operational-state.ts", "packages/core"],
-      "dependsOn": ["S-HC-PUB-02-MULTIFORMAT-PREVIEW", "S-HC-PUB-04-HOURLY-BATCH-CRON"],
+      "dependsOn": ["S-HC-PUB-04-HOURLY-BATCH-CRON"],
       "acceptance": [
         "Automatic reconciliation for Case A (Result ok + externalPostId + incomplete Draft)",
         "Alert-only for Case B (Draft.externalPostId present + Result absent)",
@@ -203,14 +209,14 @@
       ]
     },
     {
-      "id": "S-HC-OBS-01",
-      "title": "Observability: structured logging, metrics dashboard, alert thresholds",
+      "id": "S-HC-OBS-01-PUBLISHING-OBSERVABILITY",
+      "title": "Publishing observability: structured logging, metrics dashboard, alert thresholds",
       "owner": "Manuel",
       "backupOwner": "Manuel",
       "status": "pending",
       "track": "observability",
       "zone": ["apps/web", "packages/core", "docs"],
-      "dependsOn": ["S-HC-PUB-04-HOURLY-BATCH-CRON"],
+      "dependsOn": ["S-HC-PUB-05-RECONCILIATION-OPS"],
       "acceptance": [
         "Structured logging with correlation IDs",
         "Publishing metrics dashboard (attempts, failures, latency)",
@@ -219,7 +225,7 @@
       ]
     },
     {
-      "id": "S-HC-COMM-01-SIGNUP",
+      "id": "S-HC-COMM-01-SELF-SERVICE-SIGNUP",
       "title": "Self-service tenant signup with trial gate and onboarding flow",
       "owner": "Manuel",
       "backupOwner": "Manuel",
@@ -235,14 +241,14 @@
       ]
     },
     {
-      "id": "S-HC-COMM-02-BILLING",
-      "title": "Tenant billing: plan selection, usage tracking, payment integration",
+      "id": "S-HC-COMM-02-BILLING-ACTIVATION",
+      "title": "Tenant billing activation: plan selection, usage tracking, payment integration",
       "owner": "Manuel",
       "backupOwner": "Manuel",
       "status": "pending",
       "track": "commercial",
       "zone": ["apps/web/app/api/billing", "packages/db", "apps/web/components"],
-      "dependsOn": ["S-HC-COMM-01-SIGNUP"],
+      "dependsOn": ["S-HC-COMM-01-SELF-SERVICE-SIGNUP"],
       "acceptance": [
         "Plan selection (Free, Pro, Agency)",
         "Usage tracking (posts, assets, tenants)",
@@ -251,17 +257,17 @@
       ]
     },
     {
-      "id": "S-HC-TEN-02-CEPEG",
-      "title": "CEPEQ tenant onboarding: brand, assets, network configuration",
+      "id": "S-HC-TEN-02-CEPEG-ONBOARDING",
+      "title": "CEPEG tenant onboarding: brand, assets, network configuration",
       "owner": "Manuel",
       "backupOwner": "Manuel",
       "status": "pending",
       "track": "tenant-onboarding",
-      "zone": ["examples/tenants/cepeq", "apps/web", "packages/db"],
-      "dependsOn": ["S-HC-COMM-01-SIGNUP"],
+      "zone": ["examples/tenants/cepeg", "apps/web", "packages/db"],
+      "dependsOn": ["S-HC-PUB-03-MULTITENANT-ASSETS", "S-HC-COMM-01-SELF-SERVICE-SIGNUP"],
       "acceptance": [
-        "CEPEQ tenant seeded with brand identity",
-        "Asset upload and organization for CEPEQ",
+        "CEPEG tenant seeded with brand identity",
+        "Asset upload and organization for CEPEG",
         "Facebook/Instagram network configuration",
         "Initial strategy draft generated"
       ]
@@ -359,11 +365,11 @@
       "reason": "User-directed reassignment to maximize parallel closeout."
     },
     {
-      "at": "2026-06-21T05:30:00.000Z",
+      "at": "2026-06-21T06:00:00.000Z",
       "task": "*",
       "from": "Jean",
-      "to": "Manuel + agente principal",
-      "reason": "Jean fuera de ruta critica. Responsabilidades pendientes reasignadas temporalmente a Manuel y al agente principal."
+      "to": "Manuel+Agent",
+      "reason": "Jean fuera de ruta critica. Responsabilidades pendientes reasignadas temporalmente a Manuel+Agent."
     }
   ]
 }
