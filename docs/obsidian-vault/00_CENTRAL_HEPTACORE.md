@@ -2,14 +2,13 @@
 type: master-dashboard
 project: "HeptaCore"
 status: active-production
-phase: "Canonical Oreshnik task board governs current assignments"
-last_updated: "2026-06-21T04:49:24.876Z"
+phase: "Production baseline stabilized — S-HC-REC-00C canonical integration complete"
+last_updated: "2026-06-21T05:17:30.292Z"
 mother_branch: "MADRE/v45-s-hc-rec-00c-canonical-integration-after-recovery-2026-06-21"
 tags:
   - "#central"
-  - "#status/live-source"
+  - "#status/production-stable"
   - "#manuel"
-  - "#jean"
   - "#heptacore"
 ---
 
@@ -21,46 +20,33 @@ tags:
 
 | Campo | Valor |
 |---|---|
-| Task board actualizado | 2026-06-14T08:47:00.166Z |
+| Task board actualizado | 2026-06-21T05:15:00.000Z |
 | Rama madre | MADRE/v45-s-hc-rec-00c-canonical-integration-after-recovery-2026-06-21 |
-| Publicacion RRSS real | Bloqueada hasta aprobacion explicita |
+| Produccion estable | `2fd9e24929ffe1022cf9521ed0f13888f30accbd` (heptacore.vercel.app) |
+| Facebook / Instagram | Publican realmente desde la UI con durabilidad transaccional |
+| Errores ambiguos | Bloqueados sin retry automatico; reconciliacion manual via IN_REVIEW |
+| Tests | 156 (155 publish-flow + 1 calendar-state) |
 | Campaign spend | Bloqueado |
 | Real scraping | Bloqueado |
+| S-HC-REC-00A | CERRADO |
+| S-HC-REC-00B | CANCELADO (Manuel elimino manualmente el duplicado en Facebook) |
+| S-HC-REC-00C | CERRADO |
+| Siguiente fase | S-HC-PUB-02-MULTIFORMAT-PREVIEW — publicacion multiformato |
+| Jean | Fuera de ruta critica; responsabilidades reasignadas a Manuel y agente principal |
 
 ## Orden de Ejecucion
 
-- Wave 1 parallel: Jean S-HC-PROD-02, Manuel S-HC-PROD-03 (LLM provider adapter + Turpial tenant QA)
-- Wave 2 parallel: Jean S-HC-PROD-04, Manuel S-HC-PROD-05 after S-HC-PROD-03
-- Wave 3 parallel: Jean S-HC-PROD-09/S-HC-PROD-11, Manuel S-HC-PROD-07/S-HC-PROD-08/S-HC-PROD-10 after core proof
-- Wave 4 sequential: S-HC-PROD-06 control bus/dashboard after PROD-02/03/04/05/07/08/09/10/11
-- Final: S-HC-RELEASE-01 end-to-end Turpial Sound production proof
-- tarea-para-turpialsound-y-mantis-embeber-videos
-- configurar-sprints-oreshnik-configurar-los-spri
-- eliminar-restricciones-publicaci-n-en-heptacore
-- hay-algo-que-no-entiendo-y-que-necesito-que-me-r
-- en-la-cola-de-draft-de-heptacore-algunos-draft
-- en-heptacore-quiero-agregar-la-posibilidad-de-in
-- el-proceso-de-carga-de-activos-en-heptacore-en
-- en-la-seccion-de-asstes-de-heptacore-debe-existi
-- el-card-proximo-primer-hito-en-heptacore-d
-- en-el-cronograma-de-heptacore-que-significa-el
-- en-heptacore-la-seccion-checklist-no-se-si-esta
-- en-heptacore-dashboard-reportes-quisiera-algo
-- en-publicacion-heptacore-muestra-cards-de-readi
-- en-el-dashboard-de-admn-global-en-heptacore-los
-- para-heptacore-implementar-la-posibilidad-de-ed
-- en-heptacore-eliminar-bloqueos-desactivar-los-b
-- implementar-inicio-de-heptacore-se-debe-cambia
-- para-heptacore-interactuar-tableros-configurar
-- para-heptacore-incluir-hora-incorporar-el-par-m
-- el-modal-de-admin-llm-en-heptacore-debe-tener-un
-- como-publica-heptacore-posts-programados-si-estoy-offline
+- Fase completada: Baseline de publicacion recuperado y estabilizado (S-HC-REC-00A, SHA 2fd9e249). Facebook e Instagram publican realmente desde la UI con durabilidad transaccional.
+- Fase completada: Integracion canonica (S-HC-REC-00C, SHA a25d1ca). Documentacion del repositorio actualizada.
+- Siguiente fase: S-HC-PUB-02-MULTIFORMAT-PREVIEW — publicacion multiformato (Instagram Carousel, Stories, Facebook preview, asset manifest).
+- Jean fuera de ruta critica. Responsabilidades pendientes reasignadas temporalmente a Manuel y al agente principal.
 
 ## Tareas Abiertas
 
 | Sprint | Estado | Owner | Scope | Depende de |
 |---|---|---|---|---|
-
+| S-HC-REC-00B | cancelled | Manuel | Facebook duplicate cleanup | - |
+| S-HC-PUB-02-MULTIFORMAT | pending | Manuel | Multiformat publishing: Instagram Carousel, Stories, Facebook preview, asset manifest | S-HC-REC-00C |
 
 ## Ready Ahora
 
@@ -72,11 +58,12 @@ tags:
 
 | Sprint | Owner | Scope | Depende de |
 |---|---|---|---|
-| Ninguno | - | - |
+| S-HC-PUB-02-MULTIFORMAT | Manuel | Multiformat publishing: Instagram Carousel, Stories, Facebook preview, asset manifest | S-HC-REC-00C |
 
 ## Reglas Activas
 
-- No publicar en redes reales desde HeptaCore sin aprobacion explicita.
+- Facebook e Instagram publican realmente desde la UI con aprobacion y durabilidad transaccional.
+- Errores ambiguos del proveedor quedan bloqueados sin retry automatico.
 - No pedir ni commitear credenciales reales.
 - No ejecutar scraping real.
 - No gastar en campanas.

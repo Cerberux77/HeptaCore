@@ -813,15 +813,16 @@ npm run oreshnik:preflight -- --sprint S-HC-JEAN-ALIGN --operator Jean --desc "a
 | Estado | CANCELADO |
 | Motivo | Manuel elimino manualmente el duplicado en Facebook. No requiere sprint de codigo. |
 
-## En Curso S-HC-REC-00C — 2026-06-21
+## Cierre S-HC-REC-00C — 2026-06-21
 
 | Campo | Valor |
 |---|---|
 | Operador | Manuel |
 | Rama | `Manuel/s-hc-rec-00c-canonical-integration` |
-| Estado | EN CURSO |
-| Scope | Integracion canonica del baseline productivo en rama revisable. Actualizacion de documentacion del repositorio. |
-| Depende de | S-HC-REC-00A |
+| Estado | CERRADO |
+| SHA canonico | `a25d1ca600ece2d9e9ba36f57541c803df29fdd4` |
+| Madre docs | `MADRE/v45-s-hc-rec-00c-canonical-integration-after-recovery-2026-06-21` |
+| Descripcion | Integracion canonica del baseline productivo. Documentacion del repositorio actualizada. Task board Oreshnik alineado. |
 
 ## Siguiente Fase: Publicacion Multiformato
 
@@ -843,14 +844,3 @@ Jean queda fuera de la ruta critica. Responsabilidades pendientes reasignadas te
 - `apps/web/app/login/**` → Manuel
 - `apps/web/lib/tenant-auth.ts` → Manuel
 - Scripts de verificacion OAuth (`scripts/verify-turpial-*.mjs`) → Manuel
-
-
-## Cierre S-HC-REC-00C - 2026-06-21
-
-| Campo | Valor |
-|---|---|
-| Operador | Manuel |
-| Rama | `Manuel/s-hc-rec-00c-canonical-integration` |
-| Estado | CERRADO |
-| Madre docs | `MADRE/v45-s-hc-rec-00c-canonical-integration-after-recovery-2026-06-21` |
-| Descripcion | canonical integration after recovery |
