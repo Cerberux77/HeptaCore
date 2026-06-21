@@ -20,7 +20,7 @@ Public production:
 https://heptacore.vercel.app (SHA 2fd9e249)
 
 Oreshnik:
-CLOSED
+OPEN — cierre pendiente después de review canónico
 ```
 
 ## Status
