@@ -50,7 +50,7 @@ Do not work directly on the mother branch except through Oreshnik close/sync flo
 
 ## Hard Stops
 
-- No real RRSS publishing.
+- No real RRSS publishing outside an explicitly authorized sprint. Publishing is operational and authorized within scoped sprint boundaries (e.g., S-HC-PUB-xx). Accidental publishing during QA, dry-run testing, or development is prohibited.
 - No campaign spend.
 - No real scraping.
 - No credentials in git.

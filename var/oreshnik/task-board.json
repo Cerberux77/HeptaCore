@@ -1,12 +1,13 @@
 {
   "project": "HeptaCore",
-  "updatedAt": "2026-06-21T05:15:00.000Z",
+  "updatedAt": "2026-06-21T05:30:00.000Z",
   "productionSha": "2fd9e24929ffe1022cf9521ed0f13888f30accbd",
   "productionUrl": "https://heptacore.vercel.app",
   "canonicalBranch": "master",
-  "canonicalSha": "a25d1ca600ece2d9e9ba36f57541c803df29fdd4",
+  "canonicalSha": "0877376d7aa6be09486fa60a17b31cb13fd5c0d6",
+  "oreshnikVersion": "0.2.0-alpha.0",
   "resiliencePolicy": "If an owner is unavailable for more than one working block or blocks the critical path, backupOwner may take over after recording reassignment.",
-  "closurePolicy": "No sprint may be closed until acceptance criteria, base tests, sprint-specific tests, docs/handoff, and Oreshnik zone checks pass. See docs/obsidian-vault/METODOLOGIA/ORQUESTACION_AGENTES_HEPTACORE.md.",
+  "closurePolicy": "No sprint may be closed until acceptance criteria, base tests, sprint-specific tests, docs/handoff, and Oreshnik zone checks pass.",
   "baseTestMatrix": [
     "npm run typecheck",
     "npm run build",
@@ -15,8 +16,9 @@
   ],
   "currentExecutionOrder": [
     "Fase completada: Baseline de publicacion recuperado y estabilizado (S-HC-REC-00A, SHA 2fd9e249). Facebook e Instagram publican realmente desde la UI con durabilidad transaccional.",
-    "Fase completada: Integracion canonica (S-HC-REC-00C, SHA a25d1ca). Documentacion del repositorio actualizada.",
-    "Siguiente fase: S-HC-PUB-02-MULTIFORMAT-PREVIEW — publicacion multiformato (Instagram Carousel, Stories, Facebook preview, asset manifest).",
+    "Fase completada: Integracion canonica (S-HC-REC-00C, SHA 0877376). Documentacion del repositorio actualizada.",
+    "Fase completada: Oreshnik command layer ready (0.2.0-alpha.0). Reconcile check/write operational.",
+    "Siguiente fase (parallel): S-HC-PUB-02 multiformato + S-HC-PUB-03 assets multi-tenant.",
     "Jean fuera de ruta critica. Responsabilidades pendientes reasignadas temporalmente a Manuel y al agente principal."
   ],
   "jeanReassignment": {
@@ -49,7 +51,6 @@
       "zone": ["repo", "docs", "oreshnik"],
       "dependsOn": [],
       "acceptance": ["Initial monorepo committed", "Oreshnik vault operational", "Build/typecheck pass"],
-      "handoff": "Jean reviews baseline after commit.",
       "history": [
         { "at": "2026-06-12T04:30:20.302Z", "action": "closed", "operator": "Manuel", "branch": "Manuel/s-hc-prod-01-producto-operativo-tenant-admin-produccion-2026-06-09", "description": "foundation baseline commit" }
       ]
@@ -64,7 +65,6 @@
       "zone": ["apps/web", "packages/ui", "packages/agents"],
       "dependsOn": ["S-HC-00"],
       "acceptance": ["Tenant dashboard route", "Onboarding form mock", "Input checklist", "Draft queue screen"],
-      "handoff": "Jean can take dashboard data wiring if Manuel is unavailable.",
       "history": [
         { "at": "2026-06-09T19:56:42.980Z", "action": "reassigned", "from": "Manuel", "to": "Jean", "reason": "Manuel ausente - ruta critica bloqueada" }
       ]
@@ -79,7 +79,6 @@
       "zone": ["packages/db", "examples/tenants/turpial", "scripts"],
       "dependsOn": ["S-HC-00"],
       "acceptance": ["Seed tenant", "Import assets metadata", "Import publication queue", "No real credentials"],
-      "handoff": "Manuel can implement importer from existing queue if Jean is unavailable.",
       "history": [
         { "at": "2026-06-12T04:32:55.688Z", "action": "closed", "operator": "Jean", "branch": "Manuel/s-hc-prod-01-producto-operativo-tenant-admin-produccion-2026-06-09", "description": "turpial importer and prisma seed" }
       ]
@@ -97,12 +96,11 @@
         "Facebook e Instagram publican realmente desde la UI con durabilidad transaccional",
         "Errores ambiguos bloqueados sin retry automatico",
         "156 tests (155 publish-flow + 1 calendar-state)",
-        "Produccion estable en SHA 2fd9e24929ffe1022cf9521ed0f13888f30accbd",
-        "Deploy en heptacore.vercel.app"
+        "Produccion estable en SHA 2fd9e24929ffe1022cf9521ed0f13888f30accbd"
       ],
       "handoff": "docs/07_handoffs/HC-REC-00A-codex-blockers.md",
       "history": [
-        { "at": "2026-06-21T04:30:00.000Z", "action": "closed", "operator": "Manuel", "branch": "manuel/s-hc-rec-00a-ui-publishing-baseline", "description": "Baseline de publicacion recuperado y estabilizado. Facebook e Instagram publican realmente desde la UI." }
+        { "at": "2026-06-21T04:30:00.000Z", "action": "closed", "operator": "Manuel", "branch": "manuel/s-hc-rec-00a-ui-publishing-baseline", "description": "Baseline de publicacion recuperado y estabilizado" }
       ]
     },
     {
@@ -114,10 +112,8 @@
       "track": "recovery",
       "zone": [],
       "dependsOn": [],
-      "acceptance": [],
-      "handoff": "Cancelado: Manuel elimino manualmente el duplicado en Facebook. No requirio sprint de codigo.",
       "history": [
-        { "at": "2026-06-21T04:30:00.000Z", "action": "cancelled", "operator": "Manuel", "description": "Manuel elimino manualmente el duplicado en Facebook. Sprint cancelado." }
+        { "at": "2026-06-21T04:30:00.000Z", "action": "cancelled", "operator": "Manuel", "description": "Manuel elimino manualmente el duplicado en Facebook" }
       ]
     },
     {
@@ -131,13 +127,9 @@
       "dependsOn": ["S-HC-REC-00A"],
       "acceptance": [
         "Baseline productivo 2fd9e249 integrado en master via merge",
-        "Documentacion del repositorio actualizada (README, 00_CENTRAL, PLAN_MAESTRO)",
         "Oreshnik cerrado con exito",
-        "SHA canonico master: a25d1ca600ece2d9e9ba36f57541c803df29fdd4",
-        "Rama remota: Manuel/s-hc-rec-00c-canonical-integration",
-        "MADRE/v45 creada"
+        "SHA canonico master: 0877376d7aa6be09486fa60a17b31cb13fd5c0d6"
       ],
-      "handoff": "docs/07_handoffs/HC-REC-00A-codex-blockers.md",
       "history": [
         { "at": "2026-06-21T05:15:00.000Z", "action": "closed", "operator": "Manuel", "branch": "Manuel/s-hc-rec-00c-canonical-integration", "description": "canonical integration after recovery" }
       ]
@@ -158,8 +150,121 @@
         "Visual dry-run per platform",
         "Facebook preview with caption",
         "Reuse idempotency and durable finalization"
-      ],
-      "handoff": "Siguiente fase despues de integracion canonica. docs/07_handoffs/HC-REC-00A-codex-blockers.md (seccion Multiformat Sprint)."
+      ]
+    },
+    {
+      "id": "S-HC-PUB-03-ASSETS",
+      "title": "Multi-tenant asset management: upload, replace, reorganize across tenants",
+      "owner": "Manuel",
+      "backupOwner": "Manuel",
+      "status": "pending",
+      "track": "publishing",
+      "zone": ["apps/web/app/api/tenant-assets", "apps/web/components", "packages/core"],
+      "dependsOn": ["S-HC-REC-00C"],
+      "acceptance": [
+        "Asset upload with tenant scoping",
+        "Asset replacement preserves audit log",
+        "Asset reorganization (move, rename, delete)",
+        "Multi-format validation (images, video)",
+        "Preview before publish"
+      ]
+    },
+    {
+      "id": "S-HC-PUB-04-CRON",
+      "title": "Scheduled cron batch publishing with timezone-aware scheduling",
+      "owner": "Manuel",
+      "backupOwner": "Manuel",
+      "status": "pending",
+      "track": "publishing",
+      "zone": ["apps/web/app/api/cron", "apps/worker", "packages/core"],
+      "dependsOn": ["S-HC-PUB-02-MULTIFORMAT"],
+      "acceptance": [
+        "Batch cron processes multiple scheduled posts",
+        "Timezone-aware scheduling per tenant",
+        "Rate limiting per platform",
+        "Failure isolation (one post fails, others proceed)",
+        "Cron idempotency preserved"
+      ]
+    },
+    {
+      "id": "S-HC-PUB-05-RECONCILE",
+      "title": "Operational reconciliation automation for ambiguous provider outcomes",
+      "owner": "Manuel",
+      "backupOwner": "Manuel",
+      "status": "pending",
+      "track": "publishing",
+      "zone": ["apps/web/lib/publishing-finalization.ts", "apps/web/lib/draft-operational-state.ts", "packages/core"],
+      "dependsOn": ["S-HC-PUB-02-MULTIFORMAT", "S-HC-PUB-04-CRON"],
+      "acceptance": [
+        "Automatic reconciliation for Case A (Result ok + externalPostId + incomplete Draft)",
+        "Alert-only for Case B (Draft.externalPostId present + Result absent)",
+        "Block and notify for Case C (no evidence)",
+        "Never auto-retry provider calls"
+      ]
+    },
+    {
+      "id": "S-HC-OBS-01",
+      "title": "Observability: structured logging, metrics dashboard, alert thresholds",
+      "owner": "Manuel",
+      "backupOwner": "Manuel",
+      "status": "pending",
+      "track": "observability",
+      "zone": ["apps/web", "packages/core", "docs"],
+      "dependsOn": ["S-HC-PUB-04-CRON"],
+      "acceptance": [
+        "Structured logging with correlation IDs",
+        "Publishing metrics dashboard (attempts, failures, latency)",
+        "Alert thresholds for provider failures",
+        "Daily digest summarizing publishing activity"
+      ]
+    },
+    {
+      "id": "S-HC-COMM-01-SIGNUP",
+      "title": "Self-service tenant signup with trial gate and onboarding flow",
+      "owner": "Manuel",
+      "backupOwner": "Manuel",
+      "status": "pending",
+      "track": "commercial",
+      "zone": ["apps/web/app/register", "apps/web/app/api/auth", "packages/db", "apps/web/components"],
+      "dependsOn": ["S-HC-REC-00C"],
+      "acceptance": [
+        "Self-service registration with email verification",
+        "Trial tenant creation with default config",
+        "Guided onboarding wizard (brand, networks, first draft)",
+        "Trial gate enforcement before publishing"
+      ]
+    },
+    {
+      "id": "S-HC-COMM-02-BILLING",
+      "title": "Tenant billing: plan selection, usage tracking, payment integration",
+      "owner": "Manuel",
+      "backupOwner": "Manuel",
+      "status": "pending",
+      "track": "commercial",
+      "zone": ["apps/web/app/api/billing", "packages/db", "apps/web/components"],
+      "dependsOn": ["S-HC-COMM-01-SIGNUP"],
+      "acceptance": [
+        "Plan selection (Free, Pro, Agency)",
+        "Usage tracking (posts, assets, tenants)",
+        "Payment gateway integration (Stripe)",
+        "Invoice generation and history"
+      ]
+    },
+    {
+      "id": "S-HC-TEN-02-CEPEG",
+      "title": "CEPEQ tenant onboarding: brand, assets, network configuration",
+      "owner": "Manuel",
+      "backupOwner": "Manuel",
+      "status": "pending",
+      "track": "tenant-onboarding",
+      "zone": ["examples/tenants/cepeq", "apps/web", "packages/db"],
+      "dependsOn": ["S-HC-COMM-01-SIGNUP"],
+      "acceptance": [
+        "CEPEQ tenant seeded with brand identity",
+        "Asset upload and organization for CEPEQ",
+        "Facebook/Instagram network configuration",
+        "Initial strategy draft generated"
+      ]
     },
     {
       "id": "S-HC-PROD-02",
@@ -170,112 +275,10 @@
       "track": "production-infra",
       "zone": ["docs", "scripts", "packages/db", "vercel-env"],
       "dependsOn": ["S-HC-PROD-ALIGN"],
-      "acceptance": [
-        "Production env checklist completed without committing secrets",
-        "Prisma migrations validated/applied to hosted DB",
-        "Admin and Turpial seed verified",
-        "Login smoke passes against hosted DB",
-        "29 drafts and 46 assets verified for turpial-sound"
-      ],
-      "handoff": "Jean owns DB/Auth/env proof.",
+      "acceptance": ["Production env checklist completed", "29 drafts and 46 assets verified"],
       "history": [
         { "at": "2026-06-11T00:20:00.000Z", "action": "reassigned", "from": "Manuel", "to": "Jean", "reason": "User-directed PROD closeout split" },
         { "at": "2026-06-11T01:44:03.976Z", "action": "closed", "operator": "Jean", "branch": "Jean/s-hc-canonical-alignment-2026-06-09", "description": "production-db-auth-env-turpial-seed-smoke" }
-      ]
-    },
-    {
-      "id": "S-HC-PROD-03",
-      "title": "LLM provider adapter plus Turpial tenant functional QA and UX polish",
-      "owner": "Manuel",
-      "backupOwner": "Jean",
-      "status": "done",
-      "track": "tenant-strategy-product",
-      "zone": ["packages/agents", "apps/web/components/dashboard-console.tsx", "apps/web/components/admin-console.tsx", "apps/web/lib/dashboard.ts", "docs"],
-      "dependsOn": ["S-HC-PROD-ALIGN"],
-      "acceptance": [
-        "LLM provider adapter interface exists with deterministic fallback",
-        "Tenant-specific strategy generation works",
-        "Tenant console renders strategy, assets, queue, calendar, reports",
-        "Approve/reject flow works in UI"
-      ],
-      "handoff": "Manuel owns packages/agents and tenant UX/product QA.",
-      "history": [
-        { "at": "2026-06-11T02:44:03.210Z", "action": "closed", "operator": "Manuel", "branch": "Manuel/s-hc-prod-01-producto-operativo-tenant-admin-produccion-2026-06-09", "description": "LLM provider adapter plus Turpial tenant QA UX polish" }
-      ]
-    },
-    {
-      "id": "S-HC-PROD-04",
-      "title": "Worker, Redis and persistent dry-run processing",
-      "owner": "Jean",
-      "backupOwner": "Manuel",
-      "status": "done",
-      "track": "worker",
-      "zone": ["apps/worker", "packages/integrations", "scripts", "docs"],
-      "dependsOn": ["S-HC-PROD-02"],
-      "acceptance": ["Redis/worker hosting plan documented", "Worker validates with Turpial queue", "Dry-run job path emits logs", "No Vercel long-running worker assumption"],
-      "handoff": "Jean owns worker/integrations.",
-      "history": [
-        { "at": "2026-06-11T01:46:33.673Z", "action": "closed", "operator": "Jean", "branch": "Jean/s-hc-canonical-alignment-2026-06-09", "description": "worker-redis-persistent-dryrun-processing" }
-      ]
-    },
-    {
-      "id": "S-HC-PROD-05",
-      "title": "Publishing gate UI, AuditLog and rollback proof",
-      "owner": "Manuel",
-      "backupOwner": "Jean",
-      "status": "done",
-      "track": "publishing-gate",
-      "zone": ["apps/web/app/api/publishing", "apps/web/components/dashboard-console.tsx", "apps/web/lib/dashboard.ts", "docs"],
-      "dependsOn": ["S-HC-PROD-03"],
-      "acceptance": ["Publishing flow validated end-to-end", "Approval gate works", "AuditLog visible", "Rollback procedure documented"],
-      "handoff": "Manuel owns web publishing gate.",
-      "history": [
-        { "at": "2026-06-11T02:48:21.432Z", "action": "closed", "operator": "Manuel", "branch": "Manuel/s-hc-prod-01-producto-operativo-tenant-admin-produccion-2026-06-09", "description": "Publishing gate UI AuditLog and rollback proof" }
-      ]
-    },
-    {
-      "id": "S-HC-PROD-06",
-      "title": "Oreshnik operator dashboard and canonical task board",
-      "owner": "Manuel",
-      "backupOwner": "Jean",
-      "status": "done",
-      "track": "control-bus",
-      "zone": ["scripts/oreshnik", "var/oreshnik", "var/sprint-events", "docs"],
-      "dependsOn": ["S-HC-PROD-02", "S-HC-PROD-03", "S-HC-PROD-04", "S-HC-PROD-05", "S-HC-PROD-07", "S-HC-PROD-08", "S-HC-PROD-09", "S-HC-PROD-10", "S-HC-PROD-11"],
-      "acceptance": ["Task board reflects PROD reality", "Operator dashboard functional", "Closeout produces canonical release handoff"],
-      "handoff": "Manuel owns Oreshnik/control bus.",
-      "history": [
-        { "at": "2026-06-11T03:02:44.197Z", "action": "closed", "operator": "Manuel", "branch": "Manuel/s-hc-prod-01-producto-operativo-tenant-admin-produccion-2026-06-09", "description": "Oreshnik operator dashboard and canonical task board" }
-      ]
-    },
-    {
-      "id": "S-HC-PROD-07",
-      "title": "Sales landing, client onboarding and login entry",
-      "owner": "Manuel",
-      "backupOwner": "Jean",
-      "status": "done",
-      "track": "growth-onboarding",
-      "zone": ["apps/web/app/page.tsx", "apps/web/app/login", "apps/web/app/globals.css", "apps/web/components", "docs"],
-      "dependsOn": ["S-HC-PROD-03"],
-      "acceptance": ["Landing explains HeptaCore value", "Landing has CTA to login/onboarding", "Login protected and usable"],
-      "handoff": "Manuel owns public web and onboarding UX.",
-      "history": [
-        { "at": "2026-06-11T02:58:38.777Z", "action": "closed", "operator": "Manuel", "branch": "Manuel/s-hc-prod-01-producto-operativo-tenant-admin-produccion-2026-06-09", "description": "Sales landing client onboarding and login entry" }
-      ]
-    },
-    {
-      "id": "S-HC-PROD-08",
-      "title": "Draft editor and post modification workflow",
-      "owner": "Manuel",
-      "backupOwner": "Jean",
-      "status": "done",
-      "track": "content-operations",
-      "zone": ["apps/web/app/api/drafts", "apps/web/components/dashboard-console.tsx", "apps/web/lib/dashboard.ts", "docs"],
-      "dependsOn": ["S-HC-PROD-03"],
-      "acceptance": ["Operator can edit draft metadata", "Edits tenant-scoped and RBAC-protected", "Edited draft returns to review state", "AuditLog records modifications"],
-      "handoff": "Manuel owns draft editor.",
-      "history": [
-        { "at": "2026-06-11T03:00:02.044Z", "action": "closed", "operator": "Manuel", "branch": "Manuel/s-hc-prod-01-producto-operativo-tenant-admin-produccion-2026-06-09", "description": "Draft editor and post modification workflow" }
       ]
     },
     {
@@ -289,7 +292,6 @@
       "dependsOn": ["S-HC-PROD-02", "S-HC-PROD-03", "S-HC-PROD-04", "S-HC-PROD-05", "S-HC-PROD-06", "S-HC-PROD-07", "S-HC-PROD-08"],
       "acceptance": [
         "Login works",
-        "Sales landing and onboarding entry work",
         "Turpial tenant loads strategy and assets",
         "Draft approval works",
         "Facebook e Instagram publican realmente desde la UI con durabilidad transaccional",
@@ -297,25 +299,8 @@
         "typecheck, build and worker:validate pass",
         "156 tests"
       ],
-      "handoff": "Final release completed. Produccion estabilizada en master.",
       "history": [
         { "at": "2026-06-11T03:19:41.362Z", "action": "closed", "operator": "Manuel", "branch": "Manuel/s-hc-prod-01-producto-operativo-tenant-admin-produccion-2026-06-09", "description": "E2E Turpial Sound production proof" }
-      ]
-    },
-    {
-      "id": "S-HC-MAINT-ALIGN-01",
-      "title": "Canonical task board and derived docs alignment gate",
-      "owner": "Manuel",
-      "backupOwner": "Jean",
-      "status": "done",
-      "track": "maintenance",
-      "zone": ["scripts/oreshnik", "var/oreshnik", "docs"],
-      "dependsOn": ["S-HC-PROD-ALIGN"],
-      "acceptance": ["Preflight blocks on drift", "Canonical derived docs regenerable", "Close marks task done and regenerates"],
-      "handoff": "Manuel owns Oreshnik alignment infrastructure.",
-      "history": [
-        { "at": "2026-06-11T00:59:18.706Z", "action": "closed", "operator": "Manuel", "branch": "Manuel/s-hc-prod-01-producto-operativo-tenant-admin-produccion-2026-06-09", "description": "alineacion definitiva task board docs derivados" },
-        { "at": "2026-06-14T08:47:00.166Z", "action": "closed", "operator": "Manuel", "branch": "Architect/jean-pendientes-2026-06-14-jean-tiene-11-tareas-ready-para-revision-2026-06-14", "description": "QA review + fixes de 11 tareas Jean" }
       ]
     },
     {
@@ -327,8 +312,6 @@
       "track": "ad-hoc",
       "zone": ["package.json", "scripts/oreshnik"],
       "dependsOn": ["S-HC-PROD-01"],
-      "acceptance": ["Ad-hoc: sprint"],
-      "handoff": "Drift registered via preflight on 2026-06-12. Mode: silent.",
       "history": [
         { "at": "2026-06-12T04:56:32.932Z", "action": "drift-recorded", "operator": "Manuel", "mode": "silent", "description": "sprint" }
       ]
@@ -340,27 +323,23 @@
       "backupOwner": "Manuel",
       "status": "done",
       "track": "ad-hoc",
-      "zone": ["apps/web", "packages/agents", "packages/integrations", "scripts/seed-turpial.mjs", "scripts/verify-prod-smoke.mjs", ".vercelignore", "VECTORS/", "apps/web", "packages/db"],
+      "zone": ["apps/web", "packages/agents", "packages/integrations"],
       "dependsOn": ["S-HC-PROD-01"],
-      "acceptance": ["Ad-hoc: Codex multi-RRSS refactor, readiness gates, UI fixes, migrations, vercelignore"],
-      "handoff": "Drift registered via preflight on 2026-06-12. Mode: silent.",
       "history": [
-        { "at": "2026-06-12T07:16:29.270Z", "action": "drift-recorded", "operator": "Manuel", "mode": "silent", "description": "Codex multi-RRSS refactor, readiness gates, UI fixes, migrations, vercelignore" }
+        { "at": "2026-06-12T07:16:29.270Z", "action": "drift-recorded", "operator": "Manuel", "mode": "silent", "description": "Codex multi-RRSS refactor" }
       ]
     },
     {
       "id": "S-HC-DRIFT-003",
-      "title": "Sistema de publicacion con 3 modos, 24 crons Vercel, cron publisher idempotente, QA Jean",
+      "title": "Sistema de publicacion con 3 modos, 24 crons Vercel, cron publisher idempotente",
       "owner": "Manuel",
       "backupOwner": "Manuel",
       "status": "done",
       "track": "ad-hoc",
       "zone": ["apps/web", "vercel.json", "docs/07_handoffs"],
       "dependsOn": [],
-      "acceptance": ["Ad-hoc: Sistema de publicacion con 3 modos, 24 crons Vercel Hobby compatibles, cron publisher idempotente, QA Jean"],
-      "handoff": "Drift registered via preflight on 2026-06-14. Mode: silent.",
       "history": [
-        { "at": "2026-06-14T08:39:53.687Z", "action": "drift-recorded", "operator": "Manuel", "mode": "silent", "description": "Sistema de publicacion con 3 modos, 24 crons Vercel, cron publisher idempotente, QA Jean" }
+        { "at": "2026-06-14T08:39:53.687Z", "action": "drift-recorded", "operator": "Manuel", "mode": "silent", "description": "Sistema de publicacion con 3 modos, 24 crons Vercel, cron publisher idempotente" }
       ]
     }
   ],
@@ -380,28 +359,7 @@
       "reason": "User-directed reassignment to maximize parallel closeout."
     },
     {
-      "at": "2026-06-11T00:20:00.000Z",
-      "task": "S-HC-PROD-04",
-      "from": "Manuel",
-      "to": "Jean",
-      "reason": "User-directed reassignment: Jean owns worker/infra path."
-    },
-    {
-      "at": "2026-06-11T00:20:00.000Z",
-      "task": "S-HC-PROD-03",
-      "from": "Jean",
-      "to": "Manuel",
-      "reason": "User-directed reassignment: Manuel owns tenant product QA/polish."
-    },
-    {
-      "at": "2026-06-11T00:20:00.000Z",
-      "task": "S-HC-PROD-05",
-      "from": "Jean",
-      "to": "Manuel",
-      "reason": "User-directed reassignment: Manuel owns web publishing gate."
-    },
-    {
-      "at": "2026-06-21T05:15:00.000Z",
+      "at": "2026-06-21T05:30:00.000Z",
       "task": "*",
       "from": "Jean",
       "to": "Manuel + agente principal",

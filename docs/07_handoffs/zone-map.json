@@ -4,14 +4,14 @@
   "assignmentSource": "var/oreshnik/task-board.json",
   "zones": {
     "packages/db/**": {
-      "owner": "Jean+Manuel",
+      "owner": "Manuel+Agent",
       "lock": "double_jean_manuel",
       "sprints": [
         "*",
         "S-HC-RELEASE-02"
       ],
       "criticality": "critical",
-      "notes": "Prisma schema, migrations and DB access require coordination. S-HC-RELEASE-02: schema extended for Tenant.llmConfig and ContentDraft.sortOrder."
+      "notes": "Prisma schema, migrations and DB access require coordination. Reasignado: Jean fuera de ruta critica (REC-00C), Manuel + agente principal con doble lock."
     },
     "package.json": {
       "owner": "Jean+Manuel",
@@ -54,13 +54,13 @@
       "criticality": "critical"
     },
     "apps/worker/**": {
-      "owner": "Jean",
-      "lock": "jean_exclusive",
+      "owner": "Manuel",
+      "lock": "manuel_exclusive",
       "sprints": [
         "*"
       ],
       "criticality": "high",
-      "notes": "Worker, publishing, jobs, retries. Manuel solo lectura."
+      "notes": "Worker, publishing, jobs, retries. Reasignado de Jean a Manuel (REC-00C)."
     },
     "packages/agents/**": {
       "owner": "Manuel",
@@ -163,8 +163,8 @@
       "notes": "Kilo configuration and plans."
     },
     "apps/web/app/login/**": {
-      "owner": "Jean",
-      "lock": "jean_exclusive",
+      "owner": "Manuel",
+      "lock": "manuel_exclusive",
       "sprints": [
         "S-HC-04",
         "S-HC-PROD-01",
@@ -172,7 +172,7 @@
         "S-HC-RELEASE-02"
       ],
       "criticality": "high",
-      "notes": "Auth, login page. Manuel NO tocar durante Auth sprint."
+      "notes": "Auth, login page. Reasignado de Jean a Manuel (REC-00C)."
     },
     "apps/web/app/dashboard/**": {
       "owner": "Manuel",
@@ -202,14 +202,14 @@
       "notes": "OAuth Instagram/Facebook. Jean NO tocar. Doble lock con packages/integrations."
     },
     "apps/web/lib/tenant-auth.ts": {
-      "owner": "Jean",
-      "lock": "jean_exclusive",
+      "owner": "Manuel",
+      "lock": "manuel_exclusive",
       "sprints": [
         "S-HC-04",
         "S-HC-PROD-01"
       ],
       "criticality": "high",
-      "notes": "Session, auth guards."
+      "notes": "Session, auth guards. Reasignado de Jean a Manuel (REC-00C)."
     },
     "apps/web/lib/token-vault.ts": {
       "owner": "Manuel",
@@ -248,12 +248,13 @@
       "notes": "Resto de apps/web. Zonas de Jean definidas arriba tienen prioridad por ser más específicas."
     },
     "packages/integrations/**": {
-      "owner": "Jean+Manuel",
+      "owner": "Manuel+Agent",
       "lock": "double_jean_manuel",
       "sprints": [
         "*"
       ],
-      "criticality": "high"
+      "criticality": "high",
+      "notes": "Meta adapters, token vault. Reasignado: Jean fuera de ruta critica (REC-00C), Manuel + agente principal con doble lock."
     },
     "docs/obsidian-vault/**": {
       "owner": "Both",
@@ -299,14 +300,14 @@
       "notes": "Seed scripts Turpial."
     },
     "scripts/verify-turpial-*.mjs": {
-      "owner": "Jean",
-      "lock": "jean_exclusive",
+      "owner": "Manuel",
+      "lock": "manuel_exclusive",
       "sprints": [
         "S-HC-02A",
         "S-HC-PUB-01"
       ],
       "criticality": "high",
-      "notes": "Verificación OAuth vault."
+      "notes": "Verificación OAuth vault. Reasignado de Jean a Manuel (REC-00C)."
     },
     "examples/tenants/turpial/**": {
       "owner": "Manuel",

@@ -52,7 +52,8 @@
   },
   "dependencies": {
     "@prisma/adapter-pg": "^7.8.0",
-    "oreshnik": "file:../oreshnik",
+    "oreshnik": "npm:oreshnik-cli@0.2.0-alpha.0",
+    "oreshnik-cli": "file:../oreshnik/oreshnik-cli-0.2.0-alpha.0.tgz",
     "pg": "^8.21.0"
   }
 }

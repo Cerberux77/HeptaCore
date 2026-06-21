@@ -14,5 +14,31 @@
       { "name": "build", "command": "npm", "args": ["run", "build"], "timeoutSeconds": 300 },
       { "name": "worker", "command": "npm", "args": ["run", "worker:validate"], "timeoutSeconds": 120 }
     ]
+  },
+  "canonical": {
+    "derivedDocs": [
+      {
+        "path": "docs/obsidian-vault/00_CENTRAL_HEPTACORE.md",
+        "type": "central",
+        "source": "task-board"
+      },
+      {
+        "path": "docs/obsidian-vault/COLABORADORES/ESTADO_MANUEL.md",
+        "type": "collaborator",
+        "source": "task-board",
+        "filter": { "owner": "Manuel" }
+      },
+      {
+        "path": "docs/obsidian-vault/COLABORADORES/ESTADO_JEAN.md",
+        "type": "collaborator",
+        "source": "task-board",
+        "filter": { "owner": "Jean" }
+      },
+      {
+        "path": "docs/obsidian-vault/PRODUCT/STATUS_BOARD.md",
+        "type": "status-board",
+        "source": "task-board"
+      }
+    ]
   }
 }
