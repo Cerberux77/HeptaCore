@@ -1,8 +1,8 @@
 ---
 type: sprint-plan
 project: "HeptaCore"
-last_updated: "2026-06-21T04:47:49.577Z"
-mother_branch: "MADRE/v45-s-hc-rec-00c-canonical-integration-after-recovery-2026-06-21"
+last_updated: "2026-06-21T19:08:48.084Z"
+mother_branch: "MADRE/v46-s-hc-pub-02-multiformat-preview-multiformat-previews-deterministic-auth-approval-2026-06-21"
 tags:
   - "#sprints"
   - "#manuel"
@@ -844,3 +844,14 @@ Jean queda fuera de la ruta critica. Responsabilidades pendientes reasignadas te
 - `apps/web/app/login/**` → Manuel
 - `apps/web/lib/tenant-auth.ts` → Manuel
 - Scripts de verificacion OAuth (`scripts/verify-turpial-*.mjs`) → Manuel
+
+
+## Cierre S-HC-PUB-02-MULTIFORMAT-PREVIEW - 2026-06-21
+
+| Campo | Valor |
+|---|---|
+| Operador | Manuel |
+| Rama | `Manuel/s-hc-pub-02-closeout` |
+| Estado | CERRADO |
+| Madre docs | `MADRE/v46-s-hc-pub-02-multiformat-preview-multiformat-previews-deterministic-auth-approval-2026-06-21` |
+| Descripcion | multiformat previews, deterministic auth, approval UI and dry-run QA completed |

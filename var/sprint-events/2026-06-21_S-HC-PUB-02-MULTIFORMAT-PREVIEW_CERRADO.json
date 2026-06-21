@@ -1,0 +1,17 @@
+{
+  "sprint": "S-HC-PUB-02-MULTIFORMAT-PREVIEW",
+  "operator": "Manuel",
+  "status": "CERRADO",
+  "date": "2026-06-21",
+  "at": "2026-06-21T19:08:48.084Z",
+  "branch": "Manuel/s-hc-pub-02-closeout",
+  "previousMother": "MADRE/v45-s-hc-rec-00c-canonical-integration-after-recovery-2026-06-21",
+  "nextMother": "MADRE/v46-s-hc-pub-02-multiformat-preview-multiformat-previews-deterministic-auth-approval-2026-06-21",
+  "description": "multiformat previews, deterministic auth, approval UI and dry-run QA completed",
+  "changedFiles": [
+    "docs/obsidian-vault/00_CENTRAL_HEPTACORE.md",
+    "docs/obsidian-vault/COLABORADORES/ESTADO_JEAN.md",
+    "docs/obsidian-vault/COLABORADORES/ESTADO_MANUEL.md",
+    "docs/obsidian-vault/PRODUCT/STATUS_BOARD.md"
+  ]
+}
