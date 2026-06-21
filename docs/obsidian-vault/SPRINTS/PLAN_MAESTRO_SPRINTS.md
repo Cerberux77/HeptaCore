@@ -1,12 +1,13 @@
 ---
 type: sprint-plan
 project: "HeptaCore"
-last_updated: "2026-06-14T08:47:00.166Z"
+last_updated: "2026-06-21T04:30:00.000Z"
 mother_branch: "MADRE/v44-s-hc-maint-align-01-qa-review-fixes-de-11-tareas-jean-sistema-de-pub-2026-06-14"
 tags:
   - "#sprints"
   - "#manuel"
-  - "#jean"
+  - "#heptacore"
+  - "#production-stable"
 ---
 
 # Plan Maestro de Sprints HeptaCore
@@ -193,72 +194,70 @@ tags:
 | S-HC-08 | Ambos | Meta adapter sandbox design | Credenciales solo en `.env.rrss` local/secret manager; no git |
 | S-HC-09 | Manuel | First tenant publish readiness gate | Dry-run + approvals + rollback plan |
 
-## Ruta Critica Hoy - Turpial
+## Ruta Critica Hoy — 2026-06-21
 
 | Gate | Estado | Owner | Cierre |
 |---|---|---|---|
-| Cola y assets | PASS | Manuel | `npm run worker:validate` muestra 29/29 y 46/46 |
-| UI operativa | Parcial | Manuel | Cards llevan a cola, pendientes, drafts, assets y calendario |
-| OAuth readiness | Pendiente `.env.rrss` | Jean | `npm run worker:meta:readiness` PASS |
-| DB persistente | Pendiente | Jean | Seed Turpial en Prisma + service layer |
-| Approval persistente | Pendiente | Manuel + Jean | Acciones guardan en DB + audit log |
-| Publicacion real | Bloqueada por hard stop | Manuel + Jean | Aprobacion explicita, rollback y primer post bajo riesgo |
+| Cola y assets | PASS | Manuel | `npm run worker:validate` |
+| UI operativa | PASS | Manuel | Cards navegables, publicacion, assets, calendario, dashboard |
+| Facebook Page | PRODUCTION | Manuel | Token permanente, publicacion real desde UI, durabilidad transaccional |
+| Instagram | PRODUCTION | Manuel | Publicacion real desde UI, media container readiness, durabilidad transaccional |
+| OAuth readiness | PASS | Manuel | Facebook y Instagram OAuth con token vault AES-256-GCM |
+| Publicacion real | OPERATIVA | Manuel | Facebook e Instagram publican desde la UI. 156 tests. IN_REVIEW → PUBLISHED con rollback. |
+| Errores ambiguos | BLOQUEADOS SIN RETRY | Manuel | Reconciliacion manual requerida. Job queda IN_REVIEW. |
 
-## Control Bus 2026-06-09
+## Control Bus 2026-06-09 — COMPLETADO HISTORICO
 
 | Sprint | Owner | Estado | Resultado esperado |
 |---|---|---|---|
-| S-HC-CTRL-01 | Manuel | En curso | Control Bus formalizado y Jean listo para discovery/dry-run |
-| S-HC-CTRL-02 | Manuel | En curso | Corregir autoridad: Oreshnik asigna workload |
-| S-HC-PUB-01 | Pendiente Oreshnik | Candidato | Validar conexiones, assets y dry-run sin publicar si Oreshnik asigna |
+| S-HC-CTRL-01 | Manuel | CERRADO | Control Bus formalizado |
+| S-HC-CTRL-02 | Manuel | CERRADO | Oreshnik asigna workload |
+| S-HC-PUB-01 | Manuel | CERRADO | Primer post real publicado en Facebook e Instagram |
 
-## Actualizacion S-HC-01 / S-HC-02 / S-HC-06 - 2026-06-08
+## Actualizacion REC-00A — 2026-06-21
 
 | Sprint | Estado | Resultado |
 |---|---|---|
-| S-HC-01 | Listo para cierre | Production URL y callback temporal documentados; build/typecheck/worker validate PASS |
-| S-HC-02 | Foundation iniciado | Prisma SaaS extendido para `Tenant`, `User`, `TenantMember`, `Invitation`, OAuth, brand/strategy/content/publishing |
-| S-HC-06 | Foundation iniciado | Instagram login URL y callback con code exchange seguro; storage bloqueado hasta encryption/vault |
+| S-HC-REC-00A | CERRADO | Baseline de publicacion recuperado y estabilizado en `2fd9e249`. Facebook e Instagram operativos. |
+| S-HC-REC-00B | CANCELADO | Duplicado en Facebook eliminado manualmente por Manuel. |
+| S-HC-REC-00C | EN CURSO | Integracion canonica. |
 
-Bloqueos activos:
+Bloqueos resueltos:
+- Tokens OAuth almacenados con `ENCRYPTION_KEY` y token vault (AES-256-GCM).
+- Publicacion RRSS real operativa desde la UI con aprobacion y durabilidad transaccional.
+- Migracion aplicada en produccion.
 
-- No guardar tokens OAuth hasta implementar `ENCRYPTION_KEY` y vault adapter.
-- No crear primer admin hasta completar password hashing y sesiones.
-- No publicar RRSS reales hasta Meta readiness, aprobacion humana y levantamiento explicito del hard stop.
-- No aplicar migracion en Production sin review de `20260608221500_init_saas_tenants_auth_oauth_content`.
-
-## Asignacion Activa — 2026-06-09 15:25 VET
+## Asignacion Activa — 2026-06-21 04:30 UTC
 
 ### Sprints con CLOSURE (push + MADRE + sprint-event)
 
 | Sprint | Owner | Rama | Madre | Estado |
 |---|---|---|---|---|
-| S-HC-XX | Manuel | `Manuel/s-hc-xx...` | MADRE/v2 | CERRADO |
-| S-HC-01 | Manuel | `Manuel/s-hc-xx...` | MADRE/v3, v4 | CERRADO |
-| S-HC-CTRL-01 | Manuel | `Manuel/s-hc-xx...` | MADRE/v5 | CERRADO |
-| S-HC-CTRL-02 | Manuel | `Manuel/s-hc-xx...` | MADRE/v6 | CERRADO |
-| S-HC-CTRL-03 | Manuel | `Manuel/s-hc-xx...` | MADRE/v7 | CERRADO |
-| S-HC-PROD-00 | Manuel | `Manuel/s-hc-xx...` | MADRE/v8 | CERRADO |
+| S-HC-REC-00A | Manuel | `manuel/s-hc-rec-00a-ui-publishing-baseline` | — | CERRADO |
+| S-HC-REC-00B | Manuel | — | — | CANCELADO |
 
-### Sprints SIN closure (trabajo local de Jean, invisible en repo)
+### Sprints EN CURSO
 
-| Sprint | Owner reportado | Rama en repo | Commits en repo | Requiere |
-|---|---|---|---|---|
-| S-HC-02 | Jean | **NO EXISTE** | **CERO** | `oreshnik:close --push` |
-| S-HC-04 | Jean | **NO EXISTE** | **CERO** | `oreshnik:preflight` → commit → `oreshnik:close --push` |
+| Sprint | Owner | Rama | Requiere |
+|---|---|---|---|
+| S-HC-REC-00C | Manuel | `manuel/s-hc-rec-00c-canonical-integration` | typecheck + test + build + worker:validate |
 
-**Causa**: Jean trabaja localmente sin ejecutar el script de cierre que el modelo TurpialSound exige. Sin closure: sin MADRE, sin visibilidad, sin avance documentado.
-
-### Proximos sprints (dependen de S-HC-04)
+### Proximos sprints
 
 | Sprint | Owner | Depende de | Estado |
 |---|---|---|---|
-| S-HC-PROD-02 | Manuel | S-HC-04 (Jean) | depends_on |
-| S-HC-PROD-03 | Jean | S-HC-PROD-00 | assigned |
-| S-HC-PROD-04 | Jean | S-HC-PROD-02 + S-HC-PROD-03 | depends_on |
-| S-HC-PROD-05 | Jean | S-HC-PROD-04 + S-HC-PROD-06 | depends_on |
-| S-HC-PROD-06 | Manuel | S-HC-PROD-02 | depends_on |
-| S-HC-PUB-01 | Jean | PROD-01 al 06 | depends_on |
+| S-HC-PUB-02-MULTIFORMAT | Manuel | S-HC-REC-00C | pending |
+| S-HC-PROD-06 | Manuel | S-HC-PUB-02 | pending |
+
+### Jean — Fuera de Ruta Critica
+
+Jean queda fuera de la ruta critica. Sus responsabilidades pendientes se reasignan temporalmente a Manuel y al agente principal hasta nuevo aviso de Oreshnik o decision del Arquitecto. Zonas transferidas:
+- `apps/worker/**` → Manuel (lectura/escritura)
+- `packages/integrations/**` → Manuel + agente principal (doble lock)
+- `packages/db/**` → Manuel + agente principal (doble lock)
+- `apps/web/app/login/**` → Manuel
+- `apps/web/lib/tenant-auth.ts` → Manuel
+- Scripts OAuth (`scripts/verify-turpial-*.mjs`) → Manuel
 
 ## Paralelizacion
 
@@ -793,3 +792,54 @@ npm run oreshnik:preflight -- --sprint S-HC-JEAN-ALIGN --operator Jean --desc "a
 | Estado | CERRADO |
 | Madre docs | `MADRE/v44-s-hc-maint-align-01-qa-review-fixes-de-11-tareas-jean-sistema-de-pub-2026-06-14` |
 | Descripcion | QA review + fixes de 11 tareas Jean, sistema de publicacion 3 modos, 24 crons Vercel Hobby compatibles, cron publisher idempotente |
+
+
+## Cierre S-HC-REC-00A — 2026-06-21
+
+| Campo | Valor |
+|---|---|
+| Operador | Manuel |
+| Rama | `manuel/s-hc-rec-00a-ui-publishing-baseline` |
+| Estado | CERRADO |
+| SHA produccion | `2fd9e24929ffe1022cf9521ed0f13888f30accbd` |
+| Deployment | `heptacore.vercel.app` |
+| Descripcion | Baseline de publicacion recuperado y estabilizado. Facebook e Instagram publican realmente desde la UI. Errores ambiguos bloqueados sin retry automatico. 156 tests. Estado transaccional IN_REVIEW → PUBLISHED validado. |
+
+## Cancelacion S-HC-REC-00B — 2026-06-21
+
+| Campo | Valor |
+|---|---|
+| Operador | Manuel |
+| Estado | CANCELADO |
+| Motivo | Manuel elimino manualmente el duplicado en Facebook. No requiere sprint de codigo. |
+
+## En Curso S-HC-REC-00C — 2026-06-21
+
+| Campo | Valor |
+|---|---|
+| Operador | Manuel |
+| Rama | `Manuel/s-hc-rec-00c-canonical-integration` |
+| Estado | EN CURSO |
+| Scope | Integracion canonica del baseline productivo en rama revisable. Actualizacion de documentacion del repositorio. |
+| Depende de | S-HC-REC-00A |
+
+## Siguiente Fase: Publicacion Multiformato
+
+**S-HC-PUB-02-MULTIFORMAT-PREVIEW**
+
+| Campo | Valor |
+|---|---|
+| Operador | Manuel |
+| Estado | PENDIENTE |
+| Scope | Instagram Carousel, Instagram Stories, asset manifest, validacion de assets, preview visual por plataforma, Facebook preview, reutilizacion de idempotencia y durabilidad |
+| Depende de | S-HC-REC-00C |
+
+## Reasignacion Temporal Jean
+
+Jean queda fuera de la ruta critica. Responsabilidades pendientes reasignadas temporalmente a Manuel y al agente principal:
+- `apps/worker/**` → Manuel (lectura/escritura)
+- `packages/integrations/**` → Manuel + agente principal (doble lock)
+- `packages/db/**` → Manuel + agente principal (doble lock)
+- `apps/web/app/login/**` → Manuel
+- `apps/web/lib/tenant-auth.ts` → Manuel
+- Scripts de verificacion OAuth (`scripts/verify-turpial-*.mjs`) → Manuel

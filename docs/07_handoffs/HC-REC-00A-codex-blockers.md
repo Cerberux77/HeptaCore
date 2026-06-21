@@ -1,4 +1,4 @@
-# Codex Promotion Final — S-HC-REC-00A
+# Codex Promotion Final — S-HC-REC-00A (CLOSED)
 
 Sprint: S-HC-REC-00A
 Operator: Manuel
@@ -7,20 +7,20 @@ Branch: manuel/s-hc-rec-00a-ui-publishing-baseline
 ## Baseline
 
 ```text
-Code baseline reviewed:
-a574183c0969646dc5d7b4fba2f1931b5a70644d
+Production baseline:
+2fd9e24929ffe1022cf9521ed0f13888f30accbd
 
 Branch:
 manuel/s-hc-rec-00a-ui-publishing-baseline
 
 Promotion:
-NOT PROMOTED
+PROMOTED (heptacore.vercel.app)
 
 Public production:
-continúa en el deployment anterior (dpl_8iKrhoJMEsrTLWfgzCQyVPD1saEM, heptacore.vercel.app)
+https://heptacore.vercel.app (SHA 2fd9e249)
 
 Oreshnik:
-OPEN / NOT TRUSTED FOR CLOSURE
+CLOSED
 ```
 
 ## Status

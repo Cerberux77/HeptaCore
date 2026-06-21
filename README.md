@@ -4,9 +4,7 @@ HeptaCore is a multi-tenant AI marketing operating system for strategy, RRSS con
 
 ## Current Status
 
-HeptaCore is an MVP tecnico pre-produccion. The closest deployable/productive base is `master` / `origin/master`; the current production-like commit identified during canonical alignment is `000ce31`.
-
-`https://heptacore.vercel.app` is the Vercel target, but production usefulness depends on configured environment variables, database migrations, and seed data. Real RRSS publishing remains blocked by design.
+HeptaCore is a production multi-tenant AI marketing operating system. Production stable: `2fd9e24929ffe1022cf9521ed0f13888f30accbd` deployed at [`https://heptacore.vercel.app`](https://heptacore.vercel.app). Facebook and Instagram publish real posts from the UI. Ambiguous provider errors are blocked without automatic retry (manual reconciliation required). 156 tests validate the transactional publishing state machine.
 
 ## Monorepo
 
@@ -35,8 +33,9 @@ npx prisma validate --schema packages/db/prisma/schema.prisma
 
 ## Production Guardrails
 
-- No real RRSS publishing without explicit human approval.
-- No real Meta adapters are connected in this repository state.
-- Worker publishing remains draft/dry-run first.
-- BullMQ workers need persistent hosting with Redis outside Vercel serverless.
-- Secrets belong in environment variables, secret manager, or encrypted vault rows, never in git.
+- Live RRSS publishing is operational (Facebook Page, Instagram) with approval gates and transactional durability.
+- Real Meta adapters (Facebook Page, Instagram) are connected and verified in production.
+- Ambiguous provider outcomes are blocked without automatic retry; manual reconciliation via IN_REVIEW state machine.
+- Publishing worker remains serverless via Vercel cron (24 daily slots, idempotent publisher).
+- Secrets belong in environment variables or encrypted vault rows, never in git.
+- No campaign spend, no real scraping.
