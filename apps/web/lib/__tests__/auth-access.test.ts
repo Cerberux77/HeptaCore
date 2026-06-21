@@ -64,6 +64,13 @@ describe("auth access routing", () => {
     assert.match(proxySource, /callbackUrl/);
   });
 
+  it("login does not block legacy identifiers with browser email validation", async () => {
+    const { readFileSync } = await import("node:fs");
+    const loginSource = readFileSync(new URL("../../app/login/page.tsx", import.meta.url), "utf8");
+    assert.doesNotMatch(loginSource, /type="email"/);
+    assert.match(loginSource, /Correo electrónico/);
+  });
+
   it("membership added after login refreshes token claims", () => {
     const token = { id: "user-1", memberships: [], tenantId: null, role: null };
     applyMembershipClaims(token, [{ tenantId: "tenant-1", role: "TENANT_ADMIN" }]);
