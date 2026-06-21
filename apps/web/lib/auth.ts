@@ -1,6 +1,7 @@
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
+import { applyMembershipClaims } from "./auth-token-claims";
 import { prisma } from "./prisma";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
@@ -28,20 +29,33 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     }),
   ],
   session: { strategy: "jwt" },
+  trustHost: true,
   callbacks: {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     async jwt({ token, user }: { token: any; user: any }) {
       if (user) {
         token.id = user.id;
+      }
+
+      if (token.id) {
         const memberships = await prisma.membership.findMany({
-          where: { userId: user.id },
+          where: { userId: token.id },
+          orderBy: { createdAt: "asc" },
           select: { tenantId: true, role: true },
         });
-        token.memberships = memberships;
-        token.tenantId = memberships[0]?.tenantId ?? null;
-        token.role = memberships[0]?.role ?? null;
+        applyMembershipClaims(token, memberships);
       }
       return token;
+    },
+    async redirect({ url, baseUrl }) {
+      if (url.startsWith("/") && !url.startsWith("//")) return `${baseUrl}${url}`;
+      try {
+        const parsed = new URL(url);
+        if (parsed.origin === baseUrl) return parsed.toString();
+      } catch {
+        // Fall through to the deterministic app resolver.
+      }
+      return `${baseUrl}/app`;
     },
     async session({ session, token }) {
       if (session.user) {

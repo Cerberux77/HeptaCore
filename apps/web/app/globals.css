@@ -1183,6 +1183,9 @@ textarea { min-height: 84px; resize: vertical; }
   border-color: var(--hc-ink);
 }
 .login-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   width: 100%;
   min-height: 44px;
   border: 0;
@@ -1196,6 +1199,50 @@ textarea { min-height: 84px; resize: vertical; }
 .login-button:disabled {
   opacity: .65;
   cursor: not-allowed;
+}
+.login-button.secondary {
+  border: 1px solid var(--hc-line);
+  background: var(--hc-panel);
+  color: var(--hc-ink);
+}
+.app-resolver-card,
+.access-required-card {
+  max-width: 520px;
+}
+.tenant-choice-list,
+.access-required-actions {
+  display: grid;
+  gap: 10px;
+}
+.tenant-choice-link {
+  display: grid;
+  gap: 4px;
+  padding: 12px;
+  border: 1px solid var(--hc-line);
+  border-radius: 8px;
+  background: var(--hc-bone);
+}
+.tenant-choice-link strong {
+  font-size: 14px;
+}
+.tenant-choice-link span,
+.tenant-choice-link small,
+.access-required-detail span {
+  color: var(--hc-fog);
+  font-size: 11px;
+}
+.access-required-detail {
+  display: grid;
+  gap: 5px;
+  margin-bottom: 16px;
+  padding: 12px;
+  border: 1px solid var(--hc-line);
+  border-radius: 8px;
+  background: var(--hc-bone);
+}
+.access-required-detail strong {
+  overflow-wrap: anywhere;
+  font-size: 14px;
 }
 .login-error {
   margin: 0;

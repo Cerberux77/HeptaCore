@@ -4,6 +4,8 @@ import type { NextRequest } from "next/server";
 function isPublicPath(path: string): boolean {
   if (path === "/") return true;
   if (path === "/login") return true;
+  if (path === "/app") return true;
+  if (path === "/access-required") return true;
   if (path === "/register") return true;
   if (path === "/recover") return true;
   if (path === "/reset-password") return true;
@@ -18,6 +20,7 @@ function isPublicPath(path: string): boolean {
   if (path.startsWith("/_next/")) return true;
   if (path.startsWith("/api/auth/")) return true;
   if (path.startsWith("/api/oauth/")) return true;
+  if (path.startsWith("/tenant/")) return true;
   if (path.startsWith("/api/tenant-assets/")) return true;
   if (path.startsWith("/tenant-assets/")) return true;
   if (path.startsWith("/api/cron/")) return true;
@@ -38,7 +41,8 @@ export function proxy(req: NextRequest) {
     req.cookies.has("__Secure-next-auth.session-token");
 
   if (!isLoggedIn) {
-    const loginUrl = new URL("/tenant/turpial-sound", req.url);
+    const loginUrl = new URL("/login", req.url);
+    loginUrl.searchParams.set("callbackUrl", `${req.nextUrl.pathname}${req.nextUrl.search}`);
     return NextResponse.redirect(loginUrl);
   }
 

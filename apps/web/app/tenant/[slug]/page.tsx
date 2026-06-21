@@ -1,5 +1,6 @@
-import { redirect } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { DashboardConsole } from "../../../components/dashboard-console";
+import { tenantAccessRequiredHref, tenantLoginHref } from "../../../lib/access-routing";
 import { auth } from "../../../lib/auth";
 import {
   getChecklist,
@@ -11,6 +12,7 @@ import {
   getStrategySnapshot,
   getTenantAssets,
 } from "../../../lib/dashboard";
+import { prisma } from "../../../lib/prisma";
 import { getTrialStatus } from "../../../lib/trial";
 
 export const dynamic = "force-dynamic";
@@ -20,10 +22,25 @@ export default async function TenantPage({
 }: {
   params: Promise<{ slug: string }>;
 }) {
-  const session = await auth();
-  if (!session) redirect("/login");
-
   const { slug } = await params;
+  const session = await auth();
+  if (!session?.user?.id) redirect(tenantLoginHref(slug));
+
+  const tenant = await prisma.tenant.findUnique({
+    where: { slug },
+    select: { id: true },
+  });
+  if (!tenant) notFound();
+
+  const membership = await prisma.membership.findFirst({
+    where: {
+      userId: session.user.id,
+      OR: [{ tenantId: tenant.id }, { role: "SUPER_ADMIN" }],
+    },
+    select: { role: true },
+  });
+  if (!membership) redirect(tenantAccessRequiredHref(slug));
+
   const [metrics, queue, assets, strategy, calendar, checklist, report, readiness] = await Promise.all([
     getDashboardMetrics(slug),
     getDraftQueue(slug),
@@ -35,11 +52,9 @@ export default async function TenantPage({
     getReadinessReport(slug),
   ]);
 
-  if (!metrics) redirect("/");
+  if (!metrics) notFound();
 
-  const isGlobalAdmin = session.user.memberships?.some((membership) => membership.role === "SUPER_ADMIN");
-  const hasTenantAccess = session.user.memberships?.some((membership) => membership.tenantId === metrics.tenant.id);
-  if (!isGlobalAdmin && !hasTenantAccess) redirect("/");
+  const isGlobalAdmin = membership.role === "SUPER_ADMIN";
 
   const trial = await getTrialStatus(metrics.tenant.id);
 

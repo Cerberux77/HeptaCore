@@ -3,8 +3,6 @@ import { cookies } from "next/headers";
 import { CodexLanding } from "../components/codex-landing";
 import { auth } from "../lib/auth";
 
-const DEFAULT_TENANT = "turpial-sound";
-
 export default async function Home() {
   const cookieStore = await cookies();
   const hasSessionCookie =
@@ -15,8 +13,7 @@ export default async function Home() {
   const session = hasSessionCookie ? await auth().catch(() => null) : null;
 
   if (session?.user?.id) {
-    if (session.user?.memberships?.some((m) => m.role === "SUPER_ADMIN")) redirect("/admin");
-    redirect(`/tenant/${DEFAULT_TENANT}`);
+    redirect("/app");
   }
 
   return <CodexLanding />;
