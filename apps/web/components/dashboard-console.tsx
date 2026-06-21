@@ -41,6 +41,7 @@ import {
   selectedDraftFromQueue,
   type DraftQueuePatch,
 } from "../lib/dashboard-queue";
+import { calendarDisplayState } from "../lib/calendar-state";
 import type { TrialStatus } from "../lib/trial";
 
 type View = "overview" | "strategy" | "queue" | "assets" | "calendar" | "checklist" | "reports" | "readiness";
@@ -1462,7 +1463,7 @@ export function DashboardConsole({
                     >
                       <span>{item.scheduledFor ?? "Sin fecha"}</span>
                       <strong>{item.title}</strong>
-                      <small>{item.network} / {item.format} / {item.status}</small>
+                      <small>{item.network} / {item.format} / {calendarDisplayState(item)}</small>
                       <Risk level={item.riskLevel} />
                     </button>
                   ))}
