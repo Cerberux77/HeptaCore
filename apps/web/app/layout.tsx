@@ -8,8 +8,8 @@ export const metadata: Metadata = {
   description:
     "Sistema AI de marketing 24/7 para estrategia, RRSS, contenido, respuestas, campañas, leads y reporting por cliente.",
   icons: {
-    icon: [{ url: "/brand/heptacore-icon.svg", type: "image/svg+xml" }],
-    apple: "/brand/heptacore-icon.svg",
+    icon: [{ url: "/brand/favicon-32x32.png", type: "image/png" }],
+    apple: "/brand/apple-touch-icon.png",
   },
   openGraph: {
     title: "HeptaCore",

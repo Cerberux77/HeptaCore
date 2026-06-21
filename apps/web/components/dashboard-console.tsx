@@ -1,6 +1,7 @@
 "use client";
 
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   AlertTriangle,
   BarChart3,
@@ -33,6 +34,14 @@ import type {
   StrategySnapshot,
   TenantAssetItem,
 } from "../lib/dashboard";
+import {
+  buildPublishPayload,
+  mergeDraftQueueItem,
+  resolvePublishTargetFromQueue,
+  selectedDraftFromQueue,
+  type DraftQueuePatch,
+} from "../lib/dashboard-queue";
+import { calendarDisplayState } from "../lib/calendar-state";
 import type { TrialStatus } from "../lib/trial";
 
 type View = "overview" | "strategy" | "queue" | "assets" | "calendar" | "checklist" | "reports" | "readiness";
@@ -64,9 +73,16 @@ const NETWORK_LABELS: Record<string, string> = {
   X: "X",
 };
 
-function assetUrl(path: string | null | undefined) {
+function tenantAssetSlug(tenantSlug: string): string {
+  return tenantSlug === "turpial-sound" ? "turpial" : tenantSlug;
+}
+
+function assetUrl(path: string | null | undefined, slug: string) {
   if (!path) return "";
-  return `/tenant-assets/turpial/${path.replace(/^content\/inbox\//, "")}`;
+  const folder = tenantAssetSlug(slug);
+  const cleanPath = path.replace(/^content\/inbox\//, "").replace(/\\/g, "/");
+  if (cleanPath.includes("..")) return "";
+  return `/tenant-assets/${folder}/${cleanPath}`;
 }
 
 function channelLabel(item: DraftQueueItem) {
@@ -90,8 +106,8 @@ function isVideoAsset(item: DraftQueueItem | { asset?: { path: string | null; ki
   return item.asset?.kind === "VIDEO" || path.endsWith(".mp4") || path.endsWith(".mov") || path.endsWith(".webm");
 }
 
-function Thumb({ item }: { item: DraftQueueItem }) {
-  const url = assetUrl(item.asset?.path);
+function Thumb({ item, slug }: { item: DraftQueueItem; slug: string }) {
+  const url = assetUrl(item.asset?.path, slug);
   if (url) {
     if (isVideoAsset(item)) {
       return <video src={url} className="thumb thumb-video" muted playsInline preload="metadata" />;
@@ -199,16 +215,32 @@ export function DashboardConsole({
   trial?: TrialStatus;
 }) {
   const [view, setView] = useState<View>("overview");
-  const [selectedId, setSelectedId] = useState(queue[0]?.id ?? "");
+  const [selectedId, setSelectedIdRaw] = useState(queue[0]?.id ?? "");
+  const [publishDraftId, setPublishDraftId] = useState("");
   const [localQueue, setLocalQueue] = useState(queue);
+  const router = useRouter();
   const [manualApproval, setManualApproval] = useState(false);
   const [publishMode, setPublishMode] = useState<"dry_run" | "scheduled" | "immediate">("dry_run");
   const tenantAutoPilot =
     metrics?.tenant.mode === "AUTOPILOT_FULL" || metrics?.tenant.mode === "AUTOPILOT_LIMITED";
   const tenantNeedsManual =
     metrics?.tenant.mode === "APPROVAL_REQUIRED" || metrics?.tenant.mode === "DRAFT_ONLY";
-  const [publishState, setPublishState] = useState<"idle" | "loading" | "done" | "error">("idle");
+  const [publishState, setPublishState] = useState<"idle" | "loading" | "published" | "scheduled" | "dry_run_ok" | "blocked" | "failed" | "reconciliation_required">("idle");
   const [publishMessage, setPublishMessage] = useState("");
+  const activeRequestRef = useRef<{ draftId: string; mode: string; requestId: string } | null>(null);
+
+  const setSelectedId = useCallback((id: string) => {
+    if (publishState === "loading") return;
+    setSelectedIdRaw(id);
+  }, [publishState]);
+
+  useEffect(() => {
+    setManualApproval(false);
+    setPublishState("idle");
+    setPublishMessage("");
+    activeRequestRef.current = null;
+  }, [selectedId, publishMode]);
+
   const [editMode, setEditMode] = useState(false);
   const [editTitle, setEditTitle] = useState("");
   const [editCaption, setEditCaption] = useState("");
@@ -243,7 +275,7 @@ export function DashboardConsole({
   const [uploading, setUploading] = useState(false);
   const [uploadFile, setUploadFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const selected = localQueue.find((i) => i.id === selectedId) ?? localQueue[0];
+  const selected = selectedDraftFromQueue(localQueue, selectedId);
   const activeNetworks = metrics?.tenant.activeNetworks?.length ? metrics.tenant.activeNetworks : ["INSTAGRAM", "FACEBOOK"];
   const missingCoreNetworks = SUPPORTED_NETWORKS.filter((network) => !activeNetworks.includes(network));
 
@@ -254,53 +286,128 @@ export function DashboardConsole({
     .filter((i) => i.status !== "PUBLISHED")
     .sort((a, b) => (a.scheduledFor ?? "").localeCompare(b.scheduledFor ?? ""));
   const readyNow = scheduled.slice(0, 5);
+  const nextItem = metrics?.nextUp?.[0] ?? null;
+  const nextTitle = nextItem ? (nextItem.title.length > 25 ? `${nextItem.title.slice(0, 25)}…` : nextItem.title) : "Sin proximas";
+  const nextNote = nextItem ? `${nextItem.network} · SCHEDULED · ${nextItem.scheduledFor ?? ""}` : "No hay publicaciones futuras programadas";
 
-  const nextItem = scheduled[0] ?? null;
-  const nextDate = nextItem?.scheduledFor?.slice(5) ?? "--";
-  const nextTitle = nextItem?.title ? (nextItem.title.length > 25 ? nextItem.title.slice(0, 25) + "…" : nextItem.title) : null;
-  const nextNote = nextItem
-    ? `${nextItem.network} · ${nextItem.status === "APPROVED" ? "Listo" : nextItem.status === "NEEDS_REVIEW" ? "Pendiente revision" : nextItem.status}`
-    : "No hay programados";
-
-  const updateLocalStatus = useCallback((id: string, newStatus: string) => {
-    setLocalQueue((prev) => prev.map((d) => (d.id === id ? { ...d, status: newStatus } : d)));
+  const mergeLocalDraft = useCallback((patch: DraftQueuePatch) => {
+    setLocalQueue((prev) => mergeDraftQueueItem(prev, patch));
   }, []);
 
-  const firstApproved = localQueue.find((item) => item.status === "APPROVED");
+  const updateLocalStatus = useCallback((id: string, newStatus: string, extra?: Partial<DraftQueueItem>) => {
+    mergeLocalDraft({ id, status: newStatus, ...extra });
+  }, [mergeLocalDraft]);
+
+  const approvedDrafts = useMemo(
+    () => localQueue.filter((draft) => draft.operationalState === "READY_TO_PUBLISH"),
+    [localQueue],
+  );
+
+  const reconciliationDrafts = useMemo(
+    () => localQueue.filter((draft) => draft.operationalState === "RECONCILIATION_REQUIRED"),
+    [localQueue],
+  );
+
+  const reviewRequiredDrafts = useMemo(
+    () => localQueue.filter((draft) => draft.operationalState === "REVIEW_REQUIRED"),
+    [localQueue],
+  );
+
+  const publishTarget = useMemo(
+    () => approvedDrafts.find((draft) => draft.id === publishDraftId) ?? approvedDrafts[0] ?? null,
+    [approvedDrafts, publishDraftId],
+  );
+
+  useEffect(() => {
+    setManualApproval(false);
+    setPublishState("idle");
+    setPublishMessage("");
+    activeRequestRef.current = null;
+  }, [selectedId]);
+
+  useEffect(() => {
+    setManualApproval(false);
+    setPublishState("idle");
+    setPublishMessage("");
+  }, [publishDraftId, publishMode]);
+
+  useEffect(() => {
+    const currentStillApproved = approvedDrafts.some((draft) => draft.id === publishDraftId);
+    if (!currentStillApproved) {
+      setPublishDraftId(approvedDrafts[0]?.id ?? "");
+    }
+  }, [approvedDrafts, publishDraftId]);
 
   async function handlePublish() {
-    if (!firstApproved) return;
+    const target = publishTarget;
+    if (!target) return;
+    const requestDraftId = target.id;
+    const requestMode = publishMode;
+    const requestId = `${requestDraftId}_${requestMode}_${Date.now().toString(36)}`;
+    activeRequestRef.current = { draftId: requestDraftId, mode: requestMode, requestId };
     setPublishState("loading");
     setPublishMessage("");
     try {
-      const effectiveMode = publishMode;
       const res = await fetch("/api/publishing/publish", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
+        body: JSON.stringify(buildPublishPayload(
           tenantSlug,
-          draftId: firstApproved.id,
-          manualApproval: manualApproval || tenantAutoPilot,
-          mode: effectiveMode,
-        }),
+          requestDraftId,
+          requestMode,
+          manualApproval || tenantAutoPilot,
+        )),
       });
       const data = await res.json();
-      if (!res.ok || !data.ok) {
-        setPublishState("error");
-        setPublishMessage(data.error || "No se pudo ejecutar la publicacion.");
+
+      if (activeRequestRef.current?.requestId !== requestId) {
         return;
       }
-      updateLocalStatus(firstApproved.id, data.mode === "immediate" ? "PUBLISHED" : data.mode === "scheduled" ? "SCHEDULED" : "APPROVED");
-      setPublishState("done");
+
+      if (data.providerConfirmed === true && data.code === "LIVE_RECONCILIATION_REQUIRED") {
+        setPublishState("reconciliation_required");
+        const extIdPart = data.externalPostId ? ` ID externo: ${data.externalPostId}.` : "";
+        setPublishMessage(`${data.error}${extIdPart} ${data.action}`);
+        router.refresh();
+        return;
+      }
+
+      if (data.providerOutcomeUnknown === true || data.status === "RECONCILIATION_REQUIRED" || data.code === "LIVE_RECONCILIATION_REQUIRED") {
+        setPublishState("reconciliation_required");
+        setPublishMessage(data.action || data.error || "Meta pudo haber publicado. El intento quedo bloqueado para reconciliacion.");
+        router.refresh();
+        return;
+        return;
+      }
+
+      if (!res.ok || !data.ok) {
+        setPublishState(data.code === "LIVE_BLOCKED_TRIAL_LIMIT" || data.code?.startsWith("LIVE_BLOCKED") ? "blocked" : "failed");
+        setPublishMessage(data.error || data.action || "No se pudo ejecutar la publicacion.");
+        return;
+      }
+      const newStatus = data.mode === "immediate" ? "PUBLISHED" : data.mode === "scheduled" ? "SCHEDULED" : "APPROVED";
+      const extra = data.externalPostId ? { externalPostId: data.externalPostId } as Partial<DraftQueueItem> : {};
+      updateLocalStatus(requestDraftId, newStatus, extra);
+      if (data.mode === "dry_run") {
+        setPublishState("dry_run_ok");
+      } else if (data.mode === "scheduled") {
+        setPublishState("scheduled");
+      } else {
+        setPublishState("published");
+      }
+      const externalIdPart = data.externalPostId ? ` (ID: ${data.externalPostId})` : "";
       setPublishMessage(
         data.mode === "immediate"
-          ? `Publicado en vivo: ${firstApproved.title}.`
+          ? `Publicado en vivo: ${target.title}.${externalIdPart}`
           : data.mode === "scheduled"
-            ? `Programado: ${firstApproved.title} (${data.scheduledFor ? new Date(data.scheduledFor).toLocaleString() : "pronto"}).`
-            : `Dry-run validado: ${firstApproved.title}.`,
+            ? `Programado: ${target.title} (${data.scheduledFor ? new Date(data.scheduledFor).toLocaleString() : "pronto"}).`
+            : `Dry-run validado: ${target.title}.`,
       );
+      if (data.mode === "immediate" || data.mode === "scheduled") {
+        router.refresh();
+      }
     } catch (error) {
-      setPublishState("error");
+      setPublishState("failed");
       setPublishMessage(error instanceof Error ? error.message : "Error de red.");
     }
   }
@@ -438,6 +545,7 @@ export function DashboardConsole({
         status: data.draft.status,
       } : d));
       setEditMode(false);
+      router.refresh();
     } finally {
       setEditSaving(false);
     }
@@ -591,10 +699,12 @@ export function DashboardConsole({
         {metrics && (
           <section className="status-strip">
             <StatusCard label="Total" value={metrics.counts.totalDrafts} note="drafts en DB" onClick={() => setView("queue")} />
-            <StatusCard label="Pendientes" value={pendingReview.length} note="requieren criterio" tone="warn" onClick={() => setView("queue")} />
-            <StatusCard label="Aprobados" value={metrics.counts.approved} note="listos para publicar" onClick={() => setView("readiness")} />
+            <StatusCard label="Pendientes" value={metrics.counts.reviewRequired} note="requieren criterio" tone="warn" onClick={() => setView("queue")} />
+            <StatusCard label="Listos" value={metrics.counts.readyToPublish} note="listos para publicar" onClick={() => setView("readiness")} />
+            <StatusCard label="Por reconciliar" value={metrics.counts.reconciliationRequired} note="requieren verificacion" tone="warn" onClick={() => setView("queue")} />
+            <StatusCard label="Publicados" value={metrics.counts.published} note="en Meta" tone="ok" onClick={() => setView("calendar")} />
             <StatusCard label="Assets" value={metrics.counts.totalAssets} note="importados" tone="ok" onClick={() => setView("assets")} />
-            <StatusCard label="Proximo" value={nextTitle ?? nextDate} note={nextNote} onClick={() => setView("calendar")} />
+            <StatusCard label="Proximo" value={nextTitle} note={nextNote} onClick={() => setView("calendar")} />
           </section>
         )}
         {trial && !trial.trialActive && (
@@ -703,7 +813,7 @@ export function DashboardConsole({
               <div className="compact-queue">
                 {readyNow.map((item) => (
                   <button key={item.id} className="compact-row" onClick={() => { setSelectedId(item.id); setView("queue"); }}>
-                    <Thumb item={item} />
+                    <Thumb item={item} slug={tenantSlug} />
                     <span>
                       <small>{channelLabel(item)} / {item.scheduledFor}</small>
                       <strong>{item.title}</strong>
@@ -733,7 +843,7 @@ export function DashboardConsole({
                       <strong>{selected.format}</strong>
                     </div>
                     <div className="platform-media">
-                      <img src={assetUrl(selected.asset?.path)} alt={selected.title} />
+                      <img src={assetUrl(selected.asset?.path, tenantSlug)} alt={selected.title} />
                     </div>
                     <div className="platform-caption">
                       <strong>{metrics?.tenant.name ?? "Tenant"}</strong>
@@ -959,7 +1069,7 @@ export function DashboardConsole({
                       onClick={() => setSelectedId(item.id)}
                       style={{ width: "100%", textAlign: "left" }}
                     >
-                      <Thumb item={item} />
+                      <Thumb item={item} slug={tenantSlug} />
                       <span>
                         <small>{channelLabel(item)} / {item.scheduledFor}</small>
                         <strong>{item.title}</strong>
@@ -1015,9 +1125,9 @@ export function DashboardConsole({
                   </div>
                   <div className="platform-media">
                     {isVideoAsset(selected) ? (
-                      <video src={assetUrl(selected.asset?.path)} controls preload="metadata" />
+                      <video src={assetUrl(selected.asset?.path, tenantSlug)} controls preload="metadata" />
                     ) : (
-                      <img src={assetUrl(selected.asset?.path)} alt={selected.title} />
+                      <img src={assetUrl(selected.asset?.path, tenantSlug)} alt={selected.title} />
                     )}
                   </div>
                   <div className="platform-caption">
@@ -1063,7 +1173,7 @@ export function DashboardConsole({
                             }}
                           >
                             {asset.path ? (
-                              <img src={assetUrl(asset.path)} alt={asset.filename} style={{ width: 60, height: 60, objectFit: "cover", borderRadius: 3 }} />
+                              <img src={assetUrl(asset.path, tenantSlug)} alt={asset.filename} style={{ width: 60, height: 60, objectFit: "cover", borderRadius: 3 }} />
                             ) : (
                               <div style={{ width: 60, height: 60, display: "flex", alignItems: "center", justifyContent: "center", background: "var(--hc-bone)", borderRadius: 3 }}>
                                 <PackageSearch size={18} />
@@ -1130,7 +1240,17 @@ export function DashboardConsole({
                   </div>
                 )}
                 {!editMode && (selected.status === "DRAFT" || selected.status === "NEEDS_REVIEW" || selected.status === "REJECTED" ? (
-                  <ApprovalActions draftId={selected.id} onStatusChange={(s) => updateLocalStatus(selected.id, s)} />
+                  <ApprovalActions
+                    draftId={selected.id}
+                    onStatusChange={(patch) => {
+                      mergeLocalDraft(patch);
+                      setSelectedIdRaw(patch.id);
+                      setManualApproval(false);
+                      setPublishState("idle");
+                      setPublishMessage("");
+                      activeRequestRef.current = null;
+                    }}
+                  />
                 ) : (
                   <div className="approval-actions">
                     <span style={{ color: "var(--hc-fog)", fontSize: 12, padding: "8px 0" }}>
@@ -1239,9 +1359,9 @@ export function DashboardConsole({
                   <div className="market-card" key={asset.id}>
                     {asset.path ? (
                       asset.kind === "VIDEO" || asset.path.toLowerCase().endsWith(".mp4") ? (
-                        <video src={assetUrl(asset.path)} className="asset-tile" controls preload="metadata" />
+                        <video src={assetUrl(asset.path, tenantSlug)} className="asset-tile" controls preload="metadata" />
                       ) : (
-                        <img src={assetUrl(asset.path)} alt={asset.filename} className="asset-tile" />
+                        <img src={assetUrl(asset.path, tenantSlug)} alt={asset.filename} className="asset-tile" />
                       )
                     ) : (
                       <div className="asset-tile asset-empty"><PackageSearch size={22} /></div>
@@ -1343,7 +1463,7 @@ export function DashboardConsole({
                     >
                       <span>{item.scheduledFor ?? "Sin fecha"}</span>
                       <strong>{item.title}</strong>
-                      <small>{item.network} / {item.format} / {item.status}</small>
+                      <small>{item.network} / {item.format} / {calendarDisplayState(item)}</small>
                       <Risk level={item.riskLevel} />
                     </button>
                   ))}
@@ -1567,6 +1687,7 @@ export function DashboardConsole({
                   <select
                     value={publishMode}
                     onChange={(e) => setPublishMode(e.target.value as "dry_run" | "scheduled" | "immediate")}
+                    disabled={publishState === "loading"}
                     style={{ padding: "6px 10px", borderRadius: 6, border: "1px solid var(--hc-line)", fontSize: 13 }}
                   >
                     <option value="dry_run">Dry-run (validar, no publicar)</option>
@@ -1575,12 +1696,34 @@ export function DashboardConsole({
                   </select>
                 </label>
                 <div className="publish-gate">
+                  <label className="gate-check" style={{ marginBottom: 10, display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+                    <span style={{ fontSize: 13, color: "var(--hc-ink)" }}>Draft a publicar:</span>
+                    <select
+                      value={publishTarget?.id ?? ""}
+                      onChange={(e) => {
+                        setPublishDraftId(e.target.value);
+                        setManualApproval(false);
+                        setPublishState("idle");
+                        setPublishMessage("");
+                      }}
+                      disabled={publishState === "loading" || approvedDrafts.length === 0}
+                      style={{ padding: "6px 10px", borderRadius: 6, border: "1px solid var(--hc-line)", fontSize: 13, maxWidth: 320 }}
+                    >
+                      {approvedDrafts.length === 0 && <option value="">Sin drafts aprobados</option>}
+                      {approvedDrafts.map((draft) => (
+                        <option key={draft.id} value={draft.id}>
+                          {draft.title} — {NETWORK_LABELS[draft.network] ?? draft.network}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
                   {tenantNeedsManual && (
                     <label className="gate-check">
                       <input
                         type="checkbox"
                         checked={manualApproval}
                         onChange={(event) => setManualApproval(event.target.checked)}
+                        disabled={publishState === "loading"}
                       />
                       Manuel aprueba ejecutar este {publishMode === "immediate" ? "intento de publicacion real" : publishMode === "scheduled" ? "intento de programacion" : "dry-run controlado"}.
                     </label>
@@ -1591,6 +1734,7 @@ export function DashboardConsole({
                         type="checkbox"
                         checked={manualApproval}
                         onChange={(event) => setManualApproval(event.target.checked)}
+                        disabled={publishState === "loading"}
                       />
                       Confirmo que quiero publicar en redes reales. Esta accion no es reversible.
                     </label>
@@ -1598,7 +1742,7 @@ export function DashboardConsole({
                   <button
                     className="primary-action"
                     onClick={handlePublish}
-                    disabled={publishState === "loading" || !firstApproved}
+                    disabled={publishState === "loading" || !publishTarget}
                   >
                     <LockKeyhole size={16} />
                     {publishState === "loading"
@@ -1609,13 +1753,21 @@ export function DashboardConsole({
                           ? "Programar publicacion"
                           : "Ejecutar dry-run"}
                   </button>
-                  <small>
-                    {firstApproved
-                      ? `Siguiente draft aprobado: ${firstApproved.title}`
-                      : "No hay drafts aprobados para ejecutar."}
-                  </small>
+                  {publishTarget && (
+                    <small style={{ marginTop: 6, display: "block" }}>
+                      Draft seleccionado: <strong>{publishTarget.title}</strong> ({publishTarget.id})<br />
+                      Red: {NETWORK_LABELS[publishTarget.network] ?? publishTarget.network} · Estado: {publishTarget.status} · Modo: {publishMode}
+                    </small>
+                  )}
+                  {!publishTarget && (
+                    <small style={{ color: "var(--hc-sand)", display: "block", marginTop: 6 }}>
+                      {approvedDrafts.length === 0
+                        ? "No hay drafts APPROVED disponibles para publicar."
+                        : "Selecciona un draft aprobado arriba."}
+                    </small>
+                  )}
                   {publishMessage && (
-                    <p className={publishState === "error" ? "login-error" : "publish-ok"}>
+                    <p className={publishState === "failed" || publishState === "blocked" || publishState === "reconciliation_required" ? "login-error" : "publish-ok"}>
                       {publishMessage}
                     </p>
                   )}
@@ -1674,7 +1826,7 @@ function ApprovalActions({
   onStatusChange,
 }: {
   draftId: string;
-  onStatusChange: (status: string) => void;
+  onStatusChange: (draft: DraftQueuePatch) => void;
 }) {
   const [loading, setLoading] = useState<"approve" | "reject" | null>(null);
 
@@ -1683,7 +1835,7 @@ function ApprovalActions({
     try {
       const res = await fetch(`/api/drafts/${draftId}/approve`, { method: "POST" });
       const data = await res.json();
-      if (data.ok) onStatusChange("APPROVED");
+      if (data.ok) onStatusChange(data.draft ?? { id: draftId, status: "APPROVED", requiresReview: false });
       else alert(data.error || "Error");
     } finally {
       setLoading(null);
@@ -1695,7 +1847,7 @@ function ApprovalActions({
     try {
       const res = await fetch(`/api/drafts/${draftId}/reject`, { method: "POST" });
       const data = await res.json();
-      if (data.ok) onStatusChange("REJECTED");
+      if (data.ok) onStatusChange(data.draft ?? { id: draftId, status: "REJECTED" });
       else alert(data.error || "Error");
     } finally {
       setLoading(null);

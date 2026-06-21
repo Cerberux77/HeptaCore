@@ -1,6 +1,42 @@
 import { cache } from "react";
 import { prisma } from "./prisma";
 import { getTrialStatus, type TrialStatus } from "./trial";
+import { projectDraftOperationalState, type DraftOperationalState } from "./draft-operational-state";
+
+export interface OperCounts {
+  total: number; draft: number; reviewRequired: number; readyToPublish: number;
+  reconciliationRequired: number; scheduled: number; published: number;
+  failed: number; rejected: number; assets: number;
+}
+
+export interface TenantOperationalSnapshot {
+  drafts: DraftQueueItem[];
+  counts: OperCounts;
+  nextScheduled: DraftQueueItem | null;
+  byNetwork: Record<string, number>;
+}
+
+export type DraftQueueItem = {
+  id: string;
+  title: string;
+  caption: string;
+  network: string;
+  format: string;
+  pillar: string | null;
+  status: string;
+  operationalState?: DraftOperationalState;
+  publishBlockedReason?: string;
+  duplicateIncident?: boolean;
+  externalPostId?: string | null;
+  riskLevel: string;
+  requiresReview: boolean;
+  scheduledFor: string | null;
+  hashtags: string[];
+  cta: string | null;
+  source: string | null;
+  publishEligibility?: "READY" | "RECONCILIATION_REQUIRED" | "PUBLISHED" | "NOT_APPROVED";
+  asset: { filename: string; path: string | null; kind: string } | null;
+};
 
 export type DashboardMetrics = {
   tenant: {
@@ -14,11 +50,13 @@ export type DashboardMetrics = {
   counts: {
     totalDrafts: number;
     drafts: number;
-    approved: number;
-    needsReview: number;
+    reviewRequired: number;
+    readyToPublish: number;
+    reconciliationRequired: number;
     scheduled: number;
     published: number;
     failed: number;
+    rejected: number;
     totalAssets: number;
   };
   nextUp: Array<{
@@ -34,22 +72,7 @@ export type DashboardMetrics = {
   pillars: Array<{ name: string; count: number }>;
 };
 
-export type DraftQueueItem = {
-  id: string;
-  title: string;
-  caption: string;
-  network: string;
-  format: string;
-  pillar: string | null;
-  status: string;
-  riskLevel: string;
-  requiresReview: boolean;
-  scheduledFor: string | null;
-  hashtags: string[];
-  cta: string | null;
-  source: string | null;
-  asset: { filename: string; path: string | null; kind: string } | null;
-};
+import { isDraftActuallyPublishable } from "./publishing-execution";
 
 export type TenantAssetItem = {
   id: string;
@@ -75,6 +98,8 @@ export type CalendarItem = {
   status: string;
   scheduledFor: string | null;
   riskLevel: string;
+  operationalState?: DraftOperationalState;
+  publishBlockedReason?: string;
 };
 
 export type AdminDashboardData = {
@@ -169,111 +194,104 @@ const NETWORK_REQUIREMENTS: Record<string, NetworkReadinessItem["requirements"]>
   },
 };
 
-const DEFAULT_TURPIAL_NETWORKS = ["INSTAGRAM", "FACEBOOK", "YOUTUBE", "TIKTOK", "LINKEDIN"];
+const DEFAULT_TURPIAL_NETWORKS = ["INSTAGRAM", "FACEBOOK", "YOUTUBE", "TIKTOK", "LINKEDIN"] as const;
 
-function normalizeNetworkList(value: unknown, fallback: string[] = []) {
-  if (!Array.isArray(value)) return fallback;
-  return value
-    .map((network) => String(network).toUpperCase())
-    .filter((network, index, arr) => Object.hasOwn(NETWORK_REQUIREMENTS, network) && arr.indexOf(network) === index);
+function normalizeNetworkList(
+  channels: unknown,
+  fallback: readonly string[],
+): string[] {
+  if (Array.isArray(channels)) {
+    const cleaned = channels.map((c: string) => c.toUpperCase()).filter((c: string) => SUPPORTED_NETWORKS.includes(c));
+    if (cleaned.length > 0) return cleaned;
+  }
+  if (Array.isArray(fallback)) return fallback.filter((f) => true) as string[];
+  return [];
 }
+
+const SUPPORTED_NETWORKS = ["INSTAGRAM", "FACEBOOK", "YOUTUBE", "TIKTOK", "LINKEDIN", "X"] as string[];
+
+function emptyCounts(): OperCounts {
+  return { total: 0, draft: 0, reviewRequired: 0, readyToPublish: 0, reconciliationRequired: 0, scheduled: 0, published: 0, failed: 0, rejected: 0, assets: 0 };
+}
+
+export async function getTenantOperationalSnapshot(tenantSlug: string): Promise<TenantOperationalSnapshot> {
+  const tenant = await prisma.tenant.findFirst({ where: { slug: tenantSlug }, select: { id: true } });
+  if (!tenant) return { drafts: [], counts: emptyCounts(), nextScheduled: null, byNetwork: {} };
+
+  const assets = await prisma.asset.findMany({ where: { tenantId: tenant.id }, select: { id: true } });
+  const drafts = await prisma.contentDraft.findMany({
+    where: { tenantId: tenant.id },
+    orderBy: { scheduledFor: "asc" },
+    select: { id: true, title: true, caption: true, network: true, format: true, pillar: true, status: true, externalPostId: true, riskLevel: true, requiresReview: true, scheduledFor: true, hashtags: true, cta: true, source: true, assets: { take: 1, select: { asset: { select: { filename: true, sourcePath: true, kind: true } } } } },
+  });
+
+  const draftIds = drafts.map((d) => d.id);
+  const allJobs = await prisma.publishingJob.findMany({
+    where: { postId: { in: draftIds } },
+    select: { id: true, postId: true, status: true, provider: true, attempts: true, scheduledFor: true, lastError: true, PublishingResult: { select: { ok: true, externalPostId: true } } },
+  });
+
+  const jobsByDraftId = new Map<string, typeof allJobs>();
+  for (const job of allJobs) { const key = job.postId!; if (!jobsByDraftId.has(key)) jobsByDraftId.set(key, []); jobsByDraftId.get(key)!.push(job); }
+
+  const now = new Date();
+  const counts = emptyCounts();
+  counts.assets = assets.length;
+  const byNetwork: Record<string, number> = {};
+
+  const projectedDrafts: DraftQueueItem[] = drafts.map((d) => {
+    const jobs = jobsByDraftId.get(d.id) ?? [];
+    const p = projectDraftOperationalState({ id: d.id, status: d.status, externalPostId: d.externalPostId, network: d.network, requiresReview: d.requiresReview, riskLevel: d.riskLevel, scheduledFor: d.scheduledFor }, jobs, now);
+    counts.total++;
+    if (p.operationalState === "DRAFT") counts.draft++;
+    else if (p.operationalState === "REVIEW_REQUIRED") counts.reviewRequired++;
+    else if (p.operationalState === "READY_TO_PUBLISH") counts.readyToPublish++;
+    else if (p.operationalState === "RECONCILIATION_REQUIRED") counts.reconciliationRequired++;
+    else if (p.operationalState === "SCHEDULED") counts.scheduled++;
+    else if (p.operationalState === "PUBLISHED") counts.published++;
+    else if (p.operationalState === "FAILED") counts.failed++;
+    else if (p.operationalState === "REJECTED") counts.rejected++;
+    const nw = NETWORK_LABELS[d.network] ?? d.network;
+    byNetwork[nw] = (byNetwork[nw] ?? 0) + 1;
+    return { id: d.id, title: d.title, caption: d.caption, network: d.network, format: d.format, pillar: d.pillar, status: d.status, operationalState: p.operationalState, publishBlockedReason: p.blockedReason, duplicateIncident: p.duplicateIncident, externalPostId: p.externalPostId, riskLevel: d.riskLevel, requiresReview: d.requiresReview, scheduledFor: d.scheduledFor?.toISOString().slice(0, 16).replace("T", " ") ?? null, hashtags: d.hashtags, cta: d.cta, source: d.source, asset: d.assets[0]?.asset ? { filename: d.assets[0].asset.filename, path: d.assets[0].asset.sourcePath, kind: d.assets[0].asset.kind } : null };
+  });
+
+  const nextScheduled = projectedDrafts.find((d) => d.operationalState === "SCHEDULED" && d.scheduledFor && new Date(d.scheduledFor) > now) ?? null;
+
+  return { drafts: projectedDrafts, counts, nextScheduled, byNetwork };
+}
+
+const NETWORK_LABELS: Record<string, string> = { INSTAGRAM: "Instagram", FACEBOOK: "Facebook", YOUTUBE: "YouTube", TIKTOK: "TikTok", LINKEDIN: "LinkedIn" };
 
 export const getDashboardMetrics = cache(
   async (tenantSlug: string): Promise<DashboardMetrics | null> => {
-    const tenant = await prisma.tenant.findFirst({
-      where: { slug: tenantSlug },
-    });
+    const tenant = await prisma.tenant.findFirst({ where: { slug: tenantSlug } });
     if (!tenant) return null;
+
+    const snapshot = await getTenantOperationalSnapshot(tenantSlug);
+    const { counts } = snapshot;
 
     const defaultNetworks = tenantSlug === "turpial-sound" ? DEFAULT_TURPIAL_NETWORKS : [];
 
     const [profileNetworks, accounts] = await Promise.all([
-      prisma.brandProfile.findFirst({
-        where: { tenantId: tenant.id },
-        select: { socialChannels: true },
-      }),
-      prisma.socialAccount.findMany({
-        where: { tenantId: tenant.id },
-        select: { network: true },
-      }),
+      prisma.brandProfile.findFirst({ where: { tenantId: tenant.id }, select: { socialChannels: true } }),
+      prisma.socialAccount.findMany({ where: { tenantId: tenant.id }, select: { network: true } }),
     ]);
     const activeNetworks = normalizeNetworkList(
       profileNetworks?.socialChannels,
-      accounts.length ? accounts.map((account) => account.network) : defaultNetworks,
+      accounts.length ? accounts.map((a) => a.network) : defaultNetworks,
     );
 
-    const [
-      totalDrafts,
-      drafts,
-      approved,
-      needsReview,
-      scheduled,
-      published,
-      failed,
-      totalAssets,
-      nextUp,
-      pillars,
-    ] = await Promise.all([
-      prisma.contentDraft.count({ where: { tenantId: tenant.id } }),
-      prisma.contentDraft.count({ where: { tenantId: tenant.id, status: "DRAFT" } }),
-      prisma.contentDraft.count({ where: { tenantId: tenant.id, status: "APPROVED" } }),
-      prisma.contentDraft.count({ where: { tenantId: tenant.id, status: "NEEDS_REVIEW" } }),
-      prisma.contentDraft.count({ where: { tenantId: tenant.id, status: "SCHEDULED" } }),
-      prisma.contentDraft.count({ where: { tenantId: tenant.id, status: "PUBLISHED" } }),
-      prisma.contentDraft.count({ where: { tenantId: tenant.id, status: "FAILED" } }),
-      prisma.asset.count({ where: { tenantId: tenant.id } }),
-      prisma.contentDraft.findMany({
-        where: { tenantId: tenant.id, status: { in: ["DRAFT", "APPROVED", "SCHEDULED"] } },
-        orderBy: { scheduledFor: "asc" },
-        take: 10,
-        select: {
-          id: true,
-          title: true,
-          network: true,
-          format: true,
-          status: true,
-          riskLevel: true,
-          scheduledFor: true,
-          assets: { take: 1, select: { asset: { select: { sourcePath: true } } } },
-        },
-      }),
-      prisma.contentDraft.groupBy({
-        by: ["pillar"],
-        where: { tenantId: tenant.id, pillar: { not: null } },
-        _count: true,
-        orderBy: { _count: { pillar: "desc" } },
-      }),
+    const [pillars] = await Promise.all([
+      prisma.contentDraft.groupBy({ by: ["pillar"], where: { tenantId: tenant.id, pillar: { not: null } }, _count: true, orderBy: { _count: { pillar: "desc" } } }),
     ]);
 
+    const nextUp = snapshot.nextScheduled ? [snapshot.nextScheduled] : [];
+
     return {
-      tenant: {
-        id: tenant.id,
-        slug: tenant.slug,
-        name: tenant.name,
-        plan: tenant.plan,
-        mode: tenant.automationMode,
-        activeNetworks,
-      },
-      counts: {
-        totalDrafts,
-        drafts,
-        approved,
-        needsReview,
-        scheduled,
-        published,
-        failed,
-        totalAssets,
-      },
-      nextUp: nextUp.map((d) => ({
-        id: d.id,
-        title: d.title,
-        network: d.network,
-        format: d.format,
-        status: d.status,
-        riskLevel: d.riskLevel,
-        scheduledFor: d.scheduledFor?.toISOString().slice(0, 16).replace("T", " ") ?? null,
-        assetPath: d.assets[0]?.asset.sourcePath ?? null,
-      })),
+      tenant: { id: tenant.id, slug: tenant.slug, name: tenant.name, plan: tenant.plan, mode: tenant.automationMode, activeNetworks },
+      counts: { totalDrafts: counts.total, drafts: counts.draft, reviewRequired: counts.reviewRequired, readyToPublish: counts.readyToPublish, reconciliationRequired: counts.reconciliationRequired, scheduled: counts.scheduled, published: counts.published, failed: counts.failed, rejected: counts.rejected, totalAssets: counts.assets },
+      nextUp: nextUp.map((d) => ({ id: d.id, title: d.title, network: d.network, format: d.format, status: d.status, riskLevel: d.riskLevel, scheduledFor: d.scheduledFor ?? null, assetPath: d.asset?.path ?? null })),
       pillars: pillars.map((p) => ({ name: p.pillar!, count: p._count })),
     };
   },
@@ -366,18 +384,34 @@ export async function getContentCalendar(tenantSlug: string): Promise<CalendarIt
       status: true,
       scheduledFor: true,
       riskLevel: true,
+      externalPostId: true,
     },
   });
 
-  return drafts.map((draft) => ({
-    id: draft.id,
-    title: draft.title,
-    network: draft.network,
-    format: draft.format,
-    status: draft.status,
-    scheduledFor: draft.scheduledFor?.toISOString().slice(0, 16).replace("T", " ") ?? null,
-    riskLevel: draft.riskLevel,
-  }));
+  const draftIds = drafts.map((d) => d.id);
+  const jobs = await prisma.publishingJob.findMany({
+    where: { postId: { in: draftIds } },
+    select: { postId: true, status: true, PublishingResult: { select: { ok: true, externalPostId: true } } },
+  });
+  const jobsByDraftId = new Map<string, typeof jobs>();
+  for (const j of jobs) { const k = j.postId!; if (!jobsByDraftId.has(k)) jobsByDraftId.set(k, []); jobsByDraftId.get(k)!.push(j); }
+
+  const now = new Date();
+  return drafts.map((draft) => {
+    const j = jobsByDraftId.get(draft.id) ?? [];
+    const p = projectDraftOperationalState({ id: draft.id, status: draft.status, externalPostId: draft.externalPostId, network: draft.network }, j, now);
+    return {
+      id: draft.id,
+      title: draft.title,
+      network: draft.network,
+      format: draft.format,
+      status: draft.status,
+      scheduledFor: draft.scheduledFor?.toISOString().slice(0, 16).replace("T", " ") ?? null,
+      riskLevel: draft.riskLevel,
+      operationalState: p.operationalState,
+      publishBlockedReason: p.blockedReason,
+    };
+  });
 }
 
 export const getDraftQueue = cache(
@@ -399,6 +433,7 @@ export const getDraftQueue = cache(
         format: true,
         pillar: true,
         status: true,
+        externalPostId: true,
         riskLevel: true,
         requiresReview: true,
         scheduledFor: true,
@@ -409,28 +444,73 @@ export const getDraftQueue = cache(
       },
     });
 
-    return drafts.map((d) => ({
-      id: d.id,
-      title: d.title,
-      caption: d.caption,
-      network: d.network,
-      format: d.format,
-      pillar: d.pillar,
-      status: d.status,
-      riskLevel: d.riskLevel,
-      requiresReview: d.requiresReview,
-      scheduledFor: d.scheduledFor?.toISOString().slice(0, 16).replace("T", " ") ?? null,
-      hashtags: d.hashtags,
-      cta: d.cta,
-      source: d.source,
-      asset: d.assets[0]?.asset
-        ? {
-            filename: d.assets[0].asset.filename,
-            path: d.assets[0].asset.sourcePath,
-            kind: d.assets[0].asset.kind,
-          }
-        : null,
-    }));
+    const draftIds = drafts.map((d) => d.id);
+
+    const activeJobs = await prisma.publishingJob.findMany({
+      where: { postId: { in: draftIds } },
+      select: {
+        id: true,
+        postId: true,
+        status: true,
+        provider: true,
+        attempts: true,
+        scheduledFor: true,
+        lastError: true,
+        PublishingResult: { select: { ok: true, externalPostId: true } },
+      },
+    });
+
+    const jobsByDraftId = new Map<string, typeof activeJobs>();
+    for (const job of activeJobs) {
+      const key = job.postId!;
+      if (!jobsByDraftId.has(key)) jobsByDraftId.set(key, []);
+      jobsByDraftId.get(key)!.push(job);
+    }
+
+    const now = new Date();
+
+    return drafts.map((d) => {
+      const jobs = jobsByDraftId.get(d.id) ?? [];
+      const projection = projectDraftOperationalState(
+        { id: d.id, status: d.status, externalPostId: d.externalPostId, network: d.network, requiresReview: d.requiresReview, riskLevel: d.riskLevel, scheduledFor: d.scheduledFor },
+        jobs,
+        now,
+      );
+
+      const eligibility = isDraftActuallyPublishable({
+        draftStatus: d.status,
+        draftExternalPostId: d.externalPostId,
+        hasInReviewJob: jobs.some((j) => j.status === "IN_REVIEW"),
+        hasPublishedJob: jobs.some((j) => j.status === "PUBLISHED"),
+        hasPublishedResult: jobs.some((j) => j.PublishingResult?.ok === true),
+        hasResultExternalPostId: jobs.some((j) => !!j.PublishingResult?.externalPostId),
+      });
+
+      return {
+        id: d.id,
+        title: d.title,
+        caption: d.caption,
+        network: d.network,
+        format: d.format,
+        pillar: d.pillar,
+        status: d.status,
+        operationalState: projection.operationalState,
+        publishBlockedReason: projection.blockedReason ?? eligibility.blockedReason,
+        duplicateIncident: projection.duplicateIncident,
+        externalPostId: projection.externalPostId,
+        publishEligibility: eligibility.eligibility,
+        riskLevel: d.riskLevel,
+        requiresReview: d.requiresReview,
+        scheduledFor: d.scheduledFor?.toISOString().slice(0, 16).replace("T", " ") ?? null,
+        hashtags: d.hashtags,
+        cta: d.cta,
+        source: d.source,
+        asset: d.assets[0]?.asset
+          ? { filename: d.assets[0].asset.filename, path: d.assets[0].asset.sourcePath, kind: d.assets[0].asset.kind }
+          : null,
+      };
+    });
+
   },
 );
 
@@ -441,12 +521,12 @@ export async function getChecklist(tenantSlug: string) {
   });
   if (!tenant) return [];
 
-  const [project, profile, accounts, credentials, minDrafts, scheduledCount, assetCount] = await Promise.all([
+  const snapshot = await getTenantOperationalSnapshot(tenantSlug);
+  const [project, profile, accounts, credentials, scheduledCount, assetCount] = await Promise.all([
     prisma.project.findFirst({ where: { tenantId: tenant.id } }),
     prisma.brandProfile.findFirst({ where: { tenantId: tenant.id } }),
     prisma.socialAccount.findMany({ where: { tenantId: tenant.id }, select: { network: true } }),
     prisma.credentialVaultItem.findMany({ where: { tenantId: tenant.id }, select: { provider: true } }),
-    prisma.contentDraft.count({ where: { tenantId: tenant.id, status: "APPROVED" } }),
     prisma.contentDraft.count({ where: { tenantId: tenant.id, scheduledFor: { not: null } } }),
     prisma.asset.count({ where: { tenantId: tenant.id } }),
   ]);
@@ -461,11 +541,11 @@ export async function getChecklist(tenantSlug: string) {
     { label: "Proyecto definido", done: !!project },
     { label: `Redes seleccionadas: ${selectedNetworks.join(", ") || "pendiente"}`, done: selectedNetworks.length > 0 },
     { label: "Cuentas sociales configuradas para redes seleccionadas", done: selectedNetworks.every((network) => accounts.some((account) => account.network === network)) },
-    { label: "Al menos 1 draft aprobado", done: minDrafts > 0 },
+    { label: "Al menos 1 draft listo para publicar", done: snapshot.counts.readyToPublish > 0 },
     { label: "Credenciales OAuth configuradas por red a publicar en real", done: selectedNetworks.every((network) => credentialProviders.has(network)) },
     { label: "Voz de marca y CTA definidos", done: !!profile?.toneOfVoice },
     { label: `Assets cargados (${assetCount})`, done: assetCount > 0 },
-    { label: `Ventanas horarias configuradas (${scheduledCount})`, done: scheduledCount > 0 },
+    { label: `Publicaciones programadas (${snapshot.counts.scheduled})`, done: snapshot.counts.scheduled > 0 },
   ];
 }
 
@@ -473,26 +553,29 @@ export async function getReportData(tenantSlug: string) {
   const tenant = await prisma.tenant.findFirst({ where: { slug: tenantSlug }, select: { id: true, name: true } });
   if (!tenant) return null;
 
-  const [total, byStatus, byNetwork, needsReview, pendingAssets, recentActivity] = await Promise.all([
-    prisma.contentDraft.count({ where: { tenantId: tenant.id } }),
-    prisma.contentDraft.groupBy({ by: ["status"], where: { tenantId: tenant.id }, _count: true }),
-    prisma.contentDraft.groupBy({ by: ["network"], where: { tenantId: tenant.id }, _count: true }),
-    prisma.contentDraft.count({ where: { tenantId: tenant.id, OR: [{ requiresReview: true }, { riskLevel: { not: "low" } }] } }),
+  const snapshot = await getTenantOperationalSnapshot(tenantSlug);
+  const { counts, byNetwork } = snapshot;
+
+  const [pendingAssets, recentActivity] = await Promise.all([
     prisma.contentDraft.count({ where: { tenantId: tenant.id, assets: { none: {} } } }),
-    prisma.auditLog.findMany({
-      where: { tenantId: tenant.id },
-      orderBy: { createdAt: "desc" },
-      take: 20,
-      select: { action: true, target: true, createdAt: true },
-    }),
+    prisma.auditLog.findMany({ where: { tenantId: tenant.id }, orderBy: { createdAt: "desc" }, take: 20, select: { action: true, target: true, createdAt: true } }),
   ]);
 
   return {
     tenantName: tenant.name,
-    total,
-    byStatus: byStatus.map((s) => ({ status: s.status, count: s._count })),
-    byNetwork: byNetwork.map((n) => ({ network: n.network, count: n._count })),
-    needsReview,
+    total: counts.total,
+    byStatus: [
+      { status: "DRAFT", count: counts.draft },
+      { status: "REVIEW_REQUIRED", count: counts.reviewRequired },
+      { status: "READY_TO_PUBLISH", count: counts.readyToPublish },
+      { status: "RECONCILIATION_REQUIRED", count: counts.reconciliationRequired },
+      { status: "SCHEDULED", count: counts.scheduled },
+      { status: "PUBLISHED", count: counts.published },
+      { status: "FAILED", count: counts.failed },
+      { status: "REJECTED", count: counts.rejected },
+    ],
+    byNetwork: Object.entries(byNetwork).map(([network, count]) => ({ network, count })),
+    needsReview: counts.reviewRequired,
     pendingAssets,
     recentActivity: recentActivity.map((a) => ({
       action: a.action,
@@ -503,40 +586,33 @@ export async function getReportData(tenantSlug: string) {
 }
 
 export async function getReadinessReport(tenantSlug: string) {
-  const tenant = await prisma.tenant.findFirst({
-    where: { slug: tenantSlug },
-    select: { id: true, name: true },
-  });
+  const tenant = await prisma.tenant.findFirst({ where: { slug: tenantSlug }, select: { id: true, name: true } });
   if (!tenant) return null;
 
-  const [approved, scheduled, published, credentials, assetsLinked, profile, accounts, draftsByNetwork, assetsByNetwork] = await Promise.all([
-    prisma.contentDraft.count({ where: { tenantId: tenant.id, status: "APPROVED" } }),
-    prisma.contentDraft.count({ where: { tenantId: tenant.id, status: "SCHEDULED" } }),
-    prisma.contentDraft.count({ where: { tenantId: tenant.id, status: "PUBLISHED" } }),
+  const snapshot = await getTenantOperationalSnapshot(tenantSlug);
+  const readyDrafts = snapshot.drafts.filter((d) => d.operationalState === "READY_TO_PUBLISH");
+  const readyByNetwork = new Map<string, number>();
+  for (const d of readyDrafts) readyByNetwork.set(d.network, (readyByNetwork.get(d.network) ?? 0) + 1);
+
+  const [credentials, assetsLinked, profile, accounts, assetDraftsByNetwork] = await Promise.all([
     prisma.credentialVaultItem.findMany({ where: { tenantId: tenant.id }, select: { provider: true } }),
-    prisma.contentDraft.count({ where: { tenantId: tenant.id, status: "APPROVED", assets: { some: {} } } }),
+    snapshot.counts.readyToPublish,
     prisma.brandProfile.findFirst({ where: { tenantId: tenant.id }, select: { socialChannels: true } }),
     prisma.socialAccount.findMany({ where: { tenantId: tenant.id }, select: { network: true, status: true } }),
-    prisma.contentDraft.groupBy({ by: ["network"], where: { tenantId: tenant.id, status: "APPROVED" }, _count: true }),
     prisma.contentDraft.groupBy({ by: ["network"], where: { tenantId: tenant.id, assets: { some: {} } }, _count: true }),
   ]);
 
-  const selectedNetworks = normalizeNetworkList(
-    profile?.socialChannels,
-    accounts.length ? accounts.map((account) => account.network) : tenantSlug === "turpial-sound" ? DEFAULT_TURPIAL_NETWORKS : [],
-  );
-  const credentialProviders = new Set(credentials.map((item) => item.provider.toUpperCase()));
-  const approvedByNetwork = new Map<string, number>(draftsByNetwork.map((item) => [String(item.network), item._count]));
-  const assetDraftsByNetwork = new Map<string, number>(assetsByNetwork.map((item) => [String(item.network), item._count]));
+  const selectedNetworks = normalizeNetworkList(profile?.socialChannels, accounts.length ? accounts.map((a) => a.network) : tenantSlug === "turpial-sound" ? DEFAULT_TURPIAL_NETWORKS : []);
+  const credentialProviders = new Set(credentials.map((i) => i.provider.toUpperCase()));
+  const assetDraftsMap = new Map<string, number>(assetDraftsByNetwork.map((i) => [String(i.network), i._count]));
   const networkReadiness: NetworkReadinessItem[] = selectedNetworks.map((network) => {
-    const account = accounts.find((item) => item.network === network);
+    const account = accounts.find((i) => i.network === network);
     const accountReady = !!account;
     const authReady = credentialProviders.has(network);
-    const approvedDrafts = approvedByNetwork.get(network) ?? 0;
-    const assetsReady = (assetDraftsByNetwork.get(network) ?? 0) > 0;
+    const approvedDrafts = readyByNetwork.get(network) ?? 0;
+    const assetsReady = (assetDraftsMap.get(network) ?? 0) > 0;
     const liveReady = accountReady && authReady && assetsReady && approvedDrafts > 0;
-    const action = !accountReady
-      ? `Configurar cuenta ${network}`
+    const action = !accountReady ? `Configurar cuenta ${network}`
       : !authReady
         ? `Conectar credenciales ${network}`
         : !assetsReady
@@ -558,17 +634,17 @@ export async function getReadinessReport(tenantSlug: string) {
   });
 
   const gates = [
-    { label: "Al menos 1 draft aprobado", passed: approved > 0 },
+    { label: "Al menos 1 draft listo para publicar", passed: snapshot.counts.readyToPublish > 0 },
     { label: "Draft aprobado con asset vinculado", passed: assetsLinked > 0 },
     { label: "Redes seleccionadas en estrategia del tenant", passed: selectedNetworks.length > 0 },
     { label: "Dry-run disponible para todas las redes seleccionadas", passed: selectedNetworks.length > 0 },
-    { label: "Credenciales por red para publicacion real", passed: networkReadiness.some((network) => network.authReady) },
+    { label: "Credenciales por red para publicacion real", passed: networkReadiness.some((n: NetworkReadinessItem) => n.authReady) },
     { label: "Sin credenciales reales en git", passed: true },
     { label: "Approval queue funcional", passed: true },
     { label: "Dry-run ejecutable desde la web", passed: true },
   ];
 
-  const allPassed = approved > 0 && assetsLinked > 0 && selectedNetworks.length > 0;
+  const allPassed = snapshot.counts.readyToPublish > 0 && assetsLinked > 0 && selectedNetworks.length > 0;
   const livePublishingReady = networkReadiness.some((network) => network.liveReady);
 
   return {
@@ -578,8 +654,8 @@ export async function getReadinessReport(tenantSlug: string) {
     dryRunReady: allPassed,
     livePublishingReady,
     networks: networkReadiness,
-    approvedDrafts: approved,
-    scheduledDrafts: scheduled,
+    approvedDrafts: snapshot.counts.readyToPublish,
+    scheduledDrafts: snapshot.counts.scheduled,
     credentialCount: credentials.length,
     summary: allPassed
       ? livePublishingReady
