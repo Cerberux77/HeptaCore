@@ -57,6 +57,16 @@ import {
   type MultiformatDryRunResult,
   type PublishingFormat,
 } from "../lib/publishing-formats";
+import { extractAssetMetadataFromFile, normalizeTechnicalAssetMetadata } from "../lib/asset-metadata";
+import {
+  ASSET_COMPATIBILITY_CONFIGS,
+  ASSET_COMPATIBILITY_TARGETS,
+  compatibilityTargetFromPublishingFormat,
+  evaluateAssetCompatibility,
+  type AssetCompatibilityInput,
+  type AssetCompatibilityStatus,
+  type AssetCompatibilityTarget,
+} from "../lib/asset-compatibility";
 
 type View = "overview" | "strategy" | "queue" | "assets" | "calendar" | "checklist" | "reports" | "readiness";
 type CalendarView = "list" | "week" | "month";
@@ -119,6 +129,52 @@ function isVideoPath(path?: string | null, kind?: string | null, mimeType?: stri
 
 function assetLabel(asset: DraftFormatAsset) {
   return asset.filename ?? asset.id;
+}
+
+function formatBytes(value?: number | null) {
+  if (!value) return "tamano pendiente";
+  if (value >= 1024 * 1024) return `${(value / 1024 / 1024).toFixed(value >= 10 * 1024 * 1024 ? 0 : 1)} MB`;
+  return `${Math.max(1, Math.round(value / 1024))} KB`;
+}
+
+function formatDuration(value?: number | null) {
+  if (value == null) return null;
+  const seconds = Math.round(value);
+  const minutes = Math.floor(seconds / 60);
+  const rest = seconds % 60;
+  return minutes > 0 ? `${minutes}:${String(rest).padStart(2, "0")}` : `${seconds}s`;
+}
+
+function aspectRatioText(value: unknown) {
+  if (value && typeof value === "object" && !Array.isArray(value)) {
+    const ratio = value as { label?: unknown; value?: unknown };
+    if (typeof ratio.label === "string") return ratio.label;
+    if (typeof ratio.value === "number") return ratio.value.toFixed(2);
+  }
+  if (typeof value === "number") return value.toFixed(2);
+  if (typeof value === "string" && value.trim()) return value;
+  return "Sin analizar";
+}
+
+function assetCompatibilityInput(asset: TenantAssetItem | DraftFormatAsset): AssetCompatibilityInput {
+  return {
+    kind: asset.kind ?? null,
+    mimeType: asset.mimeType ?? null,
+    width: asset.width ?? null,
+    height: asset.height ?? null,
+    sizeBytes: asset.sizeBytes ?? null,
+    durationSeconds: asset.durationSeconds ?? null,
+    orientation: "orientation" in asset ? asset.orientation as any : null,
+    aspectRatio: ("aspectRatio" in asset ? asset.aspectRatio : null) as AssetCompatibilityInput["aspectRatio"],
+    metadata: "metadata" in asset ? asset.metadata ?? null : null,
+  };
+}
+
+function compatibilityLabel(status: AssetCompatibilityStatus) {
+  if (status === "IDEAL") return "Ideal";
+  if (status === "USABLE") return "Usable";
+  if (status === "INCOMPATIBLE") return "No compatible";
+  return "Sin analizar";
 }
 
 function Thumb({ item, slug }: { item: DraftQueueItem; slug: string }) {
@@ -388,10 +444,14 @@ export function DashboardConsole({
   const [localAssets, setLocalAssets] = useState<TenantAssetItem[]>(assets);
   const [assetKindFilter, setAssetKindFilter] = useState("ALL");
   const [assetFolderFilter, setAssetFolderFilter] = useState("ALL");
+  const [assetOrientationFilter, setAssetOrientationFilter] = useState("ALL");
+  const [assetTargetFilter, setAssetTargetFilter] = useState<AssetCompatibilityTarget | "ALL">("ALL");
+  const [assetCompatibilityFilter, setAssetCompatibilityFilter] = useState<AssetCompatibilityStatus | "ALL">("ALL");
   const [movingAssetId, setMovingAssetId] = useState("");
   const [moveFolder, setMoveFolder] = useState("");
   const [replaceAssetId, setReplaceAssetId] = useState("");
   const [deletingAssetId, setDeletingAssetId] = useState("");
+  const analyzedAssetIdsRef = useRef<Set<string>>(new Set());
   const fileInputRef = useRef<HTMLInputElement>(null);
   const selected = selectedDraftFromQueue(localQueue, selectedId);
   const selectedValidation = selected ? validateFormatAssets(selected.format, selected.assets ?? []) : null;
@@ -402,12 +462,21 @@ export function DashboardConsole({
     return [...folders].sort();
   }, [localAssets]);
   const visibleAssets = useMemo(() => {
-    return localAssets.filter((asset) => {
+    const basic = localAssets.filter((asset) => {
       const kindOk = assetKindFilter === "ALL" || asset.kind === assetKindFilter;
       const folderOk = assetFolderFilter === "ALL" || (asset.folder ?? "") === assetFolderFilter;
-      return kindOk && folderOk;
+      const orientationOk = assetOrientationFilter === "ALL" || asset.orientation === assetOrientationFilter;
+      return kindOk && folderOk && orientationOk;
     });
-  }, [assetFolderFilter, assetKindFilter, localAssets]);
+    if (assetTargetFilter === "ALL" && assetCompatibilityFilter === "ALL") return basic;
+    return basic.filter((asset) => {
+      if (assetTargetFilter === "ALL") {
+        return ASSET_COMPATIBILITY_TARGETS.some((target) => evaluateAssetCompatibility(assetCompatibilityInput(asset), target).status === assetCompatibilityFilter);
+      }
+      const result = evaluateAssetCompatibility(assetCompatibilityInput(asset), assetTargetFilter);
+      return assetCompatibilityFilter === "ALL" || result.status === assetCompatibilityFilter;
+    });
+  }, [assetCompatibilityFilter, assetFolderFilter, assetKindFilter, assetOrientationFilter, assetTargetFilter, localAssets]);
 
   useEffect(() => {
     setLocalAssets(assets);
@@ -840,6 +909,7 @@ export function DashboardConsole({
       for (const file of uploadFiles) {
         const safeName = sanitizeClientFilename(file.name);
         const pathname = `tenants/${metrics.tenant.id}/assets/${crypto.randomUUID()}/${safeName}`;
+        const technicalMetadata = await extractAssetMetadataFromFile(file);
         await uploadBlob(pathname, file, {
           access: "public",
           handleUploadUrl: `/api/tenants/${tenantSlug}/assets/upload`,
@@ -849,6 +919,7 @@ export function DashboardConsole({
             mimeType: file.type,
             sizeBytes: file.size,
             folder: uploadFolder,
+            technicalMetadata,
           }),
           onUploadProgress: ({ percentage }) => {
             setUploadProgress((prev) => ({ ...prev, [file.name]: Math.round(percentage) }));
@@ -920,6 +991,7 @@ export function DashboardConsole({
       const current = localAssets.find((asset) => asset.id === assetId);
       const safeName = sanitizeClientFilename(file.name);
       const pathname = `tenants/${metrics.tenant.id}/assets/${crypto.randomUUID()}/${safeName}`;
+      const technicalMetadata = await extractAssetMetadataFromFile(file);
       await uploadBlob(pathname, file, {
         access: "public",
         handleUploadUrl: `/api/tenants/${tenantSlug}/assets/${assetId}/content/upload`,
@@ -929,6 +1001,7 @@ export function DashboardConsole({
           mimeType: file.type,
           sizeBytes: file.size,
           expectedStorageKey: current?.storageKey ?? null,
+          technicalMetadata,
         }),
       });
       const refreshed = await refreshTenantAssets();
@@ -944,6 +1017,11 @@ export function DashboardConsole({
           mimeType: nextAsset?.mimeType ?? asset.mimeType,
           kind: nextAsset?.kind ?? asset.kind,
           sizeBytes: nextAsset?.sizeBytes ?? asset.sizeBytes,
+          width: nextAsset?.width ?? asset.width,
+          height: nextAsset?.height ?? asset.height,
+          durationSeconds: nextAsset?.durationSeconds ?? asset.durationSeconds,
+          orientation: nextAsset?.orientation ?? asset.orientation,
+          aspectRatio: nextAsset?.aspectRatio ?? asset.aspectRatio,
         } : asset),
       })));
       setAssetMessage({ kind: "success", text: "Contenido reemplazado." });
@@ -952,6 +1030,39 @@ export function DashboardConsole({
       setAssetMessage({ kind: "error", text: error instanceof Error ? error.message : "Error al reemplazar asset" });
     } finally {
       setReplaceAssetId("");
+    }
+  }
+
+  async function handlePersistAnalyzedMetadata(
+    asset: TenantAssetItem,
+    measured: { width?: number | null; height?: number | null; durationSeconds?: number | null },
+  ) {
+    if (analyzedAssetIdsRef.current.has(asset.id) || (asset.width && asset.height)) return;
+    analyzedAssetIdsRef.current.add(asset.id);
+    const technicalMetadata = normalizeTechnicalAssetMetadata({
+      ...measured,
+      mimeType: asset.mimeType,
+      sizeBytes: asset.sizeBytes,
+      originalFilename: asset.filename,
+      metadataSource: "client-extracted",
+    }, {
+      sizeBytes: asset.sizeBytes,
+      mimeType: asset.mimeType,
+      originalFilename: asset.filename,
+      folder: asset.folder ?? "",
+    });
+    try {
+      const res = await fetch(`/api/tenants/${tenantSlug}/assets/${asset.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ technicalMetadata }),
+      });
+      const data = await res.json();
+      if (res.ok && data.ok) {
+        setLocalAssets((prev) => prev.map((item) => item.id === asset.id ? { ...item, ...data.asset } : item));
+      }
+    } catch {
+      setLocalAssets((prev) => prev.map((item) => item.id === asset.id ? { ...item, metadata: { ...(item.metadata ?? {}), metadataAnalysisFailed: true } } : item));
     }
   }
 
@@ -1493,7 +1604,12 @@ export function DashboardConsole({
                   {(selected.assets ?? []).map((asset, index) => (
                     <div className="asset-manifest-row" key={`${asset.id}-${asset.order}`}>
                       <span className="asset-order">{asset.order}</span>
-                      <strong>{assetLabel(asset)}</strong>
+                      <span style={{ minWidth: 0 }}>
+                        <strong>{assetLabel(asset)}</strong>
+                        <small style={{ display: "block", color: "var(--hc-fog)" }}>
+                          {asset.width && asset.height ? `${asset.width} x ${asset.height}` : "Sin analizar"} / {formatBytes(asset.sizeBytes)} / {aspectRatioText(asset.aspectRatio)}
+                        </small>
+                      </span>
                       <small>{asset.mimeType ?? asset.kind ?? "metadata pendiente"}</small>
                       <div className="asset-actions">
                         <button className="icon-button" onClick={() => handleMoveDraftAsset(asset.order, "up")} disabled={index === 0 || assetReplacing} aria-label="Mover asset arriba">
@@ -1533,14 +1649,24 @@ export function DashboardConsole({
                       {assetPickerTarget.mode === "add" ? "Agregar asset:" : `Reemplazar asset #${assetPickerTarget.order ?? 1}:`}
                     </strong>
                     <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 6, maxHeight: 160, overflowY: "auto" }}>
-                       {localAssets
-                         .filter((a) => assetPickerTarget.mode === "replace" || !(selected.assets ?? []).some((current) => current.id === a.id))
-                         .slice(0, 20)
-                        .map((asset) => (
+                      {localAssets
+                        .filter((a) => assetPickerTarget.mode === "replace" || !(selected.assets ?? []).some((current) => current.id === a.id))
+                        .sort((a, b) => {
+                          const target = compatibilityTargetFromPublishingFormat(selected.format);
+                          const rank: Record<AssetCompatibilityStatus, number> = { IDEAL: 0, USABLE: 1, UNKNOWN: 2, INCOMPATIBLE: 3 };
+                          return rank[evaluateAssetCompatibility(assetCompatibilityInput(a), target).status] - rank[evaluateAssetCompatibility(assetCompatibilityInput(b), target).status];
+                        })
+                        .slice(0, 20)
+                        .map((asset) => {
+                          const target = compatibilityTargetFromPublishingFormat(selected.format);
+                          const compatibility = evaluateAssetCompatibility(assetCompatibilityInput(asset), target);
+                          const blocked = compatibility.status === "INCOMPATIBLE";
+                          return (
                           <button
                             key={asset.id}
                             onClick={() => handlePickAsset(asset.id)}
-                            disabled={assetReplacing}
+                            disabled={assetReplacing || blocked}
+                            title={`${ASSET_COMPATIBILITY_CONFIGS[target].label}: ${compatibility.reasons.join(" ")}`}
                             style={{
                               display: "flex",
                               flexDirection: "column",
@@ -1549,10 +1675,10 @@ export function DashboardConsole({
                               padding: 4,
                               borderRadius: 4,
                               border: "1px solid var(--hc-line)",
-                              background: "var(--hc-surface)",
-                              cursor: "pointer",
+                              background: blocked ? "#fff1f0" : "var(--hc-surface)",
+                              cursor: blocked ? "not-allowed" : "pointer",
                               fontSize: 10,
-                              maxWidth: 100,
+                              maxWidth: 132,
                             }}
                           >
                             {asset.path ? (
@@ -1563,9 +1689,11 @@ export function DashboardConsole({
                               </div>
                             )}
                             <span style={{ fontSize: 9, textAlign: "center", lineHeight: 1.1 }}>{asset.filename.slice(0, 20)}</span>
-                            <small style={{ color: "var(--hc-fog)", fontSize: 8 }}>{asset.kind}</small>
+                            <small style={{ color: "var(--hc-fog)", fontSize: 8 }}>{asset.width && asset.height ? `${asset.width}x${asset.height}` : "Sin analizar"}</small>
+                            <small style={{ color: blocked ? "#b42318" : "var(--hc-fog)", fontSize: 8 }}>{compatibilityLabel(compatibility.status)}</small>
                           </button>
-                        ))}
+                          );
+                        })}
                     </div>
                   </div>
                 )}
@@ -1762,15 +1890,63 @@ export function DashboardConsole({
                   <option value="ALL">Todas las carpetas</option>
                   {assetFolders.map((folder) => <option key={folder} value={folder}>{folder}</option>)}
                 </select>
+                <select value={assetOrientationFilter} onChange={(e) => setAssetOrientationFilter(e.target.value)} style={{ fontSize: 12, padding: "4px 8px" }}>
+                  <option value="ALL">Todas las orientaciones</option>
+                  <option value="square">Cuadrado</option>
+                  <option value="portrait">Vertical</option>
+                  <option value="landscape">Horizontal</option>
+                </select>
+                <select value={assetTargetFilter} onChange={(e) => setAssetTargetFilter(e.target.value as AssetCompatibilityTarget | "ALL")} style={{ fontSize: 12, padding: "4px 8px" }}>
+                  <option value="ALL">Todos los formatos</option>
+                  {ASSET_COMPATIBILITY_TARGETS.map((target) => (
+                    <option key={target} value={target}>{ASSET_COMPATIBILITY_CONFIGS[target].label}</option>
+                  ))}
+                </select>
+                <select value={assetCompatibilityFilter} onChange={(e) => setAssetCompatibilityFilter(e.target.value as AssetCompatibilityStatus | "ALL")} style={{ fontSize: 12, padding: "4px 8px" }}>
+                  <option value="ALL">Todos los estados</option>
+                  <option value="IDEAL">Ideal</option>
+                  <option value="USABLE">Usable</option>
+                  <option value="INCOMPATIBLE">No compatible</option>
+                  <option value="UNKNOWN">Sin analizar</option>
+                </select>
               </div>
               <div className="market-grid">
-                {visibleAssets.map((asset) => (
+                {visibleAssets.map((asset) => {
+                  const badgeTargets = assetTargetFilter === "ALL"
+                    ? ASSET_COMPATIBILITY_TARGETS.slice(0, 5)
+                    : [assetTargetFilter];
+                  const metadataMissing = !asset.width || !asset.height;
+                  return (
                   <div className="market-card" key={asset.id}>
                     {asset.path ? (
                       asset.kind === "VIDEO" || asset.path.toLowerCase().endsWith(".mp4") ? (
-                        <video src={assetUrl(asset.path, tenantSlug)} className="asset-tile" controls preload="metadata" />
+                        <video
+                          src={assetUrl(asset.path, tenantSlug)}
+                          className="asset-tile"
+                          controls
+                          preload="metadata"
+                          onLoadedMetadata={(event) => {
+                            const video = event.currentTarget;
+                            void handlePersistAnalyzedMetadata(asset, {
+                              width: video.videoWidth || null,
+                              height: video.videoHeight || null,
+                              durationSeconds: Number.isFinite(video.duration) ? video.duration : null,
+                            });
+                          }}
+                        />
                       ) : (
-                        <img src={assetUrl(asset.path, tenantSlug)} alt={asset.filename} className="asset-tile" />
+                        <img
+                          src={assetUrl(asset.path, tenantSlug)}
+                          alt={asset.filename}
+                          className="asset-tile"
+                          onLoad={(event) => {
+                            const image = event.currentTarget;
+                            void handlePersistAnalyzedMetadata(asset, {
+                              width: image.naturalWidth || null,
+                              height: image.naturalHeight || null,
+                            });
+                          }}
+                        />
                       )
                     ) : (
                       <div className="asset-tile asset-empty"><PackageSearch size={22} /></div>
@@ -1810,7 +1986,36 @@ export function DashboardConsole({
                       </div>
                     ) : null}
                     <small>{asset.kind} / {asset.mimeType ?? "mime?"} / {asset.folder || "raiz"} / {asset.draftCount} drafts</small>
-                    <small>{asset.sizeBytes ? `${Math.round(asset.sizeBytes / 1024)} KB` : "tamano pendiente"}{asset.width && asset.height ? ` / ${asset.width}x${asset.height}` : ""}</small>
+                    <small>
+                      {asset.width && asset.height ? `${asset.width} x ${asset.height}` : metadataMissing ? "Sin analizar" : "resolucion pendiente"} / {formatBytes(asset.sizeBytes)}
+                      {asset.durationSeconds != null ? ` / ${formatDuration(asset.durationSeconds)}` : ""}
+                    </small>
+                    <small>
+                      {asset.orientation ?? "orientacion pendiente"} / {aspectRatioText(asset.aspectRatio)}
+                    </small>
+                    <div style={{ display: "flex", gap: 4, overflowX: "auto", paddingBottom: 2 }}>
+                      {badgeTargets.map((target) => {
+                        const result = evaluateAssetCompatibility(assetCompatibilityInput(asset), target);
+                        return (
+                          <span
+                            key={target}
+                            title={`${ASSET_COMPATIBILITY_CONFIGS[target].label}: ${result.reasons.join(" ")}`}
+                            style={{
+                              flex: "0 0 auto",
+                              padding: "2px 6px",
+                              borderRadius: 4,
+                              border: "1px solid var(--hc-line)",
+                              fontSize: 10,
+                              background: result.status === "IDEAL" ? "#e8f7ef" : result.status === "USABLE" ? "var(--hc-bone)" : result.status === "INCOMPATIBLE" ? "#fff1f0" : "var(--hc-surface)",
+                              color: result.status === "INCOMPATIBLE" ? "#b42318" : "var(--hc-ink)",
+                              whiteSpace: "nowrap",
+                            }}
+                          >
+                            {ASSET_COMPATIBILITY_CONFIGS[target].label}: {compatibilityLabel(result.status)}
+                          </span>
+                        );
+                      })}
+                    </div>
                     <div style={{ display: "flex", gap: 4, flexWrap: "wrap", marginTop: 4 }}>
                       <button onClick={() => { setMovingAssetId(asset.id); setMoveFolder(asset.folder ?? ""); }} style={{ padding: "3px 8px", borderRadius: 4, border: "1px solid var(--hc-line)", background: "var(--hc-bone)", cursor: "pointer", fontSize: 11 }}>Carpeta</button>
                       <label style={{ padding: "3px 8px", borderRadius: 4, border: "1px solid var(--hc-line)", background: "var(--hc-bone)", cursor: "pointer", fontSize: 11 }}>
@@ -1820,7 +2025,8 @@ export function DashboardConsole({
                       <button onClick={() => handleDeleteAsset(asset.id)} disabled={deletingAssetId === asset.id || asset.draftCount > 0} title={asset.draftCount > 0 ? "Asset en uso" : "Eliminar"} style={{ padding: "3px 8px", borderRadius: 4, border: "1px solid var(--hc-line)", background: asset.draftCount > 0 ? "var(--hc-bone)" : "#fff1f0", cursor: asset.draftCount > 0 ? "not-allowed" : "pointer", fontSize: 11 }}>Eliminar</button>
                     </div>
                   </div>
-                ))}
+                  );
+                })}
                 {visibleAssets.length === 0 && <p style={{ padding: 14 }}>No hay activos cargados para este filtro.</p>}
               </div>
             </section>

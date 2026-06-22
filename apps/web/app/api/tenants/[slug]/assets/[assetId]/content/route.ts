@@ -13,6 +13,11 @@ function jsonError(error: unknown) {
   return NextResponse.json({ ok: false, code: "ASSET_REPLACE_FAILED", error: "Asset replacement failed." }, { status: 500 });
 }
 
+function parseJsonField(value: FormDataEntryValue | null): unknown {
+  if (typeof value !== "string" || !value.trim()) return undefined;
+  return JSON.parse(value);
+}
+
 export async function PUT(req: Request, context: { params: Promise<{ slug: string; assetId: string }> }) {
   const session = await auth();
   if (!session?.user?.id) return NextResponse.json({ ok: false, error: "Unauthorized" }, { status: 401 });
@@ -29,6 +34,7 @@ export async function PUT(req: Request, context: { params: Promise<{ slug: strin
       assetId,
       file,
       expectedStorageKey: formData?.get("expectedStorageKey") ? String(formData.get("expectedStorageKey")) : null,
+      technicalMetadata: parseJsonField(formData?.get("technicalMetadata") ?? null),
     });
     const metadata = asset.metadata && typeof asset.metadata === "object" ? asset.metadata as Record<string, unknown> : {};
     return NextResponse.json({
@@ -44,6 +50,12 @@ export async function PUT(req: Request, context: { params: Promise<{ slug: strin
         rightsStatus: asset.rightsStatus,
         metadata,
         folder: metadata.folder ?? "",
+        sizeBytes: metadata.sizeBytes ?? null,
+        width: metadata.width ?? null,
+        height: metadata.height ?? null,
+        durationSeconds: metadata.durationSeconds ?? null,
+        orientation: metadata.orientation ?? null,
+        aspectRatio: metadata.aspectRatio ?? null,
       },
     });
   } catch (error) {

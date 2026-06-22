@@ -30,6 +30,8 @@ function serializeAsset(asset: any, tenantSlug: string) {
     width: metadata.width ?? null,
     height: metadata.height ?? null,
     durationSeconds: metadata.durationSeconds ?? null,
+    orientation: metadata.orientation ?? null,
+    aspectRatio: metadata.aspectRatio ?? null,
   };
 }
 
@@ -37,7 +39,7 @@ export async function PATCH(req: Request, context: { params: Promise<{ slug: str
   const session = await auth();
   if (!session?.user?.id) return NextResponse.json({ ok: false, error: "Unauthorized" }, { status: 401 });
   const { slug, assetId } = await context.params;
-  const body = await req.json().catch(() => null) as { filename?: string; folder?: string | null } | null;
+  const body = await req.json().catch(() => null) as { filename?: string; folder?: string | null; technicalMetadata?: unknown } | null;
   if (!body) return NextResponse.json({ ok: false, error: "Request body is required." }, { status: 400 });
   try {
     const asset = await updateTenantAssetMetadata({
@@ -46,6 +48,7 @@ export async function PATCH(req: Request, context: { params: Promise<{ slug: str
       assetId,
       filename: body.filename,
       folder: body.folder,
+      technicalMetadata: body.technicalMetadata,
     });
     return NextResponse.json({ ok: true, asset: serializeAsset(asset, slug) });
   } catch (error) {

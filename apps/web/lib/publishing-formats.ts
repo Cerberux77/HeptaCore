@@ -17,6 +17,8 @@ export type DraftFormatAsset = {
   height: number | null;
   sizeBytes: number | null;
   durationSeconds?: number | null;
+  orientation?: string | null;
+  aspectRatio?: unknown;
   order: number;
   kind?: string | null;
   role?: string | null;
@@ -247,6 +249,8 @@ export function normalizeAssetManifest<T extends {
         height: numberFrom(metadata.height),
         sizeBytes: numberFrom(metadata.sizeBytes ?? metadata.size),
         durationSeconds: numberFrom(metadata.durationSeconds ?? metadata.duration),
+        orientation: typeof metadata.orientation === "string" ? metadata.orientation : null,
+        aspectRatio: metadata.aspectRatio ?? null,
         order: index + 1,
         kind: asset?.kind ?? null,
         role: link.role ?? null,

@@ -128,6 +128,7 @@ describe("tenant asset service", () => {
       userId: "user-a",
       file: file("hero image.jpg", "image/jpeg"),
       folder: "feed",
+      technicalMetadata: { width: 1080, height: 1080, mimeType: "image/jpeg", sizeBytes: 10 },
       db: db as any,
       storage,
       audit: async (entry) => { audits.push(entry); },
@@ -135,6 +136,10 @@ describe("tenant asset service", () => {
     assert.equal(asset.tenantId, "tenant-a");
     assert.equal(asset.filename, "hero-image.jpg");
     assert.equal((asset.metadata as Row).folder, "feed");
+    assert.equal((asset.metadata as Row).width, 1080);
+    assert.equal((asset.metadata as Row).height, 1080);
+    assert.deepEqual((asset.metadata as Row).aspectRatio, { value: 1, label: "1:1" });
+    assert.equal((asset.metadata as Row).metadataVersion, 1);
     assert.equal(audits[0].action, "asset_uploaded");
   });
 
@@ -172,6 +177,7 @@ describe("tenant asset service", () => {
       userId: "user-a",
       assetId: "asset-a",
       file: file("new.jpg", "image/jpeg"),
+      technicalMetadata: { width: 1080, height: 1920, mimeType: "image/jpeg", sizeBytes: 10 },
       db: db as any,
       storage: new MemoryStorage(),
       audit: async (entry) => { audits.push(entry); },
@@ -179,6 +185,9 @@ describe("tenant asset service", () => {
     assert.equal(updated.id, "asset-a");
     assert.equal(db.links[0].assetId, "asset-a");
     assert.equal(db.drafts[0].status, "NEEDS_REVIEW");
+    assert.equal((updated.metadata as Row).width, 1080);
+    assert.equal((updated.metadata as Row).height, 1920);
+    assert.equal((updated.metadata as Row).orientation, "portrait");
     assert.equal(audits.some((entry) => entry.action === "asset_content_replaced"), true);
   });
 
@@ -196,6 +205,22 @@ describe("tenant asset service", () => {
     await deleteTenantAsset({ tenantSlug: "tenant-a", userId: "user-a", assetId: "asset-a", db: db as any, storage, audit });
     assert.equal(db.assets.some((asset) => asset.id === "asset-a"), false);
     assert.deepEqual(storage.deleted, ["old/a.jpg"]);
+  });
+
+  it("persists analyzed legacy metadata through tenant-scoped update", async () => {
+    const db = new FakeDb();
+    db.assets[0].metadata = { folder: "", originalFilename: "legacy.jpg" };
+    const updated = await updateTenantAssetMetadata({
+      tenantSlug: "tenant-a",
+      userId: "user-a",
+      assetId: "asset-a",
+      technicalMetadata: { width: 1080, height: 1920, mimeType: "image/jpeg", sizeBytes: 100 },
+      db: db as any,
+      audit: async () => {},
+    });
+    assert.equal((updated.metadata as Row).width, 1080);
+    assert.equal((updated.metadata as Row).height, 1920);
+    assert.equal((updated.metadata as Row).orientation, "portrait");
   });
 
   it("keeps Turpial legacy assets renderable and Blob URLs usable in multiformat previews", async () => {

@@ -65,6 +65,7 @@ export async function POST(request: Request, context: { params: Promise<{ slug: 
             mimeType,
             sizeBytes,
             expectedStorageKey: payload.expectedStorageKey ?? asset.storageKey ?? null,
+            technicalMetadata: payload.technicalMetadata ?? null,
           }),
         };
       },
@@ -81,6 +82,7 @@ export async function POST(request: Request, context: { params: Promise<{ slug: 
             sourcePath: blob.url,
             storageKey: blob.pathname,
             expectedStorageKey: typeof payload.expectedStorageKey === "string" ? payload.expectedStorageKey : null,
+            technicalMetadata: payload.technicalMetadata ?? null,
           });
         } catch (error) {
           await del(blob.pathname).catch(() => undefined);

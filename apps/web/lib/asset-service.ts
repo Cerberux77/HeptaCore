@@ -1,6 +1,7 @@
 import type { AssetKind, UserRole } from "@prisma/client";
 import { auditLog } from "./audit";
 import { normalizeLogicalFolder, sanitizeFilename, validateAssetFile } from "./asset-config";
+import { normalizeTechnicalAssetMetadata } from "./asset-metadata";
 import { getAssetStorage, type AssetStorageAdapter } from "./asset-storage";
 import { prisma } from "./prisma";
 
@@ -35,6 +36,8 @@ type AssetMetadata = JsonObject & {
   width?: number | null;
   height?: number | null;
   durationSeconds?: number | null;
+  orientation?: string | null;
+  aspectRatio?: unknown;
   folder?: string;
   originalFilename?: string;
   uploadedBy?: string;
@@ -55,6 +58,37 @@ function asObject(value: unknown): JsonObject {
 
 function buildStorageKey(tenantId: string, filename: string): string {
   return `tenants/${tenantId}/assets/${crypto.randomUUID()}/${filename}`;
+}
+
+function buildAssetMetadata(params: {
+  existing?: unknown;
+  technicalMetadata?: unknown;
+  provider: string;
+  sizeBytes: number;
+  mimeType: string;
+  originalFilename: string;
+  folder?: string | null;
+  uploadedBy: string;
+  etag?: string | null;
+}): AssetMetadata {
+  const existing = asObject(params.existing);
+  const normalized = normalizeTechnicalAssetMetadata(params.technicalMetadata, {
+    sizeBytes: params.sizeBytes,
+    mimeType: params.mimeType,
+    originalFilename: params.originalFilename,
+    folder: normalizeLogicalFolder(params.folder ?? String(existing.folder ?? "")),
+  });
+  return {
+    ...existing,
+    ...normalized,
+    provider: params.provider,
+    sizeBytes: normalized.sizeBytes ?? params.sizeBytes,
+    mimeType: normalized.mimeType ?? params.mimeType,
+    folder: normalized.folder ?? normalizeLogicalFolder(params.folder),
+    originalFilename: params.originalFilename,
+    uploadedBy: params.uploadedBy,
+    etag: params.etag ?? null,
+  };
 }
 
 async function requireTenantAccess(
@@ -115,6 +149,7 @@ export async function createTenantAssetFromBlob(params: {
   width?: number | null;
   height?: number | null;
   durationSeconds?: number | null;
+  technicalMetadata?: unknown;
   etag?: string | null;
   audit?: AuditFn;
   db?: typeof prisma;
@@ -131,17 +166,21 @@ export async function createTenantAssetFromBlob(params: {
     throw new AssetServiceError("ASSET_STORAGE_SCOPE", "Storage key does not match tenant scope.", 400);
   }
 
-  const metadata: AssetMetadata = {
+  const metadata: AssetMetadata = buildAssetMetadata({
+    technicalMetadata: {
+      ...(asObject(params.technicalMetadata)),
+      width: asObject(params.technicalMetadata).width ?? params.width ?? null,
+      height: asObject(params.technicalMetadata).height ?? params.height ?? null,
+      durationSeconds: asObject(params.technicalMetadata).durationSeconds ?? params.durationSeconds ?? null,
+    },
     provider: "vercel_blob",
     sizeBytes: params.sizeBytes,
-    width: params.width ?? null,
-    height: params.height ?? null,
-    durationSeconds: params.durationSeconds ?? null,
-    folder: normalizeLogicalFolder(params.folder),
+    mimeType: validation.mimeType,
     originalFilename: params.originalFilename,
+    folder: params.folder,
     uploadedBy: params.userId,
     etag: params.etag ?? null,
-  };
+  });
 
   const asset = await db.asset.create({
     data: {
@@ -174,6 +213,7 @@ export async function uploadTenantAsset(params: {
   file: File;
   folder?: string | null;
   projectId?: string | null;
+  technicalMetadata?: unknown;
   storage?: AssetStorageAdapter;
   audit?: AuditFn;
   db?: typeof prisma;
@@ -207,6 +247,7 @@ export async function uploadTenantAsset(params: {
       storageKey: uploaded.pathname,
       projectId: params.projectId,
       folder: params.folder,
+      technicalMetadata: params.technicalMetadata,
       etag: uploaded.etag ?? null,
       audit: params.audit,
       db,
@@ -223,6 +264,7 @@ export async function updateTenantAssetMetadata(params: {
   assetId: string;
   filename?: string;
   folder?: string | null;
+  technicalMetadata?: unknown;
   audit?: AuditFn;
   db?: typeof prisma;
 }) {
@@ -237,6 +279,19 @@ export async function updateTenantAssetMetadata(params: {
   if (params.folder !== undefined) {
     metadata.folder = normalizeLogicalFolder(params.folder);
     data.metadata = metadata;
+  }
+  if (params.technicalMetadata !== undefined) {
+    const technical = normalizeTechnicalAssetMetadata(params.technicalMetadata, {
+      sizeBytes: Number(metadata.sizeBytes ?? 0) || undefined,
+      mimeType: typeof metadata.mimeType === "string" ? metadata.mimeType : asset.mimeType,
+      originalFilename: typeof metadata.originalFilename === "string" ? metadata.originalFilename : asset.filename,
+      folder: typeof metadata.folder === "string" ? metadata.folder : "",
+    });
+    data.metadata = {
+      ...metadata,
+      ...technical,
+      folder: technical.folder ?? metadata.folder ?? "",
+    };
   }
   if (!data.filename && data.metadata === undefined) {
     throw new AssetServiceError("NO_ASSET_CHANGES", "No valid asset fields to update.", 400);
@@ -259,6 +314,7 @@ export async function replaceTenantAssetContent(params: {
   assetId: string;
   file: File;
   expectedStorageKey?: string | null;
+  technicalMetadata?: unknown;
   storage?: AssetStorageAdapter;
   audit?: AuditFn;
   db?: typeof prisma;
@@ -299,14 +355,16 @@ export async function replaceTenantAssetContent(params: {
           mimeType: validation.mimeType,
           sourcePath: uploaded.url,
           storageKey: uploaded.pathname,
-          metadata: {
-            ...oldMetadata,
+          metadata: buildAssetMetadata({
+            existing: oldMetadata,
             provider: "vercel_blob",
             sizeBytes: params.file.size,
+            mimeType: validation.mimeType,
+            technicalMetadata: params.technicalMetadata,
             originalFilename: params.file.name,
             uploadedBy: params.userId,
             etag: uploaded.etag ?? null,
-          },
+          }) as any,
         },
       });
 
@@ -363,6 +421,7 @@ export async function replaceTenantAssetWithBlob(params: {
   sourcePath: string;
   storageKey: string;
   expectedStorageKey?: string | null;
+  technicalMetadata?: unknown;
   etag?: string | null;
   storage?: AssetStorageAdapter;
   audit?: AuditFn;
@@ -399,14 +458,16 @@ export async function replaceTenantAssetWithBlob(params: {
           mimeType: validation.mimeType,
           sourcePath: params.sourcePath,
           storageKey: params.storageKey,
-          metadata: {
-            ...oldMetadata,
+          metadata: buildAssetMetadata({
+            existing: oldMetadata,
             provider: "vercel_blob",
             sizeBytes: params.sizeBytes,
+            mimeType: validation.mimeType,
+            technicalMetadata: params.technicalMetadata,
             originalFilename: params.originalFilename,
             uploadedBy: params.userId,
             etag: params.etag ?? null,
-          },
+          }) as any,
         },
       });
       await tx.contentDraft.updateMany({

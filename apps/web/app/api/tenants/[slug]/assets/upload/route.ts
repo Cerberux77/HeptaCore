@@ -61,6 +61,7 @@ export async function POST(request: Request, context: { params: Promise<{ slug: 
             sizeBytes,
             folder: payload.folder ?? "",
             projectId: payload.projectId ?? null,
+            technicalMetadata: payload.technicalMetadata ?? null,
           }),
         };
       },
@@ -77,6 +78,7 @@ export async function POST(request: Request, context: { params: Promise<{ slug: 
             storageKey: blob.pathname,
             folder: String(payload.folder ?? ""),
             projectId: typeof payload.projectId === "string" ? payload.projectId : null,
+            technicalMetadata: payload.technicalMetadata ?? null,
           });
         } catch (error) {
           await del(blob.pathname).catch(() => undefined);
