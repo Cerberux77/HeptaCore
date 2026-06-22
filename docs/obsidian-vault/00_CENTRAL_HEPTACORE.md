@@ -82,7 +82,7 @@ type: master-dashboard
 project: "HeptaCore"
 status: active-production
 phase: "Canonical Oreshnik task board governs current assignments"
-last_updated: "2026-06-22T19:33:37.353Z"
+last_updated: "2026-06-22T19:44:33.708Z"
 mother_branch: "MADRE/v46-s-hc-pub-02-multiformat-preview-multiformat-previews-deterministic-auth-approval-2026-06-21"
 tags:
   - "#central"
@@ -107,7 +107,9 @@ tags:
 - Fase completada: S-HC-REC-00C — integracion canonica en master (SHA 9329fe8). Documentacion y Oreshnik alineados.
 - Fase completada: oreshnik-cli@0.2.0-alpha.0 publicado. reconcile --check/--write operacional.
 - Fase completada: S-HC-PUB-02-MULTIFORMAT-PREVIEW — preview y dry-run multiformato para Instagram y Facebook.
-- Fase activa (un sprint por vez): S-HC-PUB-03-MULTITENANT-ASSETS — asset management multi-tenant con metadata, compatibilidad y Vercel Blob.
+- Fase activa (un sprint por vez): S-HC-PUB-03-MULTITENANT-ASSETS — asset management multi-tenant con metadata, compatibilidad y Vercel Blob. PUB-03 clasifica compatibilidad; no elimina ni reduce el objetivo final de publicacion.
+- Pendientes de publicacion: PUB-04 hourly batch cron, PUB-05 reconciliation ops, PUB-06 Reels/Stories publishers, PUB-07 YouTube publishing, PUB-08 format parity.
+- Reels, Stories y YouTube forman parte obligatoria del alcance final de HeptaCore. Las combinaciones sin publisher real quedan pendientes de implementacion en PUB-06, PUB-07 o PUB-08.
 - Jean fuera de ruta critica. Responsabilidades reasignadas a Manuel.
 
 ## Tareas Abiertas
@@ -118,6 +120,9 @@ tags:
 | S-HC-PUB-03-MULTITENANT-ASSETS | active | Manuel | Multi-tenant asset management: upload, replace, metadata extraction, compatibility classification | S-HC-PUB-02-MULTIFORMAT-PREVIEW |
 | S-HC-PUB-04-HOURLY-BATCH-CRON | pending | Manuel | Hourly batch cron publishing with timezone-aware scheduling | S-HC-PUB-02-MULTIFORMAT-PREVIEW, S-HC-PUB-03-MULTITENANT-ASSETS |
 | S-HC-PUB-05-RECONCILIATION-OPS | pending | Manuel | Operational reconciliation automation for ambiguous provider outcomes | S-HC-PUB-04-HOURLY-BATCH-CRON |
+| S-HC-PUB-06-REELS-STORIES-PUBLISHERS | pending | Manuel | Real publishing for Meta Reels and Stories: Instagram + Facebook | S-HC-PUB-03-MULTITENANT-ASSETS, S-HC-PUB-04-HOURLY-BATCH-CRON |
+| S-HC-PUB-07-YOUTUBE-PUBLISHING | pending | Manuel | Real publishing for YouTube: Video 16:9 and YouTube Shorts | S-HC-PUB-03-MULTITENANT-ASSETS, S-HC-PUB-04-HOURLY-BATCH-CRON |
+| S-HC-PUB-08-PLATFORM-FORMAT-PARITY | pending | Manuel | Platform-format parity: manifest, preview, dry-run, scheduling and publishing for every supported format | S-HC-PUB-06-REELS-STORIES-PUBLISHERS, S-HC-PUB-07-YOUTUBE-PUBLISHING |
 | S-HC-OBS-01-PUBLISHING-OBSERVABILITY | pending | Manuel | Publishing observability: structured logging, metrics dashboard, alert thresholds | S-HC-PUB-05-RECONCILIATION-OPS |
 | S-HC-COMM-01-SELF-SERVICE-SIGNUP | pending | Manuel | Self-service tenant signup with trial gate and onboarding flow | S-HC-REC-00C |
 | S-HC-COMM-02-BILLING-ACTIVATION | pending | Manuel | Tenant billing activation: plan selection, usage tracking, payment integration | S-HC-COMM-01-SELF-SERVICE-SIGNUP |
@@ -147,6 +152,9 @@ tags:
 |---|---|---|---|
 | S-HC-PUB-04-HOURLY-BATCH-CRON | Manuel | Hourly batch cron publishing with timezone-aware scheduling | S-HC-PUB-02-MULTIFORMAT-PREVIEW, S-HC-PUB-03-MULTITENANT-ASSETS |
 | S-HC-PUB-05-RECONCILIATION-OPS | Manuel | Operational reconciliation automation for ambiguous provider outcomes | S-HC-PUB-04-HOURLY-BATCH-CRON |
+| S-HC-PUB-06-REELS-STORIES-PUBLISHERS | Manuel | Real publishing for Meta Reels and Stories: Instagram + Facebook | S-HC-PUB-03-MULTITENANT-ASSETS, S-HC-PUB-04-HOURLY-BATCH-CRON |
+| S-HC-PUB-07-YOUTUBE-PUBLISHING | Manuel | Real publishing for YouTube: Video 16:9 and YouTube Shorts | S-HC-PUB-03-MULTITENANT-ASSETS, S-HC-PUB-04-HOURLY-BATCH-CRON |
+| S-HC-PUB-08-PLATFORM-FORMAT-PARITY | Manuel | Platform-format parity: manifest, preview, dry-run, scheduling and publishing for every supported format | S-HC-PUB-06-REELS-STORIES-PUBLISHERS, S-HC-PUB-07-YOUTUBE-PUBLISHING |
 | S-HC-OBS-01-PUBLISHING-OBSERVABILITY | Manuel | Publishing observability: structured logging, metrics dashboard, alert thresholds | S-HC-PUB-05-RECONCILIATION-OPS |
 | S-HC-COMM-01-SELF-SERVICE-SIGNUP | Manuel | Self-service tenant signup with trial gate and onboarding flow | S-HC-REC-00C |
 | S-HC-COMM-02-BILLING-ACTIVATION | Manuel | Tenant billing activation: plan selection, usage tracking, payment integration | S-HC-COMM-01-SELF-SERVICE-SIGNUP |

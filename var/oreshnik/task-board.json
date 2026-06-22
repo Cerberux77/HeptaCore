@@ -18,7 +18,9 @@
     "Fase completada: S-HC-REC-00C — integracion canonica en master (SHA 9329fe8). Documentacion y Oreshnik alineados.",
     "Fase completada: oreshnik-cli@0.2.0-alpha.0 publicado. reconcile --check/--write operacional.",
     "Fase completada: S-HC-PUB-02-MULTIFORMAT-PREVIEW — preview y dry-run multiformato para Instagram y Facebook.",
-    "Fase activa (un sprint por vez): S-HC-PUB-03-MULTITENANT-ASSETS — asset management multi-tenant con metadata, compatibilidad y Vercel Blob.",
+    "Fase activa (un sprint por vez): S-HC-PUB-03-MULTITENANT-ASSETS — asset management multi-tenant con metadata, compatibilidad y Vercel Blob. PUB-03 clasifica compatibilidad; no elimina ni reduce el objetivo final de publicacion.",
+    "Pendientes de publicacion: PUB-04 hourly batch cron, PUB-05 reconciliation ops, PUB-06 Reels/Stories publishers, PUB-07 YouTube publishing, PUB-08 format parity.",
+    "Reels, Stories y YouTube forman parte obligatoria del alcance final de HeptaCore. Las combinaciones sin publisher real quedan pendientes de implementacion en PUB-06, PUB-07 o PUB-08.",
     "Jean fuera de ruta critica. Responsabilidades reasignadas a Manuel."
   ],
   "jeanReassignment": {
@@ -188,7 +190,8 @@
         "Cero llamadas a proveedores sociales",
         "Preview antes de publish",
         "BLOB_READ_WRITE_TOKEN documentado como requerido (sin exponer valor)",
-        "Codigo base en commit c78d71d20451cc73e446d2c6053421029cd29d42"
+        "Codigo base en commit c78d71d20451cc73e446d2c6053421029cd29d42",
+        "PUB-03 clasifica compatibilidad de activos; no elimina ni reduce el objetivo final de publicacion. Los formatos sin publisher real quedan documentados como pendientes de implementacion en PUB-06, PUB-07 o PUB-08."
       ]
     },
     {
@@ -222,6 +225,65 @@
         "Alert-only for Case B (Draft.externalPostId present + Result absent)",
         "Block and notify for Case C (no evidence)",
         "Never auto-retry provider calls"
+      ]
+    },
+    {
+      "id": "S-HC-PUB-06-REELS-STORIES-PUBLISHERS",
+      "title": "Real publishing for Meta Reels and Stories: Instagram + Facebook",
+      "owner": "Manuel",
+      "backupOwner": "Manuel",
+      "status": "pending",
+      "track": "publishing",
+      "zone": ["apps/web/lib/publishers", "apps/web/app/api/publishing", "packages/integrations"],
+      "dependsOn": ["S-HC-PUB-03-MULTITENANT-ASSETS", "S-HC-PUB-04-HOURLY-BATCH-CRON"],
+      "acceptance": [
+        "Instagram Reel publishing real con durabilidad transaccional",
+        "Instagram Story imagen publishing real",
+        "Instagram Story video publishing real",
+        "Facebook Story imagen publishing real",
+        "Facebook Story video publishing real",
+        "Facebook Reel publishing real",
+        "Preview/dry-run para cada combinacion antes de publicacion real",
+        "Provider-specific tests con evidencia real para cada formato",
+        "Reutilizacion de transactional finalization y IN_REVIEW state machine",
+        "Cero declaracion de soporte hasta que la combinacion concreta haya sido validada"
+      ]
+    },
+    {
+      "id": "S-HC-PUB-07-YOUTUBE-PUBLISHING",
+      "title": "Real publishing for YouTube: Video 16:9 and YouTube Shorts",
+      "owner": "Manuel",
+      "backupOwner": "Manuel",
+      "status": "pending",
+      "track": "publishing",
+      "zone": ["apps/web/lib/publishers", "apps/web/app/api/publishing", "packages/integrations"],
+      "dependsOn": ["S-HC-PUB-03-MULTITENANT-ASSETS", "S-HC-PUB-04-HOURLY-BATCH-CRON"],
+      "acceptance": [
+        "YouTube Video 16:9 publishing real con titulo, descripcion, thumbnail y metadata",
+        "YouTube Shorts publishing real con metadata requerida",
+        "Programacion y publicacion real",
+        "Preview/dry-run para cada formato",
+        "Provider-specific tests con evidencia real para cada formato",
+        "Reutilizacion de transactional finalization y IN_REVIEW state machine",
+        "Cero declaracion de soporte hasta validacion real"
+      ]
+    },
+    {
+      "id": "S-HC-PUB-08-PLATFORM-FORMAT-PARITY",
+      "title": "Platform-format parity: manifest, preview, dry-run, scheduling and publishing for every supported format",
+      "owner": "Manuel",
+      "backupOwner": "Manuel",
+      "status": "pending",
+      "track": "publishing",
+      "zone": ["apps/web/lib/publishers", "apps/web/lib/publishing-formats.ts", "apps/web/components", "packages/integrations"],
+      "dependsOn": ["S-HC-PUB-06-REELS-STORIES-PUBLISHERS", "S-HC-PUB-07-YOUTUBE-PUBLISHING"],
+      "acceptance": [
+        "Paridad de capacidades (preview, dry-run, publicacion, metricas) para cada formato soportado",
+        "Auditoria de la matriz de capacidad red/formato: sin combinaciones sin responsable asignado",
+        "Manifiesto de activos cubre todos los formatos con reglas validadas",
+        "Preview especifico de plataforma para cada formato",
+        "Tests provider-specific para todos los formatos publicables",
+        "Documentacion del estado de cada combinacion en PRODUCT_VISION_END_TO_END"
       ]
     },
     {

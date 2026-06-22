@@ -123,7 +123,7 @@ Zonas: `examples/tenants/cepeg`, `apps/web`, `packages/db`
 type: collaborator-status
 project: "HeptaCore"
 operator: "Manuel"
-last_updated: "2026-06-22T19:33:37.361Z"
+last_updated: "2026-06-22T19:44:33.714Z"
 generated_by: "Oreshnik canonical-check"
 source: "var/oreshnik/task-board.json"
 ---
@@ -144,6 +144,9 @@ source: "var/oreshnik/task-board.json"
 |---|---|---|
 | S-HC-PUB-04-HOURLY-BATCH-CRON | Hourly batch cron publishing with timezone-aware scheduling | S-HC-PUB-02-MULTIFORMAT-PREVIEW, S-HC-PUB-03-MULTITENANT-ASSETS |
 | S-HC-PUB-05-RECONCILIATION-OPS | Operational reconciliation automation for ambiguous provider outcomes | S-HC-PUB-04-HOURLY-BATCH-CRON |
+| S-HC-PUB-06-REELS-STORIES-PUBLISHERS | Real publishing for Meta Reels and Stories: Instagram + Facebook | S-HC-PUB-03-MULTITENANT-ASSETS, S-HC-PUB-04-HOURLY-BATCH-CRON |
+| S-HC-PUB-07-YOUTUBE-PUBLISHING | Real publishing for YouTube: Video 16:9 and YouTube Shorts | S-HC-PUB-03-MULTITENANT-ASSETS, S-HC-PUB-04-HOURLY-BATCH-CRON |
+| S-HC-PUB-08-PLATFORM-FORMAT-PARITY | Platform-format parity: manifest, preview, dry-run, scheduling and publishing for every supported format | S-HC-PUB-06-REELS-STORIES-PUBLISHERS, S-HC-PUB-07-YOUTUBE-PUBLISHING |
 | S-HC-OBS-01-PUBLISHING-OBSERVABILITY | Publishing observability: structured logging, metrics dashboard, alert thresholds | S-HC-PUB-05-RECONCILIATION-OPS |
 | S-HC-COMM-01-SELF-SERVICE-SIGNUP | Self-service tenant signup with trial gate and onboarding flow | S-HC-REC-00C |
 | S-HC-COMM-02-BILLING-ACTIVATION | Tenant billing activation: plan selection, usage tracking, payment integration | S-HC-COMM-01-SELF-SERVICE-SIGNUP |
@@ -191,6 +194,7 @@ Estado: `active`
 - Preview antes de publish
 - BLOB_READ_WRITE_TOKEN documentado como requerido (sin exponer valor)
 - Codigo base en commit c78d71d20451cc73e446d2c6053421029cd29d42
+- PUB-03 clasifica compatibilidad de activos; no elimina ni reduce el objetivo final de publicacion. Los formatos sin publisher real quedan documentados como pendientes de implementacion en PUB-06, PUB-07 o PUB-08.
 
 Zonas: `apps/web/app/api/tenant-assets`, `apps/web/components`, `packages/core`, `apps/web/lib/publishing-formats.ts`
 
@@ -216,6 +220,50 @@ Estado: `pending`
 - Never auto-retry provider calls
 
 Zonas: `apps/web/lib/publishing-finalization.ts`, `apps/web/lib/draft-operational-state.ts`, `packages/core`
+
+### S-HC-PUB-06-REELS-STORIES-PUBLISHERS - Real publishing for Meta Reels and Stories: Instagram + Facebook
+
+Estado: `pending`
+
+- Instagram Reel publishing real con durabilidad transaccional
+- Instagram Story imagen publishing real
+- Instagram Story video publishing real
+- Facebook Story imagen publishing real
+- Facebook Story video publishing real
+- Facebook Reel publishing real
+- Preview/dry-run para cada combinacion antes de publicacion real
+- Provider-specific tests con evidencia real para cada formato
+- Reutilizacion de transactional finalization y IN_REVIEW state machine
+- Cero declaracion de soporte hasta que la combinacion concreta haya sido validada
+
+Zonas: `apps/web/lib/publishers`, `apps/web/app/api/publishing`, `packages/integrations`
+
+### S-HC-PUB-07-YOUTUBE-PUBLISHING - Real publishing for YouTube: Video 16:9 and YouTube Shorts
+
+Estado: `pending`
+
+- YouTube Video 16:9 publishing real con titulo, descripcion, thumbnail y metadata
+- YouTube Shorts publishing real con metadata requerida
+- Programacion y publicacion real
+- Preview/dry-run para cada formato
+- Provider-specific tests con evidencia real para cada formato
+- Reutilizacion de transactional finalization y IN_REVIEW state machine
+- Cero declaracion de soporte hasta validacion real
+
+Zonas: `apps/web/lib/publishers`, `apps/web/app/api/publishing`, `packages/integrations`
+
+### S-HC-PUB-08-PLATFORM-FORMAT-PARITY - Platform-format parity: manifest, preview, dry-run, scheduling and publishing for every supported format
+
+Estado: `pending`
+
+- Paridad de capacidades (preview, dry-run, publicacion, metricas) para cada formato soportado
+- Auditoria de la matriz de capacidad red/formato: sin combinaciones sin responsable asignado
+- Manifiesto de activos cubre todos los formatos con reglas validadas
+- Preview especifico de plataforma para cada formato
+- Tests provider-specific para todos los formatos publicables
+- Documentacion del estado de cada combinacion en PRODUCT_VISION_END_TO_END
+
+Zonas: `apps/web/lib/publishers`, `apps/web/lib/publishing-formats.ts`, `apps/web/components`, `packages/integrations`
 
 ### S-HC-OBS-01-PUBLISHING-OBSERVABILITY - Publishing observability: structured logging, metrics dashboard, alert thresholds
 

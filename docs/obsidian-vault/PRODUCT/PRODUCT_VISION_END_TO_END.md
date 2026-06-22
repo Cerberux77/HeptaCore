@@ -1,7 +1,7 @@
 ---
 type: product-vision
 project: "HeptaCore"
-last_updated: "2026-06-22T19:30:00.000Z"
+last_updated: "2026-06-22T19:42:00.000Z"
 status: "canonical"
 tags:
   - "#product"
@@ -17,6 +17,61 @@ tags:
 ## Resumen
 
 HeptaCore es un sistema operativo de marketing multi-tenant con IA que cubre el ciclo completo: landing → registro y pago → onboarding guiado → documento maestro → resolucion de vacios → estrategia con IA → activos requeridos → carga o generacion IA → calendario → aprobacion → publicacion → metricas → mensajes → optimizacion.
+
+## Alcance Final de Formatos y Plataformas
+
+HeptaCore debe soportar, para todas las redes integradas y siempre que las APIs oficiales lo permitan: generacion del contenido, manifiesto de activos, validacion tecnica de activos, preview o simulacion especifica de plataforma, dry-run, aprobacion, programacion, publicacion real, reconciliacion y metricas posteriores.
+
+Reels, Stories, videos y YouTube forman parte obligatoria del alcance final de HeptaCore. Algunas combinaciones todavia estan pendientes de implementacion o validacion real. La arquitectura debe ser extensible a nuevas redes y formatos sin hardcodear toda la logica en la interfaz.
+
+### Matriz de Capacidad por Red y Formato
+
+#### Instagram
+
+| Formato | Preview | Dry-Run | Publicacion Inmediata | Publicacion Programada | Metricas |
+|---|---|---|---|---|---|
+| Feed imagen | Implementado (PUB-02) | Implementado (REC-00A) | Implementado (REC-00A) | Implementado (REC-00A) | Pendiente (AN-01) |
+| Feed video | Parcial (PUB-02 preview) | Pendiente | Pendiente | Pendiente | Pendiente (AN-01) |
+| Carousel | Implementado (PUB-02) | Implementado (PUB-02) | Pendiente (PUB-06) | Pendiente (PUB-06 + PUB-04) | Pendiente (AN-01) |
+| Story imagen | Implementado (PUB-02) | Implementado (PUB-02) | Pendiente (PUB-06) | Pendiente (PUB-06 + PUB-04) | Pendiente (AN-01) |
+| Story video | Parcial (PUB-02 preview) | Pendiente | Pendiente (PUB-06) | Pendiente (PUB-06 + PUB-04) | Pendiente (AN-01) |
+| Reel | Pendiente | Pendiente | Pendiente (PUB-06) | Pendiente (PUB-06 + PUB-04) | Pendiente (AN-01) |
+
+#### Facebook
+
+| Formato | Preview | Dry-Run | Publicacion Inmediata | Publicacion Programada | Metricas |
+|---|---|---|---|---|---|
+| Feed imagen | Implementado (PUB-02) | Implementado (REC-00A) | Implementado (REC-00A) | Implementado (REC-00A) | Pendiente (AN-01) |
+| Feed video | Parcial (PUB-02 preview) | Pendiente | Pendiente | Pendiente | Pendiente (AN-01) |
+| Multiples medios | Pendiente | Pendiente | Pendiente | Pendiente | Pendiente (AN-01) |
+| Story imagen | Implementado (PUB-02) | Implementado (PUB-02) | Pendiente (PUB-06) | Pendiente (PUB-06 + PUB-04) | Pendiente (AN-01) |
+| Story video | Parcial (PUB-02 preview) | Pendiente | Pendiente (PUB-06) | Pendiente (PUB-06 + PUB-04) | Pendiente (AN-01) |
+| Reel | Pendiente | Pendiente | Pendiente (PUB-06) | Pendiente (PUB-06 + PUB-04) | Pendiente (AN-01) |
+
+#### YouTube
+
+| Formato | Preview | Dry-Run | Publicacion Inmediata | Publicacion Programada | Metricas |
+|---|---|---|---|---|---|
+| Video 16:9 | Pendiente | Pendiente | Pendiente (PUB-07) | Pendiente (PUB-07 + PUB-04) | Pendiente (AN-01) |
+| YouTube Short | Pendiente | Pendiente | Pendiente (PUB-07) | Pendiente (PUB-07 + PUB-04) | Pendiente (AN-01) |
+
+### Compatibilidad de Activos (PUB-03)
+
+PUB-03 clasifica la compatibilidad tecnica del activo — no publica, no llama al proveedor, no elimina ni reduce el objetivo final.
+
+| Formato | Clasificacion PUB-03 |
+|---|---|
+| Instagram Feed | Implementado / en desarrollo |
+| Instagram Carousel | Implementado / en desarrollo |
+| Instagram Story | Implementado / en desarrollo |
+| Instagram Reel | Implementado / en desarrollo (compatibilidad de activos; publicacion real pendiente en PUB-06) |
+| Facebook Feed imagen | Implementado / en desarrollo |
+| Facebook Feed video | Implementado / en desarrollo |
+| Facebook Story/Reel | Implementado / en desarrollo (compatibilidad de activos; publicacion real pendiente en PUB-06) |
+| YouTube Short | Implementado / en desarrollo (compatibilidad de activos; publicacion real pendiente en PUB-07) |
+| YouTube Video 16:9 | Implementado / en desarrollo (compatibilidad de activos; publicacion real pendiente en PUB-07) |
+
+Para formatos sin publisher implementado: la compatibilidad de activos esta en desarrollo o implementada en PUB-03; el preview/dry-run tiene el estado verificado en la matriz anterior; la publicacion real esta pendiente de implementacion en un sprint especifico; el objetivo final es obligatorio.
 
 ## Flujo Comercial
 
@@ -53,7 +108,7 @@ HeptaCore es un sistema operativo de marketing multi-tenant con IA que cubre el 
 | Tono y lenguaje | Pendiente (STRAT-01) |
 | Redes recomendadas | Pendiente (STRAT-01) |
 | Objetivo por red | Pendiente (STRAT-01) |
-| Formatos por red (Feed, Story, Carousel, Reel, Video) | Parcial (PUB-02) |
+| Formatos por red (Feed, Story, Carousel, Reel, Video) | Parcial (PUB-02 define formatos) |
 | Volumen y frecuencia | Pendiente (STRAT-01) |
 | Fechas y mejores ventanas horarias | Pendiente (STRAT-01) |
 | Copy, speech, guion, CTA, hashtags y variantes | Pendiente (STRAT-01) |
@@ -101,7 +156,7 @@ Por cada publicacion, el sistema debe definir:
 - Pedir ayuda (asistencia guiada)
 - Solicitar generacion por IA (broker provider-agnostic, consumo medido y cobrado)
 
-La generacion IA se disena como broker provider-agnostic, sin hardcodear Gemini ni otro proveedor como unica opcion.
+La generacion IA se disena como broker provider-agnostic, sin hardcodear un unico proveedor.
 
 ### 5. Seguimiento y Operacion
 
@@ -173,6 +228,9 @@ La generacion IA se disena como broker provider-agnostic, sin hardcodear Gemini 
 - S-HC-PUB-03-MULTITENANT-ASSETS: ACTIVE
 - S-HC-PUB-04-HOURLY-BATCH-CRON: PENDING
 - S-HC-PUB-05-RECONCILIATION-OPS: PENDING
+- S-HC-PUB-06-REELS-STORIES-PUBLISHERS: PENDING
+- S-HC-PUB-07-YOUTUBE-PUBLISHING: PENDING
+- S-HC-PUB-08-PLATFORM-FORMAT-PARITY: PENDING
 
 ### Comercial — PENDIENTE
 - S-HC-COMM-01-SELF-SERVICE-SIGNUP
@@ -223,3 +281,4 @@ La generacion IA se disena como broker provider-agnostic, sin hardcodear Gemini 
 5. **Provider-agnostic.** Sin hardcodear proveedores de IA, almacenamiento ni redes sociales.
 6. **Un sprint por vez.** Ejecucion secuencial con dependencias respetadas.
 7. **Cero llamadas a proveedores sociales en sprints de preview o clasificacion.**
+8. **Ningun formato se declara fuera del alcance del producto.** Reels, Stories, videos y YouTube forman parte obligatoria del alcance final. Si aun no estan implementados, estan pendientes, no excluidos.
