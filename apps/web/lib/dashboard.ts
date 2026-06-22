@@ -3,6 +3,7 @@ import { prisma } from "./prisma";
 import { getTrialStatus, type TrialStatus } from "./trial";
 import { projectDraftOperationalState, type DraftOperationalState } from "./draft-operational-state";
 import { normalizeAssetManifest, normalizePublishingFormat, type DraftFormatAsset, type PublishingFormat } from "./publishing-formats";
+import { resolveAssetUrl } from "./asset-resolution";
 
 export interface OperCounts {
   total: number; draft: number; reviewRequired: number; readyToPublish: number;
@@ -86,9 +87,17 @@ export type TenantAssetItem = {
   filename: string;
   kind: string;
   path: string | null;
+  sourcePath?: string | null;
+  storageKey?: string | null;
   mimeType: string | null;
   rightsStatus: string;
   draftCount: number;
+  folder?: string;
+  sizeBytes?: number | null;
+  width?: number | null;
+  height?: number | null;
+  durationSeconds?: number | null;
+  metadata?: Record<string, unknown>;
 };
 
 export type StrategySnapshot = {
@@ -294,7 +303,7 @@ export async function getTenantOperationalSnapshot(tenantSlug: string): Promise<
     const nw = NETWORK_LABELS[d.network] ?? d.network;
     byNetwork[nw] = (byNetwork[nw] ?? 0) + 1;
     const format = normalizePublishingFormat(d.network, d.format);
-    const orderedAssets = mapDraftAssets(d.assets);
+    const orderedAssets = mapDraftAssets(d.assets, tenantSlug);
     return { id: d.id, title: d.title, caption: d.caption, network: d.network, format, pillar: d.pillar, status: d.status, operationalState: p.operationalState, publishBlockedReason: p.blockedReason, duplicateIncident: p.duplicateIncident, externalPostId: p.externalPostId, riskLevel: d.riskLevel, requiresReview: d.requiresReview, scheduledFor: d.scheduledFor?.toISOString().slice(0, 16).replace("T", " ") ?? null, hashtags: d.hashtags, cta: d.cta, source: d.source, asset: legacyPrimaryAsset(orderedAssets), assets: orderedAssets };
   });
 
@@ -319,8 +328,9 @@ function mapDraftAssets(
       metadata: unknown;
     };
   }>,
+  tenantSlug: string,
 ): DraftFormatAsset[] {
-  return normalizeAssetManifest(assets, (asset) => asset?.sourcePath ?? asset?.storageKey ?? null);
+  return normalizeAssetManifest(assets, (asset) => resolveAssetUrl(asset, tenantSlug));
 }
 
 function legacyPrimaryAsset(assets: DraftFormatAsset[]): DraftQueueItem["asset"] {
@@ -377,17 +387,29 @@ export async function getTenantAssets(tenantSlug: string): Promise<TenantAssetIt
       filename: true,
       kind: true,
       sourcePath: true,
+      storageKey: true,
       mimeType: true,
+      metadata: true,
       rightsStatus: true,
       _count: { select: { drafts: true } },
     },
   });
 
   return assets.map((asset) => ({
+    ...(asset.metadata && typeof asset.metadata === "object" ? {
+      folder: String((asset.metadata as Record<string, unknown>).folder ?? ""),
+      sizeBytes: Number((asset.metadata as Record<string, unknown>).sizeBytes ?? 0) || null,
+      width: Number((asset.metadata as Record<string, unknown>).width ?? 0) || null,
+      height: Number((asset.metadata as Record<string, unknown>).height ?? 0) || null,
+      durationSeconds: Number((asset.metadata as Record<string, unknown>).durationSeconds ?? 0) || null,
+      metadata: asset.metadata as Record<string, unknown>,
+    } : {}),
     id: asset.id,
     filename: asset.filename,
     kind: asset.kind,
-    path: asset.sourcePath,
+    path: resolveAssetUrl(asset, tenantSlug),
+    sourcePath: asset.sourcePath,
+    storageKey: asset.storageKey,
     mimeType: asset.mimeType,
     rightsStatus: asset.rightsStatus,
     draftCount: asset._count.drafts,
@@ -570,7 +592,7 @@ export const getDraftQueue = cache(
       });
 
       const format = normalizePublishingFormat(d.network, d.format);
-      const orderedAssets = mapDraftAssets(d.assets);
+      const orderedAssets = mapDraftAssets(d.assets, tenantSlug);
 
       return {
         id: d.id,

@@ -6,6 +6,7 @@ import { getPublisher, PublishInput } from "../../../../lib/publishers";
 import { ProviderError } from "../../../../lib/publishers/types";
 import { checkCronJobEligibility, hasDurableProviderSuccess, isPublicationDurablyCommitted } from "../../../../lib/publishing-execution";
 import { commitConfirmedPublication, recordUnconfirmedProviderFailure } from "../../../../lib/publishing-finalization";
+import { resolveAssetUrl } from "../../../../lib/asset-resolution";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -40,19 +41,7 @@ type PublishOutcome =
   | { kind: "attempted"; error: string }
   | { kind: "ambiguous"; error: string };
 
-function resolveAssetPath(asset: { storageKey?: string | null; sourcePath?: string | null; filename: string }): string | null {
-  const raw = asset.storageKey || asset.sourcePath || asset.filename;
-  if (!raw) return null;
-  const normalized = raw.replace(/\\/g, "/").replace(/^\/+/, "");
-  if (normalized.includes("..")) return null;
-  return normalized;
-}
-
-function tenantAssetSlug(tenantSlug: string): string {
-  return tenantSlug === "turpial-sound" ? "turpial" : tenantSlug;
-}
-
-function buildPublicAssetUrl(tenantSlug: string, assetPath: string): string | null {
+function appOrigin(): string | null {
   const raw =
     process.env.APP_PUBLIC_URL ||
     process.env.NEXT_PUBLIC_APP_URL ||
@@ -75,13 +64,19 @@ function buildPublicAssetUrl(tenantSlug: string, assetPath: string): string | nu
     origin = `https://${base}`;
   }
 
-  const folder = tenantAssetSlug(tenantSlug);
-  const encodedPath = assetPath.split("/").map((s) => encodeURIComponent(s)).join("/");
-  const url = `${origin}/tenant-assets/${folder}/${encodedPath}`;
+  return origin.includes("\r") || origin.includes("\n") ? null : origin;
+}
 
-  if (url.includes("\r") || url.includes("\n")) return null;
-
-  return url;
+function buildPublicAssetUrl(tenantSlug: string, asset: { storageKey?: string | null; sourcePath?: string | null; filename?: string | null }): string | null {
+  const resolved = resolveAssetUrl(asset, tenantSlug);
+  if (!resolved) return null;
+  if (resolved.startsWith("https://")) return resolved;
+  if (resolved.startsWith("http://")) {
+    const isProd = process.env.NODE_ENV === "production" || process.env.VERCEL_ENV === "production";
+    return isProd ? null : resolved;
+  }
+  const origin = appOrigin();
+  return origin ? `${origin}${resolved.startsWith("/") ? "" : "/"}${resolved}` : null;
 }
 
 async function tryRealPublish(job: JobRecord): Promise<PublishOutcome> {
@@ -140,11 +135,6 @@ async function tryRealPublish(job: JobRecord): Promise<PublishOutcome> {
   const primaryAsset = needsAsset ? (draft.assets.find((a) => a.role === "primary") ?? draft.assets[0]) : null;
 
   if (primaryAsset) {
-    const assetPath = resolveAssetPath(primaryAsset.asset);
-    if (!assetPath) {
-      return { kind: "blocked", reason: "Cannot resolve asset path. Ensure storageKey or sourcePath is set." };
-    }
-
     let tenantSlug = job.tenant?.slug;
     if (!tenantSlug) {
       const tenant = await prisma.tenant.findFirst({
@@ -157,7 +147,7 @@ async function tryRealPublish(job: JobRecord): Promise<PublishOutcome> {
       return { kind: "blocked", reason: "Tenant slug not found." };
     }
 
-    mediaUrl = buildPublicAssetUrl(tenantSlug, assetPath);
+    mediaUrl = buildPublicAssetUrl(tenantSlug, primaryAsset.asset);
     if (!mediaUrl) {
       return { kind: "blocked", reason: "Cannot construct public HTTPS asset URL." };
     }

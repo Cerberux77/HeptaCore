@@ -18,6 +18,7 @@
     "@heptacore/ui": "0.1.0",
     "@prisma/adapter-pg": "latest",
     "@prisma/client": "latest",
+    "@vercel/blob": "^2.4.1",
     "bcryptjs": "^3.0.3",
     "lucide-react": "latest",
     "next": "latest",

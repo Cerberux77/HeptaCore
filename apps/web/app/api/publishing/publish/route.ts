@@ -9,6 +9,7 @@ import { buildImmediateJobId, checkExistingJobForRetry, getAllPossibleJobIds } f
 import { commitConfirmedPublication, recordUnconfirmedProviderFailure } from "../../../../lib/publishing-finalization";
 import { ProviderError } from "../../../../lib/publishers/types";
 import { buildMultiformatDryRun, normalizeAssetManifest, normalizePublishingFormat } from "../../../../lib/publishing-formats";
+import { resolveAssetUrl } from "../../../../lib/asset-resolution";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -24,19 +25,7 @@ function checkScopes(required: string[], actual: string[]): string[] {
   );
 }
 
-function resolveAssetPath(asset: { storageKey?: string | null; sourcePath?: string | null; filename: string }): string | null {
-  const raw = asset.storageKey || asset.sourcePath || asset.filename;
-  if (!raw) return null;
-  const normalized = raw.replace(/\\/g, "/").replace(/^\/+/, "");
-  if (normalized.includes("..")) return null;
-  return normalized;
-}
-
-function tenantAssetSlug(tenantSlug: string): string {
-  return tenantSlug === "turpial-sound" ? "turpial" : tenantSlug;
-}
-
-function buildPublicAssetUrl(tenantSlug: string, assetPath: string): string | null {
+function appOrigin(): string | null {
   const raw =
     process.env.APP_PUBLIC_URL ||
     process.env.NEXT_PUBLIC_APP_URL ||
@@ -59,13 +48,19 @@ function buildPublicAssetUrl(tenantSlug: string, assetPath: string): string | nu
     origin = `https://${base}`;
   }
 
-  const folder = tenantAssetSlug(tenantSlug);
-  const encodedPath = assetPath.split("/").map((s) => encodeURIComponent(s)).join("/");
-  const url = `${origin}/tenant-assets/${folder}/${encodedPath}`;
+  return origin.includes("\r") || origin.includes("\n") ? null : origin;
+}
 
-  if (url.includes("\r") || url.includes("\n")) return null;
-
-  return url;
+function buildPublicAssetUrl(tenantSlug: string, asset: { storageKey?: string | null; sourcePath?: string | null; filename?: string | null }): string | null {
+  const resolved = resolveAssetUrl(asset, tenantSlug);
+  if (!resolved) return null;
+  if (resolved.startsWith("https://")) return resolved;
+  if (resolved.startsWith("http://")) {
+    const isProd = process.env.NODE_ENV === "production" || process.env.VERCEL_ENV === "production";
+    return isProd ? null : resolved;
+  }
+  const origin = appOrigin();
+  return origin ? `${origin}${resolved.startsWith("/") ? "" : "/"}${resolved}` : null;
 }
 
 export async function POST(req: Request) {
@@ -121,8 +116,7 @@ export async function POST(req: Request) {
   const format = normalizePublishingFormat(network, draft.format);
   const orderedAssets = normalizeAssetManifest(draft.assets, (asset) => {
     if (!asset) return null;
-    const assetPath = resolveAssetPath(asset);
-    return assetPath ? buildPublicAssetUrl(tenantSlug, assetPath) : null;
+    return buildPublicAssetUrl(tenantSlug, asset);
   });
 
   const draftOnly = tenant.automationMode === "DRAFT_ONLY";
@@ -346,15 +340,7 @@ export async function POST(req: Request) {
   const primaryAsset = needsAsset ? (draft.assets.find((a) => a.role === "primary") ?? draft.assets[0]) : null;
 
   if (primaryAsset) {
-    const assetPath = resolveAssetPath(primaryAsset.asset);
-    if (!assetPath) {
-      return NextResponse.json({
-        code: "LIVE_BLOCKED_ASSET_NOT_PUBLIC",
-        error: "Live publishing requires a public HTTPS asset URL.",
-        action: "Sube un asset con URL pública o configura APP_PUBLIC_URL/NEXT_PUBLIC_APP_URL.",
-      }, { status: 409 });
-    }
-    mediaUrl = buildPublicAssetUrl(tenantSlug, assetPath);
+    mediaUrl = buildPublicAssetUrl(tenantSlug, primaryAsset.asset);
 
     if (!mediaUrl) {
       return NextResponse.json({

@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { upload as uploadBlob } from "@vercel/blob/client";
 import {
   AlertTriangle,
   ArrowDown,
@@ -86,17 +87,12 @@ const NETWORK_LABELS: Record<string, string> = {
   X: "X",
 };
 
-function tenantAssetSlug(tenantSlug: string): string {
-  return tenantSlug === "turpial-sound" ? "turpial" : tenantSlug;
-}
-
 function assetUrl(path: string | null | undefined, slug: string) {
   if (!path) return "";
   if (path.startsWith("http://") || path.startsWith("https://") || path.startsWith("/")) return path;
-  const folder = tenantAssetSlug(slug);
   const cleanPath = path.replace(/^content\/inbox\//, "").replace(/\\/g, "/");
   if (cleanPath.includes("..")) return "";
-  return `/tenant-assets/${folder}/${cleanPath}`;
+  return `/tenant-assets/${slug}/${cleanPath}`;
 }
 
 function channelLabel(item: DraftQueueItem) {
@@ -385,12 +381,37 @@ export function DashboardConsole({
   const [newPubAssetId, setNewPubAssetId] = useState("");
   const [newPubSaving, setNewPubSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
-  const [uploadFile, setUploadFile] = useState<File | null>(null);
+  const [uploadFiles, setUploadFiles] = useState<File[]>([]);
+  const [uploadFolder, setUploadFolder] = useState("");
+  const [uploadProgress, setUploadProgress] = useState<Record<string, number>>({});
+  const [assetMessage, setAssetMessage] = useState<{ kind: "success" | "error"; text: string } | null>(null);
+  const [localAssets, setLocalAssets] = useState<TenantAssetItem[]>(assets);
+  const [assetKindFilter, setAssetKindFilter] = useState("ALL");
+  const [assetFolderFilter, setAssetFolderFilter] = useState("ALL");
+  const [movingAssetId, setMovingAssetId] = useState("");
+  const [moveFolder, setMoveFolder] = useState("");
+  const [replaceAssetId, setReplaceAssetId] = useState("");
+  const [deletingAssetId, setDeletingAssetId] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
   const selected = selectedDraftFromQueue(localQueue, selectedId);
   const selectedValidation = selected ? validateFormatAssets(selected.format, selected.assets ?? []) : null;
   const activeNetworks = metrics?.tenant.activeNetworks?.length ? metrics.tenant.activeNetworks : ["INSTAGRAM", "FACEBOOK"];
   const missingCoreNetworks = SUPPORTED_NETWORKS.filter((network) => !activeNetworks.includes(network));
+  const assetFolders = useMemo(() => {
+    const folders = new Set(localAssets.map((asset) => asset.folder ?? "").filter(Boolean));
+    return [...folders].sort();
+  }, [localAssets]);
+  const visibleAssets = useMemo(() => {
+    return localAssets.filter((asset) => {
+      const kindOk = assetKindFilter === "ALL" || asset.kind === assetKindFilter;
+      const folderOk = assetFolderFilter === "ALL" || (asset.folder ?? "") === assetFolderFilter;
+      return kindOk && folderOk;
+    });
+  }, [assetFolderFilter, assetKindFilter, localAssets]);
+
+  useEffect(() => {
+    setLocalAssets(assets);
+  }, [assets]);
 
   const pendingReview = localQueue.filter(
     (i) => i.status !== "PUBLISHED" && (i.requiresReview || i.riskLevel !== "low"),
@@ -793,23 +814,55 @@ export function DashboardConsole({
     }
   }
 
+  function sanitizeClientFilename(name: string) {
+    return (name.replace(/\\/g, "/").split("/").pop() || "asset")
+      .normalize("NFKD")
+      .replace(/[^\w.\- ]+/g, "")
+      .trim()
+      .replace(/\s+/g, "-")
+      .replace(/^\.+/, "")
+      .slice(0, 120) || "asset";
+  }
+
+  async function refreshTenantAssets() {
+    const res = await fetch(`/api/tenants/${tenantSlug}/assets`, { headers: { Accept: "application/json" } });
+    const data = await res.json();
+    if (!res.ok || !data.ok) throw new Error(data.error || "Error al refrescar assets");
+    setLocalAssets(data.assets ?? []);
+    return data.assets ?? [];
+  }
+
   async function handleUploadAsset() {
-    if (!uploadFile) return;
+    if (uploadFiles.length === 0 || !metrics?.tenant.id) return;
     setUploading(true);
+    setAssetMessage(null);
     try {
-      const formData = new FormData();
-      formData.append("file", uploadFile);
-      formData.append("tenantSlug", tenantSlug);
-      const res = await fetch("/api/assets/upload", { method: "POST", body: formData });
-      const data = await res.json();
-      if (!res.ok || !data.ok) {
-        alert(data.error || "Error al subir asset");
-        return;
+      for (const file of uploadFiles) {
+        const safeName = sanitizeClientFilename(file.name);
+        const pathname = `tenants/${metrics.tenant.id}/assets/${crypto.randomUUID()}/${safeName}`;
+        await uploadBlob(pathname, file, {
+          access: "public",
+          handleUploadUrl: `/api/tenants/${tenantSlug}/assets/upload`,
+          multipart: file.size > 4.5 * 1024 * 1024,
+          clientPayload: JSON.stringify({
+            originalFilename: file.name,
+            mimeType: file.type,
+            sizeBytes: file.size,
+            folder: uploadFolder,
+          }),
+          onUploadProgress: ({ percentage }) => {
+            setUploadProgress((prev) => ({ ...prev, [file.name]: Math.round(percentage) }));
+          },
+        });
       }
-      window.location.reload();
+      await refreshTenantAssets();
+      setAssetMessage({ kind: "success", text: `${uploadFiles.length} asset(s) cargado(s).` });
+    } catch (error) {
+      setAssetMessage({ kind: "error", text: error instanceof Error ? error.message : "Error al subir assets" });
     } finally {
       setUploading(false);
-      setUploadFile(null);
+      setUploadFiles([]);
+      setUploadProgress({});
       if (fileInputRef.current) fileInputRef.current.value = "";
     }
   }
@@ -818,7 +871,7 @@ export function DashboardConsole({
     if (!renameFilename.trim()) return;
     setRenameSaving(true);
     try {
-      const res = await fetch(`/api/assets/${assetId}`, {
+      const res = await fetch(`/api/tenants/${tenantSlug}/assets/${assetId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ filename: renameFilename.trim() }),
@@ -828,11 +881,96 @@ export function DashboardConsole({
         alert(data.error || "Error al renombrar asset");
         return;
       }
-      window.location.reload();
+      setLocalAssets((prev) => prev.map((asset) => asset.id === assetId ? { ...asset, ...data.asset } : asset));
+      setAssetMessage({ kind: "success", text: "Asset renombrado." });
     } finally {
       setRenameSaving(false);
       setRenamingAssetId("");
       setRenameFilename("");
+    }
+  }
+
+  async function handleMoveAsset(assetId: string) {
+    setRenameSaving(true);
+    try {
+      const res = await fetch(`/api/tenants/${tenantSlug}/assets/${assetId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ folder: moveFolder }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.ok) {
+        setAssetMessage({ kind: "error", text: data.error || "Error al mover asset" });
+        return;
+      }
+      setLocalAssets((prev) => prev.map((asset) => asset.id === assetId ? { ...asset, ...data.asset } : asset));
+      setAssetMessage({ kind: "success", text: "Carpeta actualizada." });
+    } finally {
+      setRenameSaving(false);
+      setMovingAssetId("");
+      setMoveFolder("");
+    }
+  }
+
+  async function handleReplaceAsset(assetId: string, file: File | null) {
+    if (!file || !metrics?.tenant.id) return;
+    setReplaceAssetId(assetId);
+    setAssetMessage(null);
+    try {
+      const current = localAssets.find((asset) => asset.id === assetId);
+      const safeName = sanitizeClientFilename(file.name);
+      const pathname = `tenants/${metrics.tenant.id}/assets/${crypto.randomUUID()}/${safeName}`;
+      await uploadBlob(pathname, file, {
+        access: "public",
+        handleUploadUrl: `/api/tenants/${tenantSlug}/assets/${assetId}/content/upload`,
+        multipart: file.size > 4.5 * 1024 * 1024,
+        clientPayload: JSON.stringify({
+          originalFilename: file.name,
+          mimeType: file.type,
+          sizeBytes: file.size,
+          expectedStorageKey: current?.storageKey ?? null,
+        }),
+      });
+      const refreshed = await refreshTenantAssets();
+      const nextAsset = refreshed.find((asset: TenantAssetItem) => asset.id === assetId);
+      setLocalQueue((prev) => prev.map((draft) => ({
+        ...draft,
+        status: draft.assets?.some((asset) => asset.id === assetId) && draft.status === "APPROVED" ? "NEEDS_REVIEW" : draft.status,
+        requiresReview: draft.assets?.some((asset) => asset.id === assetId) && draft.status === "APPROVED" ? true : draft.requiresReview,
+        assets: draft.assets?.map((asset) => asset.id === assetId ? {
+          ...asset,
+          filename: nextAsset?.filename ?? asset.filename,
+          url: nextAsset?.path ?? asset.url,
+          mimeType: nextAsset?.mimeType ?? asset.mimeType,
+          kind: nextAsset?.kind ?? asset.kind,
+          sizeBytes: nextAsset?.sizeBytes ?? asset.sizeBytes,
+        } : asset),
+      })));
+      setAssetMessage({ kind: "success", text: "Contenido reemplazado." });
+      setDryRunResult(null);
+    } catch (error) {
+      setAssetMessage({ kind: "error", text: error instanceof Error ? error.message : "Error al reemplazar asset" });
+    } finally {
+      setReplaceAssetId("");
+    }
+  }
+
+  async function handleDeleteAsset(assetId: string) {
+    const asset = localAssets.find((item) => item.id === assetId);
+    if (!asset || !confirm(`Eliminar ${asset.filename}?`)) return;
+    setDeletingAssetId(assetId);
+    setAssetMessage(null);
+    try {
+      const res = await fetch(`/api/tenants/${tenantSlug}/assets/${assetId}`, { method: "DELETE" });
+      const data = await res.json();
+      if (!res.ok || !data.ok) {
+        setAssetMessage({ kind: "error", text: data.code === "ASSET_IN_USE" ? "No se puede eliminar: asset en uso por drafts." : data.error || "Error al eliminar asset" });
+        return;
+      }
+      setLocalAssets((prev) => prev.filter((item) => item.id !== assetId));
+      setAssetMessage({ kind: "success", text: "Asset eliminado." });
+    } finally {
+      setDeletingAssetId("");
     }
   }
 
@@ -995,7 +1133,7 @@ export function DashboardConsole({
                   Asset (opcional)
                   <select value={newPubAssetId} onChange={(e) => setNewPubAssetId(e.target.value)}>
                     <option value="">Sin asset</option>
-                    {assets.map((a) => <option key={a.id} value={a.id}>{a.filename}</option>)}
+                    {localAssets.map((a) => <option key={a.id} value={a.id}>{a.filename}</option>)}
                   </select>
                 </label>
               </div>
@@ -1395,7 +1533,7 @@ export function DashboardConsole({
                       {assetPickerTarget.mode === "add" ? "Agregar asset:" : `Reemplazar asset #${assetPickerTarget.order ?? 1}:`}
                     </strong>
                     <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 6, maxHeight: 160, overflowY: "auto" }}>
-                       {assets
+                       {localAssets
                          .filter((a) => assetPickerTarget.mode === "replace" || !(selected.assets ?? []).some((current) => current.id === a.id))
                          .slice(0, 20)
                         .map((asset) => (
@@ -1582,25 +1720,51 @@ export function DashboardConsole({
             </section>
             <section className="work-panel">
               <PanelTitle icon={<PackageSearch size={17} />} title="Activos del tenant" />
-              <div style={{ display: "flex", gap: 8, padding: "0 4px 8px 4px", alignItems: "center" }}>
+              <div style={{ display: "flex", gap: 8, padding: "0 4px 8px 4px", alignItems: "center", flexWrap: "wrap" }}>
                 <input
                   ref={fileInputRef}
                   type="file"
-                  accept="image/*,video/mp4,audio/*,.pdf"
-                  onChange={(e) => setUploadFile(e.target.files?.[0] ?? null)}
+                  multiple
+                  accept="image/jpeg,image/png,image/webp,video/mp4,video/quicktime"
+                  onChange={(e) => setUploadFiles(Array.from(e.target.files ?? []))}
                   style={{ fontSize: 11 }}
+                />
+                <input
+                  value={uploadFolder}
+                  onChange={(e) => setUploadFolder(e.target.value)}
+                  placeholder="Carpeta"
+                  style={{ padding: "4px 8px", borderRadius: 4, border: "1px solid var(--hc-line)", fontSize: 12, maxWidth: 140 }}
                 />
                 <button
                   onClick={handleUploadAsset}
-                  disabled={uploading || !uploadFile}
+                  disabled={uploading || uploadFiles.length === 0}
                   className="primary-action"
                   style={{ fontSize: 12, padding: "4px 12px" }}
                 >
                   {uploading ? "Subiendo..." : "Subir"}
                 </button>
               </div>
+              {(uploadFiles.length > 0 || assetMessage) && (
+                <div style={{ padding: "0 8px 8px 8px", display: "grid", gap: 4 }}>
+                  {uploadFiles.map((file) => (
+                    <small key={file.name}>{file.name}: {uploadProgress[file.name] ?? 0}%</small>
+                  ))}
+                  {assetMessage && <small style={{ color: assetMessage.kind === "error" ? "#b42318" : "var(--hc-green)" }}>{assetMessage.text}</small>}
+                </div>
+              )}
+              <div style={{ display: "flex", gap: 8, padding: "0 8px 8px 8px", flexWrap: "wrap" }}>
+                <select value={assetKindFilter} onChange={(e) => setAssetKindFilter(e.target.value)} style={{ fontSize: 12, padding: "4px 8px" }}>
+                  <option value="ALL">Todos los tipos</option>
+                  <option value="IMAGE">Imagen</option>
+                  <option value="VIDEO">Video</option>
+                </select>
+                <select value={assetFolderFilter} onChange={(e) => setAssetFolderFilter(e.target.value)} style={{ fontSize: 12, padding: "4px 8px" }}>
+                  <option value="ALL">Todas las carpetas</option>
+                  {assetFolders.map((folder) => <option key={folder} value={folder}>{folder}</option>)}
+                </select>
+              </div>
               <div className="market-grid">
-                {assets.map((asset) => (
+                {visibleAssets.map((asset) => (
                   <div className="market-card" key={asset.id}>
                     {asset.path ? (
                       asset.kind === "VIDEO" || asset.path.toLowerCase().endsWith(".mp4") ? (
@@ -1633,10 +1797,31 @@ export function DashboardConsole({
                         ><Pencil size={12} /></button>
                       </div>
                     )}
-                    <small>{asset.kind} / {asset.rightsStatus} / {asset.draftCount} drafts</small>
+                    {movingAssetId === asset.id ? (
+                      <div style={{ display: "flex", gap: 4, marginTop: 4 }}>
+                        <input
+                          autoFocus
+                          style={{ flex: 1, padding: "3px 6px", borderRadius: 4, border: "1px solid var(--hc-line)", fontSize: 12 }}
+                          value={moveFolder}
+                          onChange={(e) => setMoveFolder(e.target.value)}
+                          placeholder="Carpeta"
+                        />
+                        <button onClick={() => handleMoveAsset(asset.id)} disabled={renameSaving} style={{ padding: "3px 8px", borderRadius: 4, border: "1px solid var(--hc-line)", background: "var(--hc-ink)", color: "#fff", cursor: "pointer", fontSize: 11 }}>Mover</button>
+                      </div>
+                    ) : null}
+                    <small>{asset.kind} / {asset.mimeType ?? "mime?"} / {asset.folder || "raiz"} / {asset.draftCount} drafts</small>
+                    <small>{asset.sizeBytes ? `${Math.round(asset.sizeBytes / 1024)} KB` : "tamano pendiente"}{asset.width && asset.height ? ` / ${asset.width}x${asset.height}` : ""}</small>
+                    <div style={{ display: "flex", gap: 4, flexWrap: "wrap", marginTop: 4 }}>
+                      <button onClick={() => { setMovingAssetId(asset.id); setMoveFolder(asset.folder ?? ""); }} style={{ padding: "3px 8px", borderRadius: 4, border: "1px solid var(--hc-line)", background: "var(--hc-bone)", cursor: "pointer", fontSize: 11 }}>Carpeta</button>
+                      <label style={{ padding: "3px 8px", borderRadius: 4, border: "1px solid var(--hc-line)", background: "var(--hc-bone)", cursor: "pointer", fontSize: 11 }}>
+                        {replaceAssetId === asset.id ? "..." : "Reemplazar"}
+                        <input type="file" accept="image/jpeg,image/png,image/webp,video/mp4,video/quicktime" hidden onChange={(e) => handleReplaceAsset(asset.id, e.target.files?.[0] ?? null)} />
+                      </label>
+                      <button onClick={() => handleDeleteAsset(asset.id)} disabled={deletingAssetId === asset.id || asset.draftCount > 0} title={asset.draftCount > 0 ? "Asset en uso" : "Eliminar"} style={{ padding: "3px 8px", borderRadius: 4, border: "1px solid var(--hc-line)", background: asset.draftCount > 0 ? "var(--hc-bone)" : "#fff1f0", cursor: asset.draftCount > 0 ? "not-allowed" : "pointer", fontSize: 11 }}>Eliminar</button>
+                    </div>
                   </div>
                 ))}
-                {assets.length === 0 && <p style={{ padding: 14 }}>No hay activos cargados.</p>}
+                {visibleAssets.length === 0 && <p style={{ padding: 14 }}>No hay activos cargados para este filtro.</p>}
               </div>
             </section>
           </div>

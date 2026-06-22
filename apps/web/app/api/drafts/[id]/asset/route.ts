@@ -3,6 +3,7 @@ import { auth } from "../../../../../lib/auth";
 import { prisma } from "../../../../../lib/prisma";
 import { auditLog } from "../../../../../lib/audit";
 import { normalizeAssetManifest, roleForAssetOrder } from "../../../../../lib/publishing-formats";
+import { resolveAssetUrl } from "../../../../../lib/asset-resolution";
 
 export async function PUT(
   req: Request,
@@ -97,7 +98,8 @@ export async function PUT(
     where: { draftId: id },
     include: { asset: true },
   });
-  const orderedAssets = normalizeAssetManifest(updatedLinks, (asset) => asset?.sourcePath ?? asset?.storageKey ?? null);
+  const tenant = await prisma.tenant.findUnique({ where: { id: draft.tenantId }, select: { slug: true } });
+  const orderedAssets = normalizeAssetManifest(updatedLinks, (asset) => resolveAssetUrl(asset, tenant?.slug ?? ""));
 
   return NextResponse.json({
     ok: true,
