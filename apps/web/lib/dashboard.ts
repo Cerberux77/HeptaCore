@@ -97,6 +97,8 @@ export type TenantAssetItem = {
   width?: number | null;
   height?: number | null;
   durationSeconds?: number | null;
+  orientation?: string | null;
+  aspectRatio?: unknown;
   metadata?: Record<string, unknown>;
 };
 
@@ -402,6 +404,8 @@ export async function getTenantAssets(tenantSlug: string): Promise<TenantAssetIt
       width: Number((asset.metadata as Record<string, unknown>).width ?? 0) || null,
       height: Number((asset.metadata as Record<string, unknown>).height ?? 0) || null,
       durationSeconds: Number((asset.metadata as Record<string, unknown>).durationSeconds ?? 0) || null,
+      orientation: typeof (asset.metadata as Record<string, unknown>).orientation === "string" ? String((asset.metadata as Record<string, unknown>).orientation) : null,
+      aspectRatio: (asset.metadata as Record<string, unknown>).aspectRatio ?? null,
       metadata: asset.metadata as Record<string, unknown>,
     } : {}),
     id: asset.id,

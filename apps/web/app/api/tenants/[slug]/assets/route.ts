@@ -31,7 +31,14 @@ function serializeAsset(asset: any, tenantSlug: string) {
     width: metadata.width ?? null,
     height: metadata.height ?? null,
     durationSeconds: metadata.durationSeconds ?? null,
+    orientation: metadata.orientation ?? null,
+    aspectRatio: metadata.aspectRatio ?? null,
   };
+}
+
+function parseJsonField(value: FormDataEntryValue | null): unknown {
+  if (typeof value !== "string" || !value.trim()) return undefined;
+  return JSON.parse(value);
 }
 
 export async function GET(_: Request, context: { params: Promise<{ slug: string }> }) {
@@ -62,6 +69,7 @@ export async function POST(req: Request, context: { params: Promise<{ slug: stri
       file,
       folder: formData?.get("folder") ? String(formData.get("folder")) : "",
       projectId: formData?.get("projectId") ? String(formData.get("projectId")) : null,
+      technicalMetadata: parseJsonField(formData?.get("technicalMetadata") ?? null),
     });
     return NextResponse.json({ ok: true, asset: serializeAsset({ ...asset, _count: { drafts: 0 } }, slug) });
   } catch (error) {
