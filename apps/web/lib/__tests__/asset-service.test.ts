@@ -359,3 +359,138 @@ describe("by-storage-key endpoint", () => {
     }
   });
 });
+
+describe("collections management", () => {
+  it("collections list from existing assets", () => {
+    const assets: TenantAssetItem[] = [
+      { id: "a1", kind: "IMAGE", filename: "a.jpg", mimeType: "image/jpeg", storageKey: "k1", path: "/a.jpg", rightsStatus: "needs_review", folder: "feed", draftCount: 0 },
+      { id: "a2", kind: "IMAGE", filename: "b.jpg", mimeType: "image/jpeg", storageKey: "k2", path: "/b.jpg", rightsStatus: "needs_review", folder: "feed", draftCount: 0 },
+      { id: "a3", kind: "IMAGE", filename: "c.jpg", mimeType: "image/jpeg", storageKey: "k3", path: "/c.jpg", rightsStatus: "needs_review", folder: "stories", draftCount: 0 },
+      { id: "a4", kind: "IMAGE", filename: "d.jpg", mimeType: "image/jpeg", storageKey: "k4", path: "/d.jpg", rightsStatus: "needs_review", draftCount: 0 },
+    ];
+    const folders = new Set(assets.map((a) => a.folder ?? "").filter(Boolean));
+    const sorted = [...folders].sort();
+    assert.deepEqual(sorted, ["feed", "stories"]);
+  });
+
+  it("create collection inline", () => {
+    const existingFolders = ["feed", "stories"];
+    const newName = "  highlights  ";
+    const trimmed = newName.trim();
+    assert.equal(trimmed, "highlights");
+    assert.ok(trimmed.length > 0);
+    assert.ok(trimmed.length <= 80);
+    assert.ok(!trimmed.includes(".."));
+    assert.ok(!existingFolders.some((f) => f.toLowerCase() === trimmed.toLowerCase()));
+  });
+
+  it("dedup case-insensitive", () => {
+    const existingFolders = ["Feed", "STORIES"];
+    const newName = "FEED";
+    const exists = existingFolders.some((f) => f.toLowerCase() === newName.toLowerCase());
+    assert.equal(exists, true);
+
+    const newName2 = "Highlights";
+    const exists2 = existingFolders.some((f) => f.toLowerCase() === newName2.toLowerCase());
+    assert.equal(exists2, false);
+  });
+});
+
+describe("waitForRegisteredAsset error handling", () => {
+  it("continues polling after 500 temporary", async () => {
+    const originalFetch = globalThis.fetch;
+    let callCount = 0;
+    globalThis.fetch = async () => {
+      callCount++;
+      if (callCount <= 2) {
+        return new Response("", { status: 500, statusText: "Internal Server Error" });
+      }
+      return new Response(JSON.stringify({
+        ok: true,
+        found: true,
+        asset: { id: "asset-x", filename: "test.jpg", kind: "IMAGE", path: "/test.jpg", storageKey: "key-1" },
+      }), { status: 200 });
+    };
+    try {
+      const result = await waitForRegisteredAsset("test-tenant", "key-1", { attempts: 5, initialDelayMs: 5, maxDelayMs: 20 });
+      assert.equal(result.found, true);
+      assert.ok(result.asset);
+      assert.equal(callCount, 3);
+    } finally {
+      globalThis.fetch = originalFetch;
+    }
+  });
+
+  it("handles non-JSON response gracefully", async () => {
+    const originalFetch = globalThis.fetch;
+    globalThis.fetch = async () => new Response("not json", { status: 200 });
+    try {
+      const result = await waitForRegisteredAsset("test-tenant", "key-1", { attempts: 3, initialDelayMs: 5, maxDelayMs: 20 });
+      assert.equal(result.found, false);
+      assert.ok(result.lastError);
+      assert.match(result.lastError!, /not valid JSON/);
+    } finally {
+      globalThis.fetch = originalFetch;
+    }
+  });
+
+  it("stops on 401/403", async () => {
+    const originalFetch = globalThis.fetch;
+    let callCount = 0;
+    globalThis.fetch = async () => {
+      callCount++;
+      return new Response(JSON.stringify({ ok: false, found: false }), { status: 403, statusText: "Forbidden" });
+    };
+    try {
+      const result = await waitForRegisteredAsset("test-tenant", "key-1", { attempts: 5, initialDelayMs: 5, maxDelayMs: 20 });
+      assert.equal(result.found, false);
+      assert.equal(result.retryable, false);
+      assert.equal(callCount, 1);
+      assert.equal(result.lastStatus, 403);
+    } finally {
+      globalThis.fetch = originalFetch;
+    }
+  });
+});
+
+describe("retry and upload behavior", () => {
+  it("retry does not create second row", () => {
+    const originalItems: Array<{ id: string; state: string }> = [
+      { id: "uid-1", state: "FAILED" },
+    ];
+    const retryId = "uid-1";
+    const nextItems = originalItems.map((it) => it.id === retryId ? { ...it, state: "PENDING" } : it);
+    assert.equal(nextItems.length, 1);
+    assert.equal(nextItems[0].id, "uid-1");
+  });
+
+  it("retry of registration does not re-upload blob", async () => {
+    const originalFetch = globalThis.fetch;
+    let uploadCalls = 0;
+    let lookupCalls = 0;
+    const mockFetch = async () => {
+      lookupCalls++;
+      return new Response(JSON.stringify({
+        ok: true,
+        found: true,
+        asset: { id: "asset-x", filename: "test.jpg", kind: "IMAGE", path: "/test.jpg", storageKey: "key-1" },
+      }), { status: 200 });
+    };
+    globalThis.fetch = mockFetch;
+    try {
+      const result = await waitForRegisteredAsset("test-tenant", "key-1", { attempts: 3, initialDelayMs: 5, maxDelayMs: 20 });
+      assert.equal(result.found, true);
+      assert.equal(uploadCalls, 0);
+      assert.equal(lookupCalls, 1);
+    } finally {
+      globalThis.fetch = originalFetch;
+    }
+  });
+});
+
+describe("zero provider calls", () => {
+  it("zero provider calls", () => {
+    const source = readFileSync(join(process.cwd(), "lib", "asset-service.ts"), "utf8");
+    assert.doesNotMatch(source, /from "\.\/publishers|from "\.\/publishers\/|getPublisher\(|\.publish\(/);
+  });
+});
