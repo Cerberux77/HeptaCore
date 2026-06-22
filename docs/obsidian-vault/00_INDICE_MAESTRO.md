@@ -1,7 +1,7 @@
 ---
 type: vault-index
 project: "HeptaCore"
-last_updated: "2026-06-01T00:00:00.000Z"
+last_updated: "2026-06-22T19:30:00.000Z"
 mother_branch: "master"
 tags:
   - "#heptacore"
@@ -16,6 +16,7 @@ Este vault es la capa operacional compartida entre Manuel y Jean. Git es la fuen
 ## Documentos Canonicos
 
 - [[00_CENTRAL_HEPTACORE]] - estado actual, pendientes y decisiones.
+- [[PRODUCT/PRODUCT_VISION_END_TO_END]] - vision completa del producto end-to-end.
 - [[METODOLOGIA/METODOLOGIA_ORESHNIK_HEPTACORE]] - protocolo Oreshnik adaptado.
 - [[METODOLOGIA/INSTRUCCION_APERTURA_SESION]] - preflight de cada sesion.
 - [[METODOLOGIA/BUS_CONTROL]] - locks, zonas, stop conditions.

@@ -2,7 +2,7 @@
 
 ## Current Position
 
-HeptaCore is now an MVP tecnico pre-produccion, not a pure foundation repo. The canonical deployable base is `master` / `origin/master`.
+HeptaCore is a production platform. The canonical deployable base is `master`. Facebook Feed and Instagram Feed publish real posts from the UI with transactional durability. 156 tests validate the publishing state machine.
 
 ## Closed / Implemented
 
@@ -18,19 +18,40 @@ HeptaCore is now an MVP tecnico pre-produccion, not a pure foundation repo. The 
 | S-HC-07 | Closed | Reports dashboard and daily summary data. |
 | S-HC-08 | Closed | Meta adapter sandbox/mock layer. |
 | S-HC-09 | Closed | Publish readiness gate. |
+| S-HC-REC-00A | Closed | Publishing baseline recovery. Facebook + Instagram live from UI. |
+| S-HC-REC-00C | Closed | Canonical integration. Oreshnik aligned. |
+| S-HC-PUB-02-MULTIFORMAT-PREVIEW | Closed | Carousel, Story, Feed previews and dry-run. Cero provider calls. |
 
-## Pending / Blocked
+## Active
 
-| Item | Status | Reason |
+| Sprint | Status | Notes |
 |---|---|---|
-| Production env setup | Pending | Vercel needs DB/auth/encryption variables. |
-| Production migrations and seeds | Pending | Admin and `turpial-sound` must be seeded in production DB. |
-| Worker hosting | Pending | BullMQ needs Redis and persistent hosting outside Vercel serverless. |
-| S-HC-PUB-01 dry-run from UI | Pending | Needs a controlled endpoint/action and explicit human gate. |
-| Real RRSS publishing | Blocked by design | Requires approval, official credentials, real adapters, rollback plan, and dry-run proof. |
-| Real campaign spend | Blocked by design | Requires explicit approval and budget controls. |
-| Paid scraping | Blocked by design | Requires compliance review and explicit approval. |
+| S-HC-PUB-03-MULTITENANT-ASSETS | Active | Multi-tenant asset management, metadata extraction, format compatibility. Vercel Blob storage. |
 
-## Recommended Next Sprint
+## Pending — Publishing
 
-S-HC-PUB-01 should remain dry-run only: add a controlled web action for one approved Turpial draft, keep real publication disabled, record audit logs, and document rollback.
+| Sprint | Dependencies |
+|---|---|
+| S-HC-PUB-04-HOURLY-BATCH-CRON | PUB-02 + PUB-03 |
+| S-HC-PUB-05-RECONCILIATION-OPS | PUB-04 |
+| S-HC-OBS-01-PUBLISHING-OBSERVABILITY | PUB-05 |
+
+## Pending — Commercial
+
+| Sprint | Dependencies |
+|---|---|
+| S-HC-COMM-01-SELF-SERVICE-SIGNUP | REC-00C |
+| S-HC-COMM-02-BILLING-ACTIVATION | COMM-01 |
+
+## Pending — End-to-End Vision
+
+12 additional sprints covering onboarding, AI, strategy, assets, operations, support, analytics, engagement and optimization. See `PRODUCT_VISION_END_TO_END.md` and `var/oreshnik/task-board.json` for full details.
+
+## Hard Stops
+
+- No campaign spend without explicit approval.
+- No real scraping.
+- No credentials in git.
+- No Prisma/schema/auth/security changes without double lock.
+- No sprint closure without vault updates and Oreshnik validations.
+- Cero provider calls in preview/classification sprints.
