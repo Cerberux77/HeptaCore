@@ -30,7 +30,7 @@ Reels, Stories, videos y YouTube forman parte obligatoria del alcance final de H
 
 | Formato | Preview | Dry-Run | Publicacion Inmediata | Publicacion Programada | Metricas |
 |---|---|---|---|---|---|
-| Feed imagen | Implementado (PUB-02) | Implementado (REC-00A) | Implementado (REC-00A) | Implementado (REC-00A) | Pendiente (AN-01) |
+| Feed imagen | Implementado (PUB-02) | Implementado (REC-00A) | Implementado (REC-00A) | Parcial (SCHEDULED configurable; ejecucion autonoma pendiente en PUB-04) | Pendiente (AN-01) |
 | Feed video | Parcial (PUB-02 preview) | Pendiente | Pendiente | Pendiente | Pendiente (AN-01) |
 | Carousel | Implementado (PUB-02) | Implementado (PUB-02) | Pendiente (PUB-06) | Pendiente (PUB-06 + PUB-04) | Pendiente (AN-01) |
 | Story imagen | Implementado (PUB-02) | Implementado (PUB-02) | Pendiente (PUB-06) | Pendiente (PUB-06 + PUB-04) | Pendiente (AN-01) |
@@ -41,7 +41,7 @@ Reels, Stories, videos y YouTube forman parte obligatoria del alcance final de H
 
 | Formato | Preview | Dry-Run | Publicacion Inmediata | Publicacion Programada | Metricas |
 |---|---|---|---|---|---|
-| Feed imagen | Implementado (PUB-02) | Implementado (REC-00A) | Implementado (REC-00A) | Implementado (REC-00A) | Pendiente (AN-01) |
+| Feed imagen | Implementado (PUB-02) | Implementado (REC-00A) | Implementado (REC-00A) | Parcial (SCHEDULED configurable; ejecucion autonoma pendiente en PUB-04) | Pendiente (AN-01) |
 | Feed video | Parcial (PUB-02 preview) | Pendiente | Pendiente | Pendiente | Pendiente (AN-01) |
 | Multiples medios | Pendiente | Pendiente | Pendiente | Pendiente | Pendiente (AN-01) |
 | Story imagen | Implementado (PUB-02) | Implementado (PUB-02) | Pendiente (PUB-06) | Pendiente (PUB-06 + PUB-04) | Pendiente (AN-01) |
@@ -57,21 +57,23 @@ Reels, Stories, videos y YouTube forman parte obligatoria del alcance final de H
 
 ### Compatibilidad de Activos (PUB-03)
 
-PUB-03 clasifica la compatibilidad tecnica del activo — no publica, no llama al proveedor, no elimina ni reduce el objetivo final.
+PUB-03 clasifica la compatibilidad tecnica del activo — no publica, no llama al proveedor, no elimina ni reduce el objetivo final. La clasificacion usa cuatro estados: IDEAL, USABLE, INCOMPATIBLE, UNKNOWN.
 
 | Formato | Clasificacion PUB-03 |
 |---|---|
-| Instagram Feed | Implementado / en desarrollo |
-| Instagram Carousel | Implementado / en desarrollo |
-| Instagram Story | Implementado / en desarrollo |
-| Instagram Reel | Implementado / en desarrollo (compatibilidad de activos; publicacion real pendiente en PUB-06) |
-| Facebook Feed imagen | Implementado / en desarrollo |
-| Facebook Feed video | Implementado / en desarrollo |
-| Facebook Story/Reel | Implementado / en desarrollo (compatibilidad de activos; publicacion real pendiente en PUB-06) |
-| YouTube Short | Implementado / en desarrollo (compatibilidad de activos; publicacion real pendiente en PUB-07) |
-| YouTube Video 16:9 | Implementado / en desarrollo (compatibilidad de activos; publicacion real pendiente en PUB-07) |
+| Instagram Feed | En desarrollo (PUB-03) |
+| Instagram Carousel | En desarrollo (PUB-03) |
+| Instagram Story | En desarrollo (PUB-03) |
+| Instagram Reel | En desarrollo (PUB-03) (compatibilidad de activos; publicacion real pendiente en PUB-06) |
+| Facebook Feed imagen | En desarrollo (PUB-03) |
+| Facebook Feed video | En desarrollo (PUB-03) |
+| Facebook Story/Reel | En desarrollo (PUB-03) (compatibilidad de activos; publicacion real pendiente en PUB-06) |
+| YouTube Short | En desarrollo (PUB-03) (compatibilidad de activos; publicacion real pendiente en PUB-07) |
+| YouTube Video 16:9 | En desarrollo (PUB-03) (compatibilidad de activos; publicacion real pendiente en PUB-07) |
 
-Para formatos sin publisher implementado: la compatibilidad de activos esta en desarrollo o implementada en PUB-03; el preview/dry-run tiene el estado verificado en la matriz anterior; la publicacion real esta pendiente de implementacion en un sprint especifico; el objetivo final es obligatorio.
+UNKNOWN se usa cuando faltan datos tecnicos suficientes; no equivale a compatible; no autoriza publicacion; aplica especialmente a assets legacy todavia no analizados. La compatibilidad se calcula desde metadata extraida; el resultado no se persiste como verdad permanente.
+
+Para formatos sin publisher implementado: la compatibilidad de activos esta en desarrollo en PUB-03; el preview/dry-run tiene el estado verificado en la matriz anterior; la publicacion real esta pendiente de implementacion en un sprint especifico; el objetivo final es obligatorio.
 
 ## Flujo Comercial
 
@@ -169,7 +171,7 @@ La generacion IA se disena como broker provider-agnostic, sin hardcodear un unic
 | Cola de drafts | Implementado |
 | Pendientes de aprobacion | Implementado |
 | Aprobadas | Implementado |
-| Programadas | Implementado |
+| Programadas | Parcial (configuracion SCHEDULED en UI; ejecucion autonoma por cron pendiente en PUB-04) |
 | Publicadas (Facebook Feed, Instagram Feed) | Implementado |
 | Bloqueadas / reconciliacion (IN_REVIEW) | Implementado |
 

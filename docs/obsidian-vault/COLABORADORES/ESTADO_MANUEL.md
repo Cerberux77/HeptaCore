@@ -123,7 +123,7 @@ Zonas: `examples/tenants/cepeg`, `apps/web`, `packages/db`
 type: collaborator-status
 project: "HeptaCore"
 operator: "Manuel"
-last_updated: "2026-06-22T19:44:33.714Z"
+last_updated: "2026-06-22T19:57:34.873Z"
 generated_by: "Oreshnik canonical-check"
 source: "var/oreshnik/task-board.json"
 ---
@@ -184,7 +184,7 @@ Estado: `active`
 - Extraccion automatica de metadata al subir o reemplazar: width, height, sizeBytes, MIME, durationSeconds para video, orientacion, aspect ratio
 - Persistencia de metadata en Asset.metadata
 - Recalculo de metadata despues de reemplazar contenido
-- Clasificacion central por formato: IDEAL, USABLE, INCOMPATIBLE
+- Clasificacion central por formato: IDEAL, USABLE, INCOMPATIBLE, UNKNOWN. UNKNOWN se usa cuando faltan datos tecnicos suficientes; no equivale a compatible; no autoriza publicacion; aplica especialmente a assets legacy todavia no analizados; la compatibilidad se calcula desde metadata; el resultado no se persiste como verdad permanente.
 - Compatibilidad por plataforma: Instagram Feed, Instagram Carousel, Instagram Story, Instagram Reel, Facebook Feed imagen, Facebook Feed video, Facebook Story/Reel, YouTube Short, YouTube Video 16:9
 - Badges visibles en la biblioteca de activos por formato
 - Filtros por red, formato, orientacion y compatibilidad
@@ -196,7 +196,7 @@ Estado: `active`
 - Codigo base en commit c78d71d20451cc73e446d2c6053421029cd29d42
 - PUB-03 clasifica compatibilidad de activos; no elimina ni reduce el objetivo final de publicacion. Los formatos sin publisher real quedan documentados como pendientes de implementacion en PUB-06, PUB-07 o PUB-08.
 
-Zonas: `apps/web/app/api/tenant-assets`, `apps/web/components`, `packages/core`, `apps/web/lib/publishing-formats.ts`
+Zonas: `apps/web/app/api/tenants/[slug]/assets/**`, `apps/web/app/api/tenant-assets/**`, `apps/web/app/api/drafts/**`, `apps/web/components/**`, `apps/web/lib/asset-*.ts`, `apps/web/lib/publishing-formats.ts`, `packages/core/**`
 
 ### S-HC-PUB-04-HOURLY-BATCH-CRON - Hourly batch cron publishing with timezone-aware scheduling
 

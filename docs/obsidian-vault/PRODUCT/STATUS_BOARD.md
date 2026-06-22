@@ -81,7 +81,7 @@ source: "var/oreshnik/task-board.json"
 ---
 type: status-board
 project: "HeptaCore"
-last_updated: "2026-06-22T19:44:33.719Z"
+last_updated: "2026-06-22T19:57:34.908Z"
 generated_by: "Oreshnik canonical-check"
 source: "var/oreshnik/task-board.json"
 ---

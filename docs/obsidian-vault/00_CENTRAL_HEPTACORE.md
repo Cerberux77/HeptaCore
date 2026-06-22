@@ -82,7 +82,7 @@ type: master-dashboard
 project: "HeptaCore"
 status: active-production
 phase: "Canonical Oreshnik task board governs current assignments"
-last_updated: "2026-06-22T19:44:33.708Z"
+last_updated: "2026-06-22T19:57:34.821Z"
 mother_branch: "MADRE/v46-s-hc-pub-02-multiformat-preview-multiformat-previews-deterministic-auth-approval-2026-06-21"
 tags:
   - "#central"
