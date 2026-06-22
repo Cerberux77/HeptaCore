@@ -58,6 +58,7 @@ import {
   type PublishingFormat,
 } from "../lib/publishing-formats";
 import { extractAssetMetadataFromFile, normalizeTechnicalAssetMetadata } from "../lib/asset-metadata";
+import { waitForRegisteredAsset } from "../lib/asset-upload";
 import {
   ASSET_COMPATIBILITY_CONFIGS,
   ASSET_COMPATIBILITY_TARGETS,
@@ -70,6 +71,17 @@ import {
 
 type View = "overview" | "strategy" | "queue" | "assets" | "calendar" | "checklist" | "reports" | "readiness";
 type CalendarView = "list" | "week" | "month";
+type UploadFileState = "PENDING" | "UPLOADING" | "REGISTERING" | "READY" | "FAILED";
+type UploadQueueItem = {
+  id: string;
+  file: File;
+  state: UploadFileState;
+  progress: number;
+  error?: string;
+  storageKey?: string;
+  url?: string;
+  asset?: TenantAssetItem;
+};
 
 const SUPPORTED_NETWORKS = ["INSTAGRAM", "FACEBOOK", "YOUTUBE", "TIKTOK", "LINKEDIN"] as const;
 
@@ -451,6 +463,12 @@ export function DashboardConsole({
   const [moveFolder, setMoveFolder] = useState("");
   const [replaceAssetId, setReplaceAssetId] = useState("");
   const [deletingAssetId, setDeletingAssetId] = useState("");
+  const [uploadQueueItems, setUploadQueueItems] = useState<UploadQueueItem[]>([]);
+  const [assetViewMode, setAssetViewMode] = useState<"grid" | "list">("grid");
+  const [assetSearchFilter, setAssetSearchFilter] = useState("");
+  const [assetUsageFilter, setAssetUsageFilter] = useState<"ALL" | "IN_USE" | "FREE">("ALL");
+  const [assetSortOrder, setAssetSortOrder] = useState<"NOMBRE" | "FECHA" | "TAMANO">("NOMBRE");
+  const [inspectorAsset, setInspectorAsset] = useState<TenantAssetItem | null>(null);
   const analyzedAssetIdsRef = useRef<Set<string>>(new Set());
   const fileInputRef = useRef<HTMLInputElement>(null);
   const selected = selectedDraftFromQueue(localQueue, selectedId);
@@ -462,21 +480,30 @@ export function DashboardConsole({
     return [...folders].sort();
   }, [localAssets]);
   const visibleAssets = useMemo(() => {
-    const basic = localAssets.filter((asset) => {
+    let filtered = localAssets.filter((asset) => {
       const kindOk = assetKindFilter === "ALL" || asset.kind === assetKindFilter;
       const folderOk = assetFolderFilter === "ALL" || (asset.folder ?? "") === assetFolderFilter;
       const orientationOk = assetOrientationFilter === "ALL" || asset.orientation === assetOrientationFilter;
-      return kindOk && folderOk && orientationOk;
+      const searchOk = !assetSearchFilter || asset.filename.toLowerCase().includes(assetSearchFilter.toLowerCase());
+      const usageOk = assetUsageFilter === "ALL" || (assetUsageFilter === "IN_USE" ? asset.draftCount > 0 : asset.draftCount === 0);
+      return kindOk && folderOk && orientationOk && searchOk && usageOk;
     });
-    if (assetTargetFilter === "ALL" && assetCompatibilityFilter === "ALL") return basic;
-    return basic.filter((asset) => {
-      if (assetTargetFilter === "ALL") {
-        return ASSET_COMPATIBILITY_TARGETS.some((target) => evaluateAssetCompatibility(assetCompatibilityInput(asset), target).status === assetCompatibilityFilter);
-      }
-      const result = evaluateAssetCompatibility(assetCompatibilityInput(asset), assetTargetFilter);
-      return assetCompatibilityFilter === "ALL" || result.status === assetCompatibilityFilter;
-    });
-  }, [assetCompatibilityFilter, assetFolderFilter, assetKindFilter, assetOrientationFilter, assetTargetFilter, localAssets]);
+    if (assetTargetFilter !== "ALL" || assetCompatibilityFilter !== "ALL") {
+      filtered = filtered.filter((asset) => {
+        if (assetTargetFilter === "ALL") {
+          return ASSET_COMPATIBILITY_TARGETS.some((target) => evaluateAssetCompatibility(assetCompatibilityInput(asset), target).status === assetCompatibilityFilter);
+        }
+        const result = evaluateAssetCompatibility(assetCompatibilityInput(asset), assetTargetFilter);
+        return assetCompatibilityFilter === "ALL" || result.status === assetCompatibilityFilter;
+      });
+    }
+    if (assetSortOrder === "FECHA") {
+      filtered = [...filtered].sort((a, b) => String(b.id).localeCompare(String(a.id)));
+    } else if (assetSortOrder === "TAMANO") {
+      filtered = [...filtered].sort((a, b) => (b.sizeBytes ?? 0) - (a.sizeBytes ?? 0));
+    }
+    return filtered;
+  }, [assetCompatibilityFilter, assetFolderFilter, assetKindFilter, assetOrientationFilter, assetTargetFilter, localAssets, assetSearchFilter, assetUsageFilter, assetSortOrder]);
 
   useEffect(() => {
     setLocalAssets(assets);
@@ -901,15 +928,32 @@ export function DashboardConsole({
     return data.assets ?? [];
   }
 
+  const registeredStorageKeysRef = useRef<Set<string>>(new Set());
+
   async function handleUploadAsset() {
     if (uploadFiles.length === 0 || !metrics?.tenant.id) return;
     setUploading(true);
     setAssetMessage(null);
-    try {
-      for (const file of uploadFiles) {
-        const safeName = sanitizeClientFilename(file.name);
-        const pathname = `tenants/${metrics.tenant.id}/assets/${crypto.randomUUID()}/${safeName}`;
-        const technicalMetadata = await extractAssetMetadataFromFile(file);
+    const registered: string[] = [];
+    const failed: string[] = [];
+    const pending: string[] = [];
+
+    async function uploadOne(file: File): Promise<void> {
+      const uid = crypto.randomUUID();
+      const safeName = sanitizeClientFilename(file.name);
+      const pathname = `tenants/${metrics!.tenant.id}/assets/${uid}/${safeName}`;
+      const technicalMetadata = await extractAssetMetadataFromFile(file);
+
+      const qItem: UploadQueueItem = {
+        id: uid,
+        file,
+        state: "UPLOADING",
+        progress: 0,
+        storageKey: pathname,
+      };
+      setUploadQueueItems((prev) => [...prev, qItem]);
+
+      try {
         await uploadBlob(pathname, file, {
           access: "public",
           handleUploadUrl: `/api/tenants/${tenantSlug}/assets/upload`,
@@ -923,11 +967,58 @@ export function DashboardConsole({
           }),
           onUploadProgress: ({ percentage }) => {
             setUploadProgress((prev) => ({ ...prev, [file.name]: Math.round(percentage) }));
+            setUploadQueueItems((prev) => prev.map((item) => item.id === uid ? { ...item, progress: Math.round(percentage) } : item));
           },
         });
+
+        setUploadQueueItems((prev) => prev.map((item) => item.id === uid ? { ...item, state: "REGISTERING" } : item));
+
+        if (!registeredStorageKeysRef.current.has(pathname)) {
+          const result = await waitForRegisteredAsset(tenantSlug, pathname);
+          if (result.found && result.asset) {
+            registeredStorageKeysRef.current.add(pathname);
+            setUploadQueueItems((prev) => prev.map((item) => item.id === uid ? { ...item, state: "READY", asset: result.asset } : item));
+            registered.push(file.name);
+          } else {
+            setUploadQueueItems((prev) => prev.map((item) => item.id === uid ? { ...item, state: "FAILED", error: "Archivo subido, pero su registro sigue pendiente. Reintentar sincronizacion." } : item));
+            pending.push(file.name);
+          }
+        } else {
+          setUploadQueueItems((prev) => prev.map((item) => item.id === uid ? { ...item, state: "READY" } : item));
+          registered.push(file.name);
+        }
+      } catch (error) {
+        setUploadQueueItems((prev) => prev.map((item) => item.id === uid ? { ...item, state: "FAILED", error: error instanceof Error ? error.message : "Error al subir" } : item));
+        failed.push(file.name);
       }
+    }
+
+    const semaphore = (tasks: (() => Promise<void>)[], limit: number) => {
+      const results: Promise<void>[] = [];
+      const executing: Promise<void>[] = [];
+      for (const task of tasks) {
+        const p = Promise.resolve().then(() => task());
+        results.push(p);
+        if (limit <= tasks.length) {
+          const e = p.then(() => { executing.splice(executing.indexOf(e), 1); });
+          executing.push(e);
+          if (executing.length >= limit) {
+            results.push(Promise.race(executing) as Promise<void>);
+          }
+        }
+      }
+      return Promise.allSettled(results);
+    };
+
+    try {
+      const tasks = uploadFiles.map((file) => () => uploadOne(file));
+      await semaphore(tasks, 3);
       await refreshTenantAssets();
-      setAssetMessage({ kind: "success", text: `${uploadFiles.length} asset(s) cargado(s).` });
+      const parts: string[] = [];
+      if (registered.length > 0) parts.push(`${registered.length} cargado(s)`);
+      if (pending.length > 0) parts.push(`${pending.length} pendiente(s)`);
+      if (failed.length > 0) parts.push(`${failed.length} fallido(s)`);
+      setAssetMessage({ kind: registered.length > 0 ? "success" : "error", text: parts.join(", ") || "Sin cambios" });
     } catch (error) {
       setAssetMessage({ kind: "error", text: error instanceof Error ? error.message : "Error al subir assets" });
     } finally {
@@ -936,6 +1027,113 @@ export function DashboardConsole({
       setUploadProgress({});
       if (fileInputRef.current) fileInputRef.current.value = "";
     }
+  }
+
+  async function handleUploadFiles(files: File[]) {
+    if (files.length === 0 || !metrics?.tenant.id) return;
+    setUploading(true);
+    setAssetMessage(null);
+    setUploadQueueItems([]);
+    const registered: string[] = [];
+    const pending: string[] = [];
+    const failed: string[] = [];
+
+    async function uploadOne(file: File): Promise<void> {
+      const uid = crypto.randomUUID();
+      const safeName = sanitizeClientFilename(file.name);
+      const pathname = `tenants/${metrics!.tenant.id}/assets/${uid}/${safeName}`;
+      const technicalMetadata = await extractAssetMetadataFromFile(file);
+
+      const qItem: UploadQueueItem = {
+        id: uid,
+        file,
+        state: "UPLOADING",
+        progress: 0,
+        storageKey: pathname,
+      };
+      setUploadQueueItems((prev) => [...prev, qItem]);
+
+      try {
+        await uploadBlob(pathname, file, {
+          access: "public",
+          handleUploadUrl: `/api/tenants/${tenantSlug}/assets/upload`,
+          multipart: file.size > 4.5 * 1024 * 1024,
+          clientPayload: JSON.stringify({
+            originalFilename: file.name,
+            mimeType: file.type,
+            sizeBytes: file.size,
+            folder: uploadFolder,
+            technicalMetadata,
+          }),
+          onUploadProgress: ({ percentage }) => {
+            setUploadQueueItems((prev) => prev.map((item) => item.id === uid ? { ...item, progress: Math.round(percentage) } : item));
+          },
+        });
+
+        setUploadQueueItems((prev) => prev.map((item) => item.id === uid ? { ...item, state: "REGISTERING" } : item));
+
+        if (!registeredStorageKeysRef.current.has(pathname)) {
+          const result = await waitForRegisteredAsset(tenantSlug, pathname);
+          if (result.found && result.asset) {
+            registeredStorageKeysRef.current.add(pathname);
+            setUploadQueueItems((prev) => prev.map((item) => item.id === uid ? { ...item, state: "READY", asset: result.asset, url: result.asset?.path ?? undefined } : item));
+            registered.push(file.name);
+          } else {
+            setUploadQueueItems((prev) => prev.map((item) => item.id === uid ? { ...item, state: "FAILED", error: "Archivo subido, pero su registro sigue pendiente. Reintentar sincronizacion." } : item));
+            pending.push(file.name);
+          }
+        } else {
+          setUploadQueueItems((prev) => prev.map((item) => item.id === uid ? { ...item, state: "READY" } : item));
+          registered.push(file.name);
+        }
+      } catch (error) {
+        setUploadQueueItems((prev) => prev.map((item) => item.id === uid ? { ...item, state: "FAILED", error: error instanceof Error ? error.message : "Error al subir" } : item));
+        failed.push(file.name);
+      }
+    }
+
+    const semaphore = (tasks: (() => Promise<void>)[], limit: number) => {
+      const results: Promise<void>[] = [];
+      const executing: Promise<void>[] = [];
+      for (const task of tasks) {
+        const p = Promise.resolve().then(() => task());
+        results.push(p);
+        if (limit <= tasks.length) {
+          const e = p.then(() => { executing.splice(executing.indexOf(e), 1); });
+          executing.push(e);
+          if (executing.length >= limit) {
+            results.push(Promise.race(executing) as Promise<void>);
+          }
+        }
+      }
+      return Promise.allSettled(results);
+    };
+
+    try {
+      const tasks = files.map((file) => () => uploadOne(file));
+      await semaphore(tasks, 3);
+      await refreshTenantAssets();
+      const parts: string[] = [];
+      if (registered.length > 0) parts.push(`${registered.length} cargado(s)`);
+      if (pending.length > 0) parts.push(`${pending.length} pendiente(s)`);
+      if (failed.length > 0) parts.push(`${failed.length} fallido(s)`);
+      setAssetMessage({ kind: registered.length > 0 ? "success" : "error", text: parts.join(", ") || "Sin cambios" });
+    } catch (error) {
+      setAssetMessage({ kind: "error", text: error instanceof Error ? error.message : "Error al subir assets" });
+    } finally {
+      setUploading(false);
+    }
+  }
+
+  function handleRetryUploadItem(itemId: string) {
+    const item = uploadQueueItems.find((item) => item.id === itemId);
+    if (!item) return;
+    setUploadQueueItems((prev) => prev.map((item) => item.id === itemId ? { ...item, state: "PENDING", error: undefined, progress: 0 } : item));
+    handleUploadFiles([item.file]);
+  }
+
+  function handleRemoveUploadItem(itemId: string) {
+    setUploadQueueItems((prev) => prev.filter((item) => item.id !== itemId || item.state === "READY" || item.state === "FAILED"));
   }
 
   async function handleRenameAsset(assetId: string) {
@@ -1004,6 +1202,10 @@ export function DashboardConsole({
           technicalMetadata,
         }),
       });
+      const waitResult = await waitForRegisteredAsset(tenantSlug, pathname);
+      if (!waitResult.found) {
+        setAssetMessage({ kind: "error", text: "Archivo reemplazado, pero el registro queda pendiente. Reintentar sincronizacion." });
+      }
       const refreshed = await refreshTenantAssets();
       const nextAsset = refreshed.find((asset: TenantAssetItem) => asset.id === assetId);
       setLocalQueue((prev) => prev.map((draft) => ({
@@ -1776,260 +1978,460 @@ export function DashboardConsole({
 
         {view === "assets" && (
           <div className="strategy-grid">
-            {Array.isArray(readiness?.networks) && (
-              <section className="work-panel span-2">
-                <PanelTitle icon={<AlertTriangle size={17} />} title="Assets y configuraciones pendientes" />
-                <div className="network-readiness-grid">
-                  {readiness.networks
-                    .filter((network: any) => !network.liveReady)
-                    .map((network: any) => (
-                      <article key={network.network} className="network-card">
-                        <div>
-                          <strong>{NETWORK_LABELS[network.network] ?? network.network}</strong>
-                          <small>{network.action}</small>
+            <section className="work-panel span-2">
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 14px", borderBottom: "1px solid var(--hc-line)", minHeight: 60 }}>
+                <div>
+                  <strong style={{ fontSize: 16 }}>Biblioteca</strong>
+                  <small style={{ color: "var(--hc-fog)", marginLeft: 8 }}>{localAssets.length} activos</small>
+                </div>
+                <div style={{ display: "flex", gap: 12, fontSize: 11 }}>
+                  {(() => {
+                    const total = localAssets.length;
+                    const networkTargets = ASSET_COMPATIBILITY_TARGETS.filter((target) =>
+                      activeNetworks.some((network) => target.startsWith(network.toUpperCase()))
+                    );
+                    const listos = localAssets.filter((asset) => networkTargets.some((target) =>
+                      evaluateAssetCompatibility(assetCompatibilityInput(asset), target).status === "IDEAL"
+                    )).length;
+                    const requiereAjuste = localAssets.filter((asset) => {
+                      const hasIdeal = networkTargets.some((target) => evaluateAssetCompatibility(assetCompatibilityInput(asset), target).status === "IDEAL");
+                      const allUsable = networkTargets.length > 0 && networkTargets.every((target) => {
+                        const status = evaluateAssetCompatibility(assetCompatibilityInput(asset), target).status;
+                        return status === "USABLE" || status === "IDEAL";
+                      });
+                      return !hasIdeal && allUsable;
+                    }).length;
+                    const sinAnalizar = localAssets.filter((asset) => !asset.width || !asset.height).length;
+                    const enUso = localAssets.filter((asset) => asset.draftCount > 0).length;
+                    return (
+                      <>
+                        <span style={{ background: "var(--hc-bone)", padding: "2px 8px", borderRadius: 10 }}>Total: <strong>{total}</strong></span>
+                        <span style={{ background: "#e8f7ef", padding: "2px 8px", borderRadius: 10, color: "#0f6e3f" }}>Listos: <strong>{listos}</strong></span>
+                        <span style={{ background: "#fff8e1", padding: "2px 8px", borderRadius: 10, color: "#8d6e00" }}>Requieren ajuste: <strong>{requiereAjuste}</strong></span>
+                        <span style={{ background: "var(--hc-bone)", padding: "2px 8px", borderRadius: 10 }}>Sin analizar: <strong>{sinAnalizar}</strong></span>
+                        <span style={{ background: "var(--hc-bone)", padding: "2px 8px", borderRadius: 10 }}>En uso: <strong>{enUso}</strong></span>
+                      </>
+                    );
+                  })()}
+                </div>
+              </div>
+
+              <div style={{ padding: "10px 14px", borderBottom: "1px solid var(--hc-line)" }}>
+                <div
+                  onDragOver={(e) => { e.preventDefault(); e.currentTarget.style.borderColor = "var(--hc-teal)"; }}
+                  onDragLeave={(e) => { (e.currentTarget as HTMLElement).style.borderColor = "var(--hc-line)"; }}
+                  onDrop={(e) => {
+                    e.preventDefault();
+                    (e.currentTarget as HTMLElement).style.borderColor = "var(--hc-line)";
+                    const files = Array.from(e.dataTransfer.files);
+                    if (files.length > 0) handleUploadFiles(files);
+                  }}
+                  onClick={() => fileInputRef.current?.click()}
+                  style={{
+                    border: "2px dashed var(--hc-line)",
+                    borderRadius: 8,
+                    padding: "20px",
+                    textAlign: "center",
+                    cursor: "pointer",
+                    minHeight: 80,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    color: "var(--hc-fog)",
+                    fontSize: 13,
+                    gap: 8,
+                    background: "var(--hc-surface)",
+                  }}
+                >
+                  <PackageSearch size={18} />
+                  Arrastra imagenes y videos aqui o selecciona archivos
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    multiple
+                    accept="image/jpeg,image/png,image/webp,video/mp4,video/quicktime"
+                    onChange={(e) => {
+                      const files = Array.from(e.target.files ?? []);
+                      if (files.length > 0) handleUploadFiles(files);
+                    }}
+                    style={{ display: "none" }}
+                  />
+                </div>
+                <div style={{ display: "flex", gap: 8, marginTop: 8, alignItems: "center" }}>
+                  <input
+                    value={uploadFolder}
+                    onChange={(e) => setUploadFolder(e.target.value)}
+                    placeholder="Carpeta"
+                    style={{ padding: "4px 8px", borderRadius: 4, border: "1px solid var(--hc-line)", fontSize: 12, maxWidth: 140 }}
+                  />
+                </div>
+              </div>
+
+              {uploadQueueItems.length > 0 && (
+                <div style={{ padding: "8px 14px", borderBottom: "1px solid var(--hc-line)" }}>
+                  <small style={{ fontWeight: 600, display: "block", marginBottom: 6 }}>
+                    Subiendo {uploadQueueItems.filter((item) => item.state !== "READY" && item.state !== "FAILED").length} de {uploadQueueItems.length} archivos...
+                  </small>
+                  {uploadQueueItems.map((item) => (
+                    <div key={item.id} style={{ display: "flex", alignItems: "center", gap: 8, padding: "4px 0", fontSize: 12 }}>
+                      {item.file.type.startsWith("image/") && item.file ? (
+                        <img
+                          src={URL.createObjectURL(item.file)}
+                          alt=""
+                          style={{ width: 32, height: 32, objectFit: "cover", borderRadius: 4 }}
+                        />
+                      ) : (
+                        <div style={{ width: 32, height: 32, background: "var(--hc-bone)", borderRadius: 4, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                          <ImageIcon size={14} />
                         </div>
-                        <p><strong>Formato:</strong> {network.requirements?.formats}</p>
-                        <p><strong>Activo:</strong> {network.requirements?.asset}</p>
-                        <p><strong>Guideline:</strong> {network.requirements?.guideline}</p>
-                      </article>
-                    ))}
-                  {readiness.networks.every((network: any) => network.liveReady) && (
-                    <p style={{ padding: 14 }}>Todas las redes seleccionadas tienen readiness live completo.</p>
+                      )}
+                      <span style={{ flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{item.file.name}</span>
+                      <small style={{ color: "var(--hc-fog)", minWidth: 50 }}>{formatBytes(item.file.size)}</small>
+                      <span style={{
+                        padding: "1px 6px",
+                        borderRadius: 4,
+                        fontSize: 10,
+                        background:
+                          item.state === "READY" ? "#e8f7ef" :
+                          item.state === "FAILED" ? "#fff1f0" :
+                          item.state === "REGISTERING" ? "#e8f0fe" :
+                          item.state === "UPLOADING" ? "#fff8e1" :
+                          "var(--hc-bone)",
+                        color:
+                          item.state === "READY" ? "#0f6e3f" :
+                          item.state === "FAILED" ? "#b42318" :
+                          item.state === "REGISTERING" ? "#174ea6" :
+                          item.state === "UPLOADING" ? "#8d6e00" :
+                          "var(--hc-fog)",
+                      }}>
+                        {item.state === "READY" ? "Listo" :
+                         item.state === "FAILED" ? "Fallido" :
+                         item.state === "REGISTERING" ? "Registrando" :
+                         item.state === "UPLOADING" ? "Subiendo" :
+                         "Pendiente"}
+                      </span>
+                      {item.state === "UPLOADING" || item.state === "REGISTERING" ? (
+                        <div style={{ width: 60, height: 4, background: "var(--hc-line)", borderRadius: 2, overflow: "hidden" }}>
+                          <div style={{ width: `${item.progress}%`, height: "100%", background: "var(--hc-teal)", transition: "width 0.2s" }} />
+                        </div>
+                      ) : (
+                        <div style={{ width: 60 }} />
+                      )}
+                      {item.state === "FAILED" && (
+                        <button onClick={() => handleRetryUploadItem(item.id)} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 10, color: "var(--hc-teal)" }}>Reintentar</button>
+                      )}
+                      {item.state !== "UPLOADING" && item.state !== "REGISTERING" && (
+                        <button onClick={() => handleRemoveUploadItem(item.id)} style={{ background: "none", border: "none", cursor: "pointer", padding: 0, color: "var(--hc-fog)" }}><X size={14} /></button>
+                      )}
+                    </div>
+                  ))}
+                  {assetMessage && (
+                    <small style={{ display: "block", marginTop: 6, color: assetMessage.kind === "error" ? "#b42318" : "var(--hc-green)" }}>{assetMessage.text}</small>
                   )}
                 </div>
-              </section>
-            )}
-            <section className="work-panel">
-              <PanelTitle icon={<PackageSearch size={17} />} title="Especificaciones por plataforma" />
-              <div style={{ padding: 14 }}>
-                <div style={{ marginBottom: 12 }}>
-                  <strong style={{ fontSize: 13, display: "flex", alignItems: "center", gap: 4 }}>
-                    <ImageIcon size={14} /> Instagram
-                  </strong>
-                  <ul className="dense-list" style={{ marginTop: 4 }}>
-                    <li>Feed: 1080x1080 (1:1) JPG/PNG</li>
-                    <li>Story: 1080x1920 (9:16) JPG/PNG</li>
-                    <li>Reel: 1080x1920 (9:16) MP4, max 90s</li>
-                    <li>Carousel: 1080x1080 (1:1) JPG/PNG, 2-10 slides</li>
-                  </ul>
-                </div>
-                <div style={{ marginBottom: 12 }}>
-                  <strong style={{ fontSize: 13 }}>Facebook</strong>
-                  <ul className="dense-list" style={{ marginTop: 4 }}>
-                    <li>Feed: 1200x630 (1.91:1) JPG/PNG</li>
-                    <li>Video: 1080p MP4, max 240min</li>
-                    <li>Carousel: 1080x1080 (1:1) JPG/PNG</li>
-                  </ul>
-                </div>
-                <div style={{ marginBottom: 12 }}>
-                  <strong style={{ fontSize: 13 }}>TikTok</strong>
-                  <ul className="dense-list" style={{ marginTop: 4 }}>
-                    <li>Video: 1080x1920 (9:16) MP4, 5s-10min</li>
-                    <li>Carousel: 1080x1920 (9:16) JPG</li>
-                  </ul>
-                </div>
-                <div>
-                  <strong style={{ fontSize: 13 }}>YouTube</strong>
-                  <ul className="dense-list" style={{ marginTop: 4 }}>
-                    <li>Video: 1920x1080 (16:9) MP4</li>
-                    <li>Short: 1080x1920 (9:16) MP4, max 60s</li>
-                    <li>Thumbnail: 1280x720 JPG</li>
-                  </ul>
-                </div>
-                <div style={{ marginTop: 12 }}>
-                  <strong style={{ fontSize: 13 }}>LinkedIn</strong>
-                  <ul className="dense-list" style={{ marginTop: 4 }}>
-                    <li>Post: imagen 1200x627 JPG/PNG</li>
-                    <li>Documento: PDF o carrusel exportado</li>
-                    <li>Video: MP4 horizontal o cuadrado, enfoque negocio/confianza</li>
-                  </ul>
-                </div>
-              </div>
-            </section>
-            <section className="work-panel">
-              <PanelTitle icon={<PackageSearch size={17} />} title="Activos del tenant" />
-              <div style={{ display: "flex", gap: 8, padding: "0 4px 8px 4px", alignItems: "center", flexWrap: "wrap" }}>
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  multiple
-                  accept="image/jpeg,image/png,image/webp,video/mp4,video/quicktime"
-                  onChange={(e) => setUploadFiles(Array.from(e.target.files ?? []))}
-                  style={{ fontSize: 11 }}
-                />
-                <input
-                  value={uploadFolder}
-                  onChange={(e) => setUploadFolder(e.target.value)}
-                  placeholder="Carpeta"
-                  style={{ padding: "4px 8px", borderRadius: 4, border: "1px solid var(--hc-line)", fontSize: 12, maxWidth: 140 }}
-                />
-                <button
-                  onClick={handleUploadAsset}
-                  disabled={uploading || uploadFiles.length === 0}
-                  className="primary-action"
-                  style={{ fontSize: 12, padding: "4px 12px" }}
-                >
-                  {uploading ? "Subiendo..." : "Subir"}
-                </button>
-              </div>
-              {(uploadFiles.length > 0 || assetMessage) && (
-                <div style={{ padding: "0 8px 8px 8px", display: "grid", gap: 4 }}>
-                  {uploadFiles.map((file) => (
-                    <small key={file.name}>{file.name}: {uploadProgress[file.name] ?? 0}%</small>
-                  ))}
-                  {assetMessage && <small style={{ color: assetMessage.kind === "error" ? "#b42318" : "var(--hc-green)" }}>{assetMessage.text}</small>}
-                </div>
               )}
-              <div style={{ display: "flex", gap: 8, padding: "0 8px 8px 8px", flexWrap: "wrap" }}>
-                <select value={assetKindFilter} onChange={(e) => setAssetKindFilter(e.target.value)} style={{ fontSize: 12, padding: "4px 8px" }}>
+
+              <div style={{ display: "flex", gap: 6, padding: "8px 14px", flexWrap: "wrap", alignItems: "center", borderBottom: "1px solid var(--hc-line)" }}>
+                <input
+                  value={assetSearchFilter}
+                  onChange={(e) => setAssetSearchFilter(e.target.value)}
+                  placeholder="Buscar..."
+                  style={{ padding: "4px 8px", borderRadius: 4, border: "1px solid var(--hc-line)", fontSize: 12, minWidth: 120 }}
+                />
+                <select value={assetKindFilter} onChange={(e) => setAssetKindFilter(e.target.value)} style={{ fontSize: 12, padding: "4px 8px", borderRadius: 4, border: "1px solid var(--hc-line)" }}>
                   <option value="ALL">Todos los tipos</option>
                   <option value="IMAGE">Imagen</option>
                   <option value="VIDEO">Video</option>
                 </select>
-                <select value={assetFolderFilter} onChange={(e) => setAssetFolderFilter(e.target.value)} style={{ fontSize: 12, padding: "4px 8px" }}>
+                <select value={assetFolderFilter} onChange={(e) => setAssetFolderFilter(e.target.value)} style={{ fontSize: 12, padding: "4px 8px", borderRadius: 4, border: "1px solid var(--hc-line)" }}>
                   <option value="ALL">Todas las carpetas</option>
                   {assetFolders.map((folder) => <option key={folder} value={folder}>{folder}</option>)}
                 </select>
-                <select value={assetOrientationFilter} onChange={(e) => setAssetOrientationFilter(e.target.value)} style={{ fontSize: 12, padding: "4px 8px" }}>
+                <select value={assetOrientationFilter} onChange={(e) => setAssetOrientationFilter(e.target.value)} style={{ fontSize: 12, padding: "4px 8px", borderRadius: 4, border: "1px solid var(--hc-line)" }}>
                   <option value="ALL">Todas las orientaciones</option>
                   <option value="square">Cuadrado</option>
                   <option value="portrait">Vertical</option>
                   <option value="landscape">Horizontal</option>
                 </select>
-                <select value={assetTargetFilter} onChange={(e) => setAssetTargetFilter(e.target.value as AssetCompatibilityTarget | "ALL")} style={{ fontSize: 12, padding: "4px 8px" }}>
+                <select value={assetTargetFilter} onChange={(e) => setAssetTargetFilter(e.target.value as AssetCompatibilityTarget | "ALL")} style={{ fontSize: 12, padding: "4px 8px", borderRadius: 4, border: "1px solid var(--hc-line)" }}>
                   <option value="ALL">Todos los formatos</option>
                   {ASSET_COMPATIBILITY_TARGETS.map((target) => (
                     <option key={target} value={target}>{ASSET_COMPATIBILITY_CONFIGS[target].label}</option>
                   ))}
                 </select>
-                <select value={assetCompatibilityFilter} onChange={(e) => setAssetCompatibilityFilter(e.target.value as AssetCompatibilityStatus | "ALL")} style={{ fontSize: 12, padding: "4px 8px" }}>
+                <select value={assetCompatibilityFilter} onChange={(e) => setAssetCompatibilityFilter(e.target.value as AssetCompatibilityStatus | "ALL")} style={{ fontSize: 12, padding: "4px 8px", borderRadius: 4, border: "1px solid var(--hc-line)" }}>
                   <option value="ALL">Todos los estados</option>
                   <option value="IDEAL">Ideal</option>
                   <option value="USABLE">Usable</option>
                   <option value="INCOMPATIBLE">No compatible</option>
                   <option value="UNKNOWN">Sin analizar</option>
                 </select>
+                <select value={assetUsageFilter} onChange={(e) => setAssetUsageFilter(e.target.value as "ALL" | "IN_USE" | "FREE")} style={{ fontSize: 12, padding: "4px 8px", borderRadius: 4, border: "1px solid var(--hc-line)" }}>
+                  <option value="ALL">Todos</option>
+                  <option value="IN_USE">En uso</option>
+                  <option value="FREE">Libres</option>
+                </select>
+                <select value={assetSortOrder} onChange={(e) => setAssetSortOrder(e.target.value as "NOMBRE" | "FECHA" | "TAMANO")} style={{ fontSize: 12, padding: "4px 8px", borderRadius: 4, border: "1px solid var(--hc-line)" }}>
+                  <option value="NOMBRE">Nombre</option>
+                  <option value="FECHA">Fecha</option>
+                  <option value="TAMANO">Tamano</option>
+                </select>
+                <div style={{ display: "flex", gap: 2, marginLeft: "auto" }}>
+                  <button
+                    onClick={() => setAssetViewMode("grid")}
+                    style={{
+                      padding: "4px 8px",
+                      borderRadius: "4px 0 0 4px",
+                      border: "1px solid var(--hc-line)",
+                      background: assetViewMode === "grid" ? "var(--hc-ink)" : "var(--hc-bone)",
+                      color: assetViewMode === "grid" ? "#fff" : "var(--hc-ink)",
+                      cursor: "pointer",
+                      fontSize: 11,
+                    }}
+                  >
+                    Grid
+                  </button>
+                  <button
+                    onClick={() => setAssetViewMode("list")}
+                    style={{
+                      padding: "4px 8px",
+                      borderRadius: "0 4px 4px 0",
+                      border: "1px solid var(--hc-line)",
+                      background: assetViewMode === "list" ? "var(--hc-ink)" : "var(--hc-bone)",
+                      color: assetViewMode === "list" ? "#fff" : "var(--hc-ink)",
+                      cursor: "pointer",
+                      fontSize: 11,
+                    }}
+                  >
+                    Lista
+                  </button>
+                </div>
               </div>
-              <div className="market-grid">
-                {visibleAssets.map((asset) => {
-                  const badgeTargets = assetTargetFilter === "ALL"
-                    ? ASSET_COMPATIBILITY_TARGETS.slice(0, 5)
-                    : [assetTargetFilter];
-                  const metadataMissing = !asset.width || !asset.height;
-                  return (
-                  <div className="market-card" key={asset.id}>
-                    {asset.path ? (
-                      asset.kind === "VIDEO" || asset.path.toLowerCase().endsWith(".mp4") ? (
-                        <video
-                          src={assetUrl(asset.path, tenantSlug)}
-                          className="asset-tile"
-                          controls
-                          preload="metadata"
-                          onLoadedMetadata={(event) => {
-                            const video = event.currentTarget;
-                            void handlePersistAnalyzedMetadata(asset, {
-                              width: video.videoWidth || null,
-                              height: video.videoHeight || null,
-                              durationSeconds: Number.isFinite(video.duration) ? video.duration : null,
-                            });
-                          }}
-                        />
-                      ) : (
-                        <img
-                          src={assetUrl(asset.path, tenantSlug)}
-                          alt={asset.filename}
-                          className="asset-tile"
-                          onLoad={(event) => {
-                            const image = event.currentTarget;
-                            void handlePersistAnalyzedMetadata(asset, {
-                              width: image.naturalWidth || null,
-                              height: image.naturalHeight || null,
-                            });
-                          }}
-                        />
-                      )
-                    ) : (
-                      <div className="asset-tile asset-empty"><PackageSearch size={22} /></div>
-                    )}
-                    {renamingAssetId === asset.id ? (
-                      <div style={{ display: "flex", gap: 4, marginTop: 4 }}>
-                        <input
-                          autoFocus
-                          style={{ flex: 1, padding: "3px 6px", borderRadius: 4, border: "1px solid var(--hc-line)", fontSize: 12 }}
-                          value={renameFilename}
-                          onChange={(e) => setRenameFilename(e.target.value)}
-                          onKeyDown={(e) => { if (e.key === "Enter") handleRenameAsset(asset.id); if (e.key === "Escape") setRenamingAssetId(""); }}
-                        />
-                        <button onClick={() => handleRenameAsset(asset.id)} disabled={renameSaving} style={{ padding: "3px 8px", borderRadius: 4, border: "1px solid var(--hc-line)", background: "var(--hc-ink)", color: "#fff", cursor: "pointer", fontSize: 11 }}>{renameSaving ? "..." : "Guardar"}</button>
-                        <button onClick={() => { setRenamingAssetId(""); setRenameFilename(""); }} style={{ padding: "3px 8px", borderRadius: 4, border: "1px solid var(--hc-line)", background: "var(--hc-bone)", cursor: "pointer", fontSize: 11 }}>Cancelar</button>
+
+              {assetViewMode === "grid" ? (
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: 8, padding: 10, maxHeight: "calc(100vh - 340px)", overflowY: "auto" }}>
+                  {visibleAssets.map((asset) => {
+                    const metadataMissing = !asset.width || !asset.height;
+                    const allCompatResults = ASSET_COMPATIBILITY_TARGETS.map((target) => ({
+                      target,
+                      result: evaluateAssetCompatibility(assetCompatibilityInput(asset), target),
+                    }));
+                    const topBadges = allCompatResults
+                      .filter((entry) => entry.result.status !== "UNKNOWN")
+                      .sort((a, b) => (a.result.status === "IDEAL" ? -1 : a.result.status === "USABLE" ? 0 : 1) - (b.result.status === "IDEAL" ? -1 : b.result.status === "USABLE" ? 0 : 1))
+                      .slice(0, 3);
+                    const extraCount = allCompatResults.filter((entry) => entry.result.status !== "UNKNOWN").length - 3;
+                    return (
+                      <div key={asset.id} style={{ border: "1px solid var(--hc-line)", borderRadius: 8, overflow: "hidden", background: "var(--hc-surface)", cursor: "pointer" }} onClick={() => setInspectorAsset(asset)}>
+                        {asset.path ? (
+                          asset.kind === "VIDEO" || asset.path.toLowerCase().endsWith(".mp4") ? (
+                            <video src={assetUrl(asset.path, tenantSlug)} style={{ width: "100%", height: 90, objectFit: "cover" }} preload="metadata" muted />
+                          ) : (
+                            <img src={assetUrl(asset.path, tenantSlug)} alt={asset.filename} style={{ width: "100%", height: 90, objectFit: "cover" }} crossOrigin="anonymous" />
+                          )
+                        ) : (
+                          <div style={{ width: "100%", height: 90, background: "var(--hc-bone)", display: "flex", alignItems: "center", justifyContent: "center" }}><PackageSearch size={22} /></div>
+                        )}
+                        <div style={{ padding: 6 }}>
+                          <div style={{ fontSize: 12, fontWeight: 600, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }} title={asset.filename}>{asset.filename}</div>
+                          <div style={{ display: "flex", gap: 4, flexWrap: "wrap", marginTop: 3, fontSize: 10 }}>
+                            {asset.width && asset.height ? (
+                              <span style={{ color: "var(--hc-fog)" }}>{asset.width}x{asset.height}</span>
+                            ) : metadataMissing ? (
+                              <span style={{ color: "var(--hc-sand)" }}>Sin analizar</span>
+                            ) : null}
+                            {asset.sizeBytes != null && (
+                              <span style={{ color: "var(--hc-fog)" }}>{formatBytes(asset.sizeBytes)}</span>
+                            )}
+                            {asset.folder && (
+                              <span style={{ background: "var(--hc-bone)", padding: "0 4px", borderRadius: 3 }}>{asset.folder}</span>
+                            )}
+                          </div>
+                          <div style={{ display: "flex", gap: 3, marginTop: 4, flexWrap: "wrap" }}>
+                            {topBadges.map((entry) => (
+                              <span
+                                key={entry.target}
+                                title={`${ASSET_COMPATIBILITY_CONFIGS[entry.target].label}: ${compatibilityLabel(entry.result.status)}`}
+                                style={{
+                                  padding: "1px 5px",
+                                  borderRadius: 3,
+                                  fontSize: 9,
+                                  background: entry.result.status === "IDEAL" ? "#e8f7ef" : entry.result.status === "USABLE" ? "#fff8e1" : "#fff1f0",
+                                  color: entry.result.status === "IDEAL" ? "#0f6e3f" : entry.result.status === "USABLE" ? "#8d6e00" : "#b42318",
+                                  display: "flex",
+                                  alignItems: "center",
+                                  gap: 2,
+                                }}
+                              >
+                                <span style={{ width: 6, height: 6, borderRadius: "50%", background: entry.result.status === "IDEAL" ? "#0f6e3f" : entry.result.status === "USABLE" ? "#f5a623" : "#b42318", display: "inline-block", flexShrink: 0 }} />
+                                {compatibilityLabel(entry.result.status).slice(0, 4)}
+                              </span>
+                            ))}
+                            {extraCount > 0 && (
+                              <span style={{ fontSize: 9, color: "var(--hc-fog)", cursor: "pointer" }} onClick={(e) => { e.stopPropagation(); setInspectorAsset(asset); }}>+{extraCount} formatos</span>
+                            )}
+                          </div>
+                          {asset.draftCount > 0 && (
+                            <div style={{ marginTop: 4, fontSize: 10, color: "var(--hc-teal)" }}>usado en {asset.draftCount} drafts</div>
+                          )}
+                          <div style={{ display: "flex", gap: 4, marginTop: 6 }}>
+                            <button onClick={(e) => { e.stopPropagation(); setRenamingAssetId(asset.id); setRenameFilename(asset.filename); }} title="Renombrar" style={{ background: "none", border: "none", cursor: "pointer", padding: 2, color: "var(--hc-fog)" }}><Pencil size={12} /></button>
+                            <button onClick={(e) => { e.stopPropagation(); setMovingAssetId(asset.id); setMoveFolder(asset.folder ?? ""); }} title="Carpeta" style={{ background: "none", border: "none", cursor: "pointer", padding: 2, color: "var(--hc-fog)" }}><PackageSearch size={12} /></button>
+                            <label title="Reemplazar" style={{ cursor: "pointer", color: "var(--hc-fog)", padding: 2 }} onClick={(e) => e.stopPropagation()}>
+                              <ImageIcon size={12} />
+                              <input type="file" accept="image/jpeg,image/png,image/webp,video/mp4,video/quicktime" hidden onChange={(e) => { const f = e.target.files?.[0] ?? null; if (f) handleReplaceAsset(asset.id, f); }} />
+                            </label>
+                            <button onClick={(e) => { e.stopPropagation(); handleDeleteAsset(asset.id); }} disabled={deletingAssetId === asset.id || asset.draftCount > 0} title={asset.draftCount > 0 ? "Asset en uso" : "Eliminar"} style={{ background: "none", border: "none", cursor: asset.draftCount > 0 ? "not-allowed" : "pointer", padding: 2, color: asset.draftCount > 0 ? "var(--hc-line)" : "#b42318" }}><Trash2 size={12} /></button>
+                          </div>
+                          {renamingAssetId === asset.id && (
+                            <div style={{ display: "flex", gap: 4, marginTop: 4 }} onClick={(e) => e.stopPropagation()}>
+                              <input autoFocus style={{ flex: 1, padding: "3px 6px", borderRadius: 4, border: "1px solid var(--hc-line)", fontSize: 12 }} value={renameFilename} onChange={(e) => setRenameFilename(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") handleRenameAsset(asset.id); if (e.key === "Escape") setRenamingAssetId(""); }} />
+                              <button onClick={() => handleRenameAsset(asset.id)} disabled={renameSaving} style={{ padding: "3px 8px", borderRadius: 4, border: "1px solid var(--hc-line)", background: "var(--hc-ink)", color: "#fff", cursor: "pointer", fontSize: 11 }}>{renameSaving ? "..." : "Guardar"}</button>
+                              <button onClick={() => { setRenamingAssetId(""); setRenameFilename(""); }} style={{ padding: "3px 8px", borderRadius: 4, border: "1px solid var(--hc-line)", background: "var(--hc-bone)", cursor: "pointer", fontSize: 11 }}>Cancelar</button>
+                            </div>
+                          )}
+                          {movingAssetId === asset.id && (
+                            <div style={{ display: "flex", gap: 4, marginTop: 4 }} onClick={(e) => e.stopPropagation()}>
+                              <input autoFocus style={{ flex: 1, padding: "3px 6px", borderRadius: 4, border: "1px solid var(--hc-line)", fontSize: 12 }} value={moveFolder} onChange={(e) => setMoveFolder(e.target.value)} placeholder="Carpeta" />
+                              <button onClick={() => handleMoveAsset(asset.id)} disabled={renameSaving} style={{ padding: "3px 8px", borderRadius: 4, border: "1px solid var(--hc-line)", background: "var(--hc-ink)", color: "#fff", cursor: "pointer", fontSize: 11 }}>Mover</button>
+                            </div>
+                          )}
+                        </div>
                       </div>
-                    ) : (
-                      <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-                        <strong>{asset.filename}</strong>
-                        <button
-                          onClick={() => { setRenamingAssetId(asset.id); setRenameFilename(asset.filename); }}
-                          title="Renombrar"
-                          style={{ background: "none", border: "none", cursor: "pointer", padding: 0, color: "var(--hc-fog)", fontSize: 12 }}
-                        ><Pencil size={12} /></button>
-                      </div>
-                    )}
-                    {movingAssetId === asset.id ? (
-                      <div style={{ display: "flex", gap: 4, marginTop: 4 }}>
-                        <input
-                          autoFocus
-                          style={{ flex: 1, padding: "3px 6px", borderRadius: 4, border: "1px solid var(--hc-line)", fontSize: 12 }}
-                          value={moveFolder}
-                          onChange={(e) => setMoveFolder(e.target.value)}
-                          placeholder="Carpeta"
-                        />
-                        <button onClick={() => handleMoveAsset(asset.id)} disabled={renameSaving} style={{ padding: "3px 8px", borderRadius: 4, border: "1px solid var(--hc-line)", background: "var(--hc-ink)", color: "#fff", cursor: "pointer", fontSize: 11 }}>Mover</button>
-                      </div>
-                    ) : null}
-                    <small>{asset.kind} / {asset.mimeType ?? "mime?"} / {asset.folder || "raiz"} / {asset.draftCount} drafts</small>
-                    <small>
-                      {asset.width && asset.height ? `${asset.width} x ${asset.height}` : metadataMissing ? "Sin analizar" : "resolucion pendiente"} / {formatBytes(asset.sizeBytes)}
-                      {asset.durationSeconds != null ? ` / ${formatDuration(asset.durationSeconds)}` : ""}
-                    </small>
-                    <small>
-                      {asset.orientation ?? "orientacion pendiente"} / {aspectRatioText(asset.aspectRatio)}
-                    </small>
-                    <div style={{ display: "flex", gap: 4, overflowX: "auto", paddingBottom: 2 }}>
-                      {badgeTargets.map((target) => {
-                        const result = evaluateAssetCompatibility(assetCompatibilityInput(asset), target);
-                        return (
-                          <span
-                            key={target}
-                            title={`${ASSET_COMPATIBILITY_CONFIGS[target].label}: ${result.reasons.join(" ")}`}
-                            style={{
-                              flex: "0 0 auto",
-                              padding: "2px 6px",
-                              borderRadius: 4,
-                              border: "1px solid var(--hc-line)",
-                              fontSize: 10,
-                              background: result.status === "IDEAL" ? "#e8f7ef" : result.status === "USABLE" ? "var(--hc-bone)" : result.status === "INCOMPATIBLE" ? "#fff1f0" : "var(--hc-surface)",
-                              color: result.status === "INCOMPATIBLE" ? "#b42318" : "var(--hc-ink)",
-                              whiteSpace: "nowrap",
-                            }}
-                          >
-                            {ASSET_COMPATIBILITY_CONFIGS[target].label}: {compatibilityLabel(result.status)}
-                          </span>
-                        );
-                      })}
-                    </div>
-                    <div style={{ display: "flex", gap: 4, flexWrap: "wrap", marginTop: 4 }}>
-                      <button onClick={() => { setMovingAssetId(asset.id); setMoveFolder(asset.folder ?? ""); }} style={{ padding: "3px 8px", borderRadius: 4, border: "1px solid var(--hc-line)", background: "var(--hc-bone)", cursor: "pointer", fontSize: 11 }}>Carpeta</button>
-                      <label style={{ padding: "3px 8px", borderRadius: 4, border: "1px solid var(--hc-line)", background: "var(--hc-bone)", cursor: "pointer", fontSize: 11 }}>
-                        {replaceAssetId === asset.id ? "..." : "Reemplazar"}
-                        <input type="file" accept="image/jpeg,image/png,image/webp,video/mp4,video/quicktime" hidden onChange={(e) => handleReplaceAsset(asset.id, e.target.files?.[0] ?? null)} />
-                      </label>
-                      <button onClick={() => handleDeleteAsset(asset.id)} disabled={deletingAssetId === asset.id || asset.draftCount > 0} title={asset.draftCount > 0 ? "Asset en uso" : "Eliminar"} style={{ padding: "3px 8px", borderRadius: 4, border: "1px solid var(--hc-line)", background: asset.draftCount > 0 ? "var(--hc-bone)" : "#fff1f0", cursor: asset.draftCount > 0 ? "not-allowed" : "pointer", fontSize: 11 }}>Eliminar</button>
-                    </div>
+                    );
+                  })}
+                  {visibleAssets.length === 0 && <p style={{ padding: 14, gridColumn: "1 / -1", textAlign: "center", color: "var(--hc-fog)" }}>No hay activos para este filtro.</p>}
+                </div>
+              ) : (
+                <div style={{ padding: 10, maxHeight: "calc(100vh - 340px)", overflowY: "auto" }}>
+                  <div style={{ display: "grid", gridTemplateColumns: "40px 2fr 1fr 1fr 80px 100px 120px 80px 120px", gap: 4, fontSize: 11, fontWeight: 600, padding: "4px 8px", borderBottom: "1px solid var(--hc-line)", color: "var(--hc-fog)" }}>
+                    <span></span>
+                    <span>Nombre</span>
+                    <span>Resolucion</span>
+                    <span>Tamano</span>
+                    <span>Tipo</span>
+                    <span>Carpeta</span>
+                    <span>Compatibilidad</span>
+                    <span>Drafts</span>
+                    <span>Acciones</span>
                   </div>
-                  );
-                })}
-                {visibleAssets.length === 0 && <p style={{ padding: 14 }}>No hay activos cargados para este filtro.</p>}
-              </div>
+                  {visibleAssets.map((asset) => {
+                    const allCompatResults = ASSET_COMPATIBILITY_TARGETS.map((target) => ({
+                      target,
+                      result: evaluateAssetCompatibility(assetCompatibilityInput(asset), target),
+                    }));
+                    const topBadges = allCompatResults
+                      .filter((entry) => entry.result.status !== "UNKNOWN")
+                      .sort((a, b) => (a.result.status === "IDEAL" ? -1 : a.result.status === "USABLE" ? 0 : 1) - (b.result.status === "IDEAL" ? -1 : b.result.status === "USABLE" ? 0 : 1))
+                      .slice(0, 2);
+                    return (
+                      <div key={asset.id} style={{ display: "grid", gridTemplateColumns: "40px 2fr 1fr 1fr 80px 100px 120px 80px 120px", gap: 4, alignItems: "center", padding: "4px 8px", borderBottom: "1px solid var(--hc-line)", fontSize: 11, cursor: "pointer" }} onClick={() => setInspectorAsset(asset)}>
+                        {asset.path ? (
+                          asset.kind === "VIDEO" || asset.path.toLowerCase().endsWith(".mp4") ? (
+                            <video src={assetUrl(asset.path, tenantSlug)} style={{ width: 32, height: 32, objectFit: "cover", borderRadius: 4 }} preload="metadata" muted />
+                          ) : (
+                            <img src={assetUrl(asset.path, tenantSlug)} alt={asset.filename} style={{ width: 32, height: 32, objectFit: "cover", borderRadius: 4 }} crossOrigin="anonymous" />
+                          )
+                        ) : (
+                          <div style={{ width: 32, height: 32, background: "var(--hc-bone)", borderRadius: 4, display: "flex", alignItems: "center", justifyContent: "center" }}><PackageSearch size={14} /></div>
+                        )}
+                        <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", fontWeight: 500 }}>{asset.filename}</span>
+                        <span>{asset.width && asset.height ? `${asset.width}x${asset.height}` : "-"}</span>
+                        <span>{asset.sizeBytes != null ? formatBytes(asset.sizeBytes) : "-"}</span>
+                        <span>{asset.kind}</span>
+                        <span>{asset.folder || "raiz"}</span>
+                        <span style={{ display: "flex", gap: 2 }}>
+                          {topBadges.map((entry) => (
+                            <span
+                              key={entry.target}
+                              title={`${ASSET_COMPATIBILITY_CONFIGS[entry.target].label}: ${compatibilityLabel(entry.result.status)}`}
+                              style={{
+                                padding: "0 4px",
+                                borderRadius: 3,
+                                fontSize: 9,
+                                background: entry.result.status === "IDEAL" ? "#e8f7ef" : entry.result.status === "USABLE" ? "#fff8e1" : "#fff1f0",
+                                color: entry.result.status === "IDEAL" ? "#0f6e3f" : entry.result.status === "USABLE" ? "#8d6e00" : "#b42318",
+                              }}
+                            >
+                              {compatibilityLabel(entry.result.status).slice(0, 4)}
+                            </span>
+                          ))}
+                        </span>
+                        <span>{asset.draftCount > 0 ? `${asset.draftCount}` : "-"}</span>
+                        <span style={{ display: "flex", gap: 4 }}>
+                          <button onClick={(e) => { e.stopPropagation(); setRenamingAssetId(asset.id); setRenameFilename(asset.filename); }} title="Renombrar" style={{ background: "none", border: "none", cursor: "pointer", padding: 1, color: "var(--hc-fog)" }}><Pencil size={11} /></button>
+                          <button onClick={(e) => { e.stopPropagation(); setMovingAssetId(asset.id); setMoveFolder(asset.folder ?? ""); }} title="Mover" style={{ background: "none", border: "none", cursor: "pointer", padding: 1, color: "var(--hc-fog)" }}><PackageSearch size={11} /></button>
+                          <label title="Reemplazar" style={{ cursor: "pointer", color: "var(--hc-fog)", padding: 1 }} onClick={(e) => e.stopPropagation()}>
+                            <ImageIcon size={11} />
+                            <input type="file" accept="image/jpeg,image/png,image/webp,video/mp4,video/quicktime" hidden onChange={(e) => { const f = e.target.files?.[0] ?? null; if (f) handleReplaceAsset(asset.id, f); }} />
+                          </label>
+                          <button onClick={(e) => { e.stopPropagation(); handleDeleteAsset(asset.id); }} disabled={deletingAssetId === asset.id || asset.draftCount > 0} style={{ background: "none", border: "none", cursor: asset.draftCount > 0 ? "not-allowed" : "pointer", padding: 1, color: asset.draftCount > 0 ? "var(--hc-line)" : "#b42318" }}><Trash2 size={11} /></button>
+                        </span>
+                      </div>
+                    );
+                  })}
+                  {visibleAssets.length === 0 && <p style={{ padding: 14, textAlign: "center", color: "var(--hc-fog)" }}>No hay activos para este filtro.</p>}
+                </div>
+              )}
             </section>
+          </div>
+        )}
+
+        {inspectorAsset && (
+          <div style={{ position: "fixed", top: 0, right: 0, width: 400, maxWidth: "100vw", height: "100vh", background: "var(--hc-accent)", borderLeft: "1px solid var(--hc-line)", zIndex: 1000, overflowY: "auto", boxShadow: "-4px 0 12px rgba(0,0,0,0.1)" }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 14px", borderBottom: "1px solid var(--hc-line)" }}>
+              <strong style={{ fontSize: 14 }}>Inspector de asset</strong>
+              <button onClick={() => setInspectorAsset(null)} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--hc-fog)", fontSize: 16 }}><X size={18} /></button>
+            </div>
+            <div style={{ padding: 14 }}>
+              {inspectorAsset.path && (
+                <div style={{ marginBottom: 12 }}>
+                  {inspectorAsset.kind === "VIDEO" || (inspectorAsset.path ?? "").toLowerCase().endsWith(".mp4") ? (
+                    <video src={assetUrl(inspectorAsset.path, tenantSlug)} controls style={{ width: "100%", maxHeight: 200, objectFit: "contain", borderRadius: 6 }} preload="metadata" />
+                  ) : (
+                    <img src={assetUrl(inspectorAsset.path, tenantSlug)} alt={inspectorAsset.filename} style={{ width: "100%", maxHeight: 200, objectFit: "contain", borderRadius: 6 }} crossOrigin="anonymous" />
+                  )}
+                </div>
+              )}
+              <div style={{ display: "grid", gap: 6, fontSize: 12 }}>
+                <div><strong>Archivo:</strong> {inspectorAsset.filename}</div>
+                <div><strong>ID:</strong> {inspectorAsset.id}</div>
+                <div><strong>Tipo:</strong> {inspectorAsset.kind} / {inspectorAsset.mimeType ?? "N/D"}</div>
+                <div><strong>Resolucion:</strong> {inspectorAsset.width && inspectorAsset.height ? `${inspectorAsset.width}x${inspectorAsset.height}` : "Sin analizar"}</div>
+                <div><strong>Tamano:</strong> {formatBytes(inspectorAsset.sizeBytes)}</div>
+                {inspectorAsset.durationSeconds != null && <div><strong>Duracion:</strong> {formatDuration(inspectorAsset.durationSeconds)}</div>}
+                <div><strong>Orientacion:</strong> {inspectorAsset.orientation ?? "pendiente"}</div>
+                <div><strong>Aspect ratio:</strong> {aspectRatioText(inspectorAsset.aspectRatio)}</div>
+                <div><strong>Carpeta:</strong> {inspectorAsset.folder || "raiz"}</div>
+                <div><strong>Storage key:</strong> <code style={{ fontSize: 10, wordBreak: "break-all" }}>{inspectorAsset.storageKey ?? "N/D"}</code></div>
+                <div><strong>Drafts:</strong> {inspectorAsset.draftCount}</div>
+              </div>
+              <div style={{ marginTop: 12 }}>
+                <strong style={{ fontSize: 12 }}>Matriz de compatibilidad</strong>
+                <div style={{ display: "grid", gap: 4, marginTop: 6 }}>
+                  {ASSET_COMPATIBILITY_TARGETS.map((target) => {
+                    const result = evaluateAssetCompatibility(assetCompatibilityInput(inspectorAsset), target);
+                    return (
+                      <div key={target} style={{ display: "flex", alignItems: "center", gap: 6, padding: "3px 6px", borderRadius: 4, background: result.status === "IDEAL" ? "#e8f7ef" : result.status === "USABLE" ? "#fff8e1" : result.status === "INCOMPATIBLE" ? "#fff1f0" : "var(--hc-bone)", fontSize: 11 }}>
+                        <span style={{ width: 8, height: 8, borderRadius: "50%", background: result.status === "IDEAL" ? "#0f6e3f" : result.status === "USABLE" ? "#f5a623" : result.status === "INCOMPATIBLE" ? "#b42318" : "var(--hc-fog)", flexShrink: 0 }} />
+                        <span style={{ flex: 1 }}>{ASSET_COMPATIBILITY_CONFIGS[target].label}</span>
+                        <span style={{ fontWeight: 600 }}>{compatibilityLabel(result.status)}</span>
+                        <small style={{ color: "var(--hc-fog)", fontSize: 10 }}>{result.reasons.join("; ")}</small>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+              <div style={{ display: "flex", gap: 6, marginTop: 14, flexWrap: "wrap" }}>
+                <button onClick={() => { setInspectorAsset(null); setRenamingAssetId(inspectorAsset.id); setRenameFilename(inspectorAsset.filename); }} style={{ padding: "4px 10px", borderRadius: 4, border: "1px solid var(--hc-line)", background: "var(--hc-bone)", cursor: "pointer", fontSize: 12 }}>Renombrar</button>
+                <button onClick={() => { setInspectorAsset(null); setMovingAssetId(inspectorAsset.id); setMoveFolder(inspectorAsset.folder ?? ""); }} style={{ padding: "4px 10px", borderRadius: 4, border: "1px solid var(--hc-line)", background: "var(--hc-bone)", cursor: "pointer", fontSize: 12 }}>Mover</button>
+                <label style={{ padding: "4px 10px", borderRadius: 4, border: "1px solid var(--hc-line)", background: "var(--hc-bone)", cursor: "pointer", fontSize: 12 }}>
+                  Reemplazar
+                  <input type="file" accept="image/jpeg,image/png,image/webp,video/mp4,video/quicktime" hidden onChange={(e) => { const f = e.target.files?.[0] ?? null; if (f) { setInspectorAsset(null); handleReplaceAsset(inspectorAsset.id, f); } }} />
+                </label>
+                <button onClick={() => { setInspectorAsset(null); handleDeleteAsset(inspectorAsset.id); }} disabled={inspectorAsset.draftCount > 0} style={{ padding: "4px 10px", borderRadius: 4, border: "1px solid var(--hc-line)", background: inspectorAsset.draftCount > 0 ? "var(--hc-bone)" : "#fff1f0", color: inspectorAsset.draftCount > 0 ? "var(--hc-fog)" : "#b42318", cursor: inspectorAsset.draftCount > 0 ? "not-allowed" : "pointer", fontSize: 12 }}>Eliminar</button>
+              </div>
+            </div>
           </div>
         )}
 

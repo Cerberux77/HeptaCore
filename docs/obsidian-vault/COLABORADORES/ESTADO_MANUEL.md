@@ -123,7 +123,7 @@ Zonas: `examples/tenants/cepeg`, `apps/web`, `packages/db`
 type: collaborator-status
 project: "HeptaCore"
 operator: "Manuel"
-last_updated: "2026-06-22T19:57:34.873Z"
+last_updated: "2026-06-22T22:35:09.167Z"
 generated_by: "Oreshnik canonical-check"
 source: "var/oreshnik/task-board.json"
 ---
@@ -156,6 +156,7 @@ source: "var/oreshnik/task-board.json"
 | S-HC-STRAT-01-MASTER-STRATEGY-WORKBENCH | Master strategy workbench: LLM-powered strategy generation and conversational refinement | S-HC-ONB-02-GAP-RESOLUTION-WIZARD, S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE |
 | S-HC-STRAT-02-CONTENT-CALENDAR-BLUEPRINT | Content calendar blueprint: master publishing calendar from strategy | S-HC-STRAT-01-MASTER-STRATEGY-WORKBENCH |
 | S-HC-ASSET-01-STRATEGY-ASSET-MANIFEST | Strategy-driven asset manifest: per-publication asset requirements | S-HC-STRAT-02-CONTENT-CALENDAR-BLUEPRINT, S-HC-PUB-03-MULTITENANT-ASSETS |
+| S-HC-ASSET-02-FORMAT-DERIVATIVES | Format derivatives: badge interaction, format preview, intelligent crop, safe zones, asset variants | S-HC-PUB-03-MULTITENANT-ASSETS |
 | S-HC-AIGEN-01-ASSET-GENERATION-BROKER | AI asset generation broker: provider-agnostic, metered and billed | S-HC-ASSET-01-STRATEGY-ASSET-MANIFEST, S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE, S-HC-COMM-02-BILLING-ACTIVATION |
 | S-HC-OPS-01-CAMPAIGN-REVIEW-DEPLOYMENT | Campaign review and deployment: batch approval, schedule, publish | S-HC-STRAT-02-CONTENT-CALENDAR-BLUEPRINT, S-HC-ASSET-01-STRATEGY-ASSET-MANIFEST, S-HC-PUB-04-HOURLY-BATCH-CRON |
 | S-HC-SUP-01-ASSISTED-CUSTOMER-CHANNELS | Assisted customer channels: LLM assistant, WhatsApp, email, human escalation | S-HC-COMM-02-BILLING-ACTIVATION |
@@ -370,6 +371,24 @@ Estado: `pending`
 - Progress bar with direct CTA for each missing asset
 
 Zonas: `apps/web/components`, `packages/core`
+
+### S-HC-ASSET-02-FORMAT-DERIVATIVES - Format derivatives: badge interaction, format preview, intelligent crop, safe zones, asset variants
+
+Estado: `pending`
+
+- Badge de compatibilidad clickeable que abre detalle de formato
+- Preview especifico de formato con crop y safe zones visuales
+- Crop manual interactivo por formato (recorte, reposicion)
+- Crop inteligente automatico con deteccion de sujeto/centro
+- Fit con fondo (blur, color, gradiente) cuando el asset no llena el frame
+- Safe zones indicadas visualmente (titulo, UI de plataforma, texto)
+- Aceptar/deshacer cambios por formato
+- Asset original inmutable; derivados como registros separados con relacion sourceAsset
+- Versionado de derivados
+- Generacion por lote de variantes para todos los formatos requeridos
+- Imagenes primero; video fuera de este sprint o como fase separada
+
+Zonas: `apps/web/components`, `packages/core`, `apps/web/lib`
 
 ### S-HC-AIGEN-01-ASSET-GENERATION-BROKER - AI asset generation broker: provider-agnostic, metered and billed
 

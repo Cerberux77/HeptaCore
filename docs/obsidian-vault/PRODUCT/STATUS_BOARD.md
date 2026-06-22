@@ -81,7 +81,7 @@ source: "var/oreshnik/task-board.json"
 ---
 type: status-board
 project: "HeptaCore"
-last_updated: "2026-06-22T19:57:34.908Z"
+last_updated: "2026-06-22T22:35:09.170Z"
 generated_by: "Oreshnik canonical-check"
 source: "var/oreshnik/task-board.json"
 ---
@@ -121,6 +121,7 @@ source: "var/oreshnik/task-board.json"
 | S-HC-STRAT-01-MASTER-STRATEGY-WORKBENCH | pending | Manuel | Master strategy workbench: LLM-powered strategy generation and conversational refinement | S-HC-ONB-02-GAP-RESOLUTION-WIZARD, S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE |
 | S-HC-STRAT-02-CONTENT-CALENDAR-BLUEPRINT | pending | Manuel | Content calendar blueprint: master publishing calendar from strategy | S-HC-STRAT-01-MASTER-STRATEGY-WORKBENCH |
 | S-HC-ASSET-01-STRATEGY-ASSET-MANIFEST | pending | Manuel | Strategy-driven asset manifest: per-publication asset requirements | S-HC-STRAT-02-CONTENT-CALENDAR-BLUEPRINT, S-HC-PUB-03-MULTITENANT-ASSETS |
+| S-HC-ASSET-02-FORMAT-DERIVATIVES | pending | Manuel | Format derivatives: badge interaction, format preview, intelligent crop, safe zones, asset variants | S-HC-PUB-03-MULTITENANT-ASSETS |
 | S-HC-AIGEN-01-ASSET-GENERATION-BROKER | pending | Manuel | AI asset generation broker: provider-agnostic, metered and billed | S-HC-ASSET-01-STRATEGY-ASSET-MANIFEST, S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE, S-HC-COMM-02-BILLING-ACTIVATION |
 | S-HC-OPS-01-CAMPAIGN-REVIEW-DEPLOYMENT | pending | Manuel | Campaign review and deployment: batch approval, schedule, publish | S-HC-STRAT-02-CONTENT-CALENDAR-BLUEPRINT, S-HC-ASSET-01-STRATEGY-ASSET-MANIFEST, S-HC-PUB-04-HOURLY-BATCH-CRON |
 | S-HC-SUP-01-ASSISTED-CUSTOMER-CHANNELS | pending | Manuel | Assisted customer channels: LLM assistant, WhatsApp, email, human escalation | S-HC-COMM-02-BILLING-ACTIVATION |

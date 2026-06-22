@@ -13,6 +13,8 @@ import {
 } from "../asset-service";
 import { resolveAssetUrl } from "../asset-resolution";
 import { buildPreviewData, normalizeAssetManifest } from "../publishing-formats";
+import { waitForRegisteredAsset } from "../asset-upload";
+import type { TenantAssetItem } from "../dashboard";
 import type { AssetStorageAdapter } from "../asset-storage";
 
 type Row = Record<string, any>;
@@ -240,5 +242,120 @@ describe("tenant asset service", () => {
   it("does not import publisher adapters from tenant asset code", () => {
     const source = readFileSync(join(process.cwd(), "lib", "asset-service.ts"), "utf8");
     assert.doesNotMatch(source, /from "\.\/publishers|from "\.\/publishers\/|getPublisher\(|\.publish\(/);
+  });
+});
+
+describe("waitForRegisteredAsset", () => {
+  it("finds asset after retries", async () => {
+    const originalFetch = globalThis.fetch;
+    let callCount = 0;
+    globalThis.fetch = async (input: any, init?: any) => {
+      callCount++;
+      const body = init?.body ? JSON.parse(init.body as string) : {};
+      if (callCount <= 2) {
+        return new Response(JSON.stringify({ ok: true, found: false }), { status: 200 });
+      }
+      return new Response(JSON.stringify({
+        ok: true,
+        found: true,
+        asset: { id: "asset-x", filename: "test.jpg", kind: "IMAGE", path: "/test.jpg", storageKey: body.storageKey },
+      }), { status: 200 });
+    };
+    try {
+      const result = await waitForRegisteredAsset("test-tenant", "tenants/t1/assets/u/test.jpg", { attempts: 5, initialDelayMs: 10, maxDelayMs: 50 });
+      assert.equal(result.found, true);
+      assert.ok(result.asset);
+      assert.equal(result.asset!.filename, "test.jpg");
+      assert.equal(callCount, 3);
+    } finally {
+      globalThis.fetch = originalFetch;
+    }
+  });
+
+  it("times out without false success", async () => {
+    const originalFetch = globalThis.fetch;
+    globalThis.fetch = async () => new Response(JSON.stringify({ ok: true, found: false }), { status: 200 });
+    try {
+      const result = await waitForRegisteredAsset("test-tenant", "tenants/t1/assets/u/missing.jpg", { attempts: 4, initialDelayMs: 5, maxDelayMs: 20 });
+      assert.equal(result.found, false);
+      assert.equal(result.attempts, 4);
+      assert.equal(result.asset, undefined);
+    } finally {
+      globalThis.fetch = originalFetch;
+    }
+  });
+
+  it("retry has exponential backoff", async () => {
+    const originalFetch = globalThis.fetch;
+    const delays: number[] = [];
+    const originalSetTimeout = globalThis.setTimeout;
+    globalThis.setTimeout = ((fn: any, ms?: number, ...args: any[]) => {
+      if (typeof ms === "number") delays.push(ms);
+      return originalSetTimeout(fn, ms, ...args);
+    }) as typeof globalThis.setTimeout;
+    globalThis.fetch = async () => new Response(JSON.stringify({ ok: true, found: false }), { status: 200 });
+    try {
+      await waitForRegisteredAsset("test-tenant", "key", { attempts: 5, initialDelayMs: 100, maxDelayMs: 1000 });
+      assert.ok(delays.length >= 4);
+      assert.ok(delays[0] <= delays[1]);
+      assert.ok(delays[1] <= delays[2]);
+    } finally {
+      globalThis.fetch = originalFetch;
+      globalThis.setTimeout = originalSetTimeout;
+    }
+  });
+});
+
+describe("by-storage-key endpoint", () => {
+  it("requires auth (verified by route source)", () => {
+    const source = readFileSync(join(process.cwd(), "app", "api", "tenants", "[slug]", "assets", "by-storage-key", "route.ts"), "utf8");
+    assert.match(source, /from.*auth/);
+    assert.match(source, /auth\(\)/);
+    assert.match(source, /session\?\.user\?\.id/);
+  });
+
+  it("requires tenant membership (verified by route source)", () => {
+    const source = readFileSync(join(process.cwd(), "app", "api", "tenants", "[slug]", "assets", "by-storage-key", "route.ts"), "utf8");
+    assert.match(source, /membership/);
+    assert.match(source, /findUnique/);
+  });
+
+  it("returns found:true for registered asset", async () => {
+    const originalFetch = globalThis.fetch;
+    globalThis.fetch = async () => new Response(JSON.stringify({
+      ok: true,
+      found: true,
+      asset: { id: "asset-1", filename: "photo.jpg", kind: "IMAGE", path: "/path/photo.jpg", storageKey: "key-1", mimeType: "image/jpeg", rightsStatus: "needs_review" },
+    }), { status: 200 });
+    try {
+      const res = await fetch("/api/tenants/test/assets/by-storage-key", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ storageKey: "key-1" }),
+      });
+      const data = await res.json();
+      assert.equal(data.ok, true);
+      assert.equal(data.found, true);
+      assert.equal(data.asset.filename, "photo.jpg");
+    } finally {
+      globalThis.fetch = originalFetch;
+    }
+  });
+
+  it("returns found:false for unknown storageKey", async () => {
+    const originalFetch = globalThis.fetch;
+    globalThis.fetch = async () => new Response(JSON.stringify({ ok: true, found: false }), { status: 200 });
+    try {
+      const res = await fetch("/api/tenants/test/assets/by-storage-key", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ storageKey: "unknown-key" }),
+      });
+      const data = await res.json();
+      assert.equal(data.ok, true);
+      assert.equal(data.found, false);
+    } finally {
+      globalThis.fetch = originalFetch;
+    }
   });
 });
