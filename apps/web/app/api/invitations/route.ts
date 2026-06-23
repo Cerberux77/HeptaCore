@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { auth } from "../../../lib/auth";
 import { prisma } from "../../../lib/prisma";
 import { randomUUID } from "node:crypto";
-import { hashInvitationToken, generateInvitationToken } from "../../../lib/invitation-token";
+import { hashInvitationToken, generateInvitationToken, getInvitationExpiration } from "../../../lib/invitation-token";
 
 export async function GET(req: Request) {
   const session = await auth();
@@ -82,12 +82,12 @@ export async function POST(req: Request) {
       email: normalizedEmail,
       role: role as any,
       tokenHash,
-      expiresAt: new Date(Date.now() + 7 * 24 * 3600000),
+      expiresAt: getInvitationExpiration(),
     },
     update: {
       role: role as any,
       tokenHash,
-      expiresAt: new Date(Date.now() + 7 * 24 * 3600000),
+      expiresAt: getInvitationExpiration(),
       acceptedById: null,
       acceptedAt: null,
     },
