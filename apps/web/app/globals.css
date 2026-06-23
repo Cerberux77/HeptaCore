@@ -2460,3 +2460,33 @@ a.landing-contact-card:hover { border-color: rgba(13,197,184,0.3); }
     flex-direction: column;
   }
 }
+
+/* ─── Admin Tenant Console Responsive ─── */
+@media (max-width: 1180px) {
+  .admin-tenant-table {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .admin-tenant-table .tenant-row {
+    grid-template-columns: minmax(180px, 1fr) 140px 100px 60px 60px 90px 36px;
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 720px) {
+  .admin-tenant-table {
+    font-size: 10px;
+  }
+  .admin-tenant-table .tenant-head {
+    display: none;
+  }
+  .admin-tenant-table .tenant-row {
+    grid-template-columns: 1fr;
+    gap: 4px;
+    padding: 10px 12px;
+  }
+  .admin-tenant-table .tenant-row > * {
+    display: flex;
+    justify-content: space-between;
+  }
+}

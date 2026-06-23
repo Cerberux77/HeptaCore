@@ -260,7 +260,7 @@ export function AdminConsole({ data }: { data: AdminDashboardData }) {
         </div>
         <nav className="app-nav">
           <a className="nav-link active" href="/admin"><ShieldCheck size={17} /> Consolidado</a>
-          <a className="nav-link" href="/tenant/turpial-sound"><Building2 size={17} /> Turpial Sound</a>
+          <a className="nav-link" href="/admin/tenants"><Building2 size={17} /> Tenants</a>
         </nav>
         <div className="guardrail-box">
           <ShieldCheck size={17} />
