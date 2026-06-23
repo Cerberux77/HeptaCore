@@ -472,6 +472,24 @@
       ]
     },
     {
+      "id": "S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION",
+      "title": "Transactional email foundation: domain sender, DNS, reputation, provider integration",
+      "owner": "Jean",
+      "backupOwner": "Manuel",
+      "status": "pending",
+      "track": "email-infra",
+      "zone": ["apps/web/app/api/email", "packages/core", "docs"],
+      "dependsOn": [],
+      "acceptance": [
+        "Dominio final de HeptaCore configurado como remitente autorizado",
+        "DNS (SPF, DKIM, DMARC) verificado",
+        "Proveedor de correo transaccional integrado (Resend, SendGrid o equivalente)",
+        "Webhooks de eventos (delivered, bounced, complained) configurados",
+        "Enlaces comerciales y de marca consistentes con el dominio final"
+      ],
+      "blocker": "Pendiente de definicion y disponibilidad del dominio final de HeptaCore para configurar dominio remitente, DNS, reputacion, enlaces comerciales y webhooks del proveedor de correo transaccional."
+    },
+    {
       "id": "S-HC-COMM-01-SELF-SERVICE-SIGNUP",
       "title": "Self-service tenant signup with trial gate and onboarding flow",
       "owner": "Manuel",
@@ -485,7 +503,8 @@
         "apps/web/components"
       ],
       "dependsOn": [
-        "S-HC-TEN-01-GLOBAL-TENANT-ADMIN"
+        "S-HC-TEN-01-GLOBAL-TENANT-ADMIN",
+        "S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION"
       ],
       "acceptance": [
         "Self-service registration with email verification",

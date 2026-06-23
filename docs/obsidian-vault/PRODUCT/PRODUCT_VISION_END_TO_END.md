@@ -234,6 +234,9 @@ La generacion IA se disena como broker provider-agnostic, sin hardcodear un unic
 - S-HC-PUB-07-YOUTUBE-PUBLISHING: PENDING
 - S-HC-PUB-08-PLATFORM-FORMAT-PARITY: PENDING
 
+### Email — PENDIENTE (Jean)
+- S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION: dominio remitente, DNS, proveedor transaccional, webhooks (bloqueado hasta disponibilidad del dominio final de HeptaCore)
+
 ### Comercial — PENDIENTE
 - S-HC-COMM-01-SELF-SERVICE-SIGNUP
 - S-HC-COMM-02-BILLING-ACTIVATION
