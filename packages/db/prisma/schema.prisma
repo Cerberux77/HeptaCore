@@ -14,6 +14,11 @@ model Tenant {
   automationMode  AutomationMode        @default(DRAFT_ONLY)
   llmConfig       Json?
   costConfig      Json?
+  status          TenantStatus          @default(PROVISIONING)
+  timezone        String                @default("UTC")
+  locale          String                @default("es")
+  suspendedAt     DateTime?
+  archivedAt      DateTime?
   createdAt       DateTime              @default(now())
   updatedAt       DateTime              @updatedAt
   approvals       Approval[]
@@ -411,6 +416,13 @@ model StrategyBrief {
   Tenant         Tenant        @relation(fields: [tenantId], references: [id], onDelete: Cascade)
 
   @@index([tenantId, status])
+}
+
+enum TenantStatus {
+  PROVISIONING
+  ACTIVE
+  SUSPENDED
+  ARCHIVED
 }
 
 enum TenantPlan {
