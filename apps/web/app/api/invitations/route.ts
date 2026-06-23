@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import { auth } from "../../../lib/auth";
 import { prisma } from "../../../lib/prisma";
-import crypto from "crypto";
+import { randomUUID } from "node:crypto";
+import { hashInvitationToken, generateInvitationToken } from "../../../lib/invitation-token";
 
 export async function GET(req: Request) {
   const session = await auth();
@@ -70,13 +71,13 @@ export async function POST(req: Request) {
   }
 
   const normalizedEmail = email.toLowerCase().trim();
-  const rawToken = crypto.randomBytes(32).toString("hex");
-  const tokenHash = crypto.createHash("sha256").update(rawToken).digest("hex");
+  const rawToken = generateInvitationToken();
+  const tokenHash = hashInvitationToken(rawToken);
 
   const invitation = await prisma.invitation.upsert({
     where: { tenantId_email: { tenantId: tenant.id, email: normalizedEmail } },
     create: {
-      id: crypto.randomUUID(),
+      id: randomUUID(),
       tenantId: tenant.id,
       email: normalizedEmail,
       role: role as any,

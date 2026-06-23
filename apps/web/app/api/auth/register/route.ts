@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "../../../../lib/prisma";
 import bcrypt from "bcryptjs";
-import crypto from "crypto";
+import { hashInvitationToken } from "../../../../lib/invitation-token";
 
 export async function POST(req: Request) {
   const body = await req.json().catch(() => null);
@@ -15,7 +15,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Password must be at least 8 characters" }, { status: 400 });
   }
 
-  const tokenHash = crypto.createHash("sha256").update(token).digest("hex");
+  const tokenHash = hashInvitationToken(token);
 
   const invitation = await prisma.invitation.findFirst({
     where: { tokenHash, acceptedById: null, expiresAt: { gt: new Date() } },
