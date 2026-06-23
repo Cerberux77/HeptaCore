@@ -461,6 +461,7 @@ enum EmailDeliveryStatus {
   PENDING
   SENT
   DELIVERED
+  DISABLED
   DELAYED
   FAILED
   BOUNCED

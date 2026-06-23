@@ -13,8 +13,9 @@ export function createResendProvider(apiKey: string): TransactionalEmailProvider
           subject: input.subject,
           html: input.html,
           text: input.text,
-          headers: { "Idempotency-Key": input.idempotencyKey },
           tags: input.tags,
+        }, {
+          idempotencyKey: input.idempotencyKey,
         });
         if (result.error) {
           return { provider: "resend", accepted: false, error: result.error.message };

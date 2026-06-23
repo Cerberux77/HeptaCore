@@ -1,5 +1,6 @@
 import { prisma } from "../prisma";
 import { createAndSendEmail } from "./email-delivery-service";
+import type { CreateAndSendResult } from "./email-delivery-service";
 import { renderTemplate } from "./templates/index";
 import { getEmailConfig } from "./email-config";
 import type { Prisma } from "@prisma/client";
@@ -12,7 +13,7 @@ export async function sendTenantOwnerInvitation(params: {
   token: string;
   expiresAt: Date;
   ownerAccountState?: "EXISTING_ACCOUNT" | "INVITATION_REQUIRED";
-}): Promise<{ deliveryId?: string; status: string; error?: string }> {
+}): Promise<CreateAndSendResult> {
   const config = getEmailConfig();
   const inviteLink = buildInviteLink(params.token, params.email, params.ownerAccountState, config.appUrl, params.tenantId);
   const { html, text, subject } = await renderTemplate("owner-invitation", "es", {
@@ -34,6 +35,7 @@ export async function sendTenantOwnerInvitation(params: {
     html,
     text,
     idempotencyKey,
+    inviteLink,
     tags: [{ name: "type", value: "owner-invitation" }],
   });
 }

@@ -1,70 +1,90 @@
 import { NextResponse } from "next/server";
 import { prisma } from "../../../../lib/prisma";
+import { getEmailConfig } from "../../../../lib/email/email-config";
 
 export const dynamic = "force-dynamic";
 
-export async function POST(request: Request) {
-  const rawBody = await request.text();
-  const signature = request.headers.get("svix-signature");
+const TERMINAL_STATUSES = new Set(["DELIVERED", "BOUNCED", "COMPLAINED"]);
 
-  if (!signature) {
-    return NextResponse.json({ ok: false, error: "Missing signature" }, { status: 401 });
+export async function POST(request: Request) {
+  const config = getEmailConfig();
+  if (!config.webhookSecret) {
+    return NextResponse.json({ ok: false, error: "Webhook secret not configured" }, { status: 401 });
+  }
+
+  const rawBody = await request.text();
+  const svixId = request.headers.get("svix-id");
+  const svixTimestamp = request.headers.get("svix-timestamp");
+  const svixSignature = request.headers.get("svix-signature");
+
+  if (!svixId || !svixTimestamp || !svixSignature) {
+    return NextResponse.json({ ok: false, error: "Missing webhook headers" }, { status: 401 });
   }
 
   let event: any;
   try {
-    event = JSON.parse(rawBody);
+    const { Resend } = await import("resend");
+    const resend = new Resend(config.resendApiKey || "placeholder");
+    event = resend.webhooks.verify({
+      payload: rawBody,
+      headers: {
+        id: svixId,
+        timestamp: svixTimestamp,
+        signature: svixSignature,
+      },
+      webhookSecret: config.webhookSecret,
+    });
   } catch {
-    return NextResponse.json({ ok: false, error: "Invalid JSON" }, { status: 400 });
+    return NextResponse.json({ ok: false, error: "Invalid signature" }, { status: 401 });
   }
 
   const type = event?.type as string;
-  const providerEventId = event?.data?.id as string;
   const providerMessageId = event?.data?.email_id as string;
 
-  if (!type || !providerEventId) {
+  if (!type || !svixId) {
     return NextResponse.json({ ok: false }, { status: 400 });
   }
 
-  const existing = await prisma.emailWebhookEvent.findUnique({ where: { providerEventId } });
-  if (existing) return NextResponse.json({ ok: true, duplicate: true });
+  await prisma.$transaction(async (tx: any) => {
+    const existing = await tx.emailWebhookEvent.findUnique({ where: { providerEventId: svixId } });
+    if (existing) return;
 
-  await prisma.emailWebhookEvent.create({
-    data: {
-      providerEventId,
-      providerMessageId,
-      type,
-      occurredAt: new Date(event.data?.created_at || Date.now()),
-    },
-  });
+    await tx.emailWebhookEvent.create({
+      data: {
+        providerEventId: svixId,
+        providerMessageId,
+        type,
+        occurredAt: new Date(event.data?.created_at || Date.now()),
+      },
+    });
 
-  const statusMap: Record<string, string> = {
-    "email.sent": "SENT",
-    "email.delivered": "DELIVERED",
-    "email.delivery_delayed": "DELAYED",
-    "email.failed": "FAILED",
-    "email.bounced": "BOUNCED",
-    "email.complained": "COMPLAINED",
-  };
+    const statusMap: Record<string, string> = {
+      "email.sent": "SENT",
+      "email.delivered": "DELIVERED",
+      "email.delivery_delayed": "DELAYED",
+      "email.failed": "FAILED",
+      "email.bounced": "BOUNCED",
+      "email.complained": "COMPLAINED",
+    };
 
-  const status = statusMap[type];
-  if (!status) return NextResponse.json({ ok: true });
+    const status = statusMap[type];
+    if (!status || !providerMessageId) return;
 
-  if (providerMessageId) {
-    const delivery = await prisma.emailDelivery.findUnique({ where: { providerMessageId } });
-    if (delivery) {
-      if (delivery.status === "DELIVERED" && status !== "DELIVERED") {
-        return NextResponse.json({ ok: true });
-      }
-      const updateData: any = { status };
-      if (status === "DELIVERED") updateData.deliveredAt = new Date();
-      if (status === "BOUNCED") updateData.bouncedAt = new Date();
-      if (status === "COMPLAINED") updateData.complainedAt = new Date();
-      if (status === "FAILED") updateData.lastErrorMessage = event?.data?.reason || "Webhook reported failure";
+    const delivery = await tx.emailDelivery.findUnique({ where: { providerMessageId } });
+    if (!delivery) return;
 
-      await prisma.emailDelivery.update({ where: { id: delivery.id }, data: updateData });
+    if (TERMINAL_STATUSES.has(delivery.status) && delivery.status !== status) {
+      return;
     }
-  }
+
+    const updateData: any = { status };
+    if (status === "DELIVERED") updateData.deliveredAt = new Date();
+    if (status === "BOUNCED") updateData.bouncedAt = new Date();
+    if (status === "COMPLAINED") updateData.complainedAt = new Date();
+    if (status === "FAILED") updateData.lastErrorMessage = event?.data?.reason || "Webhook reported failure";
+
+    await tx.emailDelivery.update({ where: { id: delivery.id }, data: updateData });
+  });
 
   return NextResponse.json({ ok: true });
 }

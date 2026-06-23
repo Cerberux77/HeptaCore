@@ -2,6 +2,7 @@ import { randomUUID } from "node:crypto";
 import { TenantStatus, type Tenant } from "@prisma/client";
 import { prisma as defaultPrisma } from "./prisma";
 import { hashInvitationToken, generateInvitationToken, getInvitationExpiration } from "./invitation-token";
+import { buildInviteLink } from "./email/email-invitation-service";
 import {
   assertTenantLifecycleAllowsMutation,
   requireSuperAdminActor,
@@ -70,6 +71,7 @@ export interface SerializedTenant {
   createdAt: Date;
   ownerEmail: string;
   invitationToken?: string;
+  inviteLink?: string;
   ownerAccountState?: "EXISTING_ACCOUNT" | "INVITATION_REQUIRED";
 }
 
@@ -78,6 +80,7 @@ function serializeTenant(
   ownerEmail: string,
   invitationToken?: string,
   ownerAccountState?: "EXISTING_ACCOUNT" | "INVITATION_REQUIRED",
+  inviteLink?: string,
 ): SerializedTenant {
   return {
     id: tenant.id,
@@ -90,6 +93,7 @@ function serializeTenant(
     createdAt: tenant.createdAt,
     ownerEmail,
     ...(invitationToken ? { invitationToken } : {}),
+    ...(inviteLink ? { inviteLink } : {}),
     ...(ownerAccountState ? { ownerAccountState } : {}),
   };
 }
@@ -166,6 +170,7 @@ export async function createAdminTenant(
     });
 
     let plainToken: string | undefined;
+    let inviteLink: string | undefined;
     if (ownerAccountState === "INVITATION_REQUIRED") {
       plainToken = generateInvitationToken();
       const tokenHash = hashInvitationToken(plainToken);
@@ -179,6 +184,7 @@ export async function createAdminTenant(
           expiresAt: getInvitationExpiration(),
         },
       });
+      inviteLink = buildInviteLink(plainToken, ownerEmail, "INVITATION_REQUIRED", undefined, normalizedSlug);
     }
 
     await tx.auditLog.create({
@@ -196,6 +202,7 @@ export async function createAdminTenant(
       ownerEmail,
       plainToken,
       ownerAccountState,
+      inviteLink,
     );
   });
 }

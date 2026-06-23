@@ -11,6 +11,15 @@ export function getEmailProvider(): TransactionalEmailProvider {
   return createResendProvider(config.resendApiKey!);
 }
 
+export interface CreateAndSendResult {
+  deliveryId: string;
+  status: string;
+  reason?: string;
+  inviteLink?: string;
+  providerMessageId?: string;
+  error?: string;
+}
+
 export async function createAndSendEmail(params: {
   tenantId?: string;
   invitationId?: string;
@@ -21,29 +30,47 @@ export async function createAndSendEmail(params: {
   html: string;
   text: string;
   idempotencyKey: string;
+  inviteLink?: string;
   tags?: Array<{ name: string; value: string }>;
-}, tx?: Prisma.TransactionClient): Promise<{ deliveryId: string; status: string; providerMessageId?: string; error?: string }> {
+}, tx?: Prisma.TransactionClient): Promise<CreateAndSendResult> {
   const db = tx ?? prisma;
   const config = getEmailConfig();
   const sender = config.from;
 
-  const delivery = await (db as any).emailDelivery.create({
-    data: {
-      tenantId: params.tenantId,
-      invitationId: params.invitationId,
-      userId: params.userId,
-      type: params.type,
-      provider: config.provider,
-      recipient: params.recipient,
-      sender,
-      subject: params.subject,
-      idempotencyKey: params.idempotencyKey,
-      status: "PENDING",
-    },
-  });
+  let delivery: any;
+  try {
+    delivery = await (db as any).emailDelivery.create({
+      data: {
+        tenantId: params.tenantId,
+        invitationId: params.invitationId,
+        userId: params.userId,
+        type: params.type,
+        provider: config.provider,
+        recipient: params.recipient,
+        sender,
+        subject: params.subject,
+        idempotencyKey: params.idempotencyKey,
+        status: "PENDING",
+      },
+    });
+  } catch (err: any) {
+    if (err?.code === "P2002" || err?.message?.includes("Unique constraint") || err?.message?.includes("unique")) {
+      delivery = await (db as any).emailDelivery.findUnique({ where: { idempotencyKey: params.idempotencyKey } });
+    }
+    if (!delivery) throw err;
+  }
 
   if (config.provider === "disabled") {
-    return { deliveryId: delivery.id, status: "DISABLED" };
+    await (db as any).emailDelivery.update({
+      where: { id: delivery.id },
+      data: { status: "DISABLED", attemptCount: 0 },
+    });
+    return {
+      deliveryId: delivery.id,
+      status: "DISABLED",
+      reason: "EMAIL_PROVIDER_NOT_CONFIGURED",
+      inviteLink: params.inviteLink,
+    };
   }
 
   const provider = getEmailProvider();
