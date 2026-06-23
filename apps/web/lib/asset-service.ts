@@ -4,6 +4,7 @@ import { normalizeLogicalFolder, sanitizeFilename, validateAssetFile } from "./a
 import { normalizeTechnicalAssetMetadata } from "./asset-metadata";
 import { getAssetStorage, type AssetStorageAdapter } from "./asset-storage";
 import { prisma } from "./prisma";
+import { assertTenantLifecycleAllowsMutation } from "./tenant-access";
 
 const READ_ROLES: UserRole[] = [
   "OWNER",
@@ -121,7 +122,7 @@ async function requireTenantAccess(
   db: typeof prisma,
   params: { tenantSlug: string; userId: string; mutation?: boolean },
 ) {
-  const tenant = await db.tenant.findUnique({ where: { slug: params.tenantSlug }, select: { id: true, slug: true } });
+  const tenant = await db.tenant.findUnique({ where: { slug: params.tenantSlug }, select: { id: true, slug: true, status: true } });
   if (!tenant) throw new AssetServiceError("TENANT_NOT_FOUND", "Tenant not found.", 404);
 
   const membership = await db.membership.findUnique({
@@ -132,6 +133,11 @@ async function requireTenantAccess(
   if (!membership || !allowed.includes(membership.role)) {
     throw new AssetServiceError("FORBIDDEN", "Forbidden.", 403);
   }
+
+  if (params.mutation) {
+    assertTenantLifecycleAllowsMutation(tenant.status, "NORMAL_OPERATION");
+  }
+
   return { tenant, membership };
 }
 

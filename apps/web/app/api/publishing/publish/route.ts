@@ -10,6 +10,7 @@ import { commitConfirmedPublication, recordUnconfirmedProviderFailure } from "..
 import { ProviderError } from "../../../../lib/publishers/types";
 import { buildMultiformatDryRun, normalizeAssetManifest, normalizePublishingFormat } from "../../../../lib/publishing-formats";
 import { resolveAssetUrl } from "../../../../lib/asset-resolution";
+import { requireActiveTenant } from "../../../../lib/tenant-access";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -99,6 +100,15 @@ export async function POST(req: Request) {
   });
   if (!membership || !PUBLISH_ROLES.includes(membership.role)) {
     return NextResponse.json({ error: "Forbidden: publisher role required." }, { status: 403 });
+  }
+
+  try {
+    await requireActiveTenant(tenant.id);
+  } catch (e: any) {
+    if (e?.code) {
+      return NextResponse.json({ error: e.message }, { status: e.status || 403 });
+    }
+    throw e;
   }
 
   const draft = await prisma.contentDraft.findFirst({

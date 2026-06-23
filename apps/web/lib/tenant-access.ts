@@ -1,5 +1,6 @@
 import { prisma as defaultPrisma } from "./prisma";
 import type { TenantStatus, UserRole } from "@prisma/client";
+import { hasRolePermission, type Permission } from "./permissions";
 
 export class TenantAccessError extends Error {
   constructor(message: string, public code: string, public status: number) {
@@ -111,4 +112,84 @@ export async function requireActiveTenant(
   if (!tenant) throw new TenantAccessError("Tenant not found", "NOT_FOUND", 404);
   assertTenantLifecycleAllowsMutation(tenant.status, "NORMAL_OPERATION");
   return tenant;
+}
+
+export interface ResolveTenantAccessResult {
+  role: UserRole;
+  status: TenantStatus;
+}
+
+export type AccessResolutionDb = {
+  user: TenantAdminDb["user"];
+  membership: TenantAdminDb["membership"];
+  tenant: {
+    findUnique(args: { where: { id: string }; select: { id: true; status: true } }): Promise<{ id: string; status: TenantStatus } | null>;
+  };
+};
+
+export async function resolveTenantAccess(
+  userId: string,
+  tenantId: string,
+  permission: Permission,
+  db: AccessResolutionDb = defaultPrisma as unknown as AccessResolutionDb,
+): Promise<ResolveTenantAccessResult> {
+  const user = await db.user.findUnique({
+    where: { id: userId },
+    select: { id: true },
+  });
+  if (!user) throw new TenantAccessError("User not found", "UNAUTHORIZED", 401);
+
+  const membership = await db.membership.findUnique({
+    where: { tenantId_userId: { tenantId, userId } },
+    select: { role: true },
+  });
+  if (!membership) throw new TenantAccessError("Not a member of this tenant", "NOT_MEMBER", 403);
+
+  if (!hasRolePermission(membership.role, permission)) {
+    throw new TenantAccessError(
+      `Role ${membership.role} lacks permission ${permission}`,
+      "FORBIDDEN",
+      403,
+    );
+  }
+
+  const tenant = await db.tenant.findUnique({
+    where: { id: tenantId },
+    select: { id: true, status: true },
+  });
+  if (!tenant) throw new TenantAccessError("Tenant not found", "NOT_FOUND", 404);
+
+  return { role: membership.role, status: tenant.status };
+}
+
+export async function resolveTenantAccessWithLifecycle(
+  userId: string,
+  tenantId: string,
+  permission: Permission,
+  capability: TenantMutationCapability,
+  db: AccessResolutionDb = defaultPrisma as unknown as AccessResolutionDb,
+): Promise<ResolveTenantAccessResult> {
+  const result = await resolveTenantAccess(userId, tenantId, permission, db);
+  assertTenantLifecycleAllowsMutation(result.status, capability);
+  return result;
+}
+
+export async function resolveSuperAdminAccess(
+  userId: string,
+  db: { user: TenantAdminDb["user"]; membership: TenantAdminDb["membership"] } = defaultPrisma as unknown as { user: TenantAdminDb["user"]; membership: TenantAdminDb["membership"] },
+): Promise<string> {
+  const user = await db.user.findUnique({
+    where: { id: userId },
+    select: { id: true },
+  });
+  if (!user) throw new TenantAccessError("User not found", "UNAUTHORIZED", 401);
+
+  const memberships = await db.membership.findMany({
+    where: { userId },
+    select: { role: true },
+  });
+  if (!isSuperAdmin(memberships)) {
+    throw new TenantAccessError("SUPER_ADMIN role required", "FORBIDDEN", 403);
+  }
+  return user.id;
 }
