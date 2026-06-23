@@ -53,6 +53,7 @@ class FakeDb {
   assets: Row[] = [];
   drafts: Row[] = [];
   transactionQueue = Promise.resolve();
+  executeRawCalls = 0;
 
   tenant = {
     findUnique: async ({ where }: any) => this.tenants.find((tenant) => tenant.slug === where.slug || tenant.id === where.id) ?? null,
@@ -85,7 +86,12 @@ class FakeDb {
   };
 
   async $queryRaw() {
-    return undefined;
+    throw new Error("$queryRaw should not be used for advisory finalize locks");
+  }
+
+  async $executeRaw() {
+    this.executeRawCalls += 1;
+    return 1;
   }
 
   async $transaction(fn: any) {
@@ -137,6 +143,7 @@ describe("finalizeTenantAssetFromBlob", () => {
     assert.equal(asset.storageKey, "tenants/tenant-a/assets/u1/cover.jpg");
     assert.equal(asset.sourcePath, "https://blob.test/tenants/tenant-a/assets/u1/cover.jpg");
     assert.equal((asset.metadata as Row).folder, "feed");
+    assert.equal(db.executeRawCalls, 1);
   });
 
   it("returns the existing Asset idempotently", async () => {

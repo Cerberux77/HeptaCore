@@ -109,9 +109,9 @@ async function lockTenantAssetFinalizeKey(
   db: typeof prisma,
   params: { tenantId: string; storageKey: string },
 ) {
-  const queryRaw = (db as typeof prisma & { $queryRaw?: (query: Prisma.Sql) => Promise<unknown> }).$queryRaw;
-  if (typeof queryRaw !== "function") return;
-  await queryRaw.call(
+  const executeRaw = (db as typeof prisma & { $executeRaw?: (query: Prisma.Sql) => Promise<unknown> }).$executeRaw;
+  if (typeof executeRaw !== "function") return;
+  await executeRaw.call(
     db,
     Prisma.sql`SELECT pg_advisory_xact_lock(hashtext(${params.tenantId}), hashtext(${params.storageKey}))`,
   );
