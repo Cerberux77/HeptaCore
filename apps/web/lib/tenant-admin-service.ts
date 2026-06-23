@@ -1,12 +1,20 @@
-import { Prisma, TenantStatus, type Tenant } from "@prisma/client";
-import { createHash, randomBytes } from "node:crypto";
+import { randomUUID } from "node:crypto";
+import { TenantStatus, type Tenant } from "@prisma/client";
 import { prisma as defaultPrisma } from "./prisma";
+import { hashInvitationToken, generateInvitationToken } from "./invitation-token";
 import {
   assertTenantLifecycleAllowsMutation,
   requireSuperAdminActor,
   TenantAccessError,
   type TenantAdminDb,
 } from "./tenant-access";
+import type { Prisma } from "@prisma/client";
+
+export type TenantAdminTx = Prisma.TransactionClient;
+
+export interface TenantAdminDbWithTx extends TenantAdminDb {
+  $transaction<R>(fn: (tx: TenantAdminTx) => Promise<R>): Promise<R>;
+}
 
 const RESERVED_SLUGS = new Set([
   "admin", "api", "app", "login", "register", "tenant",
@@ -41,14 +49,6 @@ export function validateTenantSlug(slug: string): void {
   if (!SLUG_REGEX.test(slug)) throw new TenantAdminError("Slug must be lowercase alphanumeric with hyphens, no double hyphens, no leading/trailing hyphen", "INVALID_SLUG", 400);
   if (slug.includes("--")) throw new TenantAdminError("Slug cannot contain double hyphens", "INVALID_SLUG", 400);
   if (RESERVED_SLUGS.has(slug)) throw new TenantAdminError(`"${slug}" is a reserved word`, "RESERVED_SLUG", 400);
-}
-
-function hashToken(token: string): string {
-  return createHash("sha256").update(token).digest("hex");
-}
-
-export function generateInvitationToken(): string {
-  return randomBytes(32).toString("hex");
 }
 
 export interface CreateTenantParams {
@@ -93,52 +93,36 @@ function serializeTenant(
 
 export async function listAdminTenants(
   actorId: string,
-  db: TenantAdminDb = defaultPrisma,
+  db: TenantAdminDb = defaultPrisma as unknown as TenantAdminDb,
 ): Promise<SerializedTenant[]> {
-  await requireSuperAdminActor(actorId, db as any);
+  await requireSuperAdminActor(actorId, db);
   const tenants = await db.tenant.findMany({
     orderBy: { createdAt: "desc" },
-    include: {
-      memberships: {
-        where: { role: "OWNER" },
-        select: { user: { select: { email: true } } },
-        take: 1,
-      },
-    },
-  } as any);
-  return (tenants as any[]).map((t) =>
-    serializeTenant(t, (t as any).memberships[0]?.user.email ?? "N/A"),
+  } as unknown as Parameters<typeof db.tenant.findMany>[0]);
+  return (tenants as unknown as Array<Record<string, unknown> & { memberships?: Array<{ user: { email: string } }> }>).map((t) =>
+    serializeTenant(t as unknown as Tenant & { memberships?: Array<{ user: { email: string } }> }, (t.memberships?.[0]?.user?.email) ?? "N/A"),
   );
 }
 
 export async function getAdminTenant(
   actorId: string,
   tenantId: string,
-  db: TenantAdminDb = defaultPrisma,
+  db: TenantAdminDb = defaultPrisma as unknown as TenantAdminDb,
 ): Promise<SerializedTenant> {
-  await requireSuperAdminActor(actorId, db as any);
-  const tenant = await (db.tenant as any).findUniqueOrThrow({
+  await requireSuperAdminActor(actorId, db);
+  const tenant = await db.tenant.findUniqueOrThrow({
     where: { id: tenantId },
-    include: {
-      memberships: {
-        where: { role: "OWNER" },
-        select: { user: { select: { email: true } } },
-        take: 1,
-      },
-    },
-  });
+  } as unknown as Parameters<typeof db.tenant.findUniqueOrThrow>[0]);
   return serializeTenant(
-    tenant,
-    (tenant as any).memberships[0]?.user.email ?? "N/A",
+    tenant as unknown as Tenant & { memberships?: Array<{ user: { email: string } }> },
+    "N/A",
   );
 }
 
 export async function createAdminTenant(
   params: CreateTenantParams,
-  db: TenantAdminDb = defaultPrisma,
+  db: TenantAdminDbWithTx = defaultPrisma as unknown as TenantAdminDbWithTx,
 ): Promise<SerializedTenant> {
-  await requireSuperAdminActor(params.actorId, db as any);
-
   const normalizedSlug = normalizeTenantSlug(params.slug);
   validateTenantSlug(normalizedSlug);
 
@@ -146,9 +130,9 @@ export async function createAdminTenant(
   if (!ownerEmail || !ownerEmail.includes("@"))
     throw new TenantAdminError("Invalid owner email", "INVALID_OWNER_EMAIL", 400);
 
-  const fullDb = db as unknown as Prisma.TransactionClient;
+  return db.$transaction(async (tx) => {
+    await requireSuperAdminActor(params.actorId, tx);
 
-  const result = await fullDb.$transaction(async (tx: Prisma.TransactionClient) => {
     const existing = await tx.tenant.findUnique({ where: { slug: normalizedSlug } });
     if (existing) throw new TenantAdminError("Slug already in use", "SLUG_TAKEN", 409);
 
@@ -174,10 +158,10 @@ export async function createAdminTenant(
     });
 
     const plainToken = generateInvitationToken();
-    const tokenHash = hashToken(plainToken);
+    const tokenHash = hashInvitationToken(plainToken);
     await tx.invitation.create({
       data: {
-        id: `inv_${randomBytes(12).toString("hex")}`,
+        id: `inv_${randomUUID()}`,
         tenantId: tenant.id,
         email: ownerEmail,
         role: "OWNER",
@@ -193,17 +177,15 @@ export async function createAdminTenant(
         action: "TENANT_CREATED",
         target: tenant.id,
         metadata: { slug: normalizedSlug, name: params.name, ownerEmail },
-      } as any,
+      },
     });
 
     return serializeTenant(
-      { ...tenant, memberships: [{ user: { email: ownerEmail } }] } as any,
+      { ...tenant, memberships: [{ user: { email: ownerEmail } }] } as Tenant & { memberships?: Array<{ user: { email: string } }> },
       ownerEmail,
       plainToken,
     );
   });
-
-  return result;
 }
 
 const ALLOWED_TRANSITIONS: Record<TenantStatus, TenantStatus[]> = {
@@ -217,12 +199,11 @@ export async function changeTenantStatus(
   actorId: string,
   tenantId: string,
   newStatus: TenantStatus,
-  db: TenantAdminDb = defaultPrisma,
+  db: TenantAdminDbWithTx = defaultPrisma as unknown as TenantAdminDbWithTx,
 ): Promise<SerializedTenant> {
-  await requireSuperAdminActor(actorId, db as any);
-  const fullDb = db as unknown as Prisma.TransactionClient;
+  return db.$transaction(async (tx) => {
+    await requireSuperAdminActor(actorId, tx);
 
-  return fullDb.$transaction(async (tx: Prisma.TransactionClient) => {
     const tenant = await tx.tenant.findUniqueOrThrow({ where: { id: tenantId } });
 
     const allowed = ALLOWED_TRANSITIONS[tenant.status];
@@ -257,7 +238,7 @@ export async function changeTenantStatus(
         action: `TENANT_${newStatus}`,
         target: tenantId,
         metadata: { before: tenant.status, after: newStatus },
-      } as any,
+      },
     });
 
     const owner = await tx.membership.findFirst({
@@ -265,7 +246,7 @@ export async function changeTenantStatus(
       select: { user: { select: { email: true } } },
     });
 
-    return serializeTenant(updated, owner?.user.email ?? "N/A");
+    return serializeTenant(updated as unknown as Tenant & { memberships?: Array<{ user: { email: string } }> }, owner?.user.email ?? "N/A");
   });
 }
 
@@ -273,22 +254,21 @@ export async function updateAdminTenantConfiguration(
   actorId: string,
   tenantId: string,
   config: { name?: string; timezone?: string; locale?: string },
-  db: TenantAdminDb = defaultPrisma,
+  db: TenantAdminDbWithTx = defaultPrisma as unknown as TenantAdminDbWithTx,
 ): Promise<SerializedTenant> {
-  await requireSuperAdminActor(actorId, db as any);
-  const fullDb = db as unknown as Prisma.TransactionClient;
+  return db.$transaction(async (tx) => {
+    await requireSuperAdminActor(actorId, tx);
 
-  if (config.name !== undefined && (!config.name || config.name.trim().length === 0)) {
-    throw new TenantAdminError("Name cannot be empty", "INVALID_NAME", 400);
-  }
-  if (config.timezone !== undefined && !VALID_TIMEZONES.has(config.timezone)) {
-    throw new TenantAdminError("Invalid timezone", "INVALID_TIMEZONE", 400);
-  }
-  if (config.locale !== undefined && !VALID_LOCALES.has(config.locale)) {
-    throw new TenantAdminError("Invalid locale", "INVALID_LOCALE", 400);
-  }
+    if (config.name !== undefined && (!config.name || config.name.trim().length === 0)) {
+      throw new TenantAdminError("Name cannot be empty", "INVALID_NAME", 400);
+    }
+    if (config.timezone !== undefined && !VALID_TIMEZONES.has(config.timezone)) {
+      throw new TenantAdminError("Invalid timezone", "INVALID_TIMEZONE", 400);
+    }
+    if (config.locale !== undefined && !VALID_LOCALES.has(config.locale)) {
+      throw new TenantAdminError("Invalid locale", "INVALID_LOCALE", 400);
+    }
 
-  return fullDb.$transaction(async (tx: Prisma.TransactionClient) => {
     const before = await tx.tenant.findUniqueOrThrow({
       where: { id: tenantId },
       select: { name: true, timezone: true, locale: true },
@@ -313,7 +293,7 @@ export async function updateAdminTenantConfiguration(
           before: { name: before.name, timezone: before.timezone, locale: before.locale },
           after: { name: updated.name, timezone: updated.timezone, locale: updated.locale },
         },
-      } as any,
+      },
     });
 
     const owner = await tx.membership.findFirst({
@@ -321,6 +301,8 @@ export async function updateAdminTenantConfiguration(
       select: { user: { select: { email: true } } },
     });
 
-    return serializeTenant(updated, owner?.user.email ?? "N/A");
+    return serializeTenant(updated as unknown as Tenant & { memberships?: Array<{ user: { email: string } }> }, owner?.user.email ?? "N/A");
   });
 }
+
+export { generateInvitationToken };
