@@ -2,7 +2,7 @@
 type: collaborator-status
 project: "HeptaCore"
 operator: "Jean"
-last_updated: "2026-06-21T19:09:31.241Z"
+last_updated: "2026-06-23T02:07:47.780Z"
 generated_by: "Oreshnik canonical-check"
 source: "var/oreshnik/task-board.json"
 ---
@@ -26,35 +26,3 @@ source: "var/oreshnik/task-board.json"
 ## Detalle de Aceptacion
 
 Sin tareas abiertas asignadas.
-
-<!-- ORESHNIK:GENERATED:START -->
----
-type: collaborator-status
-project: "HeptaCore"
-operator: "Jean"
-last_updated: "2026-06-23T02:05:13.041Z"
-generated_by: "Oreshnik canonical-check"
-source: "var/oreshnik/task-board.json"
----
-
-# Estado Jean
-
-> Documento derivado. La fuente operativa es `var/oreshnik/task-board.json`.
-
-## Ready
-
-| Sprint | Scope | Depende de |
-|---|---|---|
-| Ninguno | - | - |
-
-## Pending
-
-| Sprint | Scope | Depende de |
-|---|---|---|
-| Ninguno | - | - |
-
-## Detalle de Aceptacion
-
-Sin tareas abiertas asignadas.
-
-<!-- ORESHNIK:GENERATED:END -->

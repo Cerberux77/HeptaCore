@@ -1,6 +1,6 @@
 {
   "project": "HeptaCore",
-  "updatedAt": "2026-06-22T19:30:00.000Z",
+  "updatedAt": "2026-06-23T02:06:55.117Z",
   "productionSha": "2fd9e24929ffe1022cf9521ed0f13888f30accbd",
   "productionUrl": "https://heptacore.vercel.app",
   "canonicalBranch": "master",
@@ -56,11 +56,25 @@
       "backupOwner": "Jean",
       "status": "done",
       "track": "foundation",
-      "zone": ["repo", "docs", "oreshnik"],
+      "zone": [
+        "repo",
+        "docs",
+        "oreshnik"
+      ],
       "dependsOn": [],
-      "acceptance": ["Initial monorepo committed", "Oreshnik vault operational", "Build/typecheck pass"],
+      "acceptance": [
+        "Initial monorepo committed",
+        "Oreshnik vault operational",
+        "Build/typecheck pass"
+      ],
       "history": [
-        { "at": "2026-06-12T04:30:20.302Z", "action": "closed", "operator": "Manuel", "branch": "Manuel/s-hc-prod-01-producto-operativo-tenant-admin-produccion-2026-06-09", "description": "foundation baseline commit" }
+        {
+          "at": "2026-06-12T04:30:20.302Z",
+          "action": "closed",
+          "operator": "Manuel",
+          "branch": "Manuel/s-hc-prod-01-producto-operativo-tenant-admin-produccion-2026-06-09",
+          "description": "foundation baseline commit"
+        }
       ]
     },
     {
@@ -70,11 +84,28 @@
       "backupOwner": "Jean",
       "status": "done",
       "track": "product-ui",
-      "zone": ["apps/web", "packages/ui", "packages/agents"],
-      "dependsOn": ["S-HC-00"],
-      "acceptance": ["Tenant dashboard route", "Onboarding form mock", "Input checklist", "Draft queue screen"],
+      "zone": [
+        "apps/web",
+        "packages/ui",
+        "packages/agents"
+      ],
+      "dependsOn": [
+        "S-HC-00"
+      ],
+      "acceptance": [
+        "Tenant dashboard route",
+        "Onboarding form mock",
+        "Input checklist",
+        "Draft queue screen"
+      ],
       "history": [
-        { "at": "2026-06-09T19:56:42.980Z", "action": "reassigned", "from": "Manuel", "to": "Jean", "reason": "Manuel ausente - ruta critica bloqueada" }
+        {
+          "at": "2026-06-09T19:56:42.980Z",
+          "action": "reassigned",
+          "from": "Manuel",
+          "to": "Jean",
+          "reason": "Manuel ausente - ruta critica bloqueada"
+        }
       ]
     },
     {
@@ -84,11 +115,28 @@
       "backupOwner": "Manuel",
       "status": "done",
       "track": "data",
-      "zone": ["packages/db", "examples/tenants/turpial", "scripts"],
-      "dependsOn": ["S-HC-00"],
-      "acceptance": ["Seed tenant", "Import assets metadata", "Import publication queue", "No real credentials"],
+      "zone": [
+        "packages/db",
+        "examples/tenants/turpial",
+        "scripts"
+      ],
+      "dependsOn": [
+        "S-HC-00"
+      ],
+      "acceptance": [
+        "Seed tenant",
+        "Import assets metadata",
+        "Import publication queue",
+        "No real credentials"
+      ],
       "history": [
-        { "at": "2026-06-12T04:32:55.688Z", "action": "closed", "operator": "Jean", "branch": "Manuel/s-hc-prod-01-producto-operativo-tenant-admin-produccion-2026-06-09", "description": "turpial importer and prisma seed" }
+        {
+          "at": "2026-06-12T04:32:55.688Z",
+          "action": "closed",
+          "operator": "Jean",
+          "branch": "Manuel/s-hc-prod-01-producto-operativo-tenant-admin-produccion-2026-06-09",
+          "description": "turpial importer and prisma seed"
+        }
       ]
     },
     {
@@ -98,7 +146,11 @@
       "backupOwner": "Manuel",
       "status": "done",
       "track": "recovery",
-      "zone": ["apps/web", "docs/07_handoffs", "docs/obsidian-vault"],
+      "zone": [
+        "apps/web",
+        "docs/07_handoffs",
+        "docs/obsidian-vault"
+      ],
       "dependsOn": [],
       "acceptance": [
         "Facebook e Instagram publican realmente desde la UI con durabilidad transaccional",
@@ -108,7 +160,13 @@
       ],
       "handoff": "docs/07_handoffs/HC-REC-00A-codex-blockers.md",
       "history": [
-        { "at": "2026-06-21T04:30:00.000Z", "action": "closed", "operator": "Manuel", "branch": "manuel/s-hc-rec-00a-ui-publishing-baseline", "description": "Baseline de publicacion recuperado y estabilizado" }
+        {
+          "at": "2026-06-21T04:30:00.000Z",
+          "action": "closed",
+          "operator": "Manuel",
+          "branch": "manuel/s-hc-rec-00a-ui-publishing-baseline",
+          "description": "Baseline de publicacion recuperado y estabilizado"
+        }
       ]
     },
     {
@@ -121,7 +179,12 @@
       "zone": [],
       "dependsOn": [],
       "history": [
-        { "at": "2026-06-21T04:30:00.000Z", "action": "cancelled", "operator": "Manuel", "description": "Manuel elimino manualmente el duplicado en Facebook" }
+        {
+          "at": "2026-06-21T04:30:00.000Z",
+          "action": "cancelled",
+          "operator": "Manuel",
+          "description": "Manuel elimino manualmente el duplicado en Facebook"
+        }
       ]
     },
     {
@@ -131,15 +194,28 @@
       "backupOwner": "Manuel",
       "status": "done",
       "track": "recovery",
-      "zone": ["docs/obsidian-vault", "docs/07_handoffs", "README.md", "var/oreshnik"],
-      "dependsOn": ["S-HC-REC-00A"],
+      "zone": [
+        "docs/obsidian-vault",
+        "docs/07_handoffs",
+        "README.md",
+        "var/oreshnik"
+      ],
+      "dependsOn": [
+        "S-HC-REC-00A"
+      ],
       "acceptance": [
         "Baseline productivo 2fd9e249 integrado en master via merge",
         "Oreshnik cerrado con exito",
         "oreshnik-cli@0.2.0-alpha.0 operacional"
       ],
       "history": [
-        { "at": "2026-06-21T05:15:00.000Z", "action": "closed", "operator": "Manuel", "branch": "Manuel/s-hc-rec-00c-canonical-integration", "description": "canonical integration after recovery" }
+        {
+          "at": "2026-06-21T05:15:00.000Z",
+          "action": "closed",
+          "operator": "Manuel",
+          "branch": "Manuel/s-hc-rec-00c-canonical-integration",
+          "description": "canonical integration after recovery"
+        }
       ]
     },
     {
@@ -149,8 +225,14 @@
       "backupOwner": "Manuel",
       "status": "done",
       "track": "publishing",
-      "zone": ["apps/web", "apps/web/lib/publishers", "packages/integrations"],
-      "dependsOn": ["S-HC-REC-00C"],
+      "zone": [
+        "apps/web",
+        "apps/web/lib/publishers",
+        "packages/integrations"
+      ],
+      "dependsOn": [
+        "S-HC-REC-00C"
+      ],
       "acceptance": [
         "Modelo de formatos (Carousel, Story, Feed) con reglas de validacion por plataforma",
         "Asset manifest requerido por formato (count, aspect ratio, resolution, duration)",
@@ -163,7 +245,13 @@
         "Cero publicacion real de Carousel ni Stories en este sprint"
       ],
       "history": [
-        { "at": "2026-06-21T19:08:48.084Z", "action": "closed", "operator": "Manuel", "branch": "Manuel/s-hc-pub-02-closeout", "description": "multiformat previews, deterministic auth, approval UI and dry-run QA completed" }
+        {
+          "at": "2026-06-21T19:08:48.084Z",
+          "action": "closed",
+          "operator": "Manuel",
+          "branch": "Manuel/s-hc-pub-02-closeout",
+          "description": "multiformat previews, deterministic auth, approval UI and dry-run QA completed"
+        }
       ]
     },
     {
@@ -173,8 +261,18 @@
       "backupOwner": "Manuel",
       "status": "done",
       "track": "publishing",
-      "zone": ["apps/web/app/api/tenants/[slug]/assets/**", "apps/web/app/api/tenant-assets/**", "apps/web/app/api/drafts/**", "apps/web/components/**", "apps/web/lib/asset-*.ts", "apps/web/lib/publishing-formats.ts", "packages/core/**"],
-      "dependsOn": ["S-HC-PUB-02-MULTIFORMAT-PREVIEW"],
+      "zone": [
+        "apps/web/app/api/tenants/[slug]/assets/**",
+        "apps/web/app/api/tenant-assets/**",
+        "apps/web/app/api/drafts/**",
+        "apps/web/components/**",
+        "apps/web/lib/asset-*.ts",
+        "apps/web/lib/publishing-formats.ts",
+        "packages/core/**"
+      ],
+      "dependsOn": [
+        "S-HC-PUB-02-MULTIFORMAT-PREVIEW"
+      ],
       "acceptance": [
         "Upload persistente en Vercel Blob (heptacore-assets, publico, tenant-scoped)",
         "Asset replacement preserva audit log",
@@ -193,6 +291,15 @@
         "BLOB_READ_WRITE_TOKEN documentado como requerido (sin exponer valor)",
         "Codigo base en commit c78d71d20451cc73e446d2c6053421029cd29d42",
         "PUB-03 clasifica compatibilidad de activos; no elimina ni reduce el objetivo final de publicacion. Los formatos sin publisher real quedan documentados como pendientes de implementacion en PUB-06, PUB-07 o PUB-08."
+      ],
+      "history": [
+        {
+          "at": "2026-06-23T02:06:55.117Z",
+          "action": "closed",
+          "operator": "Manuel",
+          "branch": "Manuel/s-hc-pub-03-multitenant-assets",
+          "description": "multitenant assets metadata compatibility batch uploads and production QA"
+        }
       ]
     },
     {
@@ -202,8 +309,15 @@
       "backupOwner": "Manuel",
       "status": "pending",
       "track": "publishing",
-      "zone": ["apps/web/app/api/cron", "apps/worker", "packages/core"],
-      "dependsOn": ["S-HC-PUB-02-MULTIFORMAT-PREVIEW", "S-HC-PUB-03-MULTITENANT-ASSETS"],
+      "zone": [
+        "apps/web/app/api/cron",
+        "apps/worker",
+        "packages/core"
+      ],
+      "dependsOn": [
+        "S-HC-PUB-02-MULTIFORMAT-PREVIEW",
+        "S-HC-PUB-03-MULTITENANT-ASSETS"
+      ],
       "acceptance": [
         "Batch cron procesa multiples posts programados por hora",
         "Timezone-aware scheduling per tenant",
@@ -219,8 +333,14 @@
       "backupOwner": "Manuel",
       "status": "pending",
       "track": "publishing",
-      "zone": ["apps/web/lib/publishing-finalization.ts", "apps/web/lib/draft-operational-state.ts", "packages/core"],
-      "dependsOn": ["S-HC-PUB-04-HOURLY-BATCH-CRON"],
+      "zone": [
+        "apps/web/lib/publishing-finalization.ts",
+        "apps/web/lib/draft-operational-state.ts",
+        "packages/core"
+      ],
+      "dependsOn": [
+        "S-HC-PUB-04-HOURLY-BATCH-CRON"
+      ],
       "acceptance": [
         "Automatic reconciliation for Case A (Result ok + externalPostId + incomplete Draft)",
         "Alert-only for Case B (Draft.externalPostId present + Result absent)",
@@ -235,8 +355,15 @@
       "backupOwner": "Manuel",
       "status": "pending",
       "track": "publishing",
-      "zone": ["apps/web/lib/publishers", "apps/web/app/api/publishing", "packages/integrations"],
-      "dependsOn": ["S-HC-PUB-03-MULTITENANT-ASSETS", "S-HC-PUB-04-HOURLY-BATCH-CRON"],
+      "zone": [
+        "apps/web/lib/publishers",
+        "apps/web/app/api/publishing",
+        "packages/integrations"
+      ],
+      "dependsOn": [
+        "S-HC-PUB-03-MULTITENANT-ASSETS",
+        "S-HC-PUB-04-HOURLY-BATCH-CRON"
+      ],
       "acceptance": [
         "Instagram Reel publishing real con durabilidad transaccional",
         "Instagram Story imagen publishing real",
@@ -257,8 +384,15 @@
       "backupOwner": "Manuel",
       "status": "pending",
       "track": "publishing",
-      "zone": ["apps/web/lib/publishers", "apps/web/app/api/publishing", "packages/integrations"],
-      "dependsOn": ["S-HC-PUB-03-MULTITENANT-ASSETS", "S-HC-PUB-04-HOURLY-BATCH-CRON"],
+      "zone": [
+        "apps/web/lib/publishers",
+        "apps/web/app/api/publishing",
+        "packages/integrations"
+      ],
+      "dependsOn": [
+        "S-HC-PUB-03-MULTITENANT-ASSETS",
+        "S-HC-PUB-04-HOURLY-BATCH-CRON"
+      ],
       "acceptance": [
         "YouTube Video 16:9 publishing real con titulo, descripcion, thumbnail y metadata",
         "YouTube Shorts publishing real con metadata requerida",
@@ -276,8 +410,16 @@
       "backupOwner": "Manuel",
       "status": "pending",
       "track": "publishing",
-      "zone": ["apps/web/lib/publishers", "apps/web/lib/publishing-formats.ts", "apps/web/components", "packages/integrations"],
-      "dependsOn": ["S-HC-PUB-06-REELS-STORIES-PUBLISHERS", "S-HC-PUB-07-YOUTUBE-PUBLISHING"],
+      "zone": [
+        "apps/web/lib/publishers",
+        "apps/web/lib/publishing-formats.ts",
+        "apps/web/components",
+        "packages/integrations"
+      ],
+      "dependsOn": [
+        "S-HC-PUB-06-REELS-STORIES-PUBLISHERS",
+        "S-HC-PUB-07-YOUTUBE-PUBLISHING"
+      ],
       "acceptance": [
         "Paridad de capacidades (preview, dry-run, publicacion, metricas) para cada formato soportado",
         "Auditoria de la matriz de capacidad red/formato: sin combinaciones sin responsable asignado",
@@ -294,8 +436,14 @@
       "backupOwner": "Manuel",
       "status": "pending",
       "track": "observability",
-      "zone": ["apps/web", "packages/core", "docs"],
-      "dependsOn": ["S-HC-PUB-05-RECONCILIATION-OPS"],
+      "zone": [
+        "apps/web",
+        "packages/core",
+        "docs"
+      ],
+      "dependsOn": [
+        "S-HC-PUB-05-RECONCILIATION-OPS"
+      ],
       "acceptance": [
         "Structured logging with correlation IDs",
         "Publishing metrics dashboard (attempts, failures, latency)",
@@ -310,8 +458,15 @@
       "backupOwner": "Manuel",
       "status": "pending",
       "track": "commercial",
-      "zone": ["apps/web/app/register", "apps/web/app/api/auth", "packages/db", "apps/web/components"],
-      "dependsOn": ["S-HC-REC-00C"],
+      "zone": [
+        "apps/web/app/register",
+        "apps/web/app/api/auth",
+        "packages/db",
+        "apps/web/components"
+      ],
+      "dependsOn": [
+        "S-HC-REC-00C"
+      ],
       "acceptance": [
         "Self-service registration with email verification",
         "Trial tenant creation with default config",
@@ -326,8 +481,14 @@
       "backupOwner": "Manuel",
       "status": "pending",
       "track": "commercial",
-      "zone": ["apps/web/app/api/billing", "packages/db", "apps/web/components"],
-      "dependsOn": ["S-HC-COMM-01-SELF-SERVICE-SIGNUP"],
+      "zone": [
+        "apps/web/app/api/billing",
+        "packages/db",
+        "apps/web/components"
+      ],
+      "dependsOn": [
+        "S-HC-COMM-01-SELF-SERVICE-SIGNUP"
+      ],
       "acceptance": [
         "Plan selection (Free, Pro, Agency)",
         "Usage tracking (posts, assets, tenants)",
@@ -342,8 +503,14 @@
       "backupOwner": "Manuel",
       "status": "pending",
       "track": "onboarding",
-      "zone": ["apps/web/components", "packages/core", "packages/agents"],
-      "dependsOn": ["S-HC-COMM-02-BILLING-ACTIVATION"],
+      "zone": [
+        "apps/web/components",
+        "packages/core",
+        "packages/agents"
+      ],
+      "dependsOn": [
+        "S-HC-COMM-02-BILLING-ACTIVATION"
+      ],
       "acceptance": [
         "Upload master document (PDF, DOCX, Markdown, texto)",
         "Extract structured information: brand, product, audience, tone",
@@ -358,8 +525,13 @@
       "backupOwner": "Manuel",
       "status": "pending",
       "track": "onboarding",
-      "zone": ["apps/web/components", "packages/core"],
-      "dependsOn": ["S-HC-ONB-01-MASTER-BRIEF-INGESTION"],
+      "zone": [
+        "apps/web/components",
+        "packages/core"
+      ],
+      "dependsOn": [
+        "S-HC-ONB-01-MASTER-BRIEF-INGESTION"
+      ],
       "acceptance": [
         "Ask only for missing data with dynamic questions",
         "Avoid unnecessarily long forms",
@@ -374,7 +546,11 @@
       "backupOwner": "Manuel",
       "status": "pending",
       "track": "ai-infra",
-      "zone": ["packages/agents", "packages/core", "apps/web/components"],
+      "zone": [
+        "packages/agents",
+        "packages/core",
+        "apps/web/components"
+      ],
       "dependsOn": [],
       "acceptance": [
         "Provider-agnostic LLM broker interface",
@@ -391,8 +567,15 @@
       "backupOwner": "Manuel",
       "status": "pending",
       "track": "strategy",
-      "zone": ["packages/agents", "apps/web/components", "packages/core"],
-      "dependsOn": ["S-HC-ONB-02-GAP-RESOLUTION-WIZARD", "S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE"],
+      "zone": [
+        "packages/agents",
+        "apps/web/components",
+        "packages/core"
+      ],
+      "dependsOn": [
+        "S-HC-ONB-02-GAP-RESOLUTION-WIZARD",
+        "S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE"
+      ],
       "acceptance": [
         "Generate target audience, value proposition, tone and language",
         "Recommend networks, format by network, volume and frequency",
@@ -411,8 +594,14 @@
       "backupOwner": "Manuel",
       "status": "pending",
       "track": "strategy",
-      "zone": ["apps/web/components", "apps/web/lib/dashboard.ts", "packages/core"],
-      "dependsOn": ["S-HC-STRAT-01-MASTER-STRATEGY-WORKBENCH"],
+      "zone": [
+        "apps/web/components",
+        "apps/web/lib/dashboard.ts",
+        "packages/core"
+      ],
+      "dependsOn": [
+        "S-HC-STRAT-01-MASTER-STRATEGY-WORKBENCH"
+      ],
       "acceptance": [
         "Generate per-format publishing schedule from strategy",
         "Slots with network, format, date, time window",
@@ -428,8 +617,14 @@
       "backupOwner": "Manuel",
       "status": "pending",
       "track": "assets",
-      "zone": ["apps/web/components", "packages/core"],
-      "dependsOn": ["S-HC-STRAT-02-CONTENT-CALENDAR-BLUEPRINT", "S-HC-PUB-03-MULTITENANT-ASSETS"],
+      "zone": [
+        "apps/web/components",
+        "packages/core"
+      ],
+      "dependsOn": [
+        "S-HC-STRAT-02-CONTENT-CALENDAR-BLUEPRINT",
+        "S-HC-PUB-03-MULTITENANT-ASSETS"
+      ],
       "acceptance": [
         "Per-publication asset manifest: type, network, format, resolution, aspect ratio, duration",
         "Creative guideline, scene context, branding, logo placement",
@@ -445,8 +640,14 @@
       "backupOwner": "Manuel",
       "status": "pending",
       "track": "assets",
-      "zone": ["apps/web/components", "packages/core", "apps/web/lib"],
-      "dependsOn": ["S-HC-PUB-03-MULTITENANT-ASSETS"],
+      "zone": [
+        "apps/web/components",
+        "packages/core",
+        "apps/web/lib"
+      ],
+      "dependsOn": [
+        "S-HC-PUB-03-MULTITENANT-ASSETS"
+      ],
       "acceptance": [
         "Badge de compatibilidad clickeable que abre detalle de formato",
         "Preview especifico de formato con crop y safe zones visuales",
@@ -468,8 +669,16 @@
       "backupOwner": "Manuel",
       "status": "pending",
       "track": "ai-generation",
-      "zone": ["packages/agents", "apps/web/app/api", "packages/core"],
-      "dependsOn": ["S-HC-ASSET-01-STRATEGY-ASSET-MANIFEST", "S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE", "S-HC-COMM-02-BILLING-ACTIVATION"],
+      "zone": [
+        "packages/agents",
+        "apps/web/app/api",
+        "packages/core"
+      ],
+      "dependsOn": [
+        "S-HC-ASSET-01-STRATEGY-ASSET-MANIFEST",
+        "S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE",
+        "S-HC-COMM-02-BILLING-ACTIVATION"
+      ],
       "acceptance": [
         "Provider-agnostic generation broker (not hardcoded to single provider)",
         "Metered consumption with cost preview before generation",
@@ -485,8 +694,16 @@
       "backupOwner": "Manuel",
       "status": "pending",
       "track": "operations",
-      "zone": ["apps/web/app/api/publishing", "apps/web/components", "packages/core"],
-      "dependsOn": ["S-HC-STRAT-02-CONTENT-CALENDAR-BLUEPRINT", "S-HC-ASSET-01-STRATEGY-ASSET-MANIFEST", "S-HC-PUB-04-HOURLY-BATCH-CRON"],
+      "zone": [
+        "apps/web/app/api/publishing",
+        "apps/web/components",
+        "packages/core"
+      ],
+      "dependsOn": [
+        "S-HC-STRAT-02-CONTENT-CALENDAR-BLUEPRINT",
+        "S-HC-ASSET-01-STRATEGY-ASSET-MANIFEST",
+        "S-HC-PUB-04-HOURLY-BATCH-CRON"
+      ],
       "acceptance": [
         "Batch review of campaign drafts",
         "Approve/reject per draft or bulk",
@@ -502,8 +719,14 @@
       "backupOwner": "Manuel",
       "status": "pending",
       "track": "support",
-      "zone": ["apps/web/components", "apps/web/app/api/assistant", "packages/core"],
-      "dependsOn": ["S-HC-COMM-02-BILLING-ACTIVATION"],
+      "zone": [
+        "apps/web/components",
+        "apps/web/app/api/assistant",
+        "packages/core"
+      ],
+      "dependsOn": [
+        "S-HC-COMM-02-BILLING-ACTIVATION"
+      ],
       "acceptance": [
         "HeptaCore LLM assistant for product guidance",
         "WhatsApp support channel",
@@ -518,8 +741,15 @@
       "backupOwner": "Manuel",
       "status": "pending",
       "track": "analytics",
-      "zone": ["apps/web/components", "apps/web/app/api", "packages/core"],
-      "dependsOn": ["S-HC-OPS-01-CAMPAIGN-REVIEW-DEPLOYMENT", "S-HC-OBS-01-PUBLISHING-OBSERVABILITY"],
+      "zone": [
+        "apps/web/components",
+        "apps/web/app/api",
+        "packages/core"
+      ],
+      "dependsOn": [
+        "S-HC-OPS-01-CAMPAIGN-REVIEW-DEPLOYMENT",
+        "S-HC-OBS-01-PUBLISHING-OBSERVABILITY"
+      ],
       "acceptance": [
         "Reach and impressions where API permits",
         "Interactions, likes, comments",
@@ -535,8 +765,14 @@
       "backupOwner": "Manuel",
       "status": "pending",
       "track": "engagement",
-      "zone": ["apps/web/components", "apps/web/app/api", "packages/integrations"],
-      "dependsOn": ["S-HC-AN-01-CAMPAIGN-PERFORMANCE"],
+      "zone": [
+        "apps/web/components",
+        "apps/web/app/api",
+        "packages/integrations"
+      ],
+      "dependsOn": [
+        "S-HC-AN-01-CAMPAIGN-PERFORMANCE"
+      ],
       "acceptance": [
         "Unified inbox for messages and comments across platforms",
         "Read and respond according to platform permissions",
@@ -551,8 +787,15 @@
       "backupOwner": "Manuel",
       "status": "pending",
       "track": "optimization",
-      "zone": ["packages/agents", "apps/web/components", "packages/core"],
-      "dependsOn": ["S-HC-AN-01-CAMPAIGN-PERFORMANCE", "S-HC-INBOX-01-UNIFIED-ENGAGEMENT"],
+      "zone": [
+        "packages/agents",
+        "apps/web/components",
+        "packages/core"
+      ],
+      "dependsOn": [
+        "S-HC-AN-01-CAMPAIGN-PERFORMANCE",
+        "S-HC-INBOX-01-UNIFIED-ENGAGEMENT"
+      ],
       "acceptance": [
         "Versioned strategy with iteration history",
         "Recommendations based on real performance data",
@@ -567,7 +810,11 @@
       "backupOwner": "Manuel",
       "status": "pending",
       "track": "tenant-onboarding",
-      "zone": ["examples/tenants/cepeg", "apps/web", "packages/db"],
+      "zone": [
+        "examples/tenants/cepeg",
+        "apps/web",
+        "packages/db"
+      ],
       "dependsOn": [
         "S-HC-OPS-01-CAMPAIGN-REVIEW-DEPLOYMENT",
         "S-HC-COMM-02-BILLING-ACTIVATION",
@@ -589,12 +836,34 @@
       "backupOwner": "Manuel",
       "status": "done",
       "track": "production-infra",
-      "zone": ["docs", "scripts", "packages/db", "vercel-env"],
-      "dependsOn": ["S-HC-PROD-ALIGN"],
-      "acceptance": ["Production env checklist completed", "29 drafts and 46 assets verified"],
+      "zone": [
+        "docs",
+        "scripts",
+        "packages/db",
+        "vercel-env"
+      ],
+      "dependsOn": [
+        "S-HC-PROD-ALIGN"
+      ],
+      "acceptance": [
+        "Production env checklist completed",
+        "29 drafts and 46 assets verified"
+      ],
       "history": [
-        { "at": "2026-06-11T00:20:00.000Z", "action": "reassigned", "from": "Manuel", "to": "Jean", "reason": "User-directed PROD closeout split" },
-        { "at": "2026-06-11T01:44:03.976Z", "action": "closed", "operator": "Jean", "branch": "Jean/s-hc-canonical-alignment-2026-06-09", "description": "production-db-auth-env-turpial-seed-smoke" }
+        {
+          "at": "2026-06-11T00:20:00.000Z",
+          "action": "reassigned",
+          "from": "Manuel",
+          "to": "Jean",
+          "reason": "User-directed PROD closeout split"
+        },
+        {
+          "at": "2026-06-11T01:44:03.976Z",
+          "action": "closed",
+          "operator": "Jean",
+          "branch": "Jean/s-hc-canonical-alignment-2026-06-09",
+          "description": "production-db-auth-env-turpial-seed-smoke"
+        }
       ]
     },
     {
@@ -604,8 +873,15 @@
       "backupOwner": "Manuel+Jean",
       "status": "done",
       "track": "release",
-      "zone": ["docs", "apps/web", "apps/worker", "packages/integrations"],
-      "dependsOn": ["S-HC-PROD-02"],
+      "zone": [
+        "docs",
+        "apps/web",
+        "apps/worker",
+        "packages/integrations"
+      ],
+      "dependsOn": [
+        "S-HC-PROD-02"
+      ],
       "acceptance": [
         "Login works",
         "Turpial tenant loads strategy and assets",
@@ -616,7 +892,13 @@
         "156 tests"
       ],
       "history": [
-        { "at": "2026-06-11T03:19:41.362Z", "action": "closed", "operator": "Manuel", "branch": "Manuel/s-hc-prod-01-producto-operativo-tenant-admin-produccion-2026-06-09", "description": "E2E Turpial Sound production proof" }
+        {
+          "at": "2026-06-11T03:19:41.362Z",
+          "action": "closed",
+          "operator": "Manuel",
+          "branch": "Manuel/s-hc-prod-01-producto-operativo-tenant-admin-produccion-2026-06-09",
+          "description": "E2E Turpial Sound production proof"
+        }
       ]
     },
     {
@@ -626,10 +908,21 @@
       "backupOwner": "Manuel",
       "status": "done",
       "track": "ad-hoc",
-      "zone": ["package.json", "scripts/oreshnik"],
-      "dependsOn": ["S-HC-PROD-01"],
+      "zone": [
+        "package.json",
+        "scripts/oreshnik"
+      ],
+      "dependsOn": [
+        "S-HC-PROD-01"
+      ],
       "history": [
-        { "at": "2026-06-12T04:56:32.932Z", "action": "drift-recorded", "operator": "Manuel", "mode": "silent", "description": "sprint" }
+        {
+          "at": "2026-06-12T04:56:32.932Z",
+          "action": "drift-recorded",
+          "operator": "Manuel",
+          "mode": "silent",
+          "description": "sprint"
+        }
       ]
     },
     {
@@ -639,10 +932,22 @@
       "backupOwner": "Manuel",
       "status": "done",
       "track": "ad-hoc",
-      "zone": ["apps/web", "packages/agents", "packages/integrations"],
-      "dependsOn": ["S-HC-PROD-01"],
+      "zone": [
+        "apps/web",
+        "packages/agents",
+        "packages/integrations"
+      ],
+      "dependsOn": [
+        "S-HC-PROD-01"
+      ],
       "history": [
-        { "at": "2026-06-12T07:16:29.270Z", "action": "drift-recorded", "operator": "Manuel", "mode": "silent", "description": "Codex multi-RRSS refactor" }
+        {
+          "at": "2026-06-12T07:16:29.270Z",
+          "action": "drift-recorded",
+          "operator": "Manuel",
+          "mode": "silent",
+          "description": "Codex multi-RRSS refactor"
+        }
       ]
     },
     {
@@ -652,10 +957,20 @@
       "backupOwner": "Manuel",
       "status": "done",
       "track": "ad-hoc",
-      "zone": ["apps/web", "vercel.json", "docs/07_handoffs"],
+      "zone": [
+        "apps/web",
+        "vercel.json",
+        "docs/07_handoffs"
+      ],
       "dependsOn": [],
       "history": [
-        { "at": "2026-06-14T08:39:53.687Z", "action": "drift-recorded", "operator": "Manuel", "mode": "silent", "description": "Sistema de publicacion con 3 modos, 24 crons Vercel, cron publisher idempotente" }
+        {
+          "at": "2026-06-14T08:39:53.687Z",
+          "action": "drift-recorded",
+          "operator": "Manuel",
+          "mode": "silent",
+          "description": "Sistema de publicacion con 3 modos, 24 crons Vercel, cron publisher idempotente"
+        }
       ]
     }
   ],

@@ -1,5 +1,5 @@
 {
-  "current": "MADRE/v46-s-hc-pub-02-multiformat-preview-multiformat-previews-deterministic-auth-approval-2026-06-21",
+  "current": "MADRE/v47-s-hc-pub-03-multitenant-assets-multitenant-assets-metadata-compatibility-batch--2026-06-23",
   "branches": [
     {
       "previous": "MADRE/v11-s-hc-09-publish-readiness-gate-2026-06-09",
@@ -330,11 +330,21 @@
       "at": "2026-06-21T19:08:48.084Z",
       "previous": "MADRE/v45-s-hc-rec-00c-canonical-integration-after-recovery-2026-06-21",
       "description": "multiformat previews, deterministic auth, approval UI and dry-run QA completed"
+    },
+    {
+      "version": 47,
+      "name": "MADRE/v47-s-hc-pub-03-multitenant-assets-multitenant-assets-metadata-compatibility-batch--2026-06-23",
+      "sprint": "S-HC-PUB-03-MULTITENANT-ASSETS",
+      "operator": "Manuel",
+      "date": "2026-06-23",
+      "at": "2026-06-23T02:06:55.117Z",
+      "previous": "MADRE/v46-s-hc-pub-02-multiformat-preview-multiformat-previews-deterministic-auth-approval-2026-06-21",
+      "description": "multitenant assets metadata compatibility batch uploads and production QA"
     }
   ],
-  "version": 46,
-  "effective": "MADRE/v45-s-hc-rec-00c-canonical-integration-after-recovery-2026-06-21",
-  "effectiveRef": "origin/MADRE/v45-s-hc-rec-00c-canonical-integration-after-recovery-2026-06-21",
+  "version": 47,
+  "effective": "MADRE/v46-s-hc-pub-02-multiformat-preview-multiformat-previews-deterministic-auth-approval-2026-06-21",
+  "effectiveRef": "origin/MADRE/v46-s-hc-pub-02-multiformat-preview-multiformat-previews-deterministic-auth-approval-2026-06-21",
   "declaredMissing": false,
   "discoveredVersion": 14
 }
