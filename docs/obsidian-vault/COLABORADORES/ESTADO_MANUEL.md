@@ -330,7 +330,7 @@ Zonas: `examples/tenants/cepeg`, `apps/web`, `packages/db`
 type: collaborator-status
 project: "HeptaCore"
 operator: "Manuel"
-last_updated: "2026-06-23T03:31:18.635Z"
+last_updated: "2026-06-23T03:44:32.892Z"
 generated_by: "Oreshnik canonical-check"
 source: "var/oreshnik/task-board.json"
 ---

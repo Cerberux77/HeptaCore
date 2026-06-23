@@ -21,7 +21,8 @@
     "Fase completada: S-HC-PUB-02-MULTIFORMAT-PREVIEW — preview y dry-run multiformato para Instagram y Facebook.",
     "Fase completada: S-HC-PUB-03-MULTITENANT-ASSETS — biblioteca multi-tenant, metadata, compatibilidad, colecciones, inspector (SHA 31dd93e).",
     "Siguiente fase (un sprint por vez): S-HC-PUB-04-HOURLY-BATCH-CRON — batch cron publishing.",
-    "Pendientes de publicacion: PUB-04 hourly batch cron, PUB-05 reconciliation ops, PUB-06 Reels/Stories publishers, PUB-07 YouTube publishing, PUB-08 format parity.",
+    "EMAIL-01 infraestructura de codigo preparada (modelos, templates, provider abstraction, webhook, Link-Only activo). Integracion externa bloqueada hasta dominio final.",
+    "Modo operacional actual: EMAIL_PROVIDER=disabled. Invitaciones se entregan via enlace copiable (inviteLink). Correos reales: 0.",
     "Reels, Stories y YouTube forman parte obligatoria del alcance final de HeptaCore. Las combinaciones sin publisher real quedan pendientes de implementacion en PUB-06, PUB-07 o PUB-08.",
     "Jean fuera de ruta critica. Responsabilidades reasignadas a Manuel."
   ],
