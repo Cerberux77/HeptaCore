@@ -20,7 +20,7 @@ export default function AcceptInvitationClient() {
       body: JSON.stringify({ token }),
     });
     const data = await res.json();
-    if (data.ok) { router.push(`/tenant/${data.tenantId}`); }
+    if (data.ok && data.tenantSlug) { router.push(`/tenant/${data.tenantSlug}`); }
     else { setStatus("error"); setError(data.error || "Acceptance failed"); }
   };
 

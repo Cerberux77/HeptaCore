@@ -49,14 +49,19 @@ export async function POST(request: Request) {
     const existing = await tx.emailWebhookEvent.findUnique({ where: { providerEventId: svixId } });
     if (existing) return;
 
-    await tx.emailWebhookEvent.create({
-      data: {
-        providerEventId: svixId,
-        providerMessageId,
-        type,
-        occurredAt: new Date(event.data?.created_at || Date.now()),
-      },
-    });
+    try {
+      await tx.emailWebhookEvent.create({
+        data: {
+          providerEventId: svixId,
+          providerMessageId,
+          type,
+          occurredAt: new Date(event.data?.created_at || Date.now()),
+        },
+      });
+    } catch (createErr: any) {
+      if (createErr?.code === "P2002") return;
+      throw createErr;
+    }
 
     const statusMap: Record<string, string> = {
       "email.sent": "SENT",

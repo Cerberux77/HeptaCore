@@ -1,6 +1,15 @@
 import assert from "node:assert/strict";
 import { describe, it, beforeEach } from "node:test";
 import { hashInvitationToken, generateInvitationToken, getInvitationExpiration } from "../invitation-token";
+
+function extractInvitationToken(inviteLink: string): string {
+  const q = inviteLink.split("?")[1];
+  if (!q) throw new Error(`No query params in inviteLink: ${inviteLink}`);
+  const params = new URLSearchParams(q);
+  const token = params.get("token");
+  if (!token) throw new Error(`No token in inviteLink: ${inviteLink}`);
+  return token;
+}
 import bcrypt from "bcryptjs";
 import {
   TenantAdminError,
@@ -292,7 +301,7 @@ describe("provisioning with fake DB", () => {
 
       assert.equal(result.status, "PROVISIONING");
       assert.equal(result.slug, "test-tenant");
-      assert.ok(result.invitationToken);
+      assert.ok(result.inviteLink);
       assert.ok(!("tokenHash" in (result as any)));
       assert.ok(!("passwordHash" in (result as any)));
 
@@ -309,7 +318,7 @@ describe("provisioning with fake DB", () => {
       );
       assert.ok(inv, "invitation should exist");
       assert.ok(inv.tokenHash, "tokenHash should be stored");
-      const rawToken = result.invitationToken!;
+      const rawToken = extractInvitationToken(result.inviteLink!);
       const expectedHash = hashInvitationToken(rawToken);
       assert.equal(inv.tokenHash, expectedHash, "invitation hash matches generated token");
 
@@ -627,7 +636,7 @@ describe("owner invitation activation", () => {
       actorId: "sa1", slug: "inv-req", name: "IR", ownerEmail: "ir@test.com",
     }, db);
     assert.equal(result.ownerAccountState, "INVITATION_REQUIRED");
-    assert.ok(result.invitationToken);
+    assert.ok(result.inviteLink);
   });
 
   it("createAdminTenant returns EXISTING_ACCOUNT for user with passwordHash", async () => {
@@ -636,14 +645,15 @@ describe("owner invitation activation", () => {
       actorId: "sa1", slug: "existing-acct", name: "EA", ownerEmail: "existing@test.com",
     }, db);
     assert.equal(result.ownerAccountState, "EXISTING_ACCOUNT");
-    assert.equal(result.invitationToken, undefined);
+    assert.ok(result.inviteLink);
+    assert.ok(result.inviteLink.includes("/login"), `expected login link, got ${result.inviteLink}`);
   });
 
   it("acceptRegistrationInvitation activates placeholder", async () => {
     const result = await createAdminTenant({
       actorId: "sa1", slug: "activate-me", name: "AM", ownerEmail: "activate@test.com",
     }, db);
-    const token = result.invitationToken!;
+    const token = extractInvitationToken(result.inviteLink!);
     await db.$transaction((tx) => acceptRegistrationInvitation({
       token, email: "activate@test.com", password: "securePassword123",
     }, tx));
@@ -656,7 +666,7 @@ describe("owner invitation activation", () => {
     const result = await createAdminTenant({
       actorId: "sa1", slug: "bcrypt-test", name: "BT", ownerEmail: "bcrypt@test.com",
     }, db);
-    const token = result.invitationToken!;
+    const token = extractInvitationToken(result.inviteLink!);
     const password = "securePassword123";
     await db.$transaction((tx) => acceptRegistrationInvitation({
       token, email: "bcrypt@test.com", password,
@@ -670,7 +680,7 @@ describe("owner invitation activation", () => {
     const result = await createAdminTenant({
       actorId: "sa1", slug: "one-membership", name: "OM", ownerEmail: "om@test.com",
     }, db);
-    const token = result.invitationToken!;
+    const token = extractInvitationToken(result.inviteLink!);
     await db.$transaction((tx) => acceptRegistrationInvitation({
       token, email: "om@test.com", password: "securePassword123",
     }, tx));
@@ -685,7 +695,7 @@ describe("owner invitation activation", () => {
     const result = await createAdminTenant({
       actorId: "sa1", slug: "accept-fields", name: "AF", ownerEmail: "af@test.com",
     }, db);
-    const token = result.invitationToken!;
+    const token = extractInvitationToken(result.inviteLink!);
     await db.$transaction((tx) => acceptRegistrationInvitation({
       token, email: "af@test.com", password: "securePassword123",
     }, tx));
@@ -698,7 +708,7 @@ describe("owner invitation activation", () => {
     const result = await createAdminTenant({
       actorId: "sa1", slug: "audit-accept", name: "AA", ownerEmail: "aa@test.com",
     }, db);
-    const token = result.invitationToken!;
+    const token = extractInvitationToken(result.inviteLink!);
     await db.$transaction((tx) => acceptRegistrationInvitation({
       token, email: "aa@test.com", password: "securePassword123",
     }, tx));
@@ -712,7 +722,7 @@ describe("owner invitation activation", () => {
     const result = await createAdminTenant({
       actorId: "sa1", slug: "reuse-token", name: "RT", ownerEmail: "rt@test.com",
     }, db);
-    const token = result.invitationToken!;
+    const token = extractInvitationToken(result.inviteLink!);
     await db.$transaction((tx) => acceptRegistrationInvitation({
       token, email: "rt@test.com", password: "securePassword123",
     }, tx));
@@ -740,7 +750,7 @@ describe("owner invitation activation", () => {
     const result = await createAdminTenant({
       actorId: "sa1", slug: "wrong-email", name: "WE", ownerEmail: "we@test.com",
     }, db);
-    const token = result.invitationToken!;
+    const token = extractInvitationToken(result.inviteLink!);
     await assert.rejects(
       () => db.$transaction((tx) => acceptRegistrationInvitation({
         token, email: "other@test.com", password: "securePassword123",
@@ -753,7 +763,7 @@ describe("owner invitation activation", () => {
     const result = await createAdminTenant({
       actorId: "sa1", slug: "expired-inv", name: "EI", ownerEmail: "ei@test.com",
     }, db);
-    const token = result.invitationToken!;
+    const token = extractInvitationToken(result.inviteLink!);
     const inv = fake.collections.invitations.records.find((i: any) => i.email === "ei@test.com")!;
     inv.expiresAt = new Date(Date.now() - 86400000).toISOString();
     await assert.rejects(
@@ -768,7 +778,7 @@ describe("owner invitation activation", () => {
     const result = await createAdminTenant({
       actorId: "sa1", slug: "rb-user-update", name: "RU", ownerEmail: "ru@test.com",
     }, db);
-    const token = result.invitationToken!;
+    const token = extractInvitationToken(result.inviteLink!);
     setFailNext("user.update");
     await assert.rejects(
       () => db.$transaction((tx) => acceptRegistrationInvitation({
@@ -783,7 +793,7 @@ describe("owner invitation activation", () => {
     const result = await createAdminTenant({
       actorId: "sa1", slug: "rb-membership", name: "RM", ownerEmail: "rm@test.com",
     }, db);
-    const token = result.invitationToken!;
+    const token = extractInvitationToken(result.inviteLink!);
     setFailNext("membership.findUnique");
     await assert.rejects(
       () => db.$transaction((tx) => acceptRegistrationInvitation({
@@ -798,7 +808,7 @@ describe("owner invitation activation", () => {
     const result = await createAdminTenant({
       actorId: "sa1", slug: "rb-inv-update", name: "RI", ownerEmail: "ri@test.com",
     }, db);
-    const token = result.invitationToken!;
+    const token = extractInvitationToken(result.inviteLink!);
     setFailNext("invitation.update");
     await assert.rejects(
       () => db.$transaction((tx) => acceptRegistrationInvitation({
@@ -813,7 +823,7 @@ describe("owner invitation activation", () => {
     const result = await createAdminTenant({
       actorId: "sa1", slug: "rb-audit", name: "RA", ownerEmail: "ra@test.com",
     }, db);
-    const token = result.invitationToken!;
+    const token = extractInvitationToken(result.inviteLink!);
     setFailNext("auditLog.create");
     await assert.rejects(
       () => db.$transaction((tx) => acceptRegistrationInvitation({
@@ -892,7 +902,7 @@ describe("owner invitation activation", () => {
     const result = await createAdminTenant({
       actorId: "sa1", slug: "no-dup-mem", name: "NDM", ownerEmail: "ndm@test.com",
     }, db);
-    const token = result.invitationToken!;
+    const token = extractInvitationToken(result.inviteLink!);
     const userBefore = fake.collections.users.records.find((u: any) => u.email === "ndm@test.com")!;
     await db.$transaction((tx) => acceptRegistrationInvitation({
       token, email: "ndm@test.com", password: "securePassword123",

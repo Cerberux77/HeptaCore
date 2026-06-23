@@ -50,7 +50,8 @@ export async function createAndSendEmail(params: {
         sender,
         subject: params.subject,
         idempotencyKey: params.idempotencyKey,
-        status: "PENDING",
+        status: config.provider === "disabled" ? "DISABLED" : "PENDING",
+        attemptCount: 0,
       },
     });
   } catch (err: any) {
@@ -60,11 +61,24 @@ export async function createAndSendEmail(params: {
     if (!delivery) throw err;
   }
 
+  // Idempotent return: if delivery already exists, don't re-send
+  if (delivery && delivery.status !== "PENDING") {
+    return {
+      deliveryId: delivery.id,
+      status: delivery.status as string,
+      reason: delivery.status === "DISABLED" ? "EMAIL_PROVIDER_NOT_CONFIGURED" : undefined,
+      inviteLink: params.inviteLink,
+      providerMessageId: delivery.providerMessageId,
+    };
+  }
+
   if (config.provider === "disabled") {
-    await (db as any).emailDelivery.update({
-      where: { id: delivery.id },
-      data: { status: "DISABLED", attemptCount: 0 },
-    });
+    if (delivery && delivery.status === "PENDING") {
+      await (db as any).emailDelivery.update({
+        where: { id: delivery.id },
+        data: { status: "DISABLED" },
+      });
+    }
     return {
       deliveryId: delivery.id,
       status: "DISABLED",

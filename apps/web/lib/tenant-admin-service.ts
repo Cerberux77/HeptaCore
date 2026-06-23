@@ -70,7 +70,6 @@ export interface SerializedTenant {
   locale: string;
   createdAt: Date;
   ownerEmail: string;
-  invitationToken?: string;
   inviteLink?: string;
   ownerAccountState?: "EXISTING_ACCOUNT" | "INVITATION_REQUIRED";
 }
@@ -78,9 +77,8 @@ export interface SerializedTenant {
 function serializeTenant(
   tenant: Tenant & { memberships?: Array<{ user: { email: string } }> },
   ownerEmail: string,
-  invitationToken?: string,
-  ownerAccountState?: "EXISTING_ACCOUNT" | "INVITATION_REQUIRED",
   inviteLink?: string,
+  ownerAccountState?: "EXISTING_ACCOUNT" | "INVITATION_REQUIRED",
 ): SerializedTenant {
   return {
     id: tenant.id,
@@ -92,7 +90,6 @@ function serializeTenant(
     locale: tenant.locale ?? "es",
     createdAt: tenant.createdAt,
     ownerEmail,
-    ...(invitationToken ? { invitationToken } : {}),
     ...(inviteLink ? { inviteLink } : {}),
     ...(ownerAccountState ? { ownerAccountState } : {}),
   };
@@ -185,6 +182,8 @@ export async function createAdminTenant(
         },
       });
       inviteLink = buildInviteLink(plainToken, ownerEmail, "INVITATION_REQUIRED", undefined, normalizedSlug);
+    } else {
+      inviteLink = buildInviteLink("", ownerEmail, "EXISTING_ACCOUNT", undefined, normalizedSlug);
     }
 
     await tx.auditLog.create({
@@ -200,9 +199,8 @@ export async function createAdminTenant(
     return serializeTenant(
       { ...tenant, memberships: [{ user: { email: ownerEmail } }] } as Tenant & { memberships?: Array<{ user: { email: string } }> },
       ownerEmail,
-      plainToken,
-      ownerAccountState,
       inviteLink,
+      ownerAccountState,
     );
   });
 }

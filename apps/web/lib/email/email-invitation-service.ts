@@ -7,6 +7,7 @@ import type { Prisma } from "@prisma/client";
 
 export async function sendTenantOwnerInvitation(params: {
   tenantId: string;
+  tenantSlug: string;
   invitationId: string;
   email: string;
   tenantName: string;
@@ -15,7 +16,7 @@ export async function sendTenantOwnerInvitation(params: {
   ownerAccountState?: "EXISTING_ACCOUNT" | "INVITATION_REQUIRED";
 }): Promise<CreateAndSendResult> {
   const config = getEmailConfig();
-  const inviteLink = buildInviteLink(params.token, params.email, params.ownerAccountState, config.appUrl, params.tenantId);
+  const inviteLink = buildInviteLink(params.token, params.email, params.ownerAccountState, config.appUrl, params.tenantSlug);
   const { html, text, subject } = await renderTemplate("owner-invitation", "es", {
     tenantName: params.tenantName,
     token: params.token,
