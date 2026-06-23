@@ -343,3 +343,71 @@ describe("Error codes", () => {
   it("TENANT_ARCHIVED has status 403", () => assert.equal(new TenantAccessError("m", "TENANT_ARCHIVED", 403).status, 403));
   it("TENANT_PROVISIONING has status 403", () => assert.equal(new TenantAccessError("m", "TENANT_PROVISIONING", 403).status, 403));
 });
+
+describe("Asset permissions (correction #2)", () => {
+  it("TENANT_READ allows asset reads", async () => {
+    const db = fakeDb(false, "VIEWER", "ACTIVE");
+    const result = await resolveTenantAccess("uid", "tid", Permission.TENANT_READ, db);
+    assert.equal(result.role, "VIEWER");
+  });
+
+  it("CONTENT_WRITE allows asset mutations by EDITOR", async () => {
+    const db = fakeDb(false, "EDITOR", "ACTIVE");
+    const result = await resolveTenantAccess("uid", "tid", Permission.CONTENT_WRITE, db);
+    assert.equal(result.role, "EDITOR");
+  });
+
+  it("TENANT_ADMIN lacks CONTENT_WRITE (cannot mutate assets)", async () => {
+    const db = fakeDb(false, "TENANT_ADMIN", "ACTIVE");
+    await assert.rejects(
+      () => resolveTenantAccess("uid", "tid", Permission.CONTENT_WRITE, db),
+      (e: unknown) => (e as TenantAccessError).code === "FORBIDDEN",
+    );
+  });
+
+  it("SUPER_ADMIN global accesses assets without membership", async () => {
+    const db = fakeDb(true, null, "ACTIVE");
+    const result = await resolveTenantAccess("uid", "tid", Permission.CONTENT_WRITE, db);
+    assert.equal(result.superAdminBypass, true);
+  });
+
+  it("assets mutation blocked on SUSPENDED tenant", async () => {
+    const db = fakeDb(false, "EDITOR", "SUSPENDED");
+    await assert.rejects(
+      () => resolveTenantAccessWithLifecycle("uid", "tid", Permission.CONTENT_WRITE, "NORMAL_OPERATION", db),
+      (e: unknown) => (e as TenantAccessError).code === "TENANT_SUSPENDED",
+    );
+  });
+});
+
+describe("Publishing permission (correction #1)", () => {
+  it("SUPER_ADMIN global publishes without membership", async () => {
+    const db = fakeDb(true, null, "ACTIVE");
+    const result = await resolveTenantAccessWithLifecycle("uid", "tid", Permission.CONTENT_PUBLISH, "NORMAL_OPERATION", db);
+    assert.equal(result.role, "SUPER_ADMIN");
+  });
+
+  it("non-member cannot publish", async () => {
+    const db = fakeDb(false, null, "ACTIVE");
+    await assert.rejects(
+      () => resolveTenantAccess("uid", "tid", Permission.CONTENT_PUBLISH, db),
+      (e: unknown) => (e as TenantAccessError).code === "NOT_MEMBER",
+    );
+  });
+
+  it("TENANT_ADMIN cannot publish (lacks CONTENT_PUBLISH)", async () => {
+    const db = fakeDb(false, "TENANT_ADMIN", "ACTIVE");
+    await assert.rejects(
+      () => resolveTenantAccess("uid", "tid", Permission.CONTENT_PUBLISH, db),
+      (e: unknown) => (e as TenantAccessError).code === "FORBIDDEN",
+    );
+  });
+
+  it("tenant SUSPENDED blocks publishing", async () => {
+    const db = fakeDb(false, "PUBLISHER", "SUSPENDED");
+    await assert.rejects(
+      () => resolveTenantAccessWithLifecycle("uid", "tid", Permission.CONTENT_PUBLISH, "NORMAL_OPERATION", db),
+      (e: unknown) => (e as TenantAccessError).code === "TENANT_SUSPENDED",
+    );
+  });
+});

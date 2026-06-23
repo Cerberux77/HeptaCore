@@ -118,8 +118,28 @@ const DEFAULT_LIMIT = 20;
 const MAX_LIMIT = 100;
 
 export function validatePagination(raw: Record<string, unknown>): PaginationParams {
-  const page = typeof raw.page === "number" && Number.isFinite(raw.page) && raw.page >= 1 ? Math.floor(raw.page) : DEFAULT_PAGE;
-  const limit = typeof raw.limit === "number" && Number.isFinite(raw.limit) && raw.limit >= 1 && raw.limit <= MAX_LIMIT ? Math.floor(raw.limit) : DEFAULT_LIMIT;
+  const hasPage = raw.page !== undefined && raw.page !== null;
+  const hasLimit = raw.limit !== undefined && raw.limit !== null;
+
+  let page = DEFAULT_PAGE;
+  let limit = DEFAULT_LIMIT;
+
+  if (hasPage) {
+    const p = raw.page;
+    if (typeof p !== "number" || !Number.isFinite(p) || !Number.isInteger(p) || p < 1) {
+      throw new TenantAdminError(`Invalid page: ${p}. Must be an integer >= 1.`, "INVALID_PAGINATION", 400);
+    }
+    page = p;
+  }
+
+  if (hasLimit) {
+    const l = raw.limit;
+    if (typeof l !== "number" || !Number.isFinite(l) || !Number.isInteger(l) || l < 1 || l > MAX_LIMIT) {
+      throw new TenantAdminError(`Invalid limit: ${l}. Must be an integer between 1 and ${MAX_LIMIT}.`, "INVALID_PAGINATION", 400);
+    }
+    limit = l;
+  }
+
   return { page, limit };
 }
 
@@ -130,18 +150,26 @@ export async function listAdminTenants(
 ): Promise<PaginatedResult<SerializedTenant>> {
   await requireSuperAdminActor(actorId, db);
   const skip = (pagination.page - 1) * pagination.limit;
-  const [tenants, total] = await Promise.all([
+
+  const [tenantsRaw, total] = await Promise.all([
     db.tenant.findMany({
       skip,
       take: pagination.limit,
       orderBy: { createdAt: "desc" },
+      include: {
+        memberships: {
+          where: { role: "OWNER" },
+          select: { user: { select: { email: true } } },
+        },
+      },
     } as unknown as Parameters<typeof db.tenant.findMany>[0]),
     (db.tenant as any).count() as Promise<number>,
   ]);
 
-  const items = (tenants as unknown as Array<Record<string, unknown> & { memberships?: Array<{ user: { email: string } }> }>).map((t) =>
-    serializeTenant(t as unknown as Tenant & { memberships?: Array<{ user: { email: string } }> }, (t.memberships?.[0]?.user?.email) ?? "N/A"),
-  );
+  const items = (tenantsRaw as unknown as Array<Record<string, unknown> & { memberships?: Array<{ user: { email: string } }> }>).map((t) => {
+    const ownerEmail = t.memberships?.[0]?.user?.email ?? "N/A";
+    return serializeTenant(t as unknown as Tenant & { memberships?: Array<{ user: { email: string } }> }, ownerEmail);
+  });
 
   return {
     items,
@@ -441,11 +469,11 @@ export async function addTenantMember(
 
     const user = await tx.user.findUnique({
       where: { email },
-      select: { id: true, email: true, name: true },
+      select: { id: true, email: true, name: true, passwordHash: true },
     });
-    if (!user) {
+    if (!user || user.passwordHash === null) {
       throw new TenantAdminError(
-        "Account does not exist. New accounts must be added via invitation.",
+        "Account does not exist or is not activated. New accounts must be added via invitation.",
         "ACCOUNT_REQUIRES_INVITATION",
         422,
       );
