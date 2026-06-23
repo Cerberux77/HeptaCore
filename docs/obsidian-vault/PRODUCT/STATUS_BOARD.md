@@ -81,7 +81,7 @@ source: "var/oreshnik/task-board.json"
 ---
 type: status-board
 project: "HeptaCore"
-last_updated: "2026-06-22T22:35:09.170Z"
+last_updated: "2026-06-23T02:05:13.068Z"
 generated_by: "Oreshnik canonical-check"
 source: "var/oreshnik/task-board.json"
 ---
@@ -96,7 +96,8 @@ source: "var/oreshnik/task-board.json"
 - Fase completada: S-HC-REC-00C — integracion canonica en master (SHA 9329fe8). Documentacion y Oreshnik alineados.
 - Fase completada: oreshnik-cli@0.2.0-alpha.0 publicado. reconcile --check/--write operacional.
 - Fase completada: S-HC-PUB-02-MULTIFORMAT-PREVIEW — preview y dry-run multiformato para Instagram y Facebook.
-- Fase activa (un sprint por vez): S-HC-PUB-03-MULTITENANT-ASSETS — asset management multi-tenant con metadata, compatibilidad y Vercel Blob. PUB-03 clasifica compatibilidad; no elimina ni reduce el objetivo final de publicacion.
+- Fase completada: S-HC-PUB-03-MULTITENANT-ASSETS — biblioteca multi-tenant, metadata, compatibilidad, colecciones, inspector (SHA 31dd93e).
+- Siguiente fase (un sprint por vez): S-HC-PUB-04-HOURLY-BATCH-CRON — batch cron publishing.
 - Pendientes de publicacion: PUB-04 hourly batch cron, PUB-05 reconciliation ops, PUB-06 Reels/Stories publishers, PUB-07 YouTube publishing, PUB-08 format parity.
 - Reels, Stories y YouTube forman parte obligatoria del alcance final de HeptaCore. Las combinaciones sin publisher real quedan pendientes de implementacion en PUB-06, PUB-07 o PUB-08.
 - Jean fuera de ruta critica. Responsabilidades reasignadas a Manuel.
@@ -106,7 +107,6 @@ source: "var/oreshnik/task-board.json"
 | Sprint | Estado | Owner | Scope | Depende de |
 |---|---|---|---|---|
 | S-HC-REC-00B | cancelled | Manuel | Facebook duplicate cleanup | - |
-| S-HC-PUB-03-MULTITENANT-ASSETS | active | Manuel | Multi-tenant asset management: upload, replace, metadata extraction, compatibility classification | S-HC-PUB-02-MULTIFORMAT-PREVIEW |
 | S-HC-PUB-04-HOURLY-BATCH-CRON | pending | Manuel | Hourly batch cron publishing with timezone-aware scheduling | S-HC-PUB-02-MULTIFORMAT-PREVIEW, S-HC-PUB-03-MULTITENANT-ASSETS |
 | S-HC-PUB-05-RECONCILIATION-OPS | pending | Manuel | Operational reconciliation automation for ambiguous provider outcomes | S-HC-PUB-04-HOURLY-BATCH-CRON |
 | S-HC-PUB-06-REELS-STORIES-PUBLISHERS | pending | Manuel | Real publishing for Meta Reels and Stories: Instagram + Facebook | S-HC-PUB-03-MULTITENANT-ASSETS, S-HC-PUB-04-HOURLY-BATCH-CRON |
@@ -145,6 +145,7 @@ source: "var/oreshnik/task-board.json"
 | S-HC-REC-00A | Manuel | UI Publishing Baseline Recovery — production publishing stabilized |
 | S-HC-REC-00C | Manuel | Canonical integration — recovered production baseline integrated into master |
 | S-HC-PUB-02-MULTIFORMAT-PREVIEW | Manuel | Multiformat preview and dry-run: format model, asset manifest, platform previews, validations |
+| S-HC-PUB-03-MULTITENANT-ASSETS | Manuel | Multi-tenant asset management: upload, replace, metadata extraction, compatibility classification |
 | S-HC-PROD-02 | Jean | Production DB/Auth/env and Turpial seed smoke |
 | S-HC-RELEASE-01 | Manuel+Jean | End-to-end Turpial Sound production proof |
 | S-HC-DRIFT-001 | Manuel | sprint |

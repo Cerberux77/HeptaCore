@@ -61,15 +61,15 @@ PUB-03 clasifica la compatibilidad tecnica del activo — no publica, no llama a
 
 | Formato | Clasificacion PUB-03 |
 |---|---|
-| Instagram Feed | En desarrollo (PUB-03) |
-| Instagram Carousel | En desarrollo (PUB-03) |
-| Instagram Story | En desarrollo (PUB-03) |
-| Instagram Reel | En desarrollo (PUB-03) (compatibilidad de activos; publicacion real pendiente en PUB-06) |
-| Facebook Feed imagen | En desarrollo (PUB-03) |
-| Facebook Feed video | En desarrollo (PUB-03) |
-| Facebook Story/Reel | En desarrollo (PUB-03) (compatibilidad de activos; publicacion real pendiente en PUB-06) |
-| YouTube Short | En desarrollo (PUB-03) (compatibilidad de activos; publicacion real pendiente en PUB-07) |
-| YouTube Video 16:9 | En desarrollo (PUB-03) (compatibilidad de activos; publicacion real pendiente en PUB-07) |
+| Instagram Feed | Implementado y validado |
+| Instagram Carousel | Implementado y validado |
+| Instagram Story | Implementado y validado |
+| Instagram Reel | Implementado y validado (compatibilidad de activos; publicacion real pendiente en PUB-06) |
+| Facebook Feed imagen | Implementado y validado |
+| Facebook Feed video | Implementado y validado |
+| Facebook Story/Reel | Implementado y validado (compatibilidad de activos; publicacion real pendiente en PUB-06) |
+| YouTube Short | Implementado y validado (compatibilidad de activos; publicacion real pendiente en PUB-07) |
+| YouTube Video 16:9 | Implementado y validado (compatibilidad de activos; publicacion real pendiente en PUB-07) |
 
 UNKNOWN se usa cuando faltan datos tecnicos suficientes; no equivale a compatible; no autoriza publicacion; aplica especialmente a assets legacy todavia no analizados. La compatibilidad se calcula desde metadata extraida; el resultado no se persiste como verdad permanente.
 
