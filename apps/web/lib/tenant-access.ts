@@ -117,15 +117,35 @@ export async function requireActiveTenant(
 export interface ResolveTenantAccessResult {
   role: UserRole;
   status: TenantStatus;
+  superAdminBypass: boolean;
 }
 
 export type AccessResolutionDb = {
-  user: TenantAdminDb["user"];
-  membership: TenantAdminDb["membership"];
+  user: {
+    findUnique(args: { where: { id: string }; select: { id: true } }): Promise<{ id: string } | null>;
+  };
+  membership: {
+    findUnique(args: { where: { tenantId_userId: { tenantId: string; userId: string } }; select: { role: true } }): Promise<{ role: UserRole } | null>;
+    findMany(args: { where: { userId: string }; select: { role: true } }): Promise<Array<{ role: UserRole }>>;
+  };
   tenant: {
     findUnique(args: { where: { id: string }; select: { id: true; status: true } }): Promise<{ id: string; status: TenantStatus } | null>;
+    count(args: { where: { id: string } }): Promise<number>;
   };
 };
+
+async function isGlobalSuperAdmin(
+  userId: string,
+  db: Pick<AccessResolutionDb, "user" | "membership">,
+): Promise<boolean> {
+  const user = await db.user.findUnique({ where: { id: userId }, select: { id: true } });
+  if (!user) return false;
+  const memberships = await db.membership.findMany({
+    where: { userId },
+    select: { role: true },
+  });
+  return isSuperAdmin(memberships);
+}
 
 export async function resolveTenantAccess(
   userId: string,
@@ -138,6 +158,17 @@ export async function resolveTenantAccess(
     select: { id: true },
   });
   if (!user) throw new TenantAccessError("User not found", "UNAUTHORIZED", 401);
+
+  const tenant = await db.tenant.findUnique({
+    where: { id: tenantId },
+    select: { id: true, status: true },
+  });
+  if (!tenant) throw new TenantAccessError("Tenant not found", "NOT_FOUND", 404);
+
+  const superAdmin = await isGlobalSuperAdmin(userId, db);
+  if (superAdmin) {
+    return { role: "SUPER_ADMIN", status: tenant.status, superAdminBypass: true };
+  }
 
   const membership = await db.membership.findUnique({
     where: { tenantId_userId: { tenantId, userId } },
@@ -153,13 +184,7 @@ export async function resolveTenantAccess(
     );
   }
 
-  const tenant = await db.tenant.findUnique({
-    where: { id: tenantId },
-    select: { id: true, status: true },
-  });
-  if (!tenant) throw new TenantAccessError("Tenant not found", "NOT_FOUND", 404);
-
-  return { role: membership.role, status: tenant.status };
+  return { role: membership.role, status: tenant.status, superAdminBypass: false };
 }
 
 export async function resolveTenantAccessWithLifecycle(
@@ -176,7 +201,7 @@ export async function resolveTenantAccessWithLifecycle(
 
 export async function resolveSuperAdminAccess(
   userId: string,
-  db: { user: TenantAdminDb["user"]; membership: TenantAdminDb["membership"] } = defaultPrisma as unknown as { user: TenantAdminDb["user"]; membership: TenantAdminDb["membership"] },
+  db: Pick<AccessResolutionDb, "user" | "membership"> = defaultPrisma as unknown as Pick<AccessResolutionDb, "user" | "membership">,
 ): Promise<string> {
   const user = await db.user.findUnique({
     where: { id: userId },
@@ -192,4 +217,11 @@ export async function resolveSuperAdminAccess(
     throw new TenantAccessError("SUPER_ADMIN role required", "FORBIDDEN", 403);
   }
   return user.id;
+}
+
+export function invitationCapabilityForLifecycle(status: TenantStatus, role: UserRole): TenantMutationCapability {
+  if (status === "PROVISIONING" && role === "OWNER") {
+    return "OWNER_INVITATION";
+  }
+  return "NORMAL_OPERATION";
 }

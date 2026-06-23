@@ -7,6 +7,8 @@ import {
   assertTenantLifecycleAllowsMutation,
   requireSuperAdminActor,
   resolveTenantAccessWithLifecycle,
+  resolveTenantAccess,
+  invitationCapabilityForLifecycle,
   TenantAccessError,
   type TenantAdminDb,
   type AccessResolutionDb,
@@ -98,17 +100,56 @@ function serializeTenant(
   };
 }
 
+export interface PaginatedResult<T> {
+  items: T[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
+
+export interface PaginationParams {
+  page: number;
+  limit: number;
+}
+
+const DEFAULT_PAGE = 1;
+const DEFAULT_LIMIT = 20;
+const MAX_LIMIT = 100;
+
+export function validatePagination(raw: Record<string, unknown>): PaginationParams {
+  const page = typeof raw.page === "number" && Number.isFinite(raw.page) && raw.page >= 1 ? Math.floor(raw.page) : DEFAULT_PAGE;
+  const limit = typeof raw.limit === "number" && Number.isFinite(raw.limit) && raw.limit >= 1 && raw.limit <= MAX_LIMIT ? Math.floor(raw.limit) : DEFAULT_LIMIT;
+  return { page, limit };
+}
+
 export async function listAdminTenants(
   actorId: string,
   db: TenantAdminDb = defaultPrisma as unknown as TenantAdminDb,
-): Promise<SerializedTenant[]> {
+  pagination: PaginationParams = { page: DEFAULT_PAGE, limit: DEFAULT_LIMIT },
+): Promise<PaginatedResult<SerializedTenant>> {
   await requireSuperAdminActor(actorId, db);
-  const tenants = await db.tenant.findMany({
-    orderBy: { createdAt: "desc" },
-  } as unknown as Parameters<typeof db.tenant.findMany>[0]);
-  return (tenants as unknown as Array<Record<string, unknown> & { memberships?: Array<{ user: { email: string } }> }>).map((t) =>
+  const skip = (pagination.page - 1) * pagination.limit;
+  const [tenants, total] = await Promise.all([
+    db.tenant.findMany({
+      skip,
+      take: pagination.limit,
+      orderBy: { createdAt: "desc" },
+    } as unknown as Parameters<typeof db.tenant.findMany>[0]),
+    (db.tenant as any).count() as Promise<number>,
+  ]);
+
+  const items = (tenants as unknown as Array<Record<string, unknown> & { memberships?: Array<{ user: { email: string } }> }>).map((t) =>
     serializeTenant(t as unknown as Tenant & { memberships?: Array<{ user: { email: string } }> }, (t.memberships?.[0]?.user?.email) ?? "N/A"),
   );
+
+  return {
+    items,
+    total,
+    page: pagination.page,
+    limit: pagination.limit,
+    totalPages: Math.ceil(total / pagination.limit),
+  };
 }
 
 export async function getAdminTenant(
@@ -340,17 +381,24 @@ export async function listTenantMembers(
   actorId: string,
   tenantId: string,
   db: TenantAdminDbWithTx = defaultPrisma as unknown as TenantAdminDbWithTx,
-): Promise<SerializedMember[]> {
+  pagination: PaginationParams = { page: DEFAULT_PAGE, limit: DEFAULT_LIMIT },
+): Promise<PaginatedResult<SerializedMember>> {
   return db.$transaction(async (tx) => {
-    await resolveTenantAccessWithLifecycle(actorId, tenantId, Permission.MEMBERS_READ, "NORMAL_OPERATION", tx as unknown as AccessResolutionDb);
+    await resolveTenantAccess(actorId, tenantId, Permission.MEMBERS_READ, tx as unknown as AccessResolutionDb);
 
-    const memberships = await tx.membership.findMany({
-      where: { tenantId },
-      include: { user: { select: { email: true, name: true } } },
-      orderBy: { createdAt: "asc" },
-    });
+    const skip = (pagination.page - 1) * pagination.limit;
+    const [memberships, total] = await Promise.all([
+      tx.membership.findMany({
+        where: { tenantId },
+        include: { user: { select: { email: true, name: true } } },
+        orderBy: { createdAt: "asc" },
+        skip,
+        take: pagination.limit,
+      }),
+      tx.membership.count({ where: { tenantId } }),
+    ]);
 
-    return memberships.map((m) => ({
+    const items = memberships.map((m) => ({
       id: m.id,
       userId: m.userId,
       email: m.user.email,
@@ -358,6 +406,8 @@ export async function listTenantMembers(
       role: m.role as UserRole,
       createdAt: m.createdAt,
     }));
+
+    return { items, total, page: pagination.page, limit: pagination.limit, totalPages: Math.ceil(total / pagination.limit) };
   });
 }
 
@@ -389,9 +439,16 @@ export async function addTenantMember(
   return db.$transaction(async (tx) => {
     await resolveTenantAccessWithLifecycle(actorId, tenantId, Permission.MEMBERS_ADD, "NORMAL_OPERATION", tx as unknown as AccessResolutionDb);
 
-    let user = await tx.user.findUnique({ where: { email } });
+    const user = await tx.user.findUnique({
+      where: { email },
+      select: { id: true, email: true, name: true },
+    });
     if (!user) {
-      user = await tx.user.create({ data: { email, name: email } });
+      throw new TenantAdminError(
+        "Account does not exist. New accounts must be added via invitation.",
+        "ACCOUNT_REQUIRES_INVITATION",
+        422,
+      );
     }
 
     const existing = await tx.membership.findUnique({
@@ -446,61 +503,74 @@ export async function changeTenantMemberRole(
     throw new TenantAdminError(`Invalid role: ${params.role}`, "INVALID_ROLE", 400);
   }
 
-  return db.$transaction(async (tx) => {
-    await resolveTenantAccessWithLifecycle(actorId, tenantId, Permission.MEMBERS_ROLE_UPDATE, "NORMAL_OPERATION", tx as unknown as AccessResolutionDb);
+  const MAX_RETRIES = 3;
+  let attempt = 0;
+  while (true) {
+    try {
+      return await db.$transaction(async (tx) => {
+        await resolveTenantAccessWithLifecycle(actorId, tenantId, Permission.MEMBERS_ROLE_UPDATE, "NORMAL_OPERATION", tx as unknown as AccessResolutionDb);
 
-    const membership = await tx.membership.findUnique({
-      where: { id: membershipId },
-      include: { user: { select: { email: true, name: true } } },
-    });
-    if (!membership || membership.tenantId !== tenantId) {
-      throw new TenantAdminError("Membership not found", "NOT_FOUND", 404);
-    }
+        const membership = await tx.membership.findUnique({
+          where: { id: membershipId },
+          include: { user: { select: { email: true, name: true } } },
+        });
+        if (!membership || membership.tenantId !== tenantId) {
+          throw new TenantAdminError("Membership not found", "NOT_FOUND", 404);
+        }
 
-    const previousRole = membership.role;
+        const previousRole = membership.role;
 
-    if (previousRole === "OWNER" && params.role !== "OWNER") {
-      const ownerCount = await tx.membership.count({
-        where: { tenantId, role: "OWNER" },
+        if (previousRole === "OWNER" && params.role !== "OWNER") {
+          await tx.$executeRawUnsafe(`SELECT id FROM "Membership" WHERE "tenantId" = $1 AND role = $2 FOR UPDATE`, tenantId, "OWNER");
+          const ownerCount = await tx.membership.count({
+            where: { tenantId, role: "OWNER" },
+          });
+          if (ownerCount <= 1) {
+            throw new TenantAdminError(
+              "Cannot downgrade the last OWNER of the tenant",
+              "LAST_OWNER",
+              409,
+            );
+          }
+        }
+
+        const updated = await tx.membership.update({
+          where: { id: membershipId },
+          data: { role: params.role },
+          include: { user: { select: { email: true, name: true } } },
+        });
+
+        await tx.auditLog.create({
+          data: {
+            tenantId,
+            actorId,
+            action: "MEMBER_ROLE_CHANGED",
+            target: membershipId,
+            metadata: {
+              userId: membership.userId,
+              before: previousRole,
+              after: params.role,
+            },
+          },
+        });
+
+        return {
+          id: updated.id,
+          userId: updated.userId,
+          email: updated.user.email,
+          name: updated.user.name,
+          role: updated.role as UserRole,
+          createdAt: updated.createdAt,
+        };
       });
-      if (ownerCount <= 1) {
-        throw new TenantAdminError(
-          "Cannot downgrade the last OWNER of the tenant",
-          "LAST_OWNER",
-          409,
-        );
+    } catch (e: any) {
+      if (e?.code === "P2034" && attempt < MAX_RETRIES) {
+        attempt++;
+        continue;
       }
+      throw e;
     }
-
-    const updated = await tx.membership.update({
-      where: { id: membershipId },
-      data: { role: params.role },
-      include: { user: { select: { email: true, name: true } } },
-    });
-
-    await tx.auditLog.create({
-      data: {
-        tenantId,
-        actorId,
-        action: "MEMBER_ROLE_CHANGED",
-        target: membershipId,
-        metadata: {
-          userId: membership.userId,
-          before: previousRole,
-          after: params.role,
-        },
-      },
-    });
-
-    return {
-      id: updated.id,
-      userId: updated.userId,
-      email: updated.user.email,
-      name: updated.user.name,
-      role: updated.role as UserRole,
-      createdAt: updated.createdAt,
-    };
-  });
+  }
 }
 
 export async function removeTenantMember(
@@ -509,41 +579,55 @@ export async function removeTenantMember(
   membershipId: string,
   db: TenantAdminDbWithTx = defaultPrisma as unknown as TenantAdminDbWithTx,
 ): Promise<void> {
-  await db.$transaction(async (tx) => {
-    await resolveTenantAccessWithLifecycle(actorId, tenantId, Permission.MEMBERS_REMOVE, "NORMAL_OPERATION", tx as unknown as AccessResolutionDb);
+  const MAX_RETRIES = 3;
+  let attempt = 0;
+  while (true) {
+    try {
+      await db.$transaction(async (tx) => {
+        await resolveTenantAccessWithLifecycle(actorId, tenantId, Permission.MEMBERS_REMOVE, "NORMAL_OPERATION", tx as unknown as AccessResolutionDb);
 
-    const membership = await tx.membership.findUnique({
-      where: { id: membershipId },
-    });
-    if (!membership || membership.tenantId !== tenantId) {
-      throw new TenantAdminError("Membership not found", "NOT_FOUND", 404);
-    }
+        const membership = await tx.membership.findUnique({
+          where: { id: membershipId },
+        });
+        if (!membership || membership.tenantId !== tenantId) {
+          throw new TenantAdminError("Membership not found", "NOT_FOUND", 404);
+        }
 
-    if (membership.role === "OWNER") {
-      const ownerCount = await tx.membership.count({
-        where: { tenantId, role: "OWNER" },
+        if (membership.role === "OWNER") {
+          await tx.$executeRawUnsafe(`SELECT id FROM "Membership" WHERE "tenantId" = $1 AND role = $2 FOR UPDATE`, tenantId, "OWNER");
+          const ownerCount = await tx.membership.count({
+            where: { tenantId, role: "OWNER" },
+          });
+          if (ownerCount <= 1) {
+            throw new TenantAdminError(
+              "Cannot remove the last OWNER of the tenant",
+              "LAST_OWNER",
+              409,
+            );
+          }
+        }
+
+        await tx.membership.delete({ where: { id: membershipId } });
+
+        await tx.auditLog.create({
+          data: {
+            tenantId,
+            actorId,
+            action: "MEMBER_REMOVED",
+            target: membershipId,
+            metadata: { userId: membership.userId, role: membership.role },
+          },
+        });
       });
-      if (ownerCount <= 1) {
-        throw new TenantAdminError(
-          "Cannot remove the last OWNER of the tenant",
-          "LAST_OWNER",
-          409,
-        );
+      return;
+    } catch (e: any) {
+      if (e?.code === "P2034" && attempt < MAX_RETRIES) {
+        attempt++;
+        continue;
       }
+      throw e;
     }
-
-    await tx.membership.delete({ where: { id: membershipId } });
-
-    await tx.auditLog.create({
-      data: {
-        tenantId,
-        actorId,
-        action: "MEMBER_REMOVED",
-        target: membershipId,
-        metadata: { userId: membership.userId, role: membership.role },
-      },
-    });
-  });
+  }
 }
 
 export interface CreateInvitationParams {
@@ -572,7 +656,9 @@ export async function createTenantInvitation(
   }
 
   return db.$transaction(async (tx) => {
-    await resolveTenantAccessWithLifecycle(actorId, tenantId, Permission.INVITATIONS_CREATE, "NORMAL_OPERATION", tx as unknown as AccessResolutionDb);
+    const accessResult = await resolveTenantAccess(actorId, tenantId, Permission.INVITATIONS_CREATE, tx as unknown as AccessResolutionDb);
+    const capability = invitationCapabilityForLifecycle(accessResult.status, params.role as UserRole);
+    assertTenantLifecycleAllowsMutation(accessResult.status, capability);
 
     const tenant = await tx.tenant.findUnique({
       where: { id: tenantId },
@@ -630,7 +716,7 @@ export async function resendTenantInvitation(
   db: TenantAdminDbWithTx = defaultPrisma as unknown as TenantAdminDbWithTx,
 ): Promise<{ id: string; inviteLink: string }> {
   return db.$transaction(async (tx) => {
-    await resolveTenantAccessWithLifecycle(actorId, tenantId, Permission.INVITATIONS_REISSUE, "NORMAL_OPERATION", tx as unknown as AccessResolutionDb);
+    const accessResult = await resolveTenantAccess(actorId, tenantId, Permission.INVITATIONS_REISSUE, tx as unknown as AccessResolutionDb);
 
     const invitation = await tx.invitation.findUnique({
       where: { id: invitationId },
@@ -642,6 +728,9 @@ export async function resendTenantInvitation(
     if (invitation.acceptedById) {
       throw new TenantAdminError("Invitation already accepted", "ALREADY_ACCEPTED", 409);
     }
+
+    const capability = invitationCapabilityForLifecycle(accessResult.status, invitation.role as UserRole);
+    assertTenantLifecycleAllowsMutation(accessResult.status, capability);
 
     const tenant = await tx.tenant.findUnique({
       where: { id: tenantId },
@@ -684,7 +773,7 @@ export async function revokeTenantInvitation(
   db: TenantAdminDbWithTx = defaultPrisma as unknown as TenantAdminDbWithTx,
 ): Promise<void> {
   await db.$transaction(async (tx) => {
-    await resolveTenantAccessWithLifecycle(actorId, tenantId, Permission.INVITATIONS_REVOKE, "NORMAL_OPERATION", tx as unknown as AccessResolutionDb);
+    const accessResult = await resolveTenantAccess(actorId, tenantId, Permission.INVITATIONS_REVOKE, tx as unknown as AccessResolutionDb);
 
     const invitation = await tx.invitation.findUnique({
       where: { id: invitationId },
@@ -696,6 +785,9 @@ export async function revokeTenantInvitation(
     if (invitation.acceptedById) {
       throw new TenantAdminError("Cannot revoke an accepted invitation", "ALREADY_ACCEPTED", 409);
     }
+
+    const capability = invitationCapabilityForLifecycle(accessResult.status, invitation.role as UserRole);
+    assertTenantLifecycleAllowsMutation(accessResult.status, capability);
 
     await tx.invitation.delete({ where: { id: invitationId } });
 
@@ -715,16 +807,23 @@ export async function listTenantInvitations(
   actorId: string,
   tenantId: string,
   db: TenantAdminDbWithTx = defaultPrisma as unknown as TenantAdminDbWithTx,
-): Promise<Array<{ id: string; email: string; role: string; accepted: boolean; expiresAt: Date; createdAt: Date }>> {
+  pagination: PaginationParams = { page: DEFAULT_PAGE, limit: DEFAULT_LIMIT },
+): Promise<PaginatedResult<{ id: string; email: string; role: string; accepted: boolean; expiresAt: Date; createdAt: Date }>> {
   return db.$transaction(async (tx) => {
-    await resolveTenantAccessWithLifecycle(actorId, tenantId, Permission.INVITATIONS_READ, "NORMAL_OPERATION", tx as unknown as AccessResolutionDb);
+    await resolveTenantAccess(actorId, tenantId, Permission.INVITATIONS_READ, tx as unknown as AccessResolutionDb);
 
-    const invitations = await tx.invitation.findMany({
-      where: { tenantId },
-      orderBy: { createdAt: "desc" },
-    });
+    const skip = (pagination.page - 1) * pagination.limit;
+    const [invitations, total] = await Promise.all([
+      tx.invitation.findMany({
+        where: { tenantId },
+        orderBy: { createdAt: "desc" },
+        skip,
+        take: pagination.limit,
+      }),
+      tx.invitation.count({ where: { tenantId } }),
+    ]);
 
-    return invitations.map((inv) => ({
+    const items = invitations.map((inv) => ({
       id: inv.id,
       email: inv.email,
       role: inv.role,
@@ -732,5 +831,7 @@ export async function listTenantInvitations(
       expiresAt: inv.expiresAt,
       createdAt: inv.createdAt,
     }));
+
+    return { items, total, page: pagination.page, limit: pagination.limit, totalPages: Math.ceil(total / pagination.limit) };
   });
 }

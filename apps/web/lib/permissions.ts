@@ -59,10 +59,6 @@ const ROLE_PERMISSION_MAP: Record<UserRole, Set<Permission>> = {
   TENANT_ADMIN: new Set([
     ...ADMIN_CORE_PERMISSIONS,
     Permission.TENANT_READ,
-    Permission.PROJECTS_WRITE,
-    Permission.CONTENT_WRITE,
-    Permission.CONTENT_APPROVE,
-    Permission.CONTENT_PUBLISH,
     Permission.ANALYTICS_READ,
   ]),
   ADMIN: new Set([

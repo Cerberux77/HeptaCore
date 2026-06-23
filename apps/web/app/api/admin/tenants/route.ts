@@ -5,6 +5,7 @@ import {
   listAdminTenants,
   createAdminTenant,
   normalizeTenantSlug,
+  validatePagination,
   TenantAdminError,
 } from "../../../../lib/tenant-admin-service";
 import { TenantAccessError, resolveSuperAdminAccess } from "../../../../lib/tenant-access";
@@ -24,15 +25,20 @@ function handleError(e: unknown) {
   throw e;
 }
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   try {
     const session = await auth();
     if (!session?.user?.id) {
       return NextResponse.json({ ok: false, error: { code: "UNAUTHORIZED", message: "Not authenticated" } }, { status: 401 });
     }
     await resolveSuperAdminAccess(session.user.id, db);
-    const tenants = await listAdminTenants(session.user.id, db);
-    return NextResponse.json({ ok: true, data: tenants });
+    const url = new URL(req.url);
+    const pagination = validatePagination({
+      page: url.searchParams.has("page") ? Number(url.searchParams.get("page")) : undefined,
+      limit: url.searchParams.has("limit") ? Number(url.searchParams.get("limit")) : undefined,
+    });
+    const result = await listAdminTenants(session.user.id, db, pagination);
+    return NextResponse.json({ ok: true, data: result });
   } catch (e) {
     return handleError(e);
   }

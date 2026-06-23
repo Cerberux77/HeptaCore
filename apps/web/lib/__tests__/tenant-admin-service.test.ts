@@ -50,7 +50,8 @@ interface FakeCollection {
   findUnique(args: { where: Record<string, unknown> }): StoredRecord | null;
   findUniqueOrThrow(args: { where: Record<string, unknown> }): StoredRecord;
   findFirst(args: { where: Record<string, unknown>; select?: unknown }): StoredRecord | null;
-  findMany(args?: { where?: Record<string, unknown>; orderBy?: unknown; include?: unknown }): StoredRecord[];
+  findMany(args?: { where?: Record<string, unknown>; orderBy?: unknown; include?: unknown; skip?: number; take?: number }): StoredRecord[];
+  count?(args?: { where?: Record<string, unknown> }): number;
   update(args: { where: Record<string, unknown>; data: Record<string, unknown> }): StoredRecord;
 }
 
@@ -85,8 +86,14 @@ function buildFakeDb(): {
       if (args?.include) {
         return results.map((r) => ({ ...r, memberships: [] }));
       }
+      if (args?.skip !== undefined || args?.take !== undefined) {
+        const skip = args?.skip ?? 0;
+        const take = args?.take ?? results.length;
+        return results.slice(skip, skip + take);
+      }
       return results;
     },
+    count() { return this.records.length; },
     update({ where, data }) { checkFault("tenant.update"); const r = this.records.find((r) => (where as any).id === r.id)!; Object.assign(r, data as any); checkFault("tenant.afterUpdate"); return { ...r }; },
   };
 
@@ -113,6 +120,11 @@ function buildFakeDb(): {
       if (args?.select === undefined) return results;
       return results.map((r) => ({ role: r.role }));
     },
+    count(args?: any) {
+      const w = args?.where as any;
+      if (!w) return this.records.length;
+      return this.records.filter((r) => (!w.tenantId || r.tenantId === w.tenantId) && (!w.role || r.role === w.role) && (!w.userId || r.userId === w.userId)).length;
+    },
     update() { throw new Error("not implemented"); },
   };
 
@@ -123,6 +135,11 @@ function buildFakeDb(): {
     findUniqueOrThrow({ where }) { const r = this.findUnique({ where }); if (!r) throw new Error("Not found"); return r; },
     findFirst({ where }) { const w = where as any; return this.records.find((r) => r.tokenHash === w.tokenHash && r.acceptedById == null && new Date(r.expiresAt as string).getTime() > Date.now()) ?? null; },
     findMany() { return this.records; },
+    count(args?: any) {
+      const w = args?.where as any;
+      if (!w) return this.records.length;
+      return this.records.filter((r: any) => (!w.tenantId || r.tenantId === w.tenantId)).length;
+    },
     update({ where, data }) { checkFault("invitation.update"); const r = this.records.find((r) => r.id === (where as any).id)!; Object.assign(r, data); return r; },
   };
 
@@ -280,7 +297,8 @@ describe("provisioning with fake DB", () => {
   describe("listAdminTenants", () => {
     it("SUPER_ADMIN can list tenants", async () => {
       const result = await listAdminTenants("sa1", db);
-      assert.ok(Array.isArray(result));
+      assert.ok(Array.isArray(result.items));
+      assert.equal(typeof result.total, "number");
     });
 
     it("OWNER cannot list tenants", async () => {

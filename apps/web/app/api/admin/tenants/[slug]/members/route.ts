@@ -4,6 +4,7 @@ import { prisma } from "../../../../../../lib/prisma";
 import {
   listTenantMembers,
   addTenantMember,
+  validatePagination,
   TenantAdminError,
 } from "../../../../../../lib/tenant-admin-service";
 import { TenantAccessError } from "../../../../../../lib/tenant-access";
@@ -40,8 +41,13 @@ export async function GET(
       return NextResponse.json({ ok: false, error: { code: "NOT_FOUND", message: "Tenant not found" } }, { status: 404 });
     }
 
-    const members = await listTenantMembers(session.user.id, tenant.id, db);
-    return NextResponse.json({ ok: true, data: members });
+    const url = new URL(req.url);
+    const pagination = validatePagination({
+      page: url.searchParams.has("page") ? Number(url.searchParams.get("page")) : undefined,
+      limit: url.searchParams.has("limit") ? Number(url.searchParams.get("limit")) : undefined,
+    });
+    const result = await listTenantMembers(session.user.id, tenant.id, db, pagination);
+    return NextResponse.json({ ok: true, data: result });
   } catch (e) {
     return handleError(e);
   }

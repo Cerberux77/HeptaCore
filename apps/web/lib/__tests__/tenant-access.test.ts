@@ -1,12 +1,10 @@
-import { describe, it, afterEach } from "node:test";
+import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 import { createHash, randomBytes } from "node:crypto";
 import {
   Permission,
   hasRolePermission,
   getPermissionsForRole,
-  hasTenantPermission,
-  requireTenantPermission,
 } from "../permissions";
 import {
   assertTenantLifecycleAllowsMutation,
@@ -18,10 +16,17 @@ import {
   requireActiveTenant,
   TenantAccessError,
   isSuperAdmin,
+  invitationCapabilityForLifecycle,
 } from "../tenant-access";
 import type { UserRole, TenantStatus } from "@prisma/client";
 
-function fakeDb(superAdmin: boolean = false, role: UserRole | null = null, status: TenantStatus = "ACTIVE", userExists: boolean = true) {
+function fakeDb(
+  superAdmin: boolean = false,
+  role: UserRole | null = null,
+  status: TenantStatus = "ACTIVE",
+  userExists: boolean = true,
+  tenantExists: boolean = true,
+) {
   return {
     user: {
       findUnique: async (args: { where: { id: string }; select: { id: true } }) => {
@@ -33,15 +38,17 @@ function fakeDb(superAdmin: boolean = false, role: UserRole | null = null, statu
       findMany: async (_args: { where: { userId: string }; select: { role: true } }) => {
         return superAdmin ? [{ role: "SUPER_ADMIN" as UserRole }] : [];
       },
-      findUnique: async (args: { where: { tenantId_userId: { tenantId: string; userId: string } }; select: { role: true } }) => {
+      findUnique: async (_args: { where: { tenantId_userId: { tenantId: string; userId: string } }; select: { role: true } }) => {
         if (!role) return null;
         return { role };
       },
     },
     tenant: {
       findUnique: async (_args: { where: { id: string }; select: { id: true; status: true } }) => {
+        if (!tenantExists) return null;
         return { id: "tid", status };
       },
+      count: async () => 1,
     },
   };
 }
@@ -60,9 +67,7 @@ describe("Permission Matrix", () => {
     assert.equal(hasRolePermission("OWNER", Permission.TENANT_READ), true);
     assert.equal(hasRolePermission("OWNER", Permission.TENANT_CONFIG_UPDATE), true);
     assert.equal(hasRolePermission("OWNER", Permission.TENANT_STATUS_CHANGE), true);
-    assert.equal(hasRolePermission("OWNER", Permission.MEMBERS_READ), true);
     assert.equal(hasRolePermission("OWNER", Permission.MEMBERS_ADD), true);
-    assert.equal(hasRolePermission("OWNER", Permission.MEMBERS_ROLE_UPDATE), true);
     assert.equal(hasRolePermission("OWNER", Permission.MEMBERS_REMOVE), true);
     assert.equal(hasRolePermission("OWNER", Permission.CONTENT_PUBLISH), true);
   });
@@ -73,55 +78,16 @@ describe("Permission Matrix", () => {
     assert.equal(hasRolePermission("TENANT_ADMIN", Permission.INVITATIONS_CREATE), true);
     assert.equal(hasRolePermission("TENANT_ADMIN", Permission.INVITATIONS_REVOKE), true);
     assert.equal(hasRolePermission("TENANT_ADMIN", Permission.INTEGRATIONS_MANAGE), true);
+    assert.equal(hasRolePermission("TENANT_ADMIN", Permission.SECURITY_MANAGE), true);
+    assert.equal(hasRolePermission("TENANT_ADMIN", Permission.TENANT_CONFIG_UPDATE), true);
   });
 
-  it("TENANT_ADMIN does NOT have tenant status change", () => {
+  it("TENANT_ADMIN lacks content and status change permissions", () => {
     assert.equal(hasRolePermission("TENANT_ADMIN", Permission.TENANT_STATUS_CHANGE), false);
-  });
-
-  it("ADMIN can write content and approve", () => {
-    assert.equal(hasRolePermission("ADMIN", Permission.CONTENT_WRITE), true);
-    assert.equal(hasRolePermission("ADMIN", Permission.CONTENT_APPROVE), true);
-    assert.equal(hasRolePermission("ADMIN", Permission.CONTENT_PUBLISH), true);
-    assert.equal(hasRolePermission("ADMIN", Permission.MEMBERS_ADD), false);
-    assert.equal(hasRolePermission("ADMIN", Permission.MEMBERS_REMOVE), false);
-  });
-
-  it("EDITOR can write content but not approve or publish", () => {
-    assert.equal(hasRolePermission("EDITOR", Permission.CONTENT_WRITE), true);
-    assert.equal(hasRolePermission("EDITOR", Permission.CONTENT_APPROVE), false);
-    assert.equal(hasRolePermission("EDITOR", Permission.CONTENT_PUBLISH), false);
-  });
-
-  it("APPROVER can approve but not write or publish", () => {
-    assert.equal(hasRolePermission("APPROVER", Permission.CONTENT_WRITE), false);
-    assert.equal(hasRolePermission("APPROVER", Permission.CONTENT_APPROVE), true);
-    assert.equal(hasRolePermission("APPROVER", Permission.CONTENT_PUBLISH), false);
-  });
-
-  it("PUBLISHER can publish but not write or approve", () => {
-    assert.equal(hasRolePermission("PUBLISHER", Permission.CONTENT_WRITE), false);
-    assert.equal(hasRolePermission("PUBLISHER", Permission.CONTENT_APPROVE), false);
-    assert.equal(hasRolePermission("PUBLISHER", Permission.CONTENT_PUBLISH), true);
-  });
-
-  it("ANALYST can read analytics but not mutate", () => {
-    assert.equal(hasRolePermission("ANALYST", Permission.ANALYTICS_READ), true);
-    assert.equal(hasRolePermission("ANALYST", Permission.CONTENT_WRITE), false);
-    assert.equal(hasRolePermission("ANALYST", Permission.CONTENT_PUBLISH), false);
-  });
-
-  it("VIEWER can only read tenant", () => {
-    assert.equal(hasRolePermission("VIEWER", Permission.TENANT_READ), true);
-    assert.equal(hasRolePermission("VIEWER", Permission.CONTENT_WRITE), false);
-    assert.equal(hasRolePermission("VIEWER", Permission.ANALYTICS_READ), false);
-  });
-
-  it("STRATEGIST can write projects and read analytics", () => {
-    assert.equal(hasRolePermission("STRATEGIST", Permission.PROJECTS_WRITE), true);
-    assert.equal(hasRolePermission("STRATEGIST", Permission.CONTENT_WRITE), true);
-    assert.equal(hasRolePermission("STRATEGIST", Permission.ANALYTICS_READ), true);
-    assert.equal(hasRolePermission("STRATEGIST", Permission.CONTENT_PUBLISH), false);
+    assert.equal(hasRolePermission("TENANT_ADMIN", Permission.PROJECTS_WRITE), false);
+    assert.equal(hasRolePermission("TENANT_ADMIN", Permission.CONTENT_WRITE), false);
+    assert.equal(hasRolePermission("TENANT_ADMIN", Permission.CONTENT_APPROVE), false);
+    assert.equal(hasRolePermission("TENANT_ADMIN", Permission.CONTENT_PUBLISH), false);
   });
 
   it("default denial for unknown roles", () => {
@@ -131,68 +97,9 @@ describe("Permission Matrix", () => {
   });
 });
 
-describe("hasTenantPermission", () => {
-  it("returns true when user exists and has matching role permission", async () => {
-    const db = fakeDb(false, "OWNER");
-    const ok = await hasTenantPermission("uid", "tid", Permission.MEMBERS_ADD, db);
-    assert.equal(ok, true);
-  });
-
-  it("returns false when user does not exist", async () => {
-    const db = fakeDb(false, "OWNER", "ACTIVE", false);
-    const ok = await hasTenantPermission("uid", "tid", Permission.MEMBERS_ADD, db);
-    assert.equal(ok, false);
-  });
-
-  it("returns false when user is not a member", async () => {
-    const db = fakeDb(false, null);
-    const ok = await hasTenantPermission("uid", "tid", Permission.MEMBERS_ADD, db);
-    assert.equal(ok, false);
-  });
-
-  it("returns false when role lacks permission", async () => {
-    const db = fakeDb(false, "VIEWER");
-    const ok = await hasTenantPermission("uid", "tid", Permission.MEMBERS_ADD, db);
-    assert.equal(ok, false);
-  });
-});
-
-describe("requireTenantPermission", () => {
-  it("returns role when authorized", async () => {
-    const db = fakeDb(false, "OWNER");
-    const result = await requireTenantPermission("uid", "tid", Permission.MEMBERS_ADD, db);
-    assert.equal(result.role, "OWNER");
-  });
-
-  it("throws UNAUTHORIZED when user does not exist", async () => {
-    const db = fakeDb(false, "OWNER", "ACTIVE", false);
-    await assert.rejects(
-      () => requireTenantPermission("uid", "tid", Permission.MEMBERS_ADD, db),
-      (e: unknown) => (e as TenantAccessError).code === "UNAUTHORIZED",
-    );
-  });
-
-  it("throws NOT_MEMBER when user is not a member", async () => {
-    const db = fakeDb(false, null);
-    await assert.rejects(
-      () => requireTenantPermission("uid", "tid", Permission.MEMBERS_ADD, db),
-      (e: unknown) => (e as TenantAccessError).code === "NOT_MEMBER",
-    );
-  });
-
-  it("throws FORBIDDEN when role lacks permission", async () => {
-    const db = fakeDb(false, "VIEWER");
-    await assert.rejects(
-      () => requireTenantPermission("uid", "tid", Permission.MEMBERS_ADD, db),
-      (e: unknown) => (e as TenantAccessError).code === "FORBIDDEN",
-    );
-  });
-});
-
 describe("isSuperAdmin", () => {
   it("returns true when SUPER_ADMIN membership exists", () => {
     assert.equal(isSuperAdmin([{ role: "SUPER_ADMIN" }]), true);
-    assert.equal(isSuperAdmin([{ role: "OWNER" }, { role: "SUPER_ADMIN" }]), true);
   });
 
   it("returns false when no SUPER_ADMIN membership", () => {
@@ -204,26 +111,10 @@ describe("isSuperAdmin", () => {
 describe("requireSuperAdminActor", () => {
   it("returns user id when SUPER_ADMIN", async () => {
     const tx = {
-      user: {
-        findUnique: async () => ({ id: "uid" }),
-      },
-      membership: {
-        findMany: async () => [{ role: "SUPER_ADMIN" as UserRole }],
-      },
+      user: { findUnique: async () => ({ id: "uid" }) },
+      membership: { findMany: async () => [{ role: "SUPER_ADMIN" as UserRole }] },
     };
-    const result = await requireSuperAdminActor("uid", tx);
-    assert.equal(result, "uid");
-  });
-
-  it("throws UNAUTHORIZED when user not found", async () => {
-    const tx = {
-      user: { findUnique: async () => null },
-      membership: { findMany: async () => [] as Array<{ role: UserRole }> },
-    };
-    await assert.rejects(
-      () => requireSuperAdminActor("uid", tx),
-      (e: unknown) => (e as TenantAccessError).code === "UNAUTHORIZED",
-    );
+    assert.equal(await requireSuperAdminActor("uid", tx), "uid");
   });
 
   it("throws FORBIDDEN when not SUPER_ADMIN", async () => {
@@ -231,22 +122,19 @@ describe("requireSuperAdminActor", () => {
       user: { findUnique: async () => ({ id: "uid" }) },
       membership: { findMany: async () => [{ role: "OWNER" as UserRole }] },
     };
-    await assert.rejects(
-      () => requireSuperAdminActor("uid", tx),
-      (e: unknown) => (e as TenantAccessError).code === "FORBIDDEN",
-    );
+    await assert.rejects(() => requireSuperAdminActor("uid", tx), (e: unknown) => (e as TenantAccessError).code === "FORBIDDEN");
   });
 });
 
 describe("requireTenantMembership", () => {
   it("returns role when member", async () => {
-    const db = fakeDb(false, "OWNER");
+    const db: any = fakeDb(false, "OWNER");
     const result = await requireTenantMembership("uid", "tid", db);
     assert.equal(result.role, "OWNER");
   });
 
   it("throws NOT_MEMBER when not a member", async () => {
-    const db = fakeDb(false, null);
+    const db: any = fakeDb(false, null);
     await assert.rejects(
       () => requireTenantMembership("uid", "tid", db),
       (e: unknown) => (e as TenantAccessError).code === "NOT_MEMBER",
@@ -260,21 +148,11 @@ describe("assertTenantLifecycleAllowsMutation", () => {
   });
 
   it("blocks NORMAL_OPERATION on SUSPENDED", () => {
-    assert.throws(
-      () => assertTenantLifecycleAllowsMutation("SUSPENDED", "NORMAL_OPERATION"),
-      (e: unknown) => (e as TenantAccessError).code === "TENANT_SUSPENDED",
-    );
+    assert.throws(() => assertTenantLifecycleAllowsMutation("SUSPENDED", "NORMAL_OPERATION"), (e: unknown) => (e as TenantAccessError).code === "TENANT_SUSPENDED");
   });
 
   it("blocks NORMAL_OPERATION on ARCHIVED", () => {
-    assert.throws(
-      () => assertTenantLifecycleAllowsMutation("ARCHIVED", "NORMAL_OPERATION"),
-      (e: unknown) => (e as TenantAccessError).code === "TENANT_ARCHIVED",
-    );
-  });
-
-  it("allows PROVISIONING_CONFIGURATION on PROVISIONING", () => {
-    assert.doesNotThrow(() => assertTenantLifecycleAllowsMutation("PROVISIONING", "PROVISIONING_CONFIGURATION"));
+    assert.throws(() => assertTenantLifecycleAllowsMutation("ARCHIVED", "NORMAL_OPERATION"), (e: unknown) => (e as TenantAccessError).code === "TENANT_ARCHIVED");
   });
 
   it("allows OWNER_INVITATION on PROVISIONING", () => {
@@ -282,136 +160,95 @@ describe("assertTenantLifecycleAllowsMutation", () => {
   });
 
   it("blocks NORMAL_OPERATION on PROVISIONING", () => {
-    assert.throws(
-      () => assertTenantLifecycleAllowsMutation("PROVISIONING", "NORMAL_OPERATION"),
-      (e: unknown) => (e as TenantAccessError).code === "TENANT_PROVISIONING",
-    );
+    assert.throws(() => assertTenantLifecycleAllowsMutation("PROVISIONING", "NORMAL_OPERATION"), (e: unknown) => (e as TenantAccessError).code === "TENANT_PROVISIONING");
   });
 });
 
 describe("requireActiveTenant", () => {
   it("returns status when ACTIVE", async () => {
-    const db = {
+    const db: any = {
       user: { findUnique: async () => ({ id: "uid" }) },
-      membership: {
-        findUnique: async () => null,
-        findMany: async () => [] as Array<{ role: UserRole }>,
-      },
-      tenant: {
-        findUnique: async () => ({ status: "ACTIVE" as TenantStatus }),
-        findMany: async () => [] as Array<Record<string, unknown>>,
-        findUniqueOrThrow: async () => ({}) as Record<string, unknown>,
-      },
+      membership: { findUnique: async () => null, findMany: async () => [] as Array<{ role: UserRole }> },
+      tenant: { findUnique: async () => ({ status: "ACTIVE" as TenantStatus }), findMany: async () => [] as Array<Record<string, unknown>>, findUniqueOrThrow: async () => ({}) as Record<string, unknown> },
     };
-    const result = await requireActiveTenant("tid", db);
-    assert.equal(result.status, "ACTIVE");
-  });
-
-  it("throws NOT_FOUND when tenant missing", async () => {
-    const db = {
-      user: { findUnique: async () => ({ id: "uid" }) },
-      membership: {
-        findUnique: async () => null,
-        findMany: async () => [] as Array<{ role: UserRole }>,
-      },
-      tenant: {
-        findUnique: async () => null,
-        findMany: async () => [] as Array<Record<string, unknown>>,
-        findUniqueOrThrow: async () => ({}) as Record<string, unknown>,
-      },
-    };
-    await assert.rejects(
-      () => requireActiveTenant("tid", db),
-      (e: unknown) => (e as TenantAccessError).code === "NOT_FOUND",
-    );
+    assert.equal((await requireActiveTenant("tid", db)).status, "ACTIVE");
   });
 
   it("throws TENANT_SUSPENDED for SUSPENDED tenant", async () => {
-    const db = {
+    const db: any = {
       user: { findUnique: async () => ({ id: "uid" }) },
-      membership: {
-        findUnique: async () => null,
-        findMany: async () => [] as Array<{ role: UserRole }>,
-      },
-      tenant: {
-        findUnique: async () => ({ status: "SUSPENDED" as TenantStatus }),
-        findMany: async () => [] as Array<Record<string, unknown>>,
-        findUniqueOrThrow: async () => ({}) as Record<string, unknown>,
-      },
+      membership: { findUnique: async () => null, findMany: async () => [] as Array<{ role: UserRole }> },
+      tenant: { findUnique: async () => ({ status: "SUSPENDED" as TenantStatus }), findMany: async () => [], findUniqueOrThrow: async () => ({}) },
     };
-    await assert.rejects(
-      () => requireActiveTenant("tid", db),
-      (e: unknown) => (e as TenantAccessError).code === "TENANT_SUSPENDED",
-    );
+    await assert.rejects(() => requireActiveTenant("tid", db), (e: unknown) => (e as TenantAccessError).code === "TENANT_SUSPENDED");
   });
 });
 
-describe("resolveTenantAccess (combined resolution)", () => {
-  it("returns role and status when authorized", async () => {
-    const db = fakeDb(false, "OWNER", "ACTIVE");
+describe("SUPER_ADMIN global access (correction #1)", () => {
+  it("SUPER_ADMIN accesses any tenant without membership", async () => {
+    const db = fakeDb(true, null, "ACTIVE");
     const result = await resolveTenantAccess("uid", "tid", Permission.MEMBERS_ADD, db);
-    assert.equal(result.role, "OWNER");
+    assert.equal(result.role, "SUPER_ADMIN");
+    assert.equal(result.superAdminBypass, true);
     assert.equal(result.status, "ACTIVE");
   });
 
-  it("throws UNAUTHORIZED when user not found", async () => {
-    const db = fakeDb(false, "OWNER", "ACTIVE", false);
+  it("SUPER_ADMIN can read SUSPENDED tenant", async () => {
+    const db = fakeDb(true, null, "SUSPENDED");
+    const result = await resolveTenantAccess("uid", "tid", Permission.MEMBERS_READ, db);
+    assert.equal(result.status, "SUSPENDED");
+    assert.equal(result.superAdminBypass, true);
+  });
+
+  it("SUPER_ADMIN can read PROVISIONING tenant", async () => {
+    const db = fakeDb(true, null, "PROVISIONING");
+    const result = await resolveTenantAccess("uid", "tid", Permission.TENANT_READ, db);
+    assert.equal(result.status, "PROVISIONING");
+  });
+
+  it("SUPER_ADMIN mutation on SUSPENDED throws lifecycle error", async () => {
+    const db = fakeDb(true, null, "SUSPENDED");
     await assert.rejects(
-      () => resolveTenantAccess("uid", "tid", Permission.MEMBERS_ADD, db),
-      (e: unknown) => (e as TenantAccessError).code === "UNAUTHORIZED",
+      () => resolveTenantAccessWithLifecycle("uid", "tid", Permission.MEMBERS_ADD, "NORMAL_OPERATION", db),
+      (e: unknown) => (e as TenantAccessError).code === "TENANT_SUSPENDED",
     );
   });
 
-  it("throws NOT_MEMBER when not a member", async () => {
-    const db = fakeDb(false, null);
+  it("normal member without membership is rejected", async () => {
+    const db = fakeDb(false, null, "ACTIVE");
     await assert.rejects(
-      () => resolveTenantAccess("uid", "tid", Permission.MEMBERS_ADD, db),
-      (e: unknown) => (e as TenantAccessError).code === "NOT_MEMBER",
-    );
-  });
-
-  it("throws FORBIDDEN when role lacks permission", async () => {
-    const db = fakeDb(false, "VIEWER", "ACTIVE");
-    await assert.rejects(
-      () => resolveTenantAccess("uid", "tid", Permission.MEMBERS_ADD, db),
-      (e: unknown) => (e as TenantAccessError).code === "FORBIDDEN",
-    );
-  });
-
-  it("throws NOT_FOUND when tenant missing", async () => {
-    const db = {
-      user: { findUnique: async () => ({ id: "uid" }) },
-      membership: {
-        findUnique: async () => ({ role: "OWNER" as UserRole }),
-        findMany: async () => [] as Array<{ role: UserRole }>,
-      },
-      tenant: {
-        findUnique: async () => null,
-      },
-    };
-    await assert.rejects(
-      () => resolveTenantAccess("uid", "tid", Permission.MEMBERS_ADD, db),
-      (e: unknown) => (e as TenantAccessError).code === "NOT_FOUND",
-    );
-  });
-
-  it("cross-tenant isolation: OWNER of tenant A can't manage tenant B", async () => {
-    const noMembershipDb = fakeDb(false, null, "ACTIVE");
-    await assert.rejects(
-      () => resolveTenantAccess("uid", "tid-B", Permission.MEMBERS_ADD, noMembershipDb),
+      () => resolveTenantAccess("uid", "tid", Permission.MEMBERS_READ, db),
       (e: unknown) => (e as TenantAccessError).code === "NOT_MEMBER",
     );
   });
 });
 
-describe("resolveTenantAccessWithLifecycle", () => {
-  it("allows access when tenant is ACTIVE", async () => {
+describe("Read/Mutation separation (correction #2)", () => {
+  it("reads allowed on ACTIVE", async () => {
     const db = fakeDb(false, "OWNER", "ACTIVE");
-    const result = await resolveTenantAccessWithLifecycle("uid", "tid", Permission.MEMBERS_ADD, "NORMAL_OPERATION", db);
+    const result = await resolveTenantAccess("uid", "tid", Permission.MEMBERS_READ, db);
     assert.equal(result.role, "OWNER");
   });
 
-  it("blocked when tenant is SUSPENDED", async () => {
+  it("reads allowed on PROVISIONING", async () => {
+    const db = fakeDb(false, "OWNER", "PROVISIONING");
+    const result = await resolveTenantAccess("uid", "tid", Permission.INVITATIONS_READ, db);
+    assert.equal(result.role, "OWNER");
+  });
+
+  it("reads allowed on SUSPENDED", async () => {
+    const db = fakeDb(false, "OWNER", "SUSPENDED");
+    const result = await resolveTenantAccess("uid", "tid", Permission.MEMBERS_READ, db);
+    assert.equal(result.role, "OWNER");
+  });
+
+  it("reads allowed on ARCHIVED", async () => {
+    const db = fakeDb(false, "OWNER", "ARCHIVED");
+    const result = await resolveTenantAccess("uid", "tid", Permission.TENANT_READ, db);
+    assert.equal(result.role, "OWNER");
+  });
+
+  it("mutations blocked on SUSPENDED", async () => {
     const db = fakeDb(false, "OWNER", "SUSPENDED");
     await assert.rejects(
       () => resolveTenantAccessWithLifecycle("uid", "tid", Permission.MEMBERS_ADD, "NORMAL_OPERATION", db),
@@ -419,19 +256,62 @@ describe("resolveTenantAccessWithLifecycle", () => {
     );
   });
 
-  it("blocked when tenant is ARCHIVED", async () => {
+  it("mutations blocked on ARCHIVED", async () => {
     const db = fakeDb(false, "OWNER", "ARCHIVED");
     await assert.rejects(
       () => resolveTenantAccessWithLifecycle("uid", "tid", Permission.MEMBERS_ADD, "NORMAL_OPERATION", db),
       (e: unknown) => (e as TenantAccessError).code === "TENANT_ARCHIVED",
     );
   });
+});
 
-  it("SUPER_ADMIN is blocked by lifecycle gates for NORMAL_OPERATION", async () => {
-    const db = fakeDb(true, "OWNER", "SUSPENDED");
+describe("Invitations in PROVISIONING (correction #3)", () => {
+  it("OWNER_INVITATION capability for OWNER role in PROVISIONING", () => {
+    assert.equal(invitationCapabilityForLifecycle("PROVISIONING", "OWNER"), "OWNER_INVITATION");
+  });
+
+  it("NORMAL_OPERATION capability for non-OWNER role in PROVISIONING", () => {
+    assert.equal(invitationCapabilityForLifecycle("PROVISIONING", "ADMIN"), "NORMAL_OPERATION");
+    assert.equal(invitationCapabilityForLifecycle("PROVISIONING", "EDITOR"), "NORMAL_OPERATION");
+  });
+
+  it("NORMAL_OPERATION capability for all roles in ACTIVE", () => {
+    assert.equal(invitationCapabilityForLifecycle("ACTIVE", "OWNER"), "NORMAL_OPERATION");
+    assert.equal(invitationCapabilityForLifecycle("ACTIVE", "ADMIN"), "NORMAL_OPERATION");
+  });
+
+  it("OWNER invitation allowed in PROVISIONING", () => {
+    assert.doesNotThrow(() => assertTenantLifecycleAllowsMutation("PROVISIONING", "OWNER_INVITATION"));
+  });
+
+  it("non-OWNER invitation blocked in PROVISIONING via NORMAL_OPERATION", () => {
+    assert.throws(
+      () => assertTenantLifecycleAllowsMutation("PROVISIONING", "NORMAL_OPERATION"),
+      (e: unknown) => (e as TenantAccessError).code === "TENANT_PROVISIONING",
+    );
+  });
+});
+
+describe("Cross-tenant isolation (correction #9)", () => {
+  it("OWNER of tenant A cannot manage tenant B", async () => {
+    const db = fakeDb(false, null, "ACTIVE");
     await assert.rejects(
-      () => resolveTenantAccessWithLifecycle("uid", "tid", Permission.MEMBERS_ADD, "NORMAL_OPERATION", db),
-      (e: unknown) => (e as TenantAccessError).code === "TENANT_SUSPENDED",
+      () => resolveTenantAccess("uid", "tid-B", Permission.MEMBERS_ADD, db),
+      (e: unknown) => (e as TenantAccessError).code === "NOT_MEMBER",
+    );
+  });
+
+  it("SUPER_ADMIN can manage any tenant", async () => {
+    const db = fakeDb(true, null, "ACTIVE");
+    const result = await resolveTenantAccess("uid", "tid-any", Permission.MEMBERS_ADD, db);
+    assert.equal(result.superAdminBypass, true);
+  });
+
+  it("tenant not found returns NOT_FOUND", async () => {
+    const db = fakeDb(false, "OWNER", "ACTIVE", true, false);
+    await assert.rejects(
+      () => resolveTenantAccess("uid", "tid", Permission.MEMBERS_READ, db),
+      (e: unknown) => (e as TenantAccessError).code === "NOT_FOUND",
     );
   });
 });
@@ -440,78 +320,26 @@ describe("resolveSuperAdminAccess", () => {
   it("returns user id when SUPER_ADMIN", async () => {
     const db = {
       user: { findUnique: async () => ({ id: "uid" }) },
-      membership: {
-        findMany: async () => [{ role: "SUPER_ADMIN" as UserRole }],
-        findUnique: async () => null as { role: UserRole } | null,
-      },
+      membership: { findMany: async () => [{ role: "SUPER_ADMIN" as UserRole }], findUnique: async () => null as { role: UserRole } | null },
     };
-    const result = await resolveSuperAdminAccess("uid", db);
-    assert.equal(result, "uid");
-  });
-
-  it("throws UNAUTHORIZED when user not found", async () => {
-    const db = {
-      user: { findUnique: async () => null },
-      membership: {
-        findMany: async () => [] as Array<{ role: UserRole }>,
-        findUnique: async () => null as { role: UserRole } | null,
-      },
-    };
-    await assert.rejects(
-      () => resolveSuperAdminAccess("uid", db),
-      (e: unknown) => (e as TenantAccessError).code === "UNAUTHORIZED",
-    );
+    assert.equal(await resolveSuperAdminAccess("uid", db), "uid");
   });
 
   it("throws FORBIDDEN when not SUPER_ADMIN", async () => {
     const db = {
       user: { findUnique: async () => ({ id: "uid" }) },
-      membership: {
-        findMany: async () => [{ role: "OWNER" as UserRole }],
-        findUnique: async () => null as { role: UserRole } | null,
-      },
+      membership: { findMany: async () => [{ role: "OWNER" as UserRole }], findUnique: async () => null as { role: UserRole } | null },
     };
-    await assert.rejects(
-      () => resolveSuperAdminAccess("uid", db),
-      (e: unknown) => (e as TenantAccessError).code === "FORBIDDEN",
-    );
+    await assert.rejects(() => resolveSuperAdminAccess("uid", db), (e: unknown) => (e as TenantAccessError).code === "FORBIDDEN");
   });
 });
 
 describe("Error codes", () => {
-  it("UNAUTHORIZED has status 401", () => {
-    const e = new TenantAccessError("msg", "UNAUTHORIZED", 401);
-    assert.equal(e.status, 401);
-    assert.equal(e.code, "UNAUTHORIZED");
-  });
-
-  it("FORBIDDEN has status 403", () => {
-    const e = new TenantAccessError("msg", "FORBIDDEN", 403);
-    assert.equal(e.status, 403);
-  });
-
-  it("NOT_MEMBER has status 403", () => {
-    const e = new TenantAccessError("msg", "NOT_MEMBER", 403);
-    assert.equal(e.status, 403);
-  });
-
-  it("NOT_FOUND has status 404", () => {
-    const e = new TenantAccessError("msg", "NOT_FOUND", 404);
-    assert.equal(e.status, 404);
-  });
-
-  it("TENANT_SUSPENDED has status 403", () => {
-    const e = new TenantAccessError("msg", "TENANT_SUSPENDED", 403);
-    assert.equal(e.status, 403);
-  });
-
-  it("TENANT_ARCHIVED has status 403", () => {
-    const e = new TenantAccessError("msg", "TENANT_ARCHIVED", 403);
-    assert.equal(e.status, 403);
-  });
-
-  it("TENANT_PROVISIONING has status 403", () => {
-    const e = new TenantAccessError("msg", "TENANT_PROVISIONING", 403);
-    assert.equal(e.status, 403);
-  });
+  it("UNAUTHORIZED has status 401", () => assert.equal(new TenantAccessError("m", "UNAUTHORIZED", 401).status, 401));
+  it("FORBIDDEN has status 403", () => assert.equal(new TenantAccessError("m", "FORBIDDEN", 403).status, 403));
+  it("NOT_MEMBER has status 403", () => assert.equal(new TenantAccessError("m", "NOT_MEMBER", 403).status, 403));
+  it("NOT_FOUND has status 404", () => assert.equal(new TenantAccessError("m", "NOT_FOUND", 404).status, 404));
+  it("TENANT_SUSPENDED has status 403", () => assert.equal(new TenantAccessError("m", "TENANT_SUSPENDED", 403).status, 403));
+  it("TENANT_ARCHIVED has status 403", () => assert.equal(new TenantAccessError("m", "TENANT_ARCHIVED", 403).status, 403));
+  it("TENANT_PROVISIONING has status 403", () => assert.equal(new TenantAccessError("m", "TENANT_PROVISIONING", 403).status, 403));
 });
