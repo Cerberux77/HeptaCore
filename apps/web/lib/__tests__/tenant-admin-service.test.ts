@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it, beforeEach } from "node:test";
-import { hashInvitationToken, generateInvitationToken } from "../invitation-token";
+import { hashInvitationToken, generateInvitationToken, getInvitationExpiration } from "../invitation-token";
+import bcrypt from "bcryptjs";
 import {
   TenantAdminError,
   normalizeTenantSlug,
@@ -18,6 +19,7 @@ import {
   requireSuperAdminActor,
 } from "../tenant-access";
 import type { TenantAdminDb } from "../tenant-access";
+import { acceptRegistrationInvitation, InvitationAcceptanceError } from "../invitation-acceptance-service";
 
 type StoredRecord = Record<string, unknown>;
 
@@ -55,12 +57,12 @@ function buildFakeDb(): {
 } {
   const users: FakeCollection = {
     records: [],
-    create({ data }) { checkFault("user.create"); const r = { id: `u_${this.records.length + 1}`, ...data }; this.records.push(r); return r; },
+    create({ data }) { checkFault("user.create"); const r = { id: `u_${this.records.length + 1}`, passwordHash: null, ...data }; this.records.push(r); return r; },
     findUnique({ where }) { checkFault("user.findUnique"); return this.records.find((r) => (where as any).id === r.id || (where as any).email === r.email) ?? null; },
     findUniqueOrThrow({ where }) { const r = this.findUnique({ where }); if (!r) throw new Error("Not found"); return r; },
     findFirst({ where }) { return this.records.find((r) => (where as any).id === r.id) ?? null; },
     findMany() { return this.records; },
-    update({ where, data }) { const r = this.findUnique({ where })!; Object.assign(r, data); return r; },
+    update({ where, data }) { checkFault("user.update"); const r = this.findUnique({ where })!; Object.assign(r, data); return r; },
   };
 
   const tenants: FakeCollection = {
@@ -83,6 +85,7 @@ function buildFakeDb(): {
     records: [],
     create({ data }) { checkFault("membership.create"); const r = { id: `m_${this.records.length + 1}`, ...data }; this.records.push(r); return r; },
     findUnique({ where }) {
+      checkFault("membership.findUnique");
       const w = where as any;
       if (w.tenantId_userId) return this.records.find((r) => r.tenantId === w.tenantId_userId.tenantId && r.userId === w.tenantId_userId.userId) ?? null;
       return null;
@@ -111,7 +114,7 @@ function buildFakeDb(): {
     findUniqueOrThrow({ where }) { const r = this.findUnique({ where }); if (!r) throw new Error("Not found"); return r; },
     findFirst({ where }) { const w = where as any; return this.records.find((r) => r.tokenHash === w.tokenHash && r.acceptedById == null && new Date(r.expiresAt as string).getTime() > Date.now()) ?? null; },
     findMany() { return this.records; },
-    update() { throw new Error("not implemented"); },
+    update({ where, data }) { checkFault("invitation.update"); const r = this.records.find((r) => r.id === (where as any).id)!; Object.assign(r, data); return r; },
   };
 
   const auditLogs: FakeCollection = {
@@ -594,6 +597,335 @@ describe("zero external deps", () => {
       .toLowerCase();
     for (const f of forbidden) {
       assert.ok(!combined.includes(f), `must not mention ${f}`);
+    }
+  });
+});
+
+describe("owner invitation activation", () => {
+  let fake: ReturnType<typeof buildFakeDb>;
+  let db: ReturnType<typeof buildFakeDb>["db"];
+
+  beforeEach(() => {
+    failNext = null;
+    fake = buildFakeDb();
+    db = fake.db;
+    fake.collections.users.create({ data: { id: "sa1", email: "sa@test.com" } });
+    fake.collections.memberships.create({ data: { tenantId: "global", userId: "sa1", role: "SUPER_ADMIN" } });
+  });
+
+  it("createAdminTenant creates placeholder owner", async () => {
+    await createAdminTenant({
+      actorId: "sa1", slug: "placeholder-1", name: "P1", ownerEmail: "p1@test.com",
+    }, db);
+    const owner = fake.collections.users.records.find((u: any) => u.email === "p1@test.com");
+    assert.ok(owner, "owner user should exist");
+    assert.equal(owner.passwordHash, null);
+  });
+
+  it("createAdminTenant returns INVITATION_REQUIRED for new owner", async () => {
+    const result = await createAdminTenant({
+      actorId: "sa1", slug: "inv-req", name: "IR", ownerEmail: "ir@test.com",
+    }, db);
+    assert.equal(result.ownerAccountState, "INVITATION_REQUIRED");
+    assert.ok(result.invitationToken);
+  });
+
+  it("createAdminTenant returns EXISTING_ACCOUNT for user with passwordHash", async () => {
+    fake.collections.users.create({ data: { id: "existing-pw", email: "existing@test.com", passwordHash: "some_hash" } });
+    const result = await createAdminTenant({
+      actorId: "sa1", slug: "existing-acct", name: "EA", ownerEmail: "existing@test.com",
+    }, db);
+    assert.equal(result.ownerAccountState, "EXISTING_ACCOUNT");
+    assert.equal(result.invitationToken, undefined);
+  });
+
+  it("acceptRegistrationInvitation activates placeholder", async () => {
+    const result = await createAdminTenant({
+      actorId: "sa1", slug: "activate-me", name: "AM", ownerEmail: "activate@test.com",
+    }, db);
+    const token = result.invitationToken!;
+    await db.$transaction((tx) => acceptRegistrationInvitation({
+      token, email: "activate@test.com", password: "securePassword123",
+    }, tx));
+    const user = fake.collections.users.records.find((u: any) => u.email === "activate@test.com")!;
+    assert.ok(user.passwordHash, "passwordHash should be set");
+    assert.notEqual(user.passwordHash, null);
+  });
+
+  it("activated owner password passes bcrypt verify", async () => {
+    const result = await createAdminTenant({
+      actorId: "sa1", slug: "bcrypt-test", name: "BT", ownerEmail: "bcrypt@test.com",
+    }, db);
+    const token = result.invitationToken!;
+    const password = "securePassword123";
+    await db.$transaction((tx) => acceptRegistrationInvitation({
+      token, email: "bcrypt@test.com", password,
+    }, tx));
+    const user = fake.collections.users.records.find((u: any) => u.email === "bcrypt@test.com")!;
+    const match = await bcrypt.compare(password, user.passwordHash as string);
+    assert.ok(match, "password should match hash");
+  });
+
+  it("only one membership after activation", async () => {
+    const result = await createAdminTenant({
+      actorId: "sa1", slug: "one-membership", name: "OM", ownerEmail: "om@test.com",
+    }, db);
+    const token = result.invitationToken!;
+    await db.$transaction((tx) => acceptRegistrationInvitation({
+      token, email: "om@test.com", password: "securePassword123",
+    }, tx));
+    const user = fake.collections.users.records.find((u: any) => u.email === "om@test.com")!;
+    const memberships = fake.collections.memberships.records.filter(
+      (m: any) => m.userId === user.id && m.role === "OWNER",
+    );
+    assert.equal(memberships.length, 1);
+  });
+
+  it("invitation acceptedById and acceptedAt set", async () => {
+    const result = await createAdminTenant({
+      actorId: "sa1", slug: "accept-fields", name: "AF", ownerEmail: "af@test.com",
+    }, db);
+    const token = result.invitationToken!;
+    await db.$transaction((tx) => acceptRegistrationInvitation({
+      token, email: "af@test.com", password: "securePassword123",
+    }, tx));
+    const inv = fake.collections.invitations.records.find((i: any) => i.email === "af@test.com")!;
+    assert.ok(inv.acceptedById, "acceptedById should be set");
+    assert.ok(inv.acceptedAt, "acceptedAt should be set");
+  });
+
+  it("audit exists for acceptance", async () => {
+    const result = await createAdminTenant({
+      actorId: "sa1", slug: "audit-accept", name: "AA", ownerEmail: "aa@test.com",
+    }, db);
+    const token = result.invitationToken!;
+    await db.$transaction((tx) => acceptRegistrationInvitation({
+      token, email: "aa@test.com", password: "securePassword123",
+    }, tx));
+    const audits = fake.collections.auditLogs.records.filter(
+      (a: any) => a.action === "TENANT_INVITATION_ACCEPTED",
+    );
+    assert.ok(audits.length >= 1, "audit log for acceptance should exist");
+  });
+
+  it("reusing accepted token fails", async () => {
+    const result = await createAdminTenant({
+      actorId: "sa1", slug: "reuse-token", name: "RT", ownerEmail: "rt@test.com",
+    }, db);
+    const token = result.invitationToken!;
+    await db.$transaction((tx) => acceptRegistrationInvitation({
+      token, email: "rt@test.com", password: "securePassword123",
+    }, tx));
+    await assert.rejects(
+      () => db.$transaction((tx) => acceptRegistrationInvitation({
+        token, email: "rt@test.com", password: "securePassword456",
+      }, tx)),
+      InvitationAcceptanceError,
+    );
+  });
+
+  it("wrong token fails", async () => {
+    await createAdminTenant({
+      actorId: "sa1", slug: "wrong-token", name: "WT", ownerEmail: "wt@test.com",
+    }, db);
+    await assert.rejects(
+      () => db.$transaction((tx) => acceptRegistrationInvitation({
+        token: "wrong-token-value", email: "wt@test.com", password: "securePassword123",
+      }, tx)),
+      InvitationAcceptanceError,
+    );
+  });
+
+  it("wrong email fails", async () => {
+    const result = await createAdminTenant({
+      actorId: "sa1", slug: "wrong-email", name: "WE", ownerEmail: "we@test.com",
+    }, db);
+    const token = result.invitationToken!;
+    await assert.rejects(
+      () => db.$transaction((tx) => acceptRegistrationInvitation({
+        token, email: "other@test.com", password: "securePassword123",
+      }, tx)),
+      InvitationAcceptanceError,
+    );
+  });
+
+  it("expired invitation fails", async () => {
+    const result = await createAdminTenant({
+      actorId: "sa1", slug: "expired-inv", name: "EI", ownerEmail: "ei@test.com",
+    }, db);
+    const token = result.invitationToken!;
+    const inv = fake.collections.invitations.records.find((i: any) => i.email === "ei@test.com")!;
+    inv.expiresAt = new Date(Date.now() - 86400000).toISOString();
+    await assert.rejects(
+      () => db.$transaction((tx) => acceptRegistrationInvitation({
+        token, email: "ei@test.com", password: "securePassword123",
+      }, tx)),
+      InvitationAcceptanceError,
+    );
+  });
+
+  it("rollback on user update failure", async () => {
+    const result = await createAdminTenant({
+      actorId: "sa1", slug: "rb-user-update", name: "RU", ownerEmail: "ru@test.com",
+    }, db);
+    const token = result.invitationToken!;
+    setFailNext("user.update");
+    await assert.rejects(
+      () => db.$transaction((tx) => acceptRegistrationInvitation({
+        token, email: "ru@test.com", password: "securePassword123",
+      }, tx)),
+    );
+    const user = fake.collections.users.records.find((u: any) => u.email === "ru@test.com")!;
+    assert.equal(user.passwordHash, null);
+  });
+
+  it("rollback on membership failure", async () => {
+    const result = await createAdminTenant({
+      actorId: "sa1", slug: "rb-membership", name: "RM", ownerEmail: "rm@test.com",
+    }, db);
+    const token = result.invitationToken!;
+    setFailNext("membership.findUnique");
+    await assert.rejects(
+      () => db.$transaction((tx) => acceptRegistrationInvitation({
+        token, email: "rm@test.com", password: "securePassword123",
+      }, tx)),
+    );
+    const user = fake.collections.users.records.find((u: any) => u.email === "rm@test.com")!;
+    assert.equal(user.passwordHash, null, "passwordHash should still be null after rollback");
+  });
+
+  it("rollback on invitation update failure", async () => {
+    const result = await createAdminTenant({
+      actorId: "sa1", slug: "rb-inv-update", name: "RI", ownerEmail: "ri@test.com",
+    }, db);
+    const token = result.invitationToken!;
+    setFailNext("invitation.update");
+    await assert.rejects(
+      () => db.$transaction((tx) => acceptRegistrationInvitation({
+        token, email: "ri@test.com", password: "securePassword123",
+      }, tx)),
+    );
+    const inv = fake.collections.invitations.records.find((i: any) => i.email === "ri@test.com")!;
+    assert.equal(inv.acceptedById ?? null, null, "acceptedById should still be null");
+  });
+
+  it("rollback on audit failure", async () => {
+    const result = await createAdminTenant({
+      actorId: "sa1", slug: "rb-audit", name: "RA", ownerEmail: "ra@test.com",
+    }, db);
+    const token = result.invitationToken!;
+    setFailNext("auditLog.create");
+    await assert.rejects(
+      () => db.$transaction((tx) => acceptRegistrationInvitation({
+        token, email: "ra@test.com", password: "securePassword123",
+      }, tx)),
+    );
+    const user = fake.collections.users.records.find((u: any) => u.email === "ra@test.com")!;
+    assert.equal(user.passwordHash, null, "passwordHash should still be null after rollback");
+    const inv = fake.collections.invitations.records.find((i: any) => i.email === "ra@test.com")!;
+    assert.equal(inv.acceptedById ?? null, null, "acceptedById should still be null");
+  });
+
+  it("legacy user (no existing user) creates successfully", async () => {
+    const plainToken = generateInvitationToken();
+    const tokenHash = hashInvitationToken(plainToken);
+    const tenantId = "t_legacy";
+    fake.collections.tenants.create({ data: { slug: "legacy", name: "Legacy", status: "PROVISIONING", id: tenantId } } as any);
+    fake.collections.invitations.create({
+      data: {
+        id: "inv_legacy",
+        tenantId,
+        email: "legacy@test.com",
+        role: "OWNER",
+        tokenHash,
+        expiresAt: getInvitationExpiration(),
+      },
+    });
+    await db.$transaction((tx) => acceptRegistrationInvitation({
+      token: plainToken, email: "legacy@test.com", password: "securePassword123", name: "Legacy Owner",
+    }, tx));
+    const user = fake.collections.users.records.find((u: any) => u.email === "legacy@test.com");
+    assert.ok(user, "user should be created");
+    assert.ok(user.passwordHash, "passwordHash should be set");
+    const membership = fake.collections.memberships.records.find(
+      (m: any) => m.tenantId === tenantId && m.userId === user.id && m.role === "OWNER",
+    );
+    assert.ok(membership, "membership should be created");
+    const inv = fake.collections.invitations.records.find((i: any) => i.id === "inv_legacy");
+    assert.ok(inv!.acceptedById, "invitation should be accepted");
+  });
+
+  it("existing account with password returns ACCOUNT_ALREADY_EXISTS", async () => {
+    const plainToken = generateInvitationToken();
+    const tokenHash = hashInvitationToken(plainToken);
+    fake.collections.users.create({ data: { id: "existing-active", email: "active@test.com", passwordHash: "some_hash" } });
+    fake.collections.invitations.create({
+      data: {
+        id: "inv_active",
+        tenantId: "t_active",
+        email: "active@test.com",
+        role: "OWNER",
+        tokenHash,
+        expiresAt: getInvitationExpiration(),
+      },
+    });
+    await assert.rejects(
+      () => db.$transaction((tx) => acceptRegistrationInvitation({
+        token: plainToken, email: "active@test.com", password: "securePassword123",
+      }, tx)),
+      (err: any) => err instanceof InvitationAcceptanceError && err.code === "ACCOUNT_ALREADY_EXISTS",
+    );
+  });
+
+  it("no duplicate users", async () => {
+    await createAdminTenant({
+      actorId: "sa1", slug: "no-dup-1", name: "ND1", ownerEmail: "nd@test.com",
+    }, db);
+    await createAdminTenant({
+      actorId: "sa1", slug: "no-dup-2", name: "ND2", ownerEmail: "nd@test.com",
+    }, db);
+    const users = fake.collections.users.records.filter((u: any) => u.email === "nd@test.com");
+    assert.equal(users.length, 1, "should not create duplicate user");
+  });
+
+  it("no duplicate memberships", async () => {
+    const result = await createAdminTenant({
+      actorId: "sa1", slug: "no-dup-mem", name: "NDM", ownerEmail: "ndm@test.com",
+    }, db);
+    const token = result.invitationToken!;
+    const userBefore = fake.collections.users.records.find((u: any) => u.email === "ndm@test.com")!;
+    await db.$transaction((tx) => acceptRegistrationInvitation({
+      token, email: "ndm@test.com", password: "securePassword123",
+    }, tx));
+    const memberships = fake.collections.memberships.records.filter(
+      (m: any) => m.userId === userBefore.id && m.role === "OWNER",
+    );
+    assert.equal(memberships.length, 1, "should not create duplicate membership");
+  });
+
+  it("zero secrets serialized", async () => {
+    const result = await createAdminTenant({
+      actorId: "sa1", slug: "no-secrets", name: "NoSecrets", ownerEmail: "nosecrets@test.com",
+    }, db);
+    assert.ok(!("passwordHash" in (result as any)));
+    assert.ok(!("tokenHash" in (result as any)));
+  });
+
+  it("zero provider calls", () => {
+    const forbidden = ["meta", "facebook", "instagram-api", "publisher"];
+    const combined = JSON.stringify([acceptRegistrationInvitation, createAdminTenant, changeTenantStatus])
+      .toLowerCase();
+    for (const f of forbidden) {
+      assert.ok(!combined.includes(f), `must not mention ${f}`);
+    }
+  });
+
+  it("zero Playwright", () => {
+    const forbidden = ["playwright", "chromium", "firefox", "webkit", "browser"];
+    const combined = JSON.stringify([acceptRegistrationInvitation, createAdminTenant])
+      .toLowerCase();
+    for (const f of forbidden) {
+      assert.ok(!combined.includes(f), `must not import ${f}`);
     }
   });
 });
