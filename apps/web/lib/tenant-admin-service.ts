@@ -63,6 +63,8 @@ export interface CreateTenantParams {
   name: string;
   ownerEmail: string;
   ownerName?: string;
+  timezone?: string;
+  locale?: string;
 }
 
 export interface SerializedTenant {
@@ -143,16 +145,41 @@ export function validatePagination(raw: Record<string, unknown>): PaginationPara
   return { page, limit };
 }
 
+const VALID_STATUSES = new Set(["PROVISIONING", "ACTIVE", "SUSPENDED", "ARCHIVED"]);
+
 export async function listAdminTenants(
   actorId: string,
   db: TenantAdminDb = defaultPrisma as unknown as TenantAdminDb,
   pagination: PaginationParams = { page: DEFAULT_PAGE, limit: DEFAULT_LIMIT },
+  filters?: { search?: string; status?: string },
 ): Promise<PaginatedResult<SerializedTenant>> {
   await requireSuperAdminActor(actorId, db);
   const skip = (pagination.page - 1) * pagination.limit;
 
+  const where: Record<string, unknown> = {};
+
+  if (filters?.search) {
+    const term = filters.search.trim();
+    if (term) {
+      where.OR = [
+        { name: { contains: term, mode: "insensitive" } },
+        { slug: { contains: term, mode: "insensitive" } },
+      ];
+    }
+  }
+
+  if (filters?.status) {
+    if (!VALID_STATUSES.has(filters.status)) {
+      throw new TenantAdminError(`Invalid status filter: ${filters.status}`, "INVALID_STATUS", 400);
+    }
+    where.status = filters.status;
+  }
+
+  const hasWhere = Object.keys(where).length > 0;
+
   const [tenantsRaw, total] = await Promise.all([
     db.tenant.findMany({
+      ...(hasWhere ? { where } : {}),
       skip,
       take: pagination.limit,
       orderBy: { createdAt: "desc" },
@@ -163,7 +190,9 @@ export async function listAdminTenants(
         },
       },
     } as unknown as Parameters<typeof db.tenant.findMany>[0]),
-    (db.tenant as any).count() as Promise<number>,
+    hasWhere
+      ? (db.tenant as any).count({ where }) as Promise<number>
+      : (db.tenant as any).count() as Promise<number>,
   ]);
 
   const items = (tenantsRaw as unknown as Array<Record<string, unknown> & { memberships?: Array<{ user: { email: string } }> }>).map((t) => {
@@ -188,10 +217,18 @@ export async function getAdminTenant(
   await requireSuperAdminActor(actorId, db);
   const tenant = await db.tenant.findUniqueOrThrow({
     where: { id: tenantId },
+    include: {
+      memberships: {
+        where: { role: "OWNER" },
+        select: { user: { select: { email: true } } },
+      },
+    },
   } as unknown as Parameters<typeof db.tenant.findUniqueOrThrow>[0]);
+  const t = tenant as unknown as Record<string, unknown> & { memberships?: Array<{ user: { email: string } }> };
+  const ownerEmail = t.memberships?.[0]?.user?.email ?? "N/A";
   return serializeTenant(
-    tenant as unknown as Tenant & { memberships?: Array<{ user: { email: string } }> },
-    "N/A",
+    t as unknown as Tenant & { memberships?: Array<{ user: { email: string } }> },
+    ownerEmail,
   );
 }
 
@@ -224,13 +261,16 @@ export async function createAdminTenant(
       ownerAccountState = "EXISTING_ACCOUNT";
     }
 
+    const timezone = params.timezone && VALID_TIMEZONES.has(params.timezone) ? params.timezone : "UTC";
+    const locale = params.locale && VALID_LOCALES.has(params.locale) ? params.locale : "es";
+
     const tenant = await tx.tenant.create({
       data: {
         slug: normalizedSlug,
         name: params.name,
         status: "PROVISIONING",
-        timezone: "UTC",
-        locale: "es",
+        timezone,
+        locale,
       },
     });
 

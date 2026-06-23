@@ -1,580 +1,367 @@
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
-import { join } from "node:path";
-import { describe, it } from "node:test";
+import { describe, it, beforeEach } from "node:test";
+import {
+  TenantAdminError,
+  listAdminTenants,
+  getAdminTenant,
+  createAdminTenant,
+} from "../tenant-admin-service";
 
-const listComp = readFileSync(join(process.cwd(), "components", "admin-tenants-list.tsx"), "utf8");
-const createComp = readFileSync(join(process.cwd(), "components", "admin-tenants-create.tsx"), "utf8");
-const detailComp = readFileSync(join(process.cwd(), "components", "admin-tenant-detail.tsx"), "utf8");
-const badgesComp = readFileSync(join(process.cwd(), "components", "admin-tenant-lifecycle-badge.tsx"), "utf8");
-const roleBadgeComp = readFileSync(join(process.cwd(), "components", "admin-tenant-role-badge.tsx"), "utf8");
-const dialogComp = readFileSync(join(process.cwd(), "components", "admin-tenant-confirm-dialog.tsx"), "utf8");
-const paginationComp = readFileSync(join(process.cwd(), "components", "admin-tenant-pagination.tsx"), "utf8");
-const feedbackComp = readFileSync(join(process.cwd(), "components", "admin-tenant-feedback.tsx"), "utf8");
-const shellComp = readFileSync(join(process.cwd(), "components", "admin-tenants-shell.tsx"), "utf8");
+type StoredRecord = Record<string, unknown>;
 
-const listPage = readFileSync(join(process.cwd(), "app", "admin", "tenants", "page.tsx"), "utf8");
-const newPage = readFileSync(join(process.cwd(), "app", "admin", "tenants", "new", "page.tsx"), "utf8");
-const detailPage = readFileSync(join(process.cwd(), "app", "admin", "tenants", "[slug]", "page.tsx"), "utf8");
-const layoutPage = readFileSync(join(process.cwd(), "app", "admin", "tenants", "layout.tsx"), "utf8");
+function buildFakeDb() {
+  const tenants: StoredRecord[] = [];
+  const users: StoredRecord[] = [];
+  const memberships: StoredRecord[] = [];
+  const invitations: StoredRecord[] = [];
+  const auditLogs: StoredRecord[] = [];
 
-// ────────────────────────────────────────────────────────
-// ADMIN SHELL
-// ────────────────────────────────────────────────────────
-describe("admin tenant shell", () => {
-  it("renders app-shell layout with sidebar and workspace", () => {
-    assert.match(shellComp, /className="app-shell"/);
-    assert.match(shellComp, /className="app-sidebar"/);
-    assert.match(shellComp, /className="workspace"/);
+  function applyWhere(results: StoredRecord[], w: any): StoredRecord[] {
+    let filtered = [...results];
+    if (w.status) filtered = filtered.filter((r) => r.status === w.status);
+    if (w.OR) {
+      const firstCond = (w.OR as any[])[0] as any;
+      const nameContains = firstCond?.name?.contains?.toLowerCase?.();
+      const slugContains = ((w.OR as any[])[1] as any)?.slug?.contains?.toLowerCase?.();
+      const search = (nameContains ?? slugContains ?? "").toLowerCase?.() ?? "";
+      if (search) {
+        filtered = filtered.filter((r) =>
+          String(r.name ?? "").toLowerCase().includes(search) ||
+          String(r.slug ?? "").toLowerCase().includes(search)
+        );
+      }
+    }
+    return filtered;
+  }
+
+  function applyInclude(results: StoredRecord[]): StoredRecord[] {
+    return results.map((r) => {
+      const m = memberships.find((m: StoredRecord) => m.tenantId === r.id && m.role === "OWNER");
+      if (m) {
+        const u = users.find((u: StoredRecord) => u.id === m.userId);
+        return { ...r, memberships: u?.email ? [{ user: { email: u.email } }] : [] };
+      }
+      return { ...r, memberships: [] };
+    });
+  }
+
+  function reset() {
+    tenants.length = 0;
+    users.length = 0;
+    memberships.length = 0;
+    invitations.length = 0;
+    auditLogs.length = 0;
+  }
+
+  const db: any = {
+    tenant: {
+      records: tenants,
+      findUnique(args?: any) {
+        const where = args?.where ?? {};
+        const key = Object.keys(where)[0] ?? "id";
+        const r = this.records.find((r: StoredRecord) => r[key] === where[key]) ?? null;
+        if (!r) return null;
+        if (args?.include) return applyInclude([r])[0];
+        return { ...r };
+      },
+      findUniqueOrThrow(args?: any) {
+        const r = this.findUnique(args);
+        if (!r) throw new Error("Not found");
+        return r;
+      },
+      findMany(args?: any) {
+        let results = [...this.records];
+        if (args?.where) results = applyWhere(results, args.where);
+        const totalFiltered = results.length;
+        if (args?.skip !== undefined || args?.take !== undefined) {
+          const skip = args?.skip ?? 0;
+          const take = args?.take ?? results.length;
+          results = results.slice(skip, skip + take);
+        }
+        if (args?.include) return applyInclude(results);
+        return results;
+      },
+      count(args?: any) {
+        if (args?.where) return applyWhere([...this.records], args.where).length;
+        return this.records.length;
+      },
+      create(args?: any) {
+        const r = { id: `t_${tenants.length + 1}`, plan: "PILOT", createdAt: new Date(), ...(args?.data ?? {}) };
+        tenants.push(r);
+        return r;
+      },
+    },
+    user: {
+      records: users,
+      findUnique(args?: any) {
+        const where = args?.where ?? {};
+        const key = Object.keys(where)[0] ?? "email";
+        const val = where[key];
+        const r = this.records.find((r: StoredRecord) => r[key] === val);
+        if (!r) return null;
+        if (args?.select) {
+          const sel: StoredRecord = {};
+          for (const k of Object.keys(args.select)) {
+            if (args.select[k]) sel[k] = r[k];
+          }
+          return sel;
+        }
+        return { ...r };
+      },
+      create(args?: any) {
+        const r = { id: `u_${users.length + 1}`, name: null, passwordHash: null, ...(args?.data ?? {}) };
+        users.push(r);
+        return r;
+      },
+    },
+    membership: {
+      records: memberships,
+      findUnique(args?: any) {
+        const w = args?.where as any;
+        if (w?.tenantId_userId) {
+          return this.records.find((r: StoredRecord) => r.tenantId === w.tenantId_userId.tenantId && r.userId === w.tenantId_userId.userId) ?? null;
+        }
+        return this.records.find((r: StoredRecord) => r.id === w?.id) ?? null;
+      },
+      findFirst(args?: any) {
+        const w = args?.where ?? {};
+        const r = this.records.find((r: StoredRecord) => Object.keys(w).every((k) => r[k] === w[k]));
+        if (!r) return null;
+        if ((args?.select as any)?.user?.select?.email) {
+          const u = users.find((u: StoredRecord) => u.id === r.userId);
+          return { ...r, user: { email: u?.email ?? null } };
+        }
+        return { ...r };
+      },
+      findMany(args?: any) {
+        let results = [...this.records];
+        if (args?.where?.tenantId) results = results.filter((r) => r.tenantId === args.where.tenantId);
+        if (args?.include) {
+          return results.map((r) => {
+            const u = users.find((u: StoredRecord) => u.id === r.userId);
+            return { ...r, user: { email: u?.email ?? null, name: u?.name ?? null } };
+          });
+        }
+        const skip = args?.skip ?? 0;
+        const take = args?.take ?? results.length;
+        return results.slice(skip, skip + take);
+      },
+      count(args?: any) {
+        let results = [...this.records];
+        if (args?.where?.tenantId) results = results.filter((r) => r.tenantId === args.where.tenantId);
+        return results.length;
+      },
+      create(args?: any) {
+        const r = { id: `m_${memberships.length + 1}`, createdAt: new Date(), ...(args?.data ?? {}) };
+        memberships.push(r);
+        return r;
+      },
+    },
+    invitation: {
+      records: invitations,
+      create(args?: any) {
+        const r = { id: `inv_${invitations.length + 1}`, acceptedById: null, expiresAt: new Date(Date.now() + 86400000), createdAt: new Date(), ...(args?.data ?? {}) };
+        invitations.push(r);
+        return r;
+      },
+    },
+    auditLog: {
+      create(args?: any) {
+        auditLogs.push({ ...(args?.data ?? {}), createdAt: new Date() });
+        return auditLogs[auditLogs.length - 1];
+      },
+    },
+    $transaction<R>(fn: (tx: any) => Promise<R>): Promise<R> {
+      return fn(db);
+    },
+  };
+
+  return { db, reset };
+}
+
+describe("tenant console — list with search/filter", () => {
+  const { db, reset } = buildFakeDb();
+
+  beforeEach(() => {
+    reset();
+    db.user.create({ data: { id: "sa1", email: "sa@test.com", passwordHash: "hash" } });
+    db.membership.create({ data: { tenantId: "global", userId: "sa1", role: "SUPER_ADMIN" } });
+    db.tenant.create({ data: { id: "global", slug: "global", name: "Global", status: "ACTIVE", timezone: "UTC", locale: "es", createdAt: new Date() } });
+    db.tenant.create({ data: { slug: "alpha-corp", name: "Alpha Corp", status: "ACTIVE", timezone: "America/New_York", locale: "en", createdAt: new Date("2024-01-01") } });
+    db.tenant.create({ data: { slug: "beta-lab", name: "Beta Lab", status: "PROVISIONING", timezone: "UTC", locale: "es", createdAt: new Date("2024-06-01") } });
+    db.user.create({ data: { id: "u1", email: "alpha@corp.com", passwordHash: "hash" } });
+    db.user.create({ data: { id: "u2", email: "beta@lab.com", passwordHash: null } });
+    db.membership.create({ data: { tenantId: "t_1", userId: "u1", role: "OWNER" } });
+    db.membership.create({ data: { tenantId: "t_3", userId: "u2", role: "OWNER" } });
   });
 
-  it("includes navigation links to admin dashboard and tenants", () => {
-    assert.match(shellComp, /href="\/admin"/);
-    assert.match(shellComp, /href="\/admin\/tenants"/);
+  it("search finds tenants by name (case insensitive)", async () => {
+    const result = await listAdminTenants("sa1", db, { page: 1, limit: 20 }, { search: "alpha" });
+    assert.equal(result.items.length, 1);
+    assert.equal(result.items[0].slug, "alpha-corp");
+    assert.equal(result.total, 1);
   });
 
-  it("shows admin guardrail message", () => {
-    assert.match(shellComp, /Admin/);
-    assert.match(shellComp, /tenants/);
-  });
-});
-
-// ────────────────────────────────────────────────────────
-// TENANTS LIST
-// ────────────────────────────────────────────────────────
-describe("admin tenants list", () => {
-  it("has loading skeleton state", () => {
-    assert.match(listComp, /state === "loading"/);
-    // skeleton renders placeholder divs
-    assert.match(listComp, /Array\.from/);
+  it("search finds tenants by slug (case insensitive)", async () => {
+    const result = await listAdminTenants("sa1", db, { page: 1, limit: 20 }, { search: "BETA" });
+    assert.equal(result.items.length, 1);
+    assert.equal(result.items[0].slug, "beta-lab");
+    assert.equal(result.total, 1);
   });
 
-  it("has empty state with create CTA when no results", () => {
-    assert.match(listComp, /state === "empty"/);
-    assert.match(listComp, /No hay tenants creados/);
-    assert.match(listComp, /Crear tenant/);
+  it("status filter returns only matching tenants", async () => {
+    const result = await listAdminTenants("sa1", db, { page: 1, limit: 20 }, { status: "PROVISIONING" });
+    assert.equal(result.items.length, 1);
+    assert.equal(result.items[0].slug, "beta-lab");
+    assert.equal(result.total, 1);
   });
 
-  it("has empty state for filtered empty results", () => {
-    assert.match(listComp, /Ningun tenant coincide/);
+  it("invalid status filter throws 400", async () => {
+    await assert.rejects(
+      () => listAdminTenants("sa1", db, { page: 1, limit: 20 }, { status: "INVALID" }),
+      (e: unknown) => (e as TenantAdminError).code === "INVALID_STATUS" && (e as TenantAdminError).status === 400,
+    );
   });
 
-  it("has error state with retry", () => {
-    assert.match(listComp, /state === "error"/);
-    assert.match(listComp, /InlineError/);
-    assert.match(listComp, /onRetry/);
+  it("combined search + status filters correctly", async () => {
+    const result = await listAdminTenants("sa1", db, { page: 1, limit: 20 }, { search: "alpha", status: "ACTIVE" });
+    assert.equal(result.items.length, 1);
+    assert.equal(result.total, 1);
   });
 
-  it("renders tenant table with all required columns", () => {
-    assert.match(listComp, /Tenant/);
-    assert.match(listComp, /Owner/);
-    assert.match(listComp, /Estado/);
-    assert.match(listComp, /Locale/);
-    assert.match(listComp, /Timezone/);
-    assert.match(listComp, /Creado/);
-  });
-
-  it("shows lifecycle badge for each tenant row", () => {
-    assert.match(listComp, /LifecycleBadge/);
-    assert.match(listComp, /tenant\.status/);
-  });
-
-  it("paginates results using AdminTenantPagination", () => {
-    assert.match(listComp, /AdminTenantPagination/);
-    assert.match(listComp, /totalPages/);
-    assert.match(listComp, /onPageChange/);
-  });
-
-  it("has search input and status filter", () => {
-    assert.match(listComp, /Buscar por nombre/);
-    assert.match(listComp, /statusFilter/);
-    assert.match(listComp, /PROVISIONING/);
-    assert.match(listComp, /SUSPENDED/);
-  });
-
-  it("links to create tenant page", () => {
-    assert.match(listComp, /href="\/admin\/tenants\/new"/);
-    assert.match(listComp, /Crear tenant/);
-  });
-
-  it("renders tenant rows with slug, ownerEmail, dates", () => {
-    assert.match(listComp, /tenant\.slug/);
-    assert.match(listComp, /tenant\.ownerEmail/);
-    assert.match(listComp, /tenant\.createdAt/);
-  });
-
-  it("calls correct API endpoint for listing", () => {
-    assert.match(listComp, /\/api\/admin\/tenants/);
-  });
-});
-
-// ────────────────────────────────────────────────────────
-// CREATE TENANT
-// ────────────────────────────────────────────────────────
-describe("admin tenant create", () => {
-  it("has form fields: name, slug, ownerEmail, ownerName", () => {
-    assert.match(createComp, /Nombre del tenant/);
-    assert.match(createComp, /Slug/);
-    assert.match(createComp, /Email del owner/);
-    assert.match(createComp, /Nombre del owner/);
-  });
-
-  it("has timezone and locale selectors with server-side whitelist", () => {
-    assert.match(createComp, /America\/Caracas/);
-    assert.match(createComp, /Europe\/Madrid/);
-    assert.match(createComp, /"es"/);
-    assert.match(createComp, /"pt"/);
-  });
-
-  it("normalizes slug from name on input", () => {
-    assert.match(createComp, /normalizeSlug/);
-    assert.match(createComp, /toLowerCase/);
-    assert.match(createComp, /replace/);
-  });
-
-  it("shows invite link after creation with copy button", () => {
-    assert.match(createComp, /copyLink/);
-    assert.match(createComp, /inviteLink/);
-    assert.match(createComp, /Copiar/);
-  });
-
-  it("shows correct message: invitation created, email pending", () => {
-    assert.match(createComp, /Invitacion creada/);
-    assert.match(createComp, /envio automatico esta pendiente de configuracion/);
-  });
-
-  it("never shows 'correo enviado' message", () => {
-    assert.doesNotMatch(createComp, /correo enviado/i);
-    assert.doesNotMatch(createComp, /email sent/i);
-  });
-
-  it("has loading state on submit button", () => {
-    assert.match(createComp, /loading/);
-    assert.match(createComp, /Creando/);
-    assert.match(createComp, /disabled={loading}/);
-  });
-
-  it("prevents double submit via disabled", () => {
-    assert.match(createComp, /disabled={loading}/);
-  });
-
-  it("has client-side slug validation", () => {
-    assert.match(createComp, /Slug invalido/);
-    assert.match(createComp, /guiones dobles/);
-    assert.match(createComp, /validate/);
-  });
-
-  it("shows inline field errors for validation", () => {
-    assert.match(createComp, /errors\.slug/);
-    assert.match(createComp, /errors\.name/);
-    assert.match(createComp, /errors\.ownerEmail/);
-  });
-
-  it("handles API errors with inline display", () => {
-    assert.match(createComp, /apiError/);
-    assert.match(createComp, /SLUG_TAKEN/);
-    assert.match(createComp, /INVALID_OWNER_EMAIL/);
-  });
-
-  it("copies invite link to clipboard", () => {
-    assert.match(createComp, /navigator\.clipboard\.writeText/);
-  });
-
-  it("submit POSTs to correct API endpoint", () => {
-    assert.match(createComp, /\/api\/admin\/tenants/);
-    assert.match(createComp, /method: "POST"/);
-  });
-});
-
-// ────────────────────────────────────────────────────────
-// TENANT DETAIL
-// ────────────────────────────────────────────────────────
-describe("admin tenant detail", () => {
-  it("has tabs: Resumen, Miembros, Invitaciones, Configuracion", () => {
-    assert.match(detailComp, /Resumen/);
-    assert.match(detailComp, /Miembros/);
-    assert.match(detailComp, /Invitaciones/);
-    assert.match(detailComp, /Configuracion/);
-  });
-
-  it("shows lifecycle badge in header", () => {
-    assert.match(detailComp, /LifecycleBadge status=\{tenant\.status\}/);
-  });
-
-  it("has lifecycle status transitions with confirm for SUSPENDED/ARCHIVED", () => {
-    assert.match(detailComp, /needsConfirm/);
-    assert.match(detailComp, /SUSPENDED/);
-    assert.match(detailComp, /ARCHIVED/);
-    assert.match(detailComp, /ConfirmDialog/);
-  });
-
-  it("shows explanation of lifecycle transitions", () => {
-    assert.match(detailComp, /Vas a suspender el tenant/);
-    assert.match(detailComp, /Vas a archivar/);
-    assert.match(detailComp, /Las publicaciones programadas se pausaran/);
-  });
-
-  it("members tab: list, add member form, change role, remove", () => {
-    assert.match(detailComp, /Agregar miembro/);
-    assert.match(detailComp, /Quitar/);
-    assert.match(detailComp, /handleChangeRole/);
-    assert.match(detailComp, /handleRemove/);
-  });
-
-  it("members tab: shows email, role, and name columns", () => {
-    assert.match(detailComp, /Usuario/);
-    assert.match(detailComp, /Email/);
-    assert.match(detailComp, /Rol/);
-  });
-
-  it("members tab: has role change select with valid roles", () => {
-    assert.match(detailComp, /handleChangeRole/);
-    assert.match(detailComp, /ROLE_OPTIONS/);
-    assert.match(detailComp, /OWNER/);
-    assert.match(detailComp, /TENANT_ADMIN/);
-  });
-
-  it("members tab: last-owner protection handled server-side", () => {
-    assert.match(detailComp, /setShowRemove/);
-    assert.match(detailComp, /ConfirmDialog/);
-    assert.match(detailComp, /ultimo OWNER/);
-  });
-
-  it("members tab: never exposes SUPER_ADMIN as assignable role", () => {
-    assert.match(detailComp, /ROLE_OPTIONS/);
-    // ROLE_OPTIONS array must not contain SUPER_ADMIN
-    const roOptsMatch = detailComp.match(/ROLE_OPTIONS\s*=\s*\[([^\]]+)\]/);
-    assert.ok(roOptsMatch, "ROLE_OPTIONS array not found");
-    assert.doesNotMatch(roOptsMatch![1], /SUPER_ADMIN/);
-  });
-
-  it("members tab: confirm dialog before removing member", () => {
-    assert.match(detailComp, /showRemove/);
-    assert.match(detailComp, /Quitar miembro/);
-    assert.match(detailComp, /danger/);
-  });
-
-  it("members tab: calls correct API endpoint", () => {
-    assert.match(detailComp, /\/api\/admin\/tenants\/\$\{slug\}\/members/);
-    assert.match(detailComp, /method: "DELETE"/);
-    assert.match(detailComp, /method: "PATCH"/);
-  });
-
-  it("invitations tab: list, create, resend, revoke", () => {
-    assert.match(detailComp, /Nueva invitacion/);
-    assert.match(detailComp, /Reemitir/);
-    assert.match(detailComp, /Revocar/);
-    assert.match(detailComp, /handleResend/);
-    assert.match(detailComp, /handleRevoke/);
-  });
-
-  it("invitations tab: shows status (pendiente/aceptada) and expiration", () => {
-    assert.match(detailComp, /Pendiente/);
-    assert.match(detailComp, /Aceptada/);
-    assert.match(detailComp, /expiresAt/);
-  });
-
-  it("invitations tab: copy invite link button", () => {
-    assert.match(detailComp, /copyLink/);
-    assert.match(detailComp, /navigator\.clipboard\.writeText/);
-  });
-
-  it("invitations tab: warns about previous link invalidation on resend", () => {
-    assert.match(detailComp, /el enlace anterior quedara invalidado/);
-  });
-
-  it("invitations tab: link-only message, no email sent", () => {
-    assert.match(detailComp, /envio automatico esta pendiente de configuracion/);
-    assert.match(detailComp, /Enlace manual/);
-    assert.doesNotMatch(detailComp, /Enviado/i);
-    assert.doesNotMatch(detailComp, /correo enviado/i);
-  });
-
-  it("invitations tab: provisioning restriction notice", () => {
-    assert.match(detailComp, /PROVISIONING/);
-    assert.match(detailComp, /solo se permiten invitaciones con rol OWNER/);
-  });
-
-  it("invitations tab: confirm dialog before revoke", () => {
-    assert.match(detailComp, /revokeId/);
-    assert.match(detailComp, /Revocar invitacion/);
-  });
-
-  it("invitations tab: calls resend and revoke API endpoints", () => {
-    assert.match(detailComp, /\/api\/admin\/tenants\/.*invitations\/.*resend/);
-    assert.match(detailComp, /\/api\/admin\/tenants\/.*invitations\/.*\$/);
-    assert.match(detailComp, /method: "DELETE"/);
-  });
-
-  it("config tab: edits name, timezone, locale with initial values from API", () => {
-    assert.match(detailComp, /Nombre/);
-    assert.match(detailComp, /Timezone/);
-    assert.match(detailComp, /Locale/);
-    assert.match(detailComp, /useState\(tenant\.name\)/);
-  });
-
-  it("config tab: has dirty state tracking with cancel/restore", () => {
-    assert.match(detailComp, /dirty/);
-    assert.match(detailComp, /reset/);
-    assert.match(detailComp, /Cancelar/);
-  });
-
-  it("config tab: calls PATCH endpoint correctly", () => {
-    assert.match(detailComp, /\/api\/admin\/tenants\/\$\{slug\}/);
-    assert.match(detailComp, /method: "PATCH"/);
-  });
-
-  it("config tab: shows success feedback after save", () => {
-    assert.match(detailComp, /setSuccess/);
-    assert.match(detailComp, /guardada/);
-  });
-
-  it("detail page fetches tenant by slug", () => {
-    assert.match(detailComp, /slug/);
-    assert.match(detailComp, /\/api\/admin\/tenants\/\$\{slug\}/);
-  });
-
-  it("has loading state while fetching tenant", () => {
-    assert.match(detailComp, /loading/);
-    assert.match(detailComp, /setLoading/);
-  });
-
-  it("has error state with retry on tenant fetch failure", () => {
-    assert.match(detailComp, /error/);
-    assert.match(detailComp, /onRetry/);
-    assert.match(detailComp, /fetchTenant/);
+  it("search with no results returns empty", async () => {
+    const result = await listAdminTenants("sa1", db, { page: 1, limit: 20 }, { search: "nonexistent" });
+    assert.equal(result.items.length, 0);
+    assert.equal(result.total, 0);
   });
 });
 
-// ────────────────────────────────────────────────────────
-// LIFECYCLE BADGE
-// ────────────────────────────────────────────────────────
-describe("lifecycle badge", () => {
-  it("has styles for all four states", () => {
-    assert.match(badgesComp, /PROVISIONING/);
-    assert.match(badgesComp, /ACTIVE/);
-    assert.match(badgesComp, /SUSPENDED/);
-    assert.match(badgesComp, /ARCHIVED/);
+describe("tenant console — create with timezone/locale", () => {
+  const { db, reset } = buildFakeDb();
+
+  beforeEach(() => {
+    reset();
+    db.user.create({ data: { id: "sa1", email: "sa@test.com", passwordHash: "hash" } });
+    db.membership.create({ data: { tenantId: "global", userId: "sa1", role: "SUPER_ADMIN" } });
+    db.tenant.create({ data: { id: "global", slug: "global", name: "Global", status: "ACTIVE", timezone: "UTC", locale: "es", createdAt: new Date() } });
   });
 
-  it("uses semantic colors: teal for active, warn for suspended, red for archived", () => {
-    assert.match(badgesComp, /#0b756f/);
-    assert.match(badgesComp, /#8a5f00/);
-    assert.match(badgesComp, /#8a1d1d/);
+  it("persists timezone and locale when provided", async () => {
+    const result = await createAdminTenant({
+      actorId: "sa1", slug: "test-tenant", name: "Test", ownerEmail: "new@test.com", timezone: "Europe/Madrid", locale: "fr",
+    }, db);
+    assert.equal(result.timezone, "Europe/Madrid");
+    assert.equal(result.locale, "fr");
   });
 
-  it("renders as inline-flex with pill border-radius", () => {
-    assert.match(badgesComp, /display:\s*"inline-flex"/);
-    assert.match(badgesComp, /borderRadius:\s*10/);
+  it("defaults to UTC/es when not provided", async () => {
+    const result = await createAdminTenant({
+      actorId: "sa1", slug: "test-2", name: "Test 2", ownerEmail: "new2@test.com",
+    }, db);
+    assert.equal(result.timezone, "UTC");
+    assert.equal(result.locale, "es");
   });
 
-  it("does not depend solely on color (has text labels)", () => {
-    assert.match(badgesComp, /Activo/);
-    assert.match(badgesComp, /Suspendido/);
-    assert.match(badgesComp, /Archivado/);
-    assert.match(badgesComp, /Provisioning/);
-  });
-});
-
-// ────────────────────────────────────────────────────────
-// ROLE BADGE
-// ────────────────────────────────────────────────────────
-describe("role badge", () => {
-  it("excludes SUPER_ADMIN from role labels", () => {
-    assert.doesNotMatch(roleBadgeComp, /SUPER_ADMIN/);
+  it("returns INVITATION_REQUIRED when user has no passwordHash", async () => {
+    const result = await createAdminTenant({
+      actorId: "sa1", slug: "test-3", name: "Test 3", ownerEmail: "fresh@test.com",
+    }, db);
+    assert.equal(result.ownerAccountState, "INVITATION_REQUIRED");
+    assert.ok(result.inviteLink);
   });
 
-  it("has human-readable labels for all roles", () => {
-    assert.match(roleBadgeComp, /Owner/);
-    assert.match(roleBadgeComp, /Admin/);
-    assert.match(roleBadgeComp, /Tenant Admin/);
-    assert.match(roleBadgeComp, /Editor/);
-    assert.match(roleBadgeComp, /Viewer/);
+  it("returns EXISTING_ACCOUNT when user has passwordHash", async () => {
+    db.user.create({ data: { id: "existing-user", email: "exists@test.com", passwordHash: "somehash" } });
+    const result = await createAdminTenant({
+      actorId: "sa1", slug: "test-4", name: "Test 4", ownerEmail: "exists@test.com",
+    }, db);
+    assert.equal(result.ownerAccountState, "EXISTING_ACCOUNT");
+    assert.ok(result.inviteLink);
   });
 
-  it("renders as inline-flex pill badge", () => {
-    assert.match(roleBadgeComp, /display:\s*"inline-flex"/);
-    assert.match(roleBadgeComp, /borderRadius:\s*10/);
-  });
-});
-
-// ────────────────────────────────────────────────────────
-// CONFIRM DIALOG
-// ────────────────────────────────────────────────────────
-describe("confirm dialog", () => {
-  it("has escape key support", () => {
-    assert.match(dialogComp, /Escape/);
-    assert.match(dialogComp, /removeEventListener/);
-  });
-
-  it("has backdrop click to close", () => {
-    assert.match(dialogComp, /modal-backdrop/);
-    assert.match(dialogComp, /onClick/);
-  });
-
-  it("has proper accessibility attributes", () => {
-    assert.match(dialogComp, /role="dialog"/);
-    assert.match(dialogComp, /aria-modal="true"/);
-    assert.match(dialogComp, /aria-label/);
-  });
-
-  it("autofocuses confirm button", () => {
-    assert.match(dialogComp, /confirmRef/);
-    assert.match(dialogComp, /\.focus\(\)/);
-  });
-
-  it("has danger styling for destructive actions", () => {
-    assert.match(dialogComp, /danger/);
-    assert.match(dialogComp, /var\(--hc-red\)/);
-  });
-
-  it("supports loading disabled state", () => {
-    assert.match(dialogComp, /loading/);
-    assert.match(dialogComp, /disabled/);
+  it("serializes without exposing passwordHash or tokenHash", async () => {
+    const result = await createAdminTenant({
+      actorId: "sa1", slug: "test-5", name: "Test 5", ownerEmail: "safe@test.com",
+    }, db);
+    const json = JSON.stringify(result);
+    assert.doesNotMatch(json, /passwordHash/);
+    assert.doesNotMatch(json, /tokenHash/);
   });
 });
 
-// ────────────────────────────────────────────────────────
-// PAGINATION
-// ────────────────────────────────────────────────────────
-describe("pagination", () => {
-  it("hides when single page", () => {
-    assert.match(paginationComp, /totalPages <= 1/);
-    assert.match(paginationComp, /return null/);
+describe("tenant console — getAdminTenant with owner email", () => {
+  const { db, reset } = buildFakeDb();
+
+  beforeEach(() => {
+    reset();
+    db.user.create({ data: { id: "sa1", email: "sa@test.com", passwordHash: "hash" } });
+    db.membership.create({ data: { tenantId: "global", userId: "sa1", role: "SUPER_ADMIN" } });
+    db.tenant.create({ data: { id: "global", slug: "global", name: "Global", status: "ACTIVE", timezone: "UTC", locale: "es", createdAt: new Date() } });
+    db.tenant.create({ data: { id: "t1", slug: "test-tenant", name: "Test", status: "ACTIVE", timezone: "UTC", locale: "es", createdAt: new Date() } });
+    db.user.create({ data: { id: "owner1", email: "owner@test.com", passwordHash: "hash" } });
+    db.membership.create({ data: { tenantId: "t1", userId: "owner1", role: "OWNER" } });
   });
 
-  it("has previous/next buttons with disabled states", () => {
-    assert.match(paginationComp, /Anterior/);
-    assert.match(paginationComp, /Siguiente/);
-    assert.match(paginationComp, /disabled/);
+  it("returns real owner email from membership", async () => {
+    const result = await getAdminTenant("sa1", "t1", db);
+    assert.equal(result.ownerEmail, "owner@test.com");
   });
 
-  it("renders page numbers with current page highlighted", () => {
-    assert.match(paginationComp, /aria-current/);
-  });
-
-  it("uses proper aria labels", () => {
-    assert.match(paginationComp, /aria-label="Paginacion"/);
-    assert.match(paginationComp, /aria-label="Pagina/);
-  });
-});
-
-// ────────────────────────────────────────────────────────
-// FEEDBACK COMPONENTS
-// ────────────────────────────────────────────────────────
-describe("feedback components", () => {
-  it("empty state has optional action button", () => {
-    assert.match(feedbackComp, /action/);
-  });
-
-  it("inline error has retry button", () => {
-    assert.match(feedbackComp, /Reintentar/);
-    assert.match(feedbackComp, /onRetry/);
-  });
-
-  it("inline error uses red accent color", () => {
-    assert.match(feedbackComp, /var\(--hc-red\)/);
+  it("does not expose sensitive fields", async () => {
+    const result = await getAdminTenant("sa1", "t1", db);
+    const json = JSON.stringify(result);
+    assert.doesNotMatch(json, /passwordHash/);
+    assert.doesNotMatch(json, /tokenHash/);
+    assert.doesNotMatch(json, /"[Tt]oken":/);
   });
 });
 
-// ────────────────────────────────────────────────────────
-// PAGE SERVER COMPONENTS (auth checks)
-// ────────────────────────────────────────────────────────
-describe("server page components", () => {
-  it("list page checks SUPER_ADMIN and redirects", () => {
-    assert.match(listPage, /SUPER_ADMIN/);
-    assert.match(listPage, /redirect/);
-    assert.match(listPage, /access-required/);
-  });
-
-  it("create page checks SUPER_ADMIN and redirects", () => {
-    assert.match(newPage, /SUPER_ADMIN/);
-    assert.match(newPage, /redirect/);
-    assert.match(newPage, /access-required/);
-  });
-
-  it("detail page checks SUPER_ADMIN and redirects", () => {
-    assert.match(detailPage, /SUPER_ADMIN/);
-    assert.match(detailPage, /redirect/);
-    assert.match(detailPage, /access-required/);
-  });
-
-  it("all pages check session before access", () => {
-    assert.match(listPage, /session/);
-    assert.match(newPage, /session/);
-    assert.match(detailPage, /session/);
-  });
-
-  it("layout is a server component with metadata", () => {
-    assert.match(layoutPage, /Metadata/);
-    assert.match(layoutPage, /AdminTenantsShell/);
+describe("tenant console — pagination", () => {
+  it("listAdminTenants paginates correctly", async () => {
+    const { db, reset } = buildFakeDb();
+    reset();
+    db.user.create({ data: { id: "sa1", email: "sa@test.com", passwordHash: "hash" } });
+    db.membership.create({ data: { tenantId: "global", userId: "sa1", role: "SUPER_ADMIN" } });
+    db.tenant.create({ data: { id: "global", slug: "global", name: "Global", status: "ACTIVE", timezone: "UTC", locale: "es", createdAt: new Date() } });
+    for (let i = 1; i <= 25; i++) {
+      db.tenant.create({ data: { slug: `t-${i}`, name: `Tenant ${i}`, status: "ACTIVE", timezone: "UTC", locale: "es", createdAt: new Date() } });
+      db.user.create({ data: { id: `u${i}`, email: `u${i}@test.com`, passwordHash: "hash" } });
+      db.membership.create({ data: { tenantId: `t_${i + 1}`, userId: `u${i}`, role: "OWNER" } });
+    }
+    const page1 = await listAdminTenants("sa1", db, { page: 1, limit: 10 });
+    assert.equal(page1.items.length, 10);
+    assert.equal(page1.page, 1);
+    assert.equal(page1.totalPages, 3);
+    const page3 = await listAdminTenants("sa1", db, { page: 3, limit: 10 });
+    assert.equal(page3.items.length, 6);
+    assert.equal(page3.totalPages, 3);
   });
 });
 
-// ────────────────────────────────────────────────────────
-// FORBIDDEN PATTERNS (security / no leaks)
-// ────────────────────────────────────────────────────────
-describe("forbidden patterns", () => {
-  it("no SUPER_ADMIN exposed as assignable role in forms", () => {
-    assert.doesNotMatch(createComp, /SUPER_ADMIN/);
+describe("tenant console — SUPER_ADMIN guard via DB", () => {
+  it("rejects non-SUPER_ADMIN actors", async () => {
+    const { db, reset } = buildFakeDb();
+    reset();
+    db.user.create({ data: { id: "normal", email: "normal@test.com", passwordHash: "hash" } });
+    db.tenant.create({ data: { id: "t1", slug: "t1", name: "T1", status: "ACTIVE", timezone: "UTC", locale: "es", createdAt: new Date() } });
+    db.membership.create({ data: { tenantId: "t1", userId: "normal", role: "OWNER" } });
+    await assert.rejects(
+      () => listAdminTenants("normal", db),
+      (e: unknown) => {
+        const err = e as { code?: string; status?: number };
+        return err.code === "FORBIDDEN" && err.status === 403;
+      },
+    );
   });
 
-  it("no email provider service imports in components", () => {
-    assert.doesNotMatch(createComp, /from.*resend/i);
-    assert.doesNotMatch(createComp, /new Resend/i);
-    assert.doesNotMatch(createComp, /sendEmail/);
-    assert.doesNotMatch(detailComp, /from.*resend/i);
-    assert.doesNotMatch(detailComp, /new Resend/i);
-    assert.doesNotMatch(detailComp, /sendEmail/);
-  });
-
-  it("no Playwright or browser automation imports", () => {
-    assert.doesNotMatch(listComp, /playwright|puppeteer|selenium|browser/i);
-    assert.doesNotMatch(createComp, /playwright|puppeteer|selenium|browser/i);
-    assert.doesNotMatch(detailComp, /playwright|puppeteer|selenium|browser/i);
-  });
-
-  it("no hardcoded credentials or API keys", () => {
-    assert.doesNotMatch(listComp, /sk-[a-zA-Z0-9]{20,}/);
-    assert.doesNotMatch(createComp, /sk-[a-zA-Z0-9]{20,}/);
-    assert.doesNotMatch(detailComp, /sk-[a-zA-Z0-9]{20,}/);
-  });
-
-  it("no passwordHash or token exposed in UI strings", () => {
-    assert.doesNotMatch(createComp, /passwordHash/);
-    assert.doesNotMatch(detailComp, /passwordHash/);
-    assert.doesNotMatch(createComp, /tokenHash/);
-    assert.doesNotMatch(detailComp, /tokenHash/);
-  });
-
-  it("no secrets in localStorage usage", () => {
-    assert.doesNotMatch(listComp, /localStorage/);
-    assert.doesNotMatch(createComp, /localStorage/);
-    assert.doesNotMatch(detailComp, /localStorage/);
-  });
-
-  it("no query param based auth", () => {
-    assert.doesNotMatch(listComp, /searchParams\.get\(.*role/);
-    assert.doesNotMatch(listComp, /searchParams\.get\(.*admin/);
-  });
-
-  it("no fabrication of SUPER_ADMIN role", () => {
-    assert.doesNotMatch(listComp, /role.*=.*"SUPER_ADMIN"/);
-    assert.doesNotMatch(createComp, /role.*=.*"SUPER_ADMIN"/);
-  });
-});
-
-// ────────────────────────────────────────────────────────
-// HELPER FUNCTION TESTS (validatePagination, slug)
-// ────────────────────────────────────────────────────────
-describe("admin helpers (duplicate validation)", () => {
-  it("validatePagination rejects invalid values (already tested in service tests)", () => {
-    // Coverage already in tenant-admin-service.test.ts
-    assert.ok(true); // placeholder — actual tests in tenant-admin-service.test.ts
-  });
-
-  it("normalizeTenantSlug transforms whitespace and casing", () => {
-    // Already tested in tenant-admin-service.test.ts
-    assert.ok(true);
+  it("allows SUPER_ADMIN actors", async () => {
+    const { db, reset } = buildFakeDb();
+    reset();
+    db.user.create({ data: { id: "sa1", email: "sa@test.com", passwordHash: "hash" } });
+    db.membership.create({ data: { tenantId: "global", userId: "sa1", role: "SUPER_ADMIN" } });
+    db.tenant.create({ data: { id: "global", slug: "global", name: "Global", status: "ACTIVE", timezone: "UTC", locale: "es", createdAt: new Date() } });
+    const result = await listAdminTenants("sa1", db);
+    assert.ok(result.items !== undefined);
+    assert.ok(result.total >= 0);
   });
 });

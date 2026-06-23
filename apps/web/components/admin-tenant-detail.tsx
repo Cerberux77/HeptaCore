@@ -292,7 +292,11 @@ function MembersTab({ slug, tenantStatus }: { slug: string; tenantStatus: string
       const res = await fetch(`/api/admin/tenants/${slug}/members/${membershipId}`, { method: "DELETE" });
       const json = await res.json();
       if (!res.ok || !json.ok) { setRemoveError(json.error?.message || "Error al eliminar"); return; }
-      fetchMembers();
+      if (data && data.items.length === 1 && page > 1) {
+        setPage((p) => p - 1);
+      } else {
+        fetchMembers();
+      }
     } catch { setRemoveError("Error de conexion"); }
     finally { setRemoveLoading(false); }
   }
@@ -464,13 +468,17 @@ function InvitationsTab({ slug, tenantStatus }: { slug: string; tenantStatus: st
   async function handleResend(invitationId: string) {
     setActionLoading(true); setActionError("");
     try {
-      await fetch(`/api/admin/tenants/${slug}/invitations/${invitationId}/resend`, { method: "POST" });
-      // re-fetch to get the new link indirectly – the resend API returns { id, inviteLink }
-      const res = await apiFetch<{ id: string; inviteLink: string }>(`/api/admin/tenants/${slug}/invitations/${invitationId}/resend`, { method: "POST" });
-      if (res.ok && res.data) {
-        setResendLink(res.data.inviteLink);
-        setResendId(res.data.id);
+      const res = await fetch(`/api/admin/tenants/${slug}/invitations/${invitationId}/resend`, { method: "POST" });
+      const json = await res.json();
+      if (!res.ok || !json.ok) {
+        setActionError(json.error?.message || "Error al reemitir invitacion");
+        return;
       }
+      if (json.data?.inviteLink) {
+        setResendLink(json.data.inviteLink);
+        setResendId(json.data.id);
+      }
+      fetchInvitations();
     } catch { setActionError("Error de conexion"); }
     finally { setActionLoading(false); }
   }
@@ -481,7 +489,11 @@ function InvitationsTab({ slug, tenantStatus }: { slug: string; tenantStatus: st
     try {
       const res = await fetch(`/api/admin/tenants/${slug}/invitations/${id}`, { method: "DELETE" });
       if (!res.ok) { const json = await res.json(); setActionError(json.error?.message || "Error al revocar"); return; }
-      fetchInvitations();
+      if (data && data.items.length === 1 && page > 1) {
+        setPage((p) => p - 1);
+      } else {
+        fetchInvitations();
+      }
     } catch { setActionError("Error de conexion"); }
     finally { setActionLoading(false); }
   }

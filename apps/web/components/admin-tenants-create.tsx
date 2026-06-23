@@ -79,7 +79,7 @@ export function AdminTenantsCreate() {
       const res = await fetch("/api/admin/tenants", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: form.name.trim(), slug: form.slug, ownerEmail: form.ownerEmail.trim().toLowerCase(), ownerName: form.ownerName.trim() || undefined }),
+        body: JSON.stringify({ name: form.name.trim(), slug: form.slug, ownerEmail: form.ownerEmail.trim().toLowerCase(), ownerName: form.ownerName.trim() || undefined, timezone: form.timezone, locale: form.locale }),
       });
       const json = await res.json();
       if (!res.ok || !json.ok) {
@@ -129,12 +129,16 @@ export function AdminTenantsCreate() {
           </div>
           {created.inviteLink && (
             <div style={{ background: "var(--hc-bone)", border: "1px solid var(--hc-line)", borderRadius: 6, padding: 12, marginBottom: 14 }}>
-              <p style={{ fontSize: 12, fontWeight: 600, color: "var(--hc-graphite)", margin: "0 0 8px" }}>
-                {created.ownerAccountState === "INVITATION_REQUIRED" ? "Enlace de invitacion" : "Acceso al tenant"}
-              </p>
-              {created.ownerAccountState === "INVITATION_REQUIRED" && (
-                <p style={{ fontSize: 12, color: "var(--hc-fog)", margin: "0 0 8px" }}>
-                  La cuenta no tiene credenciales. Comparte este enlace para que el owner configure su acceso.
+              {created.ownerAccountState === "INVITATION_REQUIRED" ? (
+                <>
+                  <p style={{ fontSize: 12, fontWeight: 600, color: "var(--hc-graphite)", margin: "0 0 8px" }}>Enlace de invitacion</p>
+                  <p style={{ fontSize: 12, color: "var(--hc-fog)", margin: "0 0 8px" }}>
+                    La cuenta no tiene credenciales. Comparte este enlace para que el owner configure su acceso.
+                  </p>
+                </>
+              ) : (
+                <p style={{ fontSize: 12, fontWeight: 600, color: "var(--hc-graphite)", margin: "0 0 8px" }}>
+                  Acceso al tenant
                 </p>
               )}
               <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
@@ -152,7 +156,9 @@ export function AdminTenantsCreate() {
             </div>
           )}
           <p style={{ fontSize: 12, color: "var(--hc-fog)", margin: "0 0 14px", fontStyle: "italic" }}>
-            Invitacion creada. El envio automatico esta pendiente de configuracion.
+            {created.ownerAccountState === "INVITATION_REQUIRED"
+              ? "Invitacion creada. El envio automatico esta pendiente de configuracion."
+              : "Acceso preparado. Comparte el enlace de inicio de sesion con el owner."}
           </p>
           <a
             href={`/admin/tenants/${created.slug}`}

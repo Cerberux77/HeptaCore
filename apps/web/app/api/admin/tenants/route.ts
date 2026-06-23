@@ -37,7 +37,9 @@ export async function GET(req: NextRequest) {
       page: url.searchParams.has("page") ? Number(url.searchParams.get("page")) : undefined,
       limit: url.searchParams.has("limit") ? Number(url.searchParams.get("limit")) : undefined,
     });
-    const result = await listAdminTenants(session.user.id, db, pagination);
+    const search = url.searchParams.get("search")?.trim() || undefined;
+    const status = url.searchParams.get("status")?.trim() || undefined;
+    const result = await listAdminTenants(session.user.id, db, pagination, { search, status });
     return NextResponse.json({ ok: true, data: result });
   } catch (e) {
     return handleError(e);
@@ -57,7 +59,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ ok: false, error: { code: "BAD_REQUEST", message: "Invalid JSON body" } }, { status: 400 });
     }
 
-    const { slug, name, ownerEmail, ownerName } = body;
+    const { slug, name, ownerEmail, ownerName, timezone, locale } = body;
     if (!slug || !name || !ownerEmail) {
       return NextResponse.json({ ok: false, error: { code: "BAD_REQUEST", message: "slug, name, and ownerEmail are required" } }, { status: 400 });
     }
@@ -68,6 +70,8 @@ export async function POST(req: NextRequest) {
       name,
       ownerEmail,
       ownerName,
+      timezone,
+      locale,
     }, db);
 
     return NextResponse.json({ ok: true, data: tenant }, { status: 201 });
