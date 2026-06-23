@@ -1,33 +1,10 @@
 import { NextResponse } from "next/server";
 import { auth } from "../../../../../../lib/auth";
-import { resolveAssetUrl } from "../../../../../../lib/asset-resolution";
+import { serializeTenantAsset } from "../../../../../../lib/asset-presentation";
 import { prisma } from "../../../../../../lib/prisma";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
-
-function serializeAsset(asset: any, tenantSlug: string) {
-  const metadata = asset.metadata && typeof asset.metadata === "object" ? asset.metadata : {};
-  return {
-    id: asset.id,
-    filename: asset.filename,
-    kind: asset.kind,
-    path: resolveAssetUrl(asset, tenantSlug),
-    sourcePath: asset.sourcePath,
-    storageKey: asset.storageKey,
-    mimeType: asset.mimeType,
-    rightsStatus: asset.rightsStatus,
-    draftCount: asset._count?.drafts ?? 0,
-    metadata,
-    folder: metadata.folder ?? "",
-    sizeBytes: metadata.sizeBytes ?? null,
-    width: metadata.width ?? null,
-    height: metadata.height ?? null,
-    durationSeconds: metadata.durationSeconds ?? null,
-    orientation: metadata.orientation ?? null,
-    aspectRatio: metadata.aspectRatio ?? null,
-  };
-}
 
 export async function POST(req: Request, context: { params: Promise<{ slug: string }> }) {
   const session = await auth();
@@ -54,5 +31,5 @@ export async function POST(req: Request, context: { params: Promise<{ slug: stri
 
   if (!asset) return NextResponse.json({ ok: true, found: false });
 
-  return NextResponse.json({ ok: true, found: true, asset: serializeAsset(asset, slug) });
+  return NextResponse.json({ ok: true, found: true, asset: serializeTenantAsset(asset, slug) });
 }

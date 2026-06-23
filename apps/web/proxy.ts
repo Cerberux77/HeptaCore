@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 function isPublicPath(path: string): boolean {
+  if (/^\/api\/tenants\/[^/]+\/assets\/upload$/.test(path)) return true;
+  if (/^\/api\/tenants\/[^/]+\/assets\/[^/]+\/content\/upload$/.test(path)) return true;
   if (path === "/") return true;
   if (path === "/login") return true;
   if (path === "/app") return true;

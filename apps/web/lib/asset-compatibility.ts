@@ -16,6 +16,7 @@ export const ASSET_COMPATIBILITY_TARGETS = [
 
 export type AssetCompatibilityTarget = (typeof ASSET_COMPATIBILITY_TARGETS)[number];
 export type AssetCompatibilityStatus = "IDEAL" | "USABLE" | "INCOMPATIBLE" | "UNKNOWN";
+export type AssetCompatibilityFilter = AssetCompatibilityStatus | "ALL" | "ELIGIBLE" | "EVALUATED";
 export type AssetMediaType = "image" | "video" | "document";
 
 export type AssetCompatibilityInput = {
@@ -188,6 +189,20 @@ export type AssetCompatibilityResult = {
   target: AssetCompatibilityTarget;
 };
 
+export function isEligibleAssetCompatibilityStatus(status: AssetCompatibilityStatus): boolean {
+  return status === "IDEAL" || status === "USABLE";
+}
+
+export function matchesAssetCompatibilityFilter(
+  result: AssetCompatibilityResult,
+  filter: AssetCompatibilityFilter,
+): boolean {
+  if (filter === "ALL") return true;
+  if (filter === "ELIGIBLE") return isEligibleAssetCompatibilityStatus(result.status);
+  if (filter === "EVALUATED") return result.status !== "UNKNOWN";
+  return result.status === filter;
+}
+
 function numberFrom(value: unknown): number | null {
   if (typeof value === "number" && Number.isFinite(value)) return value;
   if (typeof value === "string" && value.trim() && Number.isFinite(Number(value))) return Number(value);
@@ -326,14 +341,14 @@ export function evaluateAssetCompatibility(
 export function filterAssetsByCompatibility<T extends AssetCompatibilityInput>(
   assets: T[],
   target: AssetCompatibilityTarget | "ALL",
-  status: AssetCompatibilityStatus | "ALL",
+  filter: AssetCompatibilityFilter,
 ): T[] {
-  if (target === "ALL" && status === "ALL") return assets;
+  if (target === "ALL" && filter === "ALL") return assets;
   return assets.filter((asset) => {
     if (target === "ALL") {
-      return ASSET_COMPATIBILITY_TARGETS.some((candidate) => evaluateAssetCompatibility(asset, candidate).status === status);
+      return ASSET_COMPATIBILITY_TARGETS.some((candidate) => matchesAssetCompatibilityFilter(evaluateAssetCompatibility(asset, candidate), filter));
     }
     const result = evaluateAssetCompatibility(asset, target);
-    return status === "ALL" || result.status === status;
+    return matchesAssetCompatibilityFilter(result, filter);
   });
 }

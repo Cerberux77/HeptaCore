@@ -1,4 +1,4 @@
-import type { AssetKind, UserRole } from "@prisma/client";
+import { Prisma, type AssetKind, type UserRole } from "@prisma/client";
 import { auditLog } from "./audit";
 import { normalizeLogicalFolder, sanitizeFilename, validateAssetFile } from "./asset-config";
 import { normalizeTechnicalAssetMetadata } from "./asset-metadata";
@@ -91,6 +91,32 @@ function buildAssetMetadata(params: {
   };
 }
 
+function normalizeBlobPathname(pathname: string): string {
+  return pathname.replace(/\\/g, "/");
+}
+
+async function findTenantAssetByStorageKey(
+  db: typeof prisma,
+  params: { tenantId: string; storageKey: string },
+) {
+  return db.asset.findFirst({
+    where: { tenantId: params.tenantId, storageKey: params.storageKey },
+    include: { _count: { select: { drafts: true } } },
+  });
+}
+
+async function lockTenantAssetFinalizeKey(
+  db: typeof prisma,
+  params: { tenantId: string; storageKey: string },
+) {
+  const queryRaw = (db as typeof prisma & { $queryRaw?: (query: Prisma.Sql) => Promise<unknown> }).$queryRaw;
+  if (typeof queryRaw !== "function") return;
+  await queryRaw.call(
+    db,
+    Prisma.sql`SELECT pg_advisory_xact_lock(hashtext(${params.tenantId}), hashtext(${params.storageKey}))`,
+  );
+}
+
 async function requireTenantAccess(
   db: typeof prisma,
   params: { tenantSlug: string; userId: string; mutation?: boolean },
@@ -151,28 +177,77 @@ export async function createTenantAssetFromBlob(params: {
   durationSeconds?: number | null;
   technicalMetadata?: unknown;
   etag?: string | null;
+  storage?: AssetStorageAdapter;
   audit?: AuditFn;
   db?: typeof prisma;
 }) {
-  const db = params.db ?? prisma;
-  const { tenant } = await requireTenantAccess(db, { ...params, mutation: true });
-  const validation = validateAssetFile({
-    filename: params.originalFilename,
-    mimeType: params.mimeType,
+  return finalizeTenantAssetFromBlob({
+    tenantSlug: params.tenantSlug,
+    userId: params.userId,
+    originalFilename: params.originalFilename,
+    contentType: params.mimeType,
     sizeBytes: params.sizeBytes,
-  });
-  if (!validation.ok) throw new AssetServiceError(validation.code, validation.error, 400);
-  if (!params.storageKey.startsWith(`tenants/${tenant.id}/assets/`)) {
-    throw new AssetServiceError("ASSET_STORAGE_SCOPE", "Storage key does not match tenant scope.", 400);
-  }
-
-  const metadata: AssetMetadata = buildAssetMetadata({
+    pathname: params.storageKey,
+    url: params.sourcePath,
+    projectId: params.projectId,
+    folder: params.folder,
     technicalMetadata: {
       ...(asObject(params.technicalMetadata)),
       width: asObject(params.technicalMetadata).width ?? params.width ?? null,
       height: asObject(params.technicalMetadata).height ?? params.height ?? null,
       durationSeconds: asObject(params.technicalMetadata).durationSeconds ?? params.durationSeconds ?? null,
     },
+    etag: params.etag ?? null,
+    storage: params.storage,
+    audit: params.audit,
+    db: params.db,
+  });
+}
+
+export async function finalizeTenantAssetFromBlob(params: {
+  tenantSlug: string;
+  userId: string;
+  originalFilename: string;
+  contentType: string;
+  sizeBytes: number;
+  pathname: string;
+  url?: string | null;
+  projectId?: string | null;
+  folder?: string | null;
+  technicalMetadata?: unknown;
+  etag?: string | null;
+  storage?: AssetStorageAdapter;
+  audit?: AuditFn;
+  db?: typeof prisma;
+}) {
+  const db = params.db ?? prisma;
+  const storage = params.storage ?? getAssetStorage();
+  const { tenant } = await requireTenantAccess(db, { ...params, mutation: true });
+  const validation = validateAssetFile({
+    filename: params.originalFilename,
+    mimeType: params.contentType,
+    sizeBytes: params.sizeBytes,
+  });
+  if (!validation.ok) throw new AssetServiceError(validation.code, validation.error, 400);
+
+  const pathname = normalizeBlobPathname(params.pathname);
+  const expectedPrefix = `tenants/${tenant.id}/assets/`;
+  if (pathname.includes("..") || pathname !== params.pathname.replace(/\\/g, "/") || !pathname.startsWith(expectedPrefix)) {
+    throw new AssetServiceError("ASSET_STORAGE_SCOPE", "Storage key does not match tenant scope.", 400);
+  }
+
+  const blob = await storage.head(pathname);
+  if (!blob.exists) throw new AssetServiceError("ASSET_BLOB_NOT_FOUND", "Blob does not exist.", 404);
+  if (!blob.url) throw new AssetServiceError("ASSET_BLOB_URL_MISSING", "Blob URL is not available.", 400);
+  if (params.url && params.url !== blob.url) {
+    throw new AssetServiceError("ASSET_BLOB_URL_MISMATCH", "Blob URL does not match uploaded blob.", 400);
+  }
+  if (blob.size != null && blob.size !== params.sizeBytes) {
+    throw new AssetServiceError("ASSET_BLOB_SIZE_MISMATCH", "Blob size does not match uploaded metadata.", 400);
+  }
+
+  const metadata: AssetMetadata = buildAssetMetadata({
+    technicalMetadata: params.technicalMetadata,
     provider: "vercel_blob",
     sizeBytes: params.sizeBytes,
     mimeType: validation.mimeType,
@@ -182,29 +257,46 @@ export async function createTenantAssetFromBlob(params: {
     etag: params.etag ?? null,
   });
 
-  const asset = await db.asset.create({
-    data: {
-      tenantId: tenant.id,
-      projectId: params.projectId ?? null,
-      kind: validation.kind,
-      filename: validation.filename,
-      mimeType: validation.mimeType,
-      storageKey: params.storageKey,
-      sourcePath: params.sourcePath,
-      metadata: metadata as any,
-      rightsStatus: "needs_review",
-    },
-  });
+  const existing = await findTenantAssetByStorageKey(db, { tenantId: tenant.id, storageKey: pathname });
+  if (existing) return existing;
 
-  await (params.audit ?? auditLog)({
-    tenantId: tenant.id,
-    actorId: params.userId,
-    action: "asset_uploaded",
-    target: `asset:${asset.id}`,
-    metadata: { assetId: asset.id, storageKey: params.storageKey, filename: asset.filename, metadata },
-  });
+  return db.$transaction(async (tx) => {
+    await lockTenantAssetFinalizeKey(tx as any, { tenantId: tenant.id, storageKey: pathname });
 
-  return asset;
+    const lockedExisting = await findTenantAssetByStorageKey(tx as any, { tenantId: tenant.id, storageKey: pathname });
+    if (lockedExisting) return lockedExisting;
+
+    try {
+      const asset = await tx.asset.create({
+        data: {
+          tenantId: tenant.id,
+          projectId: params.projectId ?? null,
+          kind: validation.kind,
+          filename: validation.filename,
+          mimeType: validation.mimeType,
+          storageKey: pathname,
+          sourcePath: blob.url,
+          metadata: metadata as any,
+          rightsStatus: "needs_review",
+        },
+        include: { _count: { select: { drafts: true } } },
+      });
+
+      await (params.audit ?? auditLog)({
+        tenantId: tenant.id,
+        actorId: params.userId,
+        action: "asset_uploaded",
+        target: `asset:${asset.id}`,
+        metadata: { assetId: asset.id, storageKey: pathname, filename: asset.filename, metadata },
+      });
+
+      return asset;
+    } catch (error) {
+      const conflicted = await findTenantAssetByStorageKey(tx as any, { tenantId: tenant.id, storageKey: pathname });
+      if (conflicted) return conflicted;
+      throw error;
+    }
+  });
 }
 
 export async function uploadTenantAsset(params: {
@@ -249,6 +341,7 @@ export async function uploadTenantAsset(params: {
       folder: params.folder,
       technicalMetadata: params.technicalMetadata,
       etag: uploaded.etag ?? null,
+      storage,
       audit: params.audit,
       db,
     });

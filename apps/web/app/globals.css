@@ -911,6 +911,53 @@ p {
   border-color: rgba(11, 117, 111, .28);
   color: var(--hc-teal);
 }
+.asset-inspector-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 20000;
+  background-color: rgba(15, 23, 42, 0.48);
+  opacity: 1;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+}
+.asset-inspector-drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 20001;
+  width: min(520px, 100vw);
+  background-color: #ffffff;
+  color: #111827;
+  opacity: 1;
+  isolation: isolate;
+  overflow-y: auto;
+  box-shadow: -16px 0 40px rgba(15, 23, 42, 0.24);
+  padding: 24px;
+}
+.asset-inspector-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.asset-inspector-header strong {
+  font-size: 14px;
+  color: #111827;
+}
+.asset-inspector-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  border-radius: 8px;
+  background: #ffffff;
+  color: #4b5563;
+}
 .modal-layer {
   position: fixed;
   inset: 0;

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { auth } from "../../../../../../../lib/auth";
-import { resolveAssetUrl } from "../../../../../../../lib/asset-resolution";
+import { serializeTenantAsset } from "../../../../../../../lib/asset-presentation";
 import { AssetServiceError, replaceTenantAssetContent } from "../../../../../../../lib/asset-service";
 
 export const dynamic = "force-dynamic";
@@ -36,27 +36,9 @@ export async function PUT(req: Request, context: { params: Promise<{ slug: strin
       expectedStorageKey: formData?.get("expectedStorageKey") ? String(formData.get("expectedStorageKey")) : null,
       technicalMetadata: parseJsonField(formData?.get("technicalMetadata") ?? null),
     });
-    const metadata = asset.metadata && typeof asset.metadata === "object" ? asset.metadata as Record<string, unknown> : {};
     return NextResponse.json({
       ok: true,
-      asset: {
-        id: asset.id,
-        filename: asset.filename,
-        kind: asset.kind,
-        path: resolveAssetUrl(asset, slug),
-        sourcePath: asset.sourcePath,
-        storageKey: asset.storageKey,
-        mimeType: asset.mimeType,
-        rightsStatus: asset.rightsStatus,
-        metadata,
-        folder: metadata.folder ?? "",
-        sizeBytes: metadata.sizeBytes ?? null,
-        width: metadata.width ?? null,
-        height: metadata.height ?? null,
-        durationSeconds: metadata.durationSeconds ?? null,
-        orientation: metadata.orientation ?? null,
-        aspectRatio: metadata.aspectRatio ?? null,
-      },
+      asset: serializeTenantAsset(asset, slug),
     });
   } catch (error) {
     return jsonError(error);

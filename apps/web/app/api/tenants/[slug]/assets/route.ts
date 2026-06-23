@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { auth } from "../../../../../lib/auth";
-import { resolveAssetUrl } from "../../../../../lib/asset-resolution";
+import { serializeTenantAsset } from "../../../../../lib/asset-presentation";
 import { AssetServiceError, listTenantAssets, uploadTenantAsset } from "../../../../../lib/asset-service";
 
 export const dynamic = "force-dynamic";
@@ -11,29 +11,6 @@ function jsonError(error: unknown) {
     return NextResponse.json({ ok: false, code: error.code, error: error.message }, { status: error.status });
   }
   return NextResponse.json({ ok: false, code: "ASSET_ERROR", error: "Asset operation failed." }, { status: 500 });
-}
-
-function serializeAsset(asset: any, tenantSlug: string) {
-  const metadata = asset.metadata && typeof asset.metadata === "object" ? asset.metadata : {};
-  return {
-    id: asset.id,
-    filename: asset.filename,
-    kind: asset.kind,
-    path: resolveAssetUrl(asset, tenantSlug),
-    sourcePath: asset.sourcePath,
-    storageKey: asset.storageKey,
-    mimeType: asset.mimeType,
-    rightsStatus: asset.rightsStatus,
-    draftCount: asset._count?.drafts ?? 0,
-    metadata,
-    folder: metadata.folder ?? "",
-    sizeBytes: metadata.sizeBytes ?? null,
-    width: metadata.width ?? null,
-    height: metadata.height ?? null,
-    durationSeconds: metadata.durationSeconds ?? null,
-    orientation: metadata.orientation ?? null,
-    aspectRatio: metadata.aspectRatio ?? null,
-  };
 }
 
 function parseJsonField(value: FormDataEntryValue | null): unknown {
@@ -47,7 +24,7 @@ export async function GET(_: Request, context: { params: Promise<{ slug: string 
   const { slug } = await context.params;
   try {
     const assets = await listTenantAssets({ tenantSlug: slug, userId: session.user.id });
-    return NextResponse.json({ ok: true, assets: assets.map((asset: any) => serializeAsset(asset, slug)) });
+    return NextResponse.json({ ok: true, assets: assets.map((asset: any) => serializeTenantAsset(asset, slug)) });
   } catch (error) {
     return jsonError(error);
   }
@@ -71,7 +48,7 @@ export async function POST(req: Request, context: { params: Promise<{ slug: stri
       projectId: formData?.get("projectId") ? String(formData.get("projectId")) : null,
       technicalMetadata: parseJsonField(formData?.get("technicalMetadata") ?? null),
     });
-    return NextResponse.json({ ok: true, asset: serializeAsset({ ...asset, _count: { drafts: 0 } }, slug) });
+    return NextResponse.json({ ok: true, asset: serializeTenantAsset({ ...asset, _count: { drafts: 0 } }, slug) });
   } catch (error) {
     return jsonError(error);
   }
