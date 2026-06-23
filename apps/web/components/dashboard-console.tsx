@@ -1196,7 +1196,8 @@ export function DashboardConsole({
         } : item));
 
         const finalized = await resolveUploadedAssetAfterUpload(tenantSlug, finalizePayload, {
-          timeoutMs: 12000,
+          timeoutMs: 20000,
+          finalizeAttempts: 2,
           attempts: 6,
           initialDelayMs: 300,
           maxDelayMs: 1500,
@@ -1275,7 +1276,8 @@ export function DashboardConsole({
           folder: item.folder ?? "",
           technicalMetadata: item.technicalMetadata,
         }, {
-          timeoutMs: 12000,
+          timeoutMs: 20000,
+          finalizeAttempts: 2,
           attempts: 6,
           initialDelayMs: 300,
           maxDelayMs: 1500,

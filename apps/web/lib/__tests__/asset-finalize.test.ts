@@ -260,6 +260,7 @@ describe("resolveUploadedAssetAfterUpload", () => {
   });
 
   it("uses storageKey fallback after finalize timeout", async () => {
+    let finalizeCalls = 0;
     let waitCalls = 0;
     const asset = {
       id: "asset-1",
@@ -282,6 +283,7 @@ describe("resolveUploadedAssetAfterUpload", () => {
     }, {
       deps: {
         finalizeUploadedAsset: async () => {
+          finalizeCalls++;
           throw new AssetFinalizeError("timeout", "ASSET_FINALIZE_TIMEOUT", 504, true);
         },
         waitForRegisteredAsset: async () => {
@@ -295,6 +297,7 @@ describe("resolveUploadedAssetAfterUpload", () => {
     if (result.outcome === "ready") {
       assert.equal(result.source, "fallback");
       assert.equal(result.attempts, 3);
+      assert.equal(finalizeCalls, 2);
       assert.equal(waitCalls, 1);
     }
   });
@@ -333,6 +336,51 @@ describe("resolveUploadedAssetAfterUpload", () => {
     if (result.outcome === "ready") {
       assert.equal(result.source, "finalize");
       assert.equal(uploadCalls, 0);
+    }
+  });
+
+  it("retries finalize once before polling fallback", async () => {
+    let finalizeCalls = 0;
+    let waitCalls = 0;
+    const asset = {
+      id: "asset-3",
+      filename: "retry-finalize.jpg",
+      kind: "IMAGE",
+      path: "https://blob.test/retry-finalize.jpg",
+      sourcePath: "https://blob.test/retry-finalize.jpg",
+      storageKey: "tenants/tenant-a/assets/u3/retry-finalize.jpg",
+      mimeType: "image/jpeg",
+      rightsStatus: "needs_review",
+      draftCount: 0,
+    };
+
+    const result = await resolveUploadedAssetAfterUpload("tenant-a", {
+      pathname: asset.storageKey!,
+      url: asset.path!,
+      contentType: asset.mimeType!,
+      size: 1024,
+      filename: asset.filename,
+    }, {
+      deps: {
+        finalizeUploadedAsset: async () => {
+          finalizeCalls++;
+          if (finalizeCalls === 1) {
+            throw new AssetFinalizeError("timeout", "ASSET_FINALIZE_TIMEOUT", 504, true);
+          }
+          return asset;
+        },
+        waitForRegisteredAsset: async () => {
+          waitCalls++;
+          return { found: false, attempts: 1, retryable: false };
+        },
+      },
+    });
+
+    assert.equal(result.outcome, "ready");
+    if (result.outcome === "ready") {
+      assert.equal(result.source, "finalize");
+      assert.equal(finalizeCalls, 2);
+      assert.equal(waitCalls, 0);
     }
   });
 });

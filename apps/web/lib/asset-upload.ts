@@ -186,6 +186,8 @@ export async function resolveUploadedAssetAfterUpload(
   payload: FinalizeUploadedAssetPayload,
   options?: {
     timeoutMs?: number;
+    finalizeAttempts?: number;
+    finalizeRetryDelayMs?: number;
     attempts?: number;
     initialDelayMs?: number;
     maxDelayMs?: number;
@@ -197,43 +199,58 @@ export async function resolveUploadedAssetAfterUpload(
     waitForRegisteredAsset,
     ...options?.deps,
   };
-  const timeoutMs = options?.timeoutMs ?? 12000;
-  const controller = typeof AbortController === "undefined" ? null : new AbortController();
-  const timeoutId = controller
-    ? setTimeout(() => controller.abort(), timeoutMs)
-    : null;
+  const timeoutMs = options?.timeoutMs ?? 20000;
+  const finalizeAttempts = Math.max(1, options?.finalizeAttempts ?? 2);
+  const finalizeRetryDelayMs = Math.max(0, options?.finalizeRetryDelayMs ?? 400);
+  let lastFinalizeError: unknown;
 
-  try {
-    const asset = await deps.finalizeUploadedAsset(tenantSlug, payload, { signal: controller?.signal });
-    return { outcome: "ready", asset, source: "finalize" };
-  } catch (error) {
-    if (error instanceof AssetFinalizeError && error.code === "ASSET_BLOB_NOT_FOUND") {
-      return { outcome: "missing-blob", error };
-    }
-    if (!shouldFallbackAfterFinalizeError(error)) {
-      throw error;
-    }
+  for (let attempt = 1; attempt <= finalizeAttempts; attempt++) {
+    const controller = typeof AbortController === "undefined" ? null : new AbortController();
+    const timeoutId = controller
+      ? setTimeout(() => controller.abort(), timeoutMs)
+      : null;
 
-    const lookup = await deps.waitForRegisteredAsset(tenantSlug, payload.pathname, {
-      attempts: options?.attempts,
-      initialDelayMs: options?.initialDelayMs,
-      maxDelayMs: options?.maxDelayMs,
-    });
-    if (lookup.found && lookup.asset) {
-      return { outcome: "ready", asset: lookup.asset, source: "fallback", attempts: lookup.attempts };
+    try {
+      const asset = await deps.finalizeUploadedAsset(tenantSlug, payload, { signal: controller?.signal });
+      return { outcome: "ready", asset, source: "finalize" };
+    } catch (error) {
+      if (error instanceof AssetFinalizeError && error.code === "ASSET_BLOB_NOT_FOUND") {
+        return { outcome: "missing-blob", error };
+      }
+      lastFinalizeError = error;
+      if (!shouldFallbackAfterFinalizeError(error) || attempt >= finalizeAttempts) {
+        break;
+      }
+      if (finalizeRetryDelayMs > 0) {
+        await new Promise((resolve) => setTimeout(resolve, finalizeRetryDelayMs));
+      }
+    } finally {
+      if (timeoutId != null) clearTimeout(timeoutId);
     }
-
-    const finalizeError = error instanceof AssetFinalizeError
-      ? error
-      : new AssetFinalizeError(
-        lookup.lastError ?? (error instanceof Error ? error.message : "Asset finalize failed."),
-        "ASSET_FINALIZE_FALLBACK_FAILED",
-        lookup.lastStatus,
-        lookup.retryable,
-      );
-    finalizeError.lookupResult = lookup;
-    throw finalizeError;
-  } finally {
-    if (timeoutId != null) clearTimeout(timeoutId);
   }
+
+  const fallbackError = lastFinalizeError ?? new AssetFinalizeError("Asset finalize failed.", "ASSET_FINALIZE_FAILED", undefined, true);
+  if (!shouldFallbackAfterFinalizeError(fallbackError)) {
+    throw fallbackError;
+  }
+
+  const lookup = await deps.waitForRegisteredAsset(tenantSlug, payload.pathname, {
+    attempts: options?.attempts,
+    initialDelayMs: options?.initialDelayMs,
+    maxDelayMs: options?.maxDelayMs,
+  });
+  if (lookup.found && lookup.asset) {
+    return { outcome: "ready", asset: lookup.asset, source: "fallback", attempts: lookup.attempts };
+  }
+
+  const finalizeError = fallbackError instanceof AssetFinalizeError
+    ? fallbackError
+    : new AssetFinalizeError(
+      lookup.lastError ?? (fallbackError instanceof Error ? fallbackError.message : "Asset finalize failed."),
+      "ASSET_FINALIZE_FALLBACK_FAILED",
+      lookup.lastStatus,
+      lookup.retryable,
+    );
+  finalizeError.lookupResult = lookup;
+  throw finalizeError;
 }
