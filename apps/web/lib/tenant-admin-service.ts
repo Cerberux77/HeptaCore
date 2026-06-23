@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { TenantStatus, type Tenant } from "@prisma/client";
 import { prisma as defaultPrisma } from "./prisma";
-import { hashInvitationToken, generateInvitationToken } from "./invitation-token";
+import { hashInvitationToken, generateInvitationToken, getInvitationExpiration } from "./invitation-token";
 import {
   assertTenantLifecycleAllowsMutation,
   requireSuperAdminActor,
@@ -70,12 +70,14 @@ export interface SerializedTenant {
   createdAt: Date;
   ownerEmail: string;
   invitationToken?: string;
+  ownerAccountState?: "EXISTING_ACCOUNT" | "INVITATION_REQUIRED";
 }
 
 function serializeTenant(
   tenant: Tenant & { memberships?: Array<{ user: { email: string } }> },
   ownerEmail: string,
   invitationToken?: string,
+  ownerAccountState?: "EXISTING_ACCOUNT" | "INVITATION_REQUIRED",
 ): SerializedTenant {
   return {
     id: tenant.id,
@@ -88,6 +90,7 @@ function serializeTenant(
     createdAt: tenant.createdAt,
     ownerEmail,
     ...(invitationToken ? { invitationToken } : {}),
+    ...(ownerAccountState ? { ownerAccountState } : {}),
   };
 }
 
@@ -143,6 +146,11 @@ export async function createAdminTenant(
       });
     }
 
+    let ownerAccountState: "EXISTING_ACCOUNT" | "INVITATION_REQUIRED" = "INVITATION_REQUIRED";
+    if (owner.passwordHash) {
+      ownerAccountState = "EXISTING_ACCOUNT";
+    }
+
     const tenant = await tx.tenant.create({
       data: {
         slug: normalizedSlug,
@@ -157,18 +165,21 @@ export async function createAdminTenant(
       data: { tenantId: tenant.id, userId: owner.id, role: "OWNER" },
     });
 
-    const plainToken = generateInvitationToken();
-    const tokenHash = hashInvitationToken(plainToken);
-    await tx.invitation.create({
-      data: {
-        id: `inv_${randomUUID()}`,
-        tenantId: tenant.id,
-        email: ownerEmail,
-        role: "OWNER",
-        tokenHash,
-        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-      },
-    });
+    let plainToken: string | undefined;
+    if (ownerAccountState === "INVITATION_REQUIRED") {
+      plainToken = generateInvitationToken();
+      const tokenHash = hashInvitationToken(plainToken);
+      await tx.invitation.create({
+        data: {
+          id: `inv_${randomUUID()}`,
+          tenantId: tenant.id,
+          email: ownerEmail,
+          role: "OWNER",
+          tokenHash,
+          expiresAt: getInvitationExpiration(),
+        },
+      });
+    }
 
     await tx.auditLog.create({
       data: {
@@ -184,6 +195,7 @@ export async function createAdminTenant(
       { ...tenant, memberships: [{ user: { email: ownerEmail } }] } as Tenant & { memberships?: Array<{ user: { email: string } }> },
       ownerEmail,
       plainToken,
+      ownerAccountState,
     );
   });
 }
