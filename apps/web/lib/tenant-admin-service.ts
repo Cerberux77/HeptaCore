@@ -1,15 +1,18 @@
 import { randomUUID } from "node:crypto";
-import { TenantStatus, type Tenant } from "@prisma/client";
+import { TenantStatus, type Tenant, type Membership, type Invitation, type User } from "@prisma/client";
 import { prisma as defaultPrisma } from "./prisma";
 import { hashInvitationToken, generateInvitationToken, getInvitationExpiration } from "./invitation-token";
 import { buildInviteLink } from "./email/email-invitation-service";
 import {
   assertTenantLifecycleAllowsMutation,
   requireSuperAdminActor,
+  resolveTenantAccessWithLifecycle,
   TenantAccessError,
   type TenantAdminDb,
+  type AccessResolutionDb,
 } from "./tenant-access";
-import type { Prisma } from "@prisma/client";
+import { Permission } from "./permissions";
+import type { Prisma, UserRole } from "@prisma/client";
 
 export type TenantAdminTx = Prisma.TransactionClient;
 
@@ -323,3 +326,411 @@ export async function updateAdminTenantConfiguration(
 }
 
 export { generateInvitationToken };
+
+export interface SerializedMember {
+  id: string;
+  userId: string;
+  email: string;
+  name: string | null;
+  role: UserRole;
+  createdAt: Date;
+}
+
+export async function listTenantMembers(
+  actorId: string,
+  tenantId: string,
+  db: TenantAdminDbWithTx = defaultPrisma as unknown as TenantAdminDbWithTx,
+): Promise<SerializedMember[]> {
+  return db.$transaction(async (tx) => {
+    await resolveTenantAccessWithLifecycle(actorId, tenantId, Permission.MEMBERS_READ, "NORMAL_OPERATION", tx as unknown as AccessResolutionDb);
+
+    const memberships = await tx.membership.findMany({
+      where: { tenantId },
+      include: { user: { select: { email: true, name: true } } },
+      orderBy: { createdAt: "asc" },
+    });
+
+    return memberships.map((m) => ({
+      id: m.id,
+      userId: m.userId,
+      email: m.user.email,
+      name: m.user.name,
+      role: m.role as UserRole,
+      createdAt: m.createdAt,
+    }));
+  });
+}
+
+export interface AddMemberParams {
+  email: string;
+  role: UserRole;
+}
+
+export async function addTenantMember(
+  actorId: string,
+  tenantId: string,
+  params: AddMemberParams,
+  db: TenantAdminDbWithTx = defaultPrisma as unknown as TenantAdminDbWithTx,
+): Promise<SerializedMember> {
+  const email = params.email.toLowerCase().trim();
+  if (!email || !email.includes("@")) {
+    throw new TenantAdminError("Invalid email", "INVALID_EMAIL", 400);
+  }
+
+  if (params.role === "SUPER_ADMIN") {
+    throw new TenantAdminError("Cannot assign SUPER_ADMIN to a tenant", "INVALID_ROLE", 400);
+  }
+
+  const validRoles: UserRole[] = ["OWNER", "ADMIN", "STRATEGIST", "EDITOR", "ANALYST", "APPROVER", "VIEWER", "TENANT_ADMIN", "PUBLISHER"];
+  if (!validRoles.includes(params.role)) {
+    throw new TenantAdminError(`Invalid role: ${params.role}`, "INVALID_ROLE", 400);
+  }
+
+  return db.$transaction(async (tx) => {
+    await resolveTenantAccessWithLifecycle(actorId, tenantId, Permission.MEMBERS_ADD, "NORMAL_OPERATION", tx as unknown as AccessResolutionDb);
+
+    let user = await tx.user.findUnique({ where: { email } });
+    if (!user) {
+      user = await tx.user.create({ data: { email, name: email } });
+    }
+
+    const existing = await tx.membership.findUnique({
+      where: { tenantId_userId: { tenantId, userId: user.id } },
+    });
+    if (existing) {
+      throw new TenantAdminError("User is already a member of this tenant", "DUPLICATE_MEMBERSHIP", 409);
+    }
+
+    const membership = await tx.membership.create({
+      data: { tenantId, userId: user.id, role: params.role },
+    });
+
+    await tx.auditLog.create({
+      data: {
+        tenantId,
+        actorId,
+        action: "MEMBER_ADDED",
+        target: membership.id,
+        metadata: { userId: user.id, email, role: params.role },
+      },
+    });
+
+    return {
+      id: membership.id,
+      userId: user.id,
+      email: user.email,
+      name: user.name,
+      role: membership.role as UserRole,
+      createdAt: membership.createdAt,
+    };
+  });
+}
+
+export interface ChangeRoleParams {
+  role: UserRole;
+}
+
+export async function changeTenantMemberRole(
+  actorId: string,
+  tenantId: string,
+  membershipId: string,
+  params: ChangeRoleParams,
+  db: TenantAdminDbWithTx = defaultPrisma as unknown as TenantAdminDbWithTx,
+): Promise<SerializedMember> {
+  if (params.role === "SUPER_ADMIN") {
+    throw new TenantAdminError("Cannot assign SUPER_ADMIN to a tenant", "INVALID_ROLE", 400);
+  }
+
+  const validRoles: UserRole[] = ["OWNER", "ADMIN", "STRATEGIST", "EDITOR", "ANALYST", "APPROVER", "VIEWER", "TENANT_ADMIN", "PUBLISHER"];
+  if (!validRoles.includes(params.role)) {
+    throw new TenantAdminError(`Invalid role: ${params.role}`, "INVALID_ROLE", 400);
+  }
+
+  return db.$transaction(async (tx) => {
+    await resolveTenantAccessWithLifecycle(actorId, tenantId, Permission.MEMBERS_ROLE_UPDATE, "NORMAL_OPERATION", tx as unknown as AccessResolutionDb);
+
+    const membership = await tx.membership.findUnique({
+      where: { id: membershipId },
+      include: { user: { select: { email: true, name: true } } },
+    });
+    if (!membership || membership.tenantId !== tenantId) {
+      throw new TenantAdminError("Membership not found", "NOT_FOUND", 404);
+    }
+
+    const previousRole = membership.role;
+
+    if (previousRole === "OWNER" && params.role !== "OWNER") {
+      const ownerCount = await tx.membership.count({
+        where: { tenantId, role: "OWNER" },
+      });
+      if (ownerCount <= 1) {
+        throw new TenantAdminError(
+          "Cannot downgrade the last OWNER of the tenant",
+          "LAST_OWNER",
+          409,
+        );
+      }
+    }
+
+    const updated = await tx.membership.update({
+      where: { id: membershipId },
+      data: { role: params.role },
+      include: { user: { select: { email: true, name: true } } },
+    });
+
+    await tx.auditLog.create({
+      data: {
+        tenantId,
+        actorId,
+        action: "MEMBER_ROLE_CHANGED",
+        target: membershipId,
+        metadata: {
+          userId: membership.userId,
+          before: previousRole,
+          after: params.role,
+        },
+      },
+    });
+
+    return {
+      id: updated.id,
+      userId: updated.userId,
+      email: updated.user.email,
+      name: updated.user.name,
+      role: updated.role as UserRole,
+      createdAt: updated.createdAt,
+    };
+  });
+}
+
+export async function removeTenantMember(
+  actorId: string,
+  tenantId: string,
+  membershipId: string,
+  db: TenantAdminDbWithTx = defaultPrisma as unknown as TenantAdminDbWithTx,
+): Promise<void> {
+  await db.$transaction(async (tx) => {
+    await resolveTenantAccessWithLifecycle(actorId, tenantId, Permission.MEMBERS_REMOVE, "NORMAL_OPERATION", tx as unknown as AccessResolutionDb);
+
+    const membership = await tx.membership.findUnique({
+      where: { id: membershipId },
+    });
+    if (!membership || membership.tenantId !== tenantId) {
+      throw new TenantAdminError("Membership not found", "NOT_FOUND", 404);
+    }
+
+    if (membership.role === "OWNER") {
+      const ownerCount = await tx.membership.count({
+        where: { tenantId, role: "OWNER" },
+      });
+      if (ownerCount <= 1) {
+        throw new TenantAdminError(
+          "Cannot remove the last OWNER of the tenant",
+          "LAST_OWNER",
+          409,
+        );
+      }
+    }
+
+    await tx.membership.delete({ where: { id: membershipId } });
+
+    await tx.auditLog.create({
+      data: {
+        tenantId,
+        actorId,
+        action: "MEMBER_REMOVED",
+        target: membershipId,
+        metadata: { userId: membership.userId, role: membership.role },
+      },
+    });
+  });
+}
+
+export interface CreateInvitationParams {
+  email: string;
+  role: UserRole;
+}
+
+export async function createTenantInvitation(
+  actorId: string,
+  tenantId: string,
+  params: CreateInvitationParams,
+  db: TenantAdminDbWithTx = defaultPrisma as unknown as TenantAdminDbWithTx,
+): Promise<{ id: string; email: string; role: string; inviteLink: string; createdAt: Date }> {
+  const email = params.email.toLowerCase().trim();
+  if (!email || !email.includes("@")) {
+    throw new TenantAdminError("Invalid email", "INVALID_EMAIL", 400);
+  }
+
+  if (params.role === "SUPER_ADMIN") {
+    throw new TenantAdminError("Cannot invite SUPER_ADMIN to a tenant", "INVALID_ROLE", 400);
+  }
+
+  const validRoles: UserRole[] = ["OWNER", "ADMIN", "STRATEGIST", "EDITOR", "ANALYST", "APPROVER", "VIEWER", "TENANT_ADMIN", "PUBLISHER"];
+  if (!validRoles.includes(params.role)) {
+    throw new TenantAdminError(`Invalid role: ${params.role}`, "INVALID_ROLE", 400);
+  }
+
+  return db.$transaction(async (tx) => {
+    await resolveTenantAccessWithLifecycle(actorId, tenantId, Permission.INVITATIONS_CREATE, "NORMAL_OPERATION", tx as unknown as AccessResolutionDb);
+
+    const tenant = await tx.tenant.findUnique({
+      where: { id: tenantId },
+      select: { slug: true },
+    });
+    if (!tenant) throw new TenantAdminError("Tenant not found", "NOT_FOUND", 404);
+
+    const existingInvite = await tx.invitation.findFirst({
+      where: { tenantId, email, acceptedById: null, expiresAt: { gt: new Date() } },
+    });
+    if (existingInvite) {
+      throw new TenantAdminError("An active invitation already exists for this email", "DUPLICATE_INVITATION", 409);
+    }
+
+    const plainToken = generateInvitationToken();
+    const tokenHash = hashInvitationToken(plainToken);
+
+    const invitation = await tx.invitation.create({
+      data: {
+        id: `inv_${randomUUID()}`,
+        tenantId,
+        email,
+        role: params.role,
+        tokenHash,
+        expiresAt: getInvitationExpiration(),
+      },
+    });
+
+    const inviteLink = buildInviteLink(plainToken, email, "INVITATION_REQUIRED", undefined, tenant.slug);
+
+    await tx.auditLog.create({
+      data: {
+        tenantId,
+        actorId,
+        action: "INVITATION_CREATED",
+        target: invitation.id,
+        metadata: { email, role: params.role },
+      },
+    });
+
+    return {
+      id: invitation.id,
+      email,
+      role: params.role,
+      inviteLink,
+      createdAt: invitation.createdAt,
+    };
+  });
+}
+
+export async function resendTenantInvitation(
+  actorId: string,
+  tenantId: string,
+  invitationId: string,
+  db: TenantAdminDbWithTx = defaultPrisma as unknown as TenantAdminDbWithTx,
+): Promise<{ id: string; inviteLink: string }> {
+  return db.$transaction(async (tx) => {
+    await resolveTenantAccessWithLifecycle(actorId, tenantId, Permission.INVITATIONS_REISSUE, "NORMAL_OPERATION", tx as unknown as AccessResolutionDb);
+
+    const invitation = await tx.invitation.findUnique({
+      where: { id: invitationId },
+    });
+    if (!invitation || invitation.tenantId !== tenantId) {
+      throw new TenantAdminError("Invitation not found", "NOT_FOUND", 404);
+    }
+
+    if (invitation.acceptedById) {
+      throw new TenantAdminError("Invitation already accepted", "ALREADY_ACCEPTED", 409);
+    }
+
+    const tenant = await tx.tenant.findUnique({
+      where: { id: tenantId },
+      select: { slug: true },
+    });
+    if (!tenant) throw new TenantAdminError("Tenant not found", "NOT_FOUND", 404);
+
+    const plainToken = generateInvitationToken();
+    const tokenHash = hashInvitationToken(plainToken);
+    const now = new Date();
+
+    await tx.invitation.update({
+      where: { id: invitationId },
+      data: {
+        tokenHash,
+        expiresAt: getInvitationExpiration(),
+      },
+    });
+
+    const inviteLink = buildInviteLink(plainToken, invitation.email, "INVITATION_REQUIRED", undefined, tenant.slug);
+
+    await tx.auditLog.create({
+      data: {
+        tenantId,
+        actorId,
+        action: "INVITATION_REISSUED",
+        target: invitationId,
+        metadata: { email: invitation.email },
+      },
+    });
+
+    return { id: invitationId, inviteLink };
+  });
+}
+
+export async function revokeTenantInvitation(
+  actorId: string,
+  tenantId: string,
+  invitationId: string,
+  db: TenantAdminDbWithTx = defaultPrisma as unknown as TenantAdminDbWithTx,
+): Promise<void> {
+  await db.$transaction(async (tx) => {
+    await resolveTenantAccessWithLifecycle(actorId, tenantId, Permission.INVITATIONS_REVOKE, "NORMAL_OPERATION", tx as unknown as AccessResolutionDb);
+
+    const invitation = await tx.invitation.findUnique({
+      where: { id: invitationId },
+    });
+    if (!invitation || invitation.tenantId !== tenantId) {
+      throw new TenantAdminError("Invitation not found", "NOT_FOUND", 404);
+    }
+
+    if (invitation.acceptedById) {
+      throw new TenantAdminError("Cannot revoke an accepted invitation", "ALREADY_ACCEPTED", 409);
+    }
+
+    await tx.invitation.delete({ where: { id: invitationId } });
+
+    await tx.auditLog.create({
+      data: {
+        tenantId,
+        actorId,
+        action: "INVITATION_REVOKED",
+        target: invitationId,
+        metadata: { email: invitation.email, role: invitation.role },
+      },
+    });
+  });
+}
+
+export async function listTenantInvitations(
+  actorId: string,
+  tenantId: string,
+  db: TenantAdminDbWithTx = defaultPrisma as unknown as TenantAdminDbWithTx,
+): Promise<Array<{ id: string; email: string; role: string; accepted: boolean; expiresAt: Date; createdAt: Date }>> {
+  return db.$transaction(async (tx) => {
+    await resolveTenantAccessWithLifecycle(actorId, tenantId, Permission.INVITATIONS_READ, "NORMAL_OPERATION", tx as unknown as AccessResolutionDb);
+
+    const invitations = await tx.invitation.findMany({
+      where: { tenantId },
+      orderBy: { createdAt: "desc" },
+    });
+
+    return invitations.map((inv) => ({
+      id: inv.id,
+      email: inv.email,
+      role: inv.role,
+      accepted: !!inv.acceptedById,
+      expiresAt: inv.expiresAt,
+      createdAt: inv.createdAt,
+    }));
+  });
+}
