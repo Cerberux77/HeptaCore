@@ -14,6 +14,7 @@
     "npm run worker:validate"
   ],
   "currentExecutionOrder": [
+    "Fase activa: S-HC-TEN-01-GLOBAL-TENANT-ADMIN — administracion global de tenants y provisionamiento.",
     "Fase completada: S-HC-REC-00A — baseline de publicacion recuperado y estabilizado (SHA 2fd9e249). Facebook e Instagram publican realmente desde la UI con durabilidad transaccional.",
     "Fase completada: S-HC-REC-00C — integracion canonica en master (SHA 9329fe8). Documentacion y Oreshnik alineados.",
     "Fase completada: oreshnik-cli@0.2.0-alpha.0 publicado. reconcile --check/--write operacional.",
@@ -48,7 +49,26 @@
     "tests": 156,
     "vercelCrons": "24 slots diarios configurados. Cron publisher idempotente."
   },
-  "tasks": [
+    "tasks": [
+    {
+      "id": "S-HC-TEN-01-GLOBAL-TENANT-ADMIN",
+      "title": "Global tenant administration and provisioning",
+      "owner": "Manuel",
+      "backupOwner": "Manuel",
+      "status": "active",
+      "track": "tenant-platform",
+      "zone": ["packages/db/**", "apps/web/lib/tenant-admin-service.ts", "apps/web/lib/tenant-access.ts", "apps/web/lib/__tests__/tenant-admin*.test.ts", "docs/**", "var/oreshnik/**"],
+      "dependsOn": ["S-HC-PUB-03-MULTITENANT-ASSETS"],
+      "acceptance": [
+        "Tenant lifecycle schema with PROVISIONING, ACTIVE, SUSPENDED, ARCHIVED states",
+        "Secure migration preserving existing tenants as ACTIVE",
+        "SUPER_ADMIN access contracts",
+        "Transactional tenant provisioning",
+        "Slug validation and normalization",
+        "Lifecycle transitions with audit trail",
+        "Secure serialization without exposing secrets"
+      ]
+    },
     {
       "id": "S-HC-00",
       "title": "Foundation baseline commit",
@@ -465,7 +485,7 @@
         "apps/web/components"
       ],
       "dependsOn": [
-        "S-HC-REC-00C"
+        "S-HC-TEN-01-GLOBAL-TENANT-ADMIN"
       ],
       "acceptance": [
         "Self-service registration with email verification",
@@ -816,6 +836,7 @@
         "packages/db"
       ],
       "dependsOn": [
+        "S-HC-TEN-01-GLOBAL-TENANT-ADMIN",
         "S-HC-OPS-01-CAMPAIGN-REVIEW-DEPLOYMENT",
         "S-HC-COMM-02-BILLING-ACTIVATION",
         "S-HC-ONB-02-GAP-RESOLUTION-WIZARD",
