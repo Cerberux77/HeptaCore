@@ -165,10 +165,11 @@ export function AdminIdentityPanel() {
   const showLoadingBadge = loading && !data && !hasError;
 
   return (
-    <div style={{ position: "relative" }}>
+    <div className="identity-panel-root">
       <button
         ref={triggerRef}
         type="button"
+        className="identity-panel-trigger"
         onClick={() => setOpen(!open)}
         aria-expanded={open}
         aria-controls="identity-panel"
@@ -194,10 +195,10 @@ export function AdminIdentityPanel() {
           <Loader2 size={12} style={{ animation: "spin 1s linear infinite" }} />
         ) : (
           <>
-            <span style={{ color: isSuperAdmin ? "var(--hc-teal)" : "var(--hc-graphite)", fontWeight: 700 }}>
+            <span className="identity-panel-trigger-text" style={{ color: isSuperAdmin ? "var(--hc-teal)" : "var(--hc-graphite)", fontWeight: 700 }}>
               {displayName}
             </span>
-            <span style={{ color: "var(--hc-fog)", fontSize: 10 }}>
+            <span style={{ color: "var(--hc-fog)", fontSize: 10, flexShrink: 0 }}>
               · {displayRole}
             </span>
           </>
@@ -209,22 +210,9 @@ export function AdminIdentityPanel() {
         <div
           id="identity-panel"
           ref={panelRef}
+          className="identity-panel-content"
           role="dialog"
           aria-label="Panel de identidad y permisos"
-          style={{
-            position: "absolute",
-            top: "calc(100% + 6px)",
-            right: 0,
-            width: 360,
-            maxHeight: "80vh",
-            overflowY: "auto",
-            background: "var(--hc-panel)",
-            border: "1px solid var(--hc-line)",
-            borderRadius: 8,
-            boxShadow: "0 8px 30px rgba(0,0,0,0.15)",
-            zIndex: 100,
-            fontFamily: "inherit",
-          }}
         >
           {hasError && (
             <div style={{ padding: "14px 16px", fontSize: 12, color: "var(--hc-red)", borderBottom: "1px solid var(--hc-line)", display: "flex", alignItems: "center", gap: 6 }}>
@@ -309,33 +297,22 @@ export function AdminIdentityPanel() {
                 <div style={{ fontSize: 11, fontWeight: 600, color: "var(--hc-graphite)", marginBottom: 6 }}>
                   Permisos efectivos
                 </div>
-                <div style={{ display: "flex", flexDirection: "column", gap: 1, maxHeight: 300, overflowY: "auto" }}>
+                <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
                   {(tenant?.tenantPermissions || data.effectivePermissions).map((p) => (
-                    <div
-                      key={p.permission}
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 6,
-                        padding: "2px 0",
-                        fontSize: 10,
-                        color: p.granted ? "var(--hc-ink)" : "var(--hc-fog)",
-                      }}
-                    >
+                    <div key={p.permission} className="identity-permission-row" style={{ color: p.granted ? "var(--hc-ink)" : "var(--hc-fog)" }}>
                       {p.granted ? (
-                        <Check size={10} color="var(--hc-teal)" />
+                        <Check size={10} color="var(--hc-teal)" style={{ flexShrink: 0 }} />
                       ) : (
-                        <X size={10} color="var(--hc-fog)" />
+                        <X size={10} color="var(--hc-fog)" style={{ flexShrink: 0 }} />
                       )}
-                      <span style={{ flex: 1 }}>{permissionLabel(p.permission)}</span>
-                      <span style={{
-                        fontSize: 9,
-                        fontWeight: 600,
-                        color: p.granted ? "var(--hc-teal)" : "var(--hc-fog)",
-                        background: p.granted ? "rgba(11,117,111,0.1)" : "rgba(107,107,107,0.1)",
-                        padding: "1px 5px",
-                        borderRadius: 3,
-                      }}>
+                      <span className="perm-label">{permissionLabel(p.permission)}</span>
+                      <span
+                        className="identity-permission-badge"
+                        style={{
+                          color: p.granted ? "var(--hc-teal)" : "var(--hc-fog)",
+                          background: p.granted ? "rgba(11,117,111,0.1)" : "rgba(107,107,107,0.1)",
+                        }}
+                      >
                         {p.granted ? "SI" : "NO"}
                       </span>
                     </div>

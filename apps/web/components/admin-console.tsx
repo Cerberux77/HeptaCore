@@ -259,7 +259,7 @@ export function AdminConsole({ data }: { data: AdminDashboardData }) {
           <strong>Admin global</strong>
           <small>Todos los tenants / control central</small>
         </div>
-        <div style={{ padding: "6px 0 10px" }}>
+        <div style={{ padding: "6px 0 10px", width: "100%", minWidth: 0, boxSizing: "border-box" }}>
           <AdminIdentityPanel />
         </div>
         <nav className="app-nav">

@@ -16,7 +16,7 @@ export function AdminTenantsShell({ children }: { children: React.ReactNode }) {
           <strong>Tenants</strong>
           <small>Gestion global de cuentas</small>
         </div>
-        <div style={{ padding: "6px 0 10px" }}>
+        <div style={{ padding: "6px 0 10px", width: "100%", minWidth: 0, boxSizing: "border-box" }}>
           <AdminIdentityPanel />
         </div>
         <nav className="app-nav">

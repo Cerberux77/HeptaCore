@@ -136,4 +136,51 @@ describe("identity panel mounting", () => {
     assert.ok(navIdx >= 0, "must contain app-nav");
     assert.ok(identityIdx < navIdx, "AdminIdentityPanel must appear before nav in console");
   });
+
+  it("AdminIdentityPanel uses flow layout CSS classes, not absolute positioning", async () => {
+    const mod = await import("../../components/admin-identity-panel");
+    const src = mod.AdminIdentityPanel.toString();
+
+    assert.ok(src.includes("identity-panel-root"), "must use CSS class identity-panel-root");
+    assert.ok(src.includes("identity-panel-trigger"), "must use CSS class identity-panel-trigger");
+    assert.ok(src.includes("identity-panel-content"), "must use CSS class identity-panel-content");
+    assert.ok(!src.includes('position: "absolute"'), "must NOT use position absolute on panel");
+    assert.ok(!src.includes('position: "fixed"'), "must NOT use position fixed on panel");
+  });
+
+  it("AdminIdentityPanel uses grid layout for permission rows", async () => {
+    const mod = await import("../../components/admin-identity-panel");
+    const src = mod.AdminIdentityPanel.toString();
+
+    assert.ok(src.includes("identity-permission-row"), "must use CSS class for permission rows");
+    assert.ok(src.includes("perm-label"), "must use CSS class for permission labels");
+    assert.ok(src.includes("identity-permission-badge"), "must use CSS class for permission badges");
+  });
+
+  it("globals.css has identity panel containment styles", async () => {
+    const fs = await import("node:fs");
+    const css = fs.readFileSync("app/globals.css", "utf8");
+
+    assert.ok(css.includes(".identity-panel-root"), "CSS must define identity-panel-root");
+    assert.ok(css.includes(".identity-panel-content"), "CSS must define identity-panel-content");
+    assert.ok(css.includes("overflow-x: hidden"), "CSS must have overflow-x control");
+    assert.ok(css.includes("max-width: 100%"), "CSS must have max-width containment");
+    assert.ok(css.includes("min-width: 0"), "CSS must have min-width 0");
+    assert.ok(css.includes("grid-template-columns"), "CSS must use grid for permissions");
+    assert.ok(css.includes("minmax(0, 1fr)"), "CSS must use minmax for flexible columns");
+  });
+
+  it("identity panel CSS does not use fixed widths that overflow sidebar", async () => {
+    const fs = await import("node:fs");
+    const css = fs.readFileSync("app/globals.css", "utf8");
+
+    const panelContent = css.match(/\.identity-panel-content\s*\{([^}]*)\}/);
+    assert.ok(panelContent, "identity-panel-content class must exist");
+    const content = panelContent![1];
+    assert.ok(!content.includes("width: 360px"), "panel must not have fixed 360px width");
+    assert.ok(!content.includes("width: 400px"), "panel must not have wide fixed width");
+    assert.ok(!content.includes("left:"), "panel must not use left offset");
+    assert.ok(!content.includes("right:"), "panel must not use right offset");
+    assert.ok(content.includes("width: 100%"), "panel must use 100 pct width");
+  });
 });
