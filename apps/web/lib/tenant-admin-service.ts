@@ -15,6 +15,7 @@ import {
   type AccessResolutionDb,
 } from "./tenant-access";
 import { Permission } from "./permissions";
+import { isAssignableTenantRole, isLegacyTenantRole, CANONICAL_TENANT_ROLES } from "./canonical-tenant-role";
 import type { Prisma, UserRole } from "@prisma/client";
 
 export type TenantAdminTx = Prisma.TransactionClient;
@@ -502,8 +503,15 @@ export async function addTenantMember(
     throw new TenantAdminError("Cannot assign SUPER_ADMIN to a tenant", "INVALID_ROLE", 400);
   }
 
-  const validRoles: UserRole[] = ["OWNER", "ADMIN", "STRATEGIST", "EDITOR", "ANALYST", "APPROVER", "VIEWER", "TENANT_ADMIN", "PUBLISHER"];
-  if (!validRoles.includes(params.role)) {
+  if (isLegacyTenantRole(params.role)) {
+    throw new TenantAdminError(
+      "Este rol pertenece al modelo anterior y ya no puede asignarse.",
+      "LEGACY_ROLE_NOT_ASSIGNABLE",
+      400,
+    );
+  }
+
+  if (!isAssignableTenantRole(params.role)) {
     throw new TenantAdminError(`Invalid role: ${params.role}`, "INVALID_ROLE", 400);
   }
 
@@ -569,8 +577,15 @@ export async function changeTenantMemberRole(
     throw new TenantAdminError("Cannot assign SUPER_ADMIN to a tenant", "INVALID_ROLE", 400);
   }
 
-  const validRoles: UserRole[] = ["OWNER", "ADMIN", "STRATEGIST", "EDITOR", "ANALYST", "APPROVER", "VIEWER", "TENANT_ADMIN", "PUBLISHER"];
-  if (!validRoles.includes(params.role)) {
+  if (isLegacyTenantRole(params.role)) {
+    throw new TenantAdminError(
+      "Este rol pertenece al modelo anterior y ya no puede asignarse.",
+      "LEGACY_ROLE_NOT_ASSIGNABLE",
+      400,
+    );
+  }
+
+  if (!isAssignableTenantRole(params.role)) {
     throw new TenantAdminError(`Invalid role: ${params.role}`, "INVALID_ROLE", 400);
   }
 
@@ -723,8 +738,15 @@ export async function createTenantInvitation(
     throw new TenantAdminError("Cannot invite SUPER_ADMIN to a tenant", "INVALID_ROLE", 400);
   }
 
-  const validRoles: UserRole[] = ["OWNER", "ADMIN", "STRATEGIST", "EDITOR", "ANALYST", "APPROVER", "VIEWER", "TENANT_ADMIN", "PUBLISHER"];
-  if (!validRoles.includes(params.role)) {
+  if (isLegacyTenantRole(params.role)) {
+    throw new TenantAdminError(
+      "Este rol pertenece al modelo anterior y ya no puede asignarse.",
+      "LEGACY_ROLE_NOT_ASSIGNABLE",
+      400,
+    );
+  }
+
+  if (!isAssignableTenantRole(params.role)) {
     throw new TenantAdminError(`Invalid role: ${params.role}`, "INVALID_ROLE", 400);
   }
 

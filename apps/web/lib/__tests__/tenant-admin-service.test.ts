@@ -636,7 +636,7 @@ describe("validatePagination", () => {
     it("placeholder with null passwordHash requires invitation", async () => {
       fake.collections.tenants.create({ data: { id: "t1", slug: "t1-tenant", name: "T1", status: "ACTIVE", plan: "PILOT", timezone: "UTC", locale: "es", createdAt: new Date() } });
       await assert.rejects(
-        () => addTenantMember("sa1", "t1", { email: "sa@test.com", role: "EDITOR" }, db),
+        () => addTenantMember("sa1", "t1", { email: "sa@test.com", role: "ADMIN" }, db),
         (e: unknown) => (e as TenantAdminError).code === "ACCOUNT_REQUIRES_INVITATION",
       );
     });
@@ -644,7 +644,7 @@ describe("validatePagination", () => {
     it("non-existent user requires invitation", async () => {
       fake.collections.tenants.create({ data: { id: "t1", slug: "t1-tenant", name: "T1", status: "ACTIVE", plan: "PILOT", timezone: "UTC", locale: "es", createdAt: new Date() } });
       await assert.rejects(
-        () => addTenantMember("sa1", "t1", { email: "nonexistent@test.com", role: "EDITOR" }, db),
+        () => addTenantMember("sa1", "t1", { email: "nonexistent@test.com", role: "ADMIN" }, db),
         (e: unknown) => (e as TenantAdminError).code === "ACCOUNT_REQUIRES_INVITATION",
       );
     });
@@ -652,9 +652,9 @@ describe("validatePagination", () => {
     it("active account with passwordHash can be added", async () => {
       fake.collections.users.create({ data: { id: "active1", email: "active@test.com", passwordHash: "some_hash" } });
       fake.collections.tenants.create({ data: { id: "t_active", slug: "active-tenant", name: "Active", status: "ACTIVE", plan: "PILOT", timezone: "UTC", locale: "es", createdAt: new Date() } });
-      const member = await addTenantMember("sa1", "t_active", { email: "active@test.com", role: "EDITOR" }, db);
+      const member = await addTenantMember("sa1", "t_active", { email: "active@test.com", role: "ADMIN" }, db);
       assert.equal(member.email, "active@test.com");
-      assert.equal(member.role, "EDITOR");
+      assert.equal(member.role, "ADMIN");
     });
   });
 

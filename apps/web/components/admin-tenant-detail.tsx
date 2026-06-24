@@ -8,6 +8,7 @@ import { ConfirmDialog } from "./admin-tenant-confirm-dialog";
 import { AdminTenantPagination } from "./admin-tenant-pagination";
 import { EmptyState, InlineError } from "./admin-tenant-feedback";
 import { translateError } from "../lib/error-messages";
+import { CANONICAL_TENANT_ROLES, getCanonicalRoleLabel } from "../lib/canonical-tenant-role";
 
 /* ─────────────────── Types ─────────────────── */
 interface TenantData {
@@ -30,7 +31,7 @@ function apiFetch<T>(url: string, init?: RequestInit): Promise<{ ok: boolean; da
   return fetch(url, init).then((r) => r.json());
 }
 
-const ROLE_OPTIONS = ["OWNER", "ADMIN", "TENANT_ADMIN", "STRATEGIST", "EDITOR", "APPROVER", "PUBLISHER", "ANALYST", "VIEWER"];
+const ROLE_OPTIONS = CANONICAL_TENANT_ROLES as unknown as string[];
 
 /* ─── Component ─── */
 export function AdminTenantDetail({ slug }: { slug: string }) {
@@ -358,7 +359,7 @@ function MembersTab({ slug, tenantStatus }: { slug: string; tenantStatus: string
           <label style={{ display: "flex", flexDirection: "column", gap: 3 }}>
             <span style={{ fontSize: 11, fontWeight: 600 }}>Rol</span>
             <select value={addRole} onChange={(e) => setAddRole(e.target.value)} style={{ padding: "5px 6px", fontSize: 12, border: "1px solid var(--hc-line)", borderRadius: 4, fontFamily: "inherit" }}>
-              {ROLE_OPTIONS.map((r) => <option key={r} value={r}>{r}</option>)}
+              {ROLE_OPTIONS.map((r) => <option key={r} value={r}>{getCanonicalRoleLabel(r)}</option>)}
             </select>
           </label>
           <button type="submit" disabled={addLoading} style={{ padding: "5px 14px", fontSize: 12, borderRadius: 4, border: "none", background: "var(--hc-teal)", color: "#fff", cursor: "pointer", fontFamily: "inherit" }}>
@@ -410,7 +411,7 @@ function MembersTab({ slug, tenantStatus }: { slug: string; tenantStatus: string
                     style={{ padding: "2px 4px", fontSize: 11, border: "1px solid var(--hc-line)", borderRadius: 4, fontFamily: "inherit", color: disableActions ? "var(--hc-fog)" : "var(--hc-ink)", opacity: disableActions ? 0.5 : 1 }}
                     aria-label={`Cambiar rol de ${m.email}${disableActions ? " (bloqueado)" : ""}`}
                   >
-                    {ROLE_OPTIONS.map((r) => <option key={r} value={r}>{r}</option>)}
+                    {ROLE_OPTIONS.map((r) => <option key={r} value={r}>{getCanonicalRoleLabel(r)}</option>)}
                   </select>
                   {isOwnerRow && (
                     <div style={{ fontSize: 9, color: "var(--hc-warn)", marginTop: 2 }}>
@@ -568,7 +569,7 @@ function InvitationsTab({ slug, tenantStatus }: { slug: string; tenantStatus: st
           <label style={{ display: "flex", flexDirection: "column", gap: 3 }}>
             <span style={{ fontSize: 11, fontWeight: 600 }}>Rol</span>
             <select value={invRole} onChange={(e) => setInvRole(e.target.value)} style={{ padding: "5px 6px", fontSize: 12, border: "1px solid var(--hc-line)", borderRadius: 4, fontFamily: "inherit" }}>
-              {(isProvisioning ? ["OWNER"] : ROLE_OPTIONS).map((r) => <option key={r} value={r}>{r}</option>)}
+              {(isProvisioning ? ["OWNER"] : ROLE_OPTIONS).map((r) => <option key={r} value={r}>{getCanonicalRoleLabel(r)}</option>)}
             </select>
           </label>
           {isProvisioning && invRole !== "OWNER" && (

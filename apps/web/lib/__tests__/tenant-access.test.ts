@@ -72,28 +72,62 @@ describe("Permission Matrix", () => {
     assert.equal(hasRolePermission("OWNER", Permission.CONTENT_PUBLISH), true);
   });
 
-  it("TENANT_ADMIN has member and invitation permissions", () => {
+  it("TENANT_ADMIN has canonical ADMIN permissions", () => {
     assert.equal(hasRolePermission("TENANT_ADMIN", Permission.MEMBERS_ADD), true);
     assert.equal(hasRolePermission("TENANT_ADMIN", Permission.MEMBERS_REMOVE), true);
     assert.equal(hasRolePermission("TENANT_ADMIN", Permission.INVITATIONS_CREATE), true);
     assert.equal(hasRolePermission("TENANT_ADMIN", Permission.INVITATIONS_REVOKE), true);
     assert.equal(hasRolePermission("TENANT_ADMIN", Permission.INTEGRATIONS_MANAGE), true);
-    assert.equal(hasRolePermission("TENANT_ADMIN", Permission.SECURITY_MANAGE), true);
     assert.equal(hasRolePermission("TENANT_ADMIN", Permission.TENANT_CONFIG_UPDATE), true);
+    assert.equal(hasRolePermission("TENANT_ADMIN", Permission.CONTENT_WRITE), true);
+    assert.equal(hasRolePermission("TENANT_ADMIN", Permission.CONTENT_PUBLISH), true);
   });
 
-  it("TENANT_ADMIN lacks content and status change permissions", () => {
+  it("TENANT_ADMIN lacks SECURITY_MANAGE and TENANT_STATUS_CHANGE (owner-only)", () => {
+    assert.equal(hasRolePermission("TENANT_ADMIN", Permission.SECURITY_MANAGE), false);
     assert.equal(hasRolePermission("TENANT_ADMIN", Permission.TENANT_STATUS_CHANGE), false);
-    assert.equal(hasRolePermission("TENANT_ADMIN", Permission.PROJECTS_WRITE), false);
-    assert.equal(hasRolePermission("TENANT_ADMIN", Permission.CONTENT_WRITE), false);
-    assert.equal(hasRolePermission("TENANT_ADMIN", Permission.CONTENT_APPROVE), false);
-    assert.equal(hasRolePermission("TENANT_ADMIN", Permission.CONTENT_PUBLISH), false);
   });
 
-  it("default denial for unknown roles", () => {
+  it("VIEWER has only read and analytics permissions", () => {
+    assert.equal(hasRolePermission("VIEWER", Permission.TENANT_READ), true);
+    assert.equal(hasRolePermission("VIEWER", Permission.ANALYTICS_READ), true);
     assert.equal(hasRolePermission("VIEWER", Permission.MEMBERS_ADD), false);
     assert.equal(hasRolePermission("VIEWER", Permission.CONTENT_PUBLISH), false);
-    assert.equal(hasRolePermission("EDITOR", Permission.MEMBERS_ADD), false);
+    assert.equal(hasRolePermission("VIEWER", Permission.SECURITY_MANAGE), false);
+  });
+
+  it("legacy roles produce canonical permissions", () => {
+    assert.equal(hasRolePermission("STRATEGIST", Permission.MEMBERS_ADD), true);
+    assert.equal(hasRolePermission("STRATEGIST", Permission.CONTENT_WRITE), true);
+    assert.equal(hasRolePermission("EDITOR", Permission.INVITATIONS_CREATE), true);
+    assert.equal(hasRolePermission("EDITOR", Permission.CONTENT_PUBLISH), true);
+    assert.equal(hasRolePermission("APPROVER", Permission.MEMBERS_READ), true);
+    assert.equal(hasRolePermission("PUBLISHER", Permission.TENANT_CONFIG_UPDATE), true);
+    assert.equal(hasRolePermission("ANALYST", Permission.TENANT_READ), true);
+    assert.equal(hasRolePermission("ANALYST", Permission.ANALYTICS_READ), true);
+    assert.equal(hasRolePermission("ANALYST", Permission.MEMBERS_ADD), false);
+    assert.equal(hasRolePermission("ANALYST", Permission.CONTENT_PUBLISH), false);
+  });
+
+  it("OWNER has all tenant permissions", () => {
+    for (const p of Object.values(Permission)) {
+      assert.equal(hasRolePermission("OWNER", p as any), true, `OWNER should have ${p}`);
+    }
+  });
+
+  it("ADMIN (canonical) has operational permissions but not security", () => {
+    assert.equal(hasRolePermission("ADMIN", Permission.MEMBERS_READ), true);
+    assert.equal(hasRolePermission("ADMIN", Permission.MEMBERS_ROLE_UPDATE), true);
+    assert.equal(hasRolePermission("ADMIN", Permission.INVITATIONS_CREATE), true);
+    assert.equal(hasRolePermission("ADMIN", Permission.INTEGRATIONS_MANAGE), true);
+    assert.equal(hasRolePermission("ADMIN", Permission.TENANT_CONFIG_UPDATE), true);
+    assert.equal(hasRolePermission("ADMIN", Permission.PROJECTS_WRITE), true);
+    assert.equal(hasRolePermission("ADMIN", Permission.CONTENT_WRITE), true);
+    assert.equal(hasRolePermission("ADMIN", Permission.CONTENT_APPROVE), true);
+    assert.equal(hasRolePermission("ADMIN", Permission.CONTENT_PUBLISH), true);
+    assert.equal(hasRolePermission("ADMIN", Permission.ANALYTICS_READ), true);
+    assert.equal(hasRolePermission("ADMIN", Permission.SECURITY_MANAGE), false);
+    assert.equal(hasRolePermission("ADMIN", Permission.TENANT_STATUS_CHANGE), false);
   });
 });
 
@@ -357,12 +391,10 @@ describe("Asset permissions (correction #2)", () => {
     assert.equal(result.role, "EDITOR");
   });
 
-  it("TENANT_ADMIN lacks CONTENT_WRITE (cannot mutate assets)", async () => {
+  it("TENANT_ADMIN has CONTENT_WRITE (canonical ADMIN role)", async () => {
     const db = fakeDb(false, "TENANT_ADMIN", "ACTIVE");
-    await assert.rejects(
-      () => resolveTenantAccess("uid", "tid", Permission.CONTENT_WRITE, db),
-      (e: unknown) => (e as TenantAccessError).code === "FORBIDDEN",
-    );
+    const result = await resolveTenantAccess("uid", "tid", Permission.CONTENT_WRITE, db);
+    assert.equal(result.role, "TENANT_ADMIN");
   });
 
   it("SUPER_ADMIN global accesses assets without membership", async () => {
@@ -395,12 +427,10 @@ describe("Publishing permission (correction #1)", () => {
     );
   });
 
-  it("TENANT_ADMIN cannot publish (lacks CONTENT_PUBLISH)", async () => {
+  it("TENANT_ADMIN can publish (canonical ADMIN role)", async () => {
     const db = fakeDb(false, "TENANT_ADMIN", "ACTIVE");
-    await assert.rejects(
-      () => resolveTenantAccess("uid", "tid", Permission.CONTENT_PUBLISH, db),
-      (e: unknown) => (e as TenantAccessError).code === "FORBIDDEN",
-    );
+    const result = await resolveTenantAccess("uid", "tid", Permission.CONTENT_PUBLISH, db);
+    assert.equal(result.role, "TENANT_ADMIN");
   });
 
   it("tenant SUSPENDED blocks publishing", async () => {

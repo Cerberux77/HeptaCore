@@ -13,6 +13,7 @@ const ERROR_MESSAGES: Record<string, string> = {
   INVALID_OWNER_EMAIL: "El email del owner no es valido.",
   INVALID_EMAIL: "El email no es valido.",
   INVALID_ROLE: "El rol especificado no es valido.",
+  LEGACY_ROLE_NOT_ASSIGNABLE: "Este rol pertenece al modelo anterior y ya no puede asignarse.",
   INVALID_TRANSITION: "La transicion de estado no esta permitida.",
   DUPLICATE_MEMBERSHIP: "El usuario ya es miembro de este tenant.",
   DUPLICATE_INVITATION: "Ya existe una invitacion activa para este email.",

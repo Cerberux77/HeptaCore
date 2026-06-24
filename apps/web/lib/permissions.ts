@@ -44,59 +44,40 @@ function superAdminPermissions(): Set<Permission> {
   return new Set(ALL_TENANT_PERMISSIONS);
 }
 
+const ADMIN_OPERATIONAL_PERMISSIONS: Permission[] = [
+  Permission.MEMBERS_READ,
+  Permission.MEMBERS_ADD,
+  Permission.MEMBERS_ROLE_UPDATE,
+  Permission.MEMBERS_REMOVE,
+  Permission.INVITATIONS_READ,
+  Permission.INVITATIONS_CREATE,
+  Permission.INVITATIONS_REISSUE,
+  Permission.INVITATIONS_REVOKE,
+  Permission.INTEGRATIONS_MANAGE,
+  Permission.TENANT_CONFIG_UPDATE,
+  Permission.PROJECTS_WRITE,
+  Permission.CONTENT_WRITE,
+  Permission.CONTENT_APPROVE,
+  Permission.CONTENT_PUBLISH,
+  Permission.ANALYTICS_READ,
+];
+
+const VIEWER_PERMISSIONS: Permission[] = [
+  Permission.TENANT_READ,
+  Permission.ANALYTICS_READ,
+];
+
 const ROLE_PERMISSION_MAP: Record<UserRole, Set<Permission>> = {
   SUPER_ADMIN: superAdminPermissions(),
-  OWNER: new Set([
-    ...ADMIN_CORE_PERMISSIONS,
-    Permission.TENANT_READ,
-    Permission.TENANT_STATUS_CHANGE,
-    Permission.PROJECTS_WRITE,
-    Permission.CONTENT_WRITE,
-    Permission.CONTENT_APPROVE,
-    Permission.CONTENT_PUBLISH,
-    Permission.ANALYTICS_READ,
-  ]),
-  TENANT_ADMIN: new Set([
-    ...ADMIN_CORE_PERMISSIONS,
-    Permission.TENANT_READ,
-    Permission.ANALYTICS_READ,
-  ]),
-  ADMIN: new Set([
-    Permission.TENANT_READ,
-    Permission.PROJECTS_WRITE,
-    Permission.CONTENT_WRITE,
-    Permission.CONTENT_APPROVE,
-    Permission.CONTENT_PUBLISH,
-    Permission.ANALYTICS_READ,
-  ]),
-  STRATEGIST: new Set([
-    Permission.TENANT_READ,
-    Permission.PROJECTS_WRITE,
-    Permission.CONTENT_WRITE,
-    Permission.ANALYTICS_READ,
-  ]),
-  EDITOR: new Set([
-    Permission.TENANT_READ,
-    Permission.PROJECTS_WRITE,
-    Permission.CONTENT_WRITE,
-  ]),
-  APPROVER: new Set([
-    Permission.TENANT_READ,
-    Permission.CONTENT_APPROVE,
-    Permission.ANALYTICS_READ,
-  ]),
-  PUBLISHER: new Set([
-    Permission.TENANT_READ,
-    Permission.CONTENT_PUBLISH,
-    Permission.ANALYTICS_READ,
-  ]),
-  ANALYST: new Set([
-    Permission.TENANT_READ,
-    Permission.ANALYTICS_READ,
-  ]),
-  VIEWER: new Set([
-    Permission.TENANT_READ,
-  ]),
+  OWNER: new Set(ALL_TENANT_PERMISSIONS),
+  TENANT_ADMIN: new Set(ADMIN_OPERATIONAL_PERMISSIONS),
+  ADMIN: new Set(ADMIN_OPERATIONAL_PERMISSIONS),
+  STRATEGIST: new Set(ADMIN_OPERATIONAL_PERMISSIONS),
+  EDITOR: new Set(ADMIN_OPERATIONAL_PERMISSIONS),
+  APPROVER: new Set(ADMIN_OPERATIONAL_PERMISSIONS),
+  PUBLISHER: new Set(ADMIN_OPERATIONAL_PERMISSIONS),
+  ANALYST: new Set(VIEWER_PERMISSIONS),
+  VIEWER: new Set(VIEWER_PERMISSIONS),
 };
 
 export function getPermissionsForRole(role: UserRole): ReadonlySet<Permission> {
@@ -113,7 +94,16 @@ export interface PermissionAccessDb {
   };
   membership: {
     findUnique(args: { where: { tenantId_userId: { tenantId: string; userId: string } }; select: { role: true } }): Promise<{ role: UserRole } | null>;
+    findMany(args: { where: { userId: string }; select: { role: true } }): Promise<Array<{ role: UserRole }>>;
   };
+}
+
+async function isGlobalSuperAdmin(userId: string, db: Pick<PermissionAccessDb, "membership">): Promise<boolean> {
+  const memberships = await db.membership.findMany({
+    where: { userId },
+    select: { role: true },
+  });
+  return memberships.some((m) => m.role === "SUPER_ADMIN");
 }
 
 export async function hasTenantPermission(
@@ -127,6 +117,8 @@ export async function hasTenantPermission(
     select: { id: true },
   });
   if (!user) return false;
+
+  if (await isGlobalSuperAdmin(userId, db)) return true;
 
   const membership = await db.membership.findUnique({
     where: { tenantId_userId: { tenantId, userId } },
@@ -148,6 +140,10 @@ export async function requireTenantPermission(
     select: { id: true },
   });
   if (!user) throw new TenantAccessError("User not found", "UNAUTHORIZED", 401);
+
+  if (await isGlobalSuperAdmin(userId, db)) {
+    return { role: "SUPER_ADMIN" as UserRole };
+  }
 
   const membership = await db.membership.findUnique({
     where: { tenantId_userId: { tenantId, userId } },

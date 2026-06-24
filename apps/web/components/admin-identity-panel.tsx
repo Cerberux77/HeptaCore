@@ -11,6 +11,8 @@ interface CapabilitiesData {
     email: string;
     name: string | null;
     globalRole: string | null;
+    identifier?: string;
+    emailIsValid?: boolean;
   };
   effectivePermissions: Array<{ permission: string; granted: boolean }>;
   tenant: {
@@ -19,6 +21,7 @@ interface CapabilitiesData {
     tenantName?: string;
     tenantStatus?: string;
     tenantRole?: string | null;
+    canonicalTenantRole?: string | null;
     lifecycleBlockedReason?: string | null;
     tenantPermissions?: Array<{ permission: string; granted: boolean }>;
   };
@@ -65,7 +68,8 @@ function safeError(res: Response, json: any): string {
   return "Error al cargar capacidades";
 }
 
-export function AdminIdentityPanel() {
+export function AdminIdentityPanel({ variant }: { variant?: "admin" | "tenant" }) {
+  const mode = variant ?? "admin";
   const [open, setOpen] = useState(false);
   const [data, setData] = useState<CapabilitiesData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -76,16 +80,21 @@ export function AdminIdentityPanel() {
   const pathname = usePathname();
 
   const tenantSlug = useMemo(() => {
+    if (mode === "tenant") {
+      const match = pathname?.match(/^\/tenant\/([^/]+)/);
+      return match ? match[1] : undefined;
+    }
     const match = pathname?.match(/^\/admin\/tenants\/([^/]+)/);
     return match ? match[1] : undefined;
-  }, [pathname]);
+  }, [pathname, mode]);
 
   const fetchCapabilities = useCallback(async () => {
     setLoading(true);
     setError("");
     try {
+      const endpoint = mode === "tenant" ? "/api/session/capabilities" : "/api/admin/capabilities";
       const params = tenantSlug ? `?tenant=${encodeURIComponent(tenantSlug)}` : "";
-      const res = await fetch(`/api/admin/capabilities${params}`);
+      const res = await fetch(`${endpoint}${params}`);
       const json = await res.json();
       if (!res.ok || !json.ok) {
         setError(safeError(res, json));
@@ -98,7 +107,7 @@ export function AdminIdentityPanel() {
     } finally {
       setLoading(false);
     }
-  }, [tenantSlug]);
+  }, [tenantSlug, mode]);
 
   useEffect(() => {
     fetchCapabilities();
@@ -153,6 +162,7 @@ export function AdminIdentityPanel() {
 
   let displayRole = "—";
   if (isSuperAdmin) displayRole = "SUPER_ADMIN";
+  else if (tenant?.canonicalTenantRole) displayRole = tenant.canonicalTenantRole;
   else if (tenant?.tenantRole) displayRole = tenant.tenantRole;
 
   let displayName = "—";
@@ -160,6 +170,8 @@ export function AdminIdentityPanel() {
   else if (user?.email) displayName = user.email.split("@")[0];
   else if (loading) displayName = "";
   else displayName = "Usuario";
+
+  const isLegacyAccount = user && !user.emailIsValid;
 
   const hasError = !!error;
   const showLoadingBadge = loading && !data && !hasError;
@@ -236,7 +248,9 @@ export function AdminIdentityPanel() {
                     <div style={{ fontSize: 13, fontWeight: 700, color: "var(--hc-ink)", marginBottom: 2 }}>
                       {user?.name || "Sin nombre"}
                     </div>
-                    <div style={{ fontSize: 11, color: "var(--hc-fog)" }}>{user?.email}</div>
+                    <div style={{ fontSize: 11, color: "var(--hc-fog)" }}>
+                      {isLegacyAccount ? "Cuenta con identificador heredado." : user?.email}
+                    </div>
                     <div style={{ marginTop: 4, display: "flex", alignItems: "center", gap: 4 }}>
                       <ShieldCheck size={12} color={isSuperAdmin ? "var(--hc-teal)" : "var(--hc-fog)"} />
                       <span style={{ fontSize: 11, fontWeight: 600, color: isSuperAdmin ? "var(--hc-teal)" : "var(--hc-fog)" }}>
