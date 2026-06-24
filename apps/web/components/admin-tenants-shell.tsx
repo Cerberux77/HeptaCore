@@ -16,6 +16,9 @@ export function AdminTenantsShell({ children }: { children: React.ReactNode }) {
           <strong>Tenants</strong>
           <small>Gestion global de cuentas</small>
         </div>
+        <div style={{ padding: "6px 0 10px" }}>
+          <AdminIdentityPanel />
+        </div>
         <nav className="app-nav">
           <a className="nav-link" href="/admin"><ShieldCheck size={17} /> Consolidado</a>
           <a className="nav-link active" href="/admin/tenants"><Building2 size={17} /> Tenants</a>
@@ -23,9 +26,6 @@ export function AdminTenantsShell({ children }: { children: React.ReactNode }) {
         <div className="guardrail-box">
           <ShieldCheck size={17} />
           <span>Consola de administracion global. Controla tenants, miembros, invitaciones y estados de lifecycle.</span>
-        </div>
-        <div style={{ marginTop: "auto", padding: "12px 14px", borderTop: "1px solid var(--hc-line)" }}>
-          <AdminIdentityPanel />
         </div>
       </aside>
       <section className="workspace">{children}</section>

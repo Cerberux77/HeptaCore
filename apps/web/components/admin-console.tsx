@@ -259,6 +259,9 @@ export function AdminConsole({ data }: { data: AdminDashboardData }) {
           <strong>Admin global</strong>
           <small>Todos los tenants / control central</small>
         </div>
+        <div style={{ padding: "6px 0 10px" }}>
+          <AdminIdentityPanel />
+        </div>
         <nav className="app-nav">
           <a className="nav-link active" href="/admin"><ShieldCheck size={17} /> Consolidado</a>
           <a className="nav-link" href="/admin/tenants"><Building2 size={17} /> Tenants</a>
@@ -266,9 +269,6 @@ export function AdminConsole({ data }: { data: AdminDashboardData }) {
         <div className="guardrail-box">
           <ShieldCheck size={17} />
           <span>Admin global. Control de tenants y gates de publicacion. Los tenants en autopilot pueden publicar en real.</span>
-        </div>
-        <div style={{ marginTop: "auto", padding: "12px 14px", borderTop: "1px solid var(--hc-line)" }}>
-          <AdminIdentityPanel />
         </div>
       </aside>
 
