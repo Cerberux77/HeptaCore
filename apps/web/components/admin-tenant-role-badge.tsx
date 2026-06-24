@@ -1,17 +1,19 @@
 "use client";
 
-import { normalizeTenantRole, getCanonicalRoleLabel, type CanonicalTenantRole } from "../lib/canonical-tenant-role";
+import { normalizeTenantRole, getCanonicalRoleLabel } from "../lib/canonical-tenant-role";
 
 const ROLE_COLORS: Record<string, string> = {
   OWNER: "#8a1d1d",
   ADMIN: "#0b756f",
   VIEWER: "#8e8e93",
+  SUPER_ADMIN: "#0b756f",
 };
 
 export function RoleBadge({ role, size }: { role: string; size?: "sm" | "md" }) {
   const canonical = normalizeTenantRole(role as any);
-  const color = ROLE_COLORS[canonical] ?? "#8e8e93";
-  const label = getCanonicalRoleLabel(canonical);
+  const displayRole = canonical ?? role;
+  const color = canonical ? (ROLE_COLORS[canonical] ?? "#8e8e93") : (ROLE_COLORS[role] ?? "#8e8e93");
+  const label = canonical ? getCanonicalRoleLabel(canonical) : role;
   const scale = size === "sm" ? 0.85 : 1;
   return (
     <span

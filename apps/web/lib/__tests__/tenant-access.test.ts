@@ -116,6 +116,7 @@ describe("Permission Matrix", () => {
   });
 
   it("ADMIN (canonical) has operational permissions but not security", () => {
+    assert.equal(hasRolePermission("ADMIN", Permission.TENANT_READ), true);
     assert.equal(hasRolePermission("ADMIN", Permission.MEMBERS_READ), true);
     assert.equal(hasRolePermission("ADMIN", Permission.MEMBERS_ROLE_UPDATE), true);
     assert.equal(hasRolePermission("ADMIN", Permission.INVITATIONS_CREATE), true);
@@ -128,6 +129,27 @@ describe("Permission Matrix", () => {
     assert.equal(hasRolePermission("ADMIN", Permission.ANALYTICS_READ), true);
     assert.equal(hasRolePermission("ADMIN", Permission.SECURITY_MANAGE), false);
     assert.equal(hasRolePermission("ADMIN", Permission.TENANT_STATUS_CHANGE), false);
+  });
+
+  it("ADMIN has TENANT_READ explicitly", () => {
+    assert.equal(hasRolePermission("ADMIN", Permission.TENANT_READ), true);
+  });
+
+  it("legacy roles use canonical permission matrix via normalizeTenantRole", () => {
+    assert.equal(hasRolePermission("STRATEGIST", Permission.SECURITY_MANAGE), false);
+    assert.equal(hasRolePermission("EDITOR", Permission.SECURITY_MANAGE), false);
+    assert.equal(hasRolePermission("APPROVER", Permission.SECURITY_MANAGE), false);
+    assert.equal(hasRolePermission("PUBLISHER", Permission.SECURITY_MANAGE), false);
+    assert.equal(hasRolePermission("TENANT_ADMIN", Permission.SECURITY_MANAGE), false);
+    assert.equal(hasRolePermission("ANALYST", Permission.SECURITY_MANAGE), false);
+    assert.equal(hasRolePermission("ANALYST", Permission.TENANT_READ), true);
+    assert.equal(hasRolePermission("ANALYST", Permission.ANALYTICS_READ), true);
+  });
+
+  it("last OWNER protection is independent of canonical roles", () => {
+    assert.equal(hasRolePermission("OWNER", Permission.MEMBERS_REMOVE), true);
+    assert.equal(hasRolePermission("VIEWER", Permission.MEMBERS_REMOVE), false);
+    assert.equal(hasRolePermission("ADMIN", Permission.MEMBERS_REMOVE), true);
   });
 });
 

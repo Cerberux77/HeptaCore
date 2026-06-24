@@ -4,8 +4,7 @@ export type CanonicalTenantRole = "OWNER" | "ADMIN" | "VIEWER";
 
 export const CANONICAL_TENANT_ROLES: readonly CanonicalTenantRole[] = ["OWNER", "ADMIN", "VIEWER"];
 
-export const LEGACY_TO_CANONICAL: Record<UserRole, CanonicalTenantRole> = {
-  OWNER: "OWNER",
+const LEGACY_TO_CANONICAL_MAP: Partial<Record<UserRole, CanonicalTenantRole>> = {
   TENANT_ADMIN: "ADMIN",
   ADMIN: "ADMIN",
   STRATEGIST: "ADMIN",
@@ -14,11 +13,12 @@ export const LEGACY_TO_CANONICAL: Record<UserRole, CanonicalTenantRole> = {
   PUBLISHER: "ADMIN",
   ANALYST: "VIEWER",
   VIEWER: "VIEWER",
-  SUPER_ADMIN: "OWNER",
 };
 
-export function normalizeTenantRole(role: UserRole): CanonicalTenantRole {
-  return LEGACY_TO_CANONICAL[role] ?? "VIEWER";
+export function normalizeTenantRole(role: UserRole): CanonicalTenantRole | null {
+  if (role === "OWNER") return "OWNER";
+  if (role === "SUPER_ADMIN") return null;
+  return LEGACY_TO_CANONICAL_MAP[role] ?? null;
 }
 
 export function isAssignableTenantRole(role: string): role is CanonicalTenantRole {

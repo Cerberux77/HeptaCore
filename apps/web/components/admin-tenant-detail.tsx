@@ -8,7 +8,7 @@ import { ConfirmDialog } from "./admin-tenant-confirm-dialog";
 import { AdminTenantPagination } from "./admin-tenant-pagination";
 import { EmptyState, InlineError } from "./admin-tenant-feedback";
 import { translateError } from "../lib/error-messages";
-import { CANONICAL_TENANT_ROLES, getCanonicalRoleLabel } from "../lib/canonical-tenant-role";
+import { CANONICAL_TENANT_ROLES, getCanonicalRoleLabel, normalizeTenantRole } from "../lib/canonical-tenant-role";
 
 /* ─────────────────── Types ─────────────────── */
 interface TenantData {
@@ -304,6 +304,11 @@ function MembersTab({ slug, tenantStatus }: { slug: string; tenantStatus: string
   }
 
   async function handleChangeRole(membershipId: string, newRole: string) {
+    const member = data?.items.find((m) => m.id === membershipId);
+    if (member) {
+      const currentCanonical = normalizeTenantRole(member.role as any) ?? member.role;
+      if (currentCanonical === newRole) return;
+    }
     setChangingRole(membershipId);
     setChangeError("");
     try {
@@ -405,7 +410,7 @@ function MembersTab({ slug, tenantStatus }: { slug: string; tenantStatus: string
                 <span style={{ fontSize: 12, color: "var(--hc-fog)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{m.email}</span>
                 <span>
                   <select
-                    value={m.role}
+                    value={normalizeTenantRole(m.role as any) ?? m.role}
                     onChange={(e) => handleChangeRole(m.id, e.target.value)}
                     disabled={changingRole === m.id || disableActions}
                     style={{ padding: "2px 4px", fontSize: 11, border: "1px solid var(--hc-line)", borderRadius: 4, fontFamily: "inherit", color: disableActions ? "var(--hc-fog)" : "var(--hc-ink)", opacity: disableActions ? 0.5 : 1 }}

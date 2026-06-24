@@ -1,5 +1,6 @@
 import { type UserRole } from "@prisma/client";
 import { TenantAccessError, type TenantAdminDb } from "./tenant-access";
+import { normalizeTenantRole } from "./canonical-tenant-role";
 
 export const Permission = {
   TENANT_READ: "TENANT_READ",
@@ -24,20 +25,6 @@ export const Permission = {
 
 export type Permission = (typeof Permission)[keyof typeof Permission];
 
-const ADMIN_CORE_PERMISSIONS: Permission[] = [
-  Permission.MEMBERS_READ,
-  Permission.MEMBERS_ADD,
-  Permission.MEMBERS_ROLE_UPDATE,
-  Permission.MEMBERS_REMOVE,
-  Permission.INVITATIONS_READ,
-  Permission.INVITATIONS_CREATE,
-  Permission.INVITATIONS_REISSUE,
-  Permission.INVITATIONS_REVOKE,
-  Permission.INTEGRATIONS_MANAGE,
-  Permission.SECURITY_MANAGE,
-  Permission.TENANT_CONFIG_UPDATE,
-];
-
 const ALL_TENANT_PERMISSIONS: Permission[] = Object.values(Permission);
 
 function superAdminPermissions(): Set<Permission> {
@@ -45,6 +32,7 @@ function superAdminPermissions(): Set<Permission> {
 }
 
 const ADMIN_OPERATIONAL_PERMISSIONS: Permission[] = [
+  Permission.TENANT_READ,
   Permission.MEMBERS_READ,
   Permission.MEMBERS_ADD,
   Permission.MEMBERS_ROLE_UPDATE,
@@ -67,25 +55,25 @@ const VIEWER_PERMISSIONS: Permission[] = [
   Permission.ANALYTICS_READ,
 ];
 
-const ROLE_PERMISSION_MAP: Record<UserRole, Set<Permission>> = {
+const CANONICAL_PERMISSION_MAP: Record<string, Set<Permission>> = {
   SUPER_ADMIN: superAdminPermissions(),
   OWNER: new Set(ALL_TENANT_PERMISSIONS),
-  TENANT_ADMIN: new Set(ADMIN_OPERATIONAL_PERMISSIONS),
   ADMIN: new Set(ADMIN_OPERATIONAL_PERMISSIONS),
-  STRATEGIST: new Set(ADMIN_OPERATIONAL_PERMISSIONS),
-  EDITOR: new Set(ADMIN_OPERATIONAL_PERMISSIONS),
-  APPROVER: new Set(ADMIN_OPERATIONAL_PERMISSIONS),
-  PUBLISHER: new Set(ADMIN_OPERATIONAL_PERMISSIONS),
-  ANALYST: new Set(VIEWER_PERMISSIONS),
   VIEWER: new Set(VIEWER_PERMISSIONS),
 };
 
 export function getPermissionsForRole(role: UserRole): ReadonlySet<Permission> {
-  return ROLE_PERMISSION_MAP[role] ?? new Set();
+  if (role === "SUPER_ADMIN") return CANONICAL_PERMISSION_MAP["SUPER_ADMIN"];
+  const canonical = normalizeTenantRole(role);
+  if (canonical === null) return new Set();
+  return CANONICAL_PERMISSION_MAP[canonical] ?? new Set();
 }
 
 export function hasRolePermission(role: UserRole, permission: Permission): boolean {
-  return ROLE_PERMISSION_MAP[role]?.has(permission) ?? false;
+  if (role === "SUPER_ADMIN") return (CANONICAL_PERMISSION_MAP["SUPER_ADMIN"]?.has(permission)) ?? false;
+  const canonical = normalizeTenantRole(role);
+  if (canonical === null) return false;
+  return CANONICAL_PERMISSION_MAP[canonical]?.has(permission) ?? false;
 }
 
 export interface PermissionAccessDb {

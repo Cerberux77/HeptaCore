@@ -6,7 +6,6 @@ import {
   isAssignableTenantRole,
   isLegacyTenantRole,
   getCanonicalRoleLabel,
-  LEGACY_TO_CANONICAL,
 } from "../../lib/canonical-tenant-role";
 
 describe("canonical tenant roles", () => {
@@ -19,10 +18,6 @@ describe("canonical tenant roles", () => {
 
   it("normalizeTenantRole maps OWNER to OWNER", () => {
     assert.equal(normalizeTenantRole("OWNER"), "OWNER");
-  });
-
-  it("normalizeTenantRole maps VISITOR to VIEWER", () => {
-    assert.equal(normalizeTenantRole("VIEWER"), "VIEWER");
   });
 
   it("normalizeTenantRole maps TENANT_ADMIN to ADMIN", () => {
@@ -55,6 +50,32 @@ describe("canonical tenant roles", () => {
 
   it("normalizeTenantRole maps VIEWER to VIEWER", () => {
     assert.equal(normalizeTenantRole("VIEWER"), "VIEWER");
+  });
+
+  it("normalizeTenantRole returns null for SUPER_ADMIN", () => {
+    assert.equal(normalizeTenantRole("SUPER_ADMIN"), null);
+  });
+
+  it("normalizeTenantRole returns null for unknown role", () => {
+    assert.equal(normalizeTenantRole("UNKNOWN" as any), null);
+  });
+
+  it("TENANT_ADMIN canonical is ADMIN not null", () => {
+    const result = normalizeTenantRole("TENANT_ADMIN");
+    assert.equal(result, "ADMIN");
+    assert.notEqual(result, null);
+  });
+
+  it("EDITOR canonical is ADMIN not null", () => {
+    const result = normalizeTenantRole("EDITOR");
+    assert.equal(result, "ADMIN");
+    assert.notEqual(result, null);
+  });
+
+  it("ANALYST canonical is VIEWER not null", () => {
+    const result = normalizeTenantRole("ANALYST");
+    assert.equal(result, "VIEWER");
+    assert.notEqual(result, null);
   });
 
   it("isAssignableTenantRole accepts OWNER", () => {
@@ -153,15 +174,25 @@ describe("canonical tenant roles", () => {
     assert.equal(getCanonicalRoleLabel("UNKNOWN"), "UNKNOWN");
   });
 
-  it("LEGACY_TO_CANONICAL covers all user roles", () => {
-    const allRoles = [
+  it("all tenant roles normalize to a canonical value or null", () => {
+    const allTenantRoles = [
       "OWNER", "TENANT_ADMIN", "ADMIN", "STRATEGIST", "EDITOR",
-      "APPROVER", "PUBLISHER", "ANALYST", "VIEWER", "SUPER_ADMIN",
+      "APPROVER", "PUBLISHER", "ANALYST", "VIEWER",
     ];
-    for (const role of allRoles) {
-      const canonical = LEGACY_TO_CANONICAL[role as keyof typeof LEGACY_TO_CANONICAL];
-      assert.ok(canonical === "OWNER" || canonical === "ADMIN" || canonical === "VIEWER",
-        `${role} mapped to ${canonical}`);
+    for (const role of allTenantRoles) {
+      const canonical = normalizeTenantRole(role as any);
+      assert.ok(canonical !== undefined, `${role} should not be undefined`);
+      if (role === "SUPER_ADMIN") {
+        assert.equal(canonical, null);
+      } else {
+        assert.ok(canonical === "OWNER" || canonical === "ADMIN" || canonical === "VIEWER",
+          `${role} mapped to ${canonical}`);
+      }
     }
+  });
+
+  it("SUPER_ADMIN does not normalize to OWNER", () => {
+    assert.notEqual(normalizeTenantRole("SUPER_ADMIN"), "OWNER");
+    assert.equal(normalizeTenantRole("SUPER_ADMIN"), null);
   });
 });

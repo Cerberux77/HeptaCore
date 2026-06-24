@@ -158,13 +158,15 @@ describe("resolveSessionCapabilities", () => {
     assert.equal(result.tenant.tenantPermissions!.every((p) => p.granted), true);
   });
 
-  it("ADMIN does not have SECURITY_MANAGE", async () => {
+  it("ADMIN has TENANT_READ and lacks SECURITY_MANAGE", async () => {
     fake.users.push({ id: "u1", email: "admin@test.com", name: "Admin" });
     fake.tenants.push({ id: "t1", slug: "my-tenant", name: "My Tenant", status: "ACTIVE" });
     fake.memberships.push({ userId: "u1", tenantId: "t1", role: "ADMIN" });
 
     const result = await resolveSessionCapabilities("u1", "my-tenant", fake.db);
 
+    const tenantRead = result.tenant.tenantPermissions!.find((p) => p.permission === "TENANT_READ");
+    assert.equal(tenantRead!.granted, true);
     const security = result.tenant.tenantPermissions!.find((p) => p.permission === "SECURITY_MANAGE");
     assert.equal(security!.granted, false);
     const statusChange = result.tenant.tenantPermissions!.find((p) => p.permission === "TENANT_STATUS_CHANGE");
