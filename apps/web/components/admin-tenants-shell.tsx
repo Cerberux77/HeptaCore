@@ -2,6 +2,7 @@
 
 import { Building2, PlusCircle, ShieldCheck } from "lucide-react";
 import { HeptaCoreWordmark } from "./heptacore-mark";
+import { AdminIdentityPanel } from "./admin-identity-panel";
 
 export function AdminTenantsShell({ children }: { children: React.ReactNode }) {
   return (
@@ -22,6 +23,9 @@ export function AdminTenantsShell({ children }: { children: React.ReactNode }) {
         <div className="guardrail-box">
           <ShieldCheck size={17} />
           <span>Consola de administracion global. Controla tenants, miembros, invitaciones y estados de lifecycle.</span>
+        </div>
+        <div style={{ marginTop: "auto", padding: "12px 14px", borderTop: "1px solid var(--hc-line)" }}>
+          <AdminIdentityPanel />
         </div>
       </aside>
       <section className="workspace">{children}</section>

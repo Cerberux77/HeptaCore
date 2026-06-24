@@ -1,12 +1,13 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { ArrowLeft, Building2, Users, Mail, Settings, Info, Loader2, Check, X, Copy, RefreshCw } from "lucide-react";
+import { ArrowLeft, Building2, Users, Mail, Settings, Info, Loader2, Check, X, Copy, RefreshCw, AlertTriangle } from "lucide-react";
 import { LifecycleBadge } from "./admin-tenant-lifecycle-badge";
 import { RoleBadge } from "./admin-tenant-role-badge";
 import { ConfirmDialog } from "./admin-tenant-confirm-dialog";
 import { AdminTenantPagination } from "./admin-tenant-pagination";
 import { EmptyState, InlineError } from "./admin-tenant-feedback";
+import { translateError } from "../lib/error-messages";
 
 /* ─────────────────── Types ─────────────────── */
 interface TenantData {
@@ -256,7 +257,7 @@ function MembersTab({ slug, tenantStatus }: { slug: string; tenantStatus: string
     setError("");
     try {
       const res = await apiFetch<PaginatedResult<Member>>(`/api/admin/tenants/${slug}/members?page=${page}&limit=20`);
-      if (!res.ok) { setError(res.error?.message || "Error al cargar miembros"); setState("error"); return; }
+      if (!res.ok) { setError(translateError(res.error?.code ?? "", res.error?.message || "Error al cargar miembros")); setState("error"); return; }
       setData(res.data!);
       setState(res.data!.items.length === 0 ? "empty" : "success");
     } catch { setError("Error de conexion"); setState("error"); }
@@ -275,7 +276,7 @@ function MembersTab({ slug, tenantStatus }: { slug: string; tenantStatus: string
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: addEmail, role: addRole }),
       });
-      if (!res.ok) { setAddError(res.error?.message || "Error al agregar miembro"); return; }
+      if (!res.ok) { setAddError(translateError(res.error?.code ?? "", res.error?.message || "Error al agregar miembro")); return; }
       setShowAdd(false);
       setAddEmail("");
       setAddRole("VIEWER");
@@ -291,7 +292,7 @@ function MembersTab({ slug, tenantStatus }: { slug: string; tenantStatus: string
     try {
       const res = await fetch(`/api/admin/tenants/${slug}/members/${membershipId}`, { method: "DELETE" });
       const json = await res.json();
-      if (!res.ok || !json.ok) { setRemoveError(json.error?.message || "Error al eliminar"); return; }
+      if (!res.ok || !json.ok) { setRemoveError(translateError(json.error?.code ?? "", json.error?.message || "Error al eliminar")); return; }
       if (data && data.items.length === 1 && page > 1) {
         setPage((p) => p - 1);
       } else {
@@ -310,24 +311,42 @@ function MembersTab({ slug, tenantStatus }: { slug: string; tenantStatus: string
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ role: newRole }),
       });
-      if (!res.ok) { setChangeError(res.error?.message || "Error al cambiar rol"); return; }
+      if (!res.ok) { setChangeError(translateError(res.error?.code ?? "", res.error?.message || "Error al cambiar rol")); return; }
       fetchMembers();
     } catch { setChangeError("Error de conexion"); }
     finally { setChangingRole(null); }
   }
 
   const isProvisioning = tenantStatus === "PROVISIONING";
+  const isFrozen = tenantStatus === "SUSPENDED" || tenantStatus === "ARCHIVED";
+
+  const ownerCount = data?.items.filter((m) => m.role === "OWNER").length ?? 0;
+  const isLastOwner = (member: Member) => member.role === "OWNER" && ownerCount <= 1;
 
   return (
     <div>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
         <span style={{ fontSize: 13, fontWeight: 600 }}>Miembros</span>
-        <button
-          onClick={() => setShowAdd(!showAdd)}
-          style={{ padding: "5px 12px", fontSize: 12, borderRadius: 6, border: "1px solid var(--hc-line)", background: "var(--hc-panel)", color: "var(--hc-ink)", cursor: "pointer", fontFamily: "inherit" }}
-        >
-          + Agregar miembro
-        </button>
+        {!isProvisioning && !isFrozen && (
+          <button
+            onClick={() => setShowAdd(!showAdd)}
+            style={{ padding: "5px 12px", fontSize: 12, borderRadius: 6, border: "1px solid var(--hc-line)", background: "var(--hc-panel)", color: "var(--hc-ink)", cursor: "pointer", fontFamily: "inherit" }}
+          >
+            + Agregar miembro
+          </button>
+        )}
+        {isProvisioning && (
+          <span style={{ fontSize: 11, color: "var(--hc-warn)", display: "flex", alignItems: "center", gap: 4 }}>
+            <AlertTriangle size={12} />
+            Las cuentas deben incorporarse mediante invitacion OWNER
+          </span>
+        )}
+        {isFrozen && (
+          <span style={{ fontSize: 11, color: "var(--hc-red)", display: "flex", alignItems: "center", gap: 4 }}>
+            <AlertTriangle size={12} />
+            Acciones bloqueadas — tenant {tenantStatus === "SUSPENDED" ? "suspendido" : "archivado"}
+          </span>
+        )}
       </div>
 
       {showAdd && (
@@ -349,7 +368,7 @@ function MembersTab({ slug, tenantStatus }: { slug: string; tenantStatus: string
             Cancelar
           </button>
           {addError && <span style={{ fontSize: 11, color: "var(--hc-red)", flexBasis: "100%" }}>{addError}</span>}
-          {isProvisioning && <span style={{ fontSize: 11, color: "var(--hc-fog)", flexBasis: "100%" }}>Tenant en PROVISIONING: los miembros agregados deben tener cuenta activa.</span>}
+          {isProvisioning && <span style={{ fontSize: 11, color: "var(--hc-warn)", flexBasis: "100%", display: "flex", alignItems: "center", gap: 4 }}><AlertTriangle size={11} /> Tenant en PROVISIONING: las cuentas nuevas deben incorporarse mediante invitacion, no mediante alta directa.</span>}
         </form>
       )}
 
@@ -369,30 +388,46 @@ function MembersTab({ slug, tenantStatus }: { slug: string; tenantStatus: string
               <span>Rol</span>
               <span></span>
             </div>
-            {data.items.map((m) => (
+            {data.items.map((m) => {
+              const isOwnerRow = isLastOwner(m);
+              const disableActions = isFrozen || isOwnerRow;
+              return (
               <div key={m.id} className="tenant-row" style={{ padding: "8px 14px", gridTemplateColumns: "1fr 180px 100px 80px", borderTop: "1px solid var(--hc-line)", alignItems: "center" }}>
-                <span style={{ fontSize: 13, fontWeight: 500 }}>{m.name || "(sin nombre)"}</span>
+                <span style={{ fontSize: 13, fontWeight: 500, display: "flex", alignItems: "center", gap: 4 }}>
+                  {m.name || "(sin nombre)"}
+                  {isOwnerRow && (
+                    <span style={{ fontSize: 9, background: "var(--hc-warn)", color: "#fff", padding: "1px 5px", borderRadius: 3, fontWeight: 600 }} title="Es el unico OWNER del tenant. No se puede cambiar su rol ni eliminarlo.">
+                      UNICO OWNER
+                    </span>
+                  )}
+                </span>
                 <span style={{ fontSize: 12, color: "var(--hc-fog)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{m.email}</span>
                 <span>
                   <select
                     value={m.role}
                     onChange={(e) => handleChangeRole(m.id, e.target.value)}
-                    disabled={changingRole === m.id}
-                    style={{ padding: "2px 4px", fontSize: 11, border: "1px solid var(--hc-line)", borderRadius: 4, fontFamily: "inherit", color: "var(--hc-ink)" }}
-                    aria-label={`Cambiar rol de ${m.email}`}
+                    disabled={changingRole === m.id || disableActions}
+                    style={{ padding: "2px 4px", fontSize: 11, border: "1px solid var(--hc-line)", borderRadius: 4, fontFamily: "inherit", color: disableActions ? "var(--hc-fog)" : "var(--hc-ink)", opacity: disableActions ? 0.5 : 1 }}
+                    aria-label={`Cambiar rol de ${m.email}${disableActions ? " (bloqueado)" : ""}`}
                   >
                     {ROLE_OPTIONS.map((r) => <option key={r} value={r}>{r}</option>)}
                   </select>
+                  {isOwnerRow && (
+                    <div style={{ fontSize: 9, color: "var(--hc-warn)", marginTop: 2 }}>
+                      No puedes cambiar el rol ni eliminar al ultimo OWNER del tenant.
+                    </div>
+                  )}
                 </span>
                 <button
                   onClick={() => setShowRemove(m.id)}
-                  disabled={removeLoading}
-                  style={{ fontSize: 11, padding: "3px 8px", border: "1px solid var(--hc-red)", borderRadius: 4, background: "transparent", color: "var(--hc-red)", cursor: "pointer", fontFamily: "inherit" }}
+                  disabled={removeLoading || disableActions}
+                  style={{ fontSize: 11, padding: "3px 8px", border: "1px solid var(--hc-red)", borderRadius: 4, background: "transparent", color: disableActions ? "var(--hc-fog)" : "var(--hc-red)", cursor: disableActions ? "default" : "pointer", fontFamily: "inherit", opacity: disableActions ? 0.4 : 1 }}
                 >
                   Quitar
                 </button>
               </div>
-            ))}
+              );
+            })}
           </div>
           <AdminTenantPagination page={data.page} totalPages={data.totalPages} onPageChange={setPage} />
         </>
@@ -436,7 +471,7 @@ function InvitationsTab({ slug, tenantStatus }: { slug: string; tenantStatus: st
     setState("loading"); setError("");
     try {
       const res = await apiFetch<PaginatedResult<Invitation>>(`/api/admin/tenants/${slug}/invitations?page=${page}&limit=20`);
-      if (!res.ok) { setError(res.error?.message || "Error al cargar invitaciones"); setState("error"); return; }
+      if (!res.ok) { setError(translateError(res.error?.code ?? "", res.error?.message || "Error al cargar invitaciones")); setState("error"); return; }
       setData(res.data!);
       setState(res.data!.items.length === 0 ? "empty" : "success");
     } catch { setError("Error de conexion"); setState("error"); }
@@ -454,7 +489,7 @@ function InvitationsTab({ slug, tenantStatus }: { slug: string; tenantStatus: st
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: invEmail, role: invRole }),
       });
-      if (!res.ok) { setInvError(res.error?.message || "Error al crear invitacion"); return; }
+      if (!res.ok) { setInvError(translateError(res.error?.code ?? "", res.error?.message || "Error al crear invitacion")); return; }
       setShowCreate(false); setInvEmail(""); setInvRole("VIEWER");
       if (res.data?.inviteLink) {
         setResendLink(res.data.inviteLink);
@@ -471,7 +506,7 @@ function InvitationsTab({ slug, tenantStatus }: { slug: string; tenantStatus: st
       const res = await fetch(`/api/admin/tenants/${slug}/invitations/${invitationId}/resend`, { method: "POST" });
       const json = await res.json();
       if (!res.ok || !json.ok) {
-        setActionError(json.error?.message || "Error al reemitir invitacion");
+        setActionError(translateError(json.error?.code ?? "", json.error?.message || "Error al reemitir invitacion"));
         return;
       }
       if (json.data?.inviteLink) {
@@ -525,7 +560,7 @@ function InvitationsTab({ slug, tenantStatus }: { slug: string; tenantStatus: st
           <label style={{ display: "flex", flexDirection: "column", gap: 3 }}>
             <span style={{ fontSize: 11, fontWeight: 600 }}>Rol</span>
             <select value={invRole} onChange={(e) => setInvRole(e.target.value)} style={{ padding: "5px 6px", fontSize: 12, border: "1px solid var(--hc-line)", borderRadius: 4, fontFamily: "inherit" }}>
-              {ROLE_OPTIONS.map((r) => <option key={r} value={r}>{r}</option>)}
+              {(isProvisioning ? ["OWNER"] : ROLE_OPTIONS).map((r) => <option key={r} value={r}>{r}</option>)}
             </select>
           </label>
           {isProvisioning && invRole !== "OWNER" && (
@@ -628,6 +663,8 @@ function ConfigTab({ tenant, slug, onRefresh }: { tenant: TenantData; slug: stri
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
 
+  const isFrozen = tenant.status === "SUSPENDED" || tenant.status === "ARCHIVED";
+
   useEffect(() => {
     setName(tenant.name);
     setTimezone(tenant.timezone);
@@ -664,22 +701,28 @@ function ConfigTab({ tenant, slug, onRefresh }: { tenant: TenantData; slug: stri
 
   return (
     <div style={{ maxWidth: 560 }}>
+      {isFrozen && (
+        <div style={{ padding: "8px 12px", background: "rgba(138,29,29,0.06)", borderLeft: "3px solid var(--hc-red)", borderRadius: 4, marginBottom: 12, fontSize: 12, color: "var(--hc-red)", display: "flex", alignItems: "center", gap: 6 }}>
+          <AlertTriangle size={14} />
+          La configuracion no se puede modificar mientras el tenant este {tenant.status === "SUSPENDED" ? "suspendido" : "archivado"}.
+        </div>
+      )}
       <div style={{ display: "flex", flexDirection: "column", gap: 14, background: "var(--hc-panel)", border: "1px solid var(--hc-line)", borderRadius: 6, padding: 18 }}>
         <label style={{ display: "flex", flexDirection: "column", gap: 4 }}>
           <span style={{ fontSize: 12, fontWeight: 600, color: "var(--hc-graphite)" }}>Nombre</span>
-          <input value={name} onChange={(e) => { setName(e.target.value); markDirty(); }} style={{ padding: "7px 10px", fontSize: 13, border: "1px solid var(--hc-line)", borderRadius: 4, fontFamily: "inherit" }} />
+          <input value={name} onChange={(e) => { if (!isFrozen) { setName(e.target.value); markDirty(); } }} disabled={isFrozen} style={{ padding: "7px 10px", fontSize: 13, border: "1px solid var(--hc-line)", borderRadius: 4, fontFamily: "inherit", opacity: isFrozen ? 0.5 : 1 }} />
         </label>
 
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
           <label style={{ display: "flex", flexDirection: "column", gap: 4 }}>
             <span style={{ fontSize: 12, fontWeight: 600, color: "var(--hc-graphite)" }}>Timezone</span>
-            <select value={timezone} onChange={(e) => { setTimezone(e.target.value); markDirty(); }} style={{ padding: "7px 8px", fontSize: 13, border: "1px solid var(--hc-line)", borderRadius: 4, fontFamily: "inherit" }}>
+            <select value={timezone} onChange={(e) => { if (!isFrozen) { setTimezone(e.target.value); markDirty(); } }} disabled={isFrozen} style={{ padding: "7px 8px", fontSize: 13, border: "1px solid var(--hc-line)", borderRadius: 4, fontFamily: "inherit", opacity: isFrozen ? 0.5 : 1 }}>
               {TIMEZONES.map((tz) => <option key={tz} value={tz}>{tz}</option>)}
             </select>
           </label>
           <label style={{ display: "flex", flexDirection: "column", gap: 4 }}>
             <span style={{ fontSize: 12, fontWeight: 600, color: "var(--hc-graphite)" }}>Locale</span>
-            <select value={locale} onChange={(e) => { setLocale(e.target.value); markDirty(); }} style={{ padding: "7px 8px", fontSize: 13, border: "1px solid var(--hc-line)", borderRadius: 4, fontFamily: "inherit" }}>
+            <select value={locale} onChange={(e) => { if (!isFrozen) { setLocale(e.target.value); markDirty(); } }} disabled={isFrozen} style={{ padding: "7px 8px", fontSize: 13, border: "1px solid var(--hc-line)", borderRadius: 4, fontFamily: "inherit", opacity: isFrozen ? 0.5 : 1 }}>
               {LOCALES.map((l) => <option key={l} value={l}>{l.toUpperCase()}</option>)}
             </select>
           </label>
@@ -688,21 +731,23 @@ function ConfigTab({ tenant, slug, onRefresh }: { tenant: TenantData; slug: stri
         {error && <span style={{ fontSize: 11, color: "var(--hc-red)" }}>{error}</span>}
         {success && <span style={{ fontSize: 11, color: "var(--hc-teal)", display: "flex", alignItems: "center", gap: 4 }}><Check size={14} /> Configuracion guardada</span>}
 
-        <div style={{ display: "flex", gap: 8, justifyContent: "flex-end", paddingTop: 8, borderTop: "1px solid var(--hc-line)" }}>
-          {dirty && (
-            <button onClick={reset} disabled={loading} style={{ fontSize: 12, padding: "6px 14px", borderRadius: 6, border: "1px solid var(--hc-line)", background: "var(--hc-bone)", color: "var(--hc-ink)", cursor: "pointer", fontFamily: "inherit" }}>
-              Cancelar
+        {!isFrozen && (
+          <div style={{ display: "flex", gap: 8, justifyContent: "flex-end", paddingTop: 8, borderTop: "1px solid var(--hc-line)" }}>
+            {dirty && (
+              <button onClick={reset} disabled={loading} style={{ fontSize: 12, padding: "6px 14px", borderRadius: 6, border: "1px solid var(--hc-line)", background: "var(--hc-bone)", color: "var(--hc-ink)", cursor: "pointer", fontFamily: "inherit" }}>
+                Cancelar
+              </button>
+            )}
+            <button
+              onClick={handleSave}
+              disabled={!dirty || loading}
+              style={{ fontSize: 12, padding: "6px 14px", borderRadius: 6, border: "none", background: !dirty || loading ? "var(--hc-bone)" : "var(--hc-teal)", color: !dirty || loading ? "var(--hc-fog)" : "#fff", cursor: !dirty || loading ? "default" : "pointer", fontFamily: "inherit", fontWeight: 600, display: "flex", alignItems: "center", gap: 6 }}
+            >
+              {loading ? <Loader2 size={14} /> : <Check size={14} />}
+              {loading ? "Guardando..." : "Guardar"}
             </button>
-          )}
-          <button
-            onClick={handleSave}
-            disabled={!dirty || loading}
-            style={{ fontSize: 12, padding: "6px 14px", borderRadius: 6, border: "none", background: !dirty || loading ? "var(--hc-bone)" : "var(--hc-teal)", color: !dirty || loading ? "var(--hc-fog)" : "#fff", cursor: !dirty || loading ? "default" : "pointer", fontFamily: "inherit", fontWeight: 600, display: "flex", alignItems: "center", gap: 6 }}
-          >
-            {loading ? <Loader2 size={14} /> : <Check size={14} />}
-            {loading ? "Guardando..." : "Guardar"}
-          </button>
-        </div>
+          </div>
+        )}
       </div>
     </div>
   );

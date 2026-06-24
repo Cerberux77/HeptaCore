@@ -17,6 +17,7 @@ import {
   X,
 } from "lucide-react";
 import { HeptaCoreWordmark } from "./heptacore-mark";
+import { AdminIdentityPanel } from "./admin-identity-panel";
 import type { AdminDashboardData } from "../lib/dashboard";
 
 type LlmConfigState = {
@@ -265,6 +266,9 @@ export function AdminConsole({ data }: { data: AdminDashboardData }) {
         <div className="guardrail-box">
           <ShieldCheck size={17} />
           <span>Admin global. Control de tenants y gates de publicacion. Los tenants en autopilot pueden publicar en real.</span>
+        </div>
+        <div style={{ marginTop: "auto", padding: "12px 14px", borderTop: "1px solid var(--hc-line)" }}>
+          <AdminIdentityPanel />
         </div>
       </aside>
 

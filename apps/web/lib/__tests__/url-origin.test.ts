@@ -5,19 +5,11 @@ import { resolvePublicOrigin, OriginResolutionError } from "../url-origin";
 const ORIGINAL_NODE_ENV = process.env.NODE_ENV;
 
 function setNodeEnv(value: string | undefined) {
-  if (value === undefined) {
-    delete process.env.NODE_ENV;
-  } else {
-    process.env.NODE_ENV = value;
-  }
+  (process.env as Record<string, string | undefined>).NODE_ENV = value;
 }
 
 function restoreNodeEnv() {
-  if (ORIGINAL_NODE_ENV === undefined) {
-    delete process.env.NODE_ENV;
-  } else {
-    process.env.NODE_ENV = ORIGINAL_NODE_ENV;
-  }
+  (process.env as Record<string, string | undefined>).NODE_ENV = ORIGINAL_NODE_ENV;
 }
 
 describe("resolvePublicOrigin", () => {
