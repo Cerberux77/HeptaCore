@@ -6,8 +6,8 @@ test.describe("QA Identity & Session", () => {
 
   test("1 - SUPER_ADMIN logs in, sees badge + role + logout in /admin", async ({ page }) => {
     await page.goto("/login");
-    await page.fill('input[name="email"]', "qa-superadmin@heptacore.test");
-    await page.fill('input[name="password"]', process.env.HEPTACORE_QA_E2E_PASSWORD!);
+    await page.fill('input[autocomplete="username"]', "qa-superadmin@heptacore.test");
+    await page.fill('input[autocomplete="current-password"]', process.env.HEPTACORE_QA_E2E_PASSWORD!);
     await page.click('button[type="submit"]');
     await page.waitForURL(/\/admin/, { timeout: 15000 });
 
@@ -25,8 +25,8 @@ test.describe("QA Identity & Session", () => {
 
   test("2 - OWNER enters /tenant/qa-e2e-active and sees Propietario role", async ({ page }) => {
     await page.goto("/login");
-    await page.fill('input[name="email"]', "qa-owner@heptacore.test");
-    await page.fill('input[name="password"]', process.env.HEPTACORE_QA_E2E_PASSWORD!);
+    await page.fill('input[autocomplete="username"]', "qa-owner@heptacore.test");
+    await page.fill('input[autocomplete="current-password"]', process.env.HEPTACORE_QA_E2E_PASSWORD!);
     await page.click('button[type="submit"]');
     await page.waitForURL(new RegExp(`/tenant/${TENANT}`), { timeout: 15000 });
 
@@ -43,8 +43,8 @@ test.describe("QA Identity & Session", () => {
 
   test("3 - ADMIN enters, sees Administrador role on tenant", async ({ page }) => {
     await page.goto("/login");
-    await page.fill('input[name="email"]', "qa-admin@heptacore.test");
-    await page.fill('input[name="password"]', process.env.HEPTACORE_QA_E2E_PASSWORD!);
+    await page.fill('input[autocomplete="username"]', "qa-admin@heptacore.test");
+    await page.fill('input[autocomplete="current-password"]', process.env.HEPTACORE_QA_E2E_PASSWORD!);
     await page.click('button[type="submit"]');
     await page.waitForURL(new RegExp(`/tenant/${TENANT}`), { timeout: 15000 });
 
@@ -58,8 +58,8 @@ test.describe("QA Identity & Session", () => {
 
   test("4 - VIEWER enters, can read but has limited permissions", async ({ page }) => {
     await page.goto("/login");
-    await page.fill('input[name="email"]', "qa-viewer@heptacore.test");
-    await page.fill('input[name="password"]', process.env.HEPTACORE_QA_E2E_PASSWORD!);
+    await page.fill('input[autocomplete="username"]', "qa-viewer@heptacore.test");
+    await page.fill('input[autocomplete="current-password"]', process.env.HEPTACORE_QA_E2E_PASSWORD!);
     await page.click('button[type="submit"]');
     await page.waitForURL(new RegExp(`/tenant/${TENANT}`), { timeout: 15000 });
 
@@ -76,8 +76,8 @@ test.describe("QA Identity & Session", () => {
 
   test("5 - qa-legacy logs in with inherited identifier, can see warning and sign out", async ({ page }) => {
     await page.goto("/login");
-    await page.fill('input[name="email"]', "qa-legacy");
-    await page.fill('input[name="password"]', process.env.HEPTACORE_QA_E2E_PASSWORD!);
+    await page.fill('input[autocomplete="username"]', "qa-legacy");
+    await page.fill('input[autocomplete="current-password"]', process.env.HEPTACORE_QA_E2E_PASSWORD!);
     await page.click('button[type="submit"]');
     await page.waitForURL(new RegExp(`/tenant/${TENANT}`), { timeout: 15000 });
 

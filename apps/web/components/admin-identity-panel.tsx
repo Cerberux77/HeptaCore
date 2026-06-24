@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
 import { ShieldCheck, ShieldAlert, X, LogOut, ChevronDown, ChevronUp, Info, Check, AlertTriangle, Loader2 } from "lucide-react";
+import { getCanonicalRoleLabel } from "../lib/canonical-tenant-role";
 
 interface CapabilitiesData {
   user: {
@@ -162,8 +163,8 @@ export function AdminIdentityPanel({ variant }: { variant?: "admin" | "tenant" }
 
   let displayRole = "—";
   if (isSuperAdmin) displayRole = "SUPER_ADMIN";
-  else if (tenant?.canonicalTenantRole) displayRole = tenant.canonicalTenantRole;
-  else if (tenant?.tenantRole) displayRole = tenant.tenantRole;
+  else if (tenant?.canonicalTenantRole) displayRole = getCanonicalRoleLabel(tenant.canonicalTenantRole);
+  else if (tenant?.tenantRole) displayRole = getCanonicalRoleLabel(tenant.tenantRole);
 
   let displayName = "—";
   if (user?.name) displayName = user.name;
@@ -291,7 +292,7 @@ export function AdminIdentityPanel({ variant }: { variant?: "admin" | "tenant" }
                   <div style={{ display: "flex", gap: 8, marginTop: 3, alignItems: "center" }}>
                     {tenant.tenantRole && (
                       <span style={{ fontSize: 10, background: "var(--hc-teal)", color: "#fff", padding: "1px 6px", borderRadius: 3, fontWeight: 600 }}>
-                        {tenant.tenantRole}
+                        {getCanonicalRoleLabel(tenant.canonicalTenantRole || tenant.tenantRole)}
                       </span>
                     )}
                     <span style={{ fontSize: 10, color: "var(--hc-fog)" }}>
