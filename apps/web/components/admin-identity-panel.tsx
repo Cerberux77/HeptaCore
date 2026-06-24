@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
-import { ShieldCheck, ShieldAlert, ShieldOff, X, LogOut, ChevronDown, ChevronUp, Info, Check, AlertTriangle } from "lucide-react";
+import { ShieldCheck, ShieldAlert, X, LogOut, ChevronDown, ChevronUp, Info, Check, AlertTriangle, Loader2 } from "lucide-react";
 
 interface CapabilitiesData {
   user: {
@@ -58,14 +58,21 @@ function statusLabel(status: string): string {
   return labels[status] ?? status;
 }
 
+function safeError(res: Response, json: any): string {
+  if (res.status === 401) return "Sesion expirada. Inicia sesion nuevamente.";
+  if (res.status === 403) return "No tienes acceso a esta informacion.";
+  if (json?.error?.message) return json.error.message;
+  return "Error al cargar capacidades";
+}
+
 export function AdminIdentityPanel() {
   const [open, setOpen] = useState(false);
   const [data, setData] = useState<CapabilitiesData | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const panelRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
-  const firstFocusRef = useRef<HTMLButtonElement>(null);
+  const closeRef = useRef<HTMLButtonElement>(null);
   const pathname = usePathname();
 
   const tenantSlug = useMemo(() => {
@@ -81,10 +88,11 @@ export function AdminIdentityPanel() {
       const res = await fetch(`/api/admin/capabilities${params}`);
       const json = await res.json();
       if (!res.ok || !json.ok) {
-        setError(json.error?.message || "Error al cargar capacidades");
+        setError(safeError(res, json));
         return;
       }
       setData(json.data);
+      setError("");
     } catch {
       setError("Error de conexion");
     } finally {
@@ -93,20 +101,13 @@ export function AdminIdentityPanel() {
   }, [tenantSlug]);
 
   useEffect(() => {
-    if (open && !data) {
-      fetchCapabilities();
-    }
-  }, [open, data, fetchCapabilities]);
-
-  useEffect(() => {
-    if (data && tenantSlug && data.tenant.tenantSlug !== tenantSlug) {
-      setData(null);
-      if (open) fetchCapabilities();
-    }
-  }, [tenantSlug, data, open, fetchCapabilities]);
+    fetchCapabilities();
+  }, [fetchCapabilities]);
 
   useEffect(() => {
     if (!open) return;
+
+    closeRef.current?.focus();
 
     function handleKeyDown(e: KeyboardEvent) {
       if (e.key === "Escape") {
@@ -116,7 +117,7 @@ export function AdminIdentityPanel() {
       }
       if (e.key === "Tab" && panelRef.current) {
         const focusable = panelRef.current.querySelectorAll<HTMLElement>(
-          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+          'button:not([disabled]), [tabindex]:not([tabindex="-1"])'
         );
         if (focusable.length === 0) return;
         const first = focusable[0];
@@ -149,18 +150,29 @@ export function AdminIdentityPanel() {
   const user = data?.user;
   const tenant = data?.tenant;
   const isSuperAdmin = user?.globalRole === "SUPER_ADMIN";
-  const displayRole = isSuperAdmin ? "SUPER_ADMIN" : (tenant?.tenantRole || "—");
-  const displayName = user?.name || user?.email?.split("@")[0] || "Usuario";
+
+  let displayRole = "—";
+  if (isSuperAdmin) displayRole = "SUPER_ADMIN";
+  else if (tenant?.tenantRole) displayRole = tenant.tenantRole;
+
+  let displayName = "—";
+  if (user?.name) displayName = user.name;
+  else if (user?.email) displayName = user.email.split("@")[0];
+  else if (loading) displayName = "";
+  else displayName = "Usuario";
+
+  const hasError = !!error;
+  const showLoadingBadge = loading && !data && !hasError;
 
   return (
     <div style={{ position: "relative" }}>
       <button
         ref={triggerRef}
         type="button"
-        onClick={() => { setOpen(!open); if (!open && data) setData(null); }}
+        onClick={() => setOpen(!open)}
         aria-expanded={open}
         aria-controls="identity-panel"
-        aria-label={`Identidad de ${displayName}, rol ${displayRole}`}
+        aria-label={`Identidad de ${displayName || "cargando"}, rol ${displayRole}`}
         style={{
           display: "flex",
           alignItems: "center",
@@ -169,19 +181,27 @@ export function AdminIdentityPanel() {
           borderRadius: 6,
           border: "1px solid var(--hc-line)",
           background: open ? "var(--hc-bone)" : "var(--hc-panel)",
-          color: "var(--hc-ink)",
+          color: hasError ? "var(--hc-red)" : "var(--hc-ink)",
           cursor: "pointer",
           fontFamily: "inherit",
           fontSize: 12,
           fontWeight: 500,
+          minWidth: 120,
+          justifyContent: "center",
         }}
       >
-        <span style={{ color: isSuperAdmin ? "var(--hc-teal)" : "var(--hc-graphite)", fontWeight: 700 }}>
-          {displayName}
-        </span>
-        <span style={{ color: "var(--hc-fog)", fontSize: 10 }}>
-          · {displayRole}
-        </span>
+        {showLoadingBadge ? (
+          <Loader2 size={12} style={{ animation: "spin 1s linear infinite" }} />
+        ) : (
+          <>
+            <span style={{ color: isSuperAdmin ? "var(--hc-teal)" : "var(--hc-graphite)", fontWeight: 700 }}>
+              {displayName}
+            </span>
+            <span style={{ color: "var(--hc-fog)", fontSize: 10 }}>
+              · {displayRole}
+            </span>
+          </>
+        )}
         {open ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
       </button>
 
@@ -206,21 +226,22 @@ export function AdminIdentityPanel() {
             fontFamily: "inherit",
           }}
         >
-          {loading && (
-            <div style={{ padding: 20, textAlign: "center", fontSize: 12, color: "var(--hc-fog)" }}>
-              Cargando...
+          {hasError && (
+            <div style={{ padding: "14px 16px", fontSize: 12, color: "var(--hc-red)", borderBottom: "1px solid var(--hc-line)", display: "flex", alignItems: "center", gap: 6 }}>
+              <AlertTriangle size={14} />
+              {error}
             </div>
           )}
 
-          {error && (
-            <div style={{ padding: "10px 14px", fontSize: 12, color: "var(--hc-red)" }}>
-              {error}
+          {!hasError && loading && !data && (
+            <div style={{ padding: 20, textAlign: "center", fontSize: 12, color: "var(--hc-fog)", display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>
+              <Loader2 size={12} style={{ animation: "spin 1s linear infinite" }} />
+              Cargando...
             </div>
           )}
 
           {data && (
             <>
-              {/* User info */}
               <div style={{ padding: "14px 16px 10px", borderBottom: "1px solid var(--hc-line)" }}>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
                   <div>
@@ -236,7 +257,7 @@ export function AdminIdentityPanel() {
                     </div>
                   </div>
                   <button
-                    ref={firstFocusRef}
+                    ref={closeRef}
                     type="button"
                     onClick={() => setOpen(false)}
                     aria-label="Cerrar panel de identidad"
@@ -253,7 +274,6 @@ export function AdminIdentityPanel() {
                 </div>
               </div>
 
-              {/* Tenant context */}
               {tenant?.tenantId && (
                 <div style={{ padding: "8px 16px", borderBottom: "1px solid var(--hc-line)", background: "var(--hc-bone)" }}>
                   <div style={{ fontSize: 11, fontWeight: 600, color: "var(--hc-graphite)", marginBottom: 4 }}>
@@ -285,7 +305,6 @@ export function AdminIdentityPanel() {
                 </div>
               )}
 
-              {/* Permissions */}
               <div style={{ padding: "10px 16px 14px" }}>
                 <div style={{ fontSize: 11, fontWeight: 600, color: "var(--hc-graphite)", marginBottom: 6 }}>
                   Permisos efectivos
@@ -324,7 +343,6 @@ export function AdminIdentityPanel() {
                 </div>
               </div>
 
-              {/* Logout */}
               <div style={{ padding: "10px 16px", borderTop: "1px solid var(--hc-line)" }}>
                 <button
                   type="button"

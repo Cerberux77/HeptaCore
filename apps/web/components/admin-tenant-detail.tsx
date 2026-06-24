@@ -141,7 +141,7 @@ function OverviewTab({ tenant, onRefresh }: { tenant: TenantData; onRefresh: () 
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status: newStatus }),
       });
-      if (!res.ok) { setStatusError(res.error?.message || "Error al cambiar estado"); return; }
+      if (!res.ok) { setStatusError(translateError(res.error?.code ?? "", res.error?.message || "Error al cambiar estado")); return; }
       onRefresh();
     } catch { setStatusError("Error de conexion"); }
     finally { setStatusLoading(false); }
@@ -523,7 +523,7 @@ function InvitationsTab({ slug, tenantStatus }: { slug: string; tenantStatus: st
     setActionLoading(true); setActionError("");
     try {
       const res = await fetch(`/api/admin/tenants/${slug}/invitations/${id}`, { method: "DELETE" });
-      if (!res.ok) { const json = await res.json(); setActionError(json.error?.message || "Error al revocar"); return; }
+      if (!res.ok) { const json = await res.json(); setActionError(translateError(json.error?.code ?? "", json.error?.message || "Error al revocar")); return; }
       if (data && data.items.length === 1 && page > 1) {
         setPage((p) => p - 1);
       } else {
@@ -538,17 +538,25 @@ function InvitationsTab({ slug, tenantStatus }: { slug: string; tenantStatus: st
   }
 
   const isProvisioning = tenantStatus === "PROVISIONING";
+  const isFrozen = tenantStatus === "SUSPENDED" || tenantStatus === "ARCHIVED";
 
   return (
     <div>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
         <span style={{ fontSize: 13, fontWeight: 600 }}>Invitaciones</span>
-        <button
-          onClick={() => setShowCreate(!showCreate)}
-          style={{ padding: "5px 12px", fontSize: 12, borderRadius: 6, border: "1px solid var(--hc-line)", background: "var(--hc-panel)", color: "var(--hc-ink)", cursor: "pointer", fontFamily: "inherit" }}
-        >
-          + Nueva invitacion
-        </button>
+        {isFrozen ? (
+          <span style={{ fontSize: 11, color: "var(--hc-red)", display: "flex", alignItems: "center", gap: 4 }}>
+            <AlertTriangle size={12} />
+            Acciones bloqueadas — tenant {tenantStatus === "SUSPENDED" ? "suspendido" : "archivado"}
+          </span>
+        ) : (
+          <button
+            onClick={() => setShowCreate(!showCreate)}
+            style={{ padding: "5px 12px", fontSize: 12, borderRadius: 6, border: "1px solid var(--hc-line)", background: "var(--hc-panel)", color: "var(--hc-ink)", cursor: "pointer", fontFamily: "inherit" }}
+          >
+            + Nueva invitacion
+          </button>
+        )}
       </div>
 
       {showCreate && (
@@ -623,10 +631,10 @@ function InvitationsTab({ slug, tenantStatus }: { slug: string; tenantStatus: st
                 <span style={{ display: "flex", gap: 4 }}>
                   {!inv.accepted && (
                     <>
-                      <button onClick={() => handleResend(inv.id)} disabled={actionLoading} style={{ fontSize: 10, padding: "2px 6px", border: "1px solid var(--hc-line)", borderRadius: 4, background: "var(--hc-panel)", cursor: "pointer", fontFamily: "inherit" }}>
+                      <button onClick={() => handleResend(inv.id)} disabled={actionLoading || isFrozen} style={{ fontSize: 10, padding: "2px 6px", border: "1px solid var(--hc-line)", borderRadius: 4, background: "var(--hc-panel)", cursor: isFrozen ? "default" : "pointer", fontFamily: "inherit", opacity: isFrozen ? 0.4 : 1 }}>
                         <RefreshCw size={11} /> Reemitir
                       </button>
-                      <button onClick={() => setRevokeId(inv.id)} disabled={actionLoading} style={{ fontSize: 10, padding: "2px 6px", border: "1px solid var(--hc-red)", borderRadius: 4, background: "transparent", color: "var(--hc-red)", cursor: "pointer", fontFamily: "inherit" }}>
+                      <button onClick={() => setRevokeId(inv.id)} disabled={actionLoading || isFrozen} style={{ fontSize: 10, padding: "2px 6px", border: "1px solid var(--hc-red)", borderRadius: 4, background: "transparent", color: isFrozen ? "var(--hc-fog)" : "var(--hc-red)", cursor: isFrozen ? "default" : "pointer", fontFamily: "inherit", opacity: isFrozen ? 0.4 : 1 }}>
                         Revocar
                       </button>
                     </>
@@ -691,7 +699,7 @@ function ConfigTab({ tenant, slug, onRefresh }: { tenant: TenantData; slug: stri
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name: name.trim(), timezone, locale }),
       });
-      if (!res.ok) { setError(res.error?.message || "Error al guardar"); return; }
+      if (!res.ok) { setError(translateError(res.error?.code ?? "", res.error?.message || "Error al guardar")); return; }
       setSuccess(true);
       setDirty(false);
       onRefresh();

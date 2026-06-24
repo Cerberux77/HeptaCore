@@ -2,15 +2,15 @@ import { NextResponse, NextRequest } from "next/server";
 import { auth } from "../../../../lib/auth";
 import { prisma } from "../../../../lib/prisma";
 import { Permission, getPermissionsForRole } from "../../../../lib/permissions";
-import { isSuperAdmin } from "../../../../lib/tenant-access";
-import type { TenantStatus, UserRole } from "@prisma/client";
+import { resolveSuperAdminAccess } from "../../../../lib/tenant-access";
+import type { TenantStatus } from "@prisma/client";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 const ALL_PERMISSIONS = Object.values(Permission);
 
-const LIFECYCLE_MUTATION_BLOCKED: Record<TenantStatus, string | null> = {
+const LIFECYCLE_MUTATION_BLOCKED: Record<string, string | null> = {
   PROVISIONING: "El tenant esta en PROVISIONING. Solo se permiten invitaciones OWNER y configuracion.",
   SUSPENDED: "El tenant esta SUSPENDED. Las mutaciones estan bloqueadas hasta su reactivacion.",
   ARCHIVED: "El tenant esta ARCHIVED. Las mutaciones estan bloqueadas hasta su reactivacion.",
@@ -30,10 +30,12 @@ export async function GET(req: NextRequest) {
     const session = await auth();
     if (!session?.user?.id) {
       return NextResponse.json(
-        { ok: false, error: { code: "UNAUTHORIZED", message: "Not authenticated" } },
+        { ok: false, error: { code: "UNAUTHORIZED", message: "No autenticado" } },
         { status: 401 },
       );
     }
+
+    await resolveSuperAdminAccess(session.user.id, prisma as any);
 
     const user = await prisma.user.findUnique({
       where: { id: session.user.id },
@@ -41,7 +43,7 @@ export async function GET(req: NextRequest) {
     });
     if (!user) {
       return NextResponse.json(
-        { ok: false, error: { code: "UNAUTHORIZED", message: "User not found" } },
+        { ok: false, error: { code: "UNAUTHORIZED", message: "Usuario no encontrado" } },
         { status: 401 },
       );
     }
@@ -51,13 +53,7 @@ export async function GET(req: NextRequest) {
       select: { tenantId: true, role: true },
     });
 
-    const isGlobalAdmin = isSuperAdmin(memberships);
-    const effectivePermissions = isGlobalAdmin
-      ? permissionsForGlobalSuperAdmin()
-      : ALL_PERMISSIONS.map((p) => ({
-          permission: p as string,
-          granted: false,
-        }));
+    const effectivePermissions = permissionsForGlobalSuperAdmin();
 
     const tenantSlug = req.nextUrl.searchParams.get("tenant");
     let tenantContext: {
@@ -75,28 +71,32 @@ export async function GET(req: NextRequest) {
         where: { slug: tenantSlug },
         select: { id: true, slug: true, name: true, status: true },
       });
-      if (tenant) {
-        const membership = memberships.find((m) => m.tenantId === tenant.id);
-        const role = membership?.role ?? null;
-        const rolePermissions = role ? getPermissionsForRole(role) : new Set<Permission>();
-
-        const tenantPerms = ALL_PERMISSIONS.map((p) => ({
-          permission: p as string,
-          granted: isGlobalAdmin || rolePermissions.has(p),
-        }));
-
-        const lifecycleReason = LIFECYCLE_MUTATION_BLOCKED[tenant.status];
-
-        tenantContext = {
-          tenantId: tenant.id,
-          tenantSlug: tenant.slug,
-          tenantName: tenant.name,
-          tenantStatus: tenant.status,
-          tenantRole: role,
-          lifecycleBlockedReason: lifecycleReason,
-          tenantPermissions: tenantPerms,
-        };
+      if (!tenant) {
+        return NextResponse.json(
+          { ok: false, error: { code: "NOT_FOUND", message: "Tenant no encontrado" } },
+          { status: 404 },
+        );
       }
+      const membership = memberships.find((m) => m.tenantId === tenant.id);
+      const role = membership?.role ?? null;
+      const rolePermissions = role ? getPermissionsForRole(role) : new Set<Permission>();
+
+      const tenantPerms = ALL_PERMISSIONS.map((p) => ({
+        permission: p as string,
+        granted: rolePermissions.has(p),
+      }));
+
+      const lifecycleReason = LIFECYCLE_MUTATION_BLOCKED[tenant.status] ?? null;
+
+      tenantContext = {
+        tenantId: tenant.id,
+        tenantSlug: tenant.slug,
+        tenantName: tenant.name,
+        tenantStatus: tenant.status,
+        tenantRole: role,
+        lifecycleBlockedReason: lifecycleReason,
+        tenantPermissions: tenantPerms,
+      };
     }
 
     return NextResponse.json({
@@ -106,15 +106,21 @@ export async function GET(req: NextRequest) {
           id: user.id,
           email: user.email,
           name: user.name,
-          globalRole: isGlobalAdmin ? "SUPER_ADMIN" : null,
+          globalRole: "SUPER_ADMIN",
         },
         effectivePermissions,
         tenant: tenantContext,
       },
     });
-  } catch {
+  } catch (e: any) {
+    if (e?.code === "UNAUTHORIZED" || e?.code === "FORBIDDEN") {
+      return NextResponse.json(
+        { ok: false, error: { code: e.code, message: e.message } },
+        { status: e.status ?? 403 },
+      );
+    }
     return NextResponse.json(
-      { ok: false, error: { code: "INTERNAL_ERROR", message: "Failed to load capabilities" } },
+      { ok: false, error: { code: "INTERNAL_ERROR", message: "Error al cargar capacidades" } },
       { status: 500 },
     );
   }
