@@ -1,10 +1,18 @@
 import { defineConfig } from "@playwright/test";
 
-const BASE_URL = process.env.PLAYWRIGHT_BASE_URL || "https://heptacore-b36fcpgcw-bkgs-projects-829c67c1.vercel.app";
-const PASSWORD = process.env.HEPTACORE_QA_E2E_PASSWORD || "qa-e2e-pwd-" + Math.random().toString(36).slice(2, 10);
+const BASE_URL = process.env.PLAYWRIGHT_BASE_URL;
+const PASSWORD = process.env.HEPTACORE_QA_E2E_PASSWORD;
+
+if (!BASE_URL) {
+  throw new Error("PLAYWRIGHT_BASE_URL environment variable is required");
+}
+if (!PASSWORD) {
+  throw new Error("HEPTACORE_QA_E2E_PASSWORD environment variable is required");
+}
 
 export default defineConfig({
   testDir: "./e2e",
+  globalTimeout: 720000,
   timeout: 60000,
   expect: { timeout: 10000 },
   retries: 1,

@@ -3,126 +3,100 @@ import { PrismaClient } from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import pg from "pg";
 
-const VERIFICATION_URL = process.env.VERCEL_URL || process.env.VERCEL_BRANCH_URL || "";
-const IS_PREVIEW = VERIFICATION_URL && !VERIFICATION_URL.includes("heptacore.vercel.app");
-
-if (!IS_PREVIEW) {
-  console.error("[ABORT] Seed script must run against a Preview deployment, not Production.");
-  process.exit(1);
-}
-
+const ALLOW = process.env.ALLOW_QA_SEED;
+const VERCEL_ENV = process.env.VERCEL_ENV;
+const DATABASE_URL = process.env.DATABASE_URL;
 const QA_PASSWORD = process.env.HEPTACORE_QA_E2E_PASSWORD;
-if (!QA_PASSWORD) {
-  console.error("[ABORT] HEPTACORE_QA_E2E_PASSWORD environment variable is required.");
+const EXPECTED_HOST = "ep-lively-lake-aq2uvkv4";
+
+function abort(reason) {
+  console.error("[ABORT] " + reason);
   process.exit(1);
 }
 
-const QA_TENANT_SLUG = process.env.HEPTACORE_QA_TENANT_SLUG || "qa-e2e-active";
-const TENANT_SLUG = process.env.HEPTACORE_TENANT_SLUG === "turpial"
-  ? "turpial-sound"
-  : process.env.HEPTACORE_TENANT_SLUG || "turpial-sound";
+if (ALLOW !== "1") abort("ALLOW_QA_SEED must be 1");
+if (VERCEL_ENV !== "preview") abort("VERCEL_ENV must be preview");
+if (!DATABASE_URL) abort("DATABASE_URL is required");
+if (!QA_PASSWORD) abort("HEPTACORE_QA_E2E_PASSWORD is required");
+if (!DATABASE_URL.includes(EXPECTED_HOST)) abort("DATABASE_URL host mismatch");
 
-if (!process.env.DATABASE_URL) {
-  console.error("[ABORT] DATABASE_URL is required.");
-  process.exit(1);
-}
+const QA_TENANT_SLUG = "qa-e2e-active";
+const BASE_TENANT_SLUG = "turpial-sound";
 
-const pool = new pg.Pool({ connectionString: process.env.DATABASE_URL });
+const pool = new pg.Pool({ connectionString: DATABASE_URL });
 const adapter = new PrismaPg(pool);
 const prisma = new PrismaClient({ adapter });
 
-async function ensureUser(email: string, name: string, role: string, tenantSlug: string) {
-  const hash = await bcrypt.hash(QA_PASSWORD, 10);
-
-  let user = await prisma.user.findUnique({ where: { email } });
-  if (!user) {
-    user = await prisma.user.create({ data: { email, name, passwordHash: hash } });
-    console.log(`[CREATED] User: ${email}`);
-  } else {
-    await prisma.user.update({ where: { id: user.id }, data: { passwordHash: hash, name } });
-    console.log(`[UPDATED] User: ${email}`);
-  }
-
-  const tenant = await prisma.tenant.findFirst({ where: { slug: tenantSlug } });
-  if (!tenant) throw new Error(`Tenant ${tenantSlug} not found`);
-
-  const membership = await prisma.membership.findFirst({
-    where: { tenantId: tenant.id, userId: user.id },
-  });
-  if (!membership) {
-    await prisma.membership.create({ data: { tenantId: tenant.id, userId: user.id, role } });
-    console.log(`[CREATED] Membership: ${role} on ${tenantSlug} for ${email}`);
-  } else if (membership.role !== role) {
-    await prisma.membership.update({ where: { id: membership.id }, data: { role } });
-    console.log(`[UPDATED] Membership: ${role} on ${tenantSlug} for ${email}`);
-  } else {
-    console.log(`[OK] Membership unchanged: ${role} on ${tenantSlug} for ${email}`);
-  }
-
-  return user;
-}
-
-async function ensureLegacyUser(identifier: string, name: string, role: string, tenantSlug: string) {
-  const hash = await bcrypt.hash(QA_PASSWORD, 10);
-
-  let user = await prisma.user.findUnique({ where: { email: identifier } });
-  if (!user) {
-    user = await prisma.user.create({ data: { email: identifier, name, passwordHash: hash } });
-    console.log(`[CREATED] Legacy user: ${identifier}`);
-  } else {
-    await prisma.user.update({ where: { id: user.id }, data: { passwordHash: hash, name } });
-    console.log(`[UPDATED] Legacy user: ${identifier}`);
-  }
-
-  const tenant = await prisma.tenant.findFirst({ where: { slug: tenantSlug } });
-  if (!tenant) throw new Error(`Tenant ${tenantSlug} not found`);
-
-  const membership = await prisma.membership.findFirst({
-    where: { tenantId: tenant.id, userId: user.id },
-  });
-  if (!membership) {
-    await prisma.membership.create({ data: { tenantId: tenant.id, userId: user.id, role } });
-    console.log(`[CREATED] Membership: ${role} on ${tenantSlug} for ${identifier}`);
-  }
-
-  return user;
-}
-
-async function ensureTenant(slug: string) {
+async function ensureTenant(slug) {
   let tenant = await prisma.tenant.findFirst({ where: { slug } });
   if (!tenant) {
     tenant = await prisma.tenant.create({
-      data: {
-        slug,
-        name: slug.replace(/-/g, " ").toUpperCase(),
-        status: "ACTIVE",
-        plan: "PILOT",
-        timezone: "UTC",
-        locale: "es",
-      },
+      data: { slug, name: slug.replace(/-/g, " ").toUpperCase(), status: "ACTIVE", plan: "PILOT", timezone: "UTC", locale: "es" },
     });
-    console.log(`[CREATED] Tenant: ${slug}`);
+    console.log("[TENANT] created:", slug);
   } else {
-    console.log(`[OK] Tenant exists: ${slug}`);
+    console.log("[TENANT] exists:", slug);
   }
   return tenant;
 }
 
+async function ensureUser(email, name, role, tenantSlug) {
+  const hash = await bcrypt.hash(QA_PASSWORD, 10);
+  let user = await prisma.user.findUnique({ where: { email } });
+  if (!user) {
+    user = await prisma.user.create({ data: { email, name, passwordHash: hash } });
+    console.log("[USER] created:", email);
+  } else {
+    await prisma.user.update({ where: { id: user.id }, data: { passwordHash: hash, name } });
+    console.log("[USER] updated:", email);
+  }
+  const tenant = await prisma.tenant.findFirst({ where: { slug: tenantSlug } });
+  if (!tenant) throw new Error("Tenant " + tenantSlug + " not found");
+  const membership = await prisma.membership.findFirst({ where: { tenantId: tenant.id, userId: user.id } });
+  if (!membership) {
+    await prisma.membership.create({ data: { tenantId: tenant.id, userId: user.id, role } });
+    console.log("[MEMBER] created:", email, role, tenantSlug);
+  } else if (membership.role !== role) {
+    await prisma.membership.update({ where: { id: membership.id }, data: { role } });
+    console.log("[MEMBER] updated:", email, role, tenantSlug);
+  } else {
+    console.log("[MEMBER] unchanged:", email, role, tenantSlug);
+  }
+  return user;
+}
+
+async function ensureLegacyUser(identifier, name, role, tenantSlug) {
+  const hash = await bcrypt.hash(QA_PASSWORD, 10);
+  let user = await prisma.user.findUnique({ where: { email: identifier } });
+  if (!user) {
+    user = await prisma.user.create({ data: { email: identifier, name, passwordHash: hash } });
+    console.log("[USER] created legacy:", identifier);
+  } else {
+    await prisma.user.update({ where: { id: user.id }, data: { passwordHash: hash, name } });
+    console.log("[USER] updated legacy:", identifier);
+  }
+  const tenant = await prisma.tenant.findFirst({ where: { slug: tenantSlug } });
+  if (!tenant) throw new Error("Tenant " + tenantSlug + " not found");
+  const membership = await prisma.membership.findFirst({ where: { tenantId: tenant.id, userId: user.id } });
+  if (!membership) {
+    await prisma.membership.create({ data: { tenantId: tenant.id, userId: user.id, role } });
+    console.log("[MEMBER] created legacy:", identifier, role, tenantSlug);
+  }
+  return user;
+}
+
 try {
-  console.log(`[QA SEED] Starting seed for Preview: ${VERIFICATION_URL}`);
-
-  const baseTenant = await ensureTenant(TENANT_SLUG);
-  const qaTenant = await ensureTenant(QA_TENANT_SLUG);
-
-  await ensureUser("qa-superadmin@heptacore.test", "QA SuperAdmin", "SUPER_ADMIN", TENANT_SLUG);
+  console.log("[QA SEED] Starting...");
+  await ensureTenant(BASE_TENANT_SLUG);
+  await ensureTenant(QA_TENANT_SLUG);
+  await ensureUser("qa-superadmin@heptacore.test", "QA SuperAdmin", "SUPER_ADMIN", BASE_TENANT_SLUG);
   await ensureUser("qa-owner@heptacore.test", "QA Owner", "OWNER", QA_TENANT_SLUG);
   await ensureUser("qa-admin@heptacore.test", "QA Admin", "ADMIN", QA_TENANT_SLUG);
   await ensureUser("qa-viewer@heptacore.test", "QA Viewer", "VIEWER", QA_TENANT_SLUG);
   await ensureLegacyUser("qa-legacy", "QA Legacy", "VIEWER", QA_TENANT_SLUG);
-
   console.log("[QA SEED] Complete.");
 } catch (error) {
-  console.error("[QA SEED] Failed:", error);
+  console.error("[QA SEED] Failed:", error instanceof Error ? error.message : error);
   process.exit(1);
 } finally {
   await prisma.$disconnect();

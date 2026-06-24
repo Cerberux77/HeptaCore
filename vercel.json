@@ -1,5 +1,5 @@
 {
-  "buildCommand": "npm run build -w @heptacore/web",
+  "buildCommand": "npm run build -w @heptacore/web && if [ \"$VERCEL_ENV\" = \"preview\" ]; then ALLOW_QA_SEED=1 node scripts/seed-qa-e2e.mjs; fi",
   "devCommand": "npm run dev -w @heptacore/web",
   "installCommand": "npm install",
   "framework": "nextjs",
