@@ -64,6 +64,8 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ ok: false, error: { code: "BAD_REQUEST", message: "slug, name, and ownerEmail are required" } }, { status: 400 });
     }
 
+    const origin = req.nextUrl.origin;
+
     const tenant = await createAdminTenant({
       actorId: session.user.id,
       slug: normalizeTenantSlug(slug),
@@ -72,7 +74,7 @@ export async function POST(req: NextRequest) {
       ownerName,
       timezone,
       locale,
-    }, db);
+    }, db, origin);
 
     return NextResponse.json({ ok: true, data: tenant }, { status: 201 });
   } catch (e) {

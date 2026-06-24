@@ -338,7 +338,7 @@ describe("tenant creation and invite links", () => {
       actorId: "sa1", slug: "slug-link-test", name: "SLT", ownerEmail: "slt@test.com",
     }, db);
     assert.ok(result.inviteLink!.includes("/register?token="), "new account invites should use /register");
-    const link = buildInviteLink("tok", "user@test.com", "INVITATION_REQUIRED", "https://test.heptacore.vercel.app", "my-tenant-slug");
+    const link = buildInviteLink("https://test.heptacore.vercel.app", "tok", "user@test.com", "INVITATION_REQUIRED", "my-tenant-slug");
     assert.ok(link.includes("/register?token="));
     assert.ok(!link.includes("/tenant/"), "new account links should NOT contain /tenant/[slug]");
   });
@@ -346,7 +346,7 @@ describe("tenant creation and invite links", () => {
 
 describe("invite link building", () => {
   it("(21) buildInviteLink existing account uses /login callback", () => {
-    const link = buildInviteLink("tok", "user@test.com", "EXISTING_ACCOUNT", "https://app.test.com", "mytenant");
+    const link = buildInviteLink("https://app.test.com", "tok", "user@test.com", "EXISTING_ACCOUNT", "mytenant");
     assert.ok(link.includes("/login"));
     assert.ok(link.includes("callbackUrl="));
     assert.ok(link.includes("/tenant/mytenant"));
@@ -354,7 +354,7 @@ describe("invite link building", () => {
   });
 
   it("(22) buildInviteLink new account uses /register", () => {
-    const link = buildInviteLink("tok", "user@test.com", "INVITATION_REQUIRED", "https://app.test.com", "mytenant");
+    const link = buildInviteLink("https://app.test.com", "tok", "user@test.com", "INVITATION_REQUIRED", "mytenant");
     assert.ok(link.includes("/register"));
     assert.ok(link.includes("token=tok"));
     assert.ok(link.includes("user%40test.com"));
@@ -364,7 +364,7 @@ describe("invite link building", () => {
   it("(4) sendTenantOwnerInvitation uses tenantSlug in login link", () => {
     const r = saveEnvAndSet({ EMAIL_PROVIDER: "disabled", HEPTACORE_APP_URL: "https://test.heptacore.vercel.app" });
     try {
-      const link = buildInviteLink("tok", "user@test.com", "EXISTING_ACCOUNT", "https://test.heptacore.vercel.app", "test-slug");
+      const link = buildInviteLink("https://test.heptacore.vercel.app", "tok", "user@test.com", "EXISTING_ACCOUNT", "test-slug");
       assert.ok(link.includes("/tenant/test-slug"), "login link must contain /tenant/[slug]");
     } finally { r(); }
   });

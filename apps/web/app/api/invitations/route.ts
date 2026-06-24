@@ -1,10 +1,11 @@
-import { NextResponse } from "next/server";
+import { NextResponse, NextRequest } from "next/server";
 import { auth } from "../../../lib/auth";
 import { prisma } from "../../../lib/prisma";
 import { randomUUID } from "node:crypto";
 import { hashInvitationToken, generateInvitationToken, getInvitationExpiration } from "../../../lib/invitation-token";
+import { resolvePublicOrigin } from "../../../lib/url-origin";
 
-export async function GET(req: Request) {
+export async function GET(req: NextRequest) {
   const session = await auth();
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -45,7 +46,7 @@ export async function GET(req: Request) {
   return NextResponse.json({ ok: true, invitations });
 }
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   const session = await auth();
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -93,13 +94,13 @@ export async function POST(req: Request) {
     },
   });
 
-  const baseUrl = process.env.NEXTAUTH_URL || process.env.VERCEL_URL || "http://localhost:3000";
-  const inviteLink = `${baseUrl}/register?token=${encodeURIComponent(rawToken)}&email=${encodeURIComponent(normalizedEmail)}`;
+  const origin = resolvePublicOrigin(req.nextUrl.origin);
+  const inviteLink = `${origin}/register?token=${encodeURIComponent(rawToken)}&email=${encodeURIComponent(normalizedEmail)}`;
 
   return NextResponse.json({ ok: true, invitation: { id: invitation.id, email: normalizedEmail, role, inviteLink } });
 }
 
-export async function DELETE(req: Request) {
+export async function DELETE(req: NextRequest) {
   const session = await auth();
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

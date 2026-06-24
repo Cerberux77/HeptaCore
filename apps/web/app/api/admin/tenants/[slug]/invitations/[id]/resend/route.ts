@@ -38,7 +38,9 @@ export async function POST(
       return NextResponse.json({ ok: false, error: { code: "NOT_FOUND", message: "Tenant not found" } }, { status: 404 });
     }
 
-    const result = await resendTenantInvitation(session.user.id, tenant.id, id);
+    const origin = req.nextUrl.origin;
+
+    const result = await resendTenantInvitation(session.user.id, tenant.id, id, undefined, origin);
     return NextResponse.json({ ok: true, data: result });
   } catch (e) {
     return handleError(e);

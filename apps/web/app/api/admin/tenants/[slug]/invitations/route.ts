@@ -74,10 +74,12 @@ export async function POST(
       return NextResponse.json({ ok: false, error: { code: "BAD_REQUEST", message: "email and role are required" } }, { status: 400 });
     }
 
+    const origin = req.nextUrl.origin;
+
     const invitation = await createTenantInvitation(session.user.id, tenant.id, {
       email: body.email,
       role: body.role as UserRole,
-    }, db);
+    }, db, origin);
 
     return NextResponse.json({ ok: true, data: invitation }, { status: 201 });
   } catch (e) {

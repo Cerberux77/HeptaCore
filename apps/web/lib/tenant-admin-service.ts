@@ -3,6 +3,7 @@ import { TenantStatus, type Tenant, type Membership, type Invitation, type User 
 import { prisma as defaultPrisma } from "./prisma";
 import { hashInvitationToken, generateInvitationToken, getInvitationExpiration } from "./invitation-token";
 import { buildInviteLink } from "./email/email-invitation-service";
+import { resolvePublicOrigin } from "./url-origin";
 import {
   assertTenantLifecycleAllowsMutation,
   requireSuperAdminActor,
@@ -235,7 +236,9 @@ export async function getAdminTenant(
 export async function createAdminTenant(
   params: CreateTenantParams,
   db: TenantAdminDbWithTx = defaultPrisma as unknown as TenantAdminDbWithTx,
+  origin?: string,
 ): Promise<SerializedTenant> {
+  const safeOrigin = resolvePublicOrigin(origin);
   const normalizedSlug = normalizeTenantSlug(params.slug);
   validateTenantSlug(normalizedSlug);
 
@@ -293,9 +296,9 @@ export async function createAdminTenant(
           expiresAt: getInvitationExpiration(),
         },
       });
-      inviteLink = buildInviteLink(plainToken, ownerEmail, "INVITATION_REQUIRED", undefined, normalizedSlug);
+      inviteLink = buildInviteLink(safeOrigin, plainToken, ownerEmail, "INVITATION_REQUIRED", normalizedSlug);
     } else {
-      inviteLink = buildInviteLink("", ownerEmail, "EXISTING_ACCOUNT", undefined, normalizedSlug);
+      inviteLink = buildInviteLink(safeOrigin, "", ownerEmail, "EXISTING_ACCOUNT", normalizedSlug);
     }
 
     await tx.auditLog.create({
@@ -708,7 +711,9 @@ export async function createTenantInvitation(
   tenantId: string,
   params: CreateInvitationParams,
   db: TenantAdminDbWithTx = defaultPrisma as unknown as TenantAdminDbWithTx,
+  origin?: string,
 ): Promise<{ id: string; email: string; role: string; inviteLink: string; createdAt: Date }> {
+  const safeOrigin = resolvePublicOrigin(origin);
   const email = params.email.toLowerCase().trim();
   if (!email || !email.includes("@")) {
     throw new TenantAdminError("Invalid email", "INVALID_EMAIL", 400);
@@ -755,7 +760,7 @@ export async function createTenantInvitation(
       },
     });
 
-    const inviteLink = buildInviteLink(plainToken, email, "INVITATION_REQUIRED", undefined, tenant.slug);
+    const inviteLink = buildInviteLink(safeOrigin, plainToken, email, "INVITATION_REQUIRED", tenant.slug);
 
     await tx.auditLog.create({
       data: {
@@ -782,7 +787,9 @@ export async function resendTenantInvitation(
   tenantId: string,
   invitationId: string,
   db: TenantAdminDbWithTx = defaultPrisma as unknown as TenantAdminDbWithTx,
+  origin?: string,
 ): Promise<{ id: string; inviteLink: string }> {
+  const safeOrigin = resolvePublicOrigin(origin);
   return db.$transaction(async (tx) => {
     const accessResult = await resolveTenantAccess(actorId, tenantId, Permission.INVITATIONS_REISSUE, tx as unknown as AccessResolutionDb);
 
@@ -818,7 +825,7 @@ export async function resendTenantInvitation(
       },
     });
 
-    const inviteLink = buildInviteLink(plainToken, invitation.email, "INVITATION_REQUIRED", undefined, tenant.slug);
+    const inviteLink = buildInviteLink(safeOrigin, plainToken, invitation.email, "INVITATION_REQUIRED", tenant.slug);
 
     await tx.auditLog.create({
       data: {

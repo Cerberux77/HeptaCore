@@ -157,8 +157,8 @@ export function AdminTenantsCreate() {
           )}
           <p style={{ fontSize: 12, color: "var(--hc-fog)", margin: "0 0 14px", fontStyle: "italic" }}>
             {created.ownerAccountState === "INVITATION_REQUIRED"
-              ? "Invitacion creada. El envio automatico esta pendiente de configuracion."
-              : "Acceso preparado. Comparte el enlace de inicio de sesion con el owner."}
+              ? "Invitación creada. El envío automático está pendiente de configuración."
+              : "Acceso preparado. Comparte el enlace de inicio de sesión con el owner."}
           </p>
           <a
             href={`/admin/tenants/${created.slug}`}
