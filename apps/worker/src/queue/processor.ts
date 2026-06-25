@@ -26,6 +26,14 @@ export async function processPublishDraft(
 ): Promise<QueueJobResult> {
   const { tenantId, draftId, mode } = job;
 
+  const tenant = await prisma.tenant.findUnique({
+    where: { id: tenantId },
+    select: { status: true },
+  });
+  if (!tenant || tenant.status !== "ACTIVE") {
+    return { ok: false, draftId, tenantId, error: `Tenant is not ACTIVE (${tenant?.status ?? "not found"})` };
+  }
+
   const draft = await prisma.contentDraft.findFirst({
     where: { id: draftId, tenantId },
     include: { assets: { include: { asset: true } }, socialAccount: true },

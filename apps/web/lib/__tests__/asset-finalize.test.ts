@@ -61,6 +61,14 @@ class FakeDb {
 
   membership = {
     findUnique: async ({ where }: any) => this.memberships.find((membership) => membership.tenantId === where.tenantId_userId.tenantId && membership.userId === where.tenantId_userId.userId) ?? null,
+    findMany: async ({ where }: any) => this.memberships.filter((m) => m.userId === where.userId),
+  };
+
+  user = {
+    findUnique: async ({ where }: any) => {
+      const id = where?.id;
+      return { id };
+    },
   };
 
   asset = {

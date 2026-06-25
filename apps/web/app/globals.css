@@ -176,6 +176,68 @@ a { color: inherit; text-decoration: none; }
   line-height: 1.45;
 }
 
+.identity-panel-root {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.identity-panel-trigger {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.identity-panel-trigger-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.identity-panel-content {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  margin-top: 6px;
+  background: var(--hc-panel);
+  border: 1px solid var(--hc-line);
+  border-radius: 8px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  max-height: min(55vh, 480px);
+  box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+  font-family: inherit;
+}
+
+.identity-permission-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 0;
+  font-size: 10px;
+  word-break: break-word;
+}
+
+.identity-permission-row .perm-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: normal;
+  word-break: break-word;
+}
+
+.identity-permission-badge {
+  font-size: 9px;
+  font-weight: 600;
+  padding: 1px 5px;
+  border-radius: 3px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
 .workspace {
   min-width: 0;
   padding: 18px;
@@ -2458,5 +2520,35 @@ a.landing-contact-card:hover { border-color: rgba(13,197,184,0.3); }
   .codex-footer {
     align-items: flex-start;
     flex-direction: column;
+  }
+}
+
+/* ─── Admin Tenant Console Responsive ─── */
+@media (max-width: 1180px) {
+  .admin-tenant-table {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .admin-tenant-table .tenant-row {
+    grid-template-columns: minmax(180px, 1fr) 140px 100px 60px 60px 90px 36px;
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 720px) {
+  .admin-tenant-table {
+    font-size: 10px;
+  }
+  .admin-tenant-table .tenant-head {
+    display: none;
+  }
+  .admin-tenant-table .tenant-row {
+    grid-template-columns: 1fr;
+    gap: 4px;
+    padding: 10px 12px;
+  }
+  .admin-tenant-table .tenant-row > * {
+    display: flex;
+    justify-content: space-between;
   }
 }

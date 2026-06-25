@@ -1,32 +1,11 @@
-import { Prisma, type AssetKind, type UserRole } from "@prisma/client";
+import { Prisma, type AssetKind } from "@prisma/client";
 import { auditLog } from "./audit";
 import { normalizeLogicalFolder, sanitizeFilename, validateAssetFile } from "./asset-config";
 import { normalizeTechnicalAssetMetadata } from "./asset-metadata";
 import { getAssetStorage, type AssetStorageAdapter } from "./asset-storage";
 import { prisma } from "./prisma";
-
-const READ_ROLES: UserRole[] = [
-  "OWNER",
-  "ADMIN",
-  "STRATEGIST",
-  "EDITOR",
-  "ANALYST",
-  "APPROVER",
-  "VIEWER",
-  "PUBLISHER",
-  "SUPER_ADMIN",
-  "TENANT_ADMIN",
-];
-
-const MUTATION_ROLES: UserRole[] = [
-  "OWNER",
-  "ADMIN",
-  "EDITOR",
-  "STRATEGIST",
-  "PUBLISHER",
-  "SUPER_ADMIN",
-  "TENANT_ADMIN",
-];
+import { resolveTenantAccess, resolveTenantAccessWithLifecycle, TenantAccessError } from "./tenant-access";
+import { Permission } from "./permissions";
 
 type JsonObject = Record<string, unknown>;
 
@@ -121,18 +100,23 @@ async function requireTenantAccess(
   db: typeof prisma,
   params: { tenantSlug: string; userId: string; mutation?: boolean },
 ) {
-  const tenant = await db.tenant.findUnique({ where: { slug: params.tenantSlug }, select: { id: true, slug: true } });
+  const tenant = await db.tenant.findUnique({ where: { slug: params.tenantSlug }, select: { id: true, slug: true, status: true } });
   if (!tenant) throw new AssetServiceError("TENANT_NOT_FOUND", "Tenant not found.", 404);
 
-  const membership = await db.membership.findUnique({
-    where: { tenantId_userId: { tenantId: tenant.id, userId: params.userId } },
-    select: { role: true },
-  });
-  const allowed = params.mutation ? MUTATION_ROLES : READ_ROLES;
-  if (!membership || !allowed.includes(membership.role)) {
-    throw new AssetServiceError("FORBIDDEN", "Forbidden.", 403);
+  try {
+    if (params.mutation) {
+      const result = await resolveTenantAccessWithLifecycle(params.userId, tenant.id, Permission.CONTENT_WRITE, "NORMAL_OPERATION", db as any);
+      return { tenant: { id: tenant.id, slug: tenant.slug, status: tenant.status }, membership: { role: result.role } };
+    } else {
+      const result = await resolveTenantAccess(params.userId, tenant.id, Permission.TENANT_READ, db as any);
+      return { tenant: { id: tenant.id, slug: tenant.slug, status: tenant.status }, membership: { role: result.role } };
+    }
+  } catch (e) {
+    if (e instanceof TenantAccessError) {
+      throw new AssetServiceError(e.code, e.message, e.status);
+    }
+    throw e;
   }
-  return { tenant, membership };
 }
 
 async function getTenantAssetOrThrow(

@@ -14,13 +14,15 @@
     "npm run worker:validate"
   ],
   "currentExecutionOrder": [
+    "Fase completada: S-HC-TEN-01-GLOBAL-TENANT-ADMIN — tres roles canonicos (OWNER/ADMIN/VIEWER), normalizacion heredada, identidad en /admin y /tenant/*, 5/5 E2E en Preview (SHA 4b82628), 569 unit tests.",
     "Fase completada: S-HC-REC-00A — baseline de publicacion recuperado y estabilizado (SHA 2fd9e249). Facebook e Instagram publican realmente desde la UI con durabilidad transaccional.",
     "Fase completada: S-HC-REC-00C — integracion canonica en master (SHA 9329fe8). Documentacion y Oreshnik alineados.",
     "Fase completada: oreshnik-cli@0.2.0-alpha.0 publicado. reconcile --check/--write operacional.",
     "Fase completada: S-HC-PUB-02-MULTIFORMAT-PREVIEW — preview y dry-run multiformato para Instagram y Facebook.",
     "Fase completada: S-HC-PUB-03-MULTITENANT-ASSETS — biblioteca multi-tenant, metadata, compatibilidad, colecciones, inspector (SHA 31dd93e).",
     "Siguiente fase (un sprint por vez): S-HC-PUB-04-HOURLY-BATCH-CRON — batch cron publishing.",
-    "Pendientes de publicacion: PUB-04 hourly batch cron, PUB-05 reconciliation ops, PUB-06 Reels/Stories publishers, PUB-07 YouTube publishing, PUB-08 format parity.",
+    "EMAIL-01 infraestructura de codigo preparada (modelos, templates, provider abstraction, webhook, Link-Only activo). Integracion externa bloqueada hasta dominio final.",
+    "Modo operacional actual: EMAIL_PROVIDER=disabled. Invitaciones se entregan via enlace copiable (inviteLink). Correos reales: 0.",
     "Reels, Stories y YouTube forman parte obligatoria del alcance final de HeptaCore. Las combinaciones sin publisher real quedan pendientes de implementacion en PUB-06, PUB-07 o PUB-08.",
     "Jean fuera de ruta critica. Responsabilidades reasignadas a Manuel."
   ],
@@ -48,7 +50,38 @@
     "tests": 156,
     "vercelCrons": "24 slots diarios configurados. Cron publisher idempotente."
   },
-  "tasks": [
+    "tasks": [
+    {
+      "id": "S-HC-TEN-01-GLOBAL-TENANT-ADMIN",
+      "title": "Global tenant administration and provisioning",
+      "owner": "Manuel",
+      "backupOwner": "Manuel",
+      "status": "done",
+      "track": "tenant-platform",
+      "zone": ["packages/db/**", "apps/web/lib/tenant-admin-service.ts", "apps/web/lib/tenant-access.ts", "apps/web/lib/__tests__/tenant-admin*.test.ts", "docs/**", "var/oreshnik/**"],
+      "dependsOn": ["S-HC-PUB-03-MULTITENANT-ASSETS"],
+      "acceptance": [
+        "Tenant lifecycle schema with PROVISIONING, ACTIVE, SUSPENDED, ARCHIVED states",
+        "Secure migration preserving existing tenants as ACTIVE",
+        "SUPER_ADMIN access contracts",
+        "Transactional tenant provisioning",
+        "Slug validation and normalization",
+        "Lifecycle transitions with audit trail",
+        "Secure serialization without exposing secrets"
+      ],
+      "handoff": "docs/07_handoffs/TEN-01-global-tenant-admin.md",
+      "history": [
+        {
+          "at": "2026-06-25T18:19:00.000Z",
+          "action": "closed",
+          "operator": "Manuel",
+          "branch": "Manuel/s-hc-ten-01-global-tenant-admin",
+          "commit": "4b82628124366f4d3df19920994eeb4d71158800",
+          "preview": "https://heptacore-2kklmxyuh-bkgs-projects-829c67c1.vercel.app",
+          "description": "Three canonical roles (OWNER/ADMIN/VIEWER), legacy role normalization, identity panel in /admin and /tenant/*, 5/5 E2E pass, 569 unit tests, production intact"
+        }
+      ]
+    },
     {
       "id": "S-HC-00",
       "title": "Foundation baseline commit",
@@ -174,7 +207,7 @@
       "title": "Facebook duplicate cleanup",
       "owner": "Manuel",
       "backupOwner": "Manuel",
-      "status": "cancelled",
+      "status": "done",
       "track": "recovery",
       "zone": [],
       "dependsOn": [],
@@ -452,6 +485,24 @@
       ]
     },
     {
+      "id": "S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION",
+      "title": "Transactional email foundation: domain sender, DNS, reputation, provider integration",
+      "owner": "Jean",
+      "backupOwner": "Manuel",
+      "status": "pending",
+      "track": "email-infra",
+      "zone": ["apps/web/app/api/email", "packages/core", "docs"],
+      "dependsOn": [],
+      "acceptance": [
+        "Dominio final de HeptaCore configurado como remitente autorizado",
+        "DNS (SPF, DKIM, DMARC) verificado",
+        "Proveedor de correo transaccional integrado (Resend, SendGrid o equivalente)",
+        "Webhooks de eventos (delivered, bounced, complained) configurados",
+        "Enlaces comerciales y de marca consistentes con el dominio final"
+      ],
+      "blocker": "Pendiente de definicion y disponibilidad del dominio final de HeptaCore para configurar dominio remitente, DNS, reputacion, enlaces comerciales y webhooks del proveedor de correo transaccional."
+    },
+    {
       "id": "S-HC-COMM-01-SELF-SERVICE-SIGNUP",
       "title": "Self-service tenant signup with trial gate and onboarding flow",
       "owner": "Manuel",
@@ -465,7 +516,8 @@
         "apps/web/components"
       ],
       "dependsOn": [
-        "S-HC-REC-00C"
+        "S-HC-TEN-01-GLOBAL-TENANT-ADMIN",
+        "S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION"
       ],
       "acceptance": [
         "Self-service registration with email verification",
@@ -816,6 +868,7 @@
         "packages/db"
       ],
       "dependsOn": [
+        "S-HC-TEN-01-GLOBAL-TENANT-ADMIN",
         "S-HC-OPS-01-CAMPAIGN-REVIEW-DEPLOYMENT",
         "S-HC-COMM-02-BILLING-ACTIVATION",
         "S-HC-ONB-02-GAP-RESOLUTION-WIZARD",

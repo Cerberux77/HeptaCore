@@ -10,12 +10,12 @@ import { commitConfirmedPublication, recordUnconfirmedProviderFailure } from "..
 import { ProviderError } from "../../../../lib/publishers/types";
 import { buildMultiformatDryRun, normalizeAssetManifest, normalizePublishingFormat } from "../../../../lib/publishing-formats";
 import { resolveAssetUrl } from "../../../../lib/asset-resolution";
+import { resolveTenantAccessWithLifecycle } from "../../../../lib/tenant-access";
+import { Permission } from "../../../../lib/permissions";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 export const maxDuration = 60;
-
-const PUBLISH_ROLES = ["OWNER", "ADMIN", "APPROVER", "PUBLISHER", "SUPER_ADMIN", "TENANT_ADMIN"];
 
 type PublishMode = "dry_run" | "scheduled" | "immediate";
 
@@ -93,12 +93,13 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Tenant not found." }, { status: 404 });
   }
 
-  const membership = await prisma.membership.findFirst({
-    where: { tenantId: tenant.id, userId: session.user.id },
-    select: { role: true },
-  });
-  if (!membership || !PUBLISH_ROLES.includes(membership.role)) {
-    return NextResponse.json({ error: "Forbidden: publisher role required." }, { status: 403 });
+  try {
+    await resolveTenantAccessWithLifecycle(session.user.id, tenant.id, Permission.CONTENT_PUBLISH, "NORMAL_OPERATION");
+  } catch (e: any) {
+    if (e?.code) {
+      return NextResponse.json({ error: e.message }, { status: e.status || 403 });
+    }
+    throw e;
   }
 
   const draft = await prisma.contentDraft.findFirst({

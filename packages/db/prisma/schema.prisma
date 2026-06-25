@@ -14,6 +14,11 @@ model Tenant {
   automationMode  AutomationMode        @default(DRAFT_ONLY)
   llmConfig       Json?
   costConfig      Json?
+  status          TenantStatus          @default(PROVISIONING)
+  timezone        String                @default("UTC")
+  locale          String                @default("es")
+  suspendedAt     DateTime?
+  archivedAt      DateTime?
   createdAt       DateTime              @default(now())
   updatedAt       DateTime              @updatedAt
   approvals       Approval[]
@@ -297,6 +302,45 @@ model AuditLog {
   @@index([actorId])
 }
 
+model EmailDelivery {
+  id                String                 @id @default(cuid())
+  tenantId          String?
+  invitationId      String?
+  userId            String?
+  type              TransactionalEmailType
+  provider          String
+  providerMessageId String?                @unique
+  idempotencyKey    String                 @unique
+  recipient         String
+  sender            String
+  subject           String
+  status            EmailDeliveryStatus    @default(PENDING)
+  attemptCount      Int                    @default(0)
+  lastErrorCode     String?
+  lastErrorMessage  String?
+  sentAt            DateTime?
+  deliveredAt       DateTime?
+  bouncedAt         DateTime?
+  complainedAt      DateTime?
+  createdAt         DateTime               @default(now())
+  updatedAt         DateTime               @updatedAt
+
+  @@index([idempotencyKey])
+  @@index([tenantId, type])
+  @@index([providerMessageId])
+}
+
+model EmailWebhookEvent {
+  id                String   @id @default(cuid())
+  providerEventId   String   @unique
+  providerMessageId String?
+  type              String
+  occurredAt        DateTime
+  receivedAt        DateTime @default(now())
+
+  @@index([providerMessageId])
+}
+
 model BrandProfile {
   id                    String   @id
   tenantId              String
@@ -411,6 +455,30 @@ model StrategyBrief {
   Tenant         Tenant        @relation(fields: [tenantId], references: [id], onDelete: Cascade)
 
   @@index([tenantId, status])
+}
+
+enum EmailDeliveryStatus {
+  PENDING
+  SENT
+  DELIVERED
+  DISABLED
+  DELAYED
+  FAILED
+  BOUNCED
+  COMPLAINED
+}
+
+enum TransactionalEmailType {
+  TENANT_OWNER_INVITATION
+  TENANT_ACCESS_GRANTED
+  MEMBER_INVITATION
+}
+
+enum TenantStatus {
+  PROVISIONING
+  ACTIVE
+  SUSPENDED
+  ARCHIVED
 }
 
 enum TenantPlan {

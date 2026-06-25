@@ -15,6 +15,9 @@ build/
 coverage/
 output/
 .playwright-cli/
+test-results/
+playwright-report/
+e2e/results.json
 var/oreshnik/.last-preflight.json
 var/oreshnik/.session-start
 *.tsbuildinfo
