@@ -1,0 +1,68 @@
+{
+  "evidence": [
+    {
+      "addedAt": "2026-06-25T21:57:43.719Z",
+      "hash": "sha256:0d9f0f098b0249c5640f246fcbc01e91f6e9b2c70128890733392e6d4007393b",
+      "path": "scripts/goal-runner/__tests__/doctor.test.mjs",
+      "type": "code"
+    },
+    {
+      "addedAt": "2026-06-25T22:45:42.309Z",
+      "hash": "sha256:597104bb684b42449a114baca21f12a09a27c24b965e4e2b72bd30139ae15126",
+      "path": "scripts/goal-runner/__tests__/doctor.test.mjs",
+      "type": "code"
+    }
+  ],
+  "gates": [
+    {
+      "durationMs": 92,
+      "exitCode": 0,
+      "gate": "diff-check",
+      "passed": true,
+      "summary": "warning: in the working copy of '.kilo/commands/goal.md', LF will be replaced by CRLF the next time Git touches it warning: in the working copy of 'docs/obsidian-vault/COLABORADORES/ESTADO_MANUEL.md',"
+    },
+    {
+      "durationMs": 11996,
+      "exitCode": 0,
+      "gate": "typecheck",
+      "passed": true,
+      "summary": " > heptacore@0.1.0 typecheck > npm run typecheck --workspaces --if-present   > @heptacore/web@0.1.0 typecheck > tsc --noEmit   > @heptacore/worker@0.2.0 typecheck > tsc --noEmit   > @heptacore/agents@"
+    },
+    {
+      "durationMs": 13284,
+      "exitCode": 0,
+      "gate": "test",
+      "passed": true,
+      "summary": " > heptacore@0.1.0 test > node --test apps/web/lib/calendar-state.test.mjs && npm run test --workspaces --if-present  ✔ calendar display state prefers operational state over approval status (1.8241ms)"
+    },
+    {
+      "durationMs": 33122,
+      "exitCode": 0,
+      "gate": "build",
+      "passed": true,
+      "summary": " > heptacore@0.1.0 build > npm run build --workspaces --if-present   > @heptacore/web@0.1.0 build > node scripts/copy-tenant-assets.mjs && prisma generate --schema ../../packages/db/prisma/schema.pris"
+    },
+    {
+      "durationMs": 1321,
+      "exitCode": 0,
+      "gate": "worker-validate",
+      "passed": true,
+      "summary": " > heptacore@0.1.0 worker:validate > npm run validate -w @heptacore/worker   > @heptacore/worker@0.2.0 validate > node src/validate.mjs   === Validacion de Assets ===  Presentes: 46/46 ✅ Todos los ass"
+    },
+    {
+      "durationMs": 98,
+      "exitCode": 0,
+      "gate": "oreshnik-reconcile",
+      "passed": true,
+      "summary": " \u001b[1mORESHNIK CANONICAL CHECK\u001b[0m   Board:     var/oreshnik/task-board.json   Updated:   2026-06-25T20:05:39.000Z   Operator:  not specified   Sprint:    not specified    [ \u001b[32mOK  \u001b[0m ] Derived doc"
+    },
+    {
+      "durationMs": 128,
+      "exitCode": 0,
+      "gate": "oreshnik-drift",
+      "passed": true,
+      "summary": " \u001b[1mOreshnik Drift Log\u001b[0m   S-HC-DRIFT-001     2026-06-12 Manuel   sprint   S-HC-DRIFT-002     2026-06-12 Manuel   Codex multi-RRSS refactor, readiness gates, UI fixes, migrations, vercelignore   S-"
+    }
+  ],
+  "goalId": "GR-20260625T201231Z-f723e73f-aadir-comando-doctor-al-goal-runner"
+}

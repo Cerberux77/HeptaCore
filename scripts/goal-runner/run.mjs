@@ -16,7 +16,8 @@ import {
   validatePlanFile,
   writeHistoryEvent,
   currentBranch, currentHead,
-  getActiveGoal, nowISO
+  getActiveGoal, nowISO,
+  doctorCheck
 } from "./lib.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -46,6 +47,7 @@ Subcommands:
   abort        --goalId <id> --reason "..."
   status       [--goalId <id>]
   reindex
+  doctor
 `);
 }
 
@@ -505,6 +507,43 @@ function cmdReindex() {
   ok("Index regenerated", `${index.goals.length} goal(s)`);
 }
 
+function cmdDoctor() {
+  const result = doctorCheck();
+  const errorCount = result.errors.length;
+  const warnCount = result.warnings.length;
+
+  console.log("Goal Runner Health Report");
+  console.log(`  Worktree : ${result.worktree}`);
+  console.log(`  Branch   : ${result.branch}`);
+  console.log(`  Healthy  : ${result.healthy ? "YES" : "NO"}`);
+  console.log();
+
+  if (errorCount > 0) {
+    console.log(`Errors (${errorCount}):`);
+    for (const e of result.errors) {
+      console.log(`  [${e.code}] ${e.message}`);
+    }
+    console.log();
+  }
+
+  if (warnCount > 0) {
+    console.log(`Warnings (${warnCount}):`);
+    for (const w of result.warnings) {
+      console.log(`  [${w.code}] ${w.message}`);
+    }
+    console.log();
+  }
+
+  if (result.info.length > 0) {
+    for (const i of result.info) {
+      console.log(`  [${i.code}] ${i.message}`);
+    }
+    console.log();
+  }
+
+  if (!result.healthy) process.exit(1);
+}
+
 // ─── Main ───
 
 const subcommand = process.argv[2];
@@ -531,6 +570,7 @@ switch (subcommand) {
   case "abort": cmdAbort(); break;
   case "status": cmdStatus(); break;
   case "reindex": cmdReindex(); break;
+  case "doctor": cmdDoctor(); break;
   default:
     console.error(`Unknown subcommand: ${subcommand}`);
     usage();

@@ -1,0 +1,8 @@
+{
+  "at": "2026-06-25T22:45:42.319Z",
+  "event": "evidence-added-code",
+  "goalId": "GR-20260625T201231Z-f723e73f-aadir-comando-doctor-al-goal-runner",
+  "id": "20260625T224542318Z-84a9-evidence-added-code",
+  "path": "scripts/goal-runner/__tests__/doctor.test.mjs",
+  "type": "code"
+}

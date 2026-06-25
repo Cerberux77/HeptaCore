@@ -1,0 +1,8 @@
+{
+  "at": "2026-06-25T21:58:47.285Z",
+  "content": "Gates typecheck, test, build, worker-validate fallan en Windows porque spawnSync con shell:false no resuelve npm a npm.cmd. Los tests pasan (569/569) cuando se ejecutan directamente con node --test. L",
+  "event": "finding-blocker",
+  "goalId": "GR-20260625T201231Z-f723e73f-aadir-comando-doctor-al-goal-runner",
+  "id": "20260625T215847285Z-5d62-finding-blocker",
+  "severity": "blocker"
+}

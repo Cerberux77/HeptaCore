@@ -1,0 +1,8 @@
+{
+  "at": "2026-06-25T21:57:37.390Z",
+  "event": "step-complete-registrar-subcomando-en-docs",
+  "goalId": "GR-20260625T201231Z-f723e73f-aadir-comando-doctor-al-goal-runner",
+  "id": "20260625T215737390Z-c6a4-step-complete-registrar-subcomando-en-docs",
+  "result": "Añadido doctor a Key commands en AGENTS.md y a trigger phrases en .kilo/commands/goal.md",
+  "step": "Registrar subcomando en docs"
+}

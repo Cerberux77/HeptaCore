@@ -1,0 +1,54 @@
+{
+  "baseSha": "155a7f841ec3da3ab4569fde815f07659c43f0e7",
+  "branch": "Manuel/s-hc-goal-runner-v1",
+  "createdAt": "2026-06-25T20:12:31.196Z",
+  "evidenceRequired": "code",
+  "goalId": "GR-20260625T201231Z-f723e73f-aadir-comando-doctor-al-goal-runner",
+  "owner": "Manuel",
+  "previousStatus": "ACTIVE",
+  "sprintId": "S-HC-TOOL-01-GOAL-RUNNER-V1",
+  "status": "COMPLETED",
+  "title": "Añadir comando doctor al Goal Runner",
+  "transitions": [
+    {
+      "at": "2026-06-25T20:12:50.817Z",
+      "by": "Manuel",
+      "from": "DRAFT",
+      "to": "READY"
+    },
+    {
+      "at": "2026-06-25T20:12:58.391Z",
+      "by": "Manuel",
+      "from": "READY",
+      "to": "ACTIVE"
+    },
+    {
+      "at": "2026-06-25T20:13:50.570Z",
+      "by": "Manuel",
+      "from": "ACTIVE",
+      "to": "PAUSED"
+    },
+    {
+      "at": "2026-06-25T21:49:11.416Z",
+      "by": "Manuel",
+      "from": "PAUSED",
+      "to": "ACTIVE"
+    },
+    {
+      "at": "2026-06-25T22:16:05.544Z",
+      "by": "Manuel",
+      "from": "ACTIVE",
+      "to": "COMPLETED"
+    }
+  ],
+  "updatedAt": "2026-06-25T22:16:05.544Z",
+  "validationGates": [
+    "diff-check",
+    "typecheck",
+    "test",
+    "build",
+    "worker-validate",
+    "oreshnik-reconcile",
+    "oreshnik-drift"
+  ]
+}

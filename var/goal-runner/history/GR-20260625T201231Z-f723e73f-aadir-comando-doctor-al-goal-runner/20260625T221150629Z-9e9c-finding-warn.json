@@ -1,0 +1,8 @@
+{
+  "at": "2026-06-25T22:11:50.629Z",
+  "content": "Detectado y revertido cambio accidental de shell:false a shell:true en runGate() de lib.mjs. El cambio fue introducido para resolver gates npm en Windows pero viola politica de seguridad. El codigo ac",
+  "event": "finding-warn",
+  "goalId": "GR-20260625T201231Z-f723e73f-aadir-comando-doctor-al-goal-runner",
+  "id": "20260625T221150629Z-9e9c-finding-warn",
+  "severity": "warn"
+}

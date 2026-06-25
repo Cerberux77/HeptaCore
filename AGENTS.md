@@ -131,6 +131,7 @@ node scripts/goal-runner/run.mjs step-start --goalId <id> --step "..."
 node scripts/goal-runner/run.mjs step-complete --goalId <id> --step "..." --result "..."
 node scripts/goal-runner/run.mjs evidence-add --goalId <id> --type code|ui|integration --path <relpath>
 node scripts/goal-runner/run.mjs complete --goalId <id>
+node scripts/goal-runner/run.mjs doctor
 ```
 
 ### Resumption

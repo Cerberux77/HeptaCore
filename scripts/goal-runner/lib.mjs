@@ -492,6 +492,18 @@ export function validatePlanFile(goalId, planPath) {
 
 // ─── Validation Gates ───
 
+export const CMD_ALIASES = { npm: true, npx: true };
+
+export function resolveGateSpawn(command, args) {
+  if (process.platform === "win32" && CMD_ALIASES[command]) {
+    return {
+      command: process.env.ComSpec || "cmd.exe",
+      args: ["/c", command, ...args]
+    };
+  }
+  return { command, args };
+}
+
 export function validateGateIds(gateIds) {
   if (!Array.isArray(gateIds)) throw new Error("validationGates must be an array");
   for (const id of gateIds) {
@@ -529,7 +541,8 @@ export function runGate(gateId) {
 
   const start = Date.now();
   try {
-    const result = spawnSync(gate.command, gate.args, {
+    const { command, args } = resolveGateSpawn(gate.command, gate.args);
+    const result = spawnSync(command, args, {
       cwd: resolveRoot(),
       encoding: "utf8",
       timeout: gate.timeout,
@@ -632,4 +645,198 @@ export function getActiveGoal(branch) {
   }
 
   return null;
+}
+
+// ─── Doctor ───
+
+export function doctorCheck() {
+  const errors = [];
+  const warnings = [];
+  const info = [];
+  const root = resolveRoot();
+  const branch = currentBranch();
+
+  doctorValidateWorktree(root, branch, errors, warnings, info);
+  doctorCheckIndexConsistency(root, errors, warnings);
+  doctorCheckMandatoryFiles(root, errors, warnings, info);
+
+  if (errors.length === 0 && info.length === 0) {
+    info.push({ code: "DOCTOR-I001", severity: "info", message: "All systems healthy" });
+  }
+
+  return {
+    healthy: errors.length === 0,
+    worktree: root,
+    branch,
+    errors,
+    warnings,
+    info
+  };
+}
+
+function doctorValidateWorktree(root, branch, errors, warnings, info) {
+  const lock = readLock();
+
+  if (lock) {
+    const stale = isLockStale(lock);
+
+    if (stale) {
+      let reason = "";
+
+      if (lock.worktreeRoot !== root) reason = `worktree root mismatch (lock: ${lock.worktreeRoot}, current: ${root})`;
+      else if (!lock.goalId || !validateGoalId(lock.goalId)) reason = "lock has invalid goalId";
+      else if (lock.branch !== branch) reason = `branch mismatch (lock: ${lock.branch}, current: ${branch})`;
+      else {
+        const lockState = readState(lock.goalId);
+        if (!lockState) reason = `state file not found for goal ${lock.goalId}`;
+        else if (lockState.status !== "ACTIVE") reason = `goal ${lock.goalId} status is ${lockState.status}, not ACTIVE`;
+        else if (lockState.goalId !== lock.goalId) reason = `goalId mismatch in state`;
+        else if (lockState.branch !== lock.branch) reason = `branch mismatch in state`;
+        else reason = "unknown staleness";
+      }
+
+      errors.push({ code: "DOCTOR-001", severity: "error", message: `Lock is stale: ${reason}` });
+    } else {
+      info.push({ code: "DOCTOR-I002", severity: "info", message: `Lock valid for goal ${lock.goalId} (ACTIVE)` });
+    }
+  }
+
+  const index = readIndex();
+  if (index && Array.isArray(index.goals)) {
+    const activeStates = index.goals.filter((g) => g.status === "ACTIVE");
+    for (const g of activeStates) {
+      if (!lock || lock.goalId !== g.goalId) {
+        const state = readState(g.goalId);
+        if (state && state.status === "ACTIVE") {
+          errors.push({ code: "DOCTOR-002", severity: "error", message: `Goal ${g.goalId} is ACTIVE but no lock file exists` });
+        }
+      }
+    }
+  }
+
+  if (!lock) {
+    const resumableOnBranch = [];
+    const allGoals = index?.goals || [];
+    for (const g of allGoals) {
+      if (RESUMABLE_STATUSES.includes(g.status) && g.branch === branch) {
+        resumableOnBranch.push(g.goalId);
+      }
+    }
+    if (resumableOnBranch.length > 0) {
+      warnings.push({ code: "DOCTOR-W001", severity: "warning", message: `${resumableOnBranch.length} resumable goal(s) on this branch: ${resumableOnBranch.join(", ")}` });
+    }
+  }
+}
+
+function doctorCheckIndexConsistency(root, errors, warnings) {
+  const index = readIndex();
+
+  if (!index) {
+    const gd = goalsDir();
+    let dirEmpty = true;
+    try {
+      const entries = readdirSync(gd, { withFileTypes: true }).filter((d) => d.isDirectory() && d.name !== ".gitkeep");
+      if (entries.length > 0) dirEmpty = false;
+    } catch {
+      // goals dir doesn't exist, handled by mandatory files check
+    }
+    if (!dirEmpty) {
+      errors.push({ code: "DOCTOR-008", severity: "error", message: "Index file missing or invalid but goals directory is not empty. Run reindex." });
+    }
+    return;
+  }
+
+  const gd = goalsDir();
+  let goalDirs = [];
+  try {
+    goalDirs = readdirSync(gd, { withFileTypes: true })
+      .filter((d) => d.isDirectory() && d.name !== ".gitkeep")
+      .map((d) => d.name);
+  } catch {
+    goalDirs = [];
+  }
+
+  const indexGoalIds = new Set(index.goals.map((g) => g.goalId));
+  const dirGoalIds = new Set(goalDirs);
+
+  for (const dirId of dirGoalIds) {
+    if (!indexGoalIds.has(dirId)) {
+      const state = readState(dirId);
+      if (!state) {
+        errors.push({ code: "DOCTOR-003", severity: "error", message: `State file missing or unreadable for goal directory: ${dirId}` });
+      } else {
+        const stateCheck = validateStateObject(state);
+        if (!stateCheck.valid) {
+          errors.push({ code: "DOCTOR-007", severity: "error", message: `State invalid for ${dirId}: ${stateCheck.reason}` });
+        }
+      }
+      warnings.push({ code: "DOCTOR-004", severity: "warning", message: `Goal directory exists but not in index: ${dirId}` });
+    }
+  }
+
+  for (const idxGoal of index.goals) {
+    if (!dirGoalIds.has(idxGoal.goalId)) {
+      warnings.push({ code: "DOCTOR-005", severity: "warning", message: `Index entry has no goal directory: ${idxGoal.goalId}` });
+      continue;
+    }
+
+    const state = readState(idxGoal.goalId);
+    if (!state) {
+      errors.push({ code: "DOCTOR-003", severity: "error", message: `State file not found for indexed goal ${idxGoal.goalId}` });
+      continue;
+    }
+
+    const stateCheck = validateStateObject(state);
+    if (!stateCheck.valid) {
+      errors.push({ code: "DOCTOR-007", severity: "error", message: `State invalid for ${idxGoal.goalId}: ${stateCheck.reason}` });
+      continue;
+    }
+
+    if (state.status !== idxGoal.status) {
+      warnings.push({ code: "DOCTOR-004", severity: "warning", message: `Status mismatch for ${idxGoal.goalId}: index=${idxGoal.status}, state=${state.status}` });
+    }
+  }
+
+  const goals = index.goals.filter((g) => dirGoalIds.has(g.goalId)).map((g) => g);
+  const recomputedHash = computeContentHash(goals);
+  if (index.contentHash && index.contentHash !== `sha256:${recomputedHash}`) {
+    warnings.push({ code: "DOCTOR-W003", severity: "warning", message: "Index content hash is stale. Run reindex." });
+  }
+}
+
+function doctorCheckMandatoryFiles(root, errors, warnings, info) {
+  const grd = grDir();
+  const gd = goalsDir();
+  const hd = historyDir();
+  const schemaP = schemaPath();
+
+  if (!existsSync(grd)) {
+    errors.push({ code: "DOCTOR-006", severity: "error", message: `Goal Runner directory missing: var/goal-runner/` });
+    return;
+  }
+
+  if (!existsSync(gd)) {
+    errors.push({ code: "DOCTOR-006", severity: "error", message: `Goals directory missing: var/goal-runner/goals/` });
+  }
+
+  if (!existsSync(hd)) {
+    warnings.push({ code: "DOCTOR-W002", severity: "warning", message: "History directory does not exist yet (created on first event)" });
+  }
+
+  if (!existsSync(schemaP)) {
+    errors.push({ code: "DOCTOR-009", severity: "error", message: `Schema file missing: scripts/goal-runner/schema.json` });
+  }
+
+  if (!existsSync(indexFile())) {
+    warnings.push({ code: "DOCTOR-W003", severity: "warning", message: "Index file does not exist. Run reindex." });
+  }
+
+  try {
+    const gdEntries = readdirSync(gd, { withFileTypes: true }).filter((d) => d.isDirectory() && d.name !== ".gitkeep");
+    if (gdEntries.length === 0) {
+      warnings.push({ code: "DOCTOR-W004", severity: "warning", message: "No goals found in goals directory" });
+    }
+  } catch {
+    // already handled above
+  }
 }

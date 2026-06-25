@@ -1,0 +1,8 @@
+{
+  "at": "2026-06-25T21:57:36.601Z",
+  "event": "step-complete-producir-salida-estructurada-y-exit-codes-correc",
+  "goalId": "GR-20260625T201231Z-f723e73f-aadir-comando-doctor-al-goal-runner",
+  "id": "20260625T215736601Z-58d2-step-complete-producir-salida-estructurada-y-exi",
+  "result": "Salida estructurada con healthy, worktree, branch, errors (DOCTOR-001 a 009), warnings (W001 a W004), info (I001, I002). Exit code 0 para healthy, 1 para errores.",
+  "step": "Producir salida estructurada y exit codes correctos"
+}

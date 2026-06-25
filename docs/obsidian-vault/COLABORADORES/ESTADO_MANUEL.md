@@ -137,7 +137,7 @@ Estado: `active`
 - Cero cambios en Production
 - Integracion posterior en la rama madre mediante cierre controlado
 
-Zonas: `scripts/goal-runner/**`, `var/goal-runner/**`, `.kilo/command/goal.md`, `.kilo/command/preflight.md`, `AGENTS.md`, `package.json`, `docs/07_handoffs/**`, `docs/obsidian-vault/**`
+Zonas: `scripts/goal-runner/**`, `var/goal-runner/**`, `.kilo/commands/goal.md`, `.kilo/commands/preflight.md`, `AGENTS.md`, `package.json`, `docs/07_handoffs/**`, `docs/obsidian-vault/**`
 
 ### S-HC-COMM-01-SELF-SERVICE-SIGNUP - Self-service tenant signup with trial gate and onboarding flow
 

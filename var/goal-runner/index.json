@@ -1,6 +1,17 @@
 {
-  "contentHash": "sha256:4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
-  "generatedFromStateUpdatedAt": null,
-  "goals": [],
+  "contentHash": "sha256:8da471db6c4a0a62d4346f5b5ea83a9dfe0a4774927f27be84f237d357ad8f5d",
+  "generatedFromStateUpdatedAt": "2026-06-25T22:16:05.544Z",
+  "goals": [
+    {
+      "branch": "Manuel/s-hc-goal-runner-v1",
+      "createdAt": "2026-06-25T20:12:31.196Z",
+      "goalId": "GR-20260625T201231Z-f723e73f-aadir-comando-doctor-al-goal-runner",
+      "owner": "Manuel",
+      "sprintId": "S-HC-TOOL-01-GOAL-RUNNER-V1",
+      "status": "COMPLETED",
+      "title": "Añadir comando doctor al Goal Runner",
+      "updatedAt": "2026-06-25T22:16:05.544Z"
+    }
+  ],
   "version": 1
 }

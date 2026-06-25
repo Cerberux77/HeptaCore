@@ -8,6 +8,7 @@ When the user invokes `/goal`, follow this protocol. The script `scripts/goal-ru
 - "ejecutar goal", "run goal"
 - "retomar goal", "resume goal"
 - "mis goals", "goal status"
+- "goal doctor", "goal runner health", "doctor"
 
 ## Step 1 — Status
 
