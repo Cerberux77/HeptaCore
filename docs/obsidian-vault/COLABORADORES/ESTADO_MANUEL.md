@@ -2,7 +2,7 @@
 type: collaborator-status
 project: "HeptaCore"
 operator: "Manuel"
-last_updated: "2026-06-25T18:24:11.205Z"
+last_updated: "2026-06-25T20:08:17.244Z"
 generated_by: "Oreshnik canonical-check"
 source: "var/oreshnik/task-board.json"
 ---
@@ -123,6 +123,21 @@ Estado: `pending`
 - Daily digest summarizing publishing activity
 
 Zonas: `apps/web`, `packages/core`, `docs`
+
+### S-HC-TOOL-01-GOAL-RUNNER-V1 - Goal Runner v1 for autonomous Kilo execution
+
+Estado: `active`
+
+- Nucleo determinista implementado y probado
+- Maquina de estados, locks, evidencia y gates operativos
+- Integracion /goal y /preflight disponible en Kilo
+- Anti-loop y limites de Playwright documentados
+- Goal piloto ejecutado completamente con el propio Goal Runner
+- Estado y evidencia sobreviven a clear y reinicio de sesion
+- Cero cambios en Production
+- Integracion posterior en la rama madre mediante cierre controlado
+
+Zonas: `scripts/goal-runner/**`, `var/goal-runner/**`, `.kilo/command/goal.md`, `.kilo/command/preflight.md`, `AGENTS.md`, `package.json`, `docs/07_handoffs/**`, `docs/obsidian-vault/**`
 
 ### S-HC-COMM-01-SELF-SERVICE-SIGNUP - Self-service tenant signup with trial gate and onboarding flow
 

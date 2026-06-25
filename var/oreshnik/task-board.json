@@ -1,6 +1,6 @@
 {
   "project": "HeptaCore",
-  "updatedAt": "2026-06-23T02:06:55.117Z",
+  "updatedAt": "2026-06-25T20:05:39.000Z",
   "productionSha": "2fd9e24929ffe1022cf9521ed0f13888f30accbd",
   "productionUrl": "https://heptacore.vercel.app",
   "canonicalBranch": "master",
@@ -21,6 +21,7 @@
     "Fase completada: S-HC-PUB-02-MULTIFORMAT-PREVIEW — preview y dry-run multiformato para Instagram y Facebook.",
     "Fase completada: S-HC-PUB-03-MULTITENANT-ASSETS — biblioteca multi-tenant, metadata, compatibilidad, colecciones, inspector (SHA 31dd93e).",
     "Siguiente fase (un sprint por vez): S-HC-PUB-04-HOURLY-BATCH-CRON — batch cron publishing.",
+    "Fase activa: S-HC-TOOL-01-GOAL-RUNNER-V1 — Goal Runner v1 para ejecucion autonoma de Kilo. Nucleo implementado, integrado con /goal y /preflight. Pendiente goal piloto y posterior integracion en rama madre.",
     "EMAIL-01 infraestructura de codigo preparada (modelos, templates, provider abstraction, webhook, Link-Only activo). Integracion externa bloqueada hasta dominio final.",
     "Modo operacional actual: EMAIL_PROVIDER=disabled. Invitaciones se entregan via enlace copiable (inviteLink). Correos reales: 0.",
     "Reels, Stories y YouTube forman parte obligatoria del alcance final de HeptaCore. Las combinaciones sin publisher real quedan pendientes de implementacion en PUB-06, PUB-07 o PUB-08.",
@@ -482,6 +483,37 @@
         "Publishing metrics dashboard (attempts, failures, latency)",
         "Alert thresholds for provider failures",
         "Daily digest summarizing publishing activity"
+      ]
+    },
+    {
+      "id": "S-HC-TOOL-01-GOAL-RUNNER-V1",
+      "title": "Goal Runner v1 for autonomous Kilo execution",
+      "owner": "Manuel",
+      "backupOwner": "Manuel",
+      "status": "active",
+      "track": "tooling",
+      "zone": [
+        "scripts/goal-runner/**",
+        "var/goal-runner/**",
+        ".kilo/command/goal.md",
+        ".kilo/command/preflight.md",
+        "AGENTS.md",
+        "package.json",
+        "docs/07_handoffs/**",
+        "docs/obsidian-vault/**"
+      ],
+      "dependsOn": [
+        "S-HC-TEN-01-GLOBAL-TENANT-ADMIN"
+      ],
+      "acceptance": [
+        "Nucleo determinista implementado y probado",
+        "Maquina de estados, locks, evidencia y gates operativos",
+        "Integracion /goal y /preflight disponible en Kilo",
+        "Anti-loop y limites de Playwright documentados",
+        "Goal piloto ejecutado completamente con el propio Goal Runner",
+        "Estado y evidencia sobreviven a clear y reinicio de sesion",
+        "Cero cambios en Production",
+        "Integracion posterior en la rama madre mediante cierre controlado"
       ]
     },
     {
