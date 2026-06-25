@@ -1,0 +1,105 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "definitions": {
+    "state": {
+      "type": "object",
+      "required": ["goalId", "title", "owner", "sprintId", "status", "branch", "baseSha", "evidenceRequired", "validationGates", "createdAt", "updatedAt", "transitions"],
+      "properties": {
+        "goalId": { "type": "string", "pattern": "^GR-\\d{8}T\\d{6}Z-[a-f0-9]{4}-[a-z0-9]([a-z0-9-]{0,46}[a-z0-9])?$" },
+        "title": { "type": "string", "minLength": 1 },
+        "owner": { "type": "string", "minLength": 1 },
+        "sprintId": { "type": "string", "minLength": 1 },
+        "status": { "type": "string", "enum": ["DRAFT", "READY", "ACTIVE", "PAUSED", "BLOCKED_EXTERNAL", "COMPLETED", "ABORTED_CRITICAL_DEVIATION"] },
+        "branch": { "type": "string", "minLength": 1 },
+        "baseSha": { "type": "string", "minLength": 1 },
+        "evidenceRequired": { "type": "string", "enum": ["code", "ui", "integration"] },
+        "validationGates": { "type": "array", "items": { "type": "string" } },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" },
+        "transitions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["from", "to", "at", "by"],
+            "properties": {
+              "from": { "type": "string" },
+              "to": { "type": "string" },
+              "at": { "type": "string", "format": "date-time" },
+              "by": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+    "indexEntry": {
+      "type": "object",
+      "required": ["goalId", "title", "owner", "sprintId", "status", "branch", "createdAt", "updatedAt"],
+      "properties": {
+        "goalId": { "type": "string" },
+        "title": { "type": "string" },
+        "owner": { "type": "string" },
+        "sprintId": { "type": "string" },
+        "status": { "type": "string" },
+        "branch": { "type": "string" },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      }
+    },
+    "index": {
+      "type": "object",
+      "required": ["version", "goals"],
+      "properties": {
+        "version": { "type": "integer", "const": 1 },
+        "generatedFromStateUpdatedAt": { "type": ["string", "null"], "format": "date-time" },
+        "contentHash": { "type": "string" },
+        "goals": { "type": "array", "items": { "$ref": "#/definitions/indexEntry" } }
+      }
+    },
+    "lock": {
+      "type": "object",
+      "required": ["goalId", "branch", "worktreeRoot", "owner", "startedAt"],
+      "properties": {
+        "goalId": { "type": "string" },
+        "branch": { "type": "string" },
+        "worktreeRoot": { "type": "string" },
+        "owner": { "type": "string" },
+        "startedAt": { "type": "string", "format": "date-time" },
+        "pid": { "type": "integer" }
+      }
+    },
+    "validation": {
+      "type": "object",
+      "required": ["goalId"],
+      "properties": {
+        "goalId": { "type": "string" },
+        "evidence": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["type", "path", "hash", "addedAt"],
+            "properties": {
+              "type": { "type": "string", "enum": ["code", "ui", "integration"] },
+              "path": { "type": "string" },
+              "hash": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+              "addedAt": { "type": "string", "format": "date-time" }
+            }
+          }
+        },
+        "gates": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["gate", "passed", "exitCode"],
+            "properties": {
+              "gate": { "type": "string" },
+              "passed": { "type": "boolean" },
+              "exitCode": { "type": "integer" },
+              "durationMs": { "type": "number" },
+              "summary": { "type": "string" }
+            }
+          }
+        }
+      }
+    }
+  }
+}
