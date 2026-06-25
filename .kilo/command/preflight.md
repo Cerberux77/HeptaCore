@@ -23,3 +23,42 @@ When a user identifies themselves or asks for pending tasks from HeptaCore, run 
 ## Cross-operator blocking
 - Preflight step 6 shows [BLOCK] for tasks in your zones being worked by other operators
 - If [BLOCK] appears, coordinate with the other operator before touching those files
+
+## Goal detection (AFTER preflight)
+
+After preflight completes, check for an active or resumable goal:
+
+```
+node scripts/goal-runner/run.mjs status
+```
+
+### Lock ACTIVE valido
+
+If a valid active lock exists:
+
+> "Goal `<goalId>` esta ACTIVE en esta rama. Retomar? [s/n]"
+
+- Yes: Kilo reads `state.json`, `plan.md`, `progress.md` and resumes from the last incomplete step.
+- No: ask whether to pause the goal. Do NOT remove the lock without explicit confirmation.
+
+### Lock stale
+
+If a stale lock is detected (worktree, branch, or state mismatch):
+
+> "Lock stale detectado para `<goalId>`. Eliminarlo? [s/n]"
+
+- Do NOT delete without confirmation.
+- After cleanup, check for PAUSED/BLOCKED goals.
+
+### Goals PAUSED or BLOCKED on current branch
+
+List them:
+
+> "Goals pausados/bloqueados en esta rama: `<goalId>` — `<title>` (`<status>`). Retomar alguno? [id/n]"
+
+- Only one at a time.
+- If none selected, proceed with the sprint normally.
+
+### No goals
+
+Proceed with the sprint normally. Oreshnik task board governs the work.

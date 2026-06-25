@@ -93,3 +93,46 @@ To test the hook manually:
 ```bash
 node scripts/oreshnik/hooks/pre-push-check.mjs
 ```
+
+## Goal Runner
+
+Goal Runner manages isolated, deterministic work units within a sprint. It does not replace Oreshnik or the task board.
+
+### Core rules
+
+- **One goal ACTIVE per worktree.** Enforced by `scripts/goal-runner/run.mjs` via `.active-worktree.json`.
+- **Oreshnik is the authority for sprints, zones, and owners.** Goal Runner references `sprintId` from `var/oreshnik/task-board.json` but does not modify it.
+- **Goal Runner never replaces the task board.** Goals are execution units inside a sprint, not sprints themselves.
+- Production actions require explicit user authorization. Preview and Development permit QA, seeds, and automation.
+- **Kilo modifies code; `run.mjs` only manages state.** The script handles locks, transitions, gates, and evidence. It never inspects or modifies application code.
+- **Terminal states (COMPLETED, ABORTED_CRITICAL_DEVIATION) are immutable.** No reopening.
+- **COMPLETED is forbidden without evidence of the required type and all gates passing.**
+
+### Goal lifecycle
+
+```
+DRAFT -> READY -> ACTIVE -> COMPLETED
+                   |    |
+                   +--> PAUSED -> ACTIVE
+                   |
+                   +--> BLOCKED_EXTERNAL -> ACTIVE
+                   |
+                   +--> ABORTED_CRITICAL_DEVIATION
+```
+
+### Key commands
+
+```bash
+node scripts/goal-runner/run.mjs status
+node scripts/goal-runner/run.mjs create --title "..." --owner <name> --sprintId <id> --evidenceRequired code|ui|integration --gates "g1,g2"
+node scripts/goal-runner/run.mjs plan-record --goalId <id>
+node scripts/goal-runner/run.mjs activate --goalId <id>
+node scripts/goal-runner/run.mjs step-start --goalId <id> --step "..."
+node scripts/goal-runner/run.mjs step-complete --goalId <id> --step "..." --result "..."
+node scripts/goal-runner/run.mjs evidence-add --goalId <id> --type code|ui|integration --path <relpath>
+node scripts/goal-runner/run.mjs complete --goalId <id>
+```
+
+### Resumption
+
+When `/goal` or preflight detects a goal ACTIVE, PAUSED, or BLOCKED on the current branch, Kilo offers resumption. Never auto-resume without explicit confirmation. Stale locks must be confirmed before removal.
