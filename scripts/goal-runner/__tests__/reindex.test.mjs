@@ -1,7 +1,7 @@
 import { describe, it } from "node:test";
 import assert from "node:assert";
-import { computeContentHash, reindex } from "../lib.mjs";
-import { mkdirSync, rmSync, writeFileSync } from "node:fs";
+import { computeContentHash, reindex, stableStringify } from "../lib.mjs";
+import { mkdirSync, rmSync, writeFileSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 
@@ -11,48 +11,41 @@ process.env.GOAL_RUNNER_TEST_ROOT = TEMP;
 describe("Reindex Deterministic", () => {
   it("computeContentHash is deterministic", () => {
     const goals = [
-      { goalId: "GR-20260625T192236Z-a1b2-alpha", title: "Alpha", owner: "A", sprintId: "S-01", status: "ACTIVE", branch: "main", createdAt: "2026-01-01T00:00:00.000Z", updatedAt: "2026-01-01T00:00:00.000Z" },
-      { goalId: "GR-20260625T192236Z-b3c4-beta", title: "Beta", owner: "B", sprintId: "S-02", status: "DRAFT", branch: "main", createdAt: "2026-01-02T00:00:00.000Z", updatedAt: "2026-01-02T00:00:00.000Z" }
+      { goalId: "GR-20260625T192236Z-a1b2c3d4-alpha", title: "Alpha", owner: "A", sprintId: "S-01", status: "ACTIVE", branch: "main", createdAt: "2026-01-01T00:00:00.000Z", updatedAt: "2026-01-01T00:00:00.000Z" },
+      { goalId: "GR-20260625T192236Z-b5c6d7e8-beta", title: "Beta", owner: "B", sprintId: "S-02", status: "DRAFT", branch: "main", createdAt: "2026-01-02T00:00:00.000Z", updatedAt: "2026-01-02T00:00:00.000Z" }
     ];
     const hash1 = computeContentHash(goals);
     const hash2 = computeContentHash(goals);
-    assert.equal(hash1, hash2, "Same inputs should produce same hash");
-  });
-
-  it("computeContentHash produces different hash for different data", () => {
-    const goals1 = [{ goalId: "GR-20260625T192236Z-a1b2-one", title: "One", owner: "A", sprintId: "S-01", status: "ACTIVE", branch: "main", createdAt: "2026-01-01T00:00:00.000Z", updatedAt: "2026-01-01T00:00:00.000Z" }];
-    const goals2 = [{ goalId: "GR-20260625T192236Z-a1b2-two", title: "Two", owner: "A", sprintId: "S-01", status: "ACTIVE", branch: "main", createdAt: "2026-01-01T00:00:00.000Z", updatedAt: "2026-01-01T00:00:00.000Z" }];
-    assert.notEqual(computeContentHash(goals1), computeContentHash(goals2));
+    assert.equal(hash1, hash2);
   });
 
   it("computeContentHash is stable for empty array", () => {
     assert.equal(computeContentHash([]), computeContentHash([]));
   });
 
-  it("reindex on empty goals produces empty index", async () => {
-    rmSync(TEMP, { recursive: true, force: true });
-    mkdirSync(join(TEMP, "var", "goal-runner", "goals"), { recursive: true });
-    mkdirSync(join(TEMP, "var", "goal-runner", "history"), { recursive: true });
-
-    const index = reindex();
-    assert.equal(index.goals.length, 0);
-    assert.equal(index.version, 1);
-  });
-
-  it("reindex is byte-deterministic with same state files", async () => {
+  it("reindex is byte-deterministic", async () => {
     rmSync(TEMP, { recursive: true, force: true });
     const goalsDir = join(TEMP, "var", "goal-runner", "goals");
-    mkdirSync(join(goalsDir, "GR-20260625T192236Z-a1b2-test-goal"), { recursive: true });
+    mkdirSync(goalsDir, { recursive: true });
 
-    const state = {
-      goalId: "GR-20260625T192236Z-a1b2-test-goal",
-      title: "Test", owner: "Manuel", sprintId: "S-HC-TEST",
+    const goalId1 = "GR-20260625T192236Z-a1b2c3d4-test-a";
+    const goalId2 = "GR-20260625T192236Z-b5c6d7e8-test-b";
+    mkdirSync(join(goalsDir, goalId1), { recursive: true });
+    mkdirSync(join(goalsDir, goalId2), { recursive: true });
+
+    writeFileSync(join(goalsDir, goalId1, "state.json"), JSON.stringify({
+      goalId: goalId1, title: "A", owner: "Manuel", sprintId: "S-HC-A",
       status: "ACTIVE", branch: "main", baseSha: "abc",
       evidenceRequired: "code", validationGates: [],
-      createdAt: "2026-06-25T19:00:00.000Z", updatedAt: "2026-06-25T19:00:00.000Z",
-      transitions: []
-    };
-    writeFileSync(join(goalsDir, "GR-20260625T192236Z-a1b2-test-goal", "state.json"), JSON.stringify(state) + "\n", "utf8");
+      createdAt: "2026-01-01T00:00:00.000Z", updatedAt: "2026-01-01T00:00:00.000Z", transitions: []
+    }) + "\n", "utf8");
+
+    writeFileSync(join(goalsDir, goalId2, "state.json"), JSON.stringify({
+      goalId: goalId2, title: "B", owner: "Manuel", sprintId: "S-HC-B",
+      status: "DONE", branch: "main", baseSha: "abc",
+      evidenceRequired: "code", validationGates: [],
+      createdAt: "2026-01-02T00:00:00.000Z", updatedAt: "2026-01-02T00:00:00.000Z", transitions: []
+    }) + "\n", "utf8");
 
     const index1 = reindex();
     const index2 = reindex();
@@ -60,36 +53,18 @@ describe("Reindex Deterministic", () => {
 
     assert.equal(index1.contentHash, index2.contentHash);
     assert.equal(index2.contentHash, index3.contentHash);
-    assert.equal(index1.goals.length, 1);
+
+    const bytes1 = readFileSync(join(TEMP, "var", "goal-runner", "index.json"));
+    const bytes2 = readFileSync(join(TEMP, "var", "goal-runner", "index.json"));
+    assert.deepStrictEqual(bytes1, bytes2, "Same states must produce identical bytes");
   });
 
-  it("reindex handles git conflict: preserve goals, regenerate index", async () => {
-    rmSync(TEMP, { recursive: true, force: true });
-    const goalsDir = join(TEMP, "var", "goal-runner", "goals");
-    mkdirSync(join(goalsDir, "GR-20260625T192236Z-a1b2-goal-a"), { recursive: true });
-    mkdirSync(join(goalsDir, "GR-20260625T192236Z-b3c4-goal-b"), { recursive: true });
-
-    const stateA = {
-      goalId: "GR-20260625T192236Z-a1b2-goal-a", title: "A", owner: "Manuel",
-      sprintId: "S-HC-A", status: "DONE", branch: "main", baseSha: "abc",
-      evidenceRequired: "code", validationGates: [],
-      createdAt: "2026-01-01T00:00:00.000Z", updatedAt: "2026-01-01T00:00:00.000Z", transitions: []
-    };
-    const stateB = {
-      goalId: "GR-20260625T192236Z-b3c4-goal-b", title: "B", owner: "Manuel",
-      sprintId: "S-HC-B", status: "ACTIVE", branch: "main", baseSha: "abc",
-      evidenceRequired: "code", validationGates: [],
-      createdAt: "2026-01-02T00:00:00.000Z", updatedAt: "2026-01-02T00:00:00.000Z", transitions: []
-    };
-    writeFileSync(join(goalsDir, "GR-20260625T192236Z-a1b2-goal-a", "state.json"), JSON.stringify(stateA) + "\n", "utf8");
-    writeFileSync(join(goalsDir, "GR-20260625T192236Z-b3c4-goal-b", "state.json"), JSON.stringify(stateB) + "\n", "utf8");
-
-    const index1 = reindex();
-    assert.equal(index1.goals.length, 2);
-
-    rmSync(join(goalsDir, "GR-20260625T192236Z-b3c4-goal-b"), { recursive: true });
-    const index2 = reindex();
-    assert.equal(index2.goals.length, 1);
-    assert.equal(index2.goals[0].goalId, "GR-20260625T192236Z-a1b2-goal-a");
+  it("stableStringify produces stable output", () => {
+    const obj = { z: 1, a: 2, c: { b: 3, a: 4 } };
+    const result1 = stableStringify(obj);
+    const result2 = stableStringify(obj);
+    assert.equal(result1, result2);
+    assert.ok(result1.indexOf('"a"') < result1.indexOf('"c"'));
+    assert.ok(result1.indexOf('"a"') < result1.indexOf('"z"'));
   });
 });

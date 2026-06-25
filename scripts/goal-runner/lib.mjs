@@ -1,7 +1,7 @@
 import { createHash, randomBytes } from "node:crypto";
 import { execFileSync, spawnSync } from "node:child_process";
 import { existsSync, lstatSync, mkdirSync, readdirSync, readFileSync, realpathSync, unlinkSync, writeFileSync } from "node:fs";
-import { dirname, join, relative, resolve as pathResolve, sep } from "node:path";
+import { dirname, isAbsolute, join, relative, resolve as pathResolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -11,16 +11,17 @@ export function resolveRoot() {
   return process.env.GOAL_RUNNER_TEST_ROOT || DEFAULT_ROOT;
 }
 
-// Late-bound path helpers – always resolve at call time
 function grDir() { return join(resolveRoot(), "var", "goal-runner"); }
 function goalsDir() { return join(grDir(), "goals"); }
 function historyDir() { return join(grDir(), "history"); }
 function lockFile() { return join(grDir(), ".active-worktree.json"); }
 function indexFile() { return join(grDir(), "index.json"); }
+function schemaPath() { return join(resolveRoot(), "scripts", "goal-runner", "schema.json"); }
 
 export const ALLOWED_STATUSES = ["DRAFT", "READY", "ACTIVE", "PAUSED", "BLOCKED_EXTERNAL", "COMPLETED", "ABORTED_CRITICAL_DEVIATION"];
 export const TERMINAL_STATUSES = ["COMPLETED", "ABORTED_CRITICAL_DEVIATION"];
 export const RESUMABLE_STATUSES = ["PAUSED", "BLOCKED_EXTERNAL"];
+export const GATE_CONFIGURABLE_STATUSES = ["DRAFT", "READY"];
 
 export const ALLOWED_TRANSITIONS = new Map([
   ["DRAFT", ["READY", "ABORTED_CRITICAL_DEVIATION"]],
@@ -39,8 +40,7 @@ export const GATE_ALLOWLIST = {
   "build": { command: "npm", args: ["run", "build"], timeout: 300000 },
   "worker-validate": { command: "npm", args: ["run", "worker:validate"], timeout: 120000 },
   "oreshnik-reconcile": { command: "node", args: ["scripts/oreshnik/canonical-check.mjs"], timeout: 60000 },
-  "oreshnik-drift": { command: "node", args: ["scripts/oreshnik/drift.mjs", "--check"], timeout: 30000 },
-  "playwright-focused": { command: "npx", args: ["playwright", "test"], timeout: 300000 }
+  "oreshnik-drift": { command: "node", args: ["scripts/oreshnik/drift.mjs", "--check"], timeout: 30000 }
 };
 
 export const EVIDENCE_TYPES = ["code", "ui", "integration"];
@@ -51,7 +51,7 @@ export const SENSITIVE_PATTERNS = [
   /key\.pem$/i, /key\.json$/i, /\.pem$/i
 ];
 
-export const ID_PATTERN = /^GR-\d{8}T\d{6}Z-[a-f0-9]{4}-[a-z0-9]([a-z0-9-]{0,46}[a-z0-9])?$/;
+export const ID_PATTERN = /^GR-\d{8}T\d{6}Z-[a-f0-9]{8}-[a-z0-9]([a-z0-9-]{0,46}[a-z0-9])?$/;
 
 // ─── ID Generation ───
 
@@ -60,7 +60,17 @@ export function generateGoalId(title) {
   const parts = now.toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
   const date = parts.slice(0, 8);
   const time = parts.slice(9, 15);
-  const rand = randomBytes(2).toString("hex");
+  const rand = randomBytes(4).toString("hex");
+  const slug = sanitizeSlug(title);
+  return `GR-${date}T${time}Z-${rand}-${slug}`;
+}
+
+export function generateGoalIdWithTime(title, iso) {
+  const now = new Date(iso);
+  const parts = now.toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
+  const date = parts.slice(0, 8);
+  const time = parts.slice(9, 15);
+  const rand = randomBytes(4).toString("hex");
   const slug = sanitizeSlug(title);
   return `GR-${date}T${time}Z-${rand}-${slug}`;
 }
@@ -94,6 +104,65 @@ export function validateNoPathTraversal(str) {
   if (/[<>:"|?*\\\/%]/.test(str)) return false;
   if (/[\x00-\x1f]/.test(str)) return false;
   return true;
+}
+
+// ─── Runtime Validation ───
+
+function loadSchema() {
+  return JSON.parse(readFileSync(schemaPath(), "utf8"));
+}
+
+export function validateStateObject(state) {
+  if (!state || typeof state !== "object") return { valid: false, reason: "State is not an object" };
+  const required = ["goalId", "title", "owner", "sprintId", "status", "branch", "baseSha", "evidenceRequired", "validationGates", "createdAt", "updatedAt"];
+  for (const key of required) {
+    if (!(key in state)) return { valid: false, reason: `Missing required field: ${key}` };
+  }
+  if (!ALLOWED_STATUSES.includes(state.status)) return { valid: false, reason: `Invalid status: ${state.status}` };
+  if (!EVIDENCE_TYPES.includes(state.evidenceRequired)) return { valid: false, reason: `Invalid evidenceRequired: ${state.evidenceRequired}` };
+  if (!validateGoalId(state.goalId)) return { valid: false, reason: `Invalid goalId format: ${state.goalId}` };
+  if (!Array.isArray(state.validationGates)) return { valid: false, reason: "validationGates must be an array" };
+  if (!Array.isArray(state.transitions)) return { valid: false, reason: "transitions must be an array" };
+  if (typeof state.title !== "string" || !state.title) return { valid: false, reason: "title must be a non-empty string" };
+  if (typeof state.branch !== "string" || !state.branch) return { valid: false, reason: "branch must be a non-empty string" };
+  if (typeof state.owner !== "string" || !state.owner) return { valid: false, reason: "owner must be a non-empty string" };
+  if (typeof state.baseSha !== "string" || !state.baseSha) return { valid: false, reason: "baseSha must be a non-empty string" };
+  return { valid: true };
+}
+
+export function validateLockObject(lock) {
+  if (!lock || typeof lock !== "object") return { valid: false, reason: "Lock is not an object" };
+  const required = ["goalId", "branch", "worktreeRoot", "owner", "startedAt"];
+  for (const key of required) {
+    if (!(key in lock)) return { valid: false, reason: `Missing required field: ${key}` };
+  }
+  if (!validateGoalId(lock.goalId)) return { valid: false, reason: `Invalid goalId: ${lock.goalId}` };
+  if (typeof lock.branch !== "string" || !lock.branch) return { valid: false, reason: "branch must be a non-empty string" };
+  return { valid: true };
+}
+
+export function validateIndexObject(index) {
+  if (!index || typeof index !== "object") return { valid: false, reason: "Index is not an object" };
+  if (index.version !== 1) return { valid: false, reason: "Index version must be 1" };
+  if (!Array.isArray(index.goals)) return { valid: false, reason: "goals must be an array" };
+  for (const g of index.goals) {
+    if (!g.goalId || !g.title || !g.owner || !g.status || !g.branch) return { valid: false, reason: `Invalid index entry for ${g.goalId || "unknown"}` };
+  }
+  return { valid: true };
+}
+
+export function validateValidationObject(val) {
+  if (!val || typeof val !== "object") return { valid: false, reason: "Validation is not an object" };
+  if (!val.goalId) return { valid: false, reason: "Missing goalId" };
+  if (val.evidence && !Array.isArray(val.evidence)) return { valid: false, reason: "evidence must be an array" };
+  if (val.gates && !Array.isArray(val.gates)) return { valid: false, reason: "gates must be an array" };
+  return { valid: true };
+}
+
+export function validateState(goalId) {
+  const state = readState(goalId);
+  if (!state) return { valid: false, reason: "State not found" };
+  return validateStateObject(state);
 }
 
 // ─── State Machine ───
@@ -138,7 +207,7 @@ export function readJson(path) {
 
 export function writeJson(path, value) {
   mkdirSync(dirname(path), { recursive: true });
-  writeFileSync(path, JSON.stringify(value) + "\n", "utf8");
+  writeFileSync(path, stableStringify(value) + "\n", "utf8");
 }
 
 export function ensureDir(dir) {
@@ -150,6 +219,8 @@ export function readState(goalId) {
 }
 
 export function writeState(goalId, state) {
+  const check = validateStateObject(state);
+  if (!check.valid) throw new Error(`Invalid state: ${check.reason}`);
   const dir = join(goalsDir(), goalId);
   ensureDir(dir);
   writeJson(join(dir, "state.json"), state);
@@ -160,9 +231,25 @@ export function readValidation(goalId) {
 }
 
 export function writeValidation(goalId, validation) {
+  const check = validateValidationObject(validation);
+  if (!check.valid) throw new Error(`Invalid validation: ${check.reason}`);
   const dir = join(goalsDir(), goalId);
   ensureDir(dir);
   writeJson(join(dir, "validation.json"), validation);
+}
+
+// ─── Stable JSON serialization ───
+
+export function stableStringify(value) {
+  return JSON.stringify(value, (_, v) => {
+    if (v && typeof v === "object" && !Array.isArray(v)) {
+      const keys = Object.keys(v).sort();
+      const ordered = {};
+      for (const k of keys) ordered[k] = v[k];
+      return ordered;
+    }
+    return v;
+  }, 2);
 }
 
 // ─── Lock ───
@@ -185,6 +272,8 @@ export function createLock(goalId, branch, worktreeRoot, owner) {
     startedAt: nowISO(),
     pid: process.pid
   };
+  const check = validateLockObject(lock);
+  if (!check.valid) throw new Error(`Invalid lock: ${check.reason}`);
   ensureDir(grDir());
   writeJson(lockFile(), lock);
   return lock;
@@ -197,21 +286,37 @@ export function removeLock() {
   }
 }
 
+export function removeLockForGoal(goalId) {
+  if (!goalId) return;
+  const lock = readLock();
+  if (!lock) return;
+  if (lock.goalId === goalId) removeLock();
+}
+
 export function isLockStale(lock) {
   if (!lock) return true;
   const root = resolveRoot();
   if (lock.worktreeRoot !== root) return true;
   if (!lock.goalId || !validateGoalId(lock.goalId)) return true;
+  const branch = currentBranch();
+  if (lock.branch !== branch) return true;
   const state = readState(lock.goalId);
   if (!state) return true;
   if (state.status !== "ACTIVE") return true;
+  if (state.goalId !== lock.goalId) return true;
+  if (state.branch !== lock.branch) return true;
   return false;
 }
 
 // ─── Index ───
 
 export function readIndex() {
-  return readJson(indexFile());
+  const idx = readJson(indexFile());
+  if (idx) {
+    const check = validateIndexObject(idx);
+    if (!check.valid) return null;
+  }
+  return idx;
 }
 
 export function reindex() {
@@ -224,6 +329,8 @@ export function reindex() {
       .map((d) => {
         const state = readState(d.name);
         if (!state) return null;
+        const check = validateStateObject(state);
+        if (!check.valid) return null;
         return {
           goalId: state.goalId,
           title: state.title,
@@ -277,21 +384,21 @@ export function computeContentHash(goals) {
     for (const k of keys) ordered[k] = g[k];
     return ordered;
   });
-  const serialized = JSON.stringify(normalized);
-  return createHash("sha256").update(serialized).digest("hex");
+  return createHash("sha256").update(stableStringify(normalized)).digest("hex");
 }
 
 // ─── Evidence ───
 
 export function validateEvidencePath(filePath) {
   if (!filePath || typeof filePath !== "string") return { valid: false, reason: "Path is required" };
+  if (isAbsolute(filePath)) return { valid: false, reason: "Absolute paths are not allowed; use a path relative to the repo root" };
   if (filePath.includes("..")) return { valid: false, reason: "Path traversal detected" };
 
   const root = resolveRoot();
-  const normalPath = pathResolve(filePath);
+  const normalPath = pathResolve(root, filePath);
   const normalRoot = pathResolve(root);
 
-  if (!normalPath.startsWith(normalRoot + sep)) return { valid: false, reason: "Path must be relative to repo root" };
+  if (!normalPath.startsWith(normalRoot + sep)) return { valid: false, reason: "Path must resolve within the repo root" };
 
   const relPath = relative(root, normalPath).replace(/\\/g, "/");
 
@@ -328,7 +435,8 @@ export function addEvidence(goalId, evidenceType, evidencePath) {
   const check = validateEvidencePath(evidencePath);
   if (!check.valid) throw new Error(`Invalid evidence path: ${check.reason}`);
 
-  const fullPath = pathResolve(evidencePath);
+  const root = resolveRoot();
+  const fullPath = pathResolve(root, evidencePath);
   const hash = computeFileHash(fullPath);
   const relPath = check.relPath;
 
@@ -354,6 +462,34 @@ export function validateEvidenceComplete(goalId, requiredType) {
   return { valid: true };
 }
 
+// ─── Plan validation ───
+
+export function validatePlanFile(goalId, planPath) {
+  if (!planPath) return { valid: false, reason: "Plan path is required" };
+  if (isAbsolute(planPath)) return { valid: false, reason: "Absolute paths are not allowed" };
+  if (planPath.includes("..")) return { valid: false, reason: "Path traversal detected" };
+
+  const expectedDir = join("var", "goal-runner", "goals", goalId);
+  if (!planPath.startsWith(expectedDir.replace(/\\/g, "/")) && !planPath.startsWith(expectedDir)) {
+    return { valid: false, reason: `Plan must be inside ${expectedDir}` };
+  }
+
+  const root = resolveRoot();
+  const fullPath = join(root, planPath);
+  if (!existsSync(fullPath)) return { valid: false, reason: "Plan file does not exist" };
+
+  try {
+    const stat = lstatSync(fullPath);
+    if (!stat.isFile()) return { valid: false, reason: "Plan path is not a regular file" };
+    const content = readFileSync(fullPath, "utf8").trim();
+    if (!content) return { valid: false, reason: "Plan file is empty" };
+  } catch (err) {
+    return { valid: false, reason: `Cannot read plan file: ${err.message}` };
+  }
+
+  return { valid: true };
+}
+
 // ─── Validation Gates ───
 
 export function validateGateIds(gateIds) {
@@ -361,6 +497,30 @@ export function validateGateIds(gateIds) {
   for (const id of gateIds) {
     if (!GATE_ALLOWLIST[id]) throw new Error(`Unknown gate: ${id}. Allowed: ${Object.keys(GATE_ALLOWLIST).join(", ")}`);
   }
+}
+
+export function normalizeGateList(gateIds) {
+  if (!gateIds || gateIds.length === 0) return [];
+  const seen = new Set();
+  return gateIds.filter((id) => {
+    if (seen.has(id)) return false;
+    seen.add(id);
+    return true;
+  });
+}
+
+export function setGates(goalId, gateIds) {
+  validateGateIds(gateIds);
+  const normalized = normalizeGateList(gateIds);
+  const state = readState(goalId);
+  if (!state) throw new Error("Goal not found");
+  if (!GATE_CONFIGURABLE_STATUSES.includes(state.status)) {
+    throw new Error(`Gates can only be set in ${GATE_CONFIGURABLE_STATUSES.join(" or ")} status (current: ${state.status})`);
+  }
+  state.validationGates = normalized;
+  state.updatedAt = nowISO();
+  writeState(goalId, state);
+  return state;
 }
 
 export function runGate(gateId) {
@@ -420,11 +580,19 @@ export function writeHistoryEvent(goalId, event, data) {
     const id = generateHistoryId(event);
     const path = join(dir, `${id}.json`);
     if (!existsSync(path)) {
-      writeJson(path, { goalId, event, id, at: nowISO(), ...data });
+      const record = { goalId, event, id, at: nowISO(), ...data };
+      const sanitized = sanitizeHistoryData(record);
+      writeJson(path, sanitized);
       return id;
     }
   }
   throw new Error("Failed to generate unique history ID after 10 attempts");
+}
+
+function sanitizeHistoryData(data) {
+  const clean = { ...data };
+  if (typeof clean.path === "string" && isAbsolute(clean.path)) delete clean.path;
+  return clean;
 }
 
 // ─── Git Helpers ───

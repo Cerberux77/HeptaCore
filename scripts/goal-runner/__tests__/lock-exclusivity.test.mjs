@@ -17,6 +17,7 @@ describe("Lock Exclusivity", () => {
   before(async () => {
     rmSync(TEMP, { recursive: true, force: true });
     mkdirSync(GOALS, { recursive: true });
+    lib = await import("../lib.mjs");
   });
 
   after(() => {
@@ -28,52 +29,89 @@ describe("Lock Exclusivity", () => {
     writeFileSync(MOCK_LOCK, JSON.stringify(data) + "\n", "utf8");
   }
 
-  it("readLock returns null when no lock exists", async () => {
-    lib = await import("../lib.mjs");
+  it("readLock returns null when no lock exists", () => {
     try { rmSync(MOCK_LOCK, { force: true }); } catch {}
-    const lock = lib.readLock();
-    assert.equal(lock, null);
+    assert.equal(lib.readLock(), null);
   });
 
-  it("stale lock on wrong worktreeRoot", async () => {
+  it("stale lock on wrong worktreeRoot", () => {
     writeLock({
-      goalId: "GR-20260625T192236Z-a1b2-test-goal",
-      branch: "test-branch",
-      worktreeRoot: "/nonexistent/path",
-      owner: "Test",
-      startedAt: "2026-06-25T19:00:00.000Z",
-      pid: 99999
+      goalId: "GR-20260625T192236Z-a1b2c3d4-test-goal",
+      branch: "test-branch", worktreeRoot: "/nowhere",
+      owner: "Test", startedAt: "2026-06-25T19:00:00.000Z", pid: 99999
     });
-    const lock = lib.readLock();
-    assert.ok(lock);
+    assert.ok(lib.readLock());
+    assert.equal(lib.isLockStale({ goalId: "GR-20260625T192236Z-a1b2c3d4-test-goal", worktreeRoot: "/nowhere" }), true);
+  });
+
+  it("stale lock on different branch", () => {
+    writeLock({
+      goalId: "GR-20260625T192236Z-a1b2c3d4-branch-test",
+      branch: "different-branch", worktreeRoot: TEMP,
+      owner: "Test", startedAt: "2026-06-25T19:00:00.000Z", pid: 99999
+    });
+    const lock = { goalId: "GR-20260625T192236Z-a1b2c3d4-branch-test", worktreeRoot: TEMP, branch: "different-branch" };
     assert.equal(lib.isLockStale(lock), true);
   });
 
-  it("non-existent goal state makes lock stale", async () => {
+  it("non-existent goal state makes lock stale", () => {
     writeLock({
-      goalId: "GR-20260625T192236Z-a1b2-no-state",
-      branch: "test-branch",
-      worktreeRoot: TEMP,
-      owner: "Test",
-      startedAt: "2026-06-25T19:00:00.000Z",
-      pid: 99999
+      goalId: "GR-20260625T192236Z-a1b2c3d4-no-state", branch: "test-branch",
+      worktreeRoot: TEMP, owner: "Test",
+      startedAt: "2026-06-25T19:00:00.000Z", pid: 99999
     });
-    const lock = lib.readLock();
-    assert.ok(lock);
+    const lock = { goalId: "GR-20260625T192236Z-a1b2c3d4-no-state", worktreeRoot: TEMP, branch: "test-branch" };
     assert.equal(lib.isLockStale(lock), true);
   });
 
-  it("stale lock has invalid goalId format", async () => {
+  it("stale lock has invalid goalId format", () => {
     writeLock({
-      goalId: "not-a-valid-goal-id",
-      branch: "test-branch",
-      worktreeRoot: TEMP,
-      owner: "Test",
-      startedAt: "2026-06-25T19:00:00.000Z",
-      pid: 99999
+      goalId: "not-a-valid-goal-id", branch: "test-branch",
+      worktreeRoot: TEMP, owner: "Test",
+      startedAt: "2026-06-25T19:00:00.000Z", pid: 99999
     });
-    const lock = lib.readLock();
-    assert.ok(lock);
+    const lock = { goalId: "not-a-valid-goal-id", worktreeRoot: TEMP, branch: "test-branch" };
     assert.equal(lib.isLockStale(lock), true);
+  });
+
+  it("removeLockForGoal removes only matching lock", () => {
+    lib.removeLock();
+    const goalId1 = "GR-20260625T192236Z-a1b2c3d4-lock-a";
+    const goalDir1 = join(GOALS, goalId1);
+    mkdirSync(goalDir1, { recursive: true });
+    writeFileSync(join(goalDir1, "state.json"), JSON.stringify({
+      goalId: goalId1, title: "A", owner: "Manuel", sprintId: "S-HC-TEST",
+      status: "ACTIVE", branch: "UNKNOWN", baseSha: "abc",
+      evidenceRequired: "code", validationGates: [],
+      createdAt: "2026-01-01T00:00:00.000Z", updatedAt: "2026-01-01T00:00:00.000Z", transitions: []
+    }) + "\n", "utf8");
+
+    lib.createLock(goalId1, "UNKNOWN", TEMP, "Manuel");
+    assert.ok(lib.readLock());
+
+    lib.removeLockForGoal("GR-20260625T192236Z-b5c6d7e8-other-goal");
+    assert.ok(lib.readLock(), "Lock should still exist for goalId1");
+
+    lib.removeLockForGoal(goalId1);
+    assert.equal(lib.readLock(), null, "Lock should be removed for goalId1");
+  });
+
+  it("abort doesn't remove lock from another goal", () => {
+    lib.removeLock();
+    const goalId1 = "GR-20260625T192236Z-a1b2c3d4-keep-lock";
+    const goalDir1 = join(GOALS, goalId1);
+    mkdirSync(goalDir1, { recursive: true });
+    writeFileSync(join(goalDir1, "state.json"), JSON.stringify({
+      goalId: goalId1, title: "Keep", owner: "Manuel", sprintId: "S-HC-TEST",
+      status: "ACTIVE", branch: "UNKNOWN", baseSha: "abc",
+      evidenceRequired: "code", validationGates: [],
+      createdAt: "2026-01-01T00:00:00.000Z", updatedAt: "2026-01-01T00:00:00.000Z", transitions: []
+    }) + "\n", "utf8");
+
+    lib.createLock(goalId1, "UNKNOWN", TEMP, "Manuel");
+    assert.ok(lib.readLock());
+
+    lib.removeLockForGoal("GR-20260625T192236Z-b5c6d7e8-other");
+    assert.ok(lib.readLock(), "Lock for goalId1 should remain");
   });
 });

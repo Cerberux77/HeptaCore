@@ -5,13 +5,15 @@ import { fileURLToPath } from "node:url";
 import {
   resolveRoot,
   ALLOWED_STATUSES, TERMINAL_STATUSES, RESUMABLE_STATUSES, EVIDENCE_TYPES,
+  GATE_CONFIGURABLE_STATUSES,
   generateGoalId, validateGoalId, validateNoPathTraversal,
   validateTransition, applyTransition,
-  readLock, createLock, removeLock, isLockStale,
+  readLock, createLock, removeLock, removeLockForGoal, isLockStale,
   readIndex, reindex,
   readState, writeState, readValidation, writeValidation,
   validateEvidenceComplete, addEvidence,
-  validateGateIds, runGates,
+  validateGateIds, normalizeGateList, setGates, runGates,
+  validatePlanFile,
   writeHistoryEvent,
   currentBranch, currentHead,
   getActiveGoal, nowISO
@@ -28,9 +30,10 @@ function usage() {
 Usage: node scripts/goal-runner/run.mjs <subcommand> [options]
 
 Subcommands:
-  create       --title "..." --owner <name> --sprintId <id> --evidenceRequired code|ui|integration [--branch <b>]
-  plan-record  --goalId <id> [--plan-file <path>]
+  create       --title "..." --owner <name> --sprintId <id> --evidenceRequired code|ui|integration [--branch <b>] [--gates "g1,g2"]
+  plan-record  --goalId <id>
   activate     --goalId <id>
+  gates-set    --goalId <id> --gates "g1,g2" [--clear]
   step-start   --goalId <id> --step "..."
   step-complete --goalId <id> --step "..." --result "..."
   finding-add  --goalId <id> --severity info|warn|blocker --content "..."
@@ -77,17 +80,28 @@ function cmdCreate() {
   const sprintId = requireArg("--sprintId", "sprintId");
   const evidenceRequired = requireArg("--evidenceRequired", "evidenceRequired");
   let branch = getArg("--branch") || currentBranch();
+  const gatesRaw = getArg("--gates");
 
   if (!EVIDENCE_TYPES.includes(evidenceRequired)) fail(`Invalid evidenceRequired: ${evidenceRequired}. Must be one of: ${EVIDENCE_TYPES.join(", ")}`);
 
-  const goalId = generateGoalId(title);
+  let validationGates = [];
+  if (gatesRaw) {
+    const gateIds = gatesRaw.split(",").map((s) => s.trim()).filter(Boolean);
+    validateGateIds(gateIds);
+    validationGates = normalizeGateList(gateIds);
+  }
 
-  if (!validateGoalId(goalId)) fail(`Generated invalid goalId: ${goalId}`);
-  if (!validateNoPathTraversal(goalId)) fail(`GoalId has path traversal risk: ${goalId}`);
+  let goalId;
+  for (let attempt = 0; attempt < 10; attempt++) {
+    goalId = generateGoalId(title);
+    if (!validateGoalId(goalId)) fail(`Generated invalid goalId: ${goalId}`);
+    if (!validateNoPathTraversal(goalId)) fail(`GoalId has path traversal risk: ${goalId}`);
+    const dir = join(resolveRoot(), "var", "goal-runner", "goals", goalId);
+    if (!existsSync(dir)) break;
+    if (attempt === 9) fail(`Could not generate unique goal directory after 10 attempts`);
+  }
 
   const dir = join(resolveRoot(), "var", "goal-runner", "goals", goalId);
-  if (existsSync(dir)) fail(`Goal directory already exists: ${goalId}`);
-
   mkdirSync(dir, { recursive: true });
 
   const now = nowISO();
@@ -102,7 +116,7 @@ function cmdCreate() {
     branch,
     baseSha,
     evidenceRequired,
-    validationGates: [],
+    validationGates,
     createdAt: now,
     updatedAt: now,
     transitions: []
@@ -131,20 +145,11 @@ function cmdPlanRecord() {
   const state = readState(goalId);
   if (!state) fail(`Goal not found: ${goalId}`);
 
-  applyTransition(state, "READY", state.owner);
+  const planRelPath = join("var", "goal-runner", "goals", goalId, "plan.md").replace(/\\/g, "/");
+  const planCheck = validatePlanFile(goalId, planRelPath);
+  if (!planCheck.valid) fail(`Plan file invalid: ${planCheck.reason}`);
 
-  const planFile = getArg("--plan-file");
-  if (planFile && existsSync(planFile)) {
-    const planContent = readFileSync(planFile, "utf8");
-    const planPath = goalsPath(goalId, "plan.md");
-    mkdirSync(dirname(planPath), { recursive: true });
-    writeFileSync(planPath, planContent, "utf8");
-  } else {
-    const planPath = goalsPath(goalId, "plan.md");
-    if (!existsSync(planPath)) {
-      writeFileSync(planPath, `# Plan — ${goalId}\n\n> Goal: ${state.title}\n> Owner: ${state.owner}\n> Sprint: ${state.sprintId}\n> Generated: ${nowISO()}\n`, "utf8");
-    }
-  }
+  applyTransition(state, "READY", state.owner);
 
   writeState(goalId, state);
   writeHistoryEvent(goalId, "draft-to-ready", { by: state.owner });
@@ -164,6 +169,9 @@ function cmdActivate() {
   if (state.status === "ACTIVE") fail("Goal is already ACTIVE");
 
   const branch = currentBranch();
+  if (state.branch && state.branch !== branch) {
+    fail(`Goal was created on branch "${state.branch}" but current branch is "${branch}". Switch branches or create a new goal.`);
+  }
 
   const lock = readLock();
   if (lock && !isLockStale(lock)) fail(`Worktree already locked by active goal: ${lock.goalId}`);
@@ -180,6 +188,39 @@ function cmdActivate() {
   ok("Goal activated", goalId);
   ok("Branch", branch);
   ok("Status", "ACTIVE");
+}
+
+function cmdGatesSet() {
+  const goalId = requireArg("--goalId", "goalId");
+  const gatesRaw = getArg("--gates");
+  const clear = process.argv.includes("--clear");
+  if (!validateGoalId(goalId)) fail(`Invalid goalId: ${goalId}`);
+
+  const state = readState(goalId);
+  if (!state) fail(`Goal not found: ${goalId}`);
+
+  if (clear && (!gatesRaw || gatesRaw === "")) {
+    if (!GATE_CONFIGURABLE_STATUSES.includes(state.status)) fail(`Gates can only be set in ${GATE_CONFIGURABLE_STATUSES.join(" or ")} (current: ${state.status})`);
+    state.validationGates = [];
+    state.updatedAt = nowISO();
+    writeState(goalId, state);
+    writeHistoryEvent(goalId, "gates-cleared", { by: state.owner });
+    reindex();
+    ok("Gates cleared", goalId);
+    return;
+  }
+
+  if (!gatesRaw) fail("--gates is required (comma-separated gate IDs) or use --clear");
+
+  const gateIds = gatesRaw.split(",").map((s) => s.trim()).filter(Boolean);
+  if (gateIds.length === 0) fail("--gates list is empty");
+
+  setGates(goalId, gateIds);
+  writeHistoryEvent(goalId, "gates-set", { gates: state.validationGates, by: state.owner });
+  reindex();
+
+  ok("Gates set", goalId);
+  ok("Gates", state.validationGates.join(", ") || "(none)");
 }
 
 function cmdStepStart() {
@@ -303,7 +344,7 @@ function cmdPause() {
 
   applyTransition(state, "PAUSED", state.owner);
   writeState(goalId, state);
-  removeLock();
+  removeLockForGoal(goalId);
   writeHistoryEvent(goalId, "active-to-paused", { by: state.owner });
   reindex();
 
@@ -321,7 +362,7 @@ function cmdBlock() {
 
   applyTransition(state, "BLOCKED_EXTERNAL", state.owner);
   writeState(goalId, state);
-  removeLock();
+  removeLockForGoal(goalId);
 
   const findingsPath = goalsPath(goalId, "findings.md");
   mkdirSync(dirname(findingsPath), { recursive: true });
@@ -389,7 +430,7 @@ function cmdComplete() {
 
   applyTransition(state, "COMPLETED", state.owner);
   writeState(goalId, state);
-  removeLock();
+  removeLockForGoal(goalId);
 
   const reportPath = goalsPath(goalId, "final-report.md");
   const validation = readValidation(goalId);
@@ -417,8 +458,8 @@ function cmdAbort() {
   applyTransition(state, "ABORTED_CRITICAL_DEVIATION", state.owner);
   writeState(goalId, state);
 
-  if (state.status === "ACTIVE" || readLock()) {
-    removeLock();
+  if (readLock()) {
+    removeLockForGoal(goalId);
   }
 
   const reportPath = goalsPath(goalId, "final-report.md");
@@ -477,6 +518,7 @@ switch (subcommand) {
   case "create": cmdCreate(); break;
   case "plan-record": cmdPlanRecord(); break;
   case "activate": cmdActivate(); break;
+  case "gates-set": cmdGatesSet(); break;
   case "step-start": cmdStepStart(); break;
   case "step-complete": cmdStepComplete(); break;
   case "finding-add": cmdFindingAdd(); break;

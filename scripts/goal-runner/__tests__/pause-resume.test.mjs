@@ -39,7 +39,7 @@ describe("Pause and Resume", () => {
   }
 
   it("pause: ACTIVE -> PAUSED, lock removed", async () => {
-    const goalId = "GR-20260625T192236Z-a1b2-pause-test";
+    const goalId = "GR-20260625T192236Z-a1b2c3d4-pause-test";
     await createActiveGoal(goalId, "Pause Test");
 
     const state = lib.readState(goalId);
@@ -49,7 +49,7 @@ describe("Pause and Resume", () => {
 
     lib.applyTransition(state, "PAUSED", "Manuel");
     lib.writeState(goalId, state);
-    lib.removeLock();
+    lib.removeLockForGoal(goalId);
 
     const updated = lib.readState(goalId);
     assert.equal(updated.status, "PAUSED");
@@ -57,13 +57,13 @@ describe("Pause and Resume", () => {
   });
 
   it("resume: PAUSED -> ACTIVE, lock created", async () => {
-    const goalId = "GR-20260625T192236Z-a1b2-resume-test";
+    const goalId = "GR-20260625T192236Z-b5c6d7e8-resume-test";
     await createActiveGoal(goalId, "Resume Test");
 
     let state = lib.readState(goalId);
     lib.applyTransition(state, "PAUSED", "Manuel");
     lib.writeState(goalId, state);
-    lib.removeLock();
+    lib.removeLockForGoal(goalId);
 
     state = lib.readState(goalId);
     assert.equal(state.status, "PAUSED");
@@ -76,17 +76,18 @@ describe("Pause and Resume", () => {
     state = lib.readState(goalId);
     assert.equal(state.status, "ACTIVE");
     assert.ok(lib.readLock());
-    lib.removeLock();
+    lib.removeLockForGoal(goalId);
   });
 
   it("resume: BLOCKED_EXTERNAL -> ACTIVE", async () => {
-    const goalId = "GR-20260625T192236Z-a1b2-block-resume";
+    const goalId = "GR-20260625T192236Z-c9d0e1f2-block-resume";
+    lib.removeLock();
     await createActiveGoal(goalId, "Block Resume Test");
 
     let state = lib.readState(goalId);
     lib.applyTransition(state, "BLOCKED_EXTERNAL", "Manuel");
     lib.writeState(goalId, state);
-    lib.removeLock();
+    lib.removeLockForGoal(goalId);
 
     state = lib.readState(goalId);
     assert.equal(state.status, "BLOCKED_EXTERNAL");
@@ -98,17 +99,18 @@ describe("Pause and Resume", () => {
 
     state = lib.readState(goalId);
     assert.equal(state.status, "ACTIVE");
-    lib.removeLock();
+    lib.removeLockForGoal(goalId);
   });
 
   it("cannot resume from COMPLETED", async () => {
-    const goalId = "GR-20260625T192236Z-a1b2-done-resume";
+    const goalId = "GR-20260625T192236Z-d3e4f5a6-done-resume";
+    lib.removeLock();
     await createActiveGoal(goalId, "Done Resume");
 
     let state = lib.readState(goalId);
     lib.applyTransition(state, "COMPLETED", "Manuel");
     lib.writeState(goalId, state);
-    lib.removeLock();
+    lib.removeLockForGoal(goalId);
 
     assert.throws(() => {
       lib.applyTransition(state, "ACTIVE", "Manuel");

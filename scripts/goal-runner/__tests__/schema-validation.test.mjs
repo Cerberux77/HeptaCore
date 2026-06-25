@@ -55,7 +55,8 @@ describe("Schema Validation", () => {
 
   it("state schema validates goalId pattern", () => {
     const pattern = schema.definitions.state.properties.goalId.pattern;
-    assert.ok(new RegExp(pattern).test("GR-20260625T192236Z-a1b2-test-goal"));
+    assert.ok(new RegExp(pattern).test("GR-20260625T192236Z-a1b2c3d4-test-goal"));
+    assert.ok(!new RegExp(pattern).test("GR-20260625T192236Z-abcd-test"));
     assert.ok(!new RegExp(pattern).test("invalid-id"));
   });
 
