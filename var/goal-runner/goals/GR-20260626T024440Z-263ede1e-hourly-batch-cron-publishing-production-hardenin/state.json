@@ -1,0 +1,42 @@
+{
+  "baseSha": "4216be5408bd8513ce4a3fbdf9df6578eec97ddd",
+  "branch": "Manuel/s-hc-pub-04-hourly-batch-goal",
+  "createdAt": "2026-06-26T02:44:40.629Z",
+  "evidenceRequired": "code",
+  "goalId": "GR-20260626T024440Z-263ede1e-hourly-batch-cron-publishing-production-hardenin",
+  "owner": "Manuel",
+  "previousStatus": "ACTIVE",
+  "sprintId": "S-HC-PUB-04-HOURLY-BATCH-CRON",
+  "status": "COMPLETED",
+  "title": "Hourly batch cron publishing production hardening",
+  "transitions": [
+    {
+      "at": "2026-06-26T02:45:29.128Z",
+      "by": "Manuel",
+      "from": "DRAFT",
+      "to": "READY"
+    },
+    {
+      "at": "2026-06-26T02:45:34.689Z",
+      "by": "Manuel",
+      "from": "READY",
+      "to": "ACTIVE"
+    },
+    {
+      "at": "2026-06-26T03:05:02.712Z",
+      "by": "Manuel",
+      "from": "ACTIVE",
+      "to": "COMPLETED"
+    }
+  ],
+  "updatedAt": "2026-06-26T03:05:02.712Z",
+  "validationGates": [
+    "diff-check",
+    "typecheck",
+    "test",
+    "build",
+    "worker-validate",
+    "oreshnik-reconcile",
+    "oreshnik-drift"
+  ]
+}

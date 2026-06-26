@@ -412,21 +412,26 @@ model OAuthConnection {
 }
 
 model PublishingJob {
-  id               String            @id
-  tenantId         String
-  postId           String?
-  provider         OAuthProvider
-  status           ContentStatus     @default(SCHEDULED)
-  scheduledFor     DateTime?
-  attempts         Int               @default(0)
-  lastError        String?
-  createdAt        DateTime          @default(now())
-  updatedAt        DateTime
-  ContentDraft     ContentDraft?     @relation(fields: [postId], references: [id])
-  Tenant           Tenant            @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  PublishingResult PublishingResult?
+  id                       String            @id
+  tenantId                 String
+  postId                   String?
+  provider                 OAuthProvider
+  status                   ContentStatus     @default(SCHEDULED)
+  scheduledFor             DateTime?
+  attempts                 Int               @default(0)
+  lastError                String?
+  claimedAt                DateTime?
+  claimToken               String?
+  providerAttemptStartedAt DateTime?
+  createdAt                DateTime          @default(now())
+  updatedAt                DateTime
+  ContentDraft             ContentDraft?     @relation(fields: [postId], references: [id])
+  Tenant                   Tenant            @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  PublishingResult         PublishingResult?
 
   @@index([tenantId, provider, status])
+  @@index([status, scheduledFor])
+  @@index([status, claimedAt])
 }
 
 model PublishingResult {

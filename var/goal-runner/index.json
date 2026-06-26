@@ -1,6 +1,6 @@
 {
-  "contentHash": "sha256:8da471db6c4a0a62d4346f5b5ea83a9dfe0a4774927f27be84f237d357ad8f5d",
-  "generatedFromStateUpdatedAt": "2026-06-25T22:16:05.544Z",
+  "contentHash": "sha256:a732a70ba50764dc4242ee2484c7a294eb6a84321c3680b6ba114e6b4642a7b4",
+  "generatedFromStateUpdatedAt": "2026-06-26T03:05:02.712Z",
   "goals": [
     {
       "branch": "Manuel/s-hc-goal-runner-v1",
@@ -11,6 +11,16 @@
       "status": "COMPLETED",
       "title": "Añadir comando doctor al Goal Runner",
       "updatedAt": "2026-06-25T22:16:05.544Z"
+    },
+    {
+      "branch": "Manuel/s-hc-pub-04-hourly-batch-goal",
+      "createdAt": "2026-06-26T02:44:40.629Z",
+      "goalId": "GR-20260626T024440Z-263ede1e-hourly-batch-cron-publishing-production-hardenin",
+      "owner": "Manuel",
+      "sprintId": "S-HC-PUB-04-HOURLY-BATCH-CRON",
+      "status": "COMPLETED",
+      "title": "Hourly batch cron publishing production hardening",
+      "updatedAt": "2026-06-26T03:05:02.712Z"
     }
   ],
   "version": 1

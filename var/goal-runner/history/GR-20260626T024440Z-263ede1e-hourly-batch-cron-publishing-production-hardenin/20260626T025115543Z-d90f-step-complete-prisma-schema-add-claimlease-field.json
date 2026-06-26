@@ -1,0 +1,8 @@
+{
+  "at": "2026-06-26T02:51:15.543Z",
+  "event": "step-complete-prisma-schema-add-claimlease-fields-and-indexes",
+  "goalId": "GR-20260626T024440Z-263ede1e-hourly-batch-cron-publishing-production-hardenin",
+  "id": "20260626T025115543Z-d90f-step-complete-prisma-schema-add-claimlease-field",
+  "result": "Added claimedAt, claimToken, providerAttemptStartedAt fields to PublishingJob. Added indexes on (status, scheduledFor) and (status, claimedAt). Generated Prisma client v7.8.0. Manual migration created.",
+  "step": "Prisma schema: add claim/lease fields and indexes"
+}

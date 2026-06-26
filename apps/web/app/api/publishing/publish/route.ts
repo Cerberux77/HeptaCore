@@ -5,7 +5,7 @@ import { prisma } from "../../../../lib/prisma";
 import { TRIAL_POSTS_PER_NETWORK } from "../../../../lib/trial";
 import { resolveAndDecryptOAuthCredential } from "../../../../lib/credential-resolver";
 import { getPublisher, PublishInput } from "../../../../lib/publishers";
-import { buildImmediateJobId, checkExistingJobForRetry, getAllPossibleJobIds } from "../../../../lib/publishing-execution";
+import { buildImmediateJobId, checkExistingJobForRetry, getAllPossibleJobIds, buildDeterministicScheduledJobId } from "../../../../lib/publishing-execution";
 import { commitConfirmedPublication, recordUnconfirmedProviderFailure } from "../../../../lib/publishing-finalization";
 import { ProviderError } from "../../../../lib/publishers/types";
 import { buildMultiformatDryRun, normalizeAssetManifest, normalizePublishingFormat } from "../../../../lib/publishing-formats";
@@ -187,40 +187,73 @@ export async function POST(req: Request) {
   if (requestMode === "scheduled") {
     const scheduledFor = scheduledAt ?? draft.scheduledFor ?? new Date(Date.now() + 3600000);
 
-    const scheduledClaim = await prisma.contentDraft.updateMany({
-      where: { id: draft.id, tenantId: tenant.id, status: "APPROVED" },
-      data: { status: "SCHEDULED", scheduledFor },
-    });
-
-    if (scheduledClaim.count === 0) {
+    if (isNaN(scheduledFor.getTime())) {
       return NextResponse.json({
-        code: "LIVE_BLOCKED_ALREADY_CLAIMED",
-        error: "Este draft ya fue reclamado en otra solicitud o cambio de estado.",
-        action: "Verifica si el draft ya fue publicado o programado por otra operacion concurrente.",
-      }, { status: 409 });
+        code: "LIVE_BLOCKED_INVALID_DATE",
+        error: "scheduledAt is not a valid date.",
+      }, { status: 400 });
     }
 
-    const jobId = `pj_${draft.id}_${Date.now().toString(36)}`;
+    const deterministicJobId = buildDeterministicScheduledJobId(draft.id, network, scheduledFor);
+
+    const existingJob = await prisma.publishingJob.findUnique({
+      where: { id: deterministicJobId },
+      select: { id: true, status: true, scheduledFor: true },
+    });
+
+    if (existingJob) {
+      if (existingJob.status === "SCHEDULED" || existingJob.status === "PUBLISHED" || existingJob.status === "IN_REVIEW") {
+        return NextResponse.json({
+          ok: true,
+          mode: "scheduled",
+          status: existingJob.status,
+          draftId: draft.id,
+          jobId: existingJob.id,
+          scheduledFor: existingJob.scheduledFor?.toISOString() ?? scheduledFor.toISOString(),
+        });
+      }
+    }
+
     try {
-      await prisma.publishingJob.create({
-        data: {
-          id: jobId,
-          tenantId: tenant.id,
-          postId: draft.id,
-          provider: network as any,
-          status: "SCHEDULED",
-          scheduledFor,
-          updatedAt: new Date(),
-        },
+      await prisma.$transaction(async (tx) => {
+        const claimed = await tx.contentDraft.updateMany({
+          where: { id: draft.id, tenantId: tenant.id, status: "APPROVED" },
+          data: { status: "SCHEDULED", scheduledFor },
+        });
+
+        if (claimed.count === 0) {
+          throw new Error("DRAFT_ALREADY_CLAIMED");
+        }
+
+        await tx.publishingJob.upsert({
+          where: { id: deterministicJobId },
+          create: {
+            id: deterministicJobId,
+            tenantId: tenant.id,
+            postId: draft.id,
+            provider: network as any,
+            status: "SCHEDULED",
+            scheduledFor,
+            updatedAt: new Date(),
+          },
+          update: {
+            status: "SCHEDULED",
+            scheduledFor,
+            updatedAt: new Date(),
+          },
+        });
       });
-    } catch {
-      await prisma.contentDraft.updateMany({
-        where: { id: draft.id, status: "SCHEDULED" },
-        data: { status: "APPROVED" },
-      });
+    } catch (err: any) {
+      if (err?.message === "DRAFT_ALREADY_CLAIMED") {
+        return NextResponse.json({
+          code: "LIVE_BLOCKED_ALREADY_CLAIMED",
+          error: "Este draft ya fue reclamado en otra solicitud o cambio de estado.",
+          action: "Verifica si el draft ya fue publicado o programado por otra operacion concurrente.",
+        }, { status: 409 });
+      }
       return NextResponse.json({
         code: "LIVE_BLOCKED_JOB_CREATION_FAILED",
-        error: "No se pudo crear el PublishingJob. El draft fue revertido.",
+        error: "No se pudo crear el PublishingJob de forma transaccional.",
         action: "Reintenta la operacion.",
       }, { status: 500 });
     }
@@ -236,7 +269,7 @@ export async function POST(req: Request) {
         network,
         format,
         scheduledFor: scheduledFor.toISOString(),
-        jobId,
+        jobId: deterministicJobId,
         tenantAutomationMode: tenant.automationMode,
       },
     });
@@ -246,7 +279,7 @@ export async function POST(req: Request) {
       mode: "scheduled",
       status: "SCHEDULED",
       draftId: draft.id,
-      jobId,
+      jobId: deterministicJobId,
       scheduledFor: scheduledFor.toISOString(),
     });
   }

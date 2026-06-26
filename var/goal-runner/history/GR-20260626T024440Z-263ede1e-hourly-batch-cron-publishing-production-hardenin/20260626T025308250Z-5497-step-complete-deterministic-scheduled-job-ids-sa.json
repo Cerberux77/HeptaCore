@@ -1,0 +1,8 @@
+{
+  "at": "2026-06-26T02:53:08.251Z",
+  "event": "step-complete-deterministic-scheduled-job-ids-safe-claimlease-",
+  "goalId": "GR-20260626T024440Z-263ede1e-hourly-batch-cron-publishing-production-hardenin",
+  "id": "20260626T025308250Z-5497-step-complete-deterministic-scheduled-job-ids-sa",
+  "result": "publishing-execution.ts: added buildDeterministicScheduledJobId. publishing-claim.ts: created with claimJob, generateClaimToken, isClaimExpired, canReclaimExpiredJob. publishing-revalidation.ts: created with full pre-publish revalidation and block classification. publish/route.ts: scheduled flow uses deterministic IDs and  with upsert.",
+  "step": "Deterministic scheduled job IDs + safe claim/lease + publish route fix"
+}

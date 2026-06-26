@@ -1,0 +1,7 @@
+{
+  "at": "2026-06-26T02:53:09.113Z",
+  "event": "step-start-cron-route-rewrite-with-batch-budget-dry-run-str",
+  "goalId": "GR-20260626T024440Z-263ede1e-hourly-batch-cron-publishing-production-hardenin",
+  "id": "20260626T025309113Z-d161-step-start-cron-route-rewrite-with-batch-budget-",
+  "step": "Cron route rewrite with batch budget, dry-run, structured observability"
+}
