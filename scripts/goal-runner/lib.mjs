@@ -40,7 +40,8 @@ export const GATE_ALLOWLIST = {
   "build": { command: "npm", args: ["run", "build"], timeout: 300000 },
   "worker-validate": { command: "npm", args: ["run", "worker:validate"], timeout: 120000 },
   "oreshnik-reconcile": { command: "node", args: ["scripts/oreshnik/canonical-check.mjs"], timeout: 60000 },
-  "oreshnik-drift": { command: "node", args: ["scripts/oreshnik/drift.mjs", "--check"], timeout: 30000 }
+  "oreshnik-drift": { command: "node", args: ["scripts/oreshnik/drift.mjs", "--check"], timeout: 30000 },
+  "pub04-contract": { command: "node", args: ["scripts/goal-runner/pub04-contract-gate.mjs"], timeout: 300000 }
 };
 
 export const EVIDENCE_TYPES = ["code", "ui", "integration"];
