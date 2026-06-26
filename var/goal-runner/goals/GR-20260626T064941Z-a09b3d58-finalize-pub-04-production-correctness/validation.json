@@ -1,0 +1,75 @@
+{
+  "evidence": [
+    {
+      "addedAt": "2026-06-26T06:56:38.237Z",
+      "hash": "sha256:39e22752cf6190ba759d1f31d75ee0c53060ab49b406a6f8227e5dd752af5ab7",
+      "path": "apps/web/lib/publishing-cron-executor.ts",
+      "type": "code"
+    },
+    {
+      "addedAt": "2026-06-26T06:56:38.333Z",
+      "hash": "sha256:af16da482ea9e3aa64a51021967f1ed9e6aa1012daa2e8f47ded52da5899dd0e",
+      "path": "apps/web/lib/publishing-scheduler-service.ts",
+      "type": "code"
+    }
+  ],
+  "gates": [
+    {
+      "durationMs": 89,
+      "exitCode": 1,
+      "gate": "pub04-contract",
+      "passed": false,
+      "summary": "[PUB04-CONTRACT][FAIL] No active Goal Runner lock. The contract gate must run inside the active final-correctness goal. "
+    },
+    {
+      "durationMs": 66,
+      "exitCode": 0,
+      "gate": "diff-check",
+      "passed": true,
+      "summary": "OK"
+    },
+    {
+      "durationMs": 11110,
+      "exitCode": 0,
+      "gate": "typecheck",
+      "passed": true,
+      "summary": " > heptacore@0.1.0 typecheck > npm run typecheck --workspaces --if-present   > @heptacore/web@0.1.0 typecheck > tsc --noEmit   > @heptacore/worker@0.2.0 typecheck > tsc --noEmit   > @heptacore/agents@"
+    },
+    {
+      "durationMs": 16148,
+      "exitCode": 0,
+      "gate": "test",
+      "passed": true,
+      "summary": " > heptacore@0.1.0 test > node --test apps/web/lib/calendar-state.test.mjs && npm run test --workspaces --if-present  ✔ calendar display state prefers operational state over approval status (1.3688ms)"
+    },
+    {
+      "durationMs": 88543,
+      "exitCode": 0,
+      "gate": "build",
+      "passed": true,
+      "summary": " > heptacore@0.1.0 build > npm run build --workspaces --if-present   > @heptacore/web@0.1.0 build > node scripts/copy-tenant-assets.mjs && prisma generate --schema ../../packages/db/prisma/schema.pris"
+    },
+    {
+      "durationMs": 1238,
+      "exitCode": 0,
+      "gate": "worker-validate",
+      "passed": true,
+      "summary": " > heptacore@0.1.0 worker:validate > npm run validate -w @heptacore/worker   > @heptacore/worker@0.2.0 validate > node src/validate.mjs   === Validacion de Assets ===  Presentes: 46/46 ✅ Todos los ass"
+    },
+    {
+      "durationMs": 214,
+      "exitCode": 0,
+      "gate": "oreshnik-reconcile",
+      "passed": true,
+      "summary": " \u001b[1mORESHNIK CANONICAL CHECK\u001b[0m   Board:     var/oreshnik/task-board.json   Updated:   2026-06-25T20:05:39.000Z   Operator:  not specified   Sprint:    not specified    [ \u001b[32mOK  \u001b[0m ] Derived doc"
+    },
+    {
+      "durationMs": 140,
+      "exitCode": 0,
+      "gate": "oreshnik-drift",
+      "passed": true,
+      "summary": " \u001b[1mOreshnik Drift Log\u001b[0m   S-HC-DRIFT-001     2026-06-12 Manuel   sprint   S-HC-DRIFT-002     2026-06-12 Manuel   Codex multi-RRSS refactor, readiness gates, UI fixes, migrations, vercelignore   S-"
+    }
+  ],
+  "goalId": "GR-20260626T064941Z-a09b3d58-finalize-pub-04-production-correctness"
+}

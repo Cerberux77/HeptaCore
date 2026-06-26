@@ -45,7 +45,7 @@ async function processJob(
   const now = deps.now();
   const claimToken = deps.newClaimToken();
 
-  if (dryRun) {
+    if (dryRun) {
     const ctx = await deps.repo.loadContext(job.id);
     if (!ctx) {
       return { outcome: { jobId: job.id, code: "DRY_RUN_BLOCKED", reason: "Context not found" }, publishedCount: 0, reconciliationCount: 0 };
@@ -54,26 +54,69 @@ async function processJob(
     const account = findSocialAccount(ctx);
     const preflightErrors: string[] = [];
 
-    if (!ctx.tenant || ctx.tenant.status !== "ACTIVE") {
-      preflightErrors.push("Tenant invalid");
+    if (!ctx.tenant) {
+      preflightErrors.push("Tenant not found");
+    } else if (ctx.tenant.status !== "ACTIVE") {
+      preflightErrors.push("Tenant not active");
+    } else if (ctx.tenant.automationMode === "DRAFT_ONLY") {
+      preflightErrors.push("Tenant is DRAFT_ONLY");
     }
-    if (!ctx.draft || ctx.draft.status !== "SCHEDULED") {
-      preflightErrors.push("Draft not scheduled");
+
+    if (!ctx.draft) {
+      preflightErrors.push("Draft not found");
+    } else {
+      if (ctx.draft.status !== "SCHEDULED") {
+        preflightErrors.push("Draft not scheduled");
+      }
+      if (ctx.draft.network !== ctx.job.provider) {
+        preflightErrors.push("Network mismatch");
+      }
+      if (ctx.draft.externalPostId) {
+        preflightErrors.push("Already has externalPostId");
+      }
     }
-    if (ctx.draft && ctx.draft.network !== ctx.job.provider) {
-      preflightErrors.push("Network mismatch");
-    }
-    if (ctx.draft?.externalPostId) {
-      preflightErrors.push("Already has externalPostId");
-    }
+
     if (ctx.durableResult?.ok) {
       preflightErrors.push("Durable result exists");
     }
-    if (publisher && !checkFormatSupported(publisher, ctx.draft)) {
-      preflightErrors.push("Format not supported");
+
+    if (job.attempts >= input.maxAttempts) {
+      preflightErrors.push("Max attempts reached");
     }
+
+    if (ctx.publishedCountOnNetwork >= ctx.trialLimit) {
+      preflightErrors.push("Trial limit reached");
+    }
+
     if (!publisher) {
       preflightErrors.push("Publisher not implemented");
+    } else {
+      if (!checkFormatSupported(publisher, ctx.draft)) {
+        preflightErrors.push("Format not supported");
+      }
+
+      const hasRequiredScopes = account
+        ? publisher.requiredScopes.every(
+            (s) => account.scopes.includes(s) || account.scopes.includes(s.replace("instagram_business_", ""))
+          )
+        : false;
+      if (!hasRequiredScopes) {
+        preflightErrors.push("Missing required scopes");
+      }
+
+      const needsAsset = !publisher.textOnly || (ctx.draft?.assets?.length ?? 0) > 0;
+      if (needsAsset && (!ctx.draft?.assets || ctx.draft.assets.length === 0)) {
+        preflightErrors.push("Missing required asset");
+      } else if (needsAsset && ctx.draft?.assets) {
+        const hasPublicUrl = ctx.draft.assets.some((a) => a.publicUrl && a.publicUrl.startsWith("https://"));
+        if (!hasPublicUrl) {
+          preflightErrors.push("Asset URL not public");
+        }
+      }
+    }
+
+    if (!account) {
+      preflightErrors.push("No connected social account");
     }
 
     if (preflightErrors.length === 0) {
@@ -152,6 +195,74 @@ async function processJob(
   }
 
   const publisher = deps.getPublisher(ctx.job.provider);
+
+  // Structural invariants — evaluated before social accounts and format
+  if (!ctx.tenant || ctx.tenant.status !== "ACTIVE") {
+    await deps.repo.recordPreProviderBlock({
+      jobId: job.id,
+      claimToken: activeClaimToken,
+      code: "TENANT_INVALID",
+      terminal: true,
+      now,
+    });
+    return { outcome: { jobId: job.id, code: "PRE_PROVIDER_BLOCKED", reason: "Tenant not active" }, publishedCount: 0, reconciliationCount: 0 };
+  }
+
+  if (ctx.tenant.automationMode === "DRAFT_ONLY") {
+    await deps.repo.recordPreProviderBlock({
+      jobId: job.id,
+      claimToken: activeClaimToken,
+      code: "DRAFT_ONLY",
+      terminal: true,
+      now,
+    });
+    return { outcome: { jobId: job.id, code: "PRE_PROVIDER_BLOCKED", reason: "Tenant is DRAFT_ONLY" }, publishedCount: 0, reconciliationCount: 0 };
+  }
+
+  if (!ctx.draft || ctx.draft.status !== "SCHEDULED") {
+    await deps.repo.recordPreProviderBlock({
+      jobId: job.id,
+      claimToken: activeClaimToken,
+      code: ctx.draft ? "DRAFT_NOT_SCHEDULED" : "DRAFT_NOT_FOUND",
+      terminal: true,
+      now,
+    });
+    return { outcome: { jobId: job.id, code: "PRE_PROVIDER_BLOCKED", reason: ctx.draft ? "Draft not in SCHEDULED" : "Draft not found" }, publishedCount: 0, reconciliationCount: 0 };
+  }
+
+  if (ctx.draft.network !== ctx.job.provider) {
+    await deps.repo.recordPreProviderBlock({
+      jobId: job.id,
+      claimToken: activeClaimToken,
+      code: "NETWORK_MISMATCH",
+      terminal: true,
+      now,
+    });
+    return { outcome: { jobId: job.id, code: "PRE_PROVIDER_BLOCKED", reason: "Network mismatch" }, publishedCount: 0, reconciliationCount: 0 };
+  }
+
+  if (ctx.draft.externalPostId) {
+    await deps.repo.recordPreProviderBlock({
+      jobId: job.id,
+      claimToken: activeClaimToken,
+      code: "ALREADY_PUBLISHED",
+      terminal: true,
+      now,
+    });
+    return { outcome: { jobId: job.id, code: "PRE_PROVIDER_BLOCKED", reason: "Draft already published" }, publishedCount: 0, reconciliationCount: 0 };
+  }
+
+  if (ctx.publishedCountOnNetwork >= ctx.trialLimit) {
+    await deps.repo.recordPreProviderBlock({
+      jobId: job.id,
+      claimToken: activeClaimToken,
+      code: "TRIAL_LIMIT",
+      terminal: false,
+      now,
+    });
+    return { outcome: { jobId: job.id, code: "PRE_PROVIDER_BLOCKED", reason: "Trial limit reached" }, publishedCount: 0, reconciliationCount: 0 };
+  }
+
   if (!publisher) {
     await deps.repo.recordPreProviderBlock({
       jobId: job.id,
@@ -184,39 +295,6 @@ async function processJob(
       now,
     });
     return { outcome: { jobId: job.id, code: "PRE_PROVIDER_BLOCKED", reason: "Format not supported for live" }, publishedCount: 0, reconciliationCount: 0 };
-  }
-
-  if (!ctx.tenant || ctx.tenant.status !== "ACTIVE") {
-    await deps.repo.recordPreProviderBlock({
-      jobId: job.id,
-      claimToken: activeClaimToken,
-      code: "TENANT_INVALID",
-      terminal: true,
-      now,
-    });
-    return { outcome: { jobId: job.id, code: "PRE_PROVIDER_BLOCKED", reason: "Tenant not active" }, publishedCount: 0, reconciliationCount: 0 };
-  }
-
-  if (ctx.draft && ctx.draft.externalPostId) {
-    await deps.repo.recordPreProviderBlock({
-      jobId: job.id,
-      claimToken: activeClaimToken,
-      code: "ALREADY_PUBLISHED",
-      terminal: true,
-      now,
-    });
-    return { outcome: { jobId: job.id, code: "PRE_PROVIDER_BLOCKED", reason: "Draft already published" }, publishedCount: 0, reconciliationCount: 0 };
-  }
-
-  if (ctx.publishedCountOnNetwork >= ctx.trialLimit) {
-    await deps.repo.recordPreProviderBlock({
-      jobId: job.id,
-      claimToken: activeClaimToken,
-      code: "TRIAL_LIMIT",
-      terminal: false,
-      now,
-    });
-    return { outcome: { jobId: job.id, code: "PRE_PROVIDER_BLOCKED", reason: "Trial limit reached" }, publishedCount: 0, reconciliationCount: 0 };
   }
 
   const hasRequiredScopes = publisher.requiredScopes.every(
@@ -297,7 +375,6 @@ async function processJob(
 
   const mediaAsset = ctx.draft?.assets?.find((a) => a.publicUrl?.startsWith("https://"));
   const mediaUrl = mediaAsset?.publicUrl ?? undefined;
-  const mediaType = mediaAsset?.kind === "VIDEO" ? "VIDUE" as const : "IMAGE" as const;
 
   let providerResult: Awaited<ReturnType<Pub04Publisher["publish"]>>;
   try {
@@ -435,7 +512,8 @@ export async function executePublishingCron(
     }
   }
 
-  const remainingDue = totalDue - candidates.length;
+  const timeBudgetSkips = outcomes.filter((o) => o.code === "SKIPPED_TIME_BUDGET").length;
+  const remainingDue = Math.max(0, totalDue - candidates.length) + timeBudgetSkips;
 
   const summary: Pub04CronSummary = {
     totalDue,

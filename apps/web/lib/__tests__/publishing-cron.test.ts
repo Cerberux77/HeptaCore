@@ -337,15 +337,21 @@ describe("observability", () => {
 });
 
 describe("vercel.json contract", () => {
-  it("4. single cron entry exists", async () => {
+  it("4. 24 daily Hobby cron entries covering every UTC hour", async () => {
     const fs = await import("node:fs");
     const path = await import("node:path");
     const vercelPath = path.resolve(process.cwd(), "..", "..", "vercel.json");
     const content = fs.readFileSync(vercelPath, "utf-8");
     const config = JSON.parse(content);
-    assert.equal(config.crons.length, 1, "should have exactly one cron entry");
-    assert.equal(config.crons[0].path, "/api/cron/publisher", "should use base path without slot");
-    assert.equal(config.crons[0].schedule, "0 * * * *", "should be hourly");
+    assert.equal(config.crons.length, 24, "should have exactly 24 cron entries for Vercel Hobby");
+    const seenHours = new Set<number>();
+    for (const cron of config.crons) {
+      assert.match(cron.path, /^\/api\/cron\/publisher\?slot=\d{2}$/);
+      assert.notEqual(cron.schedule, "0 * * * *");
+      const hour = Number(cron.schedule.split(" ")[1]);
+      seenHours.add(hour);
+    }
+    assert.equal(seenHours.size, 24, "should cover all 24 UTC hours");
   });
 });
 

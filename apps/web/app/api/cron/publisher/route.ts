@@ -5,6 +5,7 @@ import { resolveAndDecryptOAuthCredential } from "../../../../lib/credential-res
 import { resolveAssetUrl } from "../../../../lib/asset-resolution";
 import { validateCronSecret } from "../../../../lib/cron-auth";
 import { executePublishingCron } from "../../../../lib/publishing-cron-executor";
+import { TRIAL_POSTS_PER_NETWORK } from "../../../../lib/trial";
 import type { Pub04CronDeps, Pub04CronInput, Pub04Publisher } from "../../../../../../contracts/S-HC-PUB-04/pub04-contract.js";
 
 export const dynamic = "force-dynamic";
@@ -184,7 +185,7 @@ export async function GET(req: Request) {
             externalPostId: durableResult.externalPostId,
           } : null,
           publishedCountOnNetwork,
-          trialLimit: 999999,
+          trialLimit: TRIAL_POSTS_PER_NETWORK,
         };
       },
       async claimScheduled({ jobId, claimToken, now }) {
@@ -225,15 +226,16 @@ export async function GET(req: Request) {
         });
       },
       async recordProviderFailure({ jobId, claimToken, error, retryable, maxAttempts, now }) {
-        const job = await prisma.publishingJob.findUnique({ where: { id: jobId } });
-        if (!job) return;
-        const canRetry = retryable && job.attempts < maxAttempts;
-        const nextStatus = canRetry ? "SCHEDULED" : "FAILED";
         await prisma.$transaction(async (tx) => {
-          await tx.publishingJob.updateMany({
+          const job = await tx.publishingJob.findUnique({ where: { id: jobId } });
+          if (!job) return;
+          const canRetry = retryable && job.attempts < maxAttempts;
+          const nextStatus = canRetry ? "SCHEDULED" : "FAILED";
+          const updateResult = await tx.publishingJob.updateMany({
             where: { id: jobId, claimToken },
             data: { status: nextStatus as any, claimToken: null, claimedAt: null, providerAttemptStartedAt: null, lastError: error },
           });
+          if (updateResult.count === 0) return;
           if (job.postId) {
             await tx.contentDraft.updateMany({
               where: { id: job.postId },
@@ -243,10 +245,17 @@ export async function GET(req: Request) {
         });
       },
       async markReconciliation({ jobId, claimToken, code }) {
-        await prisma.publishingJob.updateMany({
-          where: { id: jobId },
-          data: { status: "IN_REVIEW", lastError: code },
-        });
+        if (claimToken) {
+          await prisma.publishingJob.updateMany({
+            where: { id: jobId, claimToken },
+            data: { status: "IN_REVIEW", lastError: code },
+          });
+        } else {
+          await prisma.publishingJob.updateMany({
+            where: { id: jobId },
+            data: { status: "IN_REVIEW", lastError: code },
+          });
+        }
       },
       async finalizeSuccess({ jobId, claimToken, externalPostId, providerResponse, now }) {
         try {

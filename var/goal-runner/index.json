@@ -1,6 +1,6 @@
 {
-  "contentHash": "sha256:7359f6ab617510825f75aa6d3c3fb9109e982c10ba099a7dec39c53f98daa9a4",
-  "generatedFromStateUpdatedAt": "2026-06-26T06:38:33.082Z",
+  "contentHash": "sha256:fcc2a357cd1373c402d1fd7f0ec715dbf11a2c17cc7409e44e04261dcf445bc3",
+  "generatedFromStateUpdatedAt": "2026-06-26T06:57:45.950Z",
   "goals": [
     {
       "branch": "Manuel/s-hc-goal-runner-v1",
@@ -41,6 +41,16 @@
       "status": "BLOCKED_EXTERNAL",
       "title": "Finalize PUB-04 production correctness",
       "updatedAt": "2026-06-26T06:38:33.082Z"
+    },
+    {
+      "branch": "Manuel/s-hc-pub-04-hourly-batch-goal",
+      "createdAt": "2026-06-26T06:49:41.147Z",
+      "goalId": "GR-20260626T064941Z-a09b3d58-finalize-pub-04-production-correctness",
+      "owner": "Manuel",
+      "sprintId": "S-HC-PUB-04C-FINAL-CORRECTNESS",
+      "status": "COMPLETED",
+      "title": "Finalize PUB-04 production correctness",
+      "updatedAt": "2026-06-26T06:57:45.950Z"
     }
   ],
   "version": 1

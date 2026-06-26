@@ -203,28 +203,58 @@ export async function POST(req: Request) {
           return { jobId: input.jobId, status: "existing" };
         }
 
-        await prisma.$transaction(async (tx) => {
-          const claimed = await tx.contentDraft.updateMany({
-            where: { id: input.draftId, tenantId: input.tenantId, status: "APPROVED" },
-            data: { status: "SCHEDULED", scheduledFor: input.scheduledFor },
-          });
-          if (claimed.count === 0) {
-            throw new Error("DRAFT_ALREADY_CLAIMED");
-          }
-          await tx.publishingJob.create({
-            data: {
-              id: input.jobId,
-              tenantId: input.tenantId,
-              postId: input.draftId,
-              provider: input.network as any,
-              status: "SCHEDULED",
-              scheduledFor: input.scheduledFor,
-              updatedAt: new Date(),
-            },
-          });
-        });
+        try {
+          await prisma.$transaction(async (tx) => {
+            const claimed = await tx.contentDraft.updateMany({
+              where: { id: input.draftId, tenantId: input.tenantId, status: "APPROVED" },
+              data: { status: "SCHEDULED", scheduledFor: input.scheduledFor },
+            });
 
-        return { jobId: input.jobId, status: "created" };
+            if (claimed.count === 0) {
+              const alreadyScheduled = await tx.contentDraft.findFirst({
+                where: { id: input.draftId, tenantId: input.tenantId, status: "SCHEDULED" },
+              });
+              if (alreadyScheduled) {
+                const recheckJob = await tx.publishingJob.findUnique({ where: { id: input.jobId } });
+                if (recheckJob) {
+                  throw new Error("JOB_EXISTS");
+                }
+                await tx.publishingJob.create({
+                  data: {
+                    id: input.jobId,
+                    tenantId: input.tenantId,
+                    postId: input.draftId,
+                    provider: input.network as any,
+                    status: "SCHEDULED",
+                    scheduledFor: input.scheduledFor,
+                    updatedAt: new Date(),
+                  },
+                });
+                return;
+              }
+              throw new Error("DRAFT_ALREADY_CLAIMED");
+            }
+
+            await tx.publishingJob.create({
+              data: {
+                id: input.jobId,
+                tenantId: input.tenantId,
+                postId: input.draftId,
+                provider: input.network as any,
+                status: "SCHEDULED",
+                scheduledFor: input.scheduledFor,
+                updatedAt: new Date(),
+              },
+            });
+          });
+
+          return { jobId: input.jobId, status: "created" };
+        } catch (err: any) {
+          if (err?.message === "JOB_EXISTS") {
+            return { jobId: input.jobId, status: "existing" };
+          }
+          throw err;
+        }
       },
     };
 
