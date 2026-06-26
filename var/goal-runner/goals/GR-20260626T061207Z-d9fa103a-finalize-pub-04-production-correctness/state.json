@@ -1,0 +1,43 @@
+{
+  "baseSha": "2936c16a5fb6d9b97daaaedc7f58908e139356b2",
+  "branch": "Manuel/s-hc-pub-04-hourly-batch-goal",
+  "createdAt": "2026-06-26T06:12:07.492Z",
+  "evidenceRequired": "code",
+  "goalId": "GR-20260626T061207Z-d9fa103a-finalize-pub-04-production-correctness",
+  "owner": "Manuel",
+  "previousStatus": "ACTIVE",
+  "sprintId": "S-HC-PUB-04C-FINAL-CORRECTNESS",
+  "status": "BLOCKED_EXTERNAL",
+  "title": "Finalize PUB-04 production correctness",
+  "transitions": [
+    {
+      "at": "2026-06-26T06:12:29.607Z",
+      "by": "Manuel",
+      "from": "DRAFT",
+      "to": "READY"
+    },
+    {
+      "at": "2026-06-26T06:12:29.783Z",
+      "by": "Manuel",
+      "from": "READY",
+      "to": "ACTIVE"
+    },
+    {
+      "at": "2026-06-26T06:38:33.082Z",
+      "by": "Manuel",
+      "from": "ACTIVE",
+      "to": "BLOCKED_EXTERNAL"
+    }
+  ],
+  "updatedAt": "2026-06-26T06:38:33.082Z",
+  "validationGates": [
+    "pub04-contract",
+    "diff-check",
+    "typecheck",
+    "test",
+    "build",
+    "worker-validate",
+    "oreshnik-reconcile",
+    "oreshnik-drift"
+  ]
+}

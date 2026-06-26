@@ -1,6 +1,6 @@
 {
-  "contentHash": "sha256:cf23da6d8e7ec91e55e350ffce995600f45490d3a275601a54af7484700fd845",
-  "generatedFromStateUpdatedAt": "2026-06-26T03:56:11.197Z",
+  "contentHash": "sha256:7359f6ab617510825f75aa6d3c3fb9109e982c10ba099a7dec39c53f98daa9a4",
+  "generatedFromStateUpdatedAt": "2026-06-26T06:38:33.082Z",
   "goals": [
     {
       "branch": "Manuel/s-hc-goal-runner-v1",
@@ -31,6 +31,16 @@
       "status": "COMPLETED",
       "title": "Correct PUB-04 cron execution semantics",
       "updatedAt": "2026-06-26T03:56:11.197Z"
+    },
+    {
+      "branch": "Manuel/s-hc-pub-04-hourly-batch-goal",
+      "createdAt": "2026-06-26T06:12:07.492Z",
+      "goalId": "GR-20260626T061207Z-d9fa103a-finalize-pub-04-production-correctness",
+      "owner": "Manuel",
+      "sprintId": "S-HC-PUB-04C-FINAL-CORRECTNESS",
+      "status": "BLOCKED_EXTERNAL",
+      "title": "Finalize PUB-04 production correctness",
+      "updatedAt": "2026-06-26T06:38:33.082Z"
     }
   ],
   "version": 1
