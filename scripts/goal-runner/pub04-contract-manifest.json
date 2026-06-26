@@ -1,13 +1,16 @@
 {
-  "version": 1,
-  "sprint": "S-HC-PUB-04B-CRON-CORRECTNESS",
-  "baselineCommitSubject": "test(publishing): freeze PUB-04 acceptance contract",
+  "version": 2,
+  "sprint": "S-HC-PUB-04C-FINAL-CORRECTNESS",
+  "baselineCommitSubject": "fix(publishing): restore Hobby-compatible hourly cron matrix",
   "protectedPaths": [
+    "vercel.json",
+    "docs/operations/vercel-hobby-hourly-publisher.md",
     "contracts/S-HC-PUB-04/pub04-contract.ts",
     "apps/web/lib/__contract_tests__/pub04.acceptance.test.ts",
+    "apps/web/lib/__tests__/vercel-cron-hobby-plan.test.ts",
     "scripts/goal-runner/pub04-contract-gate.mjs",
     "scripts/goal-runner/pub04-contract-manifest.json",
     "scripts/goal-runner/lib.mjs",
-    ".kilo/commands/pub04-correct.md"
+    ".kilo/commands/pub04-finalize.md"
   ]
 }
