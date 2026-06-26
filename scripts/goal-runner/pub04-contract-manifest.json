@@ -1,7 +1,7 @@
 {
   "version": 2,
   "sprint": "S-HC-PUB-04C-FINAL-CORRECTNESS",
-  "baselineCommitSubject": "fix(publishing): restore Hobby-compatible hourly cron matrix",
+  "baselineCommitSubject": "fix(publishing): repair PUB-04 protected UTF-8 baseline",
   "protectedPaths": [
     "vercel.json",
     "docs/operations/vercel-hobby-hourly-publisher.md",

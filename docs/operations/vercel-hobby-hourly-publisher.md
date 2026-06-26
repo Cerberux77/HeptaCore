@@ -1,25 +1,25 @@
-# ADR â€” Publicador aproximadamente horario en Vercel Hobby
+# ADR — Publicador aproximadamente horario en Vercel Hobby
 
 **Estado:** Aprobado
-**Ãmbito:** HeptaCore / publicaciÃ³n programada
-**Ãšltima verificaciÃ³n documental:** 2026-06-26
-**DecisiÃ³n canÃ³nica:** 24 cron jobs diarios, uno por cada hora UTC.
+**Ámbito:** HeptaCore / publicación programada
+**Última verificación documental:** 2026-06-26
+**Decisión canónica:** 24 cron jobs diarios, uno por cada hora UTC.
 
 ## Problema
 
-El plan Hobby de Vercel permite hasta 100 cron jobs por proyecto, pero cada definiciÃ³n cron puede ejecutarse como mÃ¡ximo una vez al dÃ­a. Por ello, una sola expresiÃ³n horaria:
+El plan Hobby de Vercel permite hasta 100 cron jobs por proyecto, pero cada definición cron puede ejecutarse como máximo una vez al día. Por ello, una sola expresión horaria:
 
 ```cron
 0 * * * *
 ```
 
-no es vÃ¡lida en Hobby y puede hacer fallar el deployment.
+no es válida en Hobby y puede hacer fallar el deployment.
 
-HeptaCore necesita una activaciÃ³n aproximada en cada hora para procesar publicaciones programadas sin depender de precisiÃ³n al minuto.
+HeptaCore necesita una activación aproximada en cada hora para procesar publicaciones programadas sin depender de precisión al minuto.
 
-## DecisiÃ³n
+## Decisión
 
-HeptaCore usa 24 definiciones cron distintas. Cada definiciÃ³n se ejecuta una sola vez al dÃ­a y cubre una hora UTC diferente:
+HeptaCore usa 24 definiciones cron distintas. Cada definición se ejecuta una sola vez al día y cubre una hora UTC diferente:
 
 ```json
 {
@@ -31,77 +31,77 @@ HeptaCore usa 24 definiciones cron distintas. Cada definiciÃ³n se ejecuta una 
 }
 ```
 
-La matriz continÃºa hasta `slot=23` con `schedule: "0 23 * * *"`.
+La matriz continúa hasta `slot=23` con `schedule: "0 23 * * *"`.
 
-Esta configuraciÃ³n utiliza:
+Esta configuración utiliza:
 
 - 24 de los 100 cron jobs permitidos por proyecto;
-- una ejecuciÃ³n diaria por cada definiciÃ³n;
+- una ejecución diaria por cada definición;
 - aproximadamente 24 invocaciones diarias;
-- aproximadamente 720 invocaciones en un mes de 30 dÃ­as;
-- aproximadamente 744 invocaciones en un mes de 31 dÃ­as.
+- aproximadamente 720 invocaciones en un mes de 30 días;
+- aproximadamente 744 invocaciones en un mes de 31 días.
 
 ## Invariantes obligatorios
 
 1. `vercel.json` contiene exactamente 24 cron jobs del publicador.
-2. Las horas UTC son Ãºnicas y completas: `00` a `23`.
-3. Cada expresiÃ³n tiene forma `0 H * * *` y se ejecuta una sola vez al dÃ­a.
-4. EstÃ¡ prohibido reemplazar la matriz por `0 * * * *` mientras el proyecto use Hobby.
-5. slot es Ãºnicamente un identificador de observabilidad. No limita la elegibilidad del trabajo.
-6. Cada invocaciÃ³n procesa todo job elegible con `scheduledFor <= now`, en orden oldest-first.
-7. El sistema recupera backlog. Un job no se pierde porque una invocaciÃ³n anterior no haya llegado.
+2. Las horas UTC son únicas y completas: `00` a `23`.
+3. Cada expresión tiene forma `0 H * * *` y se ejecuta una sola vez al día.
+4. Está prohibido reemplazar la matriz por `0 * * * *` mientras el proyecto use Hobby.
+5. slot es únicamente un identificador de observabilidad. No limita la elegibilidad del trabajo.
+6. Cada invocación procesa todo job elegible con `scheduledFor <= now`, en orden oldest-first.
+7. El sistema recupera backlog. Un job no se pierde porque una invocación anterior no haya llegado.
 8. El sistema es idempotente y tolera invocaciones duplicadas.
 9. El endpoint no depende de que Vercel invoque exactamente al minuto cero.
 10. `CRON_SECRET` sigue siendo obligatorio y fail-closed.
 
-## PrecisiÃ³n temporal
+## Precisión temporal
 
 En Hobby, Vercel puede ejecutar un cron en cualquier momento dentro de la hora indicada. Por ejemplo, `0 8 * * *` puede llegar entre `08:00:00` y `08:59:59`.
 
-Por esa razÃ³n, `slot=08` no significa Â«procesar solo publicaciones de las 08:00Â». El worker consulta el estado durable y procesa todo lo vencido hasta el instante real de ejecuciÃ³n.
+Por esa razón, `slot=08` no significa «procesar solo publicaciones de las 08:00». El worker consulta el estado durable y procesa todo lo vencido hasta el instante real de ejecución.
 
 ## Entrega best-effort
 
-Vercel documenta que una invocaciÃ³n puede omitirse por errores transitorios y que, ocasionalmente, una misma ejecuciÃ³n puede entregarse mÃ¡s de una vez. Por ello:
+Vercel documenta que una invocación puede omitirse por errores transitorios y que, ocasionalmente, una misma ejecución puede entregarse más de una vez. Por ello:
 
-- el worker reclama jobs de forma atÃ³mica;
-- no vuelve a publicar evidencia durable de Ã©xito;
-- procesa backlog en la siguiente ejecuciÃ³n disponible;
+- el worker reclama jobs de forma atómica;
+- no vuelve a publicar evidencia durable de éxito;
+- procesa backlog en la siguiente ejecución disponible;
 - no asume entrega exactamente una vez.
 
 ## Cambio futuro a Pro
 
-En Pro puede considerarse una sola expresiÃ³n `0 * * * *`. Ese cambio requiere:
+En Pro puede considerarse una sola expresión `0 * * * *`. Ese cambio requiere:
 
-1. decisiÃ³n explÃ­cita de infraestructura;
-2. actualizaciÃ³n de este ADR;
-3. actualizaciÃ³n del test de arquitectura cron;
-4. actualizaciÃ³n del gate `pub04-contract`;
-5. verificaciÃ³n de deployment.
+1. decisión explícita de infraestructura;
+2. actualización de este ADR;
+3. actualización del test de arquitectura cron;
+4. actualización del gate `pub04-contract`;
+5. verificación de deployment.
 
-No debe hacerse como Â«simplificaciÃ³nÂ» incidental.
+No debe hacerse como «simplificación» incidental.
 
 ## Nota comercial
 
-La compatibilidad tÃ©cnica de esta matriz con los lÃ­mites cron de Hobby es independiente de los tÃ©rminos del plan. Vercel restringe Hobby a uso personal no comercial. Antes de operar HeptaCore comercialmente en Production debe evaluarse o adoptarse Pro/Enterprise.
+La compatibilidad técnica de esta matriz con los límites cron de Hobby es independiente de los términos del plan. Vercel restringe Hobby a uso personal no comercial. Antes de operar HeptaCore comercialmente en Production debe evaluarse o adoptarse Pro/Enterprise.
 
-## VerificaciÃ³n automÃ¡tica
+## Verificación automática
 
-La decisiÃ³n estÃ¡ protegida por:
+La decisión está protegida por:
 
 - `apps/web/lib/__tests__/vercel-cron-hobby-plan.test.ts`
 - `scripts/goal-runner/pub04-contract-gate.mjs`
 - `scripts/goal-runner/pub04-contract-manifest.json`
 
-Un cambio que elimine horas, duplique slots, use `0 * * * *` o reduzca la matriz a un solo cron debe fallar automÃ¡ticamente.
+Un cambio que elimine horas, duplique slots, use `0 * * * *` o reduzca la matriz a un solo cron debe fallar automáticamente.
 
 ## Fuentes oficiales
 
-- Vercel â€” Usage & Pricing for Cron Jobs
+- Vercel — Usage & Pricing for Cron Jobs
   https://vercel.com/docs/cron-jobs/usage-and-pricing
-- Vercel â€” Managing Cron Jobs
+- Vercel — Managing Cron Jobs
   https://vercel.com/docs/cron-jobs/manage-cron-jobs
-- Vercel â€” Cron Jobs overview
+- Vercel — Cron Jobs overview
   https://vercel.com/docs/cron-jobs
-- Vercel â€” Fair Use Guidelines
+- Vercel — Fair Use Guidelines
   https://vercel.com/docs/limits/fair-use-guidelines

@@ -13,7 +13,7 @@ Create exactly one Goal Runner goal:
 
 The goal base commit MUST have this exact subject:
 
-`fix(publishing): restore Hobby-compatible hourly cron matrix`
+`fix(publishing): repair PUB-04 protected UTF-8 baseline`
 
 Never modify any protected path from:
 
