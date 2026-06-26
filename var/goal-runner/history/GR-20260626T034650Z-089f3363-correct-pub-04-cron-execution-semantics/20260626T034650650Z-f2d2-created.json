@@ -1,0 +1,9 @@
+{
+  "at": "2026-06-26T03:46:50.650Z",
+  "event": "created",
+  "goalId": "GR-20260626T034650Z-089f3363-correct-pub-04-cron-execution-semantics",
+  "id": "20260626T034650650Z-f2d2-created",
+  "owner": "Manuel",
+  "sprintId": "S-HC-PUB-04B-CRON-CORRECTNESS",
+  "title": "Correct PUB-04 cron execution semantics"
+}

@@ -1,6 +1,6 @@
 {
-  "contentHash": "sha256:a732a70ba50764dc4242ee2484c7a294eb6a84321c3680b6ba114e6b4642a7b4",
-  "generatedFromStateUpdatedAt": "2026-06-26T03:05:02.712Z",
+  "contentHash": "sha256:cf23da6d8e7ec91e55e350ffce995600f45490d3a275601a54af7484700fd845",
+  "generatedFromStateUpdatedAt": "2026-06-26T03:56:11.197Z",
   "goals": [
     {
       "branch": "Manuel/s-hc-goal-runner-v1",
@@ -21,6 +21,16 @@
       "status": "COMPLETED",
       "title": "Hourly batch cron publishing production hardening",
       "updatedAt": "2026-06-26T03:05:02.712Z"
+    },
+    {
+      "branch": "Manuel/s-hc-pub-04-hourly-batch-goal",
+      "createdAt": "2026-06-26T03:46:50.562Z",
+      "goalId": "GR-20260626T034650Z-089f3363-correct-pub-04-cron-execution-semantics",
+      "owner": "Manuel",
+      "sprintId": "S-HC-PUB-04B-CRON-CORRECTNESS",
+      "status": "COMPLETED",
+      "title": "Correct PUB-04 cron execution semantics",
+      "updatedAt": "2026-06-26T03:56:11.197Z"
     }
   ],
   "version": 1

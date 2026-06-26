@@ -12,6 +12,8 @@ import { buildMultiformatDryRun, normalizeAssetManifest, normalizePublishingForm
 import { resolveAssetUrl } from "../../../../lib/asset-resolution";
 import { resolveTenantAccessWithLifecycle } from "../../../../lib/tenant-access";
 import { Permission } from "../../../../lib/permissions";
+import { schedulePublication } from "../../../../lib/publishing-scheduler-service";
+import type { Pub04ScheduleRepository } from "../../../../../../contracts/S-HC-PUB-04/pub04-contract.js";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -194,62 +196,83 @@ export async function POST(req: Request) {
       }, { status: 400 });
     }
 
-    const deterministicJobId = buildDeterministicScheduledJobId(draft.id, network, scheduledFor);
-
-    const existingJob = await prisma.publishingJob.findUnique({
-      where: { id: deterministicJobId },
-      select: { id: true, status: true, scheduledFor: true },
-    });
-
-    if (existingJob) {
-      if (existingJob.status === "SCHEDULED" || existingJob.status === "PUBLISHED" || existingJob.status === "IN_REVIEW") {
-        return NextResponse.json({
-          ok: true,
-          mode: "scheduled",
-          status: existingJob.status,
-          draftId: draft.id,
-          jobId: existingJob.id,
-          scheduledFor: existingJob.scheduledFor?.toISOString() ?? scheduledFor.toISOString(),
-        });
-      }
-    }
-
-    try {
-      await prisma.$transaction(async (tx) => {
-        const claimed = await tx.contentDraft.updateMany({
-          where: { id: draft.id, tenantId: tenant.id, status: "APPROVED" },
-          data: { status: "SCHEDULED", scheduledFor },
-        });
-
-        if (claimed.count === 0) {
-          throw new Error("DRAFT_ALREADY_CLAIMED");
+    const scheduleRepo: Pub04ScheduleRepository = {
+      async scheduleAtomic(input) {
+        const existingJob = await prisma.publishingJob.findUnique({ where: { id: input.jobId } });
+        if (existingJob) {
+          return { jobId: input.jobId, status: "existing" };
         }
 
-        await tx.publishingJob.upsert({
-          where: { id: deterministicJobId },
-          create: {
-            id: deterministicJobId,
-            tenantId: tenant.id,
-            postId: draft.id,
-            provider: network as any,
-            status: "SCHEDULED",
-            scheduledFor,
-            updatedAt: new Date(),
-          },
-          update: {
-            status: "SCHEDULED",
-            scheduledFor,
-            updatedAt: new Date(),
-          },
+        await prisma.$transaction(async (tx) => {
+          const claimed = await tx.contentDraft.updateMany({
+            where: { id: input.draftId, tenantId: input.tenantId, status: "APPROVED" },
+            data: { status: "SCHEDULED", scheduledFor: input.scheduledFor },
+          });
+          if (claimed.count === 0) {
+            throw new Error("DRAFT_ALREADY_CLAIMED");
+          }
+          await tx.publishingJob.create({
+            data: {
+              id: input.jobId,
+              tenantId: input.tenantId,
+              postId: input.draftId,
+              provider: input.network as any,
+              status: "SCHEDULED",
+              scheduledFor: input.scheduledFor,
+              updatedAt: new Date(),
+            },
+          });
         });
+
+        return { jobId: input.jobId, status: "created" };
+      },
+    };
+
+    try {
+      const scheduleResult = await schedulePublication({
+        tenantId: tenant.id,
+        draftId: draft.id,
+        network,
+        scheduledFor,
+      }, scheduleRepo);
+
+      await auditLog({
+        tenantId: tenant.id,
+        actorId: session.user.id,
+        action: "publish_scheduled",
+        target: `draft:${draft.id}`,
+        metadata: {
+          tenant: tenant.name,
+          title: draft.title,
+          network,
+          format,
+          scheduledFor: scheduledFor.toISOString(),
+          jobId: scheduleResult.jobId,
+          tenantAutomationMode: tenant.automationMode,
+        },
+      });
+
+      return NextResponse.json({
+        ok: true,
+        mode: "scheduled",
+        status: "SCHEDULED",
+        draftId: draft.id,
+        jobId: scheduleResult.jobId,
+        scheduledFor: scheduleResult.scheduledFor,
       });
     } catch (err: any) {
-      if (err?.message === "DRAFT_ALREADY_CLAIMED") {
+      if (err?.message?.includes("DRAFT_ALREADY_CLAIMED")) {
         return NextResponse.json({
           code: "LIVE_BLOCKED_ALREADY_CLAIMED",
           error: "Este draft ya fue reclamado en otra solicitud o cambio de estado.",
           action: "Verifica si el draft ya fue publicado o programado por otra operacion concurrente.",
         }, { status: 409 });
+      }
+      if (err?.message?.includes("INVALID_SCHEDULED_AT")) {
+        return NextResponse.json({
+          code: "LIVE_BLOCKED_INVALID_DATE",
+          error: "scheduledAt is not a valid date.",
+        }, { status: 400 });
       }
       return NextResponse.json({
         code: "LIVE_BLOCKED_JOB_CREATION_FAILED",
@@ -257,31 +280,6 @@ export async function POST(req: Request) {
         action: "Reintenta la operacion.",
       }, { status: 500 });
     }
-
-    await auditLog({
-      tenantId: tenant.id,
-      actorId: session.user.id,
-      action: "publish_scheduled",
-      target: `draft:${draft.id}`,
-      metadata: {
-        tenant: tenant.name,
-        title: draft.title,
-        network,
-        format,
-        scheduledFor: scheduledFor.toISOString(),
-        jobId: deterministicJobId,
-        tenantAutomationMode: tenant.automationMode,
-      },
-    });
-
-    return NextResponse.json({
-      ok: true,
-      mode: "scheduled",
-      status: "SCHEDULED",
-      draftId: draft.id,
-      jobId: deterministicJobId,
-      scheduledFor: scheduledFor.toISOString(),
-    });
   }
 
   // === GATES: provider, account, credential, asset, token ===
