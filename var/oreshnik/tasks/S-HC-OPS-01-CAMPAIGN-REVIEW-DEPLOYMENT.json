@@ -1,0 +1,38 @@
+{
+  "project": "HeptaCore",
+  "taskId": "S-HC-OPS-01-CAMPAIGN-REVIEW-DEPLOYMENT",
+  "sprint": "operations",
+  "taskOrderIndex": 27,
+  "title": "Campaign review and deployment: batch approval, schedule, publish",
+  "owner": "Manuel",
+  "backupOwner": "Manuel",
+  "status": "blocked",
+  "taskBoardPath": "D:\\PROYECTOS\\WORKTREES\\HeptaCore_PUB04_GOAL\\var\\oreshnik\\task-board.json",
+  "zone": [
+    "apps/web/app/api/publishing",
+    "apps/web/components",
+    "packages/core"
+  ],
+  "dependsOn": [
+    "S-HC-STRAT-02-CONTENT-CALENDAR-BLUEPRINT",
+    "S-HC-ASSET-01-STRATEGY-ASSET-MANIFEST",
+    "S-HC-PUB-04-HOURLY-BATCH-CRON"
+  ],
+  "acceptance": [
+    "Batch review of campaign drafts",
+    "Approve/reject per draft or bulk",
+    "Schedule deployment with cron integration",
+    "Publishing queue with visibility (approved, scheduled, published, blocked)",
+    "Rollback capability for scheduled posts"
+  ],
+  "history": [
+    {
+      "at": "2026-06-28T18:47:05.091Z",
+      "action": "status_reconciled",
+      "operator": "manuel",
+      "description": "Task status reconciled to blocked: dependency S-HC-STRAT-02-CONTENT-CALENDAR-BLUEPRINT still pending (S-HC-STRAT-02-CONTENT-CALENDAR-BLUEPRINT:pending) | dependency S-HC-ASSET-01-STRATEGY-ASSET-MANIFEST still pending (S-HC-ASSET-01-STRATEGY-ASSET-MANIFEST:pending)"
+    }
+  ],
+  "updatedAt": "2026-06-28T18:47:05.091Z",
+  "runs": []
+}

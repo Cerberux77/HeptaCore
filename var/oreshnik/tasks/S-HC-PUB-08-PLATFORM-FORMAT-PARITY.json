@@ -1,0 +1,39 @@
+{
+  "project": "HeptaCore",
+  "taskId": "S-HC-PUB-08-PLATFORM-FORMAT-PARITY",
+  "sprint": "publishing",
+  "taskOrderIndex": 13,
+  "title": "Platform-format parity: manifest, preview, dry-run, scheduling and publishing for every supported format",
+  "owner": "Manuel",
+  "backupOwner": "Manuel",
+  "status": "blocked",
+  "taskBoardPath": "D:\\PROYECTOS\\WORKTREES\\HeptaCore_PUB04_GOAL\\var\\oreshnik\\task-board.json",
+  "zone": [
+    "apps/web/lib/publishers",
+    "apps/web/lib/publishing-formats.ts",
+    "apps/web/components",
+    "packages/integrations"
+  ],
+  "dependsOn": [
+    "S-HC-PUB-06-REELS-STORIES-PUBLISHERS",
+    "S-HC-PUB-07-YOUTUBE-PUBLISHING"
+  ],
+  "acceptance": [
+    "Paridad de capacidades (preview, dry-run, publicacion, metricas) para cada formato soportado",
+    "Auditoria de la matriz de capacidad red/formato: sin combinaciones sin responsable asignado",
+    "Manifiesto de activos cubre todos los formatos con reglas validadas",
+    "Preview especifico de plataforma para cada formato",
+    "Tests provider-specific para todos los formatos publicables",
+    "Documentacion del estado de cada combinacion en PRODUCT_VISION_END_TO_END"
+  ],
+  "history": [
+    {
+      "at": "2026-06-28T18:47:05.091Z",
+      "action": "status_reconciled",
+      "operator": "manuel",
+      "description": "Task status reconciled to blocked: dependency S-HC-PUB-06-REELS-STORIES-PUBLISHERS still pending (S-HC-PUB-06-REELS-STORIES-PUBLISHERS:pending) | dependency S-HC-PUB-07-YOUTUBE-PUBLISHING still pending (S-HC-PUB-07-YOUTUBE-PUBLISHING:pending)"
+    }
+  ],
+  "updatedAt": "2026-06-28T18:47:05.091Z",
+  "runs": []
+}

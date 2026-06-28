@@ -1,0 +1,36 @@
+{
+  "project": "HeptaCore",
+  "taskId": "S-HC-ASSET-01-STRATEGY-ASSET-MANIFEST",
+  "sprint": "assets",
+  "taskOrderIndex": 24,
+  "title": "Strategy-driven asset manifest: per-publication asset requirements",
+  "owner": "Manuel",
+  "backupOwner": "Manuel",
+  "status": "blocked",
+  "taskBoardPath": "D:\\PROYECTOS\\WORKTREES\\HeptaCore_PUB04_GOAL\\var\\oreshnik\\task-board.json",
+  "zone": [
+    "apps/web/components",
+    "packages/core"
+  ],
+  "dependsOn": [
+    "S-HC-STRAT-02-CONTENT-CALENDAR-BLUEPRINT",
+    "S-HC-PUB-03-MULTITENANT-ASSETS"
+  ],
+  "acceptance": [
+    "Per-publication asset manifest: type, network, format, resolution, aspect ratio, duration",
+    "Creative guideline, scene context, branding, logo placement",
+    "Status tracking: missing, uploaded, compatible, incompatible, approved, AI-generated",
+    "Client choice: supply, request help, or generate via AI",
+    "Progress bar with direct CTA for each missing asset"
+  ],
+  "history": [
+    {
+      "at": "2026-06-28T18:47:05.091Z",
+      "action": "status_reconciled",
+      "operator": "manuel",
+      "description": "Task status reconciled to blocked: dependency S-HC-STRAT-02-CONTENT-CALENDAR-BLUEPRINT still pending (S-HC-STRAT-02-CONTENT-CALENDAR-BLUEPRINT:pending)"
+    }
+  ],
+  "updatedAt": "2026-06-28T18:47:05.091Z",
+  "runs": []
+}

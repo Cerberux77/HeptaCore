@@ -1,0 +1,41 @@
+{
+  "project": "HeptaCore",
+  "taskId": "S-HC-PUB-02-MULTIFORMAT-PREVIEW",
+  "sprint": "publishing",
+  "taskOrderIndex": 7,
+  "title": "Multiformat preview and dry-run: format model, asset manifest, platform previews, validations",
+  "owner": "Manuel",
+  "backupOwner": "Manuel",
+  "status": "done",
+  "taskBoardPath": "D:\\PROYECTOS\\WORKTREES\\HeptaCore_PUB04_GOAL\\var\\oreshnik\\task-board.json",
+  "zone": [
+    "apps/web",
+    "apps/web/lib/publishers",
+    "packages/integrations"
+  ],
+  "dependsOn": [
+    "S-HC-REC-00C"
+  ],
+  "acceptance": [
+    "Modelo de formatos (Carousel, Story, Feed) con reglas de validacion por plataforma",
+    "Asset manifest requerido por formato (count, aspect ratio, resolution, duration)",
+    "Instagram Feed preview visual con caption, orden y safe area",
+    "Instagram Carousel preview navegable con transiciones",
+    "Instagram Story preview vertical con crop simulado",
+    "Facebook preview con caption, link preview y formato nativo",
+    "Validaciones de assets pre-dry-run (formato, peso, dimensiones)",
+    "Dry-run completo sin llamadas al proveedor",
+    "Cero publicacion real de Carousel ni Stories en este sprint"
+  ],
+  "history": [
+    {
+      "at": "2026-06-21T19:08:48.084Z",
+      "action": "closed",
+      "operator": "Manuel",
+      "branch": "Manuel/s-hc-pub-02-closeout",
+      "description": "multiformat previews, deterministic auth, approval UI and dry-run QA completed"
+    }
+  ],
+  "updatedAt": "2026-06-28T18:47:05.091Z",
+  "runs": []
+}

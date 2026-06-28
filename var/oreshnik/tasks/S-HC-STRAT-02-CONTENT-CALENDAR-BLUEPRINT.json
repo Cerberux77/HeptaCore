@@ -1,0 +1,36 @@
+{
+  "project": "HeptaCore",
+  "taskId": "S-HC-STRAT-02-CONTENT-CALENDAR-BLUEPRINT",
+  "sprint": "strategy",
+  "taskOrderIndex": 23,
+  "title": "Content calendar blueprint: master publishing calendar from strategy",
+  "owner": "Manuel",
+  "backupOwner": "Manuel",
+  "status": "blocked",
+  "taskBoardPath": "D:\\PROYECTOS\\WORKTREES\\HeptaCore_PUB04_GOAL\\var\\oreshnik\\task-board.json",
+  "zone": [
+    "apps/web/components",
+    "apps/web/lib/dashboard.ts",
+    "packages/core"
+  ],
+  "dependsOn": [
+    "S-HC-STRAT-01-MASTER-STRATEGY-WORKBENCH"
+  ],
+  "acceptance": [
+    "Generate per-format publishing schedule from strategy",
+    "Slots with network, format, date, time window",
+    "Draft stubs auto-created with strategy context",
+    "Visual calendar with drag-to-reschedule",
+    "Approval workflow per slot"
+  ],
+  "history": [
+    {
+      "at": "2026-06-28T18:47:05.091Z",
+      "action": "status_reconciled",
+      "operator": "manuel",
+      "description": "Task status reconciled to blocked: dependency S-HC-STRAT-01-MASTER-STRATEGY-WORKBENCH still pending (S-HC-STRAT-01-MASTER-STRATEGY-WORKBENCH:pending)"
+    }
+  ],
+  "updatedAt": "2026-06-28T18:47:05.091Z",
+  "runs": []
+}

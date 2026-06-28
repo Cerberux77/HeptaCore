@@ -1,0 +1,39 @@
+{
+  "project": "HeptaCore",
+  "taskId": "S-HC-PUB-07-YOUTUBE-PUBLISHING",
+  "sprint": "publishing",
+  "taskOrderIndex": 12,
+  "title": "Real publishing for YouTube: Video 16:9 and YouTube Shorts",
+  "owner": "Manuel",
+  "backupOwner": "Manuel",
+  "status": "ready",
+  "taskBoardPath": "D:\\PROYECTOS\\WORKTREES\\HeptaCore_PUB04_GOAL\\var\\oreshnik\\task-board.json",
+  "zone": [
+    "apps/web/lib/publishers",
+    "apps/web/app/api/publishing",
+    "packages/integrations"
+  ],
+  "dependsOn": [
+    "S-HC-PUB-03-MULTITENANT-ASSETS",
+    "S-HC-PUB-04-HOURLY-BATCH-CRON"
+  ],
+  "acceptance": [
+    "YouTube Video 16:9 publishing real con titulo, descripcion, thumbnail y metadata",
+    "YouTube Shorts publishing real con metadata requerida",
+    "Programacion y publicacion real",
+    "Preview/dry-run para cada formato",
+    "Provider-specific tests con evidencia real para cada formato",
+    "Reutilizacion de transactional finalization y IN_REVIEW state machine",
+    "Cero declaracion de soporte hasta validacion real"
+  ],
+  "history": [
+    {
+      "at": "2026-06-28T18:47:05.091Z",
+      "action": "status_reconciled",
+      "operator": "manuel",
+      "description": "Task status reconciled to ready: dependencies and conflicts are clear for execution"
+    }
+  ],
+  "updatedAt": "2026-06-28T18:47:05.091Z",
+  "runs": []
+}

@@ -1,11 +1,6 @@
 {
   "project": "HeptaCore",
-  "updatedAt": "2026-06-25T20:05:39.000Z",
-  "productionSha": "2fd9e24929ffe1022cf9521ed0f13888f30accbd",
-  "productionUrl": "https://heptacore.vercel.app",
-  "canonicalBranch": "master",
-  "canonicalSha": "9329fe809b541398f6907b7bdb62a704148473c2",
-  "oreshnikVersion": "0.2.0-alpha.0",
+  "updatedAt": "2026-06-28T18:47:05.091Z",
   "resiliencePolicy": "If an owner is unavailable for more than one working block or blocks the critical path, backupOwner may take over after recording reassignment.",
   "closurePolicy": "No sprint may be closed until acceptance criteria, base tests, sprint-specific tests, docs/handoff, and Oreshnik zone checks pass.",
   "baseTestMatrix": [
@@ -27,31 +22,7 @@
     "Reels, Stories y YouTube forman parte obligatoria del alcance final de HeptaCore. Las combinaciones sin publisher real quedan pendientes de implementacion en PUB-06, PUB-07 o PUB-08.",
     "Jean fuera de ruta critica. Responsabilidades reasignadas a Manuel."
   ],
-  "jeanReassignment": {
-    "effective": "2026-06-21",
-    "reason": "Jean fuera de ruta critica. Permanece en catalogo de operadores; responsabilidades activas reasignadas a Manuel.",
-    "transferredZones": {
-      "package.json": "Manuel (manuel_exclusive)",
-      "package-lock.json": "Manuel (manuel_exclusive)",
-      "prisma.config.ts": "Manuel (manuel_exclusive)",
-      "packages/db/**": "Manuel (manuel_exclusive)",
-      "packages/integrations/**": "Manuel (manuel_exclusive)",
-      "apps/web/app/tenants/**": "Manuel (manuel_exclusive)",
-      "apps/web/components/turpial-console.tsx": "Manuel (manuel_exclusive)",
-      "apps/web/lib/turpial.ts": "Manuel (manuel_exclusive)",
-      "scripts/seed-turpial-*.mjs": "Manuel (manuel_exclusive)",
-      "scripts/verify-turpial-*.mjs": "Manuel (manuel_exclusive)"
-    }
-  },
-  "productionState": {
-    "facebook": "Operativo. Publica realmente desde la UI. Token permanente. Page: Turpial Sound (1129437930248909).",
-    "instagram": "Operativo. Publica realmente desde la UI. Media container readiness verificado.",
-    "blobStore": "heptacore-assets en Vercel Blob, publico y tenant-scoped. Upload persistente probado manualmente. Requiere BLOB_READ_WRITE_TOKEN.",
-    "errors": "Errores ambiguos del proveedor quedan bloqueados sin retry automatico.",
-    "tests": 156,
-    "vercelCrons": "24 slots diarios configurados. Cron publisher idempotente."
-  },
-    "tasks": [
+  "tasks": [
     {
       "id": "S-HC-TEN-01-GLOBAL-TENANT-ADMIN",
       "title": "Global tenant administration and provisioning",
@@ -59,8 +30,17 @@
       "backupOwner": "Manuel",
       "status": "done",
       "track": "tenant-platform",
-      "zone": ["packages/db/**", "apps/web/lib/tenant-admin-service.ts", "apps/web/lib/tenant-access.ts", "apps/web/lib/__tests__/tenant-admin*.test.ts", "docs/**", "var/oreshnik/**"],
-      "dependsOn": ["S-HC-PUB-03-MULTITENANT-ASSETS"],
+      "zone": [
+        "packages/db/**",
+        "apps/web/lib/tenant-admin-service.ts",
+        "apps/web/lib/tenant-access.ts",
+        "apps/web/lib/__tests__/tenant-admin*.test.ts",
+        "docs/**",
+        "var/oreshnik/**"
+      ],
+      "dependsOn": [
+        "S-HC-PUB-03-MULTITENANT-ASSETS"
+      ],
       "acceptance": [
         "Tenant lifecycle schema with PROVISIONING, ACTIVE, SUSPENDED, ARCHIVED states",
         "Secure migration preserving existing tenants as ACTIVE",
@@ -77,8 +57,6 @@
           "action": "closed",
           "operator": "Manuel",
           "branch": "Manuel/s-hc-ten-01-global-tenant-admin",
-          "commit": "4b82628124366f4d3df19920994eeb4d71158800",
-          "preview": "https://heptacore-2kklmxyuh-bkgs-projects-829c67c1.vercel.app",
           "description": "Three canonical roles (OWNER/ADMIN/VIEWER), legacy role normalization, identity panel in /admin and /tenant/*, 5/5 E2E pass, 569 unit tests, production intact"
         }
       ]
@@ -341,8 +319,8 @@
       "title": "Hourly batch cron publishing with timezone-aware scheduling",
       "owner": "Manuel",
       "backupOwner": "Manuel",
-      "status": "pending",
-      "track": "publishing",
+      "status": "ready_for_integration",
+      "track": "S-HC-PUB-04-HOURLY-BATCH-CRON",
       "zone": [
         "apps/web/app/api/cron",
         "apps/worker",
@@ -358,6 +336,38 @@
         "Rate limiting per platform",
         "Failure isolation (un post falla, los demas continuan)",
         "Cron idempotency preservada"
+      ],
+      "handoff": "var/goal-runner/goals/GR-20260626T064941Z-a09b3d58-finalize-pub-04-production-correctness/final-report.md",
+      "attempts": 1,
+      "history": [
+        {
+          "at": "2026-06-26T08:52:44.818Z",
+          "action": "claimed",
+          "operator": "Manuel",
+          "branch": "Manuel/s-hc-pub-04-hourly-batch-goal",
+          "description": "Run Manuel-S-HC-PUB-04-HOURLY-BATCH-CRON-2026-06-26T08-52-44-815Z-2487f474 claimed via manual"
+        },
+        {
+          "at": "2026-06-26T08:53:22.298Z",
+          "action": "validation_started",
+          "operator": "Manuel",
+          "branch": "Manuel/s-hc-pub-04-hourly-batch-goal",
+          "description": "PUB-04 implementation completed at commit 941042b825fc4047860a11ec8fc74c01cd4326e2; immutable contract 22/22, typecheck, full tests, build, worker validation and Oreshnik reconciliation/drift passed."
+        },
+        {
+          "at": "2026-06-26T08:55:47.503Z",
+          "action": "validated",
+          "operator": "Manuel",
+          "branch": "Manuel/s-hc-pub-04-hourly-batch-goal",
+          "description": "changed files diff verified for commit 941042b825fc4047860a11ec8fc74c01cd4326e2; typecheck passed; tests passed; build passed; PUB-04 immutable contract 22/22 passed; protected paths verified; operator confirms task is complete."
+        },
+        {
+          "at": "2026-06-26T08:55:47.503Z",
+          "action": "ready_for_integration",
+          "operator": "Manuel",
+          "branch": "Manuel/s-hc-pub-04-hourly-batch-goal",
+          "description": "Task delivered with handoff var/goal-runner/goals/GR-20260626T064941Z-a09b3d58-finalize-pub-04-production-correctness/final-report.md"
+        }
       ]
     },
     {
@@ -365,7 +375,7 @@
       "title": "Operational reconciliation automation for ambiguous provider outcomes",
       "owner": "Manuel",
       "backupOwner": "Manuel",
-      "status": "pending",
+      "status": "ready",
       "track": "publishing",
       "zone": [
         "apps/web/lib/publishing-finalization.ts",
@@ -380,6 +390,14 @@
         "Alert-only for Case B (Draft.externalPostId present + Result absent)",
         "Block and notify for Case C (no evidence)",
         "Never auto-retry provider calls"
+      ],
+      "history": [
+        {
+          "at": "2026-06-28T18:47:05.091Z",
+          "action": "status_reconciled",
+          "operator": "manuel",
+          "description": "Task status reconciled to ready: dependencies and conflicts are clear for execution"
+        }
       ]
     },
     {
@@ -387,7 +405,7 @@
       "title": "Real publishing for Meta Reels and Stories: Instagram + Facebook",
       "owner": "Manuel",
       "backupOwner": "Manuel",
-      "status": "pending",
+      "status": "ready",
       "track": "publishing",
       "zone": [
         "apps/web/lib/publishers",
@@ -409,6 +427,14 @@
         "Provider-specific tests con evidencia real para cada formato",
         "Reutilizacion de transactional finalization y IN_REVIEW state machine",
         "Cero declaracion de soporte hasta que la combinacion concreta haya sido validada"
+      ],
+      "history": [
+        {
+          "at": "2026-06-28T18:47:05.091Z",
+          "action": "status_reconciled",
+          "operator": "manuel",
+          "description": "Task status reconciled to ready: dependencies and conflicts are clear for execution"
+        }
       ]
     },
     {
@@ -416,7 +442,7 @@
       "title": "Real publishing for YouTube: Video 16:9 and YouTube Shorts",
       "owner": "Manuel",
       "backupOwner": "Manuel",
-      "status": "pending",
+      "status": "ready",
       "track": "publishing",
       "zone": [
         "apps/web/lib/publishers",
@@ -435,6 +461,14 @@
         "Provider-specific tests con evidencia real para cada formato",
         "Reutilizacion de transactional finalization y IN_REVIEW state machine",
         "Cero declaracion de soporte hasta validacion real"
+      ],
+      "history": [
+        {
+          "at": "2026-06-28T18:47:05.091Z",
+          "action": "status_reconciled",
+          "operator": "manuel",
+          "description": "Task status reconciled to ready: dependencies and conflicts are clear for execution"
+        }
       ]
     },
     {
@@ -442,7 +476,7 @@
       "title": "Platform-format parity: manifest, preview, dry-run, scheduling and publishing for every supported format",
       "owner": "Manuel",
       "backupOwner": "Manuel",
-      "status": "pending",
+      "status": "blocked",
       "track": "publishing",
       "zone": [
         "apps/web/lib/publishers",
@@ -461,6 +495,14 @@
         "Preview especifico de plataforma para cada formato",
         "Tests provider-specific para todos los formatos publicables",
         "Documentacion del estado de cada combinacion en PRODUCT_VISION_END_TO_END"
+      ],
+      "history": [
+        {
+          "at": "2026-06-28T18:47:05.091Z",
+          "action": "status_reconciled",
+          "operator": "manuel",
+          "description": "Task status reconciled to blocked: dependency S-HC-PUB-06-REELS-STORIES-PUBLISHERS still pending (S-HC-PUB-06-REELS-STORIES-PUBLISHERS:pending) | dependency S-HC-PUB-07-YOUTUBE-PUBLISHING still pending (S-HC-PUB-07-YOUTUBE-PUBLISHING:pending)"
+        }
       ]
     },
     {
@@ -468,7 +510,7 @@
       "title": "Publishing observability: structured logging, metrics dashboard, alert thresholds",
       "owner": "Manuel",
       "backupOwner": "Manuel",
-      "status": "pending",
+      "status": "blocked",
       "track": "observability",
       "zone": [
         "apps/web",
@@ -483,6 +525,14 @@
         "Publishing metrics dashboard (attempts, failures, latency)",
         "Alert thresholds for provider failures",
         "Daily digest summarizing publishing activity"
+      ],
+      "history": [
+        {
+          "at": "2026-06-28T18:47:05.091Z",
+          "action": "status_reconciled",
+          "operator": "manuel",
+          "description": "Task status reconciled to blocked: dependency S-HC-PUB-05-RECONCILIATION-OPS still pending (S-HC-PUB-05-RECONCILIATION-OPS:pending)"
+        }
       ]
     },
     {
@@ -490,7 +540,7 @@
       "title": "Goal Runner v1 for autonomous Kilo execution",
       "owner": "Manuel",
       "backupOwner": "Manuel",
-      "status": "active",
+      "status": "blocked",
       "track": "tooling",
       "zone": [
         "scripts/goal-runner/**",
@@ -514,6 +564,14 @@
         "Estado y evidencia sobreviven a clear y reinicio de sesion",
         "Cero cambios en Production",
         "Integracion posterior en la rama madre mediante cierre controlado"
+      ],
+      "history": [
+        {
+          "at": "2026-06-28T18:47:05.091Z",
+          "action": "status_reconciled",
+          "operator": "manuel",
+          "description": "Task status reconciled to blocked: status active is not claimable for a new run"
+        }
       ]
     },
     {
@@ -523,7 +581,11 @@
       "backupOwner": "Manuel",
       "status": "pending",
       "track": "email-infra",
-      "zone": ["apps/web/app/api/email", "packages/core", "docs"],
+      "zone": [
+        "apps/web/app/api/email",
+        "packages/core",
+        "docs"
+      ],
       "dependsOn": [],
       "acceptance": [
         "Dominio final de HeptaCore configurado como remitente autorizado",
@@ -531,15 +593,14 @@
         "Proveedor de correo transaccional integrado (Resend, SendGrid o equivalente)",
         "Webhooks de eventos (delivered, bounced, complained) configurados",
         "Enlaces comerciales y de marca consistentes con el dominio final"
-      ],
-      "blocker": "Pendiente de definicion y disponibilidad del dominio final de HeptaCore para configurar dominio remitente, DNS, reputacion, enlaces comerciales y webhooks del proveedor de correo transaccional."
+      ]
     },
     {
       "id": "S-HC-COMM-01-SELF-SERVICE-SIGNUP",
       "title": "Self-service tenant signup with trial gate and onboarding flow",
       "owner": "Manuel",
       "backupOwner": "Manuel",
-      "status": "pending",
+      "status": "blocked",
       "track": "commercial",
       "zone": [
         "apps/web/app/register",
@@ -556,6 +617,14 @@
         "Trial tenant creation with default config",
         "Guided onboarding wizard (brand, networks, first draft)",
         "Trial gate enforcement before publishing"
+      ],
+      "history": [
+        {
+          "at": "2026-06-28T18:47:05.091Z",
+          "action": "status_reconciled",
+          "operator": "manuel",
+          "description": "Task status reconciled to blocked: dependency S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION still pending (S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION:pending)"
+        }
       ]
     },
     {
@@ -563,7 +632,7 @@
       "title": "Tenant billing activation: plan selection, usage tracking, payment integration",
       "owner": "Manuel",
       "backupOwner": "Manuel",
-      "status": "pending",
+      "status": "blocked",
       "track": "commercial",
       "zone": [
         "apps/web/app/api/billing",
@@ -578,6 +647,14 @@
         "Usage tracking (posts, assets, tenants)",
         "Payment gateway integration (Stripe)",
         "Invoice generation and history"
+      ],
+      "history": [
+        {
+          "at": "2026-06-28T18:47:05.091Z",
+          "action": "status_reconciled",
+          "operator": "manuel",
+          "description": "Task status reconciled to blocked: dependency S-HC-COMM-01-SELF-SERVICE-SIGNUP still pending (S-HC-COMM-01-SELF-SERVICE-SIGNUP:pending)"
+        }
       ]
     },
     {
@@ -585,7 +662,7 @@
       "title": "Master document ingestion: extract structured info from company briefs",
       "owner": "Manuel",
       "backupOwner": "Manuel",
-      "status": "pending",
+      "status": "blocked",
       "track": "onboarding",
       "zone": [
         "apps/web/components",
@@ -600,6 +677,14 @@
         "Extract structured information: brand, product, audience, tone",
         "Identify data gaps, contradictions and ambiguous zones",
         "Store as structured tenant context"
+      ],
+      "history": [
+        {
+          "at": "2026-06-28T18:47:05.091Z",
+          "action": "status_reconciled",
+          "operator": "manuel",
+          "description": "Task status reconciled to blocked: dependency S-HC-COMM-02-BILLING-ACTIVATION still pending (S-HC-COMM-02-BILLING-ACTIVATION:pending)"
+        }
       ]
     },
     {
@@ -607,7 +692,7 @@
       "title": "Gap resolution wizard: dynamic form to resolve missing or conflicting data",
       "owner": "Manuel",
       "backupOwner": "Manuel",
-      "status": "pending",
+      "status": "blocked",
       "track": "onboarding",
       "zone": [
         "apps/web/components",
@@ -621,6 +706,14 @@
         "Avoid unnecessarily long forms",
         "Save progress and allow continuation later",
         "Reduce friction with contextual help"
+      ],
+      "history": [
+        {
+          "at": "2026-06-28T18:47:05.091Z",
+          "action": "status_reconciled",
+          "operator": "manuel",
+          "description": "Task status reconciled to blocked: dependency S-HC-ONB-01-MASTER-BRIEF-INGESTION still pending (S-HC-ONB-01-MASTER-BRIEF-INGESTION:pending)"
+        }
       ]
     },
     {
@@ -628,7 +721,7 @@
       "title": "LLM provider selection, cost estimation and governance policy",
       "owner": "Manuel",
       "backupOwner": "Manuel",
-      "status": "pending",
+      "status": "ready",
       "track": "ai-infra",
       "zone": [
         "packages/agents",
@@ -642,6 +735,14 @@
         "Cost estimation before executing expensive tasks",
         "Admin policy: authorized providers, models, max spend",
         "Usage tracking and billing integration"
+      ],
+      "history": [
+        {
+          "at": "2026-06-28T18:47:05.091Z",
+          "action": "status_reconciled",
+          "operator": "manuel",
+          "description": "Task status reconciled to ready: dependencies and conflicts are clear for execution"
+        }
       ]
     },
     {
@@ -649,7 +750,7 @@
       "title": "Master strategy workbench: LLM-powered strategy generation and conversational refinement",
       "owner": "Manuel",
       "backupOwner": "Manuel",
-      "status": "pending",
+      "status": "blocked",
       "track": "strategy",
       "zone": [
         "packages/agents",
@@ -669,6 +770,14 @@
         "Approve final strategy",
         "Select provider/model/reasoning level within policy",
         "Show estimated cost before executing"
+      ],
+      "history": [
+        {
+          "at": "2026-06-28T18:47:05.091Z",
+          "action": "status_reconciled",
+          "operator": "manuel",
+          "description": "Task status reconciled to blocked: dependency S-HC-ONB-02-GAP-RESOLUTION-WIZARD still pending (S-HC-ONB-02-GAP-RESOLUTION-WIZARD:pending) | dependency S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE still pending (S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE:pending)"
+        }
       ]
     },
     {
@@ -676,7 +785,7 @@
       "title": "Content calendar blueprint: master publishing calendar from strategy",
       "owner": "Manuel",
       "backupOwner": "Manuel",
-      "status": "pending",
+      "status": "blocked",
       "track": "strategy",
       "zone": [
         "apps/web/components",
@@ -692,6 +801,14 @@
         "Draft stubs auto-created with strategy context",
         "Visual calendar with drag-to-reschedule",
         "Approval workflow per slot"
+      ],
+      "history": [
+        {
+          "at": "2026-06-28T18:47:05.091Z",
+          "action": "status_reconciled",
+          "operator": "manuel",
+          "description": "Task status reconciled to blocked: dependency S-HC-STRAT-01-MASTER-STRATEGY-WORKBENCH still pending (S-HC-STRAT-01-MASTER-STRATEGY-WORKBENCH:pending)"
+        }
       ]
     },
     {
@@ -699,7 +816,7 @@
       "title": "Strategy-driven asset manifest: per-publication asset requirements",
       "owner": "Manuel",
       "backupOwner": "Manuel",
-      "status": "pending",
+      "status": "blocked",
       "track": "assets",
       "zone": [
         "apps/web/components",
@@ -715,6 +832,14 @@
         "Status tracking: missing, uploaded, compatible, incompatible, approved, AI-generated",
         "Client choice: supply, request help, or generate via AI",
         "Progress bar with direct CTA for each missing asset"
+      ],
+      "history": [
+        {
+          "at": "2026-06-28T18:47:05.091Z",
+          "action": "status_reconciled",
+          "operator": "manuel",
+          "description": "Task status reconciled to blocked: dependency S-HC-STRAT-02-CONTENT-CALENDAR-BLUEPRINT still pending (S-HC-STRAT-02-CONTENT-CALENDAR-BLUEPRINT:pending)"
+        }
       ]
     },
     {
@@ -722,7 +847,7 @@
       "title": "Format derivatives: badge interaction, format preview, intelligent crop, safe zones, asset variants",
       "owner": "Manuel",
       "backupOwner": "Manuel",
-      "status": "pending",
+      "status": "ready",
       "track": "assets",
       "zone": [
         "apps/web/components",
@@ -744,6 +869,14 @@
         "Versionado de derivados",
         "Generacion por lote de variantes para todos los formatos requeridos",
         "Imagenes primero; video fuera de este sprint o como fase separada"
+      ],
+      "history": [
+        {
+          "at": "2026-06-28T18:47:05.091Z",
+          "action": "status_reconciled",
+          "operator": "manuel",
+          "description": "Task status reconciled to ready: dependencies and conflicts are clear for execution"
+        }
       ]
     },
     {
@@ -751,7 +884,7 @@
       "title": "AI asset generation broker: provider-agnostic, metered and billed",
       "owner": "Manuel",
       "backupOwner": "Manuel",
-      "status": "pending",
+      "status": "blocked",
       "track": "ai-generation",
       "zone": [
         "packages/agents",
@@ -769,6 +902,14 @@
         "Billed per request with usage tracking",
         "Optional: client may supply assets without using generation",
         "Generation respects brand guidelines from strategy"
+      ],
+      "history": [
+        {
+          "at": "2026-06-28T18:47:05.091Z",
+          "action": "status_reconciled",
+          "operator": "manuel",
+          "description": "Task status reconciled to blocked: dependency S-HC-ASSET-01-STRATEGY-ASSET-MANIFEST still pending (S-HC-ASSET-01-STRATEGY-ASSET-MANIFEST:pending) | dependency S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE still pending (S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE:pending) | dependency S-HC-COMM-02-BILLING-ACTIVATION still pending (S-HC-COMM-02-BILLING-ACTIVATION:pending)"
+        }
       ]
     },
     {
@@ -776,7 +917,7 @@
       "title": "Campaign review and deployment: batch approval, schedule, publish",
       "owner": "Manuel",
       "backupOwner": "Manuel",
-      "status": "pending",
+      "status": "blocked",
       "track": "operations",
       "zone": [
         "apps/web/app/api/publishing",
@@ -794,6 +935,14 @@
         "Schedule deployment with cron integration",
         "Publishing queue with visibility (approved, scheduled, published, blocked)",
         "Rollback capability for scheduled posts"
+      ],
+      "history": [
+        {
+          "at": "2026-06-28T18:47:05.091Z",
+          "action": "status_reconciled",
+          "operator": "manuel",
+          "description": "Task status reconciled to blocked: dependency S-HC-STRAT-02-CONTENT-CALENDAR-BLUEPRINT still pending (S-HC-STRAT-02-CONTENT-CALENDAR-BLUEPRINT:pending) | dependency S-HC-ASSET-01-STRATEGY-ASSET-MANIFEST still pending (S-HC-ASSET-01-STRATEGY-ASSET-MANIFEST:pending)"
+        }
       ]
     },
     {
@@ -801,7 +950,7 @@
       "title": "Assisted customer channels: LLM assistant, WhatsApp, email, human escalation",
       "owner": "Manuel",
       "backupOwner": "Manuel",
-      "status": "pending",
+      "status": "blocked",
       "track": "support",
       "zone": [
         "apps/web/components",
@@ -816,6 +965,14 @@
         "WhatsApp support channel",
         "Email support with ticket tracking",
         "Human escalation path for complex issues"
+      ],
+      "history": [
+        {
+          "at": "2026-06-28T18:47:05.091Z",
+          "action": "status_reconciled",
+          "operator": "manuel",
+          "description": "Task status reconciled to blocked: dependency S-HC-COMM-02-BILLING-ACTIVATION still pending (S-HC-COMM-02-BILLING-ACTIVATION:pending)"
+        }
       ]
     },
     {
@@ -823,7 +980,7 @@
       "title": "Campaign performance analytics: reach, engagement, metrics per post and campaign",
       "owner": "Manuel",
       "backupOwner": "Manuel",
-      "status": "pending",
+      "status": "blocked",
       "track": "analytics",
       "zone": [
         "apps/web/components",
@@ -840,6 +997,14 @@
         "Shares and saves where API permits",
         "Metrics per publication and per campaign",
         "Visual dashboard with trends"
+      ],
+      "history": [
+        {
+          "at": "2026-06-28T18:47:05.091Z",
+          "action": "status_reconciled",
+          "operator": "manuel",
+          "description": "Task status reconciled to blocked: dependency S-HC-OPS-01-CAMPAIGN-REVIEW-DEPLOYMENT still pending (S-HC-OPS-01-CAMPAIGN-REVIEW-DEPLOYMENT:pending) | dependency S-HC-OBS-01-PUBLISHING-OBSERVABILITY still pending (S-HC-OBS-01-PUBLISHING-OBSERVABILITY:pending)"
+        }
       ]
     },
     {
@@ -847,7 +1012,7 @@
       "title": "Unified engagement inbox: read and respond to messages and comments",
       "owner": "Manuel",
       "backupOwner": "Manuel",
-      "status": "pending",
+      "status": "blocked",
       "track": "engagement",
       "zone": [
         "apps/web/components",
@@ -862,6 +1027,14 @@
         "Read and respond according to platform permissions",
         "Classification: positive, negative, neutral",
         "Summary of themes and sentiment"
+      ],
+      "history": [
+        {
+          "at": "2026-06-28T18:47:05.091Z",
+          "action": "status_reconciled",
+          "operator": "manuel",
+          "description": "Task status reconciled to blocked: dependency S-HC-AN-01-CAMPAIGN-PERFORMANCE still pending (S-HC-AN-01-CAMPAIGN-PERFORMANCE:pending)"
+        }
       ]
     },
     {
@@ -869,7 +1042,7 @@
       "title": "Sentiment-driven strategy iteration: results → improved strategy",
       "owner": "Manuel",
       "backupOwner": "Manuel",
-      "status": "pending",
+      "status": "blocked",
       "track": "optimization",
       "zone": [
         "packages/agents",
@@ -885,6 +1058,14 @@
         "Recommendations based on real performance data",
         "Sentiment analysis feeding into next strategy cycle",
         "Before/after comparison per iteration"
+      ],
+      "history": [
+        {
+          "at": "2026-06-28T18:47:05.091Z",
+          "action": "status_reconciled",
+          "operator": "manuel",
+          "description": "Task status reconciled to blocked: dependency S-HC-AN-01-CAMPAIGN-PERFORMANCE still pending (S-HC-AN-01-CAMPAIGN-PERFORMANCE:pending) | dependency S-HC-INBOX-01-UNIFIED-ENGAGEMENT still pending (S-HC-INBOX-01-UNIFIED-ENGAGEMENT:pending)"
+        }
       ]
     },
     {
@@ -892,7 +1073,7 @@
       "title": "CEPEG tenant onboarding: brand, assets, network configuration",
       "owner": "Manuel",
       "backupOwner": "Manuel",
-      "status": "pending",
+      "status": "blocked",
       "track": "tenant-onboarding",
       "zone": [
         "examples/tenants/cepeg",
@@ -912,6 +1093,14 @@
         "Asset upload and organization for CEPEG",
         "Facebook/Instagram network configuration",
         "Initial strategy draft generated"
+      ],
+      "history": [
+        {
+          "at": "2026-06-28T18:47:05.091Z",
+          "action": "status_reconciled",
+          "operator": "manuel",
+          "description": "Task status reconciled to blocked: dependency S-HC-OPS-01-CAMPAIGN-REVIEW-DEPLOYMENT still pending (S-HC-OPS-01-CAMPAIGN-REVIEW-DEPLOYMENT:pending) | dependency S-HC-COMM-02-BILLING-ACTIVATION still pending (S-HC-COMM-02-BILLING-ACTIVATION:pending) | dependency S-HC-ONB-02-GAP-RESOLUTION-WIZARD still pending (S-HC-ONB-02-GAP-RESOLUTION-WIZARD:pending) | dependency S-HC-STRAT-02-CONTENT-CALENDAR-BLUEPRINT still pending (S-HC-STRAT-02-CONTENT-CALENDAR-BLUEPRINT:pending) | dependency S-HC-ASSET-01-STRATEGY-ASSET-MANIFEST still pending (S-HC-ASSET-01-STRATEGY-ASSET-MANIFEST:pending)"
+        }
       ]
     },
     {
@@ -1005,7 +1194,6 @@
           "at": "2026-06-12T04:56:32.932Z",
           "action": "drift-recorded",
           "operator": "Manuel",
-          "mode": "silent",
           "description": "sprint"
         }
       ]
@@ -1030,7 +1218,6 @@
           "at": "2026-06-12T07:16:29.270Z",
           "action": "drift-recorded",
           "operator": "Manuel",
-          "mode": "silent",
           "description": "Codex multi-RRSS refactor"
         }
       ]
@@ -1053,7 +1240,6 @@
           "at": "2026-06-14T08:39:53.687Z",
           "action": "drift-recorded",
           "operator": "Manuel",
-          "mode": "silent",
           "description": "Sistema de publicacion con 3 modos, 24 crons Vercel, cron publisher idempotente"
         }
       ]

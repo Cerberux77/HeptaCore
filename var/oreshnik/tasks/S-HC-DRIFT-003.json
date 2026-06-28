@@ -1,0 +1,27 @@
+{
+  "project": "HeptaCore",
+  "taskId": "S-HC-DRIFT-003",
+  "sprint": "ad-hoc",
+  "taskOrderIndex": 37,
+  "title": "Sistema de publicacion con 3 modos, 24 crons Vercel, cron publisher idempotente",
+  "owner": "Manuel",
+  "backupOwner": "Manuel",
+  "status": "done",
+  "taskBoardPath": "D:\\PROYECTOS\\WORKTREES\\HeptaCore_PUB04_GOAL\\var\\oreshnik\\task-board.json",
+  "zone": [
+    "apps/web",
+    "vercel.json",
+    "docs/07_handoffs"
+  ],
+  "dependsOn": [],
+  "history": [
+    {
+      "at": "2026-06-14T08:39:53.687Z",
+      "action": "drift-recorded",
+      "operator": "Manuel",
+      "description": "Sistema de publicacion con 3 modos, 24 crons Vercel, cron publisher idempotente"
+    }
+  ],
+  "updatedAt": "2026-06-28T18:47:05.091Z",
+  "runs": []
+}

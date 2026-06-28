@@ -1,0 +1,90 @@
+{
+  "project": "HeptaCore",
+  "taskId": "S-HC-PUB-04-HOURLY-BATCH-CRON",
+  "sprint": "S-HC-PUB-04-HOURLY-BATCH-CRON",
+  "taskOrderIndex": 9,
+  "title": "Hourly batch cron publishing with timezone-aware scheduling",
+  "owner": "Manuel",
+  "backupOwner": "Manuel",
+  "status": "ready_for_integration",
+  "taskBoardPath": "D:\\PROYECTOS\\WORKTREES\\HeptaCore_PUB04_GOAL\\var\\oreshnik\\task-board.json",
+  "zone": [
+    "apps/web/app/api/cron",
+    "apps/worker",
+    "packages/core"
+  ],
+  "dependsOn": [
+    "S-HC-PUB-02-MULTIFORMAT-PREVIEW",
+    "S-HC-PUB-03-MULTITENANT-ASSETS"
+  ],
+  "acceptance": [
+    "Batch cron procesa multiples posts programados por hora",
+    "Timezone-aware scheduling per tenant",
+    "Rate limiting per platform",
+    "Failure isolation (un post falla, los demas continuan)",
+    "Cron idempotency preservada"
+  ],
+  "handoff": "var/goal-runner/goals/GR-20260626T064941Z-a09b3d58-finalize-pub-04-production-correctness/final-report.md",
+  "attempts": 1,
+  "history": [
+    {
+      "at": "2026-06-26T08:52:44.818Z",
+      "action": "claimed",
+      "operator": "Manuel",
+      "branch": "Manuel/s-hc-pub-04-hourly-batch-goal",
+      "description": "Run Manuel-S-HC-PUB-04-HOURLY-BATCH-CRON-2026-06-26T08-52-44-815Z-2487f474 claimed via manual"
+    },
+    {
+      "at": "2026-06-26T08:53:22.298Z",
+      "action": "validation_started",
+      "operator": "Manuel",
+      "branch": "Manuel/s-hc-pub-04-hourly-batch-goal",
+      "description": "PUB-04 implementation completed at commit 941042b825fc4047860a11ec8fc74c01cd4326e2; immutable contract 22/22, typecheck, full tests, build, worker validation and Oreshnik reconciliation/drift passed."
+    },
+    {
+      "at": "2026-06-26T08:55:47.503Z",
+      "action": "validated",
+      "operator": "Manuel",
+      "branch": "Manuel/s-hc-pub-04-hourly-batch-goal",
+      "description": "changed files diff verified for commit 941042b825fc4047860a11ec8fc74c01cd4326e2; typecheck passed; tests passed; build passed; PUB-04 immutable contract 22/22 passed; protected paths verified; operator confirms task is complete."
+    },
+    {
+      "at": "2026-06-26T08:55:47.503Z",
+      "action": "ready_for_integration",
+      "operator": "Manuel",
+      "branch": "Manuel/s-hc-pub-04-hourly-batch-goal",
+      "description": "Task delivered with handoff var/goal-runner/goals/GR-20260626T064941Z-a09b3d58-finalize-pub-04-production-correctness/final-report.md"
+    }
+  ],
+  "updatedAt": "2026-06-28T18:47:05.091Z",
+  "runs": [
+    {
+      "runId": "Manuel-S-HC-PUB-04-HOURLY-BATCH-CRON-2026-06-26T08-52-44-815Z-2487f474",
+      "operator": "Manuel",
+      "worker": "manuel-pub04-closeout",
+      "workerMode": "manual",
+      "branch": "Manuel/s-hc-pub-04-hourly-batch-goal",
+      "worktreePath": "D:\\PROYECTOS\\WORKTREES\\HeptaCore_PUB04_GOAL",
+      "zones": [
+        "apps/web/app/api/cron",
+        "apps/worker",
+        "packages/core"
+      ],
+      "taskStatus": "ready_for_integration",
+      "claimStatus": "released",
+      "claimedAt": "2026-06-26T08:52:44.815Z",
+      "updatedAt": "2026-06-26T08:55:47.509Z",
+      "expiresAt": "2026-06-26T09:52:44.815Z",
+      "releasedAt": "2026-06-26T08:55:47.509Z",
+      "manifestPath": "var/oreshnik/runs/S-HC-PUB-04-HOURLY-BATCH-CRON/Manuel-S-HC-PUB-04-HOURLY-BATCH-CRON-2026-06-26T08-52-44-815Z-2487f474.json"
+    }
+  ],
+  "integration": {
+    "runId": "Manuel-S-HC-PUB-04-HOURLY-BATCH-CRON-2026-06-26T08-52-44-815Z-2487f474",
+    "sourceBranch": "Manuel/s-hc-pub-04-hourly-batch-goal",
+    "status": "queued",
+    "motherBranch": "MADRE/v48-s-hc-pub-04-hourly-batch-cron-hourly-batch-publishing-cron-and-pub-04-producti-2026-06-28",
+    "queuedAt": "2026-06-28T19:42:15.820Z",
+    "updatedAt": "2026-06-28T19:42:15.820Z"
+  }
+}

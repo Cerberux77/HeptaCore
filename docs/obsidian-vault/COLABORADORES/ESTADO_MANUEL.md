@@ -2,53 +2,36 @@
 type: collaborator-status
 project: "HeptaCore"
 operator: "Manuel"
-last_updated: "2026-06-25T20:08:17.244Z"
+last_updated: "2026-06-28T19:42:15.839Z"
 generated_by: "Oreshnik canonical-check"
 source: "var/oreshnik/task-board.json"
 ---
 
 # Estado Manuel
 
-> Documento derivado. La fuente operativa es `var/oreshnik/task-board.json`.
+> Documento derivado. `var/oreshnik/task-board.json` es la proyeccion compatible que debe mantenerse alineada con los artefactos durables de runtime.
 
 ## Ready
 
 | Sprint | Scope | Depende de |
 |---|---|---|
-| Ninguno | - | - |
+| S-HC-PUB-05-RECONCILIATION-OPS | Operational reconciliation automation for ambiguous provider outcomes | S-HC-PUB-04-HOURLY-BATCH-CRON |
+| S-HC-PUB-06-REELS-STORIES-PUBLISHERS | Real publishing for Meta Reels and Stories: Instagram + Facebook | S-HC-PUB-03-MULTITENANT-ASSETS, S-HC-PUB-04-HOURLY-BATCH-CRON |
+| S-HC-PUB-07-YOUTUBE-PUBLISHING | Real publishing for YouTube: Video 16:9 and YouTube Shorts | S-HC-PUB-03-MULTITENANT-ASSETS, S-HC-PUB-04-HOURLY-BATCH-CRON |
+| S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE | LLM provider selection, cost estimation and governance policy | - |
+| S-HC-ASSET-02-FORMAT-DERIVATIVES | Format derivatives: badge interaction, format preview, intelligent crop, safe zones, asset variants | S-HC-PUB-03-MULTITENANT-ASSETS |
 
 ## Pending
 
 | Sprint | Scope | Depende de |
 |---|---|---|
-| S-HC-PUB-04-HOURLY-BATCH-CRON | Hourly batch cron publishing with timezone-aware scheduling | S-HC-PUB-02-MULTIFORMAT-PREVIEW, S-HC-PUB-03-MULTITENANT-ASSETS |
-| S-HC-PUB-05-RECONCILIATION-OPS | Operational reconciliation automation for ambiguous provider outcomes | S-HC-PUB-04-HOURLY-BATCH-CRON |
-| S-HC-PUB-06-REELS-STORIES-PUBLISHERS | Real publishing for Meta Reels and Stories: Instagram + Facebook | S-HC-PUB-03-MULTITENANT-ASSETS, S-HC-PUB-04-HOURLY-BATCH-CRON |
-| S-HC-PUB-07-YOUTUBE-PUBLISHING | Real publishing for YouTube: Video 16:9 and YouTube Shorts | S-HC-PUB-03-MULTITENANT-ASSETS, S-HC-PUB-04-HOURLY-BATCH-CRON |
-| S-HC-PUB-08-PLATFORM-FORMAT-PARITY | Platform-format parity: manifest, preview, dry-run, scheduling and publishing for every supported format | S-HC-PUB-06-REELS-STORIES-PUBLISHERS, S-HC-PUB-07-YOUTUBE-PUBLISHING |
-| S-HC-OBS-01-PUBLISHING-OBSERVABILITY | Publishing observability: structured logging, metrics dashboard, alert thresholds | S-HC-PUB-05-RECONCILIATION-OPS |
-| S-HC-COMM-01-SELF-SERVICE-SIGNUP | Self-service tenant signup with trial gate and onboarding flow | S-HC-TEN-01-GLOBAL-TENANT-ADMIN, S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION |
-| S-HC-COMM-02-BILLING-ACTIVATION | Tenant billing activation: plan selection, usage tracking, payment integration | S-HC-COMM-01-SELF-SERVICE-SIGNUP |
-| S-HC-ONB-01-MASTER-BRIEF-INGESTION | Master document ingestion: extract structured info from company briefs | S-HC-COMM-02-BILLING-ACTIVATION |
-| S-HC-ONB-02-GAP-RESOLUTION-WIZARD | Gap resolution wizard: dynamic form to resolve missing or conflicting data | S-HC-ONB-01-MASTER-BRIEF-INGESTION |
-| S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE | LLM provider selection, cost estimation and governance policy | - |
-| S-HC-STRAT-01-MASTER-STRATEGY-WORKBENCH | Master strategy workbench: LLM-powered strategy generation and conversational refinement | S-HC-ONB-02-GAP-RESOLUTION-WIZARD, S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE |
-| S-HC-STRAT-02-CONTENT-CALENDAR-BLUEPRINT | Content calendar blueprint: master publishing calendar from strategy | S-HC-STRAT-01-MASTER-STRATEGY-WORKBENCH |
-| S-HC-ASSET-01-STRATEGY-ASSET-MANIFEST | Strategy-driven asset manifest: per-publication asset requirements | S-HC-STRAT-02-CONTENT-CALENDAR-BLUEPRINT, S-HC-PUB-03-MULTITENANT-ASSETS |
-| S-HC-ASSET-02-FORMAT-DERIVATIVES | Format derivatives: badge interaction, format preview, intelligent crop, safe zones, asset variants | S-HC-PUB-03-MULTITENANT-ASSETS |
-| S-HC-AIGEN-01-ASSET-GENERATION-BROKER | AI asset generation broker: provider-agnostic, metered and billed | S-HC-ASSET-01-STRATEGY-ASSET-MANIFEST, S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE, S-HC-COMM-02-BILLING-ACTIVATION |
-| S-HC-OPS-01-CAMPAIGN-REVIEW-DEPLOYMENT | Campaign review and deployment: batch approval, schedule, publish | S-HC-STRAT-02-CONTENT-CALENDAR-BLUEPRINT, S-HC-ASSET-01-STRATEGY-ASSET-MANIFEST, S-HC-PUB-04-HOURLY-BATCH-CRON |
-| S-HC-SUP-01-ASSISTED-CUSTOMER-CHANNELS | Assisted customer channels: LLM assistant, WhatsApp, email, human escalation | S-HC-COMM-02-BILLING-ACTIVATION |
-| S-HC-AN-01-CAMPAIGN-PERFORMANCE | Campaign performance analytics: reach, engagement, metrics per post and campaign | S-HC-OPS-01-CAMPAIGN-REVIEW-DEPLOYMENT, S-HC-OBS-01-PUBLISHING-OBSERVABILITY |
-| S-HC-INBOX-01-UNIFIED-ENGAGEMENT | Unified engagement inbox: read and respond to messages and comments | S-HC-AN-01-CAMPAIGN-PERFORMANCE |
-| S-HC-OPT-01-SENTIMENT-STRATEGY-ITERATION | Sentiment-driven strategy iteration: results → improved strategy | S-HC-AN-01-CAMPAIGN-PERFORMANCE, S-HC-INBOX-01-UNIFIED-ENGAGEMENT |
-| S-HC-TEN-02-CEPEG-ONBOARDING | CEPEG tenant onboarding: brand, assets, network configuration | S-HC-TEN-01-GLOBAL-TENANT-ADMIN, S-HC-OPS-01-CAMPAIGN-REVIEW-DEPLOYMENT, S-HC-COMM-02-BILLING-ACTIVATION, S-HC-ONB-02-GAP-RESOLUTION-WIZARD, S-HC-STRAT-02-CONTENT-CALENDAR-BLUEPRINT, S-HC-ASSET-01-STRATEGY-ASSET-MANIFEST |
+| Ninguno | - | - |
 
 ## Detalle de Aceptacion
 
 ### S-HC-PUB-04-HOURLY-BATCH-CRON - Hourly batch cron publishing with timezone-aware scheduling
 
-Estado: `pending`
+Estado: `ready_for_integration`
 
 - Batch cron procesa multiples posts programados por hora
 - Timezone-aware scheduling per tenant
@@ -60,7 +43,7 @@ Zonas: `apps/web/app/api/cron`, `apps/worker`, `packages/core`
 
 ### S-HC-PUB-05-RECONCILIATION-OPS - Operational reconciliation automation for ambiguous provider outcomes
 
-Estado: `pending`
+Estado: `ready`
 
 - Automatic reconciliation for Case A (Result ok + externalPostId + incomplete Draft)
 - Alert-only for Case B (Draft.externalPostId present + Result absent)
@@ -71,7 +54,7 @@ Zonas: `apps/web/lib/publishing-finalization.ts`, `apps/web/lib/draft-operationa
 
 ### S-HC-PUB-06-REELS-STORIES-PUBLISHERS - Real publishing for Meta Reels and Stories: Instagram + Facebook
 
-Estado: `pending`
+Estado: `ready`
 
 - Instagram Reel publishing real con durabilidad transaccional
 - Instagram Story imagen publishing real
@@ -88,7 +71,7 @@ Zonas: `apps/web/lib/publishers`, `apps/web/app/api/publishing`, `packages/integ
 
 ### S-HC-PUB-07-YOUTUBE-PUBLISHING - Real publishing for YouTube: Video 16:9 and YouTube Shorts
 
-Estado: `pending`
+Estado: `ready`
 
 - YouTube Video 16:9 publishing real con titulo, descripcion, thumbnail y metadata
 - YouTube Shorts publishing real con metadata requerida
@@ -102,7 +85,7 @@ Zonas: `apps/web/lib/publishers`, `apps/web/app/api/publishing`, `packages/integ
 
 ### S-HC-PUB-08-PLATFORM-FORMAT-PARITY - Platform-format parity: manifest, preview, dry-run, scheduling and publishing for every supported format
 
-Estado: `pending`
+Estado: `blocked`
 
 - Paridad de capacidades (preview, dry-run, publicacion, metricas) para cada formato soportado
 - Auditoria de la matriz de capacidad red/formato: sin combinaciones sin responsable asignado
@@ -115,7 +98,7 @@ Zonas: `apps/web/lib/publishers`, `apps/web/lib/publishing-formats.ts`, `apps/we
 
 ### S-HC-OBS-01-PUBLISHING-OBSERVABILITY - Publishing observability: structured logging, metrics dashboard, alert thresholds
 
-Estado: `pending`
+Estado: `blocked`
 
 - Structured logging with correlation IDs
 - Publishing metrics dashboard (attempts, failures, latency)
@@ -126,7 +109,7 @@ Zonas: `apps/web`, `packages/core`, `docs`
 
 ### S-HC-TOOL-01-GOAL-RUNNER-V1 - Goal Runner v1 for autonomous Kilo execution
 
-Estado: `active`
+Estado: `blocked`
 
 - Nucleo determinista implementado y probado
 - Maquina de estados, locks, evidencia y gates operativos
@@ -137,11 +120,11 @@ Estado: `active`
 - Cero cambios en Production
 - Integracion posterior en la rama madre mediante cierre controlado
 
-Zonas: `scripts/goal-runner/**`, `var/goal-runner/**`, `.kilo/commands/goal.md`, `.kilo/commands/preflight.md`, `AGENTS.md`, `package.json`, `docs/07_handoffs/**`, `docs/obsidian-vault/**`
+Zonas: `scripts/goal-runner/**`, `var/goal-runner/**`, `.kilo/command/goal.md`, `.kilo/command/preflight.md`, `AGENTS.md`, `package.json`, `docs/07_handoffs/**`, `docs/obsidian-vault/**`
 
 ### S-HC-COMM-01-SELF-SERVICE-SIGNUP - Self-service tenant signup with trial gate and onboarding flow
 
-Estado: `pending`
+Estado: `blocked`
 
 - Self-service registration with email verification
 - Trial tenant creation with default config
@@ -152,7 +135,7 @@ Zonas: `apps/web/app/register`, `apps/web/app/api/auth`, `packages/db`, `apps/we
 
 ### S-HC-COMM-02-BILLING-ACTIVATION - Tenant billing activation: plan selection, usage tracking, payment integration
 
-Estado: `pending`
+Estado: `blocked`
 
 - Plan selection (Free, Pro, Agency)
 - Usage tracking (posts, assets, tenants)
@@ -163,7 +146,7 @@ Zonas: `apps/web/app/api/billing`, `packages/db`, `apps/web/components`
 
 ### S-HC-ONB-01-MASTER-BRIEF-INGESTION - Master document ingestion: extract structured info from company briefs
 
-Estado: `pending`
+Estado: `blocked`
 
 - Upload master document (PDF, DOCX, Markdown, texto)
 - Extract structured information: brand, product, audience, tone
@@ -174,7 +157,7 @@ Zonas: `apps/web/components`, `packages/core`, `packages/agents`
 
 ### S-HC-ONB-02-GAP-RESOLUTION-WIZARD - Gap resolution wizard: dynamic form to resolve missing or conflicting data
 
-Estado: `pending`
+Estado: `blocked`
 
 - Ask only for missing data with dynamic questions
 - Avoid unnecessarily long forms
@@ -185,7 +168,7 @@ Zonas: `apps/web/components`, `packages/core`
 
 ### S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE - LLM provider selection, cost estimation and governance policy
 
-Estado: `pending`
+Estado: `ready`
 
 - Provider-agnostic LLM broker interface
 - Model selection per task (strategy, generation, analysis)
@@ -197,7 +180,7 @@ Zonas: `packages/agents`, `packages/core`, `apps/web/components`
 
 ### S-HC-STRAT-01-MASTER-STRATEGY-WORKBENCH - Master strategy workbench: LLM-powered strategy generation and conversational refinement
 
-Estado: `pending`
+Estado: `blocked`
 
 - Generate target audience, value proposition, tone and language
 - Recommend networks, format by network, volume and frequency
@@ -212,7 +195,7 @@ Zonas: `packages/agents`, `apps/web/components`, `packages/core`
 
 ### S-HC-STRAT-02-CONTENT-CALENDAR-BLUEPRINT - Content calendar blueprint: master publishing calendar from strategy
 
-Estado: `pending`
+Estado: `blocked`
 
 - Generate per-format publishing schedule from strategy
 - Slots with network, format, date, time window
@@ -224,7 +207,7 @@ Zonas: `apps/web/components`, `apps/web/lib/dashboard.ts`, `packages/core`
 
 ### S-HC-ASSET-01-STRATEGY-ASSET-MANIFEST - Strategy-driven asset manifest: per-publication asset requirements
 
-Estado: `pending`
+Estado: `blocked`
 
 - Per-publication asset manifest: type, network, format, resolution, aspect ratio, duration
 - Creative guideline, scene context, branding, logo placement
@@ -236,7 +219,7 @@ Zonas: `apps/web/components`, `packages/core`
 
 ### S-HC-ASSET-02-FORMAT-DERIVATIVES - Format derivatives: badge interaction, format preview, intelligent crop, safe zones, asset variants
 
-Estado: `pending`
+Estado: `ready`
 
 - Badge de compatibilidad clickeable que abre detalle de formato
 - Preview especifico de formato con crop y safe zones visuales
@@ -254,7 +237,7 @@ Zonas: `apps/web/components`, `packages/core`, `apps/web/lib`
 
 ### S-HC-AIGEN-01-ASSET-GENERATION-BROKER - AI asset generation broker: provider-agnostic, metered and billed
 
-Estado: `pending`
+Estado: `blocked`
 
 - Provider-agnostic generation broker (not hardcoded to single provider)
 - Metered consumption with cost preview before generation
@@ -266,7 +249,7 @@ Zonas: `packages/agents`, `apps/web/app/api`, `packages/core`
 
 ### S-HC-OPS-01-CAMPAIGN-REVIEW-DEPLOYMENT - Campaign review and deployment: batch approval, schedule, publish
 
-Estado: `pending`
+Estado: `blocked`
 
 - Batch review of campaign drafts
 - Approve/reject per draft or bulk
@@ -278,7 +261,7 @@ Zonas: `apps/web/app/api/publishing`, `apps/web/components`, `packages/core`
 
 ### S-HC-SUP-01-ASSISTED-CUSTOMER-CHANNELS - Assisted customer channels: LLM assistant, WhatsApp, email, human escalation
 
-Estado: `pending`
+Estado: `blocked`
 
 - HeptaCore LLM assistant for product guidance
 - WhatsApp support channel
@@ -289,7 +272,7 @@ Zonas: `apps/web/components`, `apps/web/app/api/assistant`, `packages/core`
 
 ### S-HC-AN-01-CAMPAIGN-PERFORMANCE - Campaign performance analytics: reach, engagement, metrics per post and campaign
 
-Estado: `pending`
+Estado: `blocked`
 
 - Reach and impressions where API permits
 - Interactions, likes, comments
@@ -301,7 +284,7 @@ Zonas: `apps/web/components`, `apps/web/app/api`, `packages/core`
 
 ### S-HC-INBOX-01-UNIFIED-ENGAGEMENT - Unified engagement inbox: read and respond to messages and comments
 
-Estado: `pending`
+Estado: `blocked`
 
 - Unified inbox for messages and comments across platforms
 - Read and respond according to platform permissions
@@ -312,7 +295,7 @@ Zonas: `apps/web/components`, `apps/web/app/api`, `packages/integrations`
 
 ### S-HC-OPT-01-SENTIMENT-STRATEGY-ITERATION - Sentiment-driven strategy iteration: results → improved strategy
 
-Estado: `pending`
+Estado: `blocked`
 
 - Versioned strategy with iteration history
 - Recommendations based on real performance data
@@ -323,7 +306,7 @@ Zonas: `packages/agents`, `apps/web/components`, `packages/core`
 
 ### S-HC-TEN-02-CEPEG-ONBOARDING - CEPEG tenant onboarding: brand, assets, network configuration
 
-Estado: `pending`
+Estado: `blocked`
 
 - CEPEG tenant seeded with brand identity
 - Asset upload and organization for CEPEG

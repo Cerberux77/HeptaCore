@@ -1,0 +1,40 @@
+{
+  "project": "HeptaCore",
+  "taskId": "S-HC-STRAT-01-MASTER-STRATEGY-WORKBENCH",
+  "sprint": "strategy",
+  "taskOrderIndex": 22,
+  "title": "Master strategy workbench: LLM-powered strategy generation and conversational refinement",
+  "owner": "Manuel",
+  "backupOwner": "Manuel",
+  "status": "blocked",
+  "taskBoardPath": "D:\\PROYECTOS\\WORKTREES\\HeptaCore_PUB04_GOAL\\var\\oreshnik\\task-board.json",
+  "zone": [
+    "packages/agents",
+    "apps/web/components",
+    "packages/core"
+  ],
+  "dependsOn": [
+    "S-HC-ONB-02-GAP-RESOLUTION-WIZARD",
+    "S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE"
+  ],
+  "acceptance": [
+    "Generate target audience, value proposition, tone and language",
+    "Recommend networks, format by network, volume and frequency",
+    "Propose calendar with timezone windows",
+    "Generate copy, CTA, hashtags and variants per format",
+    "Conversational refinement: chat with AI, request changes, compare versions",
+    "Approve final strategy",
+    "Select provider/model/reasoning level within policy",
+    "Show estimated cost before executing"
+  ],
+  "history": [
+    {
+      "at": "2026-06-28T18:47:05.091Z",
+      "action": "status_reconciled",
+      "operator": "manuel",
+      "description": "Task status reconciled to blocked: dependency S-HC-ONB-02-GAP-RESOLUTION-WIZARD still pending (S-HC-ONB-02-GAP-RESOLUTION-WIZARD:pending) | dependency S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE still pending (S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE:pending)"
+    }
+  ],
+  "updatedAt": "2026-06-28T18:47:05.091Z",
+  "runs": []
+}

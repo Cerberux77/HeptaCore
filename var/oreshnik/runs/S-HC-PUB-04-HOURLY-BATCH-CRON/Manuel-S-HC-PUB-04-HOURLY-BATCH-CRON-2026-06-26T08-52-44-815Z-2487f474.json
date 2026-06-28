@@ -1,0 +1,24 @@
+{
+  "project": "HeptaCore",
+  "taskId": "S-HC-PUB-04-HOURLY-BATCH-CRON",
+  "sprint": "S-HC-PUB-04-HOURLY-BATCH-CRON",
+  "owner": "Manuel",
+  "operator": "Manuel",
+  "worker": "manuel-pub04-closeout",
+  "workerMode": "manual",
+  "runId": "Manuel-S-HC-PUB-04-HOURLY-BATCH-CRON-2026-06-26T08-52-44-815Z-2487f474",
+  "branch": "Manuel/s-hc-pub-04-hourly-batch-goal",
+  "worktreePath": "D:\\PROYECTOS\\WORKTREES\\HeptaCore_PUB04_GOAL",
+  "zones": [
+    "apps/web/app/api/cron",
+    "apps/worker",
+    "packages/core"
+  ],
+  "taskBoardPath": "D:\\PROYECTOS\\WORKTREES\\HeptaCore_PUB04_GOAL\\var\\oreshnik\\task-board.json",
+  "taskStatus": "ready_for_integration",
+  "claimStatus": "released",
+  "claimedAt": "2026-06-26T08:52:44.815Z",
+  "updatedAt": "2026-06-26T08:55:47.509Z",
+  "expiresAt": "2026-06-26T09:52:44.815Z",
+  "releasedAt": "2026-06-26T08:55:47.509Z"
+}

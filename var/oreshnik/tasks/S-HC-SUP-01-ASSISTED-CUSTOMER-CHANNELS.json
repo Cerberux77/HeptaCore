@@ -1,0 +1,35 @@
+{
+  "project": "HeptaCore",
+  "taskId": "S-HC-SUP-01-ASSISTED-CUSTOMER-CHANNELS",
+  "sprint": "support",
+  "taskOrderIndex": 28,
+  "title": "Assisted customer channels: LLM assistant, WhatsApp, email, human escalation",
+  "owner": "Manuel",
+  "backupOwner": "Manuel",
+  "status": "blocked",
+  "taskBoardPath": "D:\\PROYECTOS\\WORKTREES\\HeptaCore_PUB04_GOAL\\var\\oreshnik\\task-board.json",
+  "zone": [
+    "apps/web/components",
+    "apps/web/app/api/assistant",
+    "packages/core"
+  ],
+  "dependsOn": [
+    "S-HC-COMM-02-BILLING-ACTIVATION"
+  ],
+  "acceptance": [
+    "HeptaCore LLM assistant for product guidance",
+    "WhatsApp support channel",
+    "Email support with ticket tracking",
+    "Human escalation path for complex issues"
+  ],
+  "history": [
+    {
+      "at": "2026-06-28T18:47:05.091Z",
+      "action": "status_reconciled",
+      "operator": "manuel",
+      "description": "Task status reconciled to blocked: dependency S-HC-COMM-02-BILLING-ACTIVATION still pending (S-HC-COMM-02-BILLING-ACTIVATION:pending)"
+    }
+  ],
+  "updatedAt": "2026-06-28T18:47:05.091Z",
+  "runs": []
+}

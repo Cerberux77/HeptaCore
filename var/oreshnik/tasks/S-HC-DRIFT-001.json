@@ -1,0 +1,28 @@
+{
+  "project": "HeptaCore",
+  "taskId": "S-HC-DRIFT-001",
+  "sprint": "ad-hoc",
+  "taskOrderIndex": 35,
+  "title": "sprint",
+  "owner": "Manuel",
+  "backupOwner": "Manuel",
+  "status": "done",
+  "taskBoardPath": "D:\\PROYECTOS\\WORKTREES\\HeptaCore_PUB04_GOAL\\var\\oreshnik\\task-board.json",
+  "zone": [
+    "package.json",
+    "scripts/oreshnik"
+  ],
+  "dependsOn": [
+    "S-HC-PROD-01"
+  ],
+  "history": [
+    {
+      "at": "2026-06-12T04:56:32.932Z",
+      "action": "drift-recorded",
+      "operator": "Manuel",
+      "description": "sprint"
+    }
+  ],
+  "updatedAt": "2026-06-28T18:47:05.091Z",
+  "runs": []
+}

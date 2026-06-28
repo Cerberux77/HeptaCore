@@ -1,0 +1,35 @@
+{
+  "project": "HeptaCore",
+  "taskId": "S-HC-PUB-05-RECONCILIATION-OPS",
+  "sprint": "publishing",
+  "taskOrderIndex": 10,
+  "title": "Operational reconciliation automation for ambiguous provider outcomes",
+  "owner": "Manuel",
+  "backupOwner": "Manuel",
+  "status": "ready",
+  "taskBoardPath": "D:\\PROYECTOS\\WORKTREES\\HeptaCore_PUB04_GOAL\\var\\oreshnik\\task-board.json",
+  "zone": [
+    "apps/web/lib/publishing-finalization.ts",
+    "apps/web/lib/draft-operational-state.ts",
+    "packages/core"
+  ],
+  "dependsOn": [
+    "S-HC-PUB-04-HOURLY-BATCH-CRON"
+  ],
+  "acceptance": [
+    "Automatic reconciliation for Case A (Result ok + externalPostId + incomplete Draft)",
+    "Alert-only for Case B (Draft.externalPostId present + Result absent)",
+    "Block and notify for Case C (no evidence)",
+    "Never auto-retry provider calls"
+  ],
+  "history": [
+    {
+      "at": "2026-06-28T18:47:05.091Z",
+      "action": "status_reconciled",
+      "operator": "manuel",
+      "description": "Task status reconciled to ready: dependencies and conflicts are clear for execution"
+    }
+  ],
+  "updatedAt": "2026-06-28T18:47:05.091Z",
+  "runs": []
+}

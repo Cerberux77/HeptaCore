@@ -1,0 +1,42 @@
+{
+  "project": "HeptaCore",
+  "taskId": "S-HC-ASSET-02-FORMAT-DERIVATIVES",
+  "sprint": "assets",
+  "taskOrderIndex": 25,
+  "title": "Format derivatives: badge interaction, format preview, intelligent crop, safe zones, asset variants",
+  "owner": "Manuel",
+  "backupOwner": "Manuel",
+  "status": "ready",
+  "taskBoardPath": "D:\\PROYECTOS\\WORKTREES\\HeptaCore_PUB04_GOAL\\var\\oreshnik\\task-board.json",
+  "zone": [
+    "apps/web/components",
+    "packages/core",
+    "apps/web/lib"
+  ],
+  "dependsOn": [
+    "S-HC-PUB-03-MULTITENANT-ASSETS"
+  ],
+  "acceptance": [
+    "Badge de compatibilidad clickeable que abre detalle de formato",
+    "Preview especifico de formato con crop y safe zones visuales",
+    "Crop manual interactivo por formato (recorte, reposicion)",
+    "Crop inteligente automatico con deteccion de sujeto/centro",
+    "Fit con fondo (blur, color, gradiente) cuando el asset no llena el frame",
+    "Safe zones indicadas visualmente (titulo, UI de plataforma, texto)",
+    "Aceptar/deshacer cambios por formato",
+    "Asset original inmutable; derivados como registros separados con relacion sourceAsset",
+    "Versionado de derivados",
+    "Generacion por lote de variantes para todos los formatos requeridos",
+    "Imagenes primero; video fuera de este sprint o como fase separada"
+  ],
+  "history": [
+    {
+      "at": "2026-06-28T18:47:05.091Z",
+      "action": "status_reconciled",
+      "operator": "manuel",
+      "description": "Task status reconciled to ready: dependencies and conflicts are clear for execution"
+    }
+  ],
+  "updatedAt": "2026-06-28T18:47:05.091Z",
+  "runs": []
+}

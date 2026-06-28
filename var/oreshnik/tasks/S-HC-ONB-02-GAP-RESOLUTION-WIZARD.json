@@ -1,0 +1,34 @@
+{
+  "project": "HeptaCore",
+  "taskId": "S-HC-ONB-02-GAP-RESOLUTION-WIZARD",
+  "sprint": "onboarding",
+  "taskOrderIndex": 20,
+  "title": "Gap resolution wizard: dynamic form to resolve missing or conflicting data",
+  "owner": "Manuel",
+  "backupOwner": "Manuel",
+  "status": "blocked",
+  "taskBoardPath": "D:\\PROYECTOS\\WORKTREES\\HeptaCore_PUB04_GOAL\\var\\oreshnik\\task-board.json",
+  "zone": [
+    "apps/web/components",
+    "packages/core"
+  ],
+  "dependsOn": [
+    "S-HC-ONB-01-MASTER-BRIEF-INGESTION"
+  ],
+  "acceptance": [
+    "Ask only for missing data with dynamic questions",
+    "Avoid unnecessarily long forms",
+    "Save progress and allow continuation later",
+    "Reduce friction with contextual help"
+  ],
+  "history": [
+    {
+      "at": "2026-06-28T18:47:05.091Z",
+      "action": "status_reconciled",
+      "operator": "manuel",
+      "description": "Task status reconciled to blocked: dependency S-HC-ONB-01-MASTER-BRIEF-INGESTION still pending (S-HC-ONB-01-MASTER-BRIEF-INGESTION:pending)"
+    }
+  ],
+  "updatedAt": "2026-06-28T18:47:05.091Z",
+  "runs": []
+}

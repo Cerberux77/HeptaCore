@@ -1,0 +1,44 @@
+{
+  "project": "HeptaCore",
+  "taskId": "S-HC-TOOL-01-GOAL-RUNNER-V1",
+  "sprint": "tooling",
+  "taskOrderIndex": 15,
+  "title": "Goal Runner v1 for autonomous Kilo execution",
+  "owner": "Manuel",
+  "backupOwner": "Manuel",
+  "status": "blocked",
+  "taskBoardPath": "D:\\PROYECTOS\\WORKTREES\\HeptaCore_PUB04_GOAL\\var\\oreshnik\\task-board.json",
+  "zone": [
+    "scripts/goal-runner/**",
+    "var/goal-runner/**",
+    ".kilo/command/goal.md",
+    ".kilo/command/preflight.md",
+    "AGENTS.md",
+    "package.json",
+    "docs/07_handoffs/**",
+    "docs/obsidian-vault/**"
+  ],
+  "dependsOn": [
+    "S-HC-TEN-01-GLOBAL-TENANT-ADMIN"
+  ],
+  "acceptance": [
+    "Nucleo determinista implementado y probado",
+    "Maquina de estados, locks, evidencia y gates operativos",
+    "Integracion /goal y /preflight disponible en Kilo",
+    "Anti-loop y limites de Playwright documentados",
+    "Goal piloto ejecutado completamente con el propio Goal Runner",
+    "Estado y evidencia sobreviven a clear y reinicio de sesion",
+    "Cero cambios en Production",
+    "Integracion posterior en la rama madre mediante cierre controlado"
+  ],
+  "history": [
+    {
+      "at": "2026-06-28T18:47:05.091Z",
+      "action": "status_reconciled",
+      "operator": "manuel",
+      "description": "Task status reconciled to blocked: status active is not claimable for a new run"
+    }
+  ],
+  "updatedAt": "2026-06-28T18:47:05.091Z",
+  "runs": []
+}

@@ -1,0 +1,58 @@
+{
+  "project": "HeptaCore",
+  "taskId": "S-HC-PROD-02",
+  "sprint": "production-infra",
+  "taskOrderIndex": 33,
+  "title": "Production DB/Auth/env and Turpial seed smoke",
+  "owner": "Jean",
+  "backupOwner": "Manuel",
+  "status": "done",
+  "taskBoardPath": "D:\\PROYECTOS\\WORKTREES\\HeptaCore_PUB04_GOAL\\var\\oreshnik\\task-board.json",
+  "zone": [
+    "docs",
+    "scripts",
+    "packages/db",
+    "vercel-env"
+  ],
+  "dependsOn": [
+    "S-HC-PROD-ALIGN"
+  ],
+  "acceptance": [
+    "Production env checklist completed",
+    "29 drafts and 46 assets verified"
+  ],
+  "history": [
+    {
+      "at": "2026-06-11T00:20:00.000Z",
+      "action": "reassigned",
+      "from": "Manuel",
+      "to": "Jean",
+      "reason": "User-directed PROD closeout split"
+    },
+    {
+      "at": "2026-06-11T01:44:03.976Z",
+      "action": "closed",
+      "operator": "Jean",
+      "branch": "Jean/s-hc-canonical-alignment-2026-06-09",
+      "description": "production-db-auth-env-turpial-seed-smoke"
+    }
+  ],
+  "reassignments": [
+    {
+      "at": "2026-06-11T00:20:00.000Z",
+      "task": "S-HC-PROD-02",
+      "from": "Manuel",
+      "to": "Jean",
+      "reason": "User-directed PROD closeout split"
+    },
+    {
+      "at": "2026-06-11T00:20:00.000Z",
+      "task": "S-HC-PROD-02",
+      "from": "Manuel",
+      "to": "Jean",
+      "reason": "User-directed reassignment to maximize parallel closeout."
+    }
+  ],
+  "updatedAt": "2026-06-28T18:47:05.091Z",
+  "runs": []
+}
