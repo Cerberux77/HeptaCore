@@ -1,6 +1,6 @@
 {
   "project": "HeptaCore",
-  "updatedAt": "2026-06-29T02:29:41.523Z",
+  "updatedAt": "2026-06-29T03:21:35.807Z",
   "resiliencePolicy": "If an owner is unavailable for more than one working block or blocks the critical path, backupOwner may take over after recording reassignment.",
   "closurePolicy": "No sprint may be closed until acceptance criteria, base tests, sprint-specific tests, docs/handoff, and Oreshnik zone checks pass.",
   "baseTestMatrix": [
@@ -205,7 +205,7 @@
       "title": "Goal Runner v1 for autonomous Kilo execution",
       "owner": "Manuel",
       "backupOwner": "Manuel",
-      "status": "ready_for_integration",
+      "status": "integrated",
       "track": "S-HC-TOOL-01-GOAL-RUNNER-V1",
       "zone": [
         "scripts/goal-runner/**",
@@ -296,6 +296,13 @@
           "action": "claim_released",
           "operator": "kilo",
           "description": "Run kilo-S-HC-TOOL-01-GOAL-RUNNER-V1-2026-06-29T02-20-46-794Z-ed5534ef released"
+        },
+        {
+          "at": "2026-06-29T03:21:35.807Z",
+          "action": "integrated",
+          "operator": "manuel",
+          "branch": "kilo/s-hc-tool-01-goal-runner-v1",
+          "description": "Integrated kilo/s-hc-tool-01-goal-runner-v1 into MADRE/v50-s-hc-tool-01-goal-runner-v1-goal-runner-v1-deterministic-state-machine-locks-2026-06-29"
         }
       ]
     },

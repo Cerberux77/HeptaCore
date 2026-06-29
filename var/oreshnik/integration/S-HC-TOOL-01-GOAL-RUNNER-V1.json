@@ -3,37 +3,19 @@
   "sprint": "S-HC-TOOL-01-GOAL-RUNNER-V1",
   "motherBranch": "MADRE/v50-s-hc-tool-01-goal-runner-v1-goal-runner-v1-deterministic-state-machine-locks-2026-06-29",
   "createdAt": "2026-06-29T02:18:06.697Z",
-  "updatedAt": "2026-06-29T03:02:46.528Z",
+  "updatedAt": "2026-06-29T03:21:35.807Z",
   "queue": [
     {
       "taskId": "S-HC-TOOL-01-GOAL-RUNNER-V1",
       "runId": "kilo-S-HC-TOOL-01-GOAL-RUNNER-V1-2026-06-29T02-07-54-626Z-6c79c9a6",
-      "sourceBranch": "task/S-HC-TOOL-01-GOAL-RUNNER-V1/S-HC-TOOL-01-GOAL-RUNNER-V1/kilo/kilo-S-HC-TOOL-01-GOAL-RUNNER-V1-2026-06-29T02-07-54-626Z-6c79c9a6",
+      "sourceBranch": "kilo/s-hc-tool-01-goal-runner-v1",
       "owner": "Manuel",
       "operator": "kilo",
       "queuedAt": "2026-06-29T02:18:06.697Z",
-      "updatedAt": "2026-06-29T03:02:46.528Z",
-      "status": "queued"
-    },
-    {
-      "taskId": "S-HC-TOOL-01-GOAL-RUNNER-V1",
-      "runId": "kilo-S-HC-TOOL-01-GOAL-RUNNER-V1-2026-06-29T02-19-43-008Z-33b124f7",
-      "sourceBranch": "task/S-HC-TOOL-01-GOAL-RUNNER-V1/S-HC-TOOL-01-GOAL-RUNNER-V1/kilo/kilo-S-HC-TOOL-01-GOAL-RUNNER-V1-2026-06-29T02-19-43-008Z-33b124f7",
-      "owner": "Manuel",
-      "operator": "kilo",
-      "queuedAt": "2026-06-29T02:59:31.021Z",
-      "updatedAt": "2026-06-29T03:02:46.528Z",
-      "status": "queued"
-    },
-    {
-      "taskId": "S-HC-TOOL-01-GOAL-RUNNER-V1",
-      "runId": "kilo-S-HC-TOOL-01-GOAL-RUNNER-V1-2026-06-29T02-20-46-794Z-ed5534ef",
-      "sourceBranch": "task/S-HC-TOOL-01-GOAL-RUNNER-V1/S-HC-TOOL-01-GOAL-RUNNER-V1/kilo/kilo-S-HC-TOOL-01-GOAL-RUNNER-V1-2026-06-29T02-20-46-794Z-ed5534ef",
-      "owner": "Manuel",
-      "operator": "kilo",
-      "queuedAt": "2026-06-29T02:59:31.021Z",
-      "updatedAt": "2026-06-29T03:02:46.528Z",
-      "status": "queued"
+      "updatedAt": "2026-06-29T03:21:35.807Z",
+      "status": "integrated",
+      "integratedAt": "2026-06-29T03:21:35.807Z",
+      "targetBranch": "MADRE/v50-s-hc-tool-01-goal-runner-v1-goal-runner-v1-deterministic-state-machine-locks-2026-06-29"
     }
   ]
 }
