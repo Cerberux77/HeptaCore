@@ -1,5 +1,6 @@
-import { NextResponse } from "next/server";
+import { NextResponse, NextRequest } from "next/server";
 import { prisma } from "../../../../lib/prisma";
+import { resolvePublicOrigin } from "../../../../lib/url-origin";
 import crypto from "crypto";
 
 function createResetToken(userId: string): string {
@@ -10,7 +11,7 @@ function createResetToken(userId: string): string {
   return `${encoded}.${sig}`;
 }
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   const body = await req.json().catch(() => null);
   if (!body || typeof body.email !== "string") {
     return NextResponse.json({ error: "email is required" }, { status: 400 });
@@ -24,8 +25,8 @@ export async function POST(req: Request) {
   }
 
   const token = createResetToken(user.id);
-  const baseUrl = process.env.NEXTAUTH_URL || process.env.VERCEL_URL || "http://localhost:3000";
-  const resetLink = `${baseUrl}/reset-password?token=${encodeURIComponent(token)}`;
+  const origin = resolvePublicOrigin(req.nextUrl.origin);
+  const resetLink = `${origin}/reset-password?token=${encodeURIComponent(token)}`;
 
   return NextResponse.json({ ok: true, resetLink });
 }

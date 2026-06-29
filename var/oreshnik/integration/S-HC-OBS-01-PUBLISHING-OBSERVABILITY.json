@@ -1,0 +1,19 @@
+{
+  "project": "HeptaCore",
+  "sprint": "S-HC-OBS-01-PUBLISHING-OBSERVABILITY",
+  "motherBranch": "MADRE/v50-s-hc-obs-01-publishing-observability-publishing-observability-structured-logging-with-2026-06-29",
+  "createdAt": "2026-06-29T02:29:51.888Z",
+  "updatedAt": "2026-06-29T02:29:51.888Z",
+  "queue": [
+    {
+      "taskId": "S-HC-OBS-01-PUBLISHING-OBSERVABILITY",
+      "runId": "kilo-S-HC-OBS-01-PUBLISHING-OBSERVABILITY-2026-06-29T02-25-50-533Z-0b59e14b",
+      "sourceBranch": "task/S-HC-OBS-01-PUBLISHING-OBSERVABILITY/S-HC-OBS-01-PUBLISHING-OBSERVABILITY/kilo/kilo-S-HC-OBS-01-PUBLISHING-OBSERVABILITY-2026-06-29T02-25-50-533Z-0b59e14b",
+      "owner": "Manuel",
+      "operator": "kilo",
+      "queuedAt": "2026-06-29T02:29:51.888Z",
+      "updatedAt": "2026-06-29T02:29:51.888Z",
+      "status": "queued"
+    }
+  ]
+}

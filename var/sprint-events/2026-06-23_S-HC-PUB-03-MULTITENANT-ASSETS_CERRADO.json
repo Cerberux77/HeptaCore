@@ -1,0 +1,12 @@
+{
+  "sprint": "S-HC-PUB-03-MULTITENANT-ASSETS",
+  "operator": "Manuel",
+  "status": "CERRADO",
+  "date": "2026-06-23",
+  "at": "2026-06-23T02:06:55.117Z",
+  "branch": "Manuel/s-hc-pub-03-multitenant-assets",
+  "previousMother": "MADRE/v46-s-hc-pub-02-multiformat-preview-multiformat-previews-deterministic-auth-approval-2026-06-21",
+  "nextMother": "MADRE/v47-s-hc-pub-03-multitenant-assets-multitenant-assets-metadata-compatibility-batch--2026-06-23",
+  "description": "multitenant assets metadata compatibility batch uploads and production QA",
+  "changedFiles": []
+}

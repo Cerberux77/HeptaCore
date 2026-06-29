@@ -1,0 +1,7 @@
+{
+  "at": "2026-06-26T02:51:50.068Z",
+  "event": "step-start-deterministic-scheduled-job-ids-safe-claimlease-",
+  "goalId": "GR-20260626T024440Z-263ede1e-hourly-batch-cron-publishing-production-hardenin",
+  "id": "20260626T025150068Z-5dd0-step-start-deterministic-scheduled-job-ids-safe-",
+  "step": "Deterministic scheduled job IDs + safe claim/lease + publish route fix"
+}

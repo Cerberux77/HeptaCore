@@ -1,0 +1,44 @@
+{
+  "project": "HeptaCore",
+  "taskId": "S-HC-TEN-01-GLOBAL-TENANT-ADMIN",
+  "sprint": "tenant-platform",
+  "sprintOrderIndex": 25,
+  "taskOrderIndex": 37,
+  "title": "Global tenant administration and provisioning",
+  "owner": "Manuel",
+  "backupOwner": "Manuel",
+  "status": "done",
+  "taskBoardPath": "D:\\PROYECTOS\\WORKTREES\\HeptaCore_PUB04_GOAL\\var\\oreshnik\\task-board.json",
+  "zone": [
+    "packages/db/**",
+    "apps/web/lib/tenant-admin-service.ts",
+    "apps/web/lib/tenant-access.ts",
+    "apps/web/lib/__tests__/tenant-admin*.test.ts",
+    "docs/**",
+    "var/oreshnik/**"
+  ],
+  "dependsOn": [
+    "S-HC-PUB-03-MULTITENANT-ASSETS"
+  ],
+  "acceptance": [
+    "Tenant lifecycle schema with PROVISIONING, ACTIVE, SUSPENDED, ARCHIVED states",
+    "Secure migration preserving existing tenants as ACTIVE",
+    "SUPER_ADMIN access contracts",
+    "Transactional tenant provisioning",
+    "Slug validation and normalization",
+    "Lifecycle transitions with audit trail",
+    "Secure serialization without exposing secrets"
+  ],
+  "handoff": "docs/07_handoffs/TEN-01-global-tenant-admin.md",
+  "history": [
+    {
+      "at": "2026-06-25T18:19:00.000Z",
+      "action": "closed",
+      "operator": "Manuel",
+      "branch": "Manuel/s-hc-ten-01-global-tenant-admin",
+      "description": "Three canonical roles (OWNER/ADMIN/VIEWER), legacy role normalization, identity panel in /admin and /tenant/*, 5/5 E2E pass, 569 unit tests, production intact"
+    }
+  ],
+  "updatedAt": "2026-06-29T02:29:41.523Z",
+  "runs": []
+}

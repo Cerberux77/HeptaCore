@@ -1,0 +1,35 @@
+{
+  "project": "HeptaCore",
+  "taskId": "S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE",
+  "sprint": "ai-infra",
+  "sprintOrderIndex": 6,
+  "taskOrderIndex": 8,
+  "title": "LLM provider selection, cost estimation and governance policy",
+  "owner": "Manuel",
+  "backupOwner": "Manuel",
+  "status": "ready",
+  "taskBoardPath": "D:\\PROYECTOS\\WORKTREES\\HeptaCore_PUB04_GOAL\\var\\oreshnik\\task-board.json",
+  "zone": [
+    "packages/agents",
+    "packages/core",
+    "apps/web/components"
+  ],
+  "dependsOn": [],
+  "acceptance": [
+    "Provider-agnostic LLM broker interface",
+    "Model selection per task (strategy, generation, analysis)",
+    "Cost estimation before executing expensive tasks",
+    "Admin policy: authorized providers, models, max spend",
+    "Usage tracking and billing integration"
+  ],
+  "history": [
+    {
+      "at": "2026-06-28T18:47:05.091Z",
+      "action": "status_reconciled",
+      "operator": "manuel",
+      "description": "Task status reconciled to ready: dependencies and conflicts are clear for execution"
+    }
+  ],
+  "updatedAt": "2026-06-29T02:29:41.523Z",
+  "runs": []
+}

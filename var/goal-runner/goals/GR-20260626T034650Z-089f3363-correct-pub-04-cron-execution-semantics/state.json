@@ -1,0 +1,43 @@
+{
+  "baseSha": "52ea168a2d39e5c1078f3590a67698ec94e06b63",
+  "branch": "Manuel/s-hc-pub-04-hourly-batch-goal",
+  "createdAt": "2026-06-26T03:46:50.562Z",
+  "evidenceRequired": "code",
+  "goalId": "GR-20260626T034650Z-089f3363-correct-pub-04-cron-execution-semantics",
+  "owner": "Manuel",
+  "previousStatus": "ACTIVE",
+  "sprintId": "S-HC-PUB-04B-CRON-CORRECTNESS",
+  "status": "COMPLETED",
+  "title": "Correct PUB-04 cron execution semantics",
+  "transitions": [
+    {
+      "at": "2026-06-26T03:47:08.072Z",
+      "by": "Manuel",
+      "from": "DRAFT",
+      "to": "READY"
+    },
+    {
+      "at": "2026-06-26T03:47:08.265Z",
+      "by": "Manuel",
+      "from": "READY",
+      "to": "ACTIVE"
+    },
+    {
+      "at": "2026-06-26T03:56:11.197Z",
+      "by": "Manuel",
+      "from": "ACTIVE",
+      "to": "COMPLETED"
+    }
+  ],
+  "updatedAt": "2026-06-26T03:56:11.197Z",
+  "validationGates": [
+    "pub04-contract",
+    "diff-check",
+    "typecheck",
+    "test",
+    "build",
+    "worker-validate",
+    "oreshnik-reconcile",
+    "oreshnik-drift"
+  ]
+}

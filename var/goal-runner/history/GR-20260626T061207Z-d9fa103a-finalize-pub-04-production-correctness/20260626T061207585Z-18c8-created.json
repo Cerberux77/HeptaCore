@@ -1,0 +1,9 @@
+{
+  "at": "2026-06-26T06:12:07.586Z",
+  "event": "created",
+  "goalId": "GR-20260626T061207Z-d9fa103a-finalize-pub-04-production-correctness",
+  "id": "20260626T061207585Z-18c8-created",
+  "owner": "Manuel",
+  "sprintId": "S-HC-PUB-04C-FINAL-CORRECTNESS",
+  "title": "Finalize PUB-04 production correctness"
+}

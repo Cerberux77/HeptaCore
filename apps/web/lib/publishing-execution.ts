@@ -7,6 +7,14 @@ export function buildScheduledJobId(draftId: string, network: string, scheduledF
   return `pj_scheduled_${draftId}_${network}_${ts}`;
 }
 
+export function buildDeterministicScheduledJobId(draftId: string, network: string, scheduledFor: Date): string {
+  if (isNaN(scheduledFor.getTime())) {
+    throw new Error("Invalid scheduledFor date");
+  }
+  const ts = scheduledFor.getTime().toString(36);
+  return `pj_sched_${draftId}_${network}_${ts}`;
+}
+
 export interface ExistingJobCheck {
   blocked: boolean;
   reason?: string;

@@ -1,0 +1,38 @@
+{
+  "project": "HeptaCore",
+  "taskId": "S-HC-COMM-01-SELF-SERVICE-SIGNUP",
+  "sprint": "commercial",
+  "sprintOrderIndex": 9,
+  "taskOrderIndex": 12,
+  "title": "Self-service tenant signup with trial gate and onboarding flow",
+  "owner": "Manuel",
+  "backupOwner": "Manuel",
+  "status": "blocked",
+  "taskBoardPath": "D:\\PROYECTOS\\WORKTREES\\HeptaCore_PUB04_GOAL\\var\\oreshnik\\task-board.json",
+  "zone": [
+    "apps/web/app/register",
+    "apps/web/app/api/auth",
+    "packages/db",
+    "apps/web/components"
+  ],
+  "dependsOn": [
+    "S-HC-TEN-01-GLOBAL-TENANT-ADMIN",
+    "S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION"
+  ],
+  "acceptance": [
+    "Self-service registration with email verification",
+    "Trial tenant creation with default config",
+    "Guided onboarding wizard (brand, networks, first draft)",
+    "Trial gate enforcement before publishing"
+  ],
+  "history": [
+    {
+      "at": "2026-06-28T18:47:05.091Z",
+      "action": "status_reconciled",
+      "operator": "manuel",
+      "description": "Task status reconciled to blocked: dependency S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION still pending (S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION:pending)"
+    }
+  ],
+  "updatedAt": "2026-06-29T02:29:41.523Z",
+  "runs": []
+}

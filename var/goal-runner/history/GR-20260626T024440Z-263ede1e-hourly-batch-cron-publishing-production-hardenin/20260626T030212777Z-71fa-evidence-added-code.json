@@ -1,0 +1,8 @@
+{
+  "at": "2026-06-26T03:02:12.777Z",
+  "event": "evidence-added-code",
+  "goalId": "GR-20260626T024440Z-263ede1e-hourly-batch-cron-publishing-production-hardenin",
+  "id": "20260626T030212777Z-71fa-evidence-added-code",
+  "path": "apps/web/lib/publishing-revalidation.ts",
+  "type": "code"
+}

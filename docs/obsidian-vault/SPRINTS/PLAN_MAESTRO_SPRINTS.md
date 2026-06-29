@@ -1,8 +1,8 @@
 ---
 type: sprint-plan
 project: "HeptaCore"
-last_updated: "2026-06-21T19:08:48.084Z"
-mother_branch: "MADRE/v46-s-hc-pub-02-multiformat-preview-multiformat-previews-deterministic-auth-approval-2026-06-21"
+last_updated: "2026-06-23T02:06:55.117Z"
+mother_branch: "MADRE/v47-s-hc-pub-03-multitenant-assets-multitenant-assets-metadata-compatibility-batch--2026-06-23"
 tags:
   - "#sprints"
   - "#manuel"
@@ -855,3 +855,14 @@ Jean queda fuera de la ruta critica. Responsabilidades pendientes reasignadas te
 | Estado | CERRADO |
 | Madre docs | `MADRE/v46-s-hc-pub-02-multiformat-preview-multiformat-previews-deterministic-auth-approval-2026-06-21` |
 | Descripcion | multiformat previews, deterministic auth, approval UI and dry-run QA completed |
+
+
+## Cierre S-HC-PUB-03-MULTITENANT-ASSETS - 2026-06-23
+
+| Campo | Valor |
+|---|---|
+| Operador | Manuel |
+| Rama | `Manuel/s-hc-pub-03-multitenant-assets` |
+| Estado | CERRADO |
+| Madre docs | `MADRE/v47-s-hc-pub-03-multitenant-assets-multitenant-assets-metadata-compatibility-batch--2026-06-23` |
+| Descripcion | multitenant assets metadata compatibility batch uploads and production QA |

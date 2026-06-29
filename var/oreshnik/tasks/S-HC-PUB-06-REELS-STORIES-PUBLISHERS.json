@@ -1,0 +1,43 @@
+{
+  "project": "HeptaCore",
+  "taskId": "S-HC-PUB-06-REELS-STORIES-PUBLISHERS",
+  "sprint": "publishing",
+  "sprintOrderIndex": 19,
+  "taskOrderIndex": 26,
+  "title": "Real publishing for Meta Reels and Stories: Instagram + Facebook",
+  "owner": "Manuel",
+  "backupOwner": "Manuel",
+  "status": "ready",
+  "taskBoardPath": "D:\\PROYECTOS\\WORKTREES\\HeptaCore_PUB04_GOAL\\var\\oreshnik\\task-board.json",
+  "zone": [
+    "apps/web/lib/publishers",
+    "apps/web/app/api/publishing",
+    "packages/integrations"
+  ],
+  "dependsOn": [
+    "S-HC-PUB-03-MULTITENANT-ASSETS",
+    "S-HC-PUB-04-HOURLY-BATCH-CRON"
+  ],
+  "acceptance": [
+    "Instagram Reel publishing real con durabilidad transaccional",
+    "Instagram Story imagen publishing real",
+    "Instagram Story video publishing real",
+    "Facebook Story imagen publishing real",
+    "Facebook Story video publishing real",
+    "Facebook Reel publishing real",
+    "Preview/dry-run para cada combinacion antes de publicacion real",
+    "Provider-specific tests con evidencia real para cada formato",
+    "Reutilizacion de transactional finalization y IN_REVIEW state machine",
+    "Cero declaracion de soporte hasta que la combinacion concreta haya sido validada"
+  ],
+  "history": [
+    {
+      "at": "2026-06-28T18:47:05.091Z",
+      "action": "status_reconciled",
+      "operator": "manuel",
+      "description": "Task status reconciled to ready: dependencies and conflicts are clear for execution"
+    }
+  ],
+  "updatedAt": "2026-06-29T02:29:41.523Z",
+  "runs": []
+}

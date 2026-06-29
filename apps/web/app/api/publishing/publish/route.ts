@@ -5,16 +5,19 @@ import { prisma } from "../../../../lib/prisma";
 import { TRIAL_POSTS_PER_NETWORK } from "../../../../lib/trial";
 import { resolveAndDecryptOAuthCredential } from "../../../../lib/credential-resolver";
 import { getPublisher, PublishInput } from "../../../../lib/publishers";
-import { buildImmediateJobId, checkExistingJobForRetry, getAllPossibleJobIds } from "../../../../lib/publishing-execution";
+import { buildImmediateJobId, checkExistingJobForRetry, getAllPossibleJobIds, buildDeterministicScheduledJobId } from "../../../../lib/publishing-execution";
 import { commitConfirmedPublication, recordUnconfirmedProviderFailure } from "../../../../lib/publishing-finalization";
 import { ProviderError } from "../../../../lib/publishers/types";
 import { buildMultiformatDryRun, normalizeAssetManifest, normalizePublishingFormat } from "../../../../lib/publishing-formats";
+import { resolveAssetUrl } from "../../../../lib/asset-resolution";
+import { resolveTenantAccessWithLifecycle } from "../../../../lib/tenant-access";
+import { Permission } from "../../../../lib/permissions";
+import { schedulePublication } from "../../../../lib/publishing-scheduler-service";
+import type { Pub04ScheduleRepository } from "../../../../../../contracts/S-HC-PUB-04/pub04-contract.js";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 export const maxDuration = 60;
-
-const PUBLISH_ROLES = ["OWNER", "ADMIN", "APPROVER", "PUBLISHER", "SUPER_ADMIN", "TENANT_ADMIN"];
 
 type PublishMode = "dry_run" | "scheduled" | "immediate";
 
@@ -24,19 +27,7 @@ function checkScopes(required: string[], actual: string[]): string[] {
   );
 }
 
-function resolveAssetPath(asset: { storageKey?: string | null; sourcePath?: string | null; filename: string }): string | null {
-  const raw = asset.storageKey || asset.sourcePath || asset.filename;
-  if (!raw) return null;
-  const normalized = raw.replace(/\\/g, "/").replace(/^\/+/, "");
-  if (normalized.includes("..")) return null;
-  return normalized;
-}
-
-function tenantAssetSlug(tenantSlug: string): string {
-  return tenantSlug === "turpial-sound" ? "turpial" : tenantSlug;
-}
-
-function buildPublicAssetUrl(tenantSlug: string, assetPath: string): string | null {
+function appOrigin(): string | null {
   const raw =
     process.env.APP_PUBLIC_URL ||
     process.env.NEXT_PUBLIC_APP_URL ||
@@ -59,13 +50,19 @@ function buildPublicAssetUrl(tenantSlug: string, assetPath: string): string | nu
     origin = `https://${base}`;
   }
 
-  const folder = tenantAssetSlug(tenantSlug);
-  const encodedPath = assetPath.split("/").map((s) => encodeURIComponent(s)).join("/");
-  const url = `${origin}/tenant-assets/${folder}/${encodedPath}`;
+  return origin.includes("\r") || origin.includes("\n") ? null : origin;
+}
 
-  if (url.includes("\r") || url.includes("\n")) return null;
-
-  return url;
+function buildPublicAssetUrl(tenantSlug: string, asset: { storageKey?: string | null; sourcePath?: string | null; filename?: string | null }): string | null {
+  const resolved = resolveAssetUrl(asset, tenantSlug);
+  if (!resolved) return null;
+  if (resolved.startsWith("https://")) return resolved;
+  if (resolved.startsWith("http://")) {
+    const isProd = process.env.NODE_ENV === "production" || process.env.VERCEL_ENV === "production";
+    return isProd ? null : resolved;
+  }
+  const origin = appOrigin();
+  return origin ? `${origin}${resolved.startsWith("/") ? "" : "/"}${resolved}` : null;
 }
 
 export async function POST(req: Request) {
@@ -98,12 +95,13 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Tenant not found." }, { status: 404 });
   }
 
-  const membership = await prisma.membership.findFirst({
-    where: { tenantId: tenant.id, userId: session.user.id },
-    select: { role: true },
-  });
-  if (!membership || !PUBLISH_ROLES.includes(membership.role)) {
-    return NextResponse.json({ error: "Forbidden: publisher role required." }, { status: 403 });
+  try {
+    await resolveTenantAccessWithLifecycle(session.user.id, tenant.id, Permission.CONTENT_PUBLISH, "NORMAL_OPERATION");
+  } catch (e: any) {
+    if (e?.code) {
+      return NextResponse.json({ error: e.message }, { status: e.status || 403 });
+    }
+    throw e;
   }
 
   const draft = await prisma.contentDraft.findFirst({
@@ -121,8 +119,7 @@ export async function POST(req: Request) {
   const format = normalizePublishingFormat(network, draft.format);
   const orderedAssets = normalizeAssetManifest(draft.assets, (asset) => {
     if (!asset) return null;
-    const assetPath = resolveAssetPath(asset);
-    return assetPath ? buildPublicAssetUrl(tenantSlug, assetPath) : null;
+    return buildPublicAssetUrl(tenantSlug, asset);
   });
 
   const draftOnly = tenant.automationMode === "DRAFT_ONLY";
@@ -192,68 +189,127 @@ export async function POST(req: Request) {
   if (requestMode === "scheduled") {
     const scheduledFor = scheduledAt ?? draft.scheduledFor ?? new Date(Date.now() + 3600000);
 
-    const scheduledClaim = await prisma.contentDraft.updateMany({
-      where: { id: draft.id, tenantId: tenant.id, status: "APPROVED" },
-      data: { status: "SCHEDULED", scheduledFor },
-    });
-
-    if (scheduledClaim.count === 0) {
+    if (isNaN(scheduledFor.getTime())) {
       return NextResponse.json({
-        code: "LIVE_BLOCKED_ALREADY_CLAIMED",
-        error: "Este draft ya fue reclamado en otra solicitud o cambio de estado.",
-        action: "Verifica si el draft ya fue publicado o programado por otra operacion concurrente.",
-      }, { status: 409 });
+        code: "LIVE_BLOCKED_INVALID_DATE",
+        error: "scheduledAt is not a valid date.",
+      }, { status: 400 });
     }
 
-    const jobId = `pj_${draft.id}_${Date.now().toString(36)}`;
+    const scheduleRepo: Pub04ScheduleRepository = {
+      async scheduleAtomic(input) {
+        const existingJob = await prisma.publishingJob.findUnique({ where: { id: input.jobId } });
+        if (existingJob) {
+          return { jobId: input.jobId, status: "existing" };
+        }
+
+        try {
+          await prisma.$transaction(async (tx) => {
+            const claimed = await tx.contentDraft.updateMany({
+              where: { id: input.draftId, tenantId: input.tenantId, status: "APPROVED" },
+              data: { status: "SCHEDULED", scheduledFor: input.scheduledFor },
+            });
+
+            if (claimed.count === 0) {
+              const alreadyScheduled = await tx.contentDraft.findFirst({
+                where: { id: input.draftId, tenantId: input.tenantId, status: "SCHEDULED" },
+              });
+              if (alreadyScheduled) {
+                const recheckJob = await tx.publishingJob.findUnique({ where: { id: input.jobId } });
+                if (recheckJob) {
+                  throw new Error("JOB_EXISTS");
+                }
+                await tx.publishingJob.create({
+                  data: {
+                    id: input.jobId,
+                    tenantId: input.tenantId,
+                    postId: input.draftId,
+                    provider: input.network as any,
+                    status: "SCHEDULED",
+                    scheduledFor: input.scheduledFor,
+                    updatedAt: new Date(),
+                  },
+                });
+                return;
+              }
+              throw new Error("DRAFT_ALREADY_CLAIMED");
+            }
+
+            await tx.publishingJob.create({
+              data: {
+                id: input.jobId,
+                tenantId: input.tenantId,
+                postId: input.draftId,
+                provider: input.network as any,
+                status: "SCHEDULED",
+                scheduledFor: input.scheduledFor,
+                updatedAt: new Date(),
+              },
+            });
+          });
+
+          return { jobId: input.jobId, status: "created" };
+        } catch (err: any) {
+          if (err?.message === "JOB_EXISTS") {
+            return { jobId: input.jobId, status: "existing" };
+          }
+          throw err;
+        }
+      },
+    };
+
     try {
-      await prisma.publishingJob.create({
-        data: {
-          id: jobId,
-          tenantId: tenant.id,
-          postId: draft.id,
-          provider: network as any,
-          status: "SCHEDULED",
-          scheduledFor,
-          updatedAt: new Date(),
+      const scheduleResult = await schedulePublication({
+        tenantId: tenant.id,
+        draftId: draft.id,
+        network,
+        scheduledFor,
+      }, scheduleRepo);
+
+      await auditLog({
+        tenantId: tenant.id,
+        actorId: session.user.id,
+        action: "publish_scheduled",
+        target: `draft:${draft.id}`,
+        metadata: {
+          tenant: tenant.name,
+          title: draft.title,
+          network,
+          format,
+          scheduledFor: scheduledFor.toISOString(),
+          jobId: scheduleResult.jobId,
+          tenantAutomationMode: tenant.automationMode,
         },
       });
-    } catch {
-      await prisma.contentDraft.updateMany({
-        where: { id: draft.id, status: "SCHEDULED" },
-        data: { status: "APPROVED" },
+
+      return NextResponse.json({
+        ok: true,
+        mode: "scheduled",
+        status: "SCHEDULED",
+        draftId: draft.id,
+        jobId: scheduleResult.jobId,
+        scheduledFor: scheduleResult.scheduledFor,
       });
+    } catch (err: any) {
+      if (err?.message?.includes("DRAFT_ALREADY_CLAIMED")) {
+        return NextResponse.json({
+          code: "LIVE_BLOCKED_ALREADY_CLAIMED",
+          error: "Este draft ya fue reclamado en otra solicitud o cambio de estado.",
+          action: "Verifica si el draft ya fue publicado o programado por otra operacion concurrente.",
+        }, { status: 409 });
+      }
+      if (err?.message?.includes("INVALID_SCHEDULED_AT")) {
+        return NextResponse.json({
+          code: "LIVE_BLOCKED_INVALID_DATE",
+          error: "scheduledAt is not a valid date.",
+        }, { status: 400 });
+      }
       return NextResponse.json({
         code: "LIVE_BLOCKED_JOB_CREATION_FAILED",
-        error: "No se pudo crear el PublishingJob. El draft fue revertido.",
+        error: "No se pudo crear el PublishingJob de forma transaccional.",
         action: "Reintenta la operacion.",
       }, { status: 500 });
     }
-
-    await auditLog({
-      tenantId: tenant.id,
-      actorId: session.user.id,
-      action: "publish_scheduled",
-      target: `draft:${draft.id}`,
-      metadata: {
-        tenant: tenant.name,
-        title: draft.title,
-        network,
-        format,
-        scheduledFor: scheduledFor.toISOString(),
-        jobId,
-        tenantAutomationMode: tenant.automationMode,
-      },
-    });
-
-    return NextResponse.json({
-      ok: true,
-      mode: "scheduled",
-      status: "SCHEDULED",
-      draftId: draft.id,
-      jobId,
-      scheduledFor: scheduledFor.toISOString(),
-    });
   }
 
   // === GATES: provider, account, credential, asset, token ===
@@ -346,15 +402,7 @@ export async function POST(req: Request) {
   const primaryAsset = needsAsset ? (draft.assets.find((a) => a.role === "primary") ?? draft.assets[0]) : null;
 
   if (primaryAsset) {
-    const assetPath = resolveAssetPath(primaryAsset.asset);
-    if (!assetPath) {
-      return NextResponse.json({
-        code: "LIVE_BLOCKED_ASSET_NOT_PUBLIC",
-        error: "Live publishing requires a public HTTPS asset URL.",
-        action: "Sube un asset con URL pública o configura APP_PUBLIC_URL/NEXT_PUBLIC_APP_URL.",
-      }, { status: 409 });
-    }
-    mediaUrl = buildPublicAssetUrl(tenantSlug, assetPath);
+    mediaUrl = buildPublicAssetUrl(tenantSlug, primaryAsset.asset);
 
     if (!mediaUrl) {
       return NextResponse.json({

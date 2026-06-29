@@ -1,0 +1,46 @@
+{
+  "project": "HeptaCore",
+  "taskId": "S-HC-01",
+  "sprint": "product-ui",
+  "sprintOrderIndex": 17,
+  "taskOrderIndex": 22,
+  "title": "Console shell: tenant dashboard, onboarding, checklist, draft queue",
+  "owner": "Jean",
+  "backupOwner": "Jean",
+  "status": "done",
+  "taskBoardPath": "D:\\PROYECTOS\\WORKTREES\\HeptaCore_PUB04_GOAL\\var\\oreshnik\\task-board.json",
+  "zone": [
+    "apps/web",
+    "packages/ui",
+    "packages/agents"
+  ],
+  "dependsOn": [
+    "S-HC-00"
+  ],
+  "acceptance": [
+    "Tenant dashboard route",
+    "Onboarding form mock",
+    "Input checklist",
+    "Draft queue screen"
+  ],
+  "history": [
+    {
+      "at": "2026-06-09T19:56:42.980Z",
+      "action": "reassigned",
+      "from": "Manuel",
+      "to": "Jean",
+      "reason": "Manuel ausente - ruta critica bloqueada"
+    }
+  ],
+  "reassignments": [
+    {
+      "at": "2026-06-09T19:56:42.980Z",
+      "task": "S-HC-01",
+      "from": "Manuel",
+      "to": "Jean",
+      "reason": "Manuel ausente - ruta critica bloqueada"
+    }
+  ],
+  "updatedAt": "2026-06-29T02:29:41.523Z",
+  "runs": []
+}

@@ -1,0 +1,8 @@
+{
+  "at": "2026-06-25T20:13:42.261Z",
+  "event": "step-complete-inspeccion-de-solo-lectura-del-nucleo-actual",
+  "goalId": "GR-20260625T201231Z-f723e73f-aadir-comando-doctor-al-goal-runner",
+  "id": "20260625T201342261Z-87da-step-complete-inspeccion-de-solo-lectura-del-nuc",
+  "result": "Nucleo: 1173 lineas (run.mjs 538 + lib.mjs 635). 16 subcomandos CLI. 36 funciones exportadas. 7 gates en allowlist. 10 archivos de test. Maquina de estados con 7 estados. Lock, evidence, gates y reindex operativos. Listo para implementar subcomando doctor.",
+  "step": "Inspeccion de solo lectura del nucleo actual"
+}

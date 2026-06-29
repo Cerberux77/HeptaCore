@@ -1,0 +1,37 @@
+{
+  "project": "HeptaCore",
+  "taskId": "S-HC-02",
+  "sprint": "data",
+  "sprintOrderIndex": 10,
+  "taskOrderIndex": 14,
+  "title": "Turpial importer and Prisma seed",
+  "owner": "Jean",
+  "backupOwner": "Manuel",
+  "status": "done",
+  "taskBoardPath": "D:\\PROYECTOS\\WORKTREES\\HeptaCore_PUB04_GOAL\\var\\oreshnik\\task-board.json",
+  "zone": [
+    "packages/db",
+    "examples/tenants/turpial",
+    "scripts"
+  ],
+  "dependsOn": [
+    "S-HC-00"
+  ],
+  "acceptance": [
+    "Seed tenant",
+    "Import assets metadata",
+    "Import publication queue",
+    "No real credentials"
+  ],
+  "history": [
+    {
+      "at": "2026-06-12T04:32:55.688Z",
+      "action": "closed",
+      "operator": "Jean",
+      "branch": "Manuel/s-hc-prod-01-producto-operativo-tenant-admin-produccion-2026-06-09",
+      "description": "turpial importer and prisma seed"
+    }
+  ],
+  "updatedAt": "2026-06-29T02:29:41.523Z",
+  "runs": []
+}

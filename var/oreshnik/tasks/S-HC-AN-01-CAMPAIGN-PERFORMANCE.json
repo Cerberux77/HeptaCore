@@ -1,0 +1,38 @@
+{
+  "project": "HeptaCore",
+  "taskId": "S-HC-AN-01-CAMPAIGN-PERFORMANCE",
+  "sprint": "analytics",
+  "sprintOrderIndex": 7,
+  "taskOrderIndex": 9,
+  "title": "Campaign performance analytics: reach, engagement, metrics per post and campaign",
+  "owner": "Manuel",
+  "backupOwner": "Manuel",
+  "status": "blocked",
+  "taskBoardPath": "D:\\PROYECTOS\\WORKTREES\\HeptaCore_PUB04_GOAL\\var\\oreshnik\\task-board.json",
+  "zone": [
+    "apps/web/components",
+    "apps/web/app/api",
+    "packages/core"
+  ],
+  "dependsOn": [
+    "S-HC-OPS-01-CAMPAIGN-REVIEW-DEPLOYMENT",
+    "S-HC-OBS-01-PUBLISHING-OBSERVABILITY"
+  ],
+  "acceptance": [
+    "Reach and impressions where API permits",
+    "Interactions, likes, comments",
+    "Shares and saves where API permits",
+    "Metrics per publication and per campaign",
+    "Visual dashboard with trends"
+  ],
+  "history": [
+    {
+      "at": "2026-06-28T18:47:05.091Z",
+      "action": "status_reconciled",
+      "operator": "manuel",
+      "description": "Task status reconciled to blocked: dependency S-HC-OPS-01-CAMPAIGN-REVIEW-DEPLOYMENT still pending (S-HC-OPS-01-CAMPAIGN-REVIEW-DEPLOYMENT:pending) | dependency S-HC-OBS-01-PUBLISHING-OBSERVABILITY still pending (S-HC-OBS-01-PUBLISHING-OBSERVABILITY:pending)"
+    }
+  ],
+  "updatedAt": "2026-06-29T02:29:41.523Z",
+  "runs": []
+}

@@ -1,0 +1,8 @@
+{
+  "at": "2026-06-26T02:51:49.266Z",
+  "event": "step-complete-verceljson-single-hourly-cron-fail-closed-auth-h",
+  "goalId": "GR-20260626T024440Z-263ede1e-hourly-batch-cron-publishing-production-hardenin",
+  "id": "20260626T025149266Z-3fea-step-complete-verceljson-single-hourly-cron-fail",
+  "result": "vercel.json: replaced 24 slot crons with single hourly cron. Created cron-auth.ts with timing-safe secret validation. Created publishing-cron-time.ts with UTC window helpers.",
+  "step": "vercel.json: single hourly cron + fail-closed auth helpers"
+}

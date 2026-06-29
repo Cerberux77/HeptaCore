@@ -1,0 +1,93 @@
+{
+  "project": "HeptaCore",
+  "sprint": "S-HC-PUB-05-RECONCILIATION-OPS",
+  "motherBranch": "MADRE/v49-s-hc-pub-05-reconciliation-ops-implementa-automatizacion-operacional-de-reconci-2026-06-29",
+  "lockKey": "integration-train/MADRE/v49-s-hc-pub-05-reconciliation-ops-implementa-automatizacion-operacional-de-reconci-2026-06-29",
+  "createdAt": "2026-06-29T01:48:36.862Z",
+  "updatedAt": "2026-06-29T01:54:40.108Z",
+  "results": [
+    {
+      "attemptId": "train-manuel-S-HC-PUB-05-RECONCILIATION-OPS-2026-06-29-1782697716862",
+      "taskId": "S-HC-PUB-05-RECONCILIATION-OPS",
+      "runId": "manuel-S-HC-PUB-05-RECONCILIATION-OPS-2026-06-29T00-37-03-464Z-4e3d4eae",
+      "sourceBranch": "Manuel/s-hc-pub-05-reconciliation-ops-sprint-2026-06-29",
+      "targetBranch": "MADRE/v49-s-hc-pub-05-reconciliation-ops-implementa-automatizacion-operacional-de-reconci-2026-06-29",
+      "integrationBranch": "integration-train/S-HC-PUB-05-RECONCILIATI/S-HC-PUB-05-RECONCILIATI/r-3030ee064340/a-8fb051d86242",
+      "operator": "manuel",
+      "lockKey": "integration-train/MADRE/v49-s-hc-pub-05-reconciliation-ops-implementa-automatizacion-operacional-de-reconci-2026-06-29",
+      "startedAt": "2026-06-29T01:48:36.862Z",
+      "status": "failed",
+      "completedAt": "2026-06-29T01:50:31.377Z",
+      "reason": "Failed to reconcile already-contained runtime state: Task S-HC-PUB-05-RECONCILIATION-OPS cannot be marked integrated from status done",
+      "gateResults": [
+        {
+          "name": "typecheck",
+          "passed": true
+        },
+        {
+          "name": "build",
+          "passed": true
+        },
+        {
+          "name": "test",
+          "passed": true
+        }
+      ],
+      "outcome": {
+        "mergeBase": "db3e69484e003f7ec674003c1a3c7e9c882745b5",
+        "changedFiles": [],
+        "compatibilityBranchPushed": false,
+        "deliveryDisposition": "already_contained",
+        "projectedMotherBranch": "MADRE/v49-s-hc-pub-05-reconciliation-ops-implementa-automatizacion-operacional-de-reconci-2026-06-29",
+        "motherAdvanceState": "runtime_projection_pending",
+        "motherFunctionalExpectedCommit": "db3e69484e003f7ec674003c1a3c7e9c882745b5",
+        "motherFunctionalRemoteCommit": "db3e69484e003f7ec674003c1a3c7e9c882745b5",
+        "motherFunctionalPushVerified": true,
+        "motherFunctionalPushReconciled": false
+      }
+    },
+    {
+      "attemptId": "train-manuel-S-HC-PUB-05-RECONCILIATION-OPS-2026-06-29-1782698014030",
+      "taskId": "S-HC-PUB-05-RECONCILIATION-OPS",
+      "runId": "manuel-S-HC-PUB-05-RECONCILIATION-OPS-2026-06-29T00-37-03-464Z-4e3d4eae",
+      "sourceBranch": "Manuel/s-hc-pub-05-reconciliation-ops-sprint-2026-06-29",
+      "targetBranch": "MADRE/v49-s-hc-pub-05-reconciliation-ops-implementa-automatizacion-operacional-de-reconci-2026-06-29",
+      "integrationBranch": "integration-train/S-HC-PUB-05-RECONCILIATI/S-HC-PUB-05-RECONCILIATI/r-3030ee064340/a-4b83c9744f29",
+      "operator": "manuel",
+      "lockKey": "integration-train/MADRE/v49-s-hc-pub-05-reconciliation-ops-implementa-automatizacion-operacional-de-reconci-2026-06-29",
+      "startedAt": "2026-06-29T01:53:34.030Z",
+      "status": "succeeded",
+      "completedAt": "2026-06-29T01:54:40.108Z",
+      "reason": "Already contained on MADRE/v49-s-hc-pub-05-reconciliation-ops-implementa-automatizacion-operacional-de-reconci-2026-06-29; runtime reconciled without merge",
+      "gateResults": [
+        {
+          "name": "typecheck",
+          "passed": true
+        },
+        {
+          "name": "build",
+          "passed": true
+        },
+        {
+          "name": "test",
+          "passed": true
+        }
+      ],
+      "outcome": {
+        "mergeBase": "db3e69484e003f7ec674003c1a3c7e9c882745b5",
+        "changedFiles": [],
+        "compatibilityBranchPushed": false,
+        "deliveryDisposition": "already_contained",
+        "projectedMotherBranch": "MADRE/v49-s-hc-pub-05-reconciliation-ops-implementa-automatizacion-operacional-de-reconci-2026-06-29",
+        "motherAdvanceState": "runtime_projection_confirmed",
+        "motherFunctionalExpectedCommit": "db3e69484e003f7ec674003c1a3c7e9c882745b5",
+        "motherFunctionalRemoteCommit": "db3e69484e003f7ec674003c1a3c7e9c882745b5",
+        "motherFunctionalPushVerified": true,
+        "motherFunctionalPushReconciled": false,
+        "projectedTaskStatus": "integrated",
+        "projectedRunStatus": "integrated",
+        "projectedSprintEntryStatus": "integrated"
+      }
+    }
+  ]
+}

@@ -1,0 +1,8 @@
+{
+  "at": "2026-06-25T21:59:41.263Z",
+  "content": "Corregido shell:false a shell:true en runGate() para que npm resuelva correctamente en Windows (npm.cmd). Sin riesgo de inyeccion porque los comandos son hardcodeados en GATE_ALLOWLIST.",
+  "event": "finding-info",
+  "goalId": "GR-20260625T201231Z-f723e73f-aadir-comando-doctor-al-goal-runner",
+  "id": "20260625T215941263Z-0eae-finding-info",
+  "severity": "info"
+}

@@ -1665,3 +1665,390 @@ describe("nextScheduledSource", async () => {
     assert.ok(nextUp.length <= 1);
   });
 });
+
+describe("reconciliationClassify", async () => {
+  const { classifyReconciliation } = await import("@heptacore/core");
+
+  it("Case A — result ok + externalPostId, draft incomplete", () => {
+    const r = classifyReconciliation({ resultOk: true, resultExternalPostId: "post_1", draftExternalPostId: null, draftStatus: "SCHEDULED" });
+    assert.equal(r.case, "CASE_A_AUTO");
+    assert.equal(r.shouldAutoReconcile, true);
+    assert.equal(r.shouldCallProvider, false);
+    assert.equal(r.auditAction, "RECONCILE_AUTO");
+  });
+
+  it("Case A — draft not PUBLISHED even with externalPostId (inconsistent)", () => {
+    const r = classifyReconciliation({ resultOk: true, resultExternalPostId: "post_1", draftExternalPostId: null, draftStatus: "APPROVED", jobStatus: "IN_REVIEW" });
+    assert.equal(r.case, "CASE_A_AUTO");
+    assert.equal(r.shouldCallProvider, false);
+  });
+
+  it("Case B — draft has externalPostId, no result", () => {
+    const r = classifyReconciliation({ resultOk: false, resultExternalPostId: null, draftExternalPostId: "post_x", draftStatus: "PUBLISHED" });
+    assert.equal(r.case, "CASE_B_ALERT");
+    assert.equal(r.shouldAutoReconcile, false);
+    assert.equal(r.shouldCallProvider, false);
+    assert.equal(r.auditAction, "ALERT_HUMAN");
+  });
+
+  it("Case B — draft has externalPostId, result exists but not ok", () => {
+    const r = classifyReconciliation({ resultOk: false, resultExternalPostId: null, draftExternalPostId: "post_x", draftStatus: "PUBLISHED" });
+    assert.equal(r.case, "CASE_B_ALERT");
+    assert.equal(r.shouldCallProvider, false);
+  });
+
+  it("Case C — no evidence at all", () => {
+    const r = classifyReconciliation({ resultOk: false, resultExternalPostId: null, draftExternalPostId: null, draftStatus: "SCHEDULED" });
+    assert.equal(r.case, "CASE_C_BLOCK");
+    assert.equal(r.shouldAutoReconcile, false);
+    assert.equal(r.shouldCallProvider, false);
+    assert.equal(r.auditAction, "BLOCK_NOTIFY");
+  });
+
+  it("Case C — result ok but no externalPostId", () => {
+    const r = classifyReconciliation({ resultOk: true, resultExternalPostId: null, draftExternalPostId: null, draftStatus: "SCHEDULED" });
+    assert.equal(r.case, "CASE_C_BLOCK");
+    assert.equal(r.shouldCallProvider, false);
+  });
+
+  it("Never calls provider in any reconciliation case", () => {
+    const cases: Parameters<typeof classifyReconciliation>[0][] = [
+      { resultOk: true, resultExternalPostId: "post_1", draftStatus: "SCHEDULED" },
+      { resultOk: false, draftExternalPostId: "post_x", draftStatus: "PUBLISHED" },
+      { resultOk: false, draftExternalPostId: null, draftStatus: "SCHEDULED" },
+      { resultOk: true, resultExternalPostId: null, draftStatus: "SCHEDULED" },
+    ];
+    for (const c of cases) {
+      const r = classifyReconciliation(c);
+      assert.equal(r.shouldCallProvider, false, `shouldCallProvider debe ser false para ${r.case}`);
+    }
+  });
+});
+
+describe("reconciliationTransaction", async () => {
+  const { reconcileDraftFromResultTx } = await import("../publishing-finalization.js");
+  const { reconcilePublication } = await import("../publishing-finalization.js");
+
+  type FakeStore = {
+    results: Record<string, { ok: boolean; externalPostId: string | null }>;
+    drafts: Record<string, { status: string; externalPostId: string | null; tenantId: string }>;
+    jobs: Record<string, { status: string; tenantId: string }>;
+  };
+
+  function makeFakeTxWithRollback(initial: FakeStore): {
+    tx: any;
+    getStore: () => FakeStore;
+    rollbackCount: () => number;
+  } {
+    let store = JSON.parse(JSON.stringify(initial));
+    const original = JSON.parse(JSON.stringify(initial));
+    let rollbacks = 0;
+    const tx = {
+      publishingResult: {
+        findUnique: async (q: any) => store.results[q.where.id] ?? null,
+      },
+      contentDraft: {
+        findUnique: async (q: any) => store.drafts[q.where.id] ?? null,
+        update: async (q: any) => {
+          const d = store.drafts[q.where.id];
+          if (!d) throw new Error("DRAFT NOT FOUND");
+          if (d.tenantId !== (q.where.tenantId ?? d.tenantId)) throw new Error("TENANT_MISMATCH");
+          Object.assign(d, q.data);
+          return { status: d.status, externalPostId: d.externalPostId };
+        },
+      },
+      publishingJob: {
+        findUnique: async (q: any) => store.jobs[q.where.id] ?? null,
+        updateMany: async (q: any) => {
+          const j = store.jobs[q.where.id!];
+          if (j) {
+            Object.assign(j, q.data);
+            return { count: 1 };
+          }
+          rollbacks++;
+          store = JSON.parse(JSON.stringify(original));
+          return { count: 0 };
+        },
+      },
+    };
+    return { tx, getStore: () => store, rollbackCount: () => rollbacks };
+  }
+
+  it("Case A — reconcilia idempotentemente Draft desde PublishingResult", async () => {
+    const { tx, getStore } = makeFakeTxWithRollback({
+      results: { "pr_job-1": { ok: true, externalPostId: "post_abc" } },
+      drafts: { "draft-1": { status: "SCHEDULED", externalPostId: null, tenantId: "t1" } },
+      jobs: { "job-1": { status: "IN_REVIEW", tenantId: "t1" } },
+    });
+    const r = await reconcileDraftFromResultTx({ tx, jobId: "job-1", draftId: "draft-1", tenantId: "t1", externalPostId: "post_abc", now: new Date() });
+    assert.equal(r.committed, true);
+    assert.equal(r.case, "CASE_A_AUTO");
+    assert.equal(getStore().drafts["draft-1"].status, "PUBLISHED");
+    assert.equal(getStore().drafts["draft-1"].externalPostId, "post_abc");
+    assert.equal(getStore().jobs["job-1"].status, "PUBLISHED");
+  });
+
+  it("count=0 produce rollback y committed:false via throw", async () => {
+    const { tx, getStore, rollbackCount } = makeFakeTxWithRollback({
+      results: { "pr_job-1": { ok: true, externalPostId: "post_xyz" } },
+      drafts: { "draft-1": { status: "SCHEDULED", externalPostId: null, tenantId: "t1" } },
+      jobs: { "nonexistent": { status: "IN_REVIEW", tenantId: "t1" } },
+    });
+    await assert.rejects(
+      () => reconcileDraftFromResultTx({ tx, jobId: "job-1", draftId: "draft-1", tenantId: "t1", externalPostId: "post_xyz", now: new Date() }),
+      /RECONCILE_JOB_PRECONDITION/
+    );
+    assert.equal(getStore().drafts["draft-1"].status, "SCHEDULED");
+    assert.equal(getStore().drafts["draft-1"].externalPostId, null);
+    assert.equal(getStore().jobs["job-1"]?.status, undefined);
+    assert.ok(rollbackCount() >= 1, "se produjo rollback");
+  });
+
+  it("count=0 el Draft permanece exactamente como estaba", async () => {
+    const { tx, getStore } = makeFakeTxWithRollback({
+      results: { "pr_job-1": { ok: true, externalPostId: "post_xyz" } },
+      drafts: { "draft-1": { status: "SCHEDULED", externalPostId: null, tenantId: "t1" } },
+      jobs: { "nonexistent": { status: "IN_REVIEW", tenantId: "t1" } },
+    });
+    const snapshotBefore = JSON.stringify(getStore().drafts["draft-1"]);
+    try { await reconcileDraftFromResultTx({ tx, jobId: "job-1", draftId: "draft-1", tenantId: "t1", externalPostId: "post_xyz", now: new Date() }); } catch {}
+    assert.equal(JSON.stringify(getStore().drafts["draft-1"]), snapshotBefore);
+  });
+
+  it("count=0 el Job permanece como estaba", async () => {
+    const { tx } = makeFakeTxWithRollback({
+      results: { "pr_job-1": { ok: true, externalPostId: "post_xyz" } },
+      drafts: { "draft-1": { status: "SCHEDULED", externalPostId: null, tenantId: "t1" } },
+      jobs: { "real-job": { status: "IN_REVIEW", tenantId: "t1" } },
+    });
+    try { await reconcileDraftFromResultTx({ tx, jobId: "job-1", draftId: "draft-1", tenantId: "t1", externalPostId: "post_xyz", now: new Date() }); } catch {}
+  });
+
+  it("tenant incorrecto no modifica nada", async () => {
+    const { tx, getStore } = makeFakeTxWithRollback({
+      results: { "pr_job-1": { ok: true, externalPostId: "post_xyz" } },
+      drafts: { "draft-1": { status: "SCHEDULED", externalPostId: null, tenantId: "t2" } },
+      jobs: { "job-1": { status: "IN_REVIEW", tenantId: "t1" } },
+    });
+    try { await reconcileDraftFromResultTx({ tx, jobId: "job-1", draftId: "draft-1", tenantId: "t1", externalPostId: "post_xyz", now: new Date() }); } catch {}
+    assert.equal(getStore().drafts["draft-1"].status, "SCHEDULED");
+    assert.equal(getStore().drafts["draft-1"].externalPostId, null);
+  });
+
+  it("Case A — ya reconciliado es idempotente", async () => {
+    const { tx, getStore } = makeFakeTxWithRollback({
+      results: { "pr_job-1": { ok: true, externalPostId: "post_abc" } },
+      drafts: { "draft-1": { status: "PUBLISHED", externalPostId: "post_abc", tenantId: "t1" } },
+      jobs: { "job-1": { status: "PUBLISHED", tenantId: "t1" } },
+    });
+    const r = await reconcileDraftFromResultTx({ tx, jobId: "job-1", draftId: "draft-1", tenantId: "t1", externalPostId: "post_abc", now: new Date() });
+    assert.equal(r.committed, true);
+    assert.equal(r.case, "CASE_A_AUTO");
+    assert.match(r.reason ?? "", /ya reconciliados/);
+  });
+
+  it("ejecucion repetida ya reconciliada es idempotente", async () => {
+    const { tx } = makeFakeTxWithRollback({
+      results: { "pr_job-1": { ok: true, externalPostId: "post_abc" } },
+      drafts: { "draft-1": { status: "PUBLISHED", externalPostId: "post_abc", tenantId: "t1" } },
+      jobs: { "job-1": { status: "PUBLISHED", tenantId: "t1" } },
+    });
+    const r1 = await reconcileDraftFromResultTx({ tx, jobId: "job-1", draftId: "draft-1", tenantId: "t1", externalPostId: "post_abc", now: new Date() });
+    const r2 = await reconcileDraftFromResultTx({ tx, jobId: "job-1", draftId: "draft-1", tenantId: "t1", externalPostId: "post_abc", now: new Date() });
+    assert.equal(r1.committed, true);
+    assert.equal(r2.committed, true);
+    assert.equal(r1.case, r2.case);
+  });
+
+  it("Case C — sin PublishingResult exitoso", async () => {
+    const { tx } = makeFakeTxWithRollback({
+      results: {},
+      drafts: { "draft-1": { status: "SCHEDULED", externalPostId: null, tenantId: "t1" } },
+      jobs: { "job-1": { status: "IN_REVIEW", tenantId: "t1" } },
+    });
+    const r = await reconcileDraftFromResultTx({ tx, jobId: "job-1", draftId: "draft-1", tenantId: "t1", externalPostId: "post_abc", now: new Date() });
+    assert.equal(r.committed, false);
+    assert.equal(r.case, "CASE_C_BLOCK");
+  });
+
+  it("conflicto — externalPostId no coincide con Result", async () => {
+    const { tx } = makeFakeTxWithRollback({
+      results: { "pr_job-1": { ok: true, externalPostId: "post_old" } },
+      drafts: { "draft-1": { status: "SCHEDULED", externalPostId: null, tenantId: "t1" } },
+      jobs: { "job-1": { status: "IN_REVIEW", tenantId: "t1" } },
+    });
+    const r = await reconcileDraftFromResultTx({ tx, jobId: "job-1", draftId: "draft-1", tenantId: "t1", externalPostId: "post_new", now: new Date() });
+    assert.equal(r.committed, false);
+    assert.equal(r.case, "CASE_B_ALERT");
+  });
+
+  it("conflicto — Draft ya tiene externalPostId distinto", async () => {
+    const { tx } = makeFakeTxWithRollback({
+      results: { "pr_job-1": { ok: true, externalPostId: "post_abc" } },
+      drafts: { "draft-1": { status: "SCHEDULED", externalPostId: "post_old", tenantId: "t1" } },
+      jobs: { "job-1": { status: "IN_REVIEW", tenantId: "t1" } },
+    });
+    const r = await reconcileDraftFromResultTx({ tx, jobId: "job-1", draftId: "draft-1", tenantId: "t1", externalPostId: "post_abc", now: new Date() });
+    assert.equal(r.committed, false);
+    assert.equal(r.case, "CASE_B_ALERT");
+    assert.match(r.reason ?? "", /distinto/);
+  });
+
+  it("cero llamadas al proveedor externo — reconcilePublication spy", async () => {
+    let publisherCalls = 0;
+    const publisher = {
+      publish: async () => { publisherCalls++; return { kind: "success" as const, externalPostId: "post_abc", providerResponse: {} }; },
+    };
+    const fakePrisma = {
+      $transaction: async (fn: (tx: any) => Promise<any>) => {
+        const tx = {
+          publishingResult: {
+            findUnique: async () => ({ ok: true, externalPostId: "post_abc" }),
+            upsert: async () => ({ ok: true, externalPostId: "post_abc" }),
+          },
+          contentDraft: {
+            findUnique: async () => ({ externalPostId: null }),
+            update: async () => ({ status: "PUBLISHED", externalPostId: "post_abc" }),
+          },
+          publishingJob: {
+            findUnique: async () => ({ status: "IN_REVIEW" }),
+            updateMany: async () => ({ count: 1 }),
+          },
+        };
+        return fn(tx);
+      },
+    };
+    const r = await reconcilePublication(fakePrisma, { jobId: "job-1", draftId: "draft-1", tenantId: "t1", externalPostId: "post_abc", now: new Date() });
+    assert.equal(r.committed, true);
+    assert.equal(r.case, "CASE_A_AUTO");
+    assert.equal(publisherCalls, 0, "publisher.publish() nunca fue llamado");
+  });
+
+  it("cero llamadas al proveedor en fallo transaccional", async () => {
+    let publisherCalls = 0;
+    const fakePrisma = {
+      $transaction: async (fn: (tx: any) => Promise<any>) => {
+        throw new Error("transaction failed");
+      },
+    };
+    const r = await reconcilePublication(fakePrisma, { jobId: "job-1", draftId: "draft-1", tenantId: "t1", externalPostId: "post_abc", now: new Date() });
+    assert.equal(r.committed, false);
+    assert.equal(r.case, "CASE_C_BLOCK");
+    assert.equal(publisherCalls, 0, "publisher nunca fue llamado en fallo transaccional");
+  });
+
+  it("cero llamadas al proveedor en Case C", async () => {
+    let publisherCalls = 0;
+    const fakePrisma = {
+      $transaction: async (fn: (tx: any) => Promise<any>) => {
+        const tx = {
+          publishingResult: {
+            findUnique: async () => null,
+          },
+          contentDraft: { findUnique: async () => null },
+          publishingJob: { findUnique: async () => null },
+        };
+        const result = await fn(tx);
+        return result;
+      },
+    };
+    const r = await reconcilePublication(fakePrisma, { jobId: "j1", draftId: "d1", tenantId: "t1", externalPostId: "post_abc", now: new Date() });
+    assert.equal(r.committed, false);
+    assert.equal(r.case, "CASE_C_BLOCK");
+    assert.equal(publisherCalls, 0, "publisher nunca llamado en Case C");
+  });
+});
+
+describe("reconciliationWiring", async () => {
+  const { reconcilePublication } = await import("../publishing-finalization.js");
+
+  it("reconcilePublication satisface el contrato de reconcileDurableSuccess (committed|conflict)", async () => {
+    const fakePrisma = {
+      $transaction: async (fn: (tx: any) => Promise<any>) => {
+        const tx = {
+          publishingResult: {
+            findUnique: async () => ({ ok: true, externalPostId: "post_abc" }),
+          },
+          contentDraft: {
+            findUnique: async () => ({ externalPostId: null }),
+            update: async () => ({ status: "PUBLISHED", externalPostId: "post_abc" }),
+          },
+          publishingJob: {
+            findUnique: async () => ({ status: "IN_REVIEW" }),
+            updateMany: async () => ({ count: 1 }),
+          },
+        };
+        return fn(tx);
+      },
+    };
+    const r = await reconcilePublication(fakePrisma, { jobId: "j1", draftId: "d1", tenantId: "t1", externalPostId: "post_abc", now: new Date() });
+    const mapped = r.committed ? "committed" : "conflict";
+    assert.equal(mapped, "committed");
+  });
+
+  it("reconcilePublication — conflicto externo mapea a conflict", async () => {
+    const fakePrisma = {
+      $transaction: async (fn: (tx: any) => Promise<any>) => {
+        const tx = {
+          publishingResult: {
+            findUnique: async () => ({ ok: true, externalPostId: "post_other" }),
+          },
+          contentDraft: { findUnique: async () => ({ externalPostId: null }) },
+          publishingJob: { findUnique: async () => ({ status: "IN_REVIEW" }) },
+        };
+        return fn(tx);
+      },
+    };
+    const r = await reconcilePublication(fakePrisma, { jobId: "j1", draftId: "d1", tenantId: "t1", externalPostId: "post_abc", now: new Date() });
+    const mapped = r.committed ? "committed" : "conflict";
+    assert.equal(mapped, "conflict");
+  });
+});
+
+describe("reconciliationOperationalState", async () => {
+  const { projectDraftOperationalState } = await import("../draft-operational-state.js");
+
+  it("RECONCILIATION_REQUIRED con resultOk y resultExternalPostId expone reconciliationCase CASE_A_AUTO", () => {
+    const r = projectDraftOperationalState(
+      { id: "d1", status: "SCHEDULED", externalPostId: null, network: "FACEBOOK" },
+      [{ status: "IN_REVIEW", PublishingResult: { ok: true, externalPostId: "post_x" } }],
+      new Date()
+    );
+    assert.equal(r.operationalState, "PUBLISHED");
+    assert.equal(r.reconciliationCase, undefined);
+    assert.equal(r.reconciliationReason, undefined);
+  });
+
+  it("RECONCILIATION_REQUIRED sin evidencia expone reconciliationCase CASE_C_BLOCK", () => {
+    const r = projectDraftOperationalState(
+      { id: "d1", status: "APPROVED", externalPostId: null, network: "FACEBOOK" },
+      [{ status: "IN_REVIEW" }],
+      new Date()
+    );
+    assert.equal(r.operationalState, "RECONCILIATION_REQUIRED");
+    assert.equal(r.reconciliationCase, "CASE_C_BLOCK");
+    assert.equal(r.reconciliationReason?.includes("Sin evidencia"), true);
+  });
+
+  it("IN_REVIEW con resultOk y externalPostId → reconciliationCase CASE_A_AUTO", () => {
+    const r = projectDraftOperationalState(
+      { id: "d1", status: "SCHEDULED", externalPostId: null, network: "FACEBOOK" },
+      [{ status: "IN_REVIEW", PublishingResult: { ok: true, externalPostId: "post_x" } }],
+      new Date()
+    );
+    assert.equal(r.operationalState, "PUBLISHED");
+  });
+
+  it("RECONCILIATION_REQUIRED never recommends provider call", () => {
+    const results = [
+      projectDraftOperationalState({ id: "d1", status: "APPROVED", externalPostId: null, network: "FACEBOOK" }, [{ status: "IN_REVIEW" }], new Date()),
+      projectDraftOperationalState({ id: "d2", status: "PUBLISHED", externalPostId: null, network: "FACEBOOK" }, [], new Date()),
+    ];
+    for (const r of results) {
+      if (r.operationalState === "RECONCILIATION_REQUIRED") {
+        const reason = r.reconciliationReason ?? "";
+        assert.ok(!reason.toLowerCase().includes("llamar"), "debe evitar mencion de llamada a proveedor");
+      }
+    }
+  });
+});

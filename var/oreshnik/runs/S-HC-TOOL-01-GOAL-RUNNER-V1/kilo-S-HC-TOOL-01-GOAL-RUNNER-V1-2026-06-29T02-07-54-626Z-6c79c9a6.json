@@ -1,0 +1,29 @@
+{
+  "project": "HeptaCore",
+  "taskId": "S-HC-TOOL-01-GOAL-RUNNER-V1",
+  "sprint": "S-HC-TOOL-01-GOAL-RUNNER-V1",
+  "owner": "Manuel",
+  "operator": "kilo",
+  "worker": "kilo",
+  "workerMode": "codex",
+  "runId": "kilo-S-HC-TOOL-01-GOAL-RUNNER-V1-2026-06-29T02-07-54-626Z-6c79c9a6",
+  "branch": "task/S-HC-TOOL-01-GOAL-RUNNER-V1/S-HC-TOOL-01-GOAL-RUNNER-V1/kilo/kilo-S-HC-TOOL-01-GOAL-RUNNER-V1-2026-06-29T02-07-54-626Z-6c79c9a6",
+  "worktreePath": "D:\\PROYECTOS\\WORKTREES\\HeptaCore_PUB04_GOAL\\var\\oreshnik\\wt\\S-HC-TOOL-01-GOAL-RUNNER-V1\\S-HC-TOOL-01-GOAL-RUNNER-V1\\r-2ff68e9be13b",
+  "zones": [
+    "scripts/goal-runner/**",
+    "var/goal-runner/**",
+    ".kilo/command/goal.md",
+    ".kilo/command/preflight.md",
+    "AGENTS.md",
+    "package.json",
+    "docs/07_handoffs/**",
+    "docs/obsidian-vault/**"
+  ],
+  "taskBoardPath": "D:\\PROYECTOS\\WORKTREES\\HeptaCore_PUB04_GOAL\\var\\oreshnik\\task-board.json",
+  "taskStatus": "integrated",
+  "claimStatus": "released",
+  "claimedAt": "2026-06-29T02:07:54.626Z",
+  "updatedAt": "2026-06-29T03:21:35.807Z",
+  "expiresAt": "2026-06-29T03:07:54.626Z",
+  "releasedAt": "2026-06-29T02:19:25.752Z"
+}

@@ -1,0 +1,8 @@
+{
+  "at": "2026-06-25T21:57:38.983Z",
+  "event": "step-complete-tests-con-nodetest",
+  "goalId": "GR-20260625T201231Z-f723e73f-aadir-comando-doctor-al-goal-runner",
+  "id": "20260625T215738982Z-3ca0-step-complete-tests-con-nodetest",
+  "result": "10 tests en doctor.test.mjs cubren: healthy worktree, lock valido, lock stale (status no ACTIVE, state missing), state corrupto, index inconsistente (stale hash, ghost entry), resumable goals, missing history dir, missing schema. All 146 tests pass across 12 suites.",
+  "step": "Tests con node:test"
+}

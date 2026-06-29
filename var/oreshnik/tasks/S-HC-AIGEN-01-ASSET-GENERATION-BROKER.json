@@ -1,0 +1,39 @@
+{
+  "project": "HeptaCore",
+  "taskId": "S-HC-AIGEN-01-ASSET-GENERATION-BROKER",
+  "sprint": "ai-generation",
+  "sprintOrderIndex": 5,
+  "taskOrderIndex": 7,
+  "title": "AI asset generation broker: provider-agnostic, metered and billed",
+  "owner": "Manuel",
+  "backupOwner": "Manuel",
+  "status": "blocked",
+  "taskBoardPath": "D:\\PROYECTOS\\WORKTREES\\HeptaCore_PUB04_GOAL\\var\\oreshnik\\task-board.json",
+  "zone": [
+    "packages/agents",
+    "apps/web/app/api",
+    "packages/core"
+  ],
+  "dependsOn": [
+    "S-HC-ASSET-01-STRATEGY-ASSET-MANIFEST",
+    "S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE",
+    "S-HC-COMM-02-BILLING-ACTIVATION"
+  ],
+  "acceptance": [
+    "Provider-agnostic generation broker (not hardcoded to single provider)",
+    "Metered consumption with cost preview before generation",
+    "Billed per request with usage tracking",
+    "Optional: client may supply assets without using generation",
+    "Generation respects brand guidelines from strategy"
+  ],
+  "history": [
+    {
+      "at": "2026-06-28T18:47:05.091Z",
+      "action": "status_reconciled",
+      "operator": "manuel",
+      "description": "Task status reconciled to blocked: dependency S-HC-ASSET-01-STRATEGY-ASSET-MANIFEST still pending (S-HC-ASSET-01-STRATEGY-ASSET-MANIFEST:pending) | dependency S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE still pending (S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE:pending) | dependency S-HC-COMM-02-BILLING-ACTIVATION still pending (S-HC-COMM-02-BILLING-ACTIVATION:pending)"
+    }
+  ],
+  "updatedAt": "2026-06-29T02:29:41.523Z",
+  "runs": []
+}

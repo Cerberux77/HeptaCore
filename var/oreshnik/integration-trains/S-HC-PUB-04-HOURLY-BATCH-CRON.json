@@ -1,0 +1,53 @@
+{
+  "project": "HeptaCore",
+  "sprint": "S-HC-PUB-04-HOURLY-BATCH-CRON",
+  "motherBranch": "MADRE/v48-s-hc-pub-04-hourly-batch-cron-hourly-batch-publishing-cron-and-pub-04-producti-2026-06-28",
+  "lockKey": "integration-train/MADRE/v48-s-hc-pub-04-hourly-batch-cron-hourly-batch-publishing-cron-and-pub-04-producti-2026-06-28",
+  "createdAt": "2026-06-28T23:57:14.146Z",
+  "updatedAt": "2026-06-28T23:59:59.956Z",
+  "results": [
+    {
+      "attemptId": "train-Manuel-S-HC-PUB-04-HOURLY-BATCH-CRON-2026-06-26T-1782691034146",
+      "taskId": "S-HC-PUB-04-HOURLY-BATCH-CRON",
+      "runId": "Manuel-S-HC-PUB-04-HOURLY-BATCH-CRON-2026-06-26T08-52-44-815Z-2487f474",
+      "sourceBranch": "Manuel/s-hc-pub-04-hourly-batch-goal",
+      "targetBranch": "MADRE/v48-s-hc-pub-04-hourly-batch-cron-hourly-batch-publishing-cron-and-pub-04-producti-2026-06-28",
+      "integrationBranch": "integration-train/S-HC-PUB-04-HOURLY-BATCH/S-HC-PUB-04-HOURLY-BATCH/r-c08e3c5d3afc/a-f62c2c114d4d",
+      "operator": "manuel",
+      "lockKey": "integration-train/MADRE/v48-s-hc-pub-04-hourly-batch-cron-hourly-batch-publishing-cron-and-pub-04-producti-2026-06-28",
+      "startedAt": "2026-06-28T23:57:14.146Z",
+      "status": "succeeded",
+      "completedAt": "2026-06-28T23:59:59.956Z",
+      "reason": "Already contained on MADRE/v48-s-hc-pub-04-hourly-batch-cron-hourly-batch-publishing-cron-and-pub-04-producti-2026-06-28; runtime reconciled without merge",
+      "gateResults": [
+        {
+          "name": "typecheck",
+          "passed": true
+        },
+        {
+          "name": "build",
+          "passed": true
+        },
+        {
+          "name": "test",
+          "passed": true
+        }
+      ],
+      "outcome": {
+        "mergeBase": "f301b7f8c2fe3e153ba006201c872ed0c825245c",
+        "changedFiles": [],
+        "compatibilityBranchPushed": false,
+        "deliveryDisposition": "already_contained",
+        "projectedMotherBranch": "MADRE/v48-s-hc-pub-04-hourly-batch-cron-hourly-batch-publishing-cron-and-pub-04-producti-2026-06-28",
+        "motherAdvanceState": "runtime_projection_confirmed",
+        "motherFunctionalExpectedCommit": "f301b7f8c2fe3e153ba006201c872ed0c825245c",
+        "motherFunctionalRemoteCommit": "f301b7f8c2fe3e153ba006201c872ed0c825245c",
+        "motherFunctionalPushVerified": true,
+        "motherFunctionalPushReconciled": false,
+        "projectedTaskStatus": "integrated",
+        "projectedRunStatus": "integrated",
+        "projectedSprintEntryStatus": "integrated"
+      }
+    }
+  ]
+}

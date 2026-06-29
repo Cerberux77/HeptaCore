@@ -1,0 +1,86 @@
+{
+  "evidence": [
+    {
+      "addedAt": "2026-06-26T03:02:03.819Z",
+      "hash": "sha256:90302645235ea7c21855d4dc05ac1f486d7a05a30e2b20b0f2b3134a593ec4a1",
+      "path": "apps/web/lib/__tests__/publish-flow.test.ts",
+      "type": "code"
+    },
+    {
+      "addedAt": "2026-06-26T03:02:12.362Z",
+      "hash": "sha256:fa0f6d7e07ee1baf559281d49f0023af0d7b60209f44feb91651df2b9d78cf49",
+      "path": "apps/web/lib/cron-auth.ts",
+      "type": "code"
+    },
+    {
+      "addedAt": "2026-06-26T03:02:12.511Z",
+      "hash": "sha256:7d66b7dd9b94e1fde29ac5f3674f7447b7dfb53d0f09e7687da92a7bb13dac71",
+      "path": "apps/web/lib/publishing-cron-time.ts",
+      "type": "code"
+    },
+    {
+      "addedAt": "2026-06-26T03:02:12.647Z",
+      "hash": "sha256:354d4fdec043d418175d34af9d032816ffbd6907aae5201cda28a9f86cc490d8",
+      "path": "apps/web/lib/publishing-claim.ts",
+      "type": "code"
+    },
+    {
+      "addedAt": "2026-06-26T03:02:12.772Z",
+      "hash": "sha256:e13036f81dde663eff4dfb25615bd87cf1e6c314ad53b25765757c14b1f7f08f",
+      "path": "apps/web/lib/publishing-revalidation.ts",
+      "type": "code"
+    }
+  ],
+  "gates": [
+    {
+      "durationMs": 89,
+      "exitCode": 0,
+      "gate": "diff-check",
+      "passed": true,
+      "summary": "warning: in the working copy of 'apps/web/app/api/cron/publisher/route.ts', LF will be replaced by CRLF the next time Git touches it warning: in the working copy of 'var/goal-runner/index.json', LF wi"
+    },
+    {
+      "durationMs": 12678,
+      "exitCode": 0,
+      "gate": "typecheck",
+      "passed": true,
+      "summary": " > heptacore@0.1.0 typecheck > npm run typecheck --workspaces --if-present   > @heptacore/web@0.1.0 typecheck > tsc --noEmit   > @heptacore/worker@0.2.0 typecheck > tsc --noEmit   > @heptacore/agents@"
+    },
+    {
+      "durationMs": 18009,
+      "exitCode": 0,
+      "gate": "test",
+      "passed": true,
+      "summary": " > heptacore@0.1.0 test > node --test apps/web/lib/calendar-state.test.mjs && npm run test --workspaces --if-present  ✔ calendar display state prefers operational state over approval status (0.8862ms)"
+    },
+    {
+      "durationMs": 45299,
+      "exitCode": 0,
+      "gate": "build",
+      "passed": true,
+      "summary": " > heptacore@0.1.0 build > npm run build --workspaces --if-present   > @heptacore/web@0.1.0 build > node scripts/copy-tenant-assets.mjs && prisma generate --schema ../../packages/db/prisma/schema.pris"
+    },
+    {
+      "durationMs": 1700,
+      "exitCode": 0,
+      "gate": "worker-validate",
+      "passed": true,
+      "summary": " > heptacore@0.1.0 worker:validate > npm run validate -w @heptacore/worker   > @heptacore/worker@0.2.0 validate > node src/validate.mjs   === Validacion de Assets ===  Presentes: 46/46 ✅ Todos los ass"
+    },
+    {
+      "durationMs": 149,
+      "exitCode": 0,
+      "gate": "oreshnik-reconcile",
+      "passed": true,
+      "summary": " \u001b[1mORESHNIK CANONICAL CHECK\u001b[0m   Board:     var/oreshnik/task-board.json   Updated:   2026-06-25T20:05:39.000Z   Operator:  not specified   Sprint:    not specified    [ \u001b[32mOK  \u001b[0m ] Derived doc"
+    },
+    {
+      "durationMs": 204,
+      "exitCode": 0,
+      "gate": "oreshnik-drift",
+      "passed": true,
+      "summary": " \u001b[1mOreshnik Drift Log\u001b[0m   S-HC-DRIFT-001     2026-06-12 Manuel   sprint   S-HC-DRIFT-002     2026-06-12 Manuel   Codex multi-RRSS refactor, readiness gates, UI fixes, migrations, vercelignore   S-"
+    }
+  ],
+  "goalId": "GR-20260626T024440Z-263ede1e-hourly-batch-cron-publishing-production-hardenin"
+}

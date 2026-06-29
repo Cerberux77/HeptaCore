@@ -115,6 +115,118 @@ export async function commitConfirmedPublication(
   }
 }
 
+export interface ReconcileTxParams {
+  tx: TxClient;
+  jobId: string;
+  draftId: string;
+  tenantId: string;
+  externalPostId: string;
+  now: Date;
+}
+
+export interface ReconcileCommitResult {
+  committed: boolean;
+  case: "CASE_A_AUTO" | "CASE_B_ALERT" | "CASE_C_BLOCK";
+  reason?: string;
+}
+
+export async function reconcileDraftFromResultTx(params: ReconcileTxParams): Promise<ReconcileCommitResult> {
+  const { tx, jobId, draftId, tenantId, externalPostId, now } = params;
+
+  if (!externalPostId) {
+    throw new Error("RECONCILE_INVALID: externalPostId is empty");
+  }
+
+  const resultId = `pr_${jobId}`;
+
+  const existingResult = await tx.publishingResult.findUnique({
+    where: { id: resultId },
+    select: { ok: true, externalPostId: true },
+  });
+
+  if (!existingResult?.ok || !existingResult.externalPostId) {
+    return {
+      committed: false,
+      case: "CASE_C_BLOCK",
+      reason: "No existe PublishingResult exitoso para reconciliar.",
+    };
+  }
+
+  if (existingResult.externalPostId !== externalPostId) {
+    return {
+      committed: false,
+      case: "CASE_B_ALERT",
+      reason: `Conflicto: externalPostId del Result (${existingResult.externalPostId}) no coincide con el esperado (${externalPostId}).`,
+    };
+  }
+
+  const existingDraft = await tx.contentDraft.findUnique({
+    where: { id: draftId },
+    select: { externalPostId: true },
+  });
+
+  if (existingDraft?.externalPostId && existingDraft.externalPostId !== externalPostId) {
+    return {
+      committed: false,
+      case: "CASE_B_ALERT",
+      reason: `Conflicto: Draft ya tiene externalPostId distinto (${existingDraft.externalPostId}).`,
+    };
+  }
+
+  if (existingDraft?.externalPostId === externalPostId) {
+    const job = await tx.publishingJob.findUnique({
+      where: { id: jobId },
+      select: { status: true },
+    });
+
+    if (job?.status === "PUBLISHED") {
+      return { committed: true, case: "CASE_A_AUTO", reason: "Draft y job ya reconciliados." };
+    }
+  }
+
+  const updatedDraft = await tx.contentDraft.update({
+    where: { id: draftId, tenantId },
+    data: { status: "PUBLISHED", publishedAt: now, externalPostId },
+    select: { status: true, externalPostId: true },
+  });
+
+  if (updatedDraft.status !== "PUBLISHED" || updatedDraft.externalPostId !== externalPostId) {
+    return {
+      committed: false,
+      case: "CASE_C_BLOCK",
+      reason: "Fallo al actualizar el Draft durante reconciliacion.",
+    };
+  }
+
+  const jobCommit = await tx.publishingJob.updateMany({
+    where: { id: jobId },
+    data: { status: "PUBLISHED", scheduledFor: null, updatedAt: now },
+  });
+
+  if (jobCommit.count < 1) {
+    throw new Error("RECONCILE_JOB_PRECONDITION: job not updated during reconciliation");
+  }
+
+  return { committed: true, case: "CASE_A_AUTO" };
+}
+
+export async function reconcilePublication(
+  prisma: { $transaction(fn: (tx: any) => Promise<any>): Promise<any> },
+  params: Omit<ReconcileTxParams, "tx">
+): Promise<ReconcileCommitResult> {
+  try {
+    return await prisma.$transaction((tx: TxClient) =>
+      reconcileDraftFromResultTx({ tx, ...params })
+    );
+  } catch {
+    return {
+      committed: false,
+      case: "CASE_C_BLOCK",
+      reason: "Transaccion de reconciliacion fallo.",
+    };
+  }
+}
+
 export interface RecordFailureParams {
   tx: any;
   jobId: string;

@@ -1,7 +1,8 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { upload as uploadBlob } from "@vercel/blob/client";
 import {
   AlertTriangle,
   ArrowDown,
@@ -31,6 +32,7 @@ import {
 } from "lucide-react";
 import { HeptaCoreWordmark } from "./heptacore-mark";
 import { AssistantFab } from "./assistant-fab";
+import AssetInspectorDrawer from "./asset-inspector-drawer";
 import type {
   CalendarItem,
   DashboardMetrics,
@@ -56,9 +58,57 @@ import {
   type MultiformatDryRunResult,
   type PublishingFormat,
 } from "../lib/publishing-formats";
+import { extractAssetMetadataFromFile, normalizeTechnicalAssetMetadata } from "../lib/asset-metadata";
+import {
+  AssetFinalizeError,
+  resolveUploadedAssetAfterUpload,
+  waitForRegisteredAsset,
+  type FinalizeUploadedAssetPayload,
+} from "../lib/asset-upload";
+import AssetCollectionPicker from "./asset-collection-picker";
+import {
+  ASSET_COMPATIBILITY_CONFIGS,
+  ASSET_COMPATIBILITY_TARGETS,
+  compatibilityTargetFromPublishingFormat,
+  evaluateAssetCompatibility,
+  type AssetCompatibilityFilter,
+  type AssetCompatibilityInput,
+  type AssetCompatibilityStatus,
+  type AssetCompatibilityTarget,
+} from "../lib/asset-compatibility";
+import {
+  applyAssetLibraryFilters,
+  clearAssetLibraryFilters,
+  DEFAULT_ASSET_LIBRARY_FILTERS,
+  updateAssetLibraryCompatibility,
+  updateAssetLibraryTarget,
+  type AssetSortOrder,
+  type AssetUsageFilter,
+} from "../lib/asset-library-filters";
+import { upsertTenantAssetList } from "../lib/asset-presentation";
 
 type View = "overview" | "strategy" | "queue" | "assets" | "calendar" | "checklist" | "reports" | "readiness";
 type CalendarView = "list" | "week" | "month";
+type UploadFileState = "PENDING" | "UPLOADING" | "FINALIZING" | "READY" | "FAILED";
+type UploadQueueItem = {
+  id: string;
+  file: File;
+  state: UploadFileState;
+  progress: number;
+  error?: string;
+  errorCode?: string;
+  lastStatus?: number;
+  attempts?: number;
+  folder?: string;
+  pathname?: string;
+  url?: string;
+  filename?: string;
+  storageKey?: string;
+  contentType?: string;
+  sizeBytes?: number;
+  technicalMetadata?: unknown;
+  asset?: TenantAssetItem;
+};
 
 const SUPPORTED_NETWORKS = ["INSTAGRAM", "FACEBOOK", "YOUTUBE", "TIKTOK", "LINKEDIN"] as const;
 
@@ -86,17 +136,12 @@ const NETWORK_LABELS: Record<string, string> = {
   X: "X",
 };
 
-function tenantAssetSlug(tenantSlug: string): string {
-  return tenantSlug === "turpial-sound" ? "turpial" : tenantSlug;
-}
-
 function assetUrl(path: string | null | undefined, slug: string) {
   if (!path) return "";
   if (path.startsWith("http://") || path.startsWith("https://") || path.startsWith("/")) return path;
-  const folder = tenantAssetSlug(slug);
   const cleanPath = path.replace(/^content\/inbox\//, "").replace(/\\/g, "/");
   if (cleanPath.includes("..")) return "";
-  return `/tenant-assets/${folder}/${cleanPath}`;
+  return `/tenant-assets/${slug}/${cleanPath}`;
 }
 
 function channelLabel(item: DraftQueueItem) {
@@ -123,6 +168,52 @@ function isVideoPath(path?: string | null, kind?: string | null, mimeType?: stri
 
 function assetLabel(asset: DraftFormatAsset) {
   return asset.filename ?? asset.id;
+}
+
+function formatBytes(value?: number | null) {
+  if (!value) return "tamano pendiente";
+  if (value >= 1024 * 1024) return `${(value / 1024 / 1024).toFixed(value >= 10 * 1024 * 1024 ? 0 : 1)} MB`;
+  return `${Math.max(1, Math.round(value / 1024))} KB`;
+}
+
+function formatDuration(value?: number | null) {
+  if (value == null) return null;
+  const seconds = Math.round(value);
+  const minutes = Math.floor(seconds / 60);
+  const rest = seconds % 60;
+  return minutes > 0 ? `${minutes}:${String(rest).padStart(2, "0")}` : `${seconds}s`;
+}
+
+function aspectRatioText(value: unknown) {
+  if (value && typeof value === "object" && !Array.isArray(value)) {
+    const ratio = value as { label?: unknown; value?: unknown };
+    if (typeof ratio.label === "string") return ratio.label;
+    if (typeof ratio.value === "number") return ratio.value.toFixed(2);
+  }
+  if (typeof value === "number") return value.toFixed(2);
+  if (typeof value === "string" && value.trim()) return value;
+  return "Sin analizar";
+}
+
+function assetCompatibilityInput(asset: TenantAssetItem | DraftFormatAsset): AssetCompatibilityInput {
+  return {
+    kind: asset.kind ?? null,
+    mimeType: asset.mimeType ?? null,
+    width: asset.width ?? null,
+    height: asset.height ?? null,
+    sizeBytes: asset.sizeBytes ?? null,
+    durationSeconds: asset.durationSeconds ?? null,
+    orientation: "orientation" in asset ? asset.orientation as any : null,
+    aspectRatio: ("aspectRatio" in asset ? asset.aspectRatio : null) as AssetCompatibilityInput["aspectRatio"],
+    metadata: "metadata" in asset ? asset.metadata ?? null : null,
+  };
+}
+
+function compatibilityLabel(status: AssetCompatibilityStatus) {
+  if (status === "IDEAL") return "Ideal";
+  if (status === "USABLE") return "Usable";
+  if (status === "INCOMPATIBLE") return "No compatible";
+  return "Sin analizar";
 }
 
 function Thumb({ item, slug }: { item: DraftQueueItem; slug: string }) {
@@ -297,6 +388,88 @@ function StatusCard({
   );
 }
 
+function InspectorContent({
+  inspectorAsset,
+  tenantSlug,
+  assetFolders,
+  onClose,
+  onRename,
+  onMove,
+  onReplace,
+  onDelete,
+  onUpdateFolder,
+}: {
+  inspectorAsset: TenantAssetItem;
+  tenantSlug: string;
+  assetFolders: string[];
+  onClose: () => void;
+  onRename: (id: string, name: string) => void;
+  onMove: (id: string, folder: string) => void;
+  onReplace: (id: string, file: File) => void;
+  onDelete: (id: string) => void;
+  onUpdateFolder: (id: string, folder: string) => void;
+}) {
+  return (
+    <>
+      {inspectorAsset.path && (
+        <div style={{ marginBottom: 16 }}>
+          {inspectorAsset.kind === "VIDEO" || (inspectorAsset.path ?? "").toLowerCase().endsWith(".mp4") ? (
+            <video src={assetUrl(inspectorAsset.path, tenantSlug)} controls style={{ width: "100%", maxHeight: 220, objectFit: "contain", borderRadius: 8 }} preload="metadata" />
+          ) : (
+            <img src={assetUrl(inspectorAsset.path, tenantSlug)} alt={inspectorAsset.filename} style={{ width: "100%", maxHeight: 220, objectFit: "contain", borderRadius: 8 }} crossOrigin="anonymous" />
+          )}
+        </div>
+      )}
+      <div style={{ display: "grid", gap: 6, fontSize: 12, color: "var(--hc-ink)" }}>
+        <div><strong>Archivo:</strong> {inspectorAsset.filename}</div>
+        <div><strong>ID:</strong> <code style={{ fontSize: 10 }}>{inspectorAsset.id}</code></div>
+        <div><strong>Tipo:</strong> {inspectorAsset.kind} / {inspectorAsset.mimeType ?? "N/D"}</div>
+        <div><strong>Resolucion:</strong> {inspectorAsset.width && inspectorAsset.height ? `${inspectorAsset.width}x${inspectorAsset.height}` : "Sin analizar"}</div>
+        <div><strong>Tamano:</strong> {formatBytes(inspectorAsset.sizeBytes)}</div>
+        {inspectorAsset.durationSeconds != null && <div><strong>Duracion:</strong> {formatDuration(inspectorAsset.durationSeconds)}</div>}
+        <div><strong>Orientacion:</strong> {inspectorAsset.orientation ?? "pendiente"}</div>
+        <div><strong>Aspect ratio:</strong> {aspectRatioText(inspectorAsset.aspectRatio)}</div>
+        <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+          <strong>Coleccion:</strong>
+          <AssetCollectionPicker
+            currentFolder={inspectorAsset.folder ?? ""}
+            tenantSlug={tenantSlug}
+            folders={assetFolders}
+            onSelect={(folder) => onUpdateFolder(inspectorAsset.id, folder)}
+          />
+        </div>
+        <div><strong>Storage key:</strong> <code style={{ fontSize: 10, wordBreak: "break-all" }}>{inspectorAsset.storageKey ?? "N/D"}</code></div>
+        <div><strong>Drafts:</strong> {inspectorAsset.draftCount}</div>
+      </div>
+      <div style={{ marginTop: 16 }}>
+        <strong style={{ fontSize: 12, color: "var(--hc-ink)" }}>Matriz de compatibilidad</strong>
+        <div style={{ display: "grid", gap: 4, marginTop: 6 }}>
+          {ASSET_COMPATIBILITY_TARGETS.map((target) => {
+            const result = evaluateAssetCompatibility(assetCompatibilityInput(inspectorAsset), target);
+            return (
+              <div key={target} style={{ display: "flex", alignItems: "center", gap: 6, padding: "4px 8px", borderRadius: 4, background: result.status === "IDEAL" ? "#e8f7ef" : result.status === "USABLE" ? "#fff8e1" : result.status === "INCOMPATIBLE" ? "#fff1f0" : "var(--hc-bone)", fontSize: 11 }}>
+                <span style={{ width: 8, height: 8, borderRadius: "50%", background: result.status === "IDEAL" ? "#0f6e3f" : result.status === "USABLE" ? "#f5a623" : result.status === "INCOMPATIBLE" ? "#b42318" : "var(--hc-fog)", flexShrink: 0 }} />
+                <span style={{ flex: 1 }}>{ASSET_COMPATIBILITY_CONFIGS[target].label}</span>
+                <span style={{ fontWeight: 600 }}>{compatibilityLabel(result.status)}</span>
+                <small style={{ color: "var(--hc-fog)", fontSize: 10 }}>{result.reasons.join("; ")}</small>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+      <div style={{ display: "flex", gap: 6, marginTop: 18, flexWrap: "wrap" }}>
+        <button onClick={() => { onClose(); onRename(inspectorAsset.id, inspectorAsset.filename); }} style={{ padding: "4px 10px", borderRadius: 4, border: "1px solid var(--hc-line)", background: "var(--hc-bone)", cursor: "pointer", fontSize: 12, color: "var(--hc-ink)" }}>Renombrar</button>
+        <button onClick={() => { onClose(); onMove(inspectorAsset.id, inspectorAsset.folder ?? ""); }} style={{ padding: "4px 10px", borderRadius: 4, border: "1px solid var(--hc-line)", background: "var(--hc-bone)", cursor: "pointer", fontSize: 12, color: "var(--hc-ink)" }}>Mover</button>
+        <label style={{ padding: "4px 10px", borderRadius: 4, border: "1px solid var(--hc-line)", background: "var(--hc-bone)", cursor: "pointer", fontSize: 12, color: "var(--hc-ink)" }}>
+          Reemplazar
+          <input type="file" accept="image/jpeg,image/png,image/webp,video/mp4,video/quicktime" hidden onChange={(e) => { const f = e.target.files?.[0] ?? null; if (f) { onClose(); onReplace(inspectorAsset.id, f); } }} />
+        </label>
+        <button onClick={() => { onClose(); onDelete(inspectorAsset.id); }} disabled={inspectorAsset.draftCount > 0} style={{ padding: "4px 10px", borderRadius: 4, border: "1px solid var(--hc-line)", background: inspectorAsset.draftCount > 0 ? "var(--hc-bone)" : "#fff1f0", color: inspectorAsset.draftCount > 0 ? "var(--hc-fog)" : "#b42318", cursor: inspectorAsset.draftCount > 0 ? "not-allowed" : "pointer", fontSize: 12 }}>Eliminar</button>
+      </div>
+    </>
+  );
+}
+
 export function DashboardConsole({
   metrics,
   queue,
@@ -385,12 +558,103 @@ export function DashboardConsole({
   const [newPubAssetId, setNewPubAssetId] = useState("");
   const [newPubSaving, setNewPubSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
-  const [uploadFile, setUploadFile] = useState<File | null>(null);
+  const [uploadFiles, setUploadFiles] = useState<File[]>([]);
+  const [uploadFolder, setUploadFolder] = useState("");
+  const [uploadProgress, setUploadProgress] = useState<Record<string, number>>({});
+  const [assetMessage, setAssetMessage] = useState<{ kind: "success" | "error"; text: string } | null>(null);
+  const [localAssets, setLocalAssets] = useState<TenantAssetItem[]>(assets);
+  const [assetKindFilter, setAssetKindFilter] = useState("ALL");
+  const [assetFolderFilter, setAssetFolderFilter] = useState("ALL");
+  const [assetOrientationFilter, setAssetOrientationFilter] = useState("ALL");
+  const [assetTargetFilter, setAssetTargetFilter] = useState<AssetCompatibilityTarget | "ALL">("ALL");
+  const [assetCompatibilityFilter, setAssetCompatibilityFilter] = useState<AssetCompatibilityFilter>("ALL");
+  const [assetCompatibilityExplicit, setAssetCompatibilityExplicit] = useState(false);
+  const [movingAssetId, setMovingAssetId] = useState("");
+  const [moveFolder, setMoveFolder] = useState("");
+  const [replaceAssetId, setReplaceAssetId] = useState("");
+  const [deletingAssetId, setDeletingAssetId] = useState("");
+  const [uploadQueueItems, setUploadQueueItems] = useState<UploadQueueItem[]>([]);
+  const [uploadErrorExpanded, setUploadErrorExpanded] = useState<Set<string>>(new Set());
+  const [assetViewMode, setAssetViewMode] = useState<"grid" | "list">("grid");
+  const [assetSearchFilter, setAssetSearchFilter] = useState("");
+  const [assetUsageFilter, setAssetUsageFilter] = useState<AssetUsageFilter>("ALL");
+  const [assetSortOrder, setAssetSortOrder] = useState<AssetSortOrder>("NOMBRE");
+  const [inspectorAsset, setInspectorAsset] = useState<TenantAssetItem | null>(null);
+  const analyzedAssetIdsRef = useRef<Set<string>>(new Set());
   const fileInputRef = useRef<HTMLInputElement>(null);
   const selected = selectedDraftFromQueue(localQueue, selectedId);
   const selectedValidation = selected ? validateFormatAssets(selected.format, selected.assets ?? []) : null;
   const activeNetworks = metrics?.tenant.activeNetworks?.length ? metrics.tenant.activeNetworks : ["INSTAGRAM", "FACEBOOK"];
   const missingCoreNetworks = SUPPORTED_NETWORKS.filter((network) => !activeNetworks.includes(network));
+  const assetFolders = useMemo(() => {
+    const folders = new Set(localAssets.map((asset) => asset.folder ?? "").filter(Boolean));
+    return [...folders].sort();
+  }, [localAssets]);
+  const currentAssetFilters = useMemo(() => ({
+    search: assetSearchFilter,
+    kind: assetKindFilter,
+    folder: assetFolderFilter,
+    orientation: assetOrientationFilter,
+    target: assetTargetFilter,
+    compatibility: assetCompatibilityFilter,
+    compatibilityExplicit: assetCompatibilityExplicit,
+    usage: assetUsageFilter,
+    sortOrder: assetSortOrder,
+  }), [
+    assetCompatibilityExplicit,
+    assetCompatibilityFilter,
+    assetFolderFilter,
+    assetKindFilter,
+    assetOrientationFilter,
+    assetSearchFilter,
+    assetSortOrder,
+    assetTargetFilter,
+    assetUsageFilter,
+  ]);
+  const visibleAssets = useMemo(() => {
+    return applyAssetLibraryFilters(localAssets, currentAssetFilters);
+  }, [currentAssetFilters, localAssets]);
+  const hasActiveAssetFilters = useMemo(() => (
+    currentAssetFilters.search !== DEFAULT_ASSET_LIBRARY_FILTERS.search ||
+    currentAssetFilters.kind !== DEFAULT_ASSET_LIBRARY_FILTERS.kind ||
+    currentAssetFilters.folder !== DEFAULT_ASSET_LIBRARY_FILTERS.folder ||
+    currentAssetFilters.orientation !== DEFAULT_ASSET_LIBRARY_FILTERS.orientation ||
+    currentAssetFilters.target !== DEFAULT_ASSET_LIBRARY_FILTERS.target ||
+    currentAssetFilters.compatibility !== DEFAULT_ASSET_LIBRARY_FILTERS.compatibility ||
+    currentAssetFilters.compatibilityExplicit !== DEFAULT_ASSET_LIBRARY_FILTERS.compatibilityExplicit ||
+    currentAssetFilters.usage !== DEFAULT_ASSET_LIBRARY_FILTERS.usage ||
+    currentAssetFilters.sortOrder !== DEFAULT_ASSET_LIBRARY_FILTERS.sortOrder
+  ), [currentAssetFilters]);
+
+  useEffect(() => {
+    setLocalAssets(assets);
+  }, [assets]);
+
+  function handleAssetTargetFilterChange(target: AssetCompatibilityTarget | "ALL") {
+    const next = updateAssetLibraryTarget(currentAssetFilters, target);
+    setAssetTargetFilter(next.target);
+    setAssetCompatibilityFilter(next.compatibility);
+    setAssetCompatibilityExplicit(next.compatibilityExplicit);
+  }
+
+  function handleAssetCompatibilityFilterChange(filter: AssetCompatibilityFilter) {
+    const next = updateAssetLibraryCompatibility(currentAssetFilters, filter);
+    setAssetCompatibilityFilter(next.compatibility);
+    setAssetCompatibilityExplicit(next.compatibilityExplicit);
+  }
+
+  function handleClearAssetFilters() {
+    const next = clearAssetLibraryFilters();
+    setAssetSearchFilter(next.search);
+    setAssetKindFilter(next.kind);
+    setAssetFolderFilter(next.folder);
+    setAssetOrientationFilter(next.orientation);
+    setAssetTargetFilter(next.target);
+    setAssetCompatibilityFilter(next.compatibility);
+    setAssetCompatibilityExplicit(next.compatibilityExplicit);
+    setAssetUsageFilter(next.usage);
+    setAssetSortOrder(next.sortOrder);
+  }
 
   const pendingReview = localQueue.filter(
     (i) => i.status !== "PUBLISHED" && (i.requiresReview || i.riskLevel !== "low"),
@@ -793,32 +1057,268 @@ export function DashboardConsole({
     }
   }
 
-  async function handleUploadAsset() {
-    if (!uploadFile) return;
-    setUploading(true);
-    try {
-      const formData = new FormData();
-      formData.append("file", uploadFile);
-      formData.append("tenantSlug", tenantSlug);
-      const res = await fetch("/api/assets/upload", { method: "POST", body: formData });
-      const data = await res.json();
-      if (!res.ok || !data.ok) {
-        alert(data.error || "Error al subir asset");
-        return;
+  function sanitizeClientFilename(name: string) {
+    return (name.replace(/\\/g, "/").split("/").pop() || "asset")
+      .normalize("NFKD")
+      .replace(/[^\w.\- ]+/g, "")
+      .trim()
+      .replace(/\s+/g, "-")
+      .replace(/^\.+/, "")
+      .slice(0, 120) || "asset";
+  }
+
+  async function refreshTenantAssets() {
+    const res = await fetch(`/api/tenants/${tenantSlug}/assets`, { headers: { Accept: "application/json" } });
+    const data = await res.json();
+    if (!res.ok || !data.ok) throw new Error(data.error || "Error al refrescar assets");
+    setLocalAssets(data.assets ?? []);
+    return data.assets ?? [];
+  }
+
+  const registeredStorageKeysRef = useRef<Set<string>>(new Set());
+  function applyReadyUploadItem(itemId: string, asset: TenantAssetItem, attempts?: number) {
+    if (asset.storageKey) registeredStorageKeysRef.current.add(asset.storageKey);
+    setUploadQueueItems((prev) => prev.map((item) => item.id === itemId ? {
+      ...item,
+      state: "READY",
+      progress: 100,
+      asset,
+      url: asset.path ?? item.url,
+      storageKey: asset.storageKey ?? item.storageKey,
+      pathname: asset.storageKey ?? item.pathname,
+      attempts,
+    } : item));
+    setLocalAssets((prev) => upsertTenantAssetList(prev, asset));
+  }
+
+  function applyFailedUploadItem(
+    itemId: string,
+    details: { message: string; code?: string; status?: number; attempts?: number },
+  ) {
+    setUploadQueueItems((prev) => prev.map((item) => item.id === itemId ? {
+      ...item,
+      state: "FAILED",
+      error: details.message,
+      errorCode: details.code ?? "ASSET_FINALIZE_FAILED",
+      lastStatus: details.status,
+      attempts: details.attempts,
+    } : item));
+  }
+
+  const semaphore = (tasks: (() => Promise<void>)[], limit: number) => {
+    const results: Promise<void>[] = [];
+    const executing: Promise<void>[] = [];
+    for (const task of tasks) {
+      const p = Promise.resolve().then(() => task());
+      results.push(p);
+      if (limit <= tasks.length) {
+        const e = p.then(() => { executing.splice(executing.indexOf(e), 1); });
+        executing.push(e);
+        if (executing.length >= limit) {
+          results.push(Promise.race(executing) as Promise<void>);
+        }
       }
-      window.location.reload();
+    }
+    return Promise.allSettled(results);
+  };
+
+  async function handleUploadAsset() {
+    await handleUploadFiles(uploadFiles);
+  }
+
+  async function handleUploadFiles(files: File[], options?: { resetQueue?: boolean }) {
+    if (files.length === 0 || !metrics?.tenant.id) return;
+    setUploading(true);
+    setAssetMessage(null);
+    if (options?.resetQueue !== false) setUploadQueueItems([]);
+    const registered: string[] = [];
+    const failed: string[] = [];
+
+    async function uploadOne(file: File): Promise<void> {
+      const uid = crypto.randomUUID();
+      const safeName = sanitizeClientFilename(file.name);
+      const initialPathname = `tenants/${metrics!.tenant.id}/assets/${uid}/${safeName}`;
+      const technicalMetadata = await extractAssetMetadataFromFile(file);
+
+      const qItem: UploadQueueItem = {
+        id: uid,
+        file,
+        state: "UPLOADING",
+        progress: 0,
+        storageKey: initialPathname,
+        folder: uploadFolder,
+        filename: safeName,
+        pathname: initialPathname,
+        contentType: file.type,
+        sizeBytes: file.size,
+        technicalMetadata,
+      };
+      setUploadQueueItems((prev) => [...prev, qItem]);
+
+      try {
+        const blob = await uploadBlob(initialPathname, file, {
+          access: "public",
+          handleUploadUrl: `/api/tenants/${tenantSlug}/assets/upload`,
+          multipart: file.size > 4.5 * 1024 * 1024,
+          clientPayload: JSON.stringify({
+            originalFilename: file.name,
+            mimeType: file.type,
+            sizeBytes: file.size,
+            folder: uploadFolder,
+            technicalMetadata,
+          }),
+          onUploadProgress: ({ percentage }) => {
+            setUploadProgress((prev) => ({ ...prev, [file.name]: Math.round(percentage) }));
+            setUploadQueueItems((prev) => prev.map((item) => item.id === uid ? { ...item, progress: Math.round(percentage) } : item));
+          },
+        });
+
+        const finalizePayload: FinalizeUploadedAssetPayload = {
+          pathname: blob.pathname,
+          url: blob.url,
+          contentType: blob.contentType ?? file.type,
+          size: file.size,
+          filename: file.name,
+          folder: uploadFolder,
+          technicalMetadata,
+        };
+
+        setUploadQueueItems((prev) => prev.map((item) => item.id === uid ? {
+          ...item,
+          state: "FINALIZING",
+          progress: 100,
+          pathname: blob.pathname,
+          storageKey: blob.pathname,
+          url: blob.url,
+          contentType: blob.contentType ?? file.type,
+          sizeBytes: file.size,
+          technicalMetadata,
+        } : item));
+
+        const finalized = await resolveUploadedAssetAfterUpload(tenantSlug, finalizePayload, {
+          timeoutMs: 20000,
+          finalizeAttempts: 2,
+          attempts: 6,
+          initialDelayMs: 300,
+          maxDelayMs: 1500,
+        });
+
+        if (finalized.outcome === "ready") {
+          applyReadyUploadItem(uid, finalized.asset, finalized.attempts);
+          registered.push(file.name);
+          return;
+        }
+
+        applyFailedUploadItem(uid, {
+          message: finalized.error.message,
+          code: finalized.error.code,
+          status: finalized.error.status,
+          attempts: finalized.error.lookupResult?.attempts,
+        });
+        failed.push(file.name);
+      } catch (error) {
+        if (error instanceof AssetFinalizeError) {
+          applyFailedUploadItem(uid, {
+            message: error.lookupResult?.lastError ?? error.message,
+            code: error.code,
+            status: error.status ?? error.lookupResult?.lastStatus,
+            attempts: error.lookupResult?.attempts,
+          });
+        } else {
+          applyFailedUploadItem(uid, {
+            message: error instanceof Error ? error.message : "Error al subir",
+            code: "NETWORK_ERROR",
+          });
+        }
+        failed.push(file.name);
+      }
+    }
+
+    try {
+      const tasks = files.map((file) => () => uploadOne(file));
+      await semaphore(tasks, 3);
+      const parts: string[] = [];
+      if (registered.length > 0) parts.push(`${registered.length} listo(s)`);
+      if (failed.length > 0) parts.push(`${failed.length} fallido(s)`);
+      setAssetMessage({ kind: failed.length === 0 ? "success" : registered.length > 0 ? "success" : "error", text: parts.join(", ") || "Sin cambios" });
+    } catch (error) {
+      setAssetMessage({ kind: "error", text: error instanceof Error ? error.message : "Error al subir assets" });
     } finally {
       setUploading(false);
-      setUploadFile(null);
+      setUploadFiles([]);
+      setUploadProgress({});
       if (fileInputRef.current) fileInputRef.current.value = "";
     }
+  }
+
+  async function handleRetryUploadItem(itemId: string) {
+    const item = uploadQueueItems.find((item) => item.id === itemId);
+    if (!item) return;
+
+    if (item.storageKey && item.url && item.contentType && item.filename && item.sizeBytes) {
+      setUploadQueueItems((prev) => prev.map((it) => it.id === itemId ? {
+        ...it,
+        state: "FINALIZING",
+        error: undefined,
+        errorCode: undefined,
+        lastStatus: undefined,
+        attempts: undefined,
+        progress: 100,
+      } : it));
+
+      try {
+        const finalized = await resolveUploadedAssetAfterUpload(tenantSlug, {
+          pathname: item.storageKey,
+          url: item.url,
+          contentType: item.contentType,
+          size: item.sizeBytes,
+          filename: item.filename,
+          folder: item.folder ?? "",
+          technicalMetadata: item.technicalMetadata,
+        }, {
+          timeoutMs: 20000,
+          finalizeAttempts: 2,
+          attempts: 6,
+          initialDelayMs: 300,
+          maxDelayMs: 1500,
+        });
+
+        if (finalized.outcome === "ready") {
+          applyReadyUploadItem(itemId, finalized.asset, finalized.attempts);
+          return;
+        }
+      } catch (error) {
+        if (error instanceof AssetFinalizeError) {
+          applyFailedUploadItem(itemId, {
+            message: error.lookupResult?.lastError ?? error.message,
+            code: error.code,
+            status: error.status ?? error.lookupResult?.lastStatus,
+            attempts: error.lookupResult?.attempts,
+          });
+          if (error.code !== "ASSET_BLOB_NOT_FOUND") return;
+        } else {
+          applyFailedUploadItem(itemId, {
+            message: error instanceof Error ? error.message : "No se pudo finalizar el asset.",
+            code: "ASSET_FINALIZE_FAILED",
+          });
+          return;
+        }
+      }
+    }
+
+    setUploadQueueItems((prev) => prev.map((it) => it.id === itemId ? { ...it, state: "PENDING", error: undefined, errorCode: undefined, lastStatus: undefined, attempts: undefined, progress: 0 } : it));
+    await handleUploadFiles([item.file], { resetQueue: false });
+  }
+
+  function handleRemoveUploadItem(itemId: string) {
+    setUploadQueueItems((prev) => prev.filter((item) => item.id !== itemId || item.state === "READY" || item.state === "FAILED"));
   }
 
   async function handleRenameAsset(assetId: string) {
     if (!renameFilename.trim()) return;
     setRenameSaving(true);
     try {
-      const res = await fetch(`/api/assets/${assetId}`, {
+      const res = await fetch(`/api/tenants/${tenantSlug}/assets/${assetId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ filename: renameFilename.trim() }),
@@ -828,11 +1328,140 @@ export function DashboardConsole({
         alert(data.error || "Error al renombrar asset");
         return;
       }
-      window.location.reload();
+      setLocalAssets((prev) => prev.map((asset) => asset.id === assetId ? { ...asset, ...data.asset } : asset));
+      setAssetMessage({ kind: "success", text: "Asset renombrado." });
     } finally {
       setRenameSaving(false);
       setRenamingAssetId("");
       setRenameFilename("");
+    }
+  }
+
+  async function handleMoveAsset(assetId: string) {
+    setRenameSaving(true);
+    try {
+      const res = await fetch(`/api/tenants/${tenantSlug}/assets/${assetId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ folder: moveFolder }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.ok) {
+        setAssetMessage({ kind: "error", text: data.error || "Error al mover asset" });
+        return;
+      }
+      setLocalAssets((prev) => prev.map((asset) => asset.id === assetId ? { ...asset, ...data.asset } : asset));
+      setAssetMessage({ kind: "success", text: "Coleccion actualizada." });
+    } finally {
+      setRenameSaving(false);
+      setMovingAssetId("");
+      setMoveFolder("");
+    }
+  }
+
+  async function handleReplaceAsset(assetId: string, file: File | null) {
+    if (!file || !metrics?.tenant.id) return;
+    setReplaceAssetId(assetId);
+    setAssetMessage(null);
+    try {
+      const current = localAssets.find((asset) => asset.id === assetId);
+      const safeName = sanitizeClientFilename(file.name);
+      const pathname = `tenants/${metrics.tenant.id}/assets/${crypto.randomUUID()}/${safeName}`;
+      const technicalMetadata = await extractAssetMetadataFromFile(file);
+      await uploadBlob(pathname, file, {
+        access: "public",
+        handleUploadUrl: `/api/tenants/${tenantSlug}/assets/${assetId}/content/upload`,
+        multipart: file.size > 4.5 * 1024 * 1024,
+        clientPayload: JSON.stringify({
+          originalFilename: file.name,
+          mimeType: file.type,
+          sizeBytes: file.size,
+          expectedStorageKey: current?.storageKey ?? null,
+          technicalMetadata,
+        }),
+      });
+      const waitResult = await waitForRegisteredAsset(tenantSlug, pathname);
+      if (!waitResult.found) {
+        setAssetMessage({ kind: "error", text: "Archivo reemplazado, pero el registro queda pendiente. Reintentar sincronizacion." });
+      }
+      const refreshed = await refreshTenantAssets();
+      const nextAsset = refreshed.find((asset: TenantAssetItem) => asset.id === assetId);
+      setLocalQueue((prev) => prev.map((draft) => ({
+        ...draft,
+        status: draft.assets?.some((asset) => asset.id === assetId) && draft.status === "APPROVED" ? "NEEDS_REVIEW" : draft.status,
+        requiresReview: draft.assets?.some((asset) => asset.id === assetId) && draft.status === "APPROVED" ? true : draft.requiresReview,
+        assets: draft.assets?.map((asset) => asset.id === assetId ? {
+          ...asset,
+          filename: nextAsset?.filename ?? asset.filename,
+          url: nextAsset?.path ?? asset.url,
+          mimeType: nextAsset?.mimeType ?? asset.mimeType,
+          kind: nextAsset?.kind ?? asset.kind,
+          sizeBytes: nextAsset?.sizeBytes ?? asset.sizeBytes,
+          width: nextAsset?.width ?? asset.width,
+          height: nextAsset?.height ?? asset.height,
+          durationSeconds: nextAsset?.durationSeconds ?? asset.durationSeconds,
+          orientation: nextAsset?.orientation ?? asset.orientation,
+          aspectRatio: nextAsset?.aspectRatio ?? asset.aspectRatio,
+        } : asset),
+      })));
+      setAssetMessage({ kind: "success", text: "Contenido reemplazado." });
+      setDryRunResult(null);
+    } catch (error) {
+      setAssetMessage({ kind: "error", text: error instanceof Error ? error.message : "Error al reemplazar asset" });
+    } finally {
+      setReplaceAssetId("");
+    }
+  }
+
+  async function handlePersistAnalyzedMetadata(
+    asset: TenantAssetItem,
+    measured: { width?: number | null; height?: number | null; durationSeconds?: number | null },
+  ) {
+    if (analyzedAssetIdsRef.current.has(asset.id) || (asset.width && asset.height)) return;
+    analyzedAssetIdsRef.current.add(asset.id);
+    const technicalMetadata = normalizeTechnicalAssetMetadata({
+      ...measured,
+      mimeType: asset.mimeType,
+      sizeBytes: asset.sizeBytes,
+      originalFilename: asset.filename,
+      metadataSource: "client-extracted",
+    }, {
+      sizeBytes: asset.sizeBytes,
+      mimeType: asset.mimeType,
+      originalFilename: asset.filename,
+      folder: asset.folder ?? "",
+    });
+    try {
+      const res = await fetch(`/api/tenants/${tenantSlug}/assets/${asset.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ technicalMetadata }),
+      });
+      const data = await res.json();
+      if (res.ok && data.ok) {
+        setLocalAssets((prev) => prev.map((item) => item.id === asset.id ? { ...item, ...data.asset } : item));
+      }
+    } catch {
+      setLocalAssets((prev) => prev.map((item) => item.id === asset.id ? { ...item, metadata: { ...(item.metadata ?? {}), metadataAnalysisFailed: true } } : item));
+    }
+  }
+
+  async function handleDeleteAsset(assetId: string) {
+    const asset = localAssets.find((item) => item.id === assetId);
+    if (!asset || !confirm(`Eliminar ${asset.filename}?`)) return;
+    setDeletingAssetId(assetId);
+    setAssetMessage(null);
+    try {
+      const res = await fetch(`/api/tenants/${tenantSlug}/assets/${assetId}`, { method: "DELETE" });
+      const data = await res.json();
+      if (!res.ok || !data.ok) {
+        setAssetMessage({ kind: "error", text: data.code === "ASSET_IN_USE" ? "No se puede eliminar: asset en uso por drafts." : data.error || "Error al eliminar asset" });
+        return;
+      }
+      setLocalAssets((prev) => prev.filter((item) => item.id !== assetId));
+      setAssetMessage({ kind: "success", text: "Asset eliminado." });
+    } finally {
+      setDeletingAssetId("");
     }
   }
 
@@ -995,7 +1624,7 @@ export function DashboardConsole({
                   Asset (opcional)
                   <select value={newPubAssetId} onChange={(e) => setNewPubAssetId(e.target.value)}>
                     <option value="">Sin asset</option>
-                    {assets.map((a) => <option key={a.id} value={a.id}>{a.filename}</option>)}
+                    {localAssets.map((a) => <option key={a.id} value={a.id}>{a.filename}</option>)}
                   </select>
                 </label>
               </div>
@@ -1355,7 +1984,12 @@ export function DashboardConsole({
                   {(selected.assets ?? []).map((asset, index) => (
                     <div className="asset-manifest-row" key={`${asset.id}-${asset.order}`}>
                       <span className="asset-order">{asset.order}</span>
-                      <strong>{assetLabel(asset)}</strong>
+                      <span style={{ minWidth: 0 }}>
+                        <strong>{assetLabel(asset)}</strong>
+                        <small style={{ display: "block", color: "var(--hc-fog)" }}>
+                          {asset.width && asset.height ? `${asset.width} x ${asset.height}` : "Sin analizar"} / {formatBytes(asset.sizeBytes)} / {aspectRatioText(asset.aspectRatio)}
+                        </small>
+                      </span>
                       <small>{asset.mimeType ?? asset.kind ?? "metadata pendiente"}</small>
                       <div className="asset-actions">
                         <button className="icon-button" onClick={() => handleMoveDraftAsset(asset.order, "up")} disabled={index === 0 || assetReplacing} aria-label="Mover asset arriba">
@@ -1395,14 +2029,24 @@ export function DashboardConsole({
                       {assetPickerTarget.mode === "add" ? "Agregar asset:" : `Reemplazar asset #${assetPickerTarget.order ?? 1}:`}
                     </strong>
                     <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 6, maxHeight: 160, overflowY: "auto" }}>
-                       {assets
-                         .filter((a) => assetPickerTarget.mode === "replace" || !(selected.assets ?? []).some((current) => current.id === a.id))
-                         .slice(0, 20)
-                        .map((asset) => (
+                      {localAssets
+                        .filter((a) => assetPickerTarget.mode === "replace" || !(selected.assets ?? []).some((current) => current.id === a.id))
+                        .sort((a, b) => {
+                          const target = compatibilityTargetFromPublishingFormat(selected.format);
+                          const rank: Record<AssetCompatibilityStatus, number> = { IDEAL: 0, USABLE: 1, UNKNOWN: 2, INCOMPATIBLE: 3 };
+                          return rank[evaluateAssetCompatibility(assetCompatibilityInput(a), target).status] - rank[evaluateAssetCompatibility(assetCompatibilityInput(b), target).status];
+                        })
+                        .slice(0, 20)
+                        .map((asset) => {
+                          const target = compatibilityTargetFromPublishingFormat(selected.format);
+                          const compatibility = evaluateAssetCompatibility(assetCompatibilityInput(asset), target);
+                          const blocked = compatibility.status === "INCOMPATIBLE";
+                          return (
                           <button
                             key={asset.id}
                             onClick={() => handlePickAsset(asset.id)}
-                            disabled={assetReplacing}
+                            disabled={assetReplacing || blocked}
+                            title={`${ASSET_COMPATIBILITY_CONFIGS[target].label}: ${compatibility.reasons.join(" ")}`}
                             style={{
                               display: "flex",
                               flexDirection: "column",
@@ -1411,10 +2055,10 @@ export function DashboardConsole({
                               padding: 4,
                               borderRadius: 4,
                               border: "1px solid var(--hc-line)",
-                              background: "var(--hc-surface)",
-                              cursor: "pointer",
+                              background: blocked ? "#fff1f0" : "var(--hc-surface)",
+                              cursor: blocked ? "not-allowed" : "pointer",
                               fontSize: 10,
-                              maxWidth: 100,
+                              maxWidth: 132,
                             }}
                           >
                             {asset.path ? (
@@ -1425,9 +2069,11 @@ export function DashboardConsole({
                               </div>
                             )}
                             <span style={{ fontSize: 9, textAlign: "center", lineHeight: 1.1 }}>{asset.filename.slice(0, 20)}</span>
-                            <small style={{ color: "var(--hc-fog)", fontSize: 8 }}>{asset.kind}</small>
+                            <small style={{ color: "var(--hc-fog)", fontSize: 8 }}>{asset.width && asset.height ? `${asset.width}x${asset.height}` : "Sin analizar"}</small>
+                            <small style={{ color: blocked ? "#b42318" : "var(--hc-fog)", fontSize: 8 }}>{compatibilityLabel(compatibility.status)}</small>
                           </button>
-                        ))}
+                          );
+                        })}
                     </div>
                   </div>
                 )}
@@ -1510,136 +2156,512 @@ export function DashboardConsole({
 
         {view === "assets" && (
           <div className="strategy-grid">
-            {Array.isArray(readiness?.networks) && (
-              <section className="work-panel span-2">
-                <PanelTitle icon={<AlertTriangle size={17} />} title="Assets y configuraciones pendientes" />
-                <div className="network-readiness-grid">
-                  {readiness.networks
-                    .filter((network: any) => !network.liveReady)
-                    .map((network: any) => (
-                      <article key={network.network} className="network-card">
-                        <div>
-                          <strong>{NETWORK_LABELS[network.network] ?? network.network}</strong>
-                          <small>{network.action}</small>
+            <section className="work-panel span-2">
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 14px", borderBottom: "1px solid var(--hc-line)", minHeight: 60 }}>
+                <div>
+                  <strong style={{ fontSize: 16 }}>Biblioteca</strong>
+                  <small style={{ color: "var(--hc-fog)", marginLeft: 8 }}>{localAssets.length} activos</small>
+                </div>
+                <div style={{ display: "flex", gap: 12, fontSize: 11 }}>
+                  {(() => {
+                    const total = localAssets.length;
+                    const networkTargets = ASSET_COMPATIBILITY_TARGETS.filter((target) =>
+                      activeNetworks.some((network) => target.startsWith(network.toUpperCase()))
+                    );
+                    const listos = localAssets.filter((asset) => networkTargets.some((target) =>
+                      evaluateAssetCompatibility(assetCompatibilityInput(asset), target).status === "IDEAL"
+                    )).length;
+                    const requiereAjuste = localAssets.filter((asset) => {
+                      const hasIdeal = networkTargets.some((target) => evaluateAssetCompatibility(assetCompatibilityInput(asset), target).status === "IDEAL");
+                      const allUsable = networkTargets.length > 0 && networkTargets.every((target) => {
+                        const status = evaluateAssetCompatibility(assetCompatibilityInput(asset), target).status;
+                        return status === "USABLE" || status === "IDEAL";
+                      });
+                      return !hasIdeal && allUsable;
+                    }).length;
+                    const sinAnalizar = localAssets.filter((asset) => !asset.width || !asset.height).length;
+                    const enUso = localAssets.filter((asset) => asset.draftCount > 0).length;
+                    return (
+                      <>
+                        <span style={{ background: "var(--hc-bone)", padding: "2px 8px", borderRadius: 10 }}>Total: <strong>{total}</strong></span>
+                        <span style={{ background: "#e8f7ef", padding: "2px 8px", borderRadius: 10, color: "#0f6e3f" }}>Listos: <strong>{listos}</strong></span>
+                        <span style={{ background: "#fff8e1", padding: "2px 8px", borderRadius: 10, color: "#8d6e00" }}>Requieren ajuste: <strong>{requiereAjuste}</strong></span>
+                        <span style={{ background: "var(--hc-bone)", padding: "2px 8px", borderRadius: 10 }}>Sin analizar: <strong>{sinAnalizar}</strong></span>
+                        <span style={{ background: "var(--hc-bone)", padding: "2px 8px", borderRadius: 10 }}>En uso: <strong>{enUso}</strong></span>
+                      </>
+                    );
+                  })()}
+                </div>
+              </div>
+
+              <div style={{ padding: "10px 14px", borderBottom: "1px solid var(--hc-line)" }}>
+                <div
+                  onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); e.currentTarget.style.borderColor = "var(--hc-teal)"; e.currentTarget.style.background = "var(--hc-teal-tint)"; }}
+                  onDragLeave={(e) => { e.preventDefault(); (e.currentTarget as HTMLElement).style.borderColor = "var(--hc-line)"; (e.currentTarget as HTMLElement).style.background = "var(--hc-surface)"; }}
+                  onDrop={(e) => {
+                    e.preventDefault();
+                    (e.currentTarget as HTMLElement).style.borderColor = "var(--hc-line)";
+                    (e.currentTarget as HTMLElement).style.background = "var(--hc-surface)";
+                    const files = Array.from(e.dataTransfer.files);
+                    if (files.length > 0) handleUploadFiles(files);
+                  }}
+                  tabIndex={0}
+                  role="button"
+                  aria-label="Seleccionar archivos para subir"
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      fileInputRef.current?.click();
+                    }
+                  }}
+                  style={{
+                    border: "2px dashed var(--hc-line)",
+                    borderRadius: 8,
+                    padding: "20px",
+                    textAlign: "center",
+                    cursor: "pointer",
+                    minHeight: 80,
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    color: "var(--hc-fog)",
+                    fontSize: 13,
+                    gap: 8,
+                    background: "var(--hc-surface)",
+                    transition: "border-color 0.15s, background 0.15s",
+                  }}
+                >
+                  <PackageSearch size={18} />
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      fileInputRef.current?.click();
+                    }}
+                    style={{
+                      padding: "6px 16px",
+                      borderRadius: 6,
+                      border: "1px solid var(--hc-line)",
+                      background: "var(--hc-ink)",
+                      color: "#fff",
+                      cursor: "pointer",
+                      fontSize: 13,
+                      fontWeight: 600,
+                      fontFamily: "inherit",
+                    }}
+                  >
+                    Seleccionar archivos
+                  </button>
+                  <span style={{ fontSize: 11, color: "var(--hc-fog)" }}>
+                    JPG, PNG, WebP, MP4 &middot; seleccion multiple
+                  </span>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    multiple
+                    accept="image/jpeg,image/png,image/webp,video/mp4,video/quicktime"
+                    onChange={(e) => {
+                      const files = Array.from(e.target.files ?? []);
+                      if (files.length > 0) handleUploadFiles(files);
+                    }}
+                    style={{ display: "none" }}
+                  />
+                </div>
+                <div style={{ display: "flex", gap: 8, marginTop: 8, alignItems: "center" }}>
+                  <AssetCollectionPicker currentFolder={uploadFolder} tenantSlug={tenantSlug} folders={assetFolders} onSelect={(folder) => setUploadFolder(folder)} />
+                </div>
+              </div>
+
+              {uploadQueueItems.length > 0 && (
+                <div style={{ padding: "8px 14px", borderBottom: "1px solid var(--hc-line)" }}>
+                  <small style={{ fontWeight: 600, display: "block", marginBottom: 6 }}>
+                    Subiendo {uploadQueueItems.filter((item) => item.state !== "READY" && item.state !== "FAILED").length} de {uploadQueueItems.length} archivos...
+                  </small>
+                  {uploadQueueItems.map((item) => (
+                    <Fragment key={item.id}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "4px 0", fontSize: 12 }}>
+                      {item.file.type.startsWith("image/") && item.file ? (
+                        <img
+                          src={URL.createObjectURL(item.file)}
+                          alt=""
+                          style={{ width: 32, height: 32, objectFit: "cover", borderRadius: 4 }}
+                        />
+                      ) : (
+                        <div style={{ width: 32, height: 32, background: "var(--hc-bone)", borderRadius: 4, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                          <ImageIcon size={14} />
                         </div>
-                        <p><strong>Formato:</strong> {network.requirements?.formats}</p>
-                        <p><strong>Activo:</strong> {network.requirements?.asset}</p>
-                        <p><strong>Guideline:</strong> {network.requirements?.guideline}</p>
-                      </article>
-                    ))}
-                  {readiness.networks.every((network: any) => network.liveReady) && (
-                    <p style={{ padding: 14 }}>Todas las redes seleccionadas tienen readiness live completo.</p>
+                      )}
+                      <span style={{ flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{item.file.name}</span>
+                      <small style={{ color: "var(--hc-fog)", minWidth: 50 }}>{formatBytes(item.file.size)}</small>
+                      <span style={{
+                        padding: "1px 6px",
+                        borderRadius: 4,
+                        fontSize: 10,
+                        background:
+                          item.state === "READY" ? "#e8f7ef" :
+                          item.state === "FAILED" ? "#fff1f0" :
+                          item.state === "FINALIZING" ? "#e8f0fe" :
+                          item.state === "UPLOADING" ? "#fff8e1" :
+                          "var(--hc-bone)",
+                        color:
+                          item.state === "READY" ? "#0f6e3f" :
+                          item.state === "FAILED" ? "#b42318" :
+                          item.state === "FINALIZING" ? "#174ea6" :
+                          item.state === "UPLOADING" ? "#8d6e00" :
+                          "var(--hc-fog)",
+                      }}>
+                        {item.state === "READY" ? "Listo" :
+                         item.state === "FAILED" ? "Fallido" :
+                         item.state === "FINALIZING" ? "Finalizando" :
+                         item.state === "UPLOADING" ? "Subiendo" :
+                         "Pendiente"}
+                      </span>
+                      {item.state === "UPLOADING" || item.state === "FINALIZING" ? (
+                        <div style={{ width: 60, height: 4, background: "var(--hc-line)", borderRadius: 2, overflow: "hidden" }}>
+                          <div style={{ width: `${item.progress}%`, height: "100%", background: "var(--hc-teal)", transition: "width 0.2s" }} />
+                        </div>
+                      ) : (
+                        <div style={{ width: 60 }} />
+                      )}
+                      {item.state === "FAILED" && (
+                        <div style={{ display: "flex", gap: 4, alignItems: "center" }}>
+                          <button onClick={() => handleRetryUploadItem(item.id)} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 10, color: "var(--hc-teal)" }}>Reintentar</button>
+                          {item.error && (
+                            <button
+                              onClick={() => setUploadErrorExpanded((prev) => {
+                                const next = new Set(prev);
+                                if (next.has(item.id)) next.delete(item.id); else next.add(item.id);
+                                return next;
+                              })}
+                              style={{ background: "none", border: "none", cursor: "pointer", fontSize: 10, color: "var(--hc-fog)", textDecoration: "underline" }}
+                            >
+                              {uploadErrorExpanded.has(item.id) ? "Ocultar" : "Ver detalle"}
+                            </button>
+                          )}
+                        </div>
+                      )}
+                      {item.state !== "UPLOADING" && item.state !== "FINALIZING" && (
+                        <button onClick={() => handleRemoveUploadItem(item.id)} style={{ background: "none", border: "none", cursor: "pointer", padding: 0, color: "var(--hc-fog)" }}><X size={14} /></button>
+                      )}
+                    </div>
+                    {item.state === "FAILED" && item.error && uploadErrorExpanded.has(item.id) && (
+                      <div style={{ marginLeft: 40, marginBottom: 4, padding: "6px 8px", background: "var(--hc-bone)", borderRadius: 4, fontSize: 10, fontFamily: "monospace", color: "var(--hc-ink)", lineHeight: 1.5 }}>
+                        <div><strong>Fase:</strong> {item.errorCode === "NETWORK_ERROR" ? "UPLOADING" : "FINALIZING"}</div>
+                        <div><strong>Status HTTP:</strong> {item.lastStatus ?? "N/D"}</div>
+                        <div><strong>Codigo:</strong> {item.errorCode ?? "UNKNOWN"}</div>
+                        <div><strong>Mensaje:</strong> {item.error}</div>
+                        <div><strong>StorageKey:</strong> {(item.storageKey ?? "").slice(0, 50)}{(item.storageKey ?? "").length > 50 ? "..." : ""}</div>
+                        <div><strong>Intentos:</strong> {item.attempts ?? "N/D"}</div>
+                      </div>
+                    )}
+                    </Fragment>
+                  ))}
+                  {assetMessage && (
+                    <small style={{ display: "block", marginTop: 6, color: assetMessage.kind === "error" ? "#b42318" : "var(--hc-green)" }}>{assetMessage.text}</small>
                   )}
                 </div>
-              </section>
-            )}
-            <section className="work-panel">
-              <PanelTitle icon={<PackageSearch size={17} />} title="Especificaciones por plataforma" />
-              <div style={{ padding: 14 }}>
-                <div style={{ marginBottom: 12 }}>
-                  <strong style={{ fontSize: 13, display: "flex", alignItems: "center", gap: 4 }}>
-                    <ImageIcon size={14} /> Instagram
-                  </strong>
-                  <ul className="dense-list" style={{ marginTop: 4 }}>
-                    <li>Feed: 1080x1080 (1:1) JPG/PNG</li>
-                    <li>Story: 1080x1920 (9:16) JPG/PNG</li>
-                    <li>Reel: 1080x1920 (9:16) MP4, max 90s</li>
-                    <li>Carousel: 1080x1080 (1:1) JPG/PNG, 2-10 slides</li>
-                  </ul>
-                </div>
-                <div style={{ marginBottom: 12 }}>
-                  <strong style={{ fontSize: 13 }}>Facebook</strong>
-                  <ul className="dense-list" style={{ marginTop: 4 }}>
-                    <li>Feed: 1200x630 (1.91:1) JPG/PNG</li>
-                    <li>Video: 1080p MP4, max 240min</li>
-                    <li>Carousel: 1080x1080 (1:1) JPG/PNG</li>
-                  </ul>
-                </div>
-                <div style={{ marginBottom: 12 }}>
-                  <strong style={{ fontSize: 13 }}>TikTok</strong>
-                  <ul className="dense-list" style={{ marginTop: 4 }}>
-                    <li>Video: 1080x1920 (9:16) MP4, 5s-10min</li>
-                    <li>Carousel: 1080x1920 (9:16) JPG</li>
-                  </ul>
-                </div>
-                <div>
-                  <strong style={{ fontSize: 13 }}>YouTube</strong>
-                  <ul className="dense-list" style={{ marginTop: 4 }}>
-                    <li>Video: 1920x1080 (16:9) MP4</li>
-                    <li>Short: 1080x1920 (9:16) MP4, max 60s</li>
-                    <li>Thumbnail: 1280x720 JPG</li>
-                  </ul>
-                </div>
-                <div style={{ marginTop: 12 }}>
-                  <strong style={{ fontSize: 13 }}>LinkedIn</strong>
-                  <ul className="dense-list" style={{ marginTop: 4 }}>
-                    <li>Post: imagen 1200x627 JPG/PNG</li>
-                    <li>Documento: PDF o carrusel exportado</li>
-                    <li>Video: MP4 horizontal o cuadrado, enfoque negocio/confianza</li>
-                  </ul>
-                </div>
-              </div>
-            </section>
-            <section className="work-panel">
-              <PanelTitle icon={<PackageSearch size={17} />} title="Activos del tenant" />
-              <div style={{ display: "flex", gap: 8, padding: "0 4px 8px 4px", alignItems: "center" }}>
+              )}
+
+              <div style={{ display: "flex", gap: 6, padding: "8px 14px", flexWrap: "wrap", alignItems: "center", borderBottom: "1px solid var(--hc-line)" }}>
                 <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept="image/*,video/mp4,audio/*,.pdf"
-                  onChange={(e) => setUploadFile(e.target.files?.[0] ?? null)}
-                  style={{ fontSize: 11 }}
+                  value={assetSearchFilter}
+                  onChange={(e) => setAssetSearchFilter(e.target.value)}
+                  placeholder="Buscar..."
+                  style={{ padding: "4px 8px", borderRadius: 4, border: "1px solid var(--hc-line)", fontSize: 12, minWidth: 120 }}
                 />
-                <button
-                  onClick={handleUploadAsset}
-                  disabled={uploading || !uploadFile}
-                  className="primary-action"
-                  style={{ fontSize: 12, padding: "4px 12px" }}
-                >
-                  {uploading ? "Subiendo..." : "Subir"}
-                </button>
+                <select value={assetKindFilter} onChange={(e) => setAssetKindFilter(e.target.value)} style={{ fontSize: 12, padding: "4px 8px", borderRadius: 4, border: "1px solid var(--hc-line)" }}>
+                  <option value="ALL">Todos los tipos</option>
+                  <option value="IMAGE">Imagen</option>
+                  <option value="VIDEO">Video</option>
+                </select>
+                <select value={assetFolderFilter} onChange={(e) => setAssetFolderFilter(e.target.value)} style={{ fontSize: 12, padding: "4px 8px", borderRadius: 4, border: "1px solid var(--hc-line)" }}>
+                  <option value="ALL">Todas las colecciones</option>
+                  {assetFolders.map((folder) => <option key={folder} value={folder}>{folder}</option>)}
+                </select>
+                <select value={assetOrientationFilter} onChange={(e) => setAssetOrientationFilter(e.target.value)} style={{ fontSize: 12, padding: "4px 8px", borderRadius: 4, border: "1px solid var(--hc-line)" }}>
+                  <option value="ALL">Todas las orientaciones</option>
+                  <option value="square">Cuadrado</option>
+                  <option value="portrait">Vertical</option>
+                  <option value="landscape">Horizontal</option>
+                </select>
+                <label style={{ display: "grid", gap: 4, minWidth: 180 }}>
+                  <span style={{ fontSize: 10, color: "var(--hc-fog)", textTransform: "uppercase", letterSpacing: ".08em" }}>Destino / formato</span>
+                  <select value={assetTargetFilter} onChange={(e) => handleAssetTargetFilterChange(e.target.value as AssetCompatibilityTarget | "ALL")} style={{ fontSize: 12, padding: "4px 8px", borderRadius: 4, border: "1px solid var(--hc-line)" }}>
+                    <option value="ALL">Todos los formatos</option>
+                    {ASSET_COMPATIBILITY_TARGETS.map((target) => (
+                      <option key={target} value={target}>{ASSET_COMPATIBILITY_CONFIGS[target].label}</option>
+                    ))}
+                  </select>
+                </label>
+                <label style={{ display: "grid", gap: 4, minWidth: 180 }}>
+                  <span style={{ fontSize: 10, color: "var(--hc-fog)", textTransform: "uppercase", letterSpacing: ".08em" }}>Compatibilidad</span>
+                  <select value={assetCompatibilityFilter} onChange={(e) => handleAssetCompatibilityFilterChange(e.target.value as AssetCompatibilityFilter)} style={{ fontSize: 12, padding: "4px 8px", borderRadius: 4, border: "1px solid var(--hc-line)" }}>
+                    <option value="ALL">Compatibilidad</option>
+                    <option value="ELIGIBLE">Compatibles</option>
+                    <option value="IDEAL">Ideal</option>
+                    <option value="USABLE">Usable</option>
+                    <option value="INCOMPATIBLE">No compatible</option>
+                    <option value="UNKNOWN">Sin analizar</option>
+                    <option value="EVALUATED">Todos los evaluados</option>
+                  </select>
+                </label>
+                <select value={assetUsageFilter} onChange={(e) => setAssetUsageFilter(e.target.value as "ALL" | "IN_USE" | "FREE")} style={{ fontSize: 12, padding: "4px 8px", borderRadius: 4, border: "1px solid var(--hc-line)" }}>
+                  <option value="ALL">Todos</option>
+                  <option value="IN_USE">En uso</option>
+                  <option value="FREE">Libres</option>
+                </select>
+                <select value={assetSortOrder} onChange={(e) => setAssetSortOrder(e.target.value as "NOMBRE" | "FECHA" | "TAMANO")} style={{ fontSize: 12, padding: "4px 8px", borderRadius: 4, border: "1px solid var(--hc-line)" }}>
+                  <option value="NOMBRE">Nombre</option>
+                  <option value="FECHA">Fecha</option>
+                  <option value="TAMANO">Tamano</option>
+                </select>
+                <div style={{ display: "flex", gap: 2, marginLeft: "auto" }}>
+                  <button
+                    onClick={() => setAssetViewMode("grid")}
+                    style={{
+                      padding: "4px 8px",
+                      borderRadius: "4px 0 0 4px",
+                      border: "1px solid var(--hc-line)",
+                      background: assetViewMode === "grid" ? "var(--hc-ink)" : "var(--hc-bone)",
+                      color: assetViewMode === "grid" ? "#fff" : "var(--hc-ink)",
+                      cursor: "pointer",
+                      fontSize: 11,
+                    }}
+                  >
+                    Grid
+                  </button>
+                  <button
+                    onClick={() => setAssetViewMode("list")}
+                    style={{
+                      padding: "4px 8px",
+                      borderRadius: "0 4px 4px 0",
+                      border: "1px solid var(--hc-line)",
+                      background: assetViewMode === "list" ? "var(--hc-ink)" : "var(--hc-bone)",
+                      color: assetViewMode === "list" ? "#fff" : "var(--hc-ink)",
+                      cursor: "pointer",
+                      fontSize: 11,
+                    }}
+                  >
+                    Lista
+                  </button>
+                </div>
               </div>
-              <div className="market-grid">
-                {assets.map((asset) => (
-                  <div className="market-card" key={asset.id}>
-                    {asset.path ? (
-                      asset.kind === "VIDEO" || asset.path.toLowerCase().endsWith(".mp4") ? (
-                        <video src={assetUrl(asset.path, tenantSlug)} className="asset-tile" controls preload="metadata" />
-                      ) : (
-                        <img src={assetUrl(asset.path, tenantSlug)} alt={asset.filename} className="asset-tile" />
-                      )
-                    ) : (
-                      <div className="asset-tile asset-empty"><PackageSearch size={22} /></div>
-                    )}
-                    {renamingAssetId === asset.id ? (
-                      <div style={{ display: "flex", gap: 4, marginTop: 4 }}>
-                        <input
-                          autoFocus
-                          style={{ flex: 1, padding: "3px 6px", borderRadius: 4, border: "1px solid var(--hc-line)", fontSize: 12 }}
-                          value={renameFilename}
-                          onChange={(e) => setRenameFilename(e.target.value)}
-                          onKeyDown={(e) => { if (e.key === "Enter") handleRenameAsset(asset.id); if (e.key === "Escape") setRenamingAssetId(""); }}
-                        />
-                        <button onClick={() => handleRenameAsset(asset.id)} disabled={renameSaving} style={{ padding: "3px 8px", borderRadius: 4, border: "1px solid var(--hc-line)", background: "var(--hc-ink)", color: "#fff", cursor: "pointer", fontSize: 11 }}>{renameSaving ? "..." : "Guardar"}</button>
-                        <button onClick={() => { setRenamingAssetId(""); setRenameFilename(""); }} style={{ padding: "3px 8px", borderRadius: 4, border: "1px solid var(--hc-line)", background: "var(--hc-bone)", cursor: "pointer", fontSize: 11 }}>Cancelar</button>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, marginTop: 8, flexWrap: "wrap" }}>
+                <strong style={{ fontSize: 12, color: "var(--hc-ink)" }}>{visibleAssets.length} activos encontrados</strong>
+                {hasActiveAssetFilters && (
+                  <button
+                    type="button"
+                    onClick={handleClearAssetFilters}
+                    style={{ border: "none", background: "none", padding: 0, color: "var(--hc-teal)", fontSize: 12, textDecoration: "underline" }}
+                  >
+                    Limpiar filtros
+                  </button>
+                )}
+              </div>
+
+              {assetViewMode === "grid" ? (
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: 8, padding: 10, maxHeight: "calc(100vh - 340px)", overflowY: "auto" }}>
+                  {visibleAssets.map((asset) => {
+                    const metadataMissing = !asset.width || !asset.height;
+                    const allCompatResults = ASSET_COMPATIBILITY_TARGETS.map((target) => ({
+                      target,
+                      result: evaluateAssetCompatibility(assetCompatibilityInput(asset), target),
+                    }));
+                    const topBadges = allCompatResults
+                      .filter((entry) => entry.result.status !== "UNKNOWN")
+                      .sort((a, b) => (a.result.status === "IDEAL" ? -1 : a.result.status === "USABLE" ? 0 : 1) - (b.result.status === "IDEAL" ? -1 : b.result.status === "USABLE" ? 0 : 1))
+                      .slice(0, 3);
+                    const extraCount = allCompatResults.filter((entry) => entry.result.status !== "UNKNOWN").length - 3;
+                    return (
+                      <div key={asset.id} style={{ border: "1px solid var(--hc-line)", borderRadius: 8, overflow: "hidden", background: "var(--hc-surface)", cursor: "pointer" }} onClick={() => setInspectorAsset(asset)}>
+                        {asset.path ? (
+                          asset.kind === "VIDEO" || asset.path.toLowerCase().endsWith(".mp4") ? (
+                            <video src={assetUrl(asset.path, tenantSlug)} style={{ width: "100%", height: 90, objectFit: "cover" }} preload="metadata" muted />
+                          ) : (
+                            <img src={assetUrl(asset.path, tenantSlug)} alt={asset.filename} style={{ width: "100%", height: 90, objectFit: "cover" }} crossOrigin="anonymous" />
+                          )
+                        ) : (
+                          <div style={{ width: "100%", height: 90, background: "var(--hc-bone)", display: "flex", alignItems: "center", justifyContent: "center" }}><PackageSearch size={22} /></div>
+                        )}
+                        <div style={{ padding: 6 }}>
+                          <div style={{ fontSize: 12, fontWeight: 600, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }} title={asset.filename}>{asset.filename}</div>
+                          <div style={{ display: "flex", gap: 4, flexWrap: "wrap", marginTop: 3, fontSize: 10 }}>
+                            {asset.width && asset.height ? (
+                              <span style={{ color: "var(--hc-fog)" }}>{asset.width}x{asset.height}</span>
+                            ) : metadataMissing ? (
+                              <span style={{ color: "var(--hc-sand)" }}>Sin analizar</span>
+                            ) : null}
+                            {asset.sizeBytes != null && (
+                              <span style={{ color: "var(--hc-fog)" }}>{formatBytes(asset.sizeBytes)}</span>
+                            )}
+                            {asset.folder && (
+                              <span style={{ background: "var(--hc-bone)", padding: "0 4px", borderRadius: 3 }}>{asset.folder}</span>
+                            )}
+                          </div>
+                          <div style={{ display: "flex", gap: 3, marginTop: 4, flexWrap: "wrap" }}>
+                            {topBadges.map((entry) => (
+                              <span
+                                key={entry.target}
+                                title={`${ASSET_COMPATIBILITY_CONFIGS[entry.target].label}: ${compatibilityLabel(entry.result.status)}`}
+                                style={{
+                                  padding: "1px 5px",
+                                  borderRadius: 3,
+                                  fontSize: 9,
+                                  background: entry.result.status === "IDEAL" ? "#e8f7ef" : entry.result.status === "USABLE" ? "#fff8e1" : "#fff1f0",
+                                  color: entry.result.status === "IDEAL" ? "#0f6e3f" : entry.result.status === "USABLE" ? "#8d6e00" : "#b42318",
+                                  display: "flex",
+                                  alignItems: "center",
+                                  gap: 2,
+                                }}
+                              >
+                                <span style={{ width: 6, height: 6, borderRadius: "50%", background: entry.result.status === "IDEAL" ? "#0f6e3f" : entry.result.status === "USABLE" ? "#f5a623" : "#b42318", display: "inline-block", flexShrink: 0 }} />
+                                {compatibilityLabel(entry.result.status).slice(0, 4)}
+                              </span>
+                            ))}
+                            {extraCount > 0 && (
+                              <span style={{ fontSize: 9, color: "var(--hc-fog)", cursor: "pointer" }} onClick={(e) => { e.stopPropagation(); setInspectorAsset(asset); }}>+{extraCount} formatos</span>
+                            )}
+                          </div>
+                          {asset.draftCount > 0 && (
+                            <div style={{ marginTop: 4, fontSize: 10, color: "var(--hc-teal)" }}>usado en {asset.draftCount} drafts</div>
+                          )}
+                          <div style={{ display: "flex", gap: 4, marginTop: 6 }}>
+                            <button onClick={(e) => { e.stopPropagation(); setRenamingAssetId(asset.id); setRenameFilename(asset.filename); }} title="Renombrar" style={{ background: "none", border: "none", cursor: "pointer", padding: 2, color: "var(--hc-fog)" }}><Pencil size={12} /></button>
+                            <button onClick={(e) => { e.stopPropagation(); setMovingAssetId(asset.id); setMoveFolder(asset.folder ?? ""); }} title="Coleccion" style={{ background: "none", border: "none", cursor: "pointer", padding: 2, color: "var(--hc-fog)" }}><PackageSearch size={12} /></button>
+                            <label title="Reemplazar" style={{ cursor: "pointer", color: "var(--hc-fog)", padding: 2 }} onClick={(e) => e.stopPropagation()}>
+                              <ImageIcon size={12} />
+                              <input type="file" accept="image/jpeg,image/png,image/webp,video/mp4,video/quicktime" hidden onChange={(e) => { const f = e.target.files?.[0] ?? null; if (f) handleReplaceAsset(asset.id, f); }} />
+                            </label>
+                            <button onClick={(e) => { e.stopPropagation(); handleDeleteAsset(asset.id); }} disabled={deletingAssetId === asset.id || asset.draftCount > 0} title={asset.draftCount > 0 ? "Asset en uso" : "Eliminar"} style={{ background: "none", border: "none", cursor: asset.draftCount > 0 ? "not-allowed" : "pointer", padding: 2, color: asset.draftCount > 0 ? "var(--hc-line)" : "#b42318" }}><Trash2 size={12} /></button>
+                          </div>
+                          {renamingAssetId === asset.id && (
+                            <div style={{ display: "flex", gap: 4, marginTop: 4 }} onClick={(e) => e.stopPropagation()}>
+                              <input autoFocus style={{ flex: 1, padding: "3px 6px", borderRadius: 4, border: "1px solid var(--hc-line)", fontSize: 12 }} value={renameFilename} onChange={(e) => setRenameFilename(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") handleRenameAsset(asset.id); if (e.key === "Escape") setRenamingAssetId(""); }} />
+                              <button onClick={() => handleRenameAsset(asset.id)} disabled={renameSaving} style={{ padding: "3px 8px", borderRadius: 4, border: "1px solid var(--hc-line)", background: "var(--hc-ink)", color: "#fff", cursor: "pointer", fontSize: 11 }}>{renameSaving ? "..." : "Guardar"}</button>
+                              <button onClick={() => { setRenamingAssetId(""); setRenameFilename(""); }} style={{ padding: "3px 8px", borderRadius: 4, border: "1px solid var(--hc-line)", background: "var(--hc-bone)", cursor: "pointer", fontSize: 11 }}>Cancelar</button>
+                            </div>
+                          )}
+                          {movingAssetId === asset.id && (
+                            <div style={{ display: "flex", gap: 4, marginTop: 4 }} onClick={(e) => e.stopPropagation()}>
+                              <AssetCollectionPicker currentFolder={moveFolder} tenantSlug={tenantSlug} folders={assetFolders} onSelect={(folder) => setMoveFolder(folder)} />
+                              <button onClick={() => handleMoveAsset(asset.id)} disabled={renameSaving} style={{ padding: "3px 8px", borderRadius: 4, border: "1px solid var(--hc-line)", background: "var(--hc-ink)", color: "#fff", cursor: "pointer", fontSize: 11 }}>Mover</button>
+                            </div>
+                          )}
+                        </div>
                       </div>
-                    ) : (
-                      <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-                        <strong>{asset.filename}</strong>
-                        <button
-                          onClick={() => { setRenamingAssetId(asset.id); setRenameFilename(asset.filename); }}
-                          title="Renombrar"
-                          style={{ background: "none", border: "none", cursor: "pointer", padding: 0, color: "var(--hc-fog)", fontSize: 12 }}
-                        ><Pencil size={12} /></button>
-                      </div>
-                    )}
-                    <small>{asset.kind} / {asset.rightsStatus} / {asset.draftCount} drafts</small>
+                    );
+                  })}
+                  {visibleAssets.length === 0 && <p style={{ padding: 14, gridColumn: "1 / -1", textAlign: "center", color: "var(--hc-fog)" }}>No hay activos para este filtro.</p>}
+                </div>
+              ) : (
+                <div style={{ padding: 10, maxHeight: "calc(100vh - 340px)", overflowY: "auto" }}>
+                  <div style={{ display: "grid", gridTemplateColumns: "40px 2fr 1fr 1fr 80px 100px 120px 80px 120px", gap: 4, fontSize: 11, fontWeight: 600, padding: "4px 8px", borderBottom: "1px solid var(--hc-line)", color: "var(--hc-fog)" }}>
+                    <span></span>
+                    <span>Nombre</span>
+                    <span>Resolucion</span>
+                    <span>Tamano</span>
+                    <span>Tipo</span>
+                    <span>Coleccion</span>
+                    <span>Compatibilidad</span>
+                    <span>Drafts</span>
+                    <span>Acciones</span>
                   </div>
-                ))}
-                {assets.length === 0 && <p style={{ padding: 14 }}>No hay activos cargados.</p>}
-              </div>
+                  {visibleAssets.map((asset) => {
+                    const allCompatResults = ASSET_COMPATIBILITY_TARGETS.map((target) => ({
+                      target,
+                      result: evaluateAssetCompatibility(assetCompatibilityInput(asset), target),
+                    }));
+                    const topBadges = allCompatResults
+                      .filter((entry) => entry.result.status !== "UNKNOWN")
+                      .sort((a, b) => (a.result.status === "IDEAL" ? -1 : a.result.status === "USABLE" ? 0 : 1) - (b.result.status === "IDEAL" ? -1 : b.result.status === "USABLE" ? 0 : 1))
+                      .slice(0, 2);
+                    return (
+                      <div key={asset.id} style={{ display: "grid", gridTemplateColumns: "40px 2fr 1fr 1fr 80px 100px 120px 80px 120px", gap: 4, alignItems: "center", padding: "4px 8px", borderBottom: "1px solid var(--hc-line)", fontSize: 11, cursor: "pointer" }} onClick={() => setInspectorAsset(asset)}>
+                        {asset.path ? (
+                          asset.kind === "VIDEO" || asset.path.toLowerCase().endsWith(".mp4") ? (
+                            <video src={assetUrl(asset.path, tenantSlug)} style={{ width: 32, height: 32, objectFit: "cover", borderRadius: 4 }} preload="metadata" muted />
+                          ) : (
+                            <img src={assetUrl(asset.path, tenantSlug)} alt={asset.filename} style={{ width: 32, height: 32, objectFit: "cover", borderRadius: 4 }} crossOrigin="anonymous" />
+                          )
+                        ) : (
+                          <div style={{ width: 32, height: 32, background: "var(--hc-bone)", borderRadius: 4, display: "flex", alignItems: "center", justifyContent: "center" }}><PackageSearch size={14} /></div>
+                        )}
+                        <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", fontWeight: 500 }}>{asset.filename}</span>
+                        <span>{asset.width && asset.height ? `${asset.width}x${asset.height}` : "-"}</span>
+                        <span>{asset.sizeBytes != null ? formatBytes(asset.sizeBytes) : "-"}</span>
+                        <span>{asset.kind}</span>
+                        <span>{asset.folder || "raiz"}</span>
+                        <span style={{ display: "flex", gap: 2 }}>
+                          {topBadges.map((entry) => (
+                            <span
+                              key={entry.target}
+                              title={`${ASSET_COMPATIBILITY_CONFIGS[entry.target].label}: ${compatibilityLabel(entry.result.status)}`}
+                              style={{
+                                padding: "0 4px",
+                                borderRadius: 3,
+                                fontSize: 9,
+                                background: entry.result.status === "IDEAL" ? "#e8f7ef" : entry.result.status === "USABLE" ? "#fff8e1" : "#fff1f0",
+                                color: entry.result.status === "IDEAL" ? "#0f6e3f" : entry.result.status === "USABLE" ? "#8d6e00" : "#b42318",
+                              }}
+                            >
+                              {compatibilityLabel(entry.result.status).slice(0, 4)}
+                            </span>
+                          ))}
+                        </span>
+                        <span>{asset.draftCount > 0 ? `${asset.draftCount}` : "-"}</span>
+                        <span style={{ display: "flex", gap: 4 }}>
+                          <button onClick={(e) => { e.stopPropagation(); setRenamingAssetId(asset.id); setRenameFilename(asset.filename); }} title="Renombrar" style={{ background: "none", border: "none", cursor: "pointer", padding: 1, color: "var(--hc-fog)" }}><Pencil size={11} /></button>
+                          <button onClick={(e) => { e.stopPropagation(); setMovingAssetId(asset.id); setMoveFolder(asset.folder ?? ""); }} title="Mover" style={{ background: "none", border: "none", cursor: "pointer", padding: 1, color: "var(--hc-fog)" }}><PackageSearch size={11} /></button>
+                          <label title="Reemplazar" style={{ cursor: "pointer", color: "var(--hc-fog)", padding: 1 }} onClick={(e) => e.stopPropagation()}>
+                            <ImageIcon size={11} />
+                            <input type="file" accept="image/jpeg,image/png,image/webp,video/mp4,video/quicktime" hidden onChange={(e) => { const f = e.target.files?.[0] ?? null; if (f) handleReplaceAsset(asset.id, f); }} />
+                          </label>
+                          <button onClick={(e) => { e.stopPropagation(); handleDeleteAsset(asset.id); }} disabled={deletingAssetId === asset.id || asset.draftCount > 0} style={{ background: "none", border: "none", cursor: asset.draftCount > 0 ? "not-allowed" : "pointer", padding: 1, color: asset.draftCount > 0 ? "var(--hc-line)" : "#b42318" }}><Trash2 size={11} /></button>
+                        </span>
+                      </div>
+                    );
+                  })}
+                  {visibleAssets.length === 0 && <p style={{ padding: 14, textAlign: "center", color: "var(--hc-fog)" }}>No hay activos para este filtro.</p>}
+                </div>
+              )}
             </section>
           </div>
+        )}
+
+        {inspectorAsset && (
+          <AssetInspectorDrawer
+            open={!!inspectorAsset}
+            title="Inspector de asset"
+            onClose={() => setInspectorAsset(null)}
+          >
+            <InspectorContent
+              inspectorAsset={inspectorAsset}
+              tenantSlug={tenantSlug}
+              assetFolders={assetFolders}
+              onClose={() => setInspectorAsset(null)}
+              onRename={(id, name) => { setInspectorAsset(null); setRenamingAssetId(id); setRenameFilename(name); }}
+              onMove={(id, folder) => { setInspectorAsset(null); setMovingAssetId(id); setMoveFolder(folder); }}
+              onReplace={(id, file) => { setInspectorAsset(null); handleReplaceAsset(id, file); }}
+              onDelete={(id) => { setInspectorAsset(null); handleDeleteAsset(id); }}
+              onUpdateFolder={(id, folder) => {
+                setRenameSaving(true);
+                fetch(`/api/tenants/${tenantSlug}/assets/${id}`, {
+                  method: "PATCH",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ folder }),
+                })
+                  .then((r) => r.json())
+                  .then((data) => {
+                    if (data.ok) {
+                      setLocalAssets((prev) => prev.map((asset) => asset.id === id ? { ...asset, ...data.asset } : asset));
+                      setAssetMessage({ kind: "success", text: "Coleccion actualizada." });
+                    }
+                  })
+                  .finally(() => setRenameSaving(false));
+              }}
+            />
+          </AssetInspectorDrawer>
         )}
 
         {view === "calendar" && (

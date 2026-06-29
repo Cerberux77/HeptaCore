@@ -1,0 +1,30 @@
+{
+  "project": "HeptaCore",
+  "taskId": "S-HC-DRIFT-002",
+  "sprint": "ad-hoc",
+  "sprintOrderIndex": 4,
+  "taskOrderIndex": 5,
+  "title": "Codex multi-RRSS refactor, readiness gates, UI fixes, migrations, vercelignore",
+  "owner": "Manuel",
+  "backupOwner": "Manuel",
+  "status": "done",
+  "taskBoardPath": "D:\\PROYECTOS\\WORKTREES\\HeptaCore_PUB04_GOAL\\var\\oreshnik\\task-board.json",
+  "zone": [
+    "apps/web",
+    "packages/agents",
+    "packages/integrations"
+  ],
+  "dependsOn": [
+    "S-HC-PROD-01"
+  ],
+  "history": [
+    {
+      "at": "2026-06-12T07:16:29.270Z",
+      "action": "drift-recorded",
+      "operator": "Manuel",
+      "description": "Codex multi-RRSS refactor"
+    }
+  ],
+  "updatedAt": "2026-06-29T02:29:41.523Z",
+  "runs": []
+}

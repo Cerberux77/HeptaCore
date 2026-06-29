@@ -1,0 +1,24 @@
+{
+  "project": "HeptaCore",
+  "taskId": "S-HC-REC-00B",
+  "sprint": "recovery",
+  "sprintOrderIndex": 20,
+  "taskOrderIndex": 30,
+  "title": "Facebook duplicate cleanup",
+  "owner": "Manuel",
+  "backupOwner": "Manuel",
+  "status": "done",
+  "taskBoardPath": "D:\\PROYECTOS\\WORKTREES\\HeptaCore_PUB04_GOAL\\var\\oreshnik\\task-board.json",
+  "zone": [],
+  "dependsOn": [],
+  "history": [
+    {
+      "at": "2026-06-21T04:30:00.000Z",
+      "action": "cancelled",
+      "operator": "Manuel",
+      "description": "Manuel elimino manualmente el duplicado en Facebook"
+    }
+  ],
+  "updatedAt": "2026-06-29T02:29:41.523Z",
+  "runs": []
+}

@@ -1,0 +1,241 @@
+{
+  "project": "HeptaCore",
+  "taskId": "S-HC-TOOL-01-GOAL-RUNNER-V1",
+  "sprint": "S-HC-TOOL-01-GOAL-RUNNER-V1",
+  "sprintOrderIndex": 2,
+  "taskOrderIndex": 2,
+  "title": "Goal Runner v1 for autonomous Kilo execution",
+  "owner": "Manuel",
+  "backupOwner": "Manuel",
+  "status": "integrated",
+  "taskBoardPath": "D:\\PROYECTOS\\WORKTREES\\HeptaCore_PUB04_GOAL\\var\\oreshnik\\task-board.json",
+  "zone": [
+    "scripts/goal-runner/**",
+    "var/goal-runner/**",
+    ".kilo/command/goal.md",
+    ".kilo/command/preflight.md",
+    "AGENTS.md",
+    "package.json",
+    "docs/07_handoffs/**",
+    "docs/obsidian-vault/**"
+  ],
+  "dependsOn": [
+    "S-HC-TEN-01-GLOBAL-TENANT-ADMIN"
+  ],
+  "acceptance": [
+    "Nucleo determinista implementado y probado",
+    "Maquina de estados, locks, evidencia y gates operativos",
+    "Integracion /goal y /preflight disponible en Kilo",
+    "Anti-loop y limites de Playwright documentados",
+    "Goal piloto ejecutado completamente con el propio Goal Runner",
+    "Estado y evidencia sobreviven a clear y reinicio de sesion",
+    "Cero cambios en Production",
+    "Integracion posterior en la rama madre mediante cierre controlado"
+  ],
+  "attempts": 3,
+  "history": [
+    {
+      "at": "2026-06-28T18:47:05.091Z",
+      "action": "status_reconciled",
+      "operator": "manuel",
+      "description": "Task status reconciled to blocked: status active is not claimable for a new run"
+    },
+    {
+      "at": "2026-06-29T00:12:30.056Z",
+      "action": "status_reconciled",
+      "operator": "manuel",
+      "description": "Task status reconciled to ready: dependencies and conflicts are clear for execution"
+    },
+    {
+      "at": "2026-06-29T02:07:54.635Z",
+      "action": "claimed",
+      "operator": "kilo",
+      "branch": "task/S-HC-TOOL-01-GOAL-RUNNER-V1/S-HC-TOOL-01-GOAL-RUNNER-V1/kilo/kilo-S-HC-TOOL-01-GOAL-RUNNER-V1-2026-06-29T02-07-54-626Z-6c79c9a6",
+      "description": "Run kilo-S-HC-TOOL-01-GOAL-RUNNER-V1-2026-06-29T02-07-54-626Z-6c79c9a6 claimed via codex"
+    },
+    {
+      "at": "2026-06-29T02:19:25.745Z",
+      "action": "claim_released",
+      "operator": "kilo",
+      "description": "Run kilo-S-HC-TOOL-01-GOAL-RUNNER-V1-2026-06-29T02-07-54-626Z-6c79c9a6 released"
+    },
+    {
+      "at": "2026-06-29T02:19:43.017Z",
+      "action": "claimed",
+      "operator": "kilo",
+      "branch": "task/S-HC-TOOL-01-GOAL-RUNNER-V1/S-HC-TOOL-01-GOAL-RUNNER-V1/kilo/kilo-S-HC-TOOL-01-GOAL-RUNNER-V1-2026-06-29T02-19-43-008Z-33b124f7",
+      "description": "Run kilo-S-HC-TOOL-01-GOAL-RUNNER-V1-2026-06-29T02-19-43-008Z-33b124f7 claimed via codex"
+    },
+    {
+      "at": "2026-06-29T02:20:03.203Z",
+      "action": "validation_started",
+      "operator": "kilo",
+      "branch": "task/S-HC-TOOL-01-GOAL-RUNNER-V1/S-HC-TOOL-01-GOAL-RUNNER-V1/kilo/kilo-S-HC-TOOL-01-GOAL-RUNNER-V1-2026-06-29T02-19-43-008Z-33b124f7",
+      "description": "Goal Runner v1: 149 tests pass (12 suites), typecheck/build/worker-validate OK, npm scripts and zone-map entries added, 6 historical goals COMPLETED"
+    },
+    {
+      "at": "2026-06-29T02:20:29.144Z",
+      "action": "claim_released",
+      "operator": "kilo",
+      "description": "Run kilo-S-HC-TOOL-01-GOAL-RUNNER-V1-2026-06-29T02-19-43-008Z-33b124f7 released"
+    },
+    {
+      "at": "2026-06-29T02:20:46.799Z",
+      "action": "claimed",
+      "operator": "kilo",
+      "branch": "task/S-HC-TOOL-01-GOAL-RUNNER-V1/S-HC-TOOL-01-GOAL-RUNNER-V1/kilo/kilo-S-HC-TOOL-01-GOAL-RUNNER-V1-2026-06-29T02-20-46-794Z-ed5534ef",
+      "description": "Run kilo-S-HC-TOOL-01-GOAL-RUNNER-V1-2026-06-29T02-20-46-794Z-ed5534ef claimed via codex"
+    },
+    {
+      "at": "2026-06-29T02:25:37.781Z",
+      "action": "status_reconciled",
+      "operator": "manuel",
+      "branch": "task/S-HC-TOOL-01-GOAL-RUNNER-V1/S-HC-TOOL-01-GOAL-RUNNER-V1/kilo/kilo-S-HC-TOOL-01-GOAL-RUNNER-V1-2026-06-29T02-20-46-794Z-ed5534ef",
+      "description": "Task status reconciled to blocked: active run owned by kilo"
+    },
+    {
+      "at": "2026-06-29T02:25:48.599Z",
+      "action": "claim_released",
+      "operator": "kilo",
+      "description": "Run kilo-S-HC-TOOL-01-GOAL-RUNNER-V1-2026-06-29T02-20-46-794Z-ed5534ef released"
+    },
+    {
+      "at": "2026-06-29T03:21:35.807Z",
+      "action": "integrated",
+      "operator": "manuel",
+      "branch": "kilo/s-hc-tool-01-goal-runner-v1",
+      "description": "Integrated kilo/s-hc-tool-01-goal-runner-v1 into MADRE/v50-s-hc-tool-01-goal-runner-v1-goal-runner-v1-deterministic-state-machine-locks-2026-06-29"
+    }
+  ],
+  "updatedAt": "2026-06-29T03:21:35.807Z",
+  "runs": [
+    {
+      "runId": "kilo-S-HC-TOOL-01-GOAL-RUNNER-V1-2026-06-29T02-07-54-626Z-6c79c9a6",
+      "operator": "kilo",
+      "worker": "kilo",
+      "workerMode": "codex",
+      "branch": "task/S-HC-TOOL-01-GOAL-RUNNER-V1/S-HC-TOOL-01-GOAL-RUNNER-V1/kilo/kilo-S-HC-TOOL-01-GOAL-RUNNER-V1-2026-06-29T02-07-54-626Z-6c79c9a6",
+      "worktreePath": "D:\\PROYECTOS\\WORKTREES\\HeptaCore_PUB04_GOAL\\var\\oreshnik\\wt\\S-HC-TOOL-01-GOAL-RUNNER-V1\\S-HC-TOOL-01-GOAL-RUNNER-V1\\r-2ff68e9be13b",
+      "zones": [
+        "scripts/goal-runner/**",
+        "var/goal-runner/**",
+        ".kilo/command/goal.md",
+        ".kilo/command/preflight.md",
+        "AGENTS.md",
+        "package.json",
+        "docs/07_handoffs/**",
+        "docs/obsidian-vault/**"
+      ],
+      "taskStatus": "integrated",
+      "claimStatus": "released",
+      "claimedAt": "2026-06-29T02:07:54.626Z",
+      "updatedAt": "2026-06-29T03:21:35.807Z",
+      "expiresAt": "2026-06-29T03:07:54.626Z",
+      "releasedAt": "2026-06-29T02:19:25.752Z",
+      "manifestPath": "var/oreshnik/runs/S-HC-TOOL-01-GOAL-RUNNER-V1/kilo-S-HC-TOOL-01-GOAL-RUNNER-V1-2026-06-29T02-07-54-626Z-6c79c9a6.json"
+    },
+    {
+      "runId": "kilo-S-HC-TOOL-01-GOAL-RUNNER-V1-2026-06-29T02-20-46-794Z-ed5534ef",
+      "operator": "kilo",
+      "worker": "kilo",
+      "workerMode": "codex",
+      "branch": "task/S-HC-TOOL-01-GOAL-RUNNER-V1/S-HC-TOOL-01-GOAL-RUNNER-V1/kilo/kilo-S-HC-TOOL-01-GOAL-RUNNER-V1-2026-06-29T02-20-46-794Z-ed5534ef",
+      "worktreePath": "D:\\PROYECTOS\\WORKTREES\\HeptaCore_PUB04_GOAL\\var\\oreshnik\\wt\\S-HC-TOOL-01-GOAL-RUNNER-V1\\S-HC-TOOL-01-GOAL-RUNNER-V1\\r-7fa3b13c04df",
+      "zones": [
+        "scripts/goal-runner/**",
+        "var/goal-runner/**",
+        ".kilo/command/goal.md",
+        ".kilo/command/preflight.md",
+        "AGENTS.md",
+        "package.json",
+        "docs/07_handoffs/**",
+        "docs/obsidian-vault/**"
+      ],
+      "taskStatus": "ready_for_integration",
+      "claimStatus": "released",
+      "claimedAt": "2026-06-29T02:20:46.793Z",
+      "updatedAt": "2026-06-29T02:25:48.610Z",
+      "expiresAt": "2026-06-29T03:20:46.793Z",
+      "releasedAt": "2026-06-29T02:25:48.610Z",
+      "manifestPath": "var/oreshnik/runs/S-HC-TOOL-01-GOAL-RUNNER-V1/kilo-S-HC-TOOL-01-GOAL-RUNNER-V1-2026-06-29T02-20-46-794Z-ed5534ef.json"
+    },
+    {
+      "runId": "kilo-S-HC-TOOL-01-GOAL-RUNNER-V1-2026-06-29T02-19-43-008Z-33b124f7",
+      "operator": "kilo",
+      "worker": "kilo",
+      "workerMode": "codex",
+      "branch": "task/S-HC-TOOL-01-GOAL-RUNNER-V1/S-HC-TOOL-01-GOAL-RUNNER-V1/kilo/kilo-S-HC-TOOL-01-GOAL-RUNNER-V1-2026-06-29T02-19-43-008Z-33b124f7",
+      "worktreePath": "D:\\PROYECTOS\\WORKTREES\\HeptaCore_PUB04_GOAL\\var\\oreshnik\\wt\\S-HC-TOOL-01-GOAL-RUNNER-V1\\S-HC-TOOL-01-GOAL-RUNNER-V1\\r-ba423d0513f6",
+      "zones": [
+        "scripts/goal-runner/**",
+        "var/goal-runner/**",
+        ".kilo/command/goal.md",
+        ".kilo/command/preflight.md",
+        "AGENTS.md",
+        "package.json",
+        "docs/07_handoffs/**",
+        "docs/obsidian-vault/**"
+      ],
+      "taskStatus": "ready_for_integration",
+      "claimStatus": "released",
+      "claimedAt": "2026-06-29T02:19:43.008Z",
+      "updatedAt": "2026-06-29T02:20:29.163Z",
+      "expiresAt": "2026-06-29T03:19:43.008Z",
+      "releasedAt": "2026-06-29T02:20:29.163Z",
+      "manifestPath": "var/oreshnik/runs/S-HC-TOOL-01-GOAL-RUNNER-V1/kilo-S-HC-TOOL-01-GOAL-RUNNER-V1-2026-06-29T02-19-43-008Z-33b124f7.json"
+    }
+  ],
+  "integration": {
+    "runId": "kilo-S-HC-TOOL-01-GOAL-RUNNER-V1-2026-06-29T02-07-54-626Z-6c79c9a6",
+    "sourceBranch": "kilo/s-hc-tool-01-goal-runner-v1",
+    "status": "integrated",
+    "motherBranch": "MADRE/v50-s-hc-tool-01-goal-runner-v1-goal-runner-v1-deterministic-state-machine-locks-2026-06-29",
+    "queuedAt": "2026-06-29T02:18:06.697Z",
+    "updatedAt": "2026-06-29T03:21:35.807Z",
+    "targetBranch": "MADRE/v50-s-hc-tool-01-goal-runner-v1-goal-runner-v1-deterministic-state-machine-locks-2026-06-29",
+    "integratedAt": "2026-06-29T03:21:35.807Z"
+  },
+  "latestTrain": {
+    "attemptId": "train-kilo-S-HC-TOOL-01-GOAL-RUNNER-V1-2026-06-29T02-0-1782703121744",
+    "runId": "kilo-S-HC-TOOL-01-GOAL-RUNNER-V1-2026-06-29T02-07-54-626Z-6c79c9a6",
+    "sourceBranch": "kilo/s-hc-tool-01-goal-runner-v1",
+    "targetBranch": "MADRE/v50-s-hc-tool-01-goal-runner-v1-goal-runner-v1-deterministic-state-machine-locks-2026-06-29",
+    "integrationBranch": "integration-train/S-HC-TOOL-01-GOAL-RUNNER/S-HC-TOOL-01-GOAL-RUNNER/r-2ff68e9be13b/a-2cfa35e28f38",
+    "operator": "manuel",
+    "lockKey": "integration-train/MADRE/v50-s-hc-tool-01-goal-runner-v1-goal-runner-v1-deterministic-state-machine-locks-2026-06-29",
+    "status": "succeeded",
+    "startedAt": "2026-06-29T03:18:41.744Z",
+    "completedAt": "2026-06-29T03:21:35.900Z",
+    "reason": "Already contained on MADRE/v50-s-hc-tool-01-goal-runner-v1-goal-runner-v1-deterministic-state-machine-locks-2026-06-29; runtime reconciled without merge",
+    "motherAdvanceState": "runtime_projection_confirmed",
+    "gateResults": [
+      {
+        "name": "typecheck",
+        "passed": true
+      },
+      {
+        "name": "build",
+        "passed": true
+      },
+      {
+        "name": "test",
+        "passed": true
+      }
+    ],
+    "outcome": {
+      "mergeBase": "4d986ac1e35c00c5b6950862b2d08a57e2347daf",
+      "changedFiles": [],
+      "compatibilityBranchPushed": false,
+      "deliveryDisposition": "already_contained",
+      "projectedMotherBranch": "MADRE/v50-s-hc-tool-01-goal-runner-v1-goal-runner-v1-deterministic-state-machine-locks-2026-06-29",
+      "motherAdvanceState": "runtime_projection_confirmed",
+      "motherFunctionalExpectedCommit": "4d986ac1e35c00c5b6950862b2d08a57e2347daf",
+      "motherFunctionalRemoteCommit": "4d986ac1e35c00c5b6950862b2d08a57e2347daf",
+      "motherFunctionalPushVerified": true,
+      "motherFunctionalPushReconciled": false,
+      "projectedTaskStatus": "integrated",
+      "projectedRunStatus": "integrated",
+      "projectedSprintEntryStatus": "integrated"
+    }
+  }
+}

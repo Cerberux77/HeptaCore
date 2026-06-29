@@ -1,0 +1,8 @@
+{
+  "at": "2026-06-26T03:55:04.332Z",
+  "event": "evidence-added-code",
+  "goalId": "GR-20260626T034650Z-089f3363-correct-pub-04-cron-execution-semantics",
+  "id": "20260626T035504331Z-af42-evidence-added-code",
+  "path": "apps/web/lib/publishing-cron-executor.ts",
+  "type": "code"
+}

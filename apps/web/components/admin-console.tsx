@@ -17,6 +17,7 @@ import {
   X,
 } from "lucide-react";
 import { HeptaCoreWordmark } from "./heptacore-mark";
+import { AdminIdentityPanel } from "./admin-identity-panel";
 import type { AdminDashboardData } from "../lib/dashboard";
 
 type LlmConfigState = {
@@ -258,9 +259,12 @@ export function AdminConsole({ data }: { data: AdminDashboardData }) {
           <strong>Admin global</strong>
           <small>Todos los tenants / control central</small>
         </div>
+        <div style={{ padding: "6px 0 10px", width: "100%", minWidth: 0, boxSizing: "border-box" }}>
+          <AdminIdentityPanel />
+        </div>
         <nav className="app-nav">
           <a className="nav-link active" href="/admin"><ShieldCheck size={17} /> Consolidado</a>
-          <a className="nav-link" href="/tenant/turpial-sound"><Building2 size={17} /> Turpial Sound</a>
+          <a className="nav-link" href="/admin/tenants"><Building2 size={17} /> Tenants</a>
         </nav>
         <div className="guardrail-box">
           <ShieldCheck size={17} />

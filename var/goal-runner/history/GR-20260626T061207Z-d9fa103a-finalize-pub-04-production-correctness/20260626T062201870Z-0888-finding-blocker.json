@@ -1,0 +1,8 @@
+{
+  "at": "2026-06-26T06:22:01.871Z",
+  "content": "Pre-existing encoding mismatch in protected files at base commit 2936c16: docs/operations/vercel-hobby-hourly-publisher.md contains U+00BA (masculine ordinal) instead of U+00FA (u-acute) in 'unicament",
+  "event": "finding-blocker",
+  "goalId": "GR-20260626T061207Z-d9fa103a-finalize-pub-04-production-correctness",
+  "id": "20260626T062201870Z-0888-finding-blocker",
+  "severity": "blocker"
+}

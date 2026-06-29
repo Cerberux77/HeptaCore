@@ -1,0 +1,24 @@
+{
+  "project": "HeptaCore",
+  "taskId": "S-HC-PUB-05-RECONCILIATION-OPS",
+  "sprint": "S-HC-PUB-05-RECONCILIATION-OPS",
+  "owner": "Manuel",
+  "operator": "manuel",
+  "worker": "manuel",
+  "workerMode": "codex",
+  "runId": "manuel-S-HC-PUB-05-RECONCILIATION-OPS-2026-06-29T00-37-03-464Z-4e3d4eae",
+  "branch": "task/S-HC-PUB-05-RECONCILIATION-OPS/S-HC-PUB-05-RECONCILIATION-OPS/manuel/manuel-S-HC-PUB-05-RECONCILIATION-OPS-2026-06-29T00-37-03-464Z-4e3d4eae",
+  "worktreePath": "D:\\PROYECTOS\\WORKTREES\\HeptaCore_PUB04_GOAL\\var\\oreshnik\\wt\\S-HC-PUB-05-RECONCILIATION-OPS\\S-HC-PUB-05-RECONCILIATION-OPS\\r-3030ee064340",
+  "zones": [
+    "apps/web/lib/publishing-finalization.ts",
+    "apps/web/lib/draft-operational-state.ts",
+    "packages/core"
+  ],
+  "taskBoardPath": "D:\\PROYECTOS\\WORKTREES\\HeptaCore_PUB04_GOAL\\var\\oreshnik\\task-board.json",
+  "taskStatus": "integrated",
+  "claimStatus": "released",
+  "claimedAt": "2026-06-29T00:37:03.464Z",
+  "updatedAt": "2026-06-29T01:54:40.093Z",
+  "expiresAt": "2026-06-29T01:37:03.464Z",
+  "releasedAt": "2026-06-29T00:37:30.052Z"
+}

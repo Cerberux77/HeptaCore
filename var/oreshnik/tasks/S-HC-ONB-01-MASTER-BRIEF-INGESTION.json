@@ -1,0 +1,36 @@
+{
+  "project": "HeptaCore",
+  "taskId": "S-HC-ONB-01-MASTER-BRIEF-INGESTION",
+  "sprint": "onboarding",
+  "sprintOrderIndex": 14,
+  "taskOrderIndex": 18,
+  "title": "Master document ingestion: extract structured info from company briefs",
+  "owner": "Manuel",
+  "backupOwner": "Manuel",
+  "status": "blocked",
+  "taskBoardPath": "D:\\PROYECTOS\\WORKTREES\\HeptaCore_PUB04_GOAL\\var\\oreshnik\\task-board.json",
+  "zone": [
+    "apps/web/components",
+    "packages/core",
+    "packages/agents"
+  ],
+  "dependsOn": [
+    "S-HC-COMM-02-BILLING-ACTIVATION"
+  ],
+  "acceptance": [
+    "Upload master document (PDF, DOCX, Markdown, texto)",
+    "Extract structured information: brand, product, audience, tone",
+    "Identify data gaps, contradictions and ambiguous zones",
+    "Store as structured tenant context"
+  ],
+  "history": [
+    {
+      "at": "2026-06-28T18:47:05.091Z",
+      "action": "status_reconciled",
+      "operator": "manuel",
+      "description": "Task status reconciled to blocked: dependency S-HC-COMM-02-BILLING-ACTIVATION still pending (S-HC-COMM-02-BILLING-ACTIVATION:pending)"
+    }
+  ],
+  "updatedAt": "2026-06-29T02:29:41.523Z",
+  "runs": []
+}

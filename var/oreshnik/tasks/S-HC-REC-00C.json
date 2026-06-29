@@ -1,0 +1,37 @@
+{
+  "project": "HeptaCore",
+  "taskId": "S-HC-REC-00C",
+  "sprint": "recovery",
+  "sprintOrderIndex": 20,
+  "taskOrderIndex": 31,
+  "title": "Canonical integration — recovered production baseline integrated into master",
+  "owner": "Manuel",
+  "backupOwner": "Manuel",
+  "status": "done",
+  "taskBoardPath": "D:\\PROYECTOS\\WORKTREES\\HeptaCore_PUB04_GOAL\\var\\oreshnik\\task-board.json",
+  "zone": [
+    "docs/obsidian-vault",
+    "docs/07_handoffs",
+    "README.md",
+    "var/oreshnik"
+  ],
+  "dependsOn": [
+    "S-HC-REC-00A"
+  ],
+  "acceptance": [
+    "Baseline productivo 2fd9e249 integrado en master via merge",
+    "Oreshnik cerrado con exito",
+    "oreshnik-cli@0.2.0-alpha.0 operacional"
+  ],
+  "history": [
+    {
+      "at": "2026-06-21T05:15:00.000Z",
+      "action": "closed",
+      "operator": "Manuel",
+      "branch": "Manuel/s-hc-rec-00c-canonical-integration",
+      "description": "canonical integration after recovery"
+    }
+  ],
+  "updatedAt": "2026-06-29T02:29:41.523Z",
+  "runs": []
+}

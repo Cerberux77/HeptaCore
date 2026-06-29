@@ -1,0 +1,4 @@
+.active-worktree.json
+goals/*/screenshots/
+goals/*/traces/
+goals/*/logs/
