@@ -7,7 +7,7 @@
   "title": "Operational reconciliation automation for ambiguous provider outcomes",
   "owner": "Manuel",
   "backupOwner": "Manuel",
-  "status": "ready_for_integration",
+  "status": "integrated",
   "taskBoardPath": "D:\\PROYECTOS\\WORKTREES\\HeptaCore_PUB04_GOAL\\var\\oreshnik\\task-board.json",
   "zone": [
     "apps/web/lib/publishing-finalization.ts",
@@ -72,9 +72,22 @@
       "operator": "manuel",
       "branch": "task/S-HC-PUB-05-RECONCILIATION-OPS/S-HC-PUB-05-RECONCILIATION-OPS/manuel/manuel-S-HC-PUB-05-RECONCILIATION-OPS-2026-06-29T00-37-03-464Z-4e3d4eae",
       "description": "Task delivered with handoff docs/07_handoffs/S-HC-PUB-05-RECONCILIATION-OPS.md"
+    },
+    {
+      "at": "2026-06-29T00:54:04.614Z",
+      "action": "claim_released",
+      "operator": "manuel",
+      "description": "Run manuel-S-HC-PUB-05-RECONCILIATION-OPS-2026-06-29T00-22-46-240Z-52eb7757 released"
+    },
+    {
+      "at": "2026-06-29T01:54:40.093Z",
+      "action": "integrated",
+      "operator": "manuel",
+      "branch": "Manuel/s-hc-pub-05-reconciliation-ops-sprint-2026-06-29",
+      "description": "Integrated Manuel/s-hc-pub-05-reconciliation-ops-sprint-2026-06-29 into MADRE/v49-s-hc-pub-05-reconciliation-ops-implementa-automatizacion-operacional-de-reconci-2026-06-29"
     }
   ],
-  "updatedAt": "2026-06-29T00:37:30.040Z",
+  "updatedAt": "2026-06-29T01:54:40.093Z",
   "runs": [
     {
       "runId": "manuel-S-HC-PUB-05-RECONCILIATION-OPS-2026-06-29T00-37-03-464Z-4e3d4eae",
@@ -88,10 +101,10 @@
         "apps/web/lib/draft-operational-state.ts",
         "packages/core"
       ],
-      "taskStatus": "ready_for_integration",
+      "taskStatus": "integrated",
       "claimStatus": "released",
       "claimedAt": "2026-06-29T00:37:03.464Z",
-      "updatedAt": "2026-06-29T00:37:30.052Z",
+      "updatedAt": "2026-06-29T01:54:40.093Z",
       "expiresAt": "2026-06-29T01:37:03.464Z",
       "releasedAt": "2026-06-29T00:37:30.052Z",
       "manifestPath": "var/oreshnik/runs/S-HC-PUB-05-RECONCILIATION-OPS/manuel-S-HC-PUB-05-RECONCILIATION-OPS-2026-06-29T00-37-03-464Z-4e3d4eae.json"
@@ -119,10 +132,55 @@
   ],
   "integration": {
     "runId": "manuel-S-HC-PUB-05-RECONCILIATION-OPS-2026-06-29T00-37-03-464Z-4e3d4eae",
-    "sourceBranch": "task/S-HC-PUB-05-RECONCILIATION-OPS/S-HC-PUB-05-RECONCILIATION-OPS/manuel/manuel-S-HC-PUB-05-RECONCILIATION-OPS-2026-06-29T00-37-03-464Z-4e3d4eae",
-    "status": "queued",
+    "sourceBranch": "Manuel/s-hc-pub-05-reconciliation-ops-sprint-2026-06-29",
+    "status": "integrated",
     "motherBranch": "MADRE/v49-s-hc-pub-05-reconciliation-ops-implementa-automatizacion-operacional-de-reconci-2026-06-29",
     "queuedAt": "2026-06-29T00:37:36.657Z",
-    "updatedAt": "2026-06-29T00:37:36.657Z"
+    "updatedAt": "2026-06-29T01:54:40.093Z",
+    "targetBranch": "MADRE/v49-s-hc-pub-05-reconciliation-ops-implementa-automatizacion-operacional-de-reconci-2026-06-29",
+    "integratedAt": "2026-06-29T01:54:40.093Z"
+  },
+  "latestTrain": {
+    "attemptId": "train-manuel-S-HC-PUB-05-RECONCILIATION-OPS-2026-06-29-1782698014030",
+    "runId": "manuel-S-HC-PUB-05-RECONCILIATION-OPS-2026-06-29T00-37-03-464Z-4e3d4eae",
+    "sourceBranch": "Manuel/s-hc-pub-05-reconciliation-ops-sprint-2026-06-29",
+    "targetBranch": "MADRE/v49-s-hc-pub-05-reconciliation-ops-implementa-automatizacion-operacional-de-reconci-2026-06-29",
+    "integrationBranch": "integration-train/S-HC-PUB-05-RECONCILIATI/S-HC-PUB-05-RECONCILIATI/r-3030ee064340/a-4b83c9744f29",
+    "operator": "manuel",
+    "lockKey": "integration-train/MADRE/v49-s-hc-pub-05-reconciliation-ops-implementa-automatizacion-operacional-de-reconci-2026-06-29",
+    "status": "succeeded",
+    "startedAt": "2026-06-29T01:53:34.030Z",
+    "completedAt": "2026-06-29T01:54:40.108Z",
+    "reason": "Already contained on MADRE/v49-s-hc-pub-05-reconciliation-ops-implementa-automatizacion-operacional-de-reconci-2026-06-29; runtime reconciled without merge",
+    "motherAdvanceState": "runtime_projection_confirmed",
+    "gateResults": [
+      {
+        "name": "typecheck",
+        "passed": true
+      },
+      {
+        "name": "build",
+        "passed": true
+      },
+      {
+        "name": "test",
+        "passed": true
+      }
+    ],
+    "outcome": {
+      "mergeBase": "db3e69484e003f7ec674003c1a3c7e9c882745b5",
+      "changedFiles": [],
+      "compatibilityBranchPushed": false,
+      "deliveryDisposition": "already_contained",
+      "projectedMotherBranch": "MADRE/v49-s-hc-pub-05-reconciliation-ops-implementa-automatizacion-operacional-de-reconci-2026-06-29",
+      "motherAdvanceState": "runtime_projection_confirmed",
+      "motherFunctionalExpectedCommit": "db3e69484e003f7ec674003c1a3c7e9c882745b5",
+      "motherFunctionalRemoteCommit": "db3e69484e003f7ec674003c1a3c7e9c882745b5",
+      "motherFunctionalPushVerified": true,
+      "motherFunctionalPushReconciled": false,
+      "projectedTaskStatus": "integrated",
+      "projectedRunStatus": "integrated",
+      "projectedSprintEntryStatus": "integrated"
+    }
   }
 }
