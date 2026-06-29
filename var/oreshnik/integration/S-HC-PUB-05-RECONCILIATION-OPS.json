@@ -8,7 +8,7 @@
     {
       "taskId": "S-HC-PUB-05-RECONCILIATION-OPS",
       "runId": "manuel-S-HC-PUB-05-RECONCILIATION-OPS-2026-06-29T00-37-03-464Z-4e3d4eae",
-      "sourceBranch": "task/S-HC-PUB-05-RECONCILIATION-OPS/S-HC-PUB-05-RECONCILIATION-OPS/manuel/manuel-S-HC-PUB-05-RECONCILIATION-OPS-2026-06-29T00-37-03-464Z-4e3d4eae",
+      "sourceBranch": "Manuel/s-hc-pub-05-reconciliation-ops-sprint-2026-06-29",
       "owner": "Manuel",
       "operator": "manuel",
       "handoff": "docs/07_handoffs/S-HC-PUB-05-RECONCILIATION-OPS.md",
