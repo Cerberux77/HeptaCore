@@ -8,7 +8,7 @@
   "owner": "Jean",
   "backupOwner": "Manuel",
   "status": "pending",
-  "taskBoardPath": "var/oreshnik/task-board.json",
+  "taskBoardPath": "D:\\PROYECTOS\\WORKTREES\\HeptaCore_ORESHNIK_READY\\var\\oreshnik\\task-board.json",
   "zone": [
     "apps/web/app/api/email",
     "packages/core",

@@ -5,7 +5,7 @@ project: "HeptaCore"
 task_id: "S-HC-TOOL-01-GOAL-RUNNER-V1"
 run_id: "kilo-S-HC-TOOL-01-GOAL-RUNNER-V1-2026-06-29T02-20-46-794Z-ed5534ef"
 sprint: "S-HC-TOOL-01-GOAL-RUNNER-V1"
-status: "ready_for_integration"
+status: "cancelled"
 claim_status: "released"
 operator: "kilo"
 last_updated: "2026-06-29T02:25:48.610Z"
@@ -25,7 +25,7 @@ source: "var/oreshnik/runs/S-HC-TOOL-01-GOAL-RUNNER-V1/kilo-S-HC-TOOL-01-GOAL-RU
 - operator: `kilo`
 - worker: `kilo`
 - mode: `codex`
-- task status: `ready_for_integration`
+- task status: `cancelled`
 - claim status: `released`
 - branch: `task/S-HC-TOOL-01-GOAL-RUNNER-V1/S-HC-TOOL-01-GOAL-RUNNER-V1/kilo/kilo-S-HC-TOOL-01-GOAL-RUNNER-V1-2026-06-29T02-20-46-794Z-ed5534ef`
 - worktree: `var/oreshnik/wt/S-HC-TOOL-01-GOAL-RUNNER-V1/S-HC-TOOL-01-GOAL-RUNNER-V1/r-7fa3b13c04df`

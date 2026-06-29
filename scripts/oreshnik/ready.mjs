@@ -69,7 +69,8 @@ try {
   }
 
   const installedPackage = readJson(installedPackagePath);
-  const binVersion = run("npx", ["--no-install", "oreshnik", "--version"]);
+  const installedCliPath = join(dirname(installedPackagePath), "dist", "cli.js");
+  const binVersion = run("node", [installedCliPath, "--version"]);
   if (binVersion !== installedPackage.version) {
     issues.push(`oreshnik binary version mismatch: bin=${binVersion} package=${installedPackage.version}`);
   }

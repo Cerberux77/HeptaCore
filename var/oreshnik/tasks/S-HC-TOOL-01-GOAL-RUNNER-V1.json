@@ -8,7 +8,7 @@
   "owner": "Manuel",
   "backupOwner": "Manuel",
   "status": "integrated",
-  "taskBoardPath": "var/oreshnik/task-board.json",
+  "taskBoardPath": "D:\\PROYECTOS\\WORKTREES\\HeptaCore_ORESHNIK_READY\\var\\oreshnik\\task-board.json",
   "zone": [
     "scripts/goal-runner/**",
     "var/goal-runner/**",
@@ -151,7 +151,7 @@
         "docs/07_handoffs/**",
         "docs/obsidian-vault/**"
       ],
-      "taskStatus": "ready_for_integration",
+      "taskStatus": "cancelled",
       "claimStatus": "released",
       "claimedAt": "2026-06-29T02:20:46.793Z",
       "updatedAt": "2026-06-29T02:25:48.610Z",
@@ -176,7 +176,7 @@
         "docs/07_handoffs/**",
         "docs/obsidian-vault/**"
       ],
-      "taskStatus": "ready_for_integration",
+      "taskStatus": "cancelled",
       "claimStatus": "released",
       "claimedAt": "2026-06-29T02:19:43.008Z",
       "updatedAt": "2026-06-29T02:20:29.163Z",

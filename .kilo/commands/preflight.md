@@ -9,7 +9,7 @@ When a user identifies themselves or asks for pending tasks from HeptaCore, run 
 
 ## Action (STRICT)
 1. Extract operator name (Jean, Architect, Manuel). Fallback: `git config user.name`.
-2. Use the installed pinned CLI. Do not resolve `../oreshnik`, smoke folders or a global binary.
+2. Use the installed pinned CLI from this repository only. Do not resolve sibling repos, smoke folders or a global binary.
 3. Generate sprint: `S-HC-{OPERATOR}-{today}`
 4. Run preflight from HeptaCore directory:
    ```
