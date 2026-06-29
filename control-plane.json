@@ -1,0 +1,48 @@
+{
+  "schemaVersion": 1,
+  "repository": {
+    "id": "32305cad03d6321a",
+    "originUrl": "https://github.com/Cerberux77/HeptaCore.git",
+    "canonicalMotherBranch": "master"
+  },
+  "generation": 1,
+  "controlHead": "bootstrap",
+  "catalog": {
+    "taskBoardPath": "var/oreshnik/task-board.json",
+    "zoneMapPath": "docs/07_handoffs/zone-map.json",
+    "sourceTaskBoardHead": "9329fe809b541398f6907b7bdb62a704148473c2",
+    "fingerprint": "ef48468fb183d640d14a52e3efb95d43201dc92a",
+    "taskCount": 19,
+    "updatedAt": "2026-06-29T20:17:43.302Z"
+  },
+  "policy": {
+    "name": "deterministic-v1",
+    "allowMultipleRunsPerOperator": false,
+    "selectionTieBreak": "task-board-order-then-sprint"
+  },
+  "machines": [
+    {
+      "machineId": "machine-89814280-0079-4c35-82c8-3d533c515221",
+      "worktreeRoot": "D:\\PROYECTOS\\WORKTREES\\HeptaCore_ORESHNIK_READY\\var\\oreshnik\\wt",
+      "hostname": "PA-ORI-L-0092",
+      "registeredAt": "2026-06-29T20:17:41.440Z",
+      "updatedAt": "2026-06-29T20:17:41.441Z"
+    }
+  ],
+  "assignments": [],
+  "claims": [],
+  "runs": [],
+  "zones": [],
+  "audit": [
+    {
+      "at": "2026-06-29T20:17:43.302Z",
+      "action": "dispatch.init",
+      "message": "Initialized control plane for 32305cad03d6321a on master."
+    }
+  ],
+  "reconciliation": {
+    "pendingDiagnostics": []
+  },
+  "createdAt": "2026-06-29T20:17:43.302Z",
+  "updatedAt": "2026-06-29T20:17:43.302Z"
+}
