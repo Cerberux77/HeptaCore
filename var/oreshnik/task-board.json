@@ -1,6 +1,6 @@
 {
   "project": "HeptaCore",
-  "updatedAt": "2026-06-28T18:47:05.091Z",
+  "updatedAt": "2026-06-28T23:59:59.945Z",
   "resiliencePolicy": "If an owner is unavailable for more than one working block or blocks the critical path, backupOwner may take over after recording reassignment.",
   "closurePolicy": "No sprint may be closed until acceptance criteria, base tests, sprint-specific tests, docs/handoff, and Oreshnik zone checks pass.",
   "baseTestMatrix": [
@@ -9,6 +9,7 @@
     "npm run worker:validate"
   ],
   "currentExecutionOrder": [
+    "S-HC-PUB-04-HOURLY-BATCH-CRON",
     "Fase completada: S-HC-TEN-01-GLOBAL-TENANT-ADMIN — tres roles canonicos (OWNER/ADMIN/VIEWER), normalizacion heredada, identidad en /admin y /tenant/*, 5/5 E2E en Preview (SHA 4b82628), 569 unit tests.",
     "Fase completada: S-HC-REC-00A — baseline de publicacion recuperado y estabilizado (SHA 2fd9e249). Facebook e Instagram publican realmente desde la UI con durabilidad transaccional.",
     "Fase completada: S-HC-REC-00C — integracion canonica en master (SHA 9329fe8). Documentacion y Oreshnik alineados.",
@@ -20,103 +21,386 @@
     "EMAIL-01 infraestructura de codigo preparada (modelos, templates, provider abstraction, webhook, Link-Only activo). Integracion externa bloqueada hasta dominio final.",
     "Modo operacional actual: EMAIL_PROVIDER=disabled. Invitaciones se entregan via enlace copiable (inviteLink). Correos reales: 0.",
     "Reels, Stories y YouTube forman parte obligatoria del alcance final de HeptaCore. Las combinaciones sin publisher real quedan pendientes de implementacion en PUB-06, PUB-07 o PUB-08.",
-    "Jean fuera de ruta critica. Responsabilidades reasignadas a Manuel."
+    "Jean fuera de ruta critica. Responsabilidades reasignadas a Manuel.",
+    "ad-hoc",
+    "ai-generation",
+    "ai-infra",
+    "analytics",
+    "assets",
+    "commercial",
+    "data",
+    "email-infra",
+    "engagement",
+    "foundation",
+    "observability",
+    "onboarding",
+    "operations",
+    "optimization",
+    "product-ui",
+    "production-infra",
+    "publishing",
+    "recovery",
+    "release",
+    "strategy",
+    "support",
+    "tenant-onboarding",
+    "tenant-platform",
+    "tooling"
   ],
   "tasks": [
     {
-      "id": "S-HC-TEN-01-GLOBAL-TENANT-ADMIN",
-      "title": "Global tenant administration and provisioning",
+      "id": "S-HC-PUB-04-HOURLY-BATCH-CRON",
+      "title": "Hourly batch cron publishing with timezone-aware scheduling",
+      "owner": "Manuel",
+      "backupOwner": "Manuel",
+      "status": "integrated",
+      "track": "S-HC-PUB-04-HOURLY-BATCH-CRON",
+      "zone": [
+        "apps/web/app/api/cron",
+        "apps/worker",
+        "packages/core"
+      ],
+      "dependsOn": [
+        "S-HC-PUB-02-MULTIFORMAT-PREVIEW",
+        "S-HC-PUB-03-MULTITENANT-ASSETS"
+      ],
+      "acceptance": [
+        "Batch cron procesa multiples posts programados por hora",
+        "Timezone-aware scheduling per tenant",
+        "Rate limiting per platform",
+        "Failure isolation (un post falla, los demas continuan)",
+        "Cron idempotency preservada"
+      ],
+      "handoff": "var/goal-runner/goals/GR-20260626T064941Z-a09b3d58-finalize-pub-04-production-correctness/final-report.md",
+      "attempts": 1,
+      "history": [
+        {
+          "at": "2026-06-26T08:52:44.818Z",
+          "action": "claimed",
+          "operator": "Manuel",
+          "branch": "Manuel/s-hc-pub-04-hourly-batch-goal",
+          "description": "Run Manuel-S-HC-PUB-04-HOURLY-BATCH-CRON-2026-06-26T08-52-44-815Z-2487f474 claimed via manual"
+        },
+        {
+          "at": "2026-06-26T08:53:22.298Z",
+          "action": "validation_started",
+          "operator": "Manuel",
+          "branch": "Manuel/s-hc-pub-04-hourly-batch-goal",
+          "description": "PUB-04 implementation completed at commit 941042b825fc4047860a11ec8fc74c01cd4326e2; immutable contract 22/22, typecheck, full tests, build, worker validation and Oreshnik reconciliation/drift passed."
+        },
+        {
+          "at": "2026-06-26T08:55:47.503Z",
+          "action": "validated",
+          "operator": "Manuel",
+          "branch": "Manuel/s-hc-pub-04-hourly-batch-goal",
+          "description": "changed files diff verified for commit 941042b825fc4047860a11ec8fc74c01cd4326e2; typecheck passed; tests passed; build passed; PUB-04 immutable contract 22/22 passed; protected paths verified; operator confirms task is complete."
+        },
+        {
+          "at": "2026-06-26T08:55:47.503Z",
+          "action": "ready_for_integration",
+          "operator": "Manuel",
+          "branch": "Manuel/s-hc-pub-04-hourly-batch-goal",
+          "description": "Task delivered with handoff var/goal-runner/goals/GR-20260626T064941Z-a09b3d58-finalize-pub-04-production-correctness/final-report.md"
+        },
+        {
+          "at": "2026-06-28T23:59:59.945Z",
+          "action": "integrated",
+          "operator": "manuel",
+          "branch": "Manuel/s-hc-pub-04-hourly-batch-goal",
+          "description": "Integrated Manuel/s-hc-pub-04-hourly-batch-goal into MADRE/v48-s-hc-pub-04-hourly-batch-cron-hourly-batch-publishing-cron-and-pub-04-producti-2026-06-28"
+        }
+      ]
+    },
+    {
+      "id": "S-HC-DRIFT-001",
+      "title": "sprint",
       "owner": "Manuel",
       "backupOwner": "Manuel",
       "status": "done",
-      "track": "tenant-platform",
+      "track": "ad-hoc",
       "zone": [
-        "packages/db/**",
-        "apps/web/lib/tenant-admin-service.ts",
-        "apps/web/lib/tenant-access.ts",
-        "apps/web/lib/__tests__/tenant-admin*.test.ts",
-        "docs/**",
-        "var/oreshnik/**"
+        "package.json",
+        "scripts/oreshnik"
+      ],
+      "dependsOn": [
+        "S-HC-PROD-01"
+      ],
+      "history": [
+        {
+          "at": "2026-06-12T04:56:32.932Z",
+          "action": "drift-recorded",
+          "operator": "Manuel",
+          "description": "sprint"
+        }
+      ]
+    },
+    {
+      "id": "S-HC-DRIFT-002",
+      "title": "Codex multi-RRSS refactor, readiness gates, UI fixes, migrations, vercelignore",
+      "owner": "Manuel",
+      "backupOwner": "Manuel",
+      "status": "done",
+      "track": "ad-hoc",
+      "zone": [
+        "apps/web",
+        "packages/agents",
+        "packages/integrations"
+      ],
+      "dependsOn": [
+        "S-HC-PROD-01"
+      ],
+      "history": [
+        {
+          "at": "2026-06-12T07:16:29.270Z",
+          "action": "drift-recorded",
+          "operator": "Manuel",
+          "description": "Codex multi-RRSS refactor"
+        }
+      ]
+    },
+    {
+      "id": "S-HC-DRIFT-003",
+      "title": "Sistema de publicacion con 3 modos, 24 crons Vercel, cron publisher idempotente",
+      "owner": "Manuel",
+      "backupOwner": "Manuel",
+      "status": "done",
+      "track": "ad-hoc",
+      "zone": [
+        "apps/web",
+        "vercel.json",
+        "docs/07_handoffs"
+      ],
+      "dependsOn": [],
+      "history": [
+        {
+          "at": "2026-06-14T08:39:53.687Z",
+          "action": "drift-recorded",
+          "operator": "Manuel",
+          "description": "Sistema de publicacion con 3 modos, 24 crons Vercel, cron publisher idempotente"
+        }
+      ]
+    },
+    {
+      "id": "S-HC-AIGEN-01-ASSET-GENERATION-BROKER",
+      "title": "AI asset generation broker: provider-agnostic, metered and billed",
+      "owner": "Manuel",
+      "backupOwner": "Manuel",
+      "status": "blocked",
+      "track": "ai-generation",
+      "zone": [
+        "packages/agents",
+        "apps/web/app/api",
+        "packages/core"
+      ],
+      "dependsOn": [
+        "S-HC-ASSET-01-STRATEGY-ASSET-MANIFEST",
+        "S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE",
+        "S-HC-COMM-02-BILLING-ACTIVATION"
+      ],
+      "acceptance": [
+        "Provider-agnostic generation broker (not hardcoded to single provider)",
+        "Metered consumption with cost preview before generation",
+        "Billed per request with usage tracking",
+        "Optional: client may supply assets without using generation",
+        "Generation respects brand guidelines from strategy"
+      ],
+      "history": [
+        {
+          "at": "2026-06-28T18:47:05.091Z",
+          "action": "status_reconciled",
+          "operator": "manuel",
+          "description": "Task status reconciled to blocked: dependency S-HC-ASSET-01-STRATEGY-ASSET-MANIFEST still pending (S-HC-ASSET-01-STRATEGY-ASSET-MANIFEST:pending) | dependency S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE still pending (S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE:pending) | dependency S-HC-COMM-02-BILLING-ACTIVATION still pending (S-HC-COMM-02-BILLING-ACTIVATION:pending)"
+        }
+      ]
+    },
+    {
+      "id": "S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE",
+      "title": "LLM provider selection, cost estimation and governance policy",
+      "owner": "Manuel",
+      "backupOwner": "Manuel",
+      "status": "ready",
+      "track": "ai-infra",
+      "zone": [
+        "packages/agents",
+        "packages/core",
+        "apps/web/components"
+      ],
+      "dependsOn": [],
+      "acceptance": [
+        "Provider-agnostic LLM broker interface",
+        "Model selection per task (strategy, generation, analysis)",
+        "Cost estimation before executing expensive tasks",
+        "Admin policy: authorized providers, models, max spend",
+        "Usage tracking and billing integration"
+      ],
+      "history": [
+        {
+          "at": "2026-06-28T18:47:05.091Z",
+          "action": "status_reconciled",
+          "operator": "manuel",
+          "description": "Task status reconciled to ready: dependencies and conflicts are clear for execution"
+        }
+      ]
+    },
+    {
+      "id": "S-HC-AN-01-CAMPAIGN-PERFORMANCE",
+      "title": "Campaign performance analytics: reach, engagement, metrics per post and campaign",
+      "owner": "Manuel",
+      "backupOwner": "Manuel",
+      "status": "blocked",
+      "track": "analytics",
+      "zone": [
+        "apps/web/components",
+        "apps/web/app/api",
+        "packages/core"
+      ],
+      "dependsOn": [
+        "S-HC-OPS-01-CAMPAIGN-REVIEW-DEPLOYMENT",
+        "S-HC-OBS-01-PUBLISHING-OBSERVABILITY"
+      ],
+      "acceptance": [
+        "Reach and impressions where API permits",
+        "Interactions, likes, comments",
+        "Shares and saves where API permits",
+        "Metrics per publication and per campaign",
+        "Visual dashboard with trends"
+      ],
+      "history": [
+        {
+          "at": "2026-06-28T18:47:05.091Z",
+          "action": "status_reconciled",
+          "operator": "manuel",
+          "description": "Task status reconciled to blocked: dependency S-HC-OPS-01-CAMPAIGN-REVIEW-DEPLOYMENT still pending (S-HC-OPS-01-CAMPAIGN-REVIEW-DEPLOYMENT:pending) | dependency S-HC-OBS-01-PUBLISHING-OBSERVABILITY still pending (S-HC-OBS-01-PUBLISHING-OBSERVABILITY:pending)"
+        }
+      ]
+    },
+    {
+      "id": "S-HC-ASSET-01-STRATEGY-ASSET-MANIFEST",
+      "title": "Strategy-driven asset manifest: per-publication asset requirements",
+      "owner": "Manuel",
+      "backupOwner": "Manuel",
+      "status": "blocked",
+      "track": "assets",
+      "zone": [
+        "apps/web/components",
+        "packages/core"
+      ],
+      "dependsOn": [
+        "S-HC-STRAT-02-CONTENT-CALENDAR-BLUEPRINT",
+        "S-HC-PUB-03-MULTITENANT-ASSETS"
+      ],
+      "acceptance": [
+        "Per-publication asset manifest: type, network, format, resolution, aspect ratio, duration",
+        "Creative guideline, scene context, branding, logo placement",
+        "Status tracking: missing, uploaded, compatible, incompatible, approved, AI-generated",
+        "Client choice: supply, request help, or generate via AI",
+        "Progress bar with direct CTA for each missing asset"
+      ],
+      "history": [
+        {
+          "at": "2026-06-28T18:47:05.091Z",
+          "action": "status_reconciled",
+          "operator": "manuel",
+          "description": "Task status reconciled to blocked: dependency S-HC-STRAT-02-CONTENT-CALENDAR-BLUEPRINT still pending (S-HC-STRAT-02-CONTENT-CALENDAR-BLUEPRINT:pending)"
+        }
+      ]
+    },
+    {
+      "id": "S-HC-ASSET-02-FORMAT-DERIVATIVES",
+      "title": "Format derivatives: badge interaction, format preview, intelligent crop, safe zones, asset variants",
+      "owner": "Manuel",
+      "backupOwner": "Manuel",
+      "status": "ready",
+      "track": "assets",
+      "zone": [
+        "apps/web/components",
+        "packages/core",
+        "apps/web/lib"
       ],
       "dependsOn": [
         "S-HC-PUB-03-MULTITENANT-ASSETS"
       ],
       "acceptance": [
-        "Tenant lifecycle schema with PROVISIONING, ACTIVE, SUSPENDED, ARCHIVED states",
-        "Secure migration preserving existing tenants as ACTIVE",
-        "SUPER_ADMIN access contracts",
-        "Transactional tenant provisioning",
-        "Slug validation and normalization",
-        "Lifecycle transitions with audit trail",
-        "Secure serialization without exposing secrets"
+        "Badge de compatibilidad clickeable que abre detalle de formato",
+        "Preview especifico de formato con crop y safe zones visuales",
+        "Crop manual interactivo por formato (recorte, reposicion)",
+        "Crop inteligente automatico con deteccion de sujeto/centro",
+        "Fit con fondo (blur, color, gradiente) cuando el asset no llena el frame",
+        "Safe zones indicadas visualmente (titulo, UI de plataforma, texto)",
+        "Aceptar/deshacer cambios por formato",
+        "Asset original inmutable; derivados como registros separados con relacion sourceAsset",
+        "Versionado de derivados",
+        "Generacion por lote de variantes para todos los formatos requeridos",
+        "Imagenes primero; video fuera de este sprint o como fase separada"
       ],
-      "handoff": "docs/07_handoffs/TEN-01-global-tenant-admin.md",
       "history": [
         {
-          "at": "2026-06-25T18:19:00.000Z",
-          "action": "closed",
-          "operator": "Manuel",
-          "branch": "Manuel/s-hc-ten-01-global-tenant-admin",
-          "description": "Three canonical roles (OWNER/ADMIN/VIEWER), legacy role normalization, identity panel in /admin and /tenant/*, 5/5 E2E pass, 569 unit tests, production intact"
+          "at": "2026-06-28T18:47:05.091Z",
+          "action": "status_reconciled",
+          "operator": "manuel",
+          "description": "Task status reconciled to ready: dependencies and conflicts are clear for execution"
         }
       ]
     },
     {
-      "id": "S-HC-00",
-      "title": "Foundation baseline commit",
+      "id": "S-HC-COMM-01-SELF-SERVICE-SIGNUP",
+      "title": "Self-service tenant signup with trial gate and onboarding flow",
       "owner": "Manuel",
-      "backupOwner": "Jean",
-      "status": "done",
-      "track": "foundation",
+      "backupOwner": "Manuel",
+      "status": "blocked",
+      "track": "commercial",
       "zone": [
-        "repo",
-        "docs",
-        "oreshnik"
-      ],
-      "dependsOn": [],
-      "acceptance": [
-        "Initial monorepo committed",
-        "Oreshnik vault operational",
-        "Build/typecheck pass"
-      ],
-      "history": [
-        {
-          "at": "2026-06-12T04:30:20.302Z",
-          "action": "closed",
-          "operator": "Manuel",
-          "branch": "Manuel/s-hc-prod-01-producto-operativo-tenant-admin-produccion-2026-06-09",
-          "description": "foundation baseline commit"
-        }
-      ]
-    },
-    {
-      "id": "S-HC-01",
-      "title": "Console shell: tenant dashboard, onboarding, checklist, draft queue",
-      "owner": "Jean",
-      "backupOwner": "Jean",
-      "status": "done",
-      "track": "product-ui",
-      "zone": [
-        "apps/web",
-        "packages/ui",
-        "packages/agents"
+        "apps/web/app/register",
+        "apps/web/app/api/auth",
+        "packages/db",
+        "apps/web/components"
       ],
       "dependsOn": [
-        "S-HC-00"
+        "S-HC-TEN-01-GLOBAL-TENANT-ADMIN",
+        "S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION"
       ],
       "acceptance": [
-        "Tenant dashboard route",
-        "Onboarding form mock",
-        "Input checklist",
-        "Draft queue screen"
+        "Self-service registration with email verification",
+        "Trial tenant creation with default config",
+        "Guided onboarding wizard (brand, networks, first draft)",
+        "Trial gate enforcement before publishing"
       ],
       "history": [
         {
-          "at": "2026-06-09T19:56:42.980Z",
-          "action": "reassigned",
-          "from": "Manuel",
-          "to": "Jean",
-          "reason": "Manuel ausente - ruta critica bloqueada"
+          "at": "2026-06-28T18:47:05.091Z",
+          "action": "status_reconciled",
+          "operator": "manuel",
+          "description": "Task status reconciled to blocked: dependency S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION still pending (S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION:pending)"
+        }
+      ]
+    },
+    {
+      "id": "S-HC-COMM-02-BILLING-ACTIVATION",
+      "title": "Tenant billing activation: plan selection, usage tracking, payment integration",
+      "owner": "Manuel",
+      "backupOwner": "Manuel",
+      "status": "blocked",
+      "track": "commercial",
+      "zone": [
+        "apps/web/app/api/billing",
+        "packages/db",
+        "apps/web/components"
+      ],
+      "dependsOn": [
+        "S-HC-COMM-01-SELF-SERVICE-SIGNUP"
+      ],
+      "acceptance": [
+        "Plan selection (Free, Pro, Agency)",
+        "Usage tracking (posts, assets, tenants)",
+        "Payment gateway integration (Stripe)",
+        "Invoice generation and history"
+      ],
+      "history": [
+        {
+          "at": "2026-06-28T18:47:05.091Z",
+          "action": "status_reconciled",
+          "operator": "manuel",
+          "description": "Task status reconciled to blocked: dependency S-HC-COMM-01-SELF-SERVICE-SIGNUP still pending (S-HC-COMM-01-SELF-SERVICE-SIGNUP:pending)"
         }
       ]
     },
@@ -152,81 +436,302 @@
       ]
     },
     {
-      "id": "S-HC-REC-00A",
-      "title": "UI Publishing Baseline Recovery — production publishing stabilized",
-      "owner": "Manuel",
+      "id": "S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION",
+      "title": "Transactional email foundation: domain sender, DNS, reputation, provider integration",
+      "owner": "Jean",
       "backupOwner": "Manuel",
-      "status": "done",
-      "track": "recovery",
+      "status": "pending",
+      "track": "email-infra",
       "zone": [
-        "apps/web",
-        "docs/07_handoffs",
-        "docs/obsidian-vault"
+        "apps/web/app/api/email",
+        "packages/core",
+        "docs"
       ],
       "dependsOn": [],
       "acceptance": [
-        "Facebook e Instagram publican realmente desde la UI con durabilidad transaccional",
-        "Errores ambiguos bloqueados sin retry automatico",
-        "156 tests (155 publish-flow + 1 calendar-state)",
-        "Produccion estable en SHA 2fd9e249"
-      ],
-      "handoff": "docs/07_handoffs/HC-REC-00A-codex-blockers.md",
-      "history": [
-        {
-          "at": "2026-06-21T04:30:00.000Z",
-          "action": "closed",
-          "operator": "Manuel",
-          "branch": "manuel/s-hc-rec-00a-ui-publishing-baseline",
-          "description": "Baseline de publicacion recuperado y estabilizado"
-        }
+        "Dominio final de HeptaCore configurado como remitente autorizado",
+        "DNS (SPF, DKIM, DMARC) verificado",
+        "Proveedor de correo transaccional integrado (Resend, SendGrid o equivalente)",
+        "Webhooks de eventos (delivered, bounced, complained) configurados",
+        "Enlaces comerciales y de marca consistentes con el dominio final"
       ]
     },
     {
-      "id": "S-HC-REC-00B",
-      "title": "Facebook duplicate cleanup",
+      "id": "S-HC-INBOX-01-UNIFIED-ENGAGEMENT",
+      "title": "Unified engagement inbox: read and respond to messages and comments",
       "owner": "Manuel",
       "backupOwner": "Manuel",
-      "status": "done",
-      "track": "recovery",
-      "zone": [],
-      "dependsOn": [],
-      "history": [
-        {
-          "at": "2026-06-21T04:30:00.000Z",
-          "action": "cancelled",
-          "operator": "Manuel",
-          "description": "Manuel elimino manualmente el duplicado en Facebook"
-        }
-      ]
-    },
-    {
-      "id": "S-HC-REC-00C",
-      "title": "Canonical integration — recovered production baseline integrated into master",
-      "owner": "Manuel",
-      "backupOwner": "Manuel",
-      "status": "done",
-      "track": "recovery",
+      "status": "blocked",
+      "track": "engagement",
       "zone": [
-        "docs/obsidian-vault",
-        "docs/07_handoffs",
-        "README.md",
-        "var/oreshnik"
+        "apps/web/components",
+        "apps/web/app/api",
+        "packages/integrations"
       ],
       "dependsOn": [
-        "S-HC-REC-00A"
+        "S-HC-AN-01-CAMPAIGN-PERFORMANCE"
       ],
       "acceptance": [
-        "Baseline productivo 2fd9e249 integrado en master via merge",
-        "Oreshnik cerrado con exito",
-        "oreshnik-cli@0.2.0-alpha.0 operacional"
+        "Unified inbox for messages and comments across platforms",
+        "Read and respond according to platform permissions",
+        "Classification: positive, negative, neutral",
+        "Summary of themes and sentiment"
       ],
       "history": [
         {
-          "at": "2026-06-21T05:15:00.000Z",
+          "at": "2026-06-28T18:47:05.091Z",
+          "action": "status_reconciled",
+          "operator": "manuel",
+          "description": "Task status reconciled to blocked: dependency S-HC-AN-01-CAMPAIGN-PERFORMANCE still pending (S-HC-AN-01-CAMPAIGN-PERFORMANCE:pending)"
+        }
+      ]
+    },
+    {
+      "id": "S-HC-00",
+      "title": "Foundation baseline commit",
+      "owner": "Manuel",
+      "backupOwner": "Jean",
+      "status": "done",
+      "track": "foundation",
+      "zone": [
+        "repo",
+        "docs",
+        "oreshnik"
+      ],
+      "dependsOn": [],
+      "acceptance": [
+        "Initial monorepo committed",
+        "Oreshnik vault operational",
+        "Build/typecheck pass"
+      ],
+      "history": [
+        {
+          "at": "2026-06-12T04:30:20.302Z",
           "action": "closed",
           "operator": "Manuel",
-          "branch": "Manuel/s-hc-rec-00c-canonical-integration",
-          "description": "canonical integration after recovery"
+          "branch": "Manuel/s-hc-prod-01-producto-operativo-tenant-admin-produccion-2026-06-09",
+          "description": "foundation baseline commit"
+        }
+      ]
+    },
+    {
+      "id": "S-HC-OBS-01-PUBLISHING-OBSERVABILITY",
+      "title": "Publishing observability: structured logging, metrics dashboard, alert thresholds",
+      "owner": "Manuel",
+      "backupOwner": "Manuel",
+      "status": "blocked",
+      "track": "observability",
+      "zone": [
+        "apps/web",
+        "packages/core",
+        "docs"
+      ],
+      "dependsOn": [
+        "S-HC-PUB-05-RECONCILIATION-OPS"
+      ],
+      "acceptance": [
+        "Structured logging with correlation IDs",
+        "Publishing metrics dashboard (attempts, failures, latency)",
+        "Alert thresholds for provider failures",
+        "Daily digest summarizing publishing activity"
+      ],
+      "history": [
+        {
+          "at": "2026-06-28T18:47:05.091Z",
+          "action": "status_reconciled",
+          "operator": "manuel",
+          "description": "Task status reconciled to blocked: dependency S-HC-PUB-05-RECONCILIATION-OPS still pending (S-HC-PUB-05-RECONCILIATION-OPS:pending)"
+        }
+      ]
+    },
+    {
+      "id": "S-HC-ONB-01-MASTER-BRIEF-INGESTION",
+      "title": "Master document ingestion: extract structured info from company briefs",
+      "owner": "Manuel",
+      "backupOwner": "Manuel",
+      "status": "blocked",
+      "track": "onboarding",
+      "zone": [
+        "apps/web/components",
+        "packages/core",
+        "packages/agents"
+      ],
+      "dependsOn": [
+        "S-HC-COMM-02-BILLING-ACTIVATION"
+      ],
+      "acceptance": [
+        "Upload master document (PDF, DOCX, Markdown, texto)",
+        "Extract structured information: brand, product, audience, tone",
+        "Identify data gaps, contradictions and ambiguous zones",
+        "Store as structured tenant context"
+      ],
+      "history": [
+        {
+          "at": "2026-06-28T18:47:05.091Z",
+          "action": "status_reconciled",
+          "operator": "manuel",
+          "description": "Task status reconciled to blocked: dependency S-HC-COMM-02-BILLING-ACTIVATION still pending (S-HC-COMM-02-BILLING-ACTIVATION:pending)"
+        }
+      ]
+    },
+    {
+      "id": "S-HC-ONB-02-GAP-RESOLUTION-WIZARD",
+      "title": "Gap resolution wizard: dynamic form to resolve missing or conflicting data",
+      "owner": "Manuel",
+      "backupOwner": "Manuel",
+      "status": "blocked",
+      "track": "onboarding",
+      "zone": [
+        "apps/web/components",
+        "packages/core"
+      ],
+      "dependsOn": [
+        "S-HC-ONB-01-MASTER-BRIEF-INGESTION"
+      ],
+      "acceptance": [
+        "Ask only for missing data with dynamic questions",
+        "Avoid unnecessarily long forms",
+        "Save progress and allow continuation later",
+        "Reduce friction with contextual help"
+      ],
+      "history": [
+        {
+          "at": "2026-06-28T18:47:05.091Z",
+          "action": "status_reconciled",
+          "operator": "manuel",
+          "description": "Task status reconciled to blocked: dependency S-HC-ONB-01-MASTER-BRIEF-INGESTION still pending (S-HC-ONB-01-MASTER-BRIEF-INGESTION:pending)"
+        }
+      ]
+    },
+    {
+      "id": "S-HC-OPS-01-CAMPAIGN-REVIEW-DEPLOYMENT",
+      "title": "Campaign review and deployment: batch approval, schedule, publish",
+      "owner": "Manuel",
+      "backupOwner": "Manuel",
+      "status": "blocked",
+      "track": "operations",
+      "zone": [
+        "apps/web/app/api/publishing",
+        "apps/web/components",
+        "packages/core"
+      ],
+      "dependsOn": [
+        "S-HC-STRAT-02-CONTENT-CALENDAR-BLUEPRINT",
+        "S-HC-ASSET-01-STRATEGY-ASSET-MANIFEST",
+        "S-HC-PUB-04-HOURLY-BATCH-CRON"
+      ],
+      "acceptance": [
+        "Batch review of campaign drafts",
+        "Approve/reject per draft or bulk",
+        "Schedule deployment with cron integration",
+        "Publishing queue with visibility (approved, scheduled, published, blocked)",
+        "Rollback capability for scheduled posts"
+      ],
+      "history": [
+        {
+          "at": "2026-06-28T18:47:05.091Z",
+          "action": "status_reconciled",
+          "operator": "manuel",
+          "description": "Task status reconciled to blocked: dependency S-HC-STRAT-02-CONTENT-CALENDAR-BLUEPRINT still pending (S-HC-STRAT-02-CONTENT-CALENDAR-BLUEPRINT:pending) | dependency S-HC-ASSET-01-STRATEGY-ASSET-MANIFEST still pending (S-HC-ASSET-01-STRATEGY-ASSET-MANIFEST:pending)"
+        }
+      ]
+    },
+    {
+      "id": "S-HC-OPT-01-SENTIMENT-STRATEGY-ITERATION",
+      "title": "Sentiment-driven strategy iteration: results → improved strategy",
+      "owner": "Manuel",
+      "backupOwner": "Manuel",
+      "status": "blocked",
+      "track": "optimization",
+      "zone": [
+        "packages/agents",
+        "apps/web/components",
+        "packages/core"
+      ],
+      "dependsOn": [
+        "S-HC-AN-01-CAMPAIGN-PERFORMANCE",
+        "S-HC-INBOX-01-UNIFIED-ENGAGEMENT"
+      ],
+      "acceptance": [
+        "Versioned strategy with iteration history",
+        "Recommendations based on real performance data",
+        "Sentiment analysis feeding into next strategy cycle",
+        "Before/after comparison per iteration"
+      ],
+      "history": [
+        {
+          "at": "2026-06-28T18:47:05.091Z",
+          "action": "status_reconciled",
+          "operator": "manuel",
+          "description": "Task status reconciled to blocked: dependency S-HC-AN-01-CAMPAIGN-PERFORMANCE still pending (S-HC-AN-01-CAMPAIGN-PERFORMANCE:pending) | dependency S-HC-INBOX-01-UNIFIED-ENGAGEMENT still pending (S-HC-INBOX-01-UNIFIED-ENGAGEMENT:pending)"
+        }
+      ]
+    },
+    {
+      "id": "S-HC-01",
+      "title": "Console shell: tenant dashboard, onboarding, checklist, draft queue",
+      "owner": "Jean",
+      "backupOwner": "Jean",
+      "status": "done",
+      "track": "product-ui",
+      "zone": [
+        "apps/web",
+        "packages/ui",
+        "packages/agents"
+      ],
+      "dependsOn": [
+        "S-HC-00"
+      ],
+      "acceptance": [
+        "Tenant dashboard route",
+        "Onboarding form mock",
+        "Input checklist",
+        "Draft queue screen"
+      ],
+      "history": [
+        {
+          "at": "2026-06-09T19:56:42.980Z",
+          "action": "reassigned",
+          "from": "Manuel",
+          "to": "Jean",
+          "reason": "Manuel ausente - ruta critica bloqueada"
+        }
+      ]
+    },
+    {
+      "id": "S-HC-PROD-02",
+      "title": "Production DB/Auth/env and Turpial seed smoke",
+      "owner": "Jean",
+      "backupOwner": "Manuel",
+      "status": "done",
+      "track": "production-infra",
+      "zone": [
+        "docs",
+        "scripts",
+        "packages/db",
+        "vercel-env"
+      ],
+      "dependsOn": [
+        "S-HC-PROD-ALIGN"
+      ],
+      "acceptance": [
+        "Production env checklist completed",
+        "29 drafts and 46 assets verified"
+      ],
+      "history": [
+        {
+          "at": "2026-06-11T00:20:00.000Z",
+          "action": "reassigned",
+          "from": "Manuel",
+          "to": "Jean",
+          "reason": "User-directed PROD closeout split"
+        },
+        {
+          "at": "2026-06-11T01:44:03.976Z",
+          "action": "closed",
+          "operator": "Jean",
+          "branch": "Jean/s-hc-canonical-alignment-2026-06-09",
+          "description": "production-db-auth-env-turpial-seed-smoke"
         }
       ]
     },
@@ -311,62 +816,6 @@
           "operator": "Manuel",
           "branch": "Manuel/s-hc-pub-03-multitenant-assets",
           "description": "multitenant assets metadata compatibility batch uploads and production QA"
-        }
-      ]
-    },
-    {
-      "id": "S-HC-PUB-04-HOURLY-BATCH-CRON",
-      "title": "Hourly batch cron publishing with timezone-aware scheduling",
-      "owner": "Manuel",
-      "backupOwner": "Manuel",
-      "status": "ready_for_integration",
-      "track": "S-HC-PUB-04-HOURLY-BATCH-CRON",
-      "zone": [
-        "apps/web/app/api/cron",
-        "apps/worker",
-        "packages/core"
-      ],
-      "dependsOn": [
-        "S-HC-PUB-02-MULTIFORMAT-PREVIEW",
-        "S-HC-PUB-03-MULTITENANT-ASSETS"
-      ],
-      "acceptance": [
-        "Batch cron procesa multiples posts programados por hora",
-        "Timezone-aware scheduling per tenant",
-        "Rate limiting per platform",
-        "Failure isolation (un post falla, los demas continuan)",
-        "Cron idempotency preservada"
-      ],
-      "handoff": "var/goal-runner/goals/GR-20260626T064941Z-a09b3d58-finalize-pub-04-production-correctness/final-report.md",
-      "attempts": 1,
-      "history": [
-        {
-          "at": "2026-06-26T08:52:44.818Z",
-          "action": "claimed",
-          "operator": "Manuel",
-          "branch": "Manuel/s-hc-pub-04-hourly-batch-goal",
-          "description": "Run Manuel-S-HC-PUB-04-HOURLY-BATCH-CRON-2026-06-26T08-52-44-815Z-2487f474 claimed via manual"
-        },
-        {
-          "at": "2026-06-26T08:53:22.298Z",
-          "action": "validation_started",
-          "operator": "Manuel",
-          "branch": "Manuel/s-hc-pub-04-hourly-batch-goal",
-          "description": "PUB-04 implementation completed at commit 941042b825fc4047860a11ec8fc74c01cd4326e2; immutable contract 22/22, typecheck, full tests, build, worker validation and Oreshnik reconciliation/drift passed."
-        },
-        {
-          "at": "2026-06-26T08:55:47.503Z",
-          "action": "validated",
-          "operator": "Manuel",
-          "branch": "Manuel/s-hc-pub-04-hourly-batch-goal",
-          "description": "changed files diff verified for commit 941042b825fc4047860a11ec8fc74c01cd4326e2; typecheck passed; tests passed; build passed; PUB-04 immutable contract 22/22 passed; protected paths verified; operator confirms task is complete."
-        },
-        {
-          "at": "2026-06-26T08:55:47.503Z",
-          "action": "ready_for_integration",
-          "operator": "Manuel",
-          "branch": "Manuel/s-hc-pub-04-hourly-batch-goal",
-          "description": "Task delivered with handoff var/goal-runner/goals/GR-20260626T064941Z-a09b3d58-finalize-pub-04-production-correctness/final-report.md"
         }
       ]
     },
@@ -506,242 +955,116 @@
       ]
     },
     {
-      "id": "S-HC-OBS-01-PUBLISHING-OBSERVABILITY",
-      "title": "Publishing observability: structured logging, metrics dashboard, alert thresholds",
+      "id": "S-HC-REC-00A",
+      "title": "UI Publishing Baseline Recovery — production publishing stabilized",
       "owner": "Manuel",
       "backupOwner": "Manuel",
-      "status": "blocked",
-      "track": "observability",
+      "status": "done",
+      "track": "recovery",
       "zone": [
         "apps/web",
-        "packages/core",
-        "docs"
-      ],
-      "dependsOn": [
-        "S-HC-PUB-05-RECONCILIATION-OPS"
-      ],
-      "acceptance": [
-        "Structured logging with correlation IDs",
-        "Publishing metrics dashboard (attempts, failures, latency)",
-        "Alert thresholds for provider failures",
-        "Daily digest summarizing publishing activity"
-      ],
-      "history": [
-        {
-          "at": "2026-06-28T18:47:05.091Z",
-          "action": "status_reconciled",
-          "operator": "manuel",
-          "description": "Task status reconciled to blocked: dependency S-HC-PUB-05-RECONCILIATION-OPS still pending (S-HC-PUB-05-RECONCILIATION-OPS:pending)"
-        }
-      ]
-    },
-    {
-      "id": "S-HC-TOOL-01-GOAL-RUNNER-V1",
-      "title": "Goal Runner v1 for autonomous Kilo execution",
-      "owner": "Manuel",
-      "backupOwner": "Manuel",
-      "status": "blocked",
-      "track": "tooling",
-      "zone": [
-        "scripts/goal-runner/**",
-        "var/goal-runner/**",
-        ".kilo/command/goal.md",
-        ".kilo/command/preflight.md",
-        "AGENTS.md",
-        "package.json",
-        "docs/07_handoffs/**",
-        "docs/obsidian-vault/**"
-      ],
-      "dependsOn": [
-        "S-HC-TEN-01-GLOBAL-TENANT-ADMIN"
-      ],
-      "acceptance": [
-        "Nucleo determinista implementado y probado",
-        "Maquina de estados, locks, evidencia y gates operativos",
-        "Integracion /goal y /preflight disponible en Kilo",
-        "Anti-loop y limites de Playwright documentados",
-        "Goal piloto ejecutado completamente con el propio Goal Runner",
-        "Estado y evidencia sobreviven a clear y reinicio de sesion",
-        "Cero cambios en Production",
-        "Integracion posterior en la rama madre mediante cierre controlado"
-      ],
-      "history": [
-        {
-          "at": "2026-06-28T18:47:05.091Z",
-          "action": "status_reconciled",
-          "operator": "manuel",
-          "description": "Task status reconciled to blocked: status active is not claimable for a new run"
-        }
-      ]
-    },
-    {
-      "id": "S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION",
-      "title": "Transactional email foundation: domain sender, DNS, reputation, provider integration",
-      "owner": "Jean",
-      "backupOwner": "Manuel",
-      "status": "pending",
-      "track": "email-infra",
-      "zone": [
-        "apps/web/app/api/email",
-        "packages/core",
-        "docs"
+        "docs/07_handoffs",
+        "docs/obsidian-vault"
       ],
       "dependsOn": [],
       "acceptance": [
-        "Dominio final de HeptaCore configurado como remitente autorizado",
-        "DNS (SPF, DKIM, DMARC) verificado",
-        "Proveedor de correo transaccional integrado (Resend, SendGrid o equivalente)",
-        "Webhooks de eventos (delivered, bounced, complained) configurados",
-        "Enlaces comerciales y de marca consistentes con el dominio final"
-      ]
-    },
-    {
-      "id": "S-HC-COMM-01-SELF-SERVICE-SIGNUP",
-      "title": "Self-service tenant signup with trial gate and onboarding flow",
-      "owner": "Manuel",
-      "backupOwner": "Manuel",
-      "status": "blocked",
-      "track": "commercial",
-      "zone": [
-        "apps/web/app/register",
-        "apps/web/app/api/auth",
-        "packages/db",
-        "apps/web/components"
+        "Facebook e Instagram publican realmente desde la UI con durabilidad transaccional",
+        "Errores ambiguos bloqueados sin retry automatico",
+        "156 tests (155 publish-flow + 1 calendar-state)",
+        "Produccion estable en SHA 2fd9e249"
       ],
-      "dependsOn": [
-        "S-HC-TEN-01-GLOBAL-TENANT-ADMIN",
-        "S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION"
-      ],
-      "acceptance": [
-        "Self-service registration with email verification",
-        "Trial tenant creation with default config",
-        "Guided onboarding wizard (brand, networks, first draft)",
-        "Trial gate enforcement before publishing"
-      ],
+      "handoff": "docs/07_handoffs/HC-REC-00A-codex-blockers.md",
       "history": [
         {
-          "at": "2026-06-28T18:47:05.091Z",
-          "action": "status_reconciled",
-          "operator": "manuel",
-          "description": "Task status reconciled to blocked: dependency S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION still pending (S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION:pending)"
+          "at": "2026-06-21T04:30:00.000Z",
+          "action": "closed",
+          "operator": "Manuel",
+          "branch": "manuel/s-hc-rec-00a-ui-publishing-baseline",
+          "description": "Baseline de publicacion recuperado y estabilizado"
         }
       ]
     },
     {
-      "id": "S-HC-COMM-02-BILLING-ACTIVATION",
-      "title": "Tenant billing activation: plan selection, usage tracking, payment integration",
+      "id": "S-HC-REC-00B",
+      "title": "Facebook duplicate cleanup",
       "owner": "Manuel",
       "backupOwner": "Manuel",
-      "status": "blocked",
-      "track": "commercial",
-      "zone": [
-        "apps/web/app/api/billing",
-        "packages/db",
-        "apps/web/components"
-      ],
-      "dependsOn": [
-        "S-HC-COMM-01-SELF-SERVICE-SIGNUP"
-      ],
-      "acceptance": [
-        "Plan selection (Free, Pro, Agency)",
-        "Usage tracking (posts, assets, tenants)",
-        "Payment gateway integration (Stripe)",
-        "Invoice generation and history"
-      ],
-      "history": [
-        {
-          "at": "2026-06-28T18:47:05.091Z",
-          "action": "status_reconciled",
-          "operator": "manuel",
-          "description": "Task status reconciled to blocked: dependency S-HC-COMM-01-SELF-SERVICE-SIGNUP still pending (S-HC-COMM-01-SELF-SERVICE-SIGNUP:pending)"
-        }
-      ]
-    },
-    {
-      "id": "S-HC-ONB-01-MASTER-BRIEF-INGESTION",
-      "title": "Master document ingestion: extract structured info from company briefs",
-      "owner": "Manuel",
-      "backupOwner": "Manuel",
-      "status": "blocked",
-      "track": "onboarding",
-      "zone": [
-        "apps/web/components",
-        "packages/core",
-        "packages/agents"
-      ],
-      "dependsOn": [
-        "S-HC-COMM-02-BILLING-ACTIVATION"
-      ],
-      "acceptance": [
-        "Upload master document (PDF, DOCX, Markdown, texto)",
-        "Extract structured information: brand, product, audience, tone",
-        "Identify data gaps, contradictions and ambiguous zones",
-        "Store as structured tenant context"
-      ],
-      "history": [
-        {
-          "at": "2026-06-28T18:47:05.091Z",
-          "action": "status_reconciled",
-          "operator": "manuel",
-          "description": "Task status reconciled to blocked: dependency S-HC-COMM-02-BILLING-ACTIVATION still pending (S-HC-COMM-02-BILLING-ACTIVATION:pending)"
-        }
-      ]
-    },
-    {
-      "id": "S-HC-ONB-02-GAP-RESOLUTION-WIZARD",
-      "title": "Gap resolution wizard: dynamic form to resolve missing or conflicting data",
-      "owner": "Manuel",
-      "backupOwner": "Manuel",
-      "status": "blocked",
-      "track": "onboarding",
-      "zone": [
-        "apps/web/components",
-        "packages/core"
-      ],
-      "dependsOn": [
-        "S-HC-ONB-01-MASTER-BRIEF-INGESTION"
-      ],
-      "acceptance": [
-        "Ask only for missing data with dynamic questions",
-        "Avoid unnecessarily long forms",
-        "Save progress and allow continuation later",
-        "Reduce friction with contextual help"
-      ],
-      "history": [
-        {
-          "at": "2026-06-28T18:47:05.091Z",
-          "action": "status_reconciled",
-          "operator": "manuel",
-          "description": "Task status reconciled to blocked: dependency S-HC-ONB-01-MASTER-BRIEF-INGESTION still pending (S-HC-ONB-01-MASTER-BRIEF-INGESTION:pending)"
-        }
-      ]
-    },
-    {
-      "id": "S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE",
-      "title": "LLM provider selection, cost estimation and governance policy",
-      "owner": "Manuel",
-      "backupOwner": "Manuel",
-      "status": "ready",
-      "track": "ai-infra",
-      "zone": [
-        "packages/agents",
-        "packages/core",
-        "apps/web/components"
-      ],
+      "status": "done",
+      "track": "recovery",
+      "zone": [],
       "dependsOn": [],
+      "history": [
+        {
+          "at": "2026-06-21T04:30:00.000Z",
+          "action": "cancelled",
+          "operator": "Manuel",
+          "description": "Manuel elimino manualmente el duplicado en Facebook"
+        }
+      ]
+    },
+    {
+      "id": "S-HC-REC-00C",
+      "title": "Canonical integration — recovered production baseline integrated into master",
+      "owner": "Manuel",
+      "backupOwner": "Manuel",
+      "status": "done",
+      "track": "recovery",
+      "zone": [
+        "docs/obsidian-vault",
+        "docs/07_handoffs",
+        "README.md",
+        "var/oreshnik"
+      ],
+      "dependsOn": [
+        "S-HC-REC-00A"
+      ],
       "acceptance": [
-        "Provider-agnostic LLM broker interface",
-        "Model selection per task (strategy, generation, analysis)",
-        "Cost estimation before executing expensive tasks",
-        "Admin policy: authorized providers, models, max spend",
-        "Usage tracking and billing integration"
+        "Baseline productivo 2fd9e249 integrado en master via merge",
+        "Oreshnik cerrado con exito",
+        "oreshnik-cli@0.2.0-alpha.0 operacional"
       ],
       "history": [
         {
-          "at": "2026-06-28T18:47:05.091Z",
-          "action": "status_reconciled",
-          "operator": "manuel",
-          "description": "Task status reconciled to ready: dependencies and conflicts are clear for execution"
+          "at": "2026-06-21T05:15:00.000Z",
+          "action": "closed",
+          "operator": "Manuel",
+          "branch": "Manuel/s-hc-rec-00c-canonical-integration",
+          "description": "canonical integration after recovery"
+        }
+      ]
+    },
+    {
+      "id": "S-HC-RELEASE-01",
+      "title": "End-to-end Turpial Sound production proof",
+      "owner": "Manuel+Jean",
+      "backupOwner": "Manuel+Jean",
+      "status": "done",
+      "track": "release",
+      "zone": [
+        "docs",
+        "apps/web",
+        "apps/worker",
+        "packages/integrations"
+      ],
+      "dependsOn": [
+        "S-HC-PROD-02"
+      ],
+      "acceptance": [
+        "Login works",
+        "Turpial tenant loads strategy and assets",
+        "Draft approval works",
+        "Facebook e Instagram publican realmente desde la UI con durabilidad transaccional",
+        "Errores ambiguos bloqueados sin retry automatico",
+        "typecheck, build and worker:validate pass",
+        "156 tests"
+      ],
+      "history": [
+        {
+          "at": "2026-06-11T03:19:41.362Z",
+          "action": "closed",
+          "operator": "Manuel",
+          "branch": "Manuel/s-hc-prod-01-producto-operativo-tenant-admin-produccion-2026-06-09",
+          "description": "E2E Turpial Sound production proof"
         }
       ]
     },
@@ -812,140 +1135,6 @@
       ]
     },
     {
-      "id": "S-HC-ASSET-01-STRATEGY-ASSET-MANIFEST",
-      "title": "Strategy-driven asset manifest: per-publication asset requirements",
-      "owner": "Manuel",
-      "backupOwner": "Manuel",
-      "status": "blocked",
-      "track": "assets",
-      "zone": [
-        "apps/web/components",
-        "packages/core"
-      ],
-      "dependsOn": [
-        "S-HC-STRAT-02-CONTENT-CALENDAR-BLUEPRINT",
-        "S-HC-PUB-03-MULTITENANT-ASSETS"
-      ],
-      "acceptance": [
-        "Per-publication asset manifest: type, network, format, resolution, aspect ratio, duration",
-        "Creative guideline, scene context, branding, logo placement",
-        "Status tracking: missing, uploaded, compatible, incompatible, approved, AI-generated",
-        "Client choice: supply, request help, or generate via AI",
-        "Progress bar with direct CTA for each missing asset"
-      ],
-      "history": [
-        {
-          "at": "2026-06-28T18:47:05.091Z",
-          "action": "status_reconciled",
-          "operator": "manuel",
-          "description": "Task status reconciled to blocked: dependency S-HC-STRAT-02-CONTENT-CALENDAR-BLUEPRINT still pending (S-HC-STRAT-02-CONTENT-CALENDAR-BLUEPRINT:pending)"
-        }
-      ]
-    },
-    {
-      "id": "S-HC-ASSET-02-FORMAT-DERIVATIVES",
-      "title": "Format derivatives: badge interaction, format preview, intelligent crop, safe zones, asset variants",
-      "owner": "Manuel",
-      "backupOwner": "Manuel",
-      "status": "ready",
-      "track": "assets",
-      "zone": [
-        "apps/web/components",
-        "packages/core",
-        "apps/web/lib"
-      ],
-      "dependsOn": [
-        "S-HC-PUB-03-MULTITENANT-ASSETS"
-      ],
-      "acceptance": [
-        "Badge de compatibilidad clickeable que abre detalle de formato",
-        "Preview especifico de formato con crop y safe zones visuales",
-        "Crop manual interactivo por formato (recorte, reposicion)",
-        "Crop inteligente automatico con deteccion de sujeto/centro",
-        "Fit con fondo (blur, color, gradiente) cuando el asset no llena el frame",
-        "Safe zones indicadas visualmente (titulo, UI de plataforma, texto)",
-        "Aceptar/deshacer cambios por formato",
-        "Asset original inmutable; derivados como registros separados con relacion sourceAsset",
-        "Versionado de derivados",
-        "Generacion por lote de variantes para todos los formatos requeridos",
-        "Imagenes primero; video fuera de este sprint o como fase separada"
-      ],
-      "history": [
-        {
-          "at": "2026-06-28T18:47:05.091Z",
-          "action": "status_reconciled",
-          "operator": "manuel",
-          "description": "Task status reconciled to ready: dependencies and conflicts are clear for execution"
-        }
-      ]
-    },
-    {
-      "id": "S-HC-AIGEN-01-ASSET-GENERATION-BROKER",
-      "title": "AI asset generation broker: provider-agnostic, metered and billed",
-      "owner": "Manuel",
-      "backupOwner": "Manuel",
-      "status": "blocked",
-      "track": "ai-generation",
-      "zone": [
-        "packages/agents",
-        "apps/web/app/api",
-        "packages/core"
-      ],
-      "dependsOn": [
-        "S-HC-ASSET-01-STRATEGY-ASSET-MANIFEST",
-        "S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE",
-        "S-HC-COMM-02-BILLING-ACTIVATION"
-      ],
-      "acceptance": [
-        "Provider-agnostic generation broker (not hardcoded to single provider)",
-        "Metered consumption with cost preview before generation",
-        "Billed per request with usage tracking",
-        "Optional: client may supply assets without using generation",
-        "Generation respects brand guidelines from strategy"
-      ],
-      "history": [
-        {
-          "at": "2026-06-28T18:47:05.091Z",
-          "action": "status_reconciled",
-          "operator": "manuel",
-          "description": "Task status reconciled to blocked: dependency S-HC-ASSET-01-STRATEGY-ASSET-MANIFEST still pending (S-HC-ASSET-01-STRATEGY-ASSET-MANIFEST:pending) | dependency S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE still pending (S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE:pending) | dependency S-HC-COMM-02-BILLING-ACTIVATION still pending (S-HC-COMM-02-BILLING-ACTIVATION:pending)"
-        }
-      ]
-    },
-    {
-      "id": "S-HC-OPS-01-CAMPAIGN-REVIEW-DEPLOYMENT",
-      "title": "Campaign review and deployment: batch approval, schedule, publish",
-      "owner": "Manuel",
-      "backupOwner": "Manuel",
-      "status": "blocked",
-      "track": "operations",
-      "zone": [
-        "apps/web/app/api/publishing",
-        "apps/web/components",
-        "packages/core"
-      ],
-      "dependsOn": [
-        "S-HC-STRAT-02-CONTENT-CALENDAR-BLUEPRINT",
-        "S-HC-ASSET-01-STRATEGY-ASSET-MANIFEST",
-        "S-HC-PUB-04-HOURLY-BATCH-CRON"
-      ],
-      "acceptance": [
-        "Batch review of campaign drafts",
-        "Approve/reject per draft or bulk",
-        "Schedule deployment with cron integration",
-        "Publishing queue with visibility (approved, scheduled, published, blocked)",
-        "Rollback capability for scheduled posts"
-      ],
-      "history": [
-        {
-          "at": "2026-06-28T18:47:05.091Z",
-          "action": "status_reconciled",
-          "operator": "manuel",
-          "description": "Task status reconciled to blocked: dependency S-HC-STRAT-02-CONTENT-CALENDAR-BLUEPRINT still pending (S-HC-STRAT-02-CONTENT-CALENDAR-BLUEPRINT:pending) | dependency S-HC-ASSET-01-STRATEGY-ASSET-MANIFEST still pending (S-HC-ASSET-01-STRATEGY-ASSET-MANIFEST:pending)"
-        }
-      ]
-    },
-    {
       "id": "S-HC-SUP-01-ASSISTED-CUSTOMER-CHANNELS",
       "title": "Assisted customer channels: LLM assistant, WhatsApp, email, human escalation",
       "owner": "Manuel",
@@ -972,99 +1161,6 @@
           "action": "status_reconciled",
           "operator": "manuel",
           "description": "Task status reconciled to blocked: dependency S-HC-COMM-02-BILLING-ACTIVATION still pending (S-HC-COMM-02-BILLING-ACTIVATION:pending)"
-        }
-      ]
-    },
-    {
-      "id": "S-HC-AN-01-CAMPAIGN-PERFORMANCE",
-      "title": "Campaign performance analytics: reach, engagement, metrics per post and campaign",
-      "owner": "Manuel",
-      "backupOwner": "Manuel",
-      "status": "blocked",
-      "track": "analytics",
-      "zone": [
-        "apps/web/components",
-        "apps/web/app/api",
-        "packages/core"
-      ],
-      "dependsOn": [
-        "S-HC-OPS-01-CAMPAIGN-REVIEW-DEPLOYMENT",
-        "S-HC-OBS-01-PUBLISHING-OBSERVABILITY"
-      ],
-      "acceptance": [
-        "Reach and impressions where API permits",
-        "Interactions, likes, comments",
-        "Shares and saves where API permits",
-        "Metrics per publication and per campaign",
-        "Visual dashboard with trends"
-      ],
-      "history": [
-        {
-          "at": "2026-06-28T18:47:05.091Z",
-          "action": "status_reconciled",
-          "operator": "manuel",
-          "description": "Task status reconciled to blocked: dependency S-HC-OPS-01-CAMPAIGN-REVIEW-DEPLOYMENT still pending (S-HC-OPS-01-CAMPAIGN-REVIEW-DEPLOYMENT:pending) | dependency S-HC-OBS-01-PUBLISHING-OBSERVABILITY still pending (S-HC-OBS-01-PUBLISHING-OBSERVABILITY:pending)"
-        }
-      ]
-    },
-    {
-      "id": "S-HC-INBOX-01-UNIFIED-ENGAGEMENT",
-      "title": "Unified engagement inbox: read and respond to messages and comments",
-      "owner": "Manuel",
-      "backupOwner": "Manuel",
-      "status": "blocked",
-      "track": "engagement",
-      "zone": [
-        "apps/web/components",
-        "apps/web/app/api",
-        "packages/integrations"
-      ],
-      "dependsOn": [
-        "S-HC-AN-01-CAMPAIGN-PERFORMANCE"
-      ],
-      "acceptance": [
-        "Unified inbox for messages and comments across platforms",
-        "Read and respond according to platform permissions",
-        "Classification: positive, negative, neutral",
-        "Summary of themes and sentiment"
-      ],
-      "history": [
-        {
-          "at": "2026-06-28T18:47:05.091Z",
-          "action": "status_reconciled",
-          "operator": "manuel",
-          "description": "Task status reconciled to blocked: dependency S-HC-AN-01-CAMPAIGN-PERFORMANCE still pending (S-HC-AN-01-CAMPAIGN-PERFORMANCE:pending)"
-        }
-      ]
-    },
-    {
-      "id": "S-HC-OPT-01-SENTIMENT-STRATEGY-ITERATION",
-      "title": "Sentiment-driven strategy iteration: results → improved strategy",
-      "owner": "Manuel",
-      "backupOwner": "Manuel",
-      "status": "blocked",
-      "track": "optimization",
-      "zone": [
-        "packages/agents",
-        "apps/web/components",
-        "packages/core"
-      ],
-      "dependsOn": [
-        "S-HC-AN-01-CAMPAIGN-PERFORMANCE",
-        "S-HC-INBOX-01-UNIFIED-ENGAGEMENT"
-      ],
-      "acceptance": [
-        "Versioned strategy with iteration history",
-        "Recommendations based on real performance data",
-        "Sentiment analysis feeding into next strategy cycle",
-        "Before/after comparison per iteration"
-      ],
-      "history": [
-        {
-          "at": "2026-06-28T18:47:05.091Z",
-          "action": "status_reconciled",
-          "operator": "manuel",
-          "description": "Task status reconciled to blocked: dependency S-HC-AN-01-CAMPAIGN-PERFORMANCE still pending (S-HC-AN-01-CAMPAIGN-PERFORMANCE:pending) | dependency S-HC-INBOX-01-UNIFIED-ENGAGEMENT still pending (S-HC-INBOX-01-UNIFIED-ENGAGEMENT:pending)"
         }
       ]
     },
@@ -1104,143 +1200,79 @@
       ]
     },
     {
-      "id": "S-HC-PROD-02",
-      "title": "Production DB/Auth/env and Turpial seed smoke",
-      "owner": "Jean",
-      "backupOwner": "Manuel",
-      "status": "done",
-      "track": "production-infra",
-      "zone": [
-        "docs",
-        "scripts",
-        "packages/db",
-        "vercel-env"
-      ],
-      "dependsOn": [
-        "S-HC-PROD-ALIGN"
-      ],
-      "acceptance": [
-        "Production env checklist completed",
-        "29 drafts and 46 assets verified"
-      ],
-      "history": [
-        {
-          "at": "2026-06-11T00:20:00.000Z",
-          "action": "reassigned",
-          "from": "Manuel",
-          "to": "Jean",
-          "reason": "User-directed PROD closeout split"
-        },
-        {
-          "at": "2026-06-11T01:44:03.976Z",
-          "action": "closed",
-          "operator": "Jean",
-          "branch": "Jean/s-hc-canonical-alignment-2026-06-09",
-          "description": "production-db-auth-env-turpial-seed-smoke"
-        }
-      ]
-    },
-    {
-      "id": "S-HC-RELEASE-01",
-      "title": "End-to-end Turpial Sound production proof",
-      "owner": "Manuel+Jean",
-      "backupOwner": "Manuel+Jean",
-      "status": "done",
-      "track": "release",
-      "zone": [
-        "docs",
-        "apps/web",
-        "apps/worker",
-        "packages/integrations"
-      ],
-      "dependsOn": [
-        "S-HC-PROD-02"
-      ],
-      "acceptance": [
-        "Login works",
-        "Turpial tenant loads strategy and assets",
-        "Draft approval works",
-        "Facebook e Instagram publican realmente desde la UI con durabilidad transaccional",
-        "Errores ambiguos bloqueados sin retry automatico",
-        "typecheck, build and worker:validate pass",
-        "156 tests"
-      ],
-      "history": [
-        {
-          "at": "2026-06-11T03:19:41.362Z",
-          "action": "closed",
-          "operator": "Manuel",
-          "branch": "Manuel/s-hc-prod-01-producto-operativo-tenant-admin-produccion-2026-06-09",
-          "description": "E2E Turpial Sound production proof"
-        }
-      ]
-    },
-    {
-      "id": "S-HC-DRIFT-001",
-      "title": "sprint",
+      "id": "S-HC-TEN-01-GLOBAL-TENANT-ADMIN",
+      "title": "Global tenant administration and provisioning",
       "owner": "Manuel",
       "backupOwner": "Manuel",
       "status": "done",
-      "track": "ad-hoc",
+      "track": "tenant-platform",
       "zone": [
+        "packages/db/**",
+        "apps/web/lib/tenant-admin-service.ts",
+        "apps/web/lib/tenant-access.ts",
+        "apps/web/lib/__tests__/tenant-admin*.test.ts",
+        "docs/**",
+        "var/oreshnik/**"
+      ],
+      "dependsOn": [
+        "S-HC-PUB-03-MULTITENANT-ASSETS"
+      ],
+      "acceptance": [
+        "Tenant lifecycle schema with PROVISIONING, ACTIVE, SUSPENDED, ARCHIVED states",
+        "Secure migration preserving existing tenants as ACTIVE",
+        "SUPER_ADMIN access contracts",
+        "Transactional tenant provisioning",
+        "Slug validation and normalization",
+        "Lifecycle transitions with audit trail",
+        "Secure serialization without exposing secrets"
+      ],
+      "handoff": "docs/07_handoffs/TEN-01-global-tenant-admin.md",
+      "history": [
+        {
+          "at": "2026-06-25T18:19:00.000Z",
+          "action": "closed",
+          "operator": "Manuel",
+          "branch": "Manuel/s-hc-ten-01-global-tenant-admin",
+          "description": "Three canonical roles (OWNER/ADMIN/VIEWER), legacy role normalization, identity panel in /admin and /tenant/*, 5/5 E2E pass, 569 unit tests, production intact"
+        }
+      ]
+    },
+    {
+      "id": "S-HC-TOOL-01-GOAL-RUNNER-V1",
+      "title": "Goal Runner v1 for autonomous Kilo execution",
+      "owner": "Manuel",
+      "backupOwner": "Manuel",
+      "status": "blocked",
+      "track": "tooling",
+      "zone": [
+        "scripts/goal-runner/**",
+        "var/goal-runner/**",
+        ".kilo/command/goal.md",
+        ".kilo/command/preflight.md",
+        "AGENTS.md",
         "package.json",
-        "scripts/oreshnik"
+        "docs/07_handoffs/**",
+        "docs/obsidian-vault/**"
       ],
       "dependsOn": [
-        "S-HC-PROD-01"
+        "S-HC-TEN-01-GLOBAL-TENANT-ADMIN"
+      ],
+      "acceptance": [
+        "Nucleo determinista implementado y probado",
+        "Maquina de estados, locks, evidencia y gates operativos",
+        "Integracion /goal y /preflight disponible en Kilo",
+        "Anti-loop y limites de Playwright documentados",
+        "Goal piloto ejecutado completamente con el propio Goal Runner",
+        "Estado y evidencia sobreviven a clear y reinicio de sesion",
+        "Cero cambios en Production",
+        "Integracion posterior en la rama madre mediante cierre controlado"
       ],
       "history": [
         {
-          "at": "2026-06-12T04:56:32.932Z",
-          "action": "drift-recorded",
-          "operator": "Manuel",
-          "description": "sprint"
-        }
-      ]
-    },
-    {
-      "id": "S-HC-DRIFT-002",
-      "title": "Codex multi-RRSS refactor, readiness gates, UI fixes, migrations, vercelignore",
-      "owner": "Manuel",
-      "backupOwner": "Manuel",
-      "status": "done",
-      "track": "ad-hoc",
-      "zone": [
-        "apps/web",
-        "packages/agents",
-        "packages/integrations"
-      ],
-      "dependsOn": [
-        "S-HC-PROD-01"
-      ],
-      "history": [
-        {
-          "at": "2026-06-12T07:16:29.270Z",
-          "action": "drift-recorded",
-          "operator": "Manuel",
-          "description": "Codex multi-RRSS refactor"
-        }
-      ]
-    },
-    {
-      "id": "S-HC-DRIFT-003",
-      "title": "Sistema de publicacion con 3 modos, 24 crons Vercel, cron publisher idempotente",
-      "owner": "Manuel",
-      "backupOwner": "Manuel",
-      "status": "done",
-      "track": "ad-hoc",
-      "zone": [
-        "apps/web",
-        "vercel.json",
-        "docs/07_handoffs"
-      ],
-      "dependsOn": [],
-      "history": [
-        {
-          "at": "2026-06-14T08:39:53.687Z",
-          "action": "drift-recorded",
-          "operator": "Manuel",
-          "description": "Sistema de publicacion con 3 modos, 24 crons Vercel, cron publisher idempotente"
+          "at": "2026-06-28T18:47:05.091Z",
+          "action": "status_reconciled",
+          "operator": "manuel",
+          "description": "Task status reconciled to blocked: status active is not claimable for a new run"
         }
       ]
     }
@@ -1252,6 +1284,13 @@
       "from": "Manuel",
       "to": "Jean",
       "reason": "Manuel ausente - ruta critica bloqueada"
+    },
+    {
+      "at": "2026-06-11T00:20:00.000Z",
+      "task": "S-HC-PROD-02",
+      "from": "Manuel",
+      "to": "Jean",
+      "reason": "User-directed PROD closeout split"
     },
     {
       "at": "2026-06-11T00:20:00.000Z",

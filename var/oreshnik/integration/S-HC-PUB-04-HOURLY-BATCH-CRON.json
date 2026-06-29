@@ -3,7 +3,7 @@
   "sprint": "S-HC-PUB-04-HOURLY-BATCH-CRON",
   "motherBranch": "MADRE/v48-s-hc-pub-04-hourly-batch-cron-hourly-batch-publishing-cron-and-pub-04-producti-2026-06-28",
   "createdAt": "2026-06-28T19:42:15.820Z",
-  "updatedAt": "2026-06-28T19:42:15.820Z",
+  "updatedAt": "2026-06-28T23:59:59.945Z",
   "queue": [
     {
       "taskId": "S-HC-PUB-04-HOURLY-BATCH-CRON",
@@ -13,8 +13,10 @@
       "operator": "Manuel",
       "handoff": "var/goal-runner/goals/GR-20260626T064941Z-a09b3d58-finalize-pub-04-production-correctness/final-report.md",
       "queuedAt": "2026-06-28T19:42:15.820Z",
-      "updatedAt": "2026-06-28T19:42:15.820Z",
-      "status": "queued"
+      "updatedAt": "2026-06-28T23:59:59.945Z",
+      "status": "integrated",
+      "integratedAt": "2026-06-28T23:59:59.945Z",
+      "targetBranch": "MADRE/v48-s-hc-pub-04-hourly-batch-cron-hourly-batch-publishing-cron-and-pub-04-producti-2026-06-28"
     }
   ]
 }
