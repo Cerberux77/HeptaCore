@@ -317,6 +317,26 @@
       ],
       "criticality": "medium"
     },
+    "scripts/goal-runner/**": {
+      "owner": "Manuel",
+      "lock": "manuel_exclusive",
+      "sprints": [
+        "S-HC-TOOL-01-GOAL-RUNNER-V1",
+        "*"
+      ],
+      "criticality": "high",
+      "notes": "Goal Runner core implementation: state machine, locks, evidence, gates, CLI, tests."
+    },
+    "var/goal-runner/**": {
+      "owner": "Manuel",
+      "lock": "manuel_exclusive",
+      "sprints": [
+        "S-HC-TOOL-01-GOAL-RUNNER-V1",
+        "*"
+      ],
+      "criticality": "medium",
+      "notes": "Goal Runner runtime state: goals, history, index, locks, evidence."
+    },
     ".env.example": {
       "owner": "Both",
       "lock": "owner_per_sprint",
