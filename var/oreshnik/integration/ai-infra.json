@@ -1,0 +1,20 @@
+{
+  "project": "HeptaCore",
+  "sprint": "ai-infra",
+  "motherBranch": "MADRE/v50-ai-infra-llm-provider-selection-cost-governance-2026-06-29",
+  "createdAt": "2026-06-29T16:17:34.752Z",
+  "updatedAt": "2026-06-29T16:17:34.752Z",
+  "queue": [
+    {
+      "taskId": "S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE",
+      "runId": "codex-S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE-2026-06-29T02-30-49-546Z-c443db0b",
+      "sourceBranch": "task/ai-infra/S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE/codex/codex-S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE-2026-06-29T02-30-49-546Z-c443db0b",
+      "owner": "Manuel",
+      "operator": "codex",
+      "handoff": "docs/07_handoffs/S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE.md",
+      "queuedAt": "2026-06-29T16:17:34.752Z",
+      "updatedAt": "2026-06-29T16:17:34.752Z",
+      "status": "queued"
+    }
+  ]
+}

@@ -1,10 +1,9 @@
-<!-- ORESHNIK:GENERATED:START -->
 ---
 type: master-dashboard
 project: "HeptaCore"
 status: active-production
 phase: "Canonical Oreshnik task board governs current assignments"
-last_updated: "2026-06-29T02:56:24.593Z"
+last_updated: "2026-06-29T16:17:34.812Z"
 mother_branch: "MADRE/v47-s-hc-pub-03-multitenant-assets-multitenant-assets-metadata-compatibility-batch--2026-06-23"
 tags:
   - "#central"
@@ -19,7 +18,7 @@ tags:
 
 | Campo | Valor |
 |---|---|
-| Task board actualizado | 2026-06-29T02:50:23.982Z |
+| Task board actualizado | 2026-06-29T16:10:34.987Z |
 | Rama madre | MADRE/v47-s-hc-pub-03-multitenant-assets-multitenant-assets-metadata-compatibility-batch--2026-06-23 |
 
 
@@ -72,7 +71,7 @@ tags:
 | S-HC-PUB-05-RECONCILIATION-OPS | integrated | Manuel | Operational reconciliation automation for ambiguous provider outcomes | S-HC-PUB-04-HOURLY-BATCH-CRON |
 | S-HC-TOOL-01-GOAL-RUNNER-V1 | ready | Manuel | Goal Runner v1 for autonomous Kilo execution | S-HC-TEN-01-GLOBAL-TENANT-ADMIN |
 | S-HC-AIGEN-01-ASSET-GENERATION-BROKER | blocked | Manuel | AI asset generation broker: provider-agnostic, metered and billed | S-HC-ASSET-01-STRATEGY-ASSET-MANIFEST, S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE, S-HC-COMM-02-BILLING-ACTIVATION |
-| S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE | validating | Manuel | LLM provider selection, cost estimation and governance policy | - |
+| S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE | ready_for_integration | Manuel | LLM provider selection, cost estimation and governance policy | - |
 | S-HC-AN-01-CAMPAIGN-PERFORMANCE | blocked | Manuel | Campaign performance analytics: reach, engagement, metrics per post and campaign | S-HC-OPS-01-CAMPAIGN-REVIEW-DEPLOYMENT, S-HC-OBS-01-PUBLISHING-OBSERVABILITY |
 | S-HC-ASSET-01-STRATEGY-ASSET-MANIFEST | blocked | Manuel | Strategy-driven asset manifest: per-publication asset requirements | S-HC-STRAT-02-CONTENT-CALENDAR-BLUEPRINT, S-HC-PUB-03-MULTITENANT-ASSETS |
 | S-HC-ASSET-02-FORMAT-DERIVATIVES | ready | Manuel | Format derivatives: badge interaction, format preview, intelligent crop, safe zones, asset variants | S-HC-PUB-03-MULTITENANT-ASSETS |
@@ -113,5 +112,3 @@ tags:
 | Sprint | Resultado | Madre | Task | Source | Compatibility | Advance |
 |---|---|---|---|---|---|---|
 | Ninguno | - | - | - | - | - | - |
-
-<!-- ORESHNIK:GENERATED:END -->

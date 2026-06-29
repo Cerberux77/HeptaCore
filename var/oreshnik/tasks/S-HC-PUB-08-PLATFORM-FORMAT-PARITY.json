@@ -8,7 +8,7 @@
   "owner": "Manuel",
   "backupOwner": "Manuel",
   "status": "blocked",
-  "taskBoardPath": "D:\\PROYECTOS\\WORKTREES\\CODEX\\AI01\\var\\oreshnik\\task-board.json",
+  "taskBoardPath": "D:\\H1\\var\\oreshnik\\wt\\ai-infra\\S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE\\r-c20ec67edeb3\\var\\oreshnik\\task-board.json",
   "zone": [
     "apps/web/lib/publishers",
     "apps/web/lib/publishing-formats.ts",
@@ -35,6 +35,6 @@
       "description": "Task status reconciled to blocked: dependency S-HC-PUB-06-REELS-STORIES-PUBLISHERS still pending (S-HC-PUB-06-REELS-STORIES-PUBLISHERS:pending) | dependency S-HC-PUB-07-YOUTUBE-PUBLISHING still pending (S-HC-PUB-07-YOUTUBE-PUBLISHING:pending)"
     }
   ],
-  "updatedAt": "2026-06-29T02:50:23.982Z",
+  "updatedAt": "2026-06-29T16:10:34.987Z",
   "runs": []
 }

@@ -8,7 +8,7 @@
   "owner": "Manuel+Jean",
   "backupOwner": "Manuel+Jean",
   "status": "done",
-  "taskBoardPath": "D:\\PROYECTOS\\WORKTREES\\CODEX\\AI01\\var\\oreshnik\\task-board.json",
+  "taskBoardPath": "D:\\H1\\var\\oreshnik\\wt\\ai-infra\\S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE\\r-c20ec67edeb3\\var\\oreshnik\\task-board.json",
   "zone": [
     "docs",
     "apps/web",
@@ -36,6 +36,6 @@
       "description": "E2E Turpial Sound production proof"
     }
   ],
-  "updatedAt": "2026-06-29T02:50:23.982Z",
+  "updatedAt": "2026-06-29T16:10:34.987Z",
   "runs": []
 }

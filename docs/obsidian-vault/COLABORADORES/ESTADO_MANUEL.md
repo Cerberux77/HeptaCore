@@ -1,9 +1,8 @@
-<!-- ORESHNIK:GENERATED:START -->
 ---
 type: collaborator-status
 project: "HeptaCore"
 operator: "Manuel"
-last_updated: "2026-06-29T02:56:24.640Z"
+last_updated: "2026-06-29T16:17:34.813Z"
 generated_by: "Oreshnik canonical-check"
 source: "var/oreshnik/task-board.json"
 ---
@@ -81,7 +80,7 @@ Zonas: `packages/agents`, `apps/web/app/api`, `packages/core`
 
 ### S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE - LLM provider selection, cost estimation and governance policy
 
-Estado: `validating`
+Estado: `ready_for_integration`
 
 - Provider-agnostic LLM broker interface
 - Model selection per task (strategy, generation, analysis)
@@ -315,5 +314,3 @@ Estado: `blocked`
 
 Zonas: `examples/tenants/cepeg`, `apps/web`, `packages/db`
 
-
-<!-- ORESHNIK:GENERATED:END -->

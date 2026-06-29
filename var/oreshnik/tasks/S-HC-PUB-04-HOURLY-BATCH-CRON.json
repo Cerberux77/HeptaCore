@@ -8,7 +8,7 @@
   "owner": "Manuel",
   "backupOwner": "Manuel",
   "status": "integrated",
-  "taskBoardPath": "D:\\PROYECTOS\\WORKTREES\\CODEX\\AI01\\var\\oreshnik\\task-board.json",
+  "taskBoardPath": "D:\\H1\\var\\oreshnik\\wt\\ai-infra\\S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE\\r-c20ec67edeb3\\var\\oreshnik\\task-board.json",
   "zone": [
     "apps/web/app/api/cron",
     "apps/worker",
@@ -64,7 +64,7 @@
       "description": "Integrated Manuel/s-hc-pub-04-hourly-batch-goal into MADRE/v48-s-hc-pub-04-hourly-batch-cron-hourly-batch-publishing-cron-and-pub-04-producti-2026-06-28"
     }
   ],
-  "updatedAt": "2026-06-29T02:50:23.982Z",
+  "updatedAt": "2026-06-29T16:10:34.987Z",
   "runs": [
     {
       "runId": "Manuel-S-HC-PUB-04-HOURLY-BATCH-CRON-2026-06-26T08-52-44-815Z-2487f474",
