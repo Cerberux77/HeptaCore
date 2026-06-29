@@ -1,9 +1,8 @@
-<!-- ORESHNIK:GENERATED:START -->
 ---
 type: collaborator-status
 project: "HeptaCore"
 operator: "Manuel"
-last_updated: "2026-06-29T02:56:24.640Z"
+last_updated: "2026-06-29T03:01:55.155Z"
 generated_by: "Oreshnik canonical-check"
 source: "var/oreshnik/task-board.json"
 ---
@@ -315,5 +314,3 @@ Estado: `blocked`
 
 Zonas: `examples/tenants/cepeg`, `apps/web`, `packages/db`
 
-
-<!-- ORESHNIK:GENERATED:END -->
