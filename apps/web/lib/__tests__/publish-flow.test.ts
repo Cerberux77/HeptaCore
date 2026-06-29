@@ -2052,3 +2052,105 @@ describe("reconciliationOperationalState", async () => {
     }
   });
 });
+
+describe("observabilityModule", async () => {
+  const {
+    generateCorrelationId,
+    generateRunId,
+    evaluateAlerts,
+    computeDailyDigest,
+    createStructuredLogger,
+    createEmptySummary,
+    DEFAULT_ALERT_THRESHOLDS,
+  } = await import("../publishing-observability.js");
+
+  it("generateRunId produces unique IDs", () => {
+    const ids = new Set<string>();
+    for (let i = 0; i < 100; i++) ids.add(generateRunId());
+    assert.equal(ids.size, 100);
+  });
+
+  it("generateCorrelationId includes runId", () => {
+    const cid = generateCorrelationId("run-2026-test-abc", "job-1");
+    assert.ok(cid.includes("run-2026-test-abc"));
+    assert.ok(cid.includes("job-1"));
+  });
+
+  it("evaluateAlerts triggers on high failure rate", () => {
+    const summary = createEmptySummary("run-1", new Date(), "", "", false);
+    summary.retryableFailures = 5;
+    summary.published = 1;
+    const result = evaluateAlerts(summary, { ...DEFAULT_ALERT_THRESHOLDS, providerFailureRate: 0.5 });
+    assert.equal(result.triggered, true);
+    assert.ok(result.alerts.some((a) => a.type === "PROVIDER_FAILURE_RATE"));
+  });
+
+  it("evaluateAlerts does not trigger on low failure rate", () => {
+    const summary = createEmptySummary("run-1", new Date(), "", "", false);
+    summary.published = 10;
+    summary.retryableFailures = 1;
+    const result = evaluateAlerts(summary);
+    assert.equal(result.triggered, false);
+  });
+
+  it("evaluateAlerts triggers on time budget exhausted", () => {
+    const summary = createEmptySummary("run-1", new Date(), "", "", false);
+    summary.timeBudgetExhausted = true;
+    const result = evaluateAlerts(summary, DEFAULT_ALERT_THRESHOLDS);
+    assert.ok(result.alerts.some((a) => a.type === "TIME_BUDGET_EXHAUSTED"));
+  });
+
+  it("evaluateAlerts triggers on latency exceeded", () => {
+    const summary = createEmptySummary("run-1", new Date(), "", "", false);
+    summary.durationMs = 60000;
+    const result = evaluateAlerts(summary, { ...DEFAULT_ALERT_THRESHOLDS, maxLatencyMs: 50000 });
+    assert.ok(result.alerts.some((a) => a.type === "LATENCY_EXCEEDED"));
+  });
+
+  it("evaluateAlerts triggers on high reconciliation rate", () => {
+    const summary = createEmptySummary("run-1", new Date(), "", "", false);
+    summary.reconciliationRequired = 8;
+    summary.published = 2;
+    const result = evaluateAlerts(summary, { ...DEFAULT_ALERT_THRESHOLDS, reconciliationRequiredRate: 0.6 });
+    assert.ok(result.alerts.some((a) => a.type === "RECONCILIATION_RATE"));
+  });
+
+  it("computeDailyDigest aggregates runs correctly", () => {
+    const runs = [
+      { ...createEmptySummary("run-1", new Date("2026-06-29T01:00:00Z"), "", "", false), published: 2, retryableFailures: 1, durationMs: 25000 },
+      { ...createEmptySummary("run-2", new Date("2026-06-29T02:00:00Z"), "", "", false), published: 3, reconciliationRequired: 1, durationMs: 35000 },
+    ];
+    const digest = computeDailyDigest(runs, "2026-06-29");
+    assert.equal(digest.totalRuns, 2);
+    assert.equal(digest.totalPublished, 5);
+    assert.equal(digest.totalReconciliation, 1);
+    assert.equal(digest.totalFailures, 1);
+    assert.equal(digest.averageLatencyMs, 30000);
+  });
+
+  it("computeDailyDigest returns zeros for empty date", () => {
+    const digest = computeDailyDigest([], "2026-06-29");
+    assert.equal(digest.totalRuns, 0);
+    assert.equal(digest.totalPublished, 0);
+  });
+
+  it("structuredLogger logs and filters entries", () => {
+    const logger = createStructuredLogger();
+    logger.log({ timestamp: "2026-06-29T01:00:00Z", correlationId: "cid-1", level: "INFO", category: "CRON", message: "start" });
+    logger.log({ timestamp: "2026-06-29T01:00:01Z", correlationId: "cid-1", level: "ERROR", category: "PROVIDER", message: "fail" });
+    logger.log({ timestamp: "2026-06-29T01:00:02Z", correlationId: "cid-2", level: "WARN", category: "ALERT", message: "alert" });
+
+    assert.equal(logger.getLogs().length, 3);
+    assert.equal(logger.getLogs({ correlationId: "cid-1" }).length, 2);
+    assert.equal(logger.getLogs({ level: "ERROR" }).length, 1);
+    assert.equal(logger.getLogs({ category: "ALERT" }).length, 1);
+  });
+
+  it("structuredLogger flush returns snapshot and clears", () => {
+    const logger = createStructuredLogger();
+    logger.log({ timestamp: "t", correlationId: "c", level: "INFO", category: "CRON", message: "msg" });
+    const snapshot = logger.flush();
+    assert.equal(snapshot.length, 1);
+    assert.equal(logger.getLogs().length, 0);
+  });
+});
