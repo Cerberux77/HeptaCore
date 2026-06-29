@@ -5,6 +5,7 @@ import { resolveAndDecryptOAuthCredential } from "../../../../lib/credential-res
 import { resolveAssetUrl } from "../../../../lib/asset-resolution";
 import { validateCronSecret } from "../../../../lib/cron-auth";
 import { executePublishingCron } from "../../../../lib/publishing-cron-executor";
+import { reconcilePublication } from "../../../../lib/publishing-finalization";
 import { TRIAL_POSTS_PER_NETWORK } from "../../../../lib/trial";
 import type { Pub04CronDeps, Pub04CronInput, Pub04Publisher } from "../../../../../../contracts/S-HC-PUB-04/pub04-contract.js";
 
@@ -286,23 +287,20 @@ export async function GET(req: Request) {
         }
       },
       async reconcileDurableSuccess({ jobId, externalPostId, now }) {
-        try {
-          await prisma.$transaction(async (tx) => {
-            const job = await tx.publishingJob.findUnique({ where: { id: jobId } });
-            if (!job || !job.postId) throw new Error("RECONCILE_PRECONDITION");
-            await tx.contentDraft.update({
-              where: { id: job.postId },
-              data: { status: "PUBLISHED", externalPostId, publishedAt: now },
-            });
-            await tx.publishingJob.updateMany({
-              where: { id: jobId },
-              data: { status: "PUBLISHED" },
-            });
-          });
-          return "committed";
-        } catch {
-          return "conflict";
-        }
+        const job = await prisma.publishingJob.findUnique({
+          where: { id: jobId },
+          select: { postId: true, tenantId: true },
+        });
+        if (!job?.postId || !job.tenantId) return "conflict";
+
+        const result = await reconcilePublication(prisma, {
+          jobId,
+          draftId: job.postId,
+          tenantId: job.tenantId,
+          externalPostId,
+          now,
+        });
+        return result.committed ? "committed" : "conflict";
       },
     },
     getPublisher(network) {

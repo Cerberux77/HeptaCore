@@ -204,18 +204,18 @@ export async function reconcileDraftFromResultTx(params: ReconcileTxParams): Pro
   });
 
   if (jobCommit.count < 1) {
-    return { committed: true, case: "CASE_A_AUTO", reason: "Draft reconciliado. Job no se pudo actualizar." };
+    throw new Error("RECONCILE_JOB_PRECONDITION: job not updated during reconciliation");
   }
 
   return { committed: true, case: "CASE_A_AUTO" };
 }
 
 export async function reconcilePublication(
-  prisma: { $transaction(fn: (tx: TxClient) => Promise<ReconcileCommitResult>): Promise<ReconcileCommitResult> },
+  prisma: { $transaction(fn: (tx: any) => Promise<any>): Promise<any> },
   params: Omit<ReconcileTxParams, "tx">
 ): Promise<ReconcileCommitResult> {
   try {
-    return await prisma.$transaction((tx) =>
+    return await prisma.$transaction((tx: TxClient) =>
       reconcileDraftFromResultTx({ tx, ...params })
     );
   } catch {

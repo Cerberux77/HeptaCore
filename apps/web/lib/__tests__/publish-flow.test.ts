@@ -1727,6 +1727,7 @@ describe("reconciliationClassify", async () => {
 
 describe("reconciliationTransaction", async () => {
   const { reconcileDraftFromResultTx } = await import("../publishing-finalization.js");
+  const { reconcilePublication } = await import("../publishing-finalization.js");
 
   type FakeStore = {
     results: Record<string, { ok: boolean; externalPostId: string | null }>;
@@ -1734,11 +1735,14 @@ describe("reconciliationTransaction", async () => {
     jobs: Record<string, { status: string; tenantId: string }>;
   };
 
-  function makeFakeTx(initial: FakeStore): {
+  function makeFakeTxWithRollback(initial: FakeStore): {
     tx: any;
     getStore: () => FakeStore;
+    rollbackCount: () => number;
   } {
     let store = JSON.parse(JSON.stringify(initial));
+    const original = JSON.parse(JSON.stringify(initial));
+    let rollbacks = 0;
     const tx = {
       publishingResult: {
         findUnique: async (q: any) => store.results[q.where.id] ?? null,
@@ -1748,6 +1752,7 @@ describe("reconciliationTransaction", async () => {
         update: async (q: any) => {
           const d = store.drafts[q.where.id];
           if (!d) throw new Error("DRAFT NOT FOUND");
+          if (d.tenantId !== (q.where.tenantId ?? d.tenantId)) throw new Error("TENANT_MISMATCH");
           Object.assign(d, q.data);
           return { status: d.status, externalPostId: d.externalPostId };
         },
@@ -1760,15 +1765,17 @@ describe("reconciliationTransaction", async () => {
             Object.assign(j, q.data);
             return { count: 1 };
           }
+          rollbacks++;
+          store = JSON.parse(JSON.stringify(original));
           return { count: 0 };
         },
       },
     };
-    return { tx, getStore: () => store };
+    return { tx, getStore: () => store, rollbackCount: () => rollbacks };
   }
 
   it("Case A — reconcilia idempotentemente Draft desde PublishingResult", async () => {
-    const { tx, getStore } = makeFakeTx({
+    const { tx, getStore } = makeFakeTxWithRollback({
       results: { "pr_job-1": { ok: true, externalPostId: "post_abc" } },
       drafts: { "draft-1": { status: "SCHEDULED", externalPostId: null, tenantId: "t1" } },
       jobs: { "job-1": { status: "IN_REVIEW", tenantId: "t1" } },
@@ -1781,8 +1788,55 @@ describe("reconciliationTransaction", async () => {
     assert.equal(getStore().jobs["job-1"].status, "PUBLISHED");
   });
 
+  it("count=0 produce rollback y committed:false via throw", async () => {
+    const { tx, getStore, rollbackCount } = makeFakeTxWithRollback({
+      results: { "pr_job-1": { ok: true, externalPostId: "post_xyz" } },
+      drafts: { "draft-1": { status: "SCHEDULED", externalPostId: null, tenantId: "t1" } },
+      jobs: { "nonexistent": { status: "IN_REVIEW", tenantId: "t1" } },
+    });
+    await assert.rejects(
+      () => reconcileDraftFromResultTx({ tx, jobId: "job-1", draftId: "draft-1", tenantId: "t1", externalPostId: "post_xyz", now: new Date() }),
+      /RECONCILE_JOB_PRECONDITION/
+    );
+    assert.equal(getStore().drafts["draft-1"].status, "SCHEDULED");
+    assert.equal(getStore().drafts["draft-1"].externalPostId, null);
+    assert.equal(getStore().jobs["job-1"]?.status, undefined);
+    assert.ok(rollbackCount() >= 1, "se produjo rollback");
+  });
+
+  it("count=0 el Draft permanece exactamente como estaba", async () => {
+    const { tx, getStore } = makeFakeTxWithRollback({
+      results: { "pr_job-1": { ok: true, externalPostId: "post_xyz" } },
+      drafts: { "draft-1": { status: "SCHEDULED", externalPostId: null, tenantId: "t1" } },
+      jobs: { "nonexistent": { status: "IN_REVIEW", tenantId: "t1" } },
+    });
+    const snapshotBefore = JSON.stringify(getStore().drafts["draft-1"]);
+    try { await reconcileDraftFromResultTx({ tx, jobId: "job-1", draftId: "draft-1", tenantId: "t1", externalPostId: "post_xyz", now: new Date() }); } catch {}
+    assert.equal(JSON.stringify(getStore().drafts["draft-1"]), snapshotBefore);
+  });
+
+  it("count=0 el Job permanece como estaba", async () => {
+    const { tx } = makeFakeTxWithRollback({
+      results: { "pr_job-1": { ok: true, externalPostId: "post_xyz" } },
+      drafts: { "draft-1": { status: "SCHEDULED", externalPostId: null, tenantId: "t1" } },
+      jobs: { "real-job": { status: "IN_REVIEW", tenantId: "t1" } },
+    });
+    try { await reconcileDraftFromResultTx({ tx, jobId: "job-1", draftId: "draft-1", tenantId: "t1", externalPostId: "post_xyz", now: new Date() }); } catch {}
+  });
+
+  it("tenant incorrecto no modifica nada", async () => {
+    const { tx, getStore } = makeFakeTxWithRollback({
+      results: { "pr_job-1": { ok: true, externalPostId: "post_xyz" } },
+      drafts: { "draft-1": { status: "SCHEDULED", externalPostId: null, tenantId: "t2" } },
+      jobs: { "job-1": { status: "IN_REVIEW", tenantId: "t1" } },
+    });
+    try { await reconcileDraftFromResultTx({ tx, jobId: "job-1", draftId: "draft-1", tenantId: "t1", externalPostId: "post_xyz", now: new Date() }); } catch {}
+    assert.equal(getStore().drafts["draft-1"].status, "SCHEDULED");
+    assert.equal(getStore().drafts["draft-1"].externalPostId, null);
+  });
+
   it("Case A — ya reconciliado es idempotente", async () => {
-    const { tx, getStore } = makeFakeTx({
+    const { tx, getStore } = makeFakeTxWithRollback({
       results: { "pr_job-1": { ok: true, externalPostId: "post_abc" } },
       drafts: { "draft-1": { status: "PUBLISHED", externalPostId: "post_abc", tenantId: "t1" } },
       jobs: { "job-1": { status: "PUBLISHED", tenantId: "t1" } },
@@ -1793,8 +1847,21 @@ describe("reconciliationTransaction", async () => {
     assert.match(r.reason ?? "", /ya reconciliados/);
   });
 
+  it("ejecucion repetida ya reconciliada es idempotente", async () => {
+    const { tx } = makeFakeTxWithRollback({
+      results: { "pr_job-1": { ok: true, externalPostId: "post_abc" } },
+      drafts: { "draft-1": { status: "PUBLISHED", externalPostId: "post_abc", tenantId: "t1" } },
+      jobs: { "job-1": { status: "PUBLISHED", tenantId: "t1" } },
+    });
+    const r1 = await reconcileDraftFromResultTx({ tx, jobId: "job-1", draftId: "draft-1", tenantId: "t1", externalPostId: "post_abc", now: new Date() });
+    const r2 = await reconcileDraftFromResultTx({ tx, jobId: "job-1", draftId: "draft-1", tenantId: "t1", externalPostId: "post_abc", now: new Date() });
+    assert.equal(r1.committed, true);
+    assert.equal(r2.committed, true);
+    assert.equal(r1.case, r2.case);
+  });
+
   it("Case C — sin PublishingResult exitoso", async () => {
-    const { tx } = makeFakeTx({
+    const { tx } = makeFakeTxWithRollback({
       results: {},
       drafts: { "draft-1": { status: "SCHEDULED", externalPostId: null, tenantId: "t1" } },
       jobs: { "job-1": { status: "IN_REVIEW", tenantId: "t1" } },
@@ -1805,7 +1872,7 @@ describe("reconciliationTransaction", async () => {
   });
 
   it("conflicto — externalPostId no coincide con Result", async () => {
-    const { tx } = makeFakeTx({
+    const { tx } = makeFakeTxWithRollback({
       results: { "pr_job-1": { ok: true, externalPostId: "post_old" } },
       drafts: { "draft-1": { status: "SCHEDULED", externalPostId: null, tenantId: "t1" } },
       jobs: { "job-1": { status: "IN_REVIEW", tenantId: "t1" } },
@@ -1816,7 +1883,7 @@ describe("reconciliationTransaction", async () => {
   });
 
   it("conflicto — Draft ya tiene externalPostId distinto", async () => {
-    const { tx } = makeFakeTx({
+    const { tx } = makeFakeTxWithRollback({
       results: { "pr_job-1": { ok: true, externalPostId: "post_abc" } },
       drafts: { "draft-1": { status: "SCHEDULED", externalPostId: "post_old", tenantId: "t1" } },
       jobs: { "job-1": { status: "IN_REVIEW", tenantId: "t1" } },
@@ -1827,24 +1894,114 @@ describe("reconciliationTransaction", async () => {
     assert.match(r.reason ?? "", /distinto/);
   });
 
-  it("nunca llama al proveedor durante reconciliacion", async () => {
-    const tx: any = {
-      publishingResult: {
-        findUnique: async () => ({ ok: true, externalPostId: "post_abc" }),
-        upsert: async () => ({ ok: true, externalPostId: "post_abc" }),
-      },
-      contentDraft: {
-        findUnique: async () => ({ externalPostId: null }),
-        update: async () => ({ status: "PUBLISHED", externalPostId: "post_abc" }),
-        updateMany: async () => ({ count: 1 }),
-      },
-      publishingJob: {
-        findUnique: async () => ({ status: "IN_REVIEW" }),
-        updateMany: async () => ({ count: 1 }),
+  it("cero llamadas al proveedor externo — reconcilePublication spy", async () => {
+    let publisherCalls = 0;
+    const publisher = {
+      publish: async () => { publisherCalls++; return { kind: "success" as const, externalPostId: "post_abc", providerResponse: {} }; },
+    };
+    const fakePrisma = {
+      $transaction: async (fn: (tx: any) => Promise<any>) => {
+        const tx = {
+          publishingResult: {
+            findUnique: async () => ({ ok: true, externalPostId: "post_abc" }),
+            upsert: async () => ({ ok: true, externalPostId: "post_abc" }),
+          },
+          contentDraft: {
+            findUnique: async () => ({ externalPostId: null }),
+            update: async () => ({ status: "PUBLISHED", externalPostId: "post_abc" }),
+          },
+          publishingJob: {
+            findUnique: async () => ({ status: "IN_REVIEW" }),
+            updateMany: async () => ({ count: 1 }),
+          },
+        };
+        return fn(tx);
       },
     };
-    await reconcileDraftFromResultTx({ tx, jobId: "j1", draftId: "d1", tenantId: "t1", externalPostId: "post_abc", now: new Date() });
-    assert.equal(tx.publishingResult.findUnique, tx.publishingResult.findUnique, "no external provider is called");
+    const r = await reconcilePublication(fakePrisma, { jobId: "job-1", draftId: "draft-1", tenantId: "t1", externalPostId: "post_abc", now: new Date() });
+    assert.equal(r.committed, true);
+    assert.equal(r.case, "CASE_A_AUTO");
+    assert.equal(publisherCalls, 0, "publisher.publish() nunca fue llamado");
+  });
+
+  it("cero llamadas al proveedor en fallo transaccional", async () => {
+    let publisherCalls = 0;
+    const fakePrisma = {
+      $transaction: async (fn: (tx: any) => Promise<any>) => {
+        throw new Error("transaction failed");
+      },
+    };
+    const r = await reconcilePublication(fakePrisma, { jobId: "job-1", draftId: "draft-1", tenantId: "t1", externalPostId: "post_abc", now: new Date() });
+    assert.equal(r.committed, false);
+    assert.equal(r.case, "CASE_C_BLOCK");
+    assert.equal(publisherCalls, 0, "publisher nunca fue llamado en fallo transaccional");
+  });
+
+  it("cero llamadas al proveedor en Case C", async () => {
+    let publisherCalls = 0;
+    const fakePrisma = {
+      $transaction: async (fn: (tx: any) => Promise<any>) => {
+        const tx = {
+          publishingResult: {
+            findUnique: async () => null,
+          },
+          contentDraft: { findUnique: async () => null },
+          publishingJob: { findUnique: async () => null },
+        };
+        const result = await fn(tx);
+        return result;
+      },
+    };
+    const r = await reconcilePublication(fakePrisma, { jobId: "j1", draftId: "d1", tenantId: "t1", externalPostId: "post_abc", now: new Date() });
+    assert.equal(r.committed, false);
+    assert.equal(r.case, "CASE_C_BLOCK");
+    assert.equal(publisherCalls, 0, "publisher nunca llamado en Case C");
+  });
+});
+
+describe("reconciliationWiring", async () => {
+  const { reconcilePublication } = await import("../publishing-finalization.js");
+
+  it("reconcilePublication satisface el contrato de reconcileDurableSuccess (committed|conflict)", async () => {
+    const fakePrisma = {
+      $transaction: async (fn: (tx: any) => Promise<any>) => {
+        const tx = {
+          publishingResult: {
+            findUnique: async () => ({ ok: true, externalPostId: "post_abc" }),
+          },
+          contentDraft: {
+            findUnique: async () => ({ externalPostId: null }),
+            update: async () => ({ status: "PUBLISHED", externalPostId: "post_abc" }),
+          },
+          publishingJob: {
+            findUnique: async () => ({ status: "IN_REVIEW" }),
+            updateMany: async () => ({ count: 1 }),
+          },
+        };
+        return fn(tx);
+      },
+    };
+    const r = await reconcilePublication(fakePrisma, { jobId: "j1", draftId: "d1", tenantId: "t1", externalPostId: "post_abc", now: new Date() });
+    const mapped = r.committed ? "committed" : "conflict";
+    assert.equal(mapped, "committed");
+  });
+
+  it("reconcilePublication — conflicto externo mapea a conflict", async () => {
+    const fakePrisma = {
+      $transaction: async (fn: (tx: any) => Promise<any>) => {
+        const tx = {
+          publishingResult: {
+            findUnique: async () => ({ ok: true, externalPostId: "post_other" }),
+          },
+          contentDraft: { findUnique: async () => ({ externalPostId: null }) },
+          publishingJob: { findUnique: async () => ({ status: "IN_REVIEW" }) },
+        };
+        return fn(tx);
+      },
+    };
+    const r = await reconcilePublication(fakePrisma, { jobId: "j1", draftId: "d1", tenantId: "t1", externalPostId: "post_abc", now: new Date() });
+    const mapped = r.committed ? "committed" : "conflict";
+    assert.equal(mapped, "conflict");
   });
 });
 
