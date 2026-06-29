@@ -7,7 +7,7 @@
   "title": "Goal Runner v1 for autonomous Kilo execution",
   "owner": "Manuel",
   "backupOwner": "Manuel",
-  "status": "claimed",
+  "status": "ready_for_integration",
   "taskBoardPath": "D:\\PROYECTOS\\WORKTREES\\HeptaCore_PUB04_GOAL\\var\\oreshnik\\task-board.json",
   "zone": [
     "scripts/goal-runner/**",
@@ -33,27 +33,6 @@
     "Integracion posterior en la rama madre mediante cierre controlado"
   ],
   "attempts": 3,
-  "activeRun": {
-    "runId": "kilo-S-HC-TOOL-01-GOAL-RUNNER-V1-2026-06-29T02-20-46-794Z-ed5534ef",
-    "operator": "kilo",
-    "worker": "kilo",
-    "workerMode": "codex",
-    "claimedAt": "2026-06-29T02:20:46.793Z",
-    "updatedAt": "2026-06-29T02:20:46.798Z",
-    "expiresAt": "2026-06-29T03:20:46.793Z",
-    "branch": "task/S-HC-TOOL-01-GOAL-RUNNER-V1/S-HC-TOOL-01-GOAL-RUNNER-V1/kilo/kilo-S-HC-TOOL-01-GOAL-RUNNER-V1-2026-06-29T02-20-46-794Z-ed5534ef",
-    "worktreePath": "D:\\PROYECTOS\\WORKTREES\\HeptaCore_PUB04_GOAL\\var\\oreshnik\\wt\\S-HC-TOOL-01-GOAL-RUNNER-V1\\S-HC-TOOL-01-GOAL-RUNNER-V1\\r-7fa3b13c04df",
-    "zones": [
-      "scripts/goal-runner/**",
-      "var/goal-runner/**",
-      ".kilo/command/goal.md",
-      ".kilo/command/preflight.md",
-      "AGENTS.md",
-      "package.json",
-      "docs/07_handoffs/**",
-      "docs/obsidian-vault/**"
-    ]
-  },
   "history": [
     {
       "at": "2026-06-28T18:47:05.091Z",
@@ -106,9 +85,22 @@
       "operator": "kilo",
       "branch": "task/S-HC-TOOL-01-GOAL-RUNNER-V1/S-HC-TOOL-01-GOAL-RUNNER-V1/kilo/kilo-S-HC-TOOL-01-GOAL-RUNNER-V1-2026-06-29T02-20-46-794Z-ed5534ef",
       "description": "Run kilo-S-HC-TOOL-01-GOAL-RUNNER-V1-2026-06-29T02-20-46-794Z-ed5534ef claimed via codex"
+    },
+    {
+      "at": "2026-06-29T02:25:37.781Z",
+      "action": "status_reconciled",
+      "operator": "manuel",
+      "branch": "task/S-HC-TOOL-01-GOAL-RUNNER-V1/S-HC-TOOL-01-GOAL-RUNNER-V1/kilo/kilo-S-HC-TOOL-01-GOAL-RUNNER-V1-2026-06-29T02-20-46-794Z-ed5534ef",
+      "description": "Task status reconciled to blocked: active run owned by kilo"
+    },
+    {
+      "at": "2026-06-29T02:25:48.599Z",
+      "action": "claim_released",
+      "operator": "kilo",
+      "description": "Run kilo-S-HC-TOOL-01-GOAL-RUNNER-V1-2026-06-29T02-20-46-794Z-ed5534ef released"
     }
   ],
-  "updatedAt": "2026-06-29T02:20:46.799Z",
+  "updatedAt": "2026-06-29T02:29:41.523Z",
   "runs": [
     {
       "runId": "kilo-S-HC-TOOL-01-GOAL-RUNNER-V1-2026-06-29T02-20-46-794Z-ed5534ef",
@@ -127,11 +119,12 @@
         "docs/07_handoffs/**",
         "docs/obsidian-vault/**"
       ],
-      "taskStatus": "claimed",
-      "claimStatus": "claimed",
+      "taskStatus": "ready_for_integration",
+      "claimStatus": "released",
       "claimedAt": "2026-06-29T02:20:46.793Z",
-      "updatedAt": "2026-06-29T02:20:46.814Z",
+      "updatedAt": "2026-06-29T02:25:48.610Z",
       "expiresAt": "2026-06-29T03:20:46.793Z",
+      "releasedAt": "2026-06-29T02:25:48.610Z",
       "manifestPath": "var/oreshnik/runs/S-HC-TOOL-01-GOAL-RUNNER-V1/kilo-S-HC-TOOL-01-GOAL-RUNNER-V1-2026-06-29T02-20-46-794Z-ed5534ef.json"
     },
     {
@@ -190,7 +183,7 @@
     "sourceBranch": "task/S-HC-TOOL-01-GOAL-RUNNER-V1/S-HC-TOOL-01-GOAL-RUNNER-V1/kilo/kilo-S-HC-TOOL-01-GOAL-RUNNER-V1-2026-06-29T02-19-43-008Z-33b124f7",
     "status": "queued",
     "motherBranch": "MADRE/v50-s-hc-tool-01-goal-runner-v1-goal-runner-v1-deterministic-state-machine-locks-2026-06-29",
-    "queuedAt": "2026-06-29T02:20:37.946Z",
-    "updatedAt": "2026-06-29T02:20:37.946Z"
+    "queuedAt": "2026-06-29T02:59:31.021Z",
+    "updatedAt": "2026-06-29T02:59:31.021Z"
   }
 }

@@ -3,10 +3,10 @@
 type: task-runtime
 project: "HeptaCore"
 task_id: "S-HC-OBS-01-PUBLISHING-OBSERVABILITY"
-sprint: "observability"
-status: "ready"
+sprint: "S-HC-OBS-01-PUBLISHING-OBSERVABILITY"
+status: "ready_for_integration"
 owner: "Manuel"
-last_updated: "2026-06-29T02:20:46.799Z"
+last_updated: "2026-06-29T02:29:41.523Z"
 source: "var/oreshnik/tasks/S-HC-OBS-01-PUBLISHING-OBSERVABILITY.json"
 ---
 
@@ -18,10 +18,10 @@ Publishing observability: structured logging, metrics dashboard, alert threshold
 
 ## Runtime
 
-- estado: `ready`
+- estado: `ready_for_integration`
 - owner: `Manuel`
 - backup: `Manuel`
-- intentos: `0`
+- intentos: `1`
 - handoff: -
 
 ## Dependencias
@@ -55,11 +55,14 @@ Publishing observability: structured logging, metrics dashboard, alert threshold
 
 | Run | Operator | Mode | Task Status | Claim | Branch |
 |---|---|---|---|---|---|
-| Ninguno | - | - | - | - | - |
+| kilo-S-HC-OBS-01-PUBLISHING-OBSERVABILITY-2026-06-29T02-25-50-533Z-0b59e14b | kilo | codex | ready_for_integration | released | task/S-HC-OBS-01-PUBLISHING-OBSERVABILITY/S-HC-OBS-01-PUBLISHING-OBSERVABILITY/kilo/kilo-S-HC-OBS-01-PUBLISHING-OBSERVABILITY-2026-06-29T02-25-50-533Z-0b59e14b |
 
 ## Integracion
 
-- Ninguna
+- run: `kilo-S-HC-OBS-01-PUBLISHING-OBSERVABILITY-2026-06-29T02-25-50-533Z-0b59e14b`
+- estado: `queued`
+- madre: `MADRE/v50-s-hc-obs-01-publishing-observability-publishing-observability-structured-logging-with-2026-06-29`
+- source: `task/S-HC-OBS-01-PUBLISHING-OBSERVABILITY/S-HC-OBS-01-PUBLISHING-OBSERVABILITY/kilo/kilo-S-HC-OBS-01-PUBLISHING-OBSERVABILITY-2026-06-29T02-25-50-533Z-0b59e14b`
 
 ## Train Mas Reciente
 

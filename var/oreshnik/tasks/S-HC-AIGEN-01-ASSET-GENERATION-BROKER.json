@@ -34,6 +34,6 @@
       "description": "Task status reconciled to blocked: dependency S-HC-ASSET-01-STRATEGY-ASSET-MANIFEST still pending (S-HC-ASSET-01-STRATEGY-ASSET-MANIFEST:pending) | dependency S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE still pending (S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE:pending) | dependency S-HC-COMM-02-BILLING-ACTIVATION still pending (S-HC-COMM-02-BILLING-ACTIVATION:pending)"
     }
   ],
-  "updatedAt": "2026-06-29T02:20:46.799Z",
+  "updatedAt": "2026-06-29T02:29:41.523Z",
   "runs": []
 }

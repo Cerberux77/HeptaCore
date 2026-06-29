@@ -39,6 +39,6 @@
       "description": "Three canonical roles (OWNER/ADMIN/VIEWER), legacy role normalization, identity panel in /admin and /tenant/*, 5/5 E2E pass, 569 unit tests, production intact"
     }
   ],
-  "updatedAt": "2026-06-29T02:20:46.799Z",
+  "updatedAt": "2026-06-29T02:29:41.523Z",
   "runs": []
 }

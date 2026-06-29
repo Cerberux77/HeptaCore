@@ -6,7 +6,7 @@ task_id: "S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE"
 sprint: "ai-infra"
 status: "ready"
 owner: "Manuel"
-last_updated: "2026-06-29T02:20:46.799Z"
+last_updated: "2026-06-29T02:29:41.523Z"
 source: "var/oreshnik/tasks/S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE.json"
 ---
 

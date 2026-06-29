@@ -1,6 +1,6 @@
 {
   "project": "HeptaCore",
-  "updatedAt": "2026-06-29T02:20:46.799Z",
+  "updatedAt": "2026-06-29T02:29:41.523Z",
   "resiliencePolicy": "If an owner is unavailable for more than one working block or blocks the critical path, backupOwner may take over after recording reassignment.",
   "closurePolicy": "No sprint may be closed until acceptance criteria, base tests, sprint-specific tests, docs/handoff, and Oreshnik zone checks pass.",
   "baseTestMatrix": [
@@ -12,7 +12,7 @@
     "S-HC-PUB-04-HOURLY-BATCH-CRON",
     "S-HC-PUB-05-RECONCILIATION-OPS",
     "S-HC-TOOL-01-GOAL-RUNNER-V1",
-    "observability",
+    "S-HC-OBS-01-PUBLISHING-OBSERVABILITY",
     "ad-hoc",
     "ai-generation",
     "ai-infra",
@@ -35,6 +35,7 @@
     "support",
     "tenant-onboarding",
     "tenant-platform",
+    "observability",
     "tooling",
     "Fase completada: S-HC-TEN-01-GLOBAL-TENANT-ADMIN — tres roles canonicos (OWNER/ADMIN/VIEWER), normalizacion heredada, identidad en /admin y /tenant/*, 5/5 E2E en Preview (SHA 4b82628), 569 unit tests.",
     "Fase completada: S-HC-REC-00A — baseline de publicacion recuperado y estabilizado (SHA 2fd9e249). Facebook e Instagram publican realmente desde la UI con durabilidad transaccional.",
@@ -204,7 +205,7 @@
       "title": "Goal Runner v1 for autonomous Kilo execution",
       "owner": "Manuel",
       "backupOwner": "Manuel",
-      "status": "claimed",
+      "status": "ready_for_integration",
       "track": "S-HC-TOOL-01-GOAL-RUNNER-V1",
       "zone": [
         "scripts/goal-runner/**",
@@ -230,27 +231,6 @@
         "Integracion posterior en la rama madre mediante cierre controlado"
       ],
       "attempts": 3,
-      "activeRun": {
-        "runId": "kilo-S-HC-TOOL-01-GOAL-RUNNER-V1-2026-06-29T02-20-46-794Z-ed5534ef",
-        "operator": "kilo",
-        "worker": "kilo",
-        "workerMode": "codex",
-        "claimedAt": "2026-06-29T02:20:46.793Z",
-        "updatedAt": "2026-06-29T02:20:46.798Z",
-        "expiresAt": "2026-06-29T03:20:46.793Z",
-        "branch": "task/S-HC-TOOL-01-GOAL-RUNNER-V1/S-HC-TOOL-01-GOAL-RUNNER-V1/kilo/kilo-S-HC-TOOL-01-GOAL-RUNNER-V1-2026-06-29T02-20-46-794Z-ed5534ef",
-        "worktreePath": "D:\\PROYECTOS\\WORKTREES\\HeptaCore_PUB04_GOAL\\var\\oreshnik\\wt\\S-HC-TOOL-01-GOAL-RUNNER-V1\\S-HC-TOOL-01-GOAL-RUNNER-V1\\r-7fa3b13c04df",
-        "zones": [
-          "scripts/goal-runner/**",
-          "var/goal-runner/**",
-          ".kilo/command/goal.md",
-          ".kilo/command/preflight.md",
-          "AGENTS.md",
-          "package.json",
-          "docs/07_handoffs/**",
-          "docs/obsidian-vault/**"
-        ]
-      },
       "history": [
         {
           "at": "2026-06-28T18:47:05.091Z",
@@ -303,6 +283,19 @@
           "operator": "kilo",
           "branch": "task/S-HC-TOOL-01-GOAL-RUNNER-V1/S-HC-TOOL-01-GOAL-RUNNER-V1/kilo/kilo-S-HC-TOOL-01-GOAL-RUNNER-V1-2026-06-29T02-20-46-794Z-ed5534ef",
           "description": "Run kilo-S-HC-TOOL-01-GOAL-RUNNER-V1-2026-06-29T02-20-46-794Z-ed5534ef claimed via codex"
+        },
+        {
+          "at": "2026-06-29T02:25:37.781Z",
+          "action": "status_reconciled",
+          "operator": "manuel",
+          "branch": "task/S-HC-TOOL-01-GOAL-RUNNER-V1/S-HC-TOOL-01-GOAL-RUNNER-V1/kilo/kilo-S-HC-TOOL-01-GOAL-RUNNER-V1-2026-06-29T02-20-46-794Z-ed5534ef",
+          "description": "Task status reconciled to blocked: active run owned by kilo"
+        },
+        {
+          "at": "2026-06-29T02:25:48.599Z",
+          "action": "claim_released",
+          "operator": "kilo",
+          "description": "Run kilo-S-HC-TOOL-01-GOAL-RUNNER-V1-2026-06-29T02-20-46-794Z-ed5534ef released"
         }
       ]
     },
@@ -311,8 +304,8 @@
       "title": "Publishing observability: structured logging, metrics dashboard, alert thresholds",
       "owner": "Manuel",
       "backupOwner": "Manuel",
-      "status": "ready",
-      "track": "observability",
+      "status": "ready_for_integration",
+      "track": "S-HC-OBS-01-PUBLISHING-OBSERVABILITY",
       "zone": [
         "apps/web",
         "packages/core",
@@ -327,6 +320,7 @@
         "Alert thresholds for provider failures",
         "Daily digest summarizing publishing activity"
       ],
+      "attempts": 1,
       "history": [
         {
           "at": "2026-06-28T18:47:05.091Z",
@@ -339,6 +333,19 @@
           "action": "status_reconciled",
           "operator": "manuel",
           "description": "Task status reconciled to ready: dependencies and conflicts are clear for execution"
+        },
+        {
+          "at": "2026-06-29T02:25:50.539Z",
+          "action": "claimed",
+          "operator": "kilo",
+          "branch": "task/S-HC-OBS-01-PUBLISHING-OBSERVABILITY/S-HC-OBS-01-PUBLISHING-OBSERVABILITY/kilo/kilo-S-HC-OBS-01-PUBLISHING-OBSERVABILITY-2026-06-29T02-25-50-533Z-0b59e14b",
+          "description": "Run kilo-S-HC-OBS-01-PUBLISHING-OBSERVABILITY-2026-06-29T02-25-50-533Z-0b59e14b claimed via codex"
+        },
+        {
+          "at": "2026-06-29T02:29:41.523Z",
+          "action": "claim_released",
+          "operator": "kilo",
+          "description": "Run kilo-S-HC-OBS-01-PUBLISHING-OBSERVABILITY-2026-06-29T02-25-50-533Z-0b59e14b released"
         }
       ]
     },

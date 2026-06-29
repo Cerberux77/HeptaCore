@@ -1,13 +1,13 @@
 {
   "project": "HeptaCore",
   "taskId": "S-HC-OBS-01-PUBLISHING-OBSERVABILITY",
-  "sprint": "observability",
+  "sprint": "S-HC-OBS-01-PUBLISHING-OBSERVABILITY",
   "sprintOrderIndex": 3,
   "taskOrderIndex": 3,
   "title": "Publishing observability: structured logging, metrics dashboard, alert thresholds",
   "owner": "Manuel",
   "backupOwner": "Manuel",
-  "status": "ready",
+  "status": "ready_for_integration",
   "taskBoardPath": "D:\\PROYECTOS\\WORKTREES\\HeptaCore_PUB04_GOAL\\var\\oreshnik\\task-board.json",
   "zone": [
     "apps/web",
@@ -23,6 +23,7 @@
     "Alert thresholds for provider failures",
     "Daily digest summarizing publishing activity"
   ],
+  "attempts": 1,
   "history": [
     {
       "at": "2026-06-28T18:47:05.091Z",
@@ -35,8 +36,50 @@
       "action": "status_reconciled",
       "operator": "manuel",
       "description": "Task status reconciled to ready: dependencies and conflicts are clear for execution"
+    },
+    {
+      "at": "2026-06-29T02:25:50.539Z",
+      "action": "claimed",
+      "operator": "kilo",
+      "branch": "task/S-HC-OBS-01-PUBLISHING-OBSERVABILITY/S-HC-OBS-01-PUBLISHING-OBSERVABILITY/kilo/kilo-S-HC-OBS-01-PUBLISHING-OBSERVABILITY-2026-06-29T02-25-50-533Z-0b59e14b",
+      "description": "Run kilo-S-HC-OBS-01-PUBLISHING-OBSERVABILITY-2026-06-29T02-25-50-533Z-0b59e14b claimed via codex"
+    },
+    {
+      "at": "2026-06-29T02:29:41.523Z",
+      "action": "claim_released",
+      "operator": "kilo",
+      "description": "Run kilo-S-HC-OBS-01-PUBLISHING-OBSERVABILITY-2026-06-29T02-25-50-533Z-0b59e14b released"
     }
   ],
-  "updatedAt": "2026-06-29T02:20:46.799Z",
-  "runs": []
+  "updatedAt": "2026-06-29T02:29:41.523Z",
+  "runs": [
+    {
+      "runId": "kilo-S-HC-OBS-01-PUBLISHING-OBSERVABILITY-2026-06-29T02-25-50-533Z-0b59e14b",
+      "operator": "kilo",
+      "worker": "kilo",
+      "workerMode": "codex",
+      "branch": "task/S-HC-OBS-01-PUBLISHING-OBSERVABILITY/S-HC-OBS-01-PUBLISHING-OBSERVABILITY/kilo/kilo-S-HC-OBS-01-PUBLISHING-OBSERVABILITY-2026-06-29T02-25-50-533Z-0b59e14b",
+      "worktreePath": "D:\\PROYECTOS\\WORKTREES\\HeptaCore_PUB04_GOAL\\var\\oreshnik\\wt\\S-HC-OBS-01-PUBLISHING-OBSERVABILITY\\S-HC-OBS-01-PUBLISHING-OBSERVABILITY\\r-226ffbae8a2e",
+      "zones": [
+        "apps/web",
+        "packages/core",
+        "docs"
+      ],
+      "taskStatus": "ready_for_integration",
+      "claimStatus": "released",
+      "claimedAt": "2026-06-29T02:25:50.533Z",
+      "updatedAt": "2026-06-29T02:29:41.536Z",
+      "expiresAt": "2026-06-29T03:25:50.533Z",
+      "releasedAt": "2026-06-29T02:29:41.536Z",
+      "manifestPath": "var/oreshnik/runs/S-HC-OBS-01-PUBLISHING-OBSERVABILITY/kilo-S-HC-OBS-01-PUBLISHING-OBSERVABILITY-2026-06-29T02-25-50-533Z-0b59e14b.json"
+    }
+  ],
+  "integration": {
+    "runId": "kilo-S-HC-OBS-01-PUBLISHING-OBSERVABILITY-2026-06-29T02-25-50-533Z-0b59e14b",
+    "sourceBranch": "task/S-HC-OBS-01-PUBLISHING-OBSERVABILITY/S-HC-OBS-01-PUBLISHING-OBSERVABILITY/kilo/kilo-S-HC-OBS-01-PUBLISHING-OBSERVABILITY-2026-06-29T02-25-50-533Z-0b59e14b",
+    "status": "queued",
+    "motherBranch": "MADRE/v50-s-hc-obs-01-publishing-observability-publishing-observability-structured-logging-with-2026-06-29",
+    "queuedAt": "2026-06-29T02:29:51.888Z",
+    "updatedAt": "2026-06-29T02:29:51.888Z"
+  }
 }

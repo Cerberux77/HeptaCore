@@ -1,7 +1,7 @@
 ---
 type: status-board
 project: "HeptaCore"
-last_updated: "2026-06-29T02:21:00.897Z"
+last_updated: "2026-06-29T02:59:31.174Z"
 generated_by: "Oreshnik canonical-check"
 source: "var/oreshnik/task-board.json"
 ---
@@ -15,7 +15,7 @@ source: "var/oreshnik/task-board.json"
 - S-HC-PUB-04-HOURLY-BATCH-CRON
 - S-HC-PUB-05-RECONCILIATION-OPS
 - S-HC-TOOL-01-GOAL-RUNNER-V1
-- observability
+- S-HC-OBS-01-PUBLISHING-OBSERVABILITY
 - ad-hoc
 - ai-generation
 - ai-infra
@@ -38,6 +38,7 @@ source: "var/oreshnik/task-board.json"
 - support
 - tenant-onboarding
 - tenant-platform
+- observability
 - tooling
 - Fase completada: S-HC-TEN-01-GLOBAL-TENANT-ADMIN — tres roles canonicos (OWNER/ADMIN/VIEWER), normalizacion heredada, identidad en /admin y /tenant/*, 5/5 E2E en Preview (SHA 4b82628), 569 unit tests.
 - Fase completada: S-HC-REC-00A — baseline de publicacion recuperado y estabilizado (SHA 2fd9e249). Facebook e Instagram publican realmente desde la UI con durabilidad transaccional.
@@ -58,8 +59,8 @@ source: "var/oreshnik/task-board.json"
 |---|---|---|---|---|
 | S-HC-PUB-04-HOURLY-BATCH-CRON | integrated | Manuel | Hourly batch cron publishing with timezone-aware scheduling | S-HC-PUB-02-MULTIFORMAT-PREVIEW, S-HC-PUB-03-MULTITENANT-ASSETS |
 | S-HC-PUB-05-RECONCILIATION-OPS | integrated | Manuel | Operational reconciliation automation for ambiguous provider outcomes | S-HC-PUB-04-HOURLY-BATCH-CRON |
-| S-HC-TOOL-01-GOAL-RUNNER-V1 | claimed | Manuel | Goal Runner v1 for autonomous Kilo execution | S-HC-TEN-01-GLOBAL-TENANT-ADMIN |
-| S-HC-OBS-01-PUBLISHING-OBSERVABILITY | ready | Manuel | Publishing observability: structured logging, metrics dashboard, alert thresholds | S-HC-PUB-05-RECONCILIATION-OPS |
+| S-HC-TOOL-01-GOAL-RUNNER-V1 | ready_for_integration | Manuel | Goal Runner v1 for autonomous Kilo execution | S-HC-TEN-01-GLOBAL-TENANT-ADMIN |
+| S-HC-OBS-01-PUBLISHING-OBSERVABILITY | ready_for_integration | Manuel | Publishing observability: structured logging, metrics dashboard, alert thresholds | S-HC-PUB-05-RECONCILIATION-OPS |
 | S-HC-AIGEN-01-ASSET-GENERATION-BROKER | blocked | Manuel | AI asset generation broker: provider-agnostic, metered and billed | S-HC-ASSET-01-STRATEGY-ASSET-MANIFEST, S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE, S-HC-COMM-02-BILLING-ACTIVATION |
 | S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE | ready | Manuel | LLM provider selection, cost estimation and governance policy | - |
 | S-HC-AN-01-CAMPAIGN-PERFORMANCE | blocked | Manuel | Campaign performance analytics: reach, engagement, metrics per post and campaign | S-HC-OPS-01-CAMPAIGN-REVIEW-DEPLOYMENT, S-HC-OBS-01-PUBLISHING-OBSERVABILITY |

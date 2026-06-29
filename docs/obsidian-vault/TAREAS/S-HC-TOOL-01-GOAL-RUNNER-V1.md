@@ -4,9 +4,9 @@ type: task-runtime
 project: "HeptaCore"
 task_id: "S-HC-TOOL-01-GOAL-RUNNER-V1"
 sprint: "S-HC-TOOL-01-GOAL-RUNNER-V1"
-status: "claimed"
+status: "ready_for_integration"
 owner: "Manuel"
-last_updated: "2026-06-29T02:20:46.799Z"
+last_updated: "2026-06-29T02:29:41.523Z"
 source: "var/oreshnik/tasks/S-HC-TOOL-01-GOAL-RUNNER-V1.json"
 ---
 
@@ -18,7 +18,7 @@ Goal Runner v1 for autonomous Kilo execution
 
 ## Runtime
 
-- estado: `claimed`
+- estado: `ready_for_integration`
 - owner: `Manuel`
 - backup: `Manuel`
 - intentos: `3`
@@ -64,7 +64,7 @@ Goal Runner v1 for autonomous Kilo execution
 
 | Run | Operator | Mode | Task Status | Claim | Branch |
 |---|---|---|---|---|---|
-| kilo-S-HC-TOOL-01-GOAL-RUNNER-V1-2026-06-29T02-20-46-794Z-ed5534ef | kilo | codex | claimed | claimed | task/S-HC-TOOL-01-GOAL-RUNNER-V1/S-HC-TOOL-01-GOAL-RUNNER-V1/kilo/kilo-S-HC-TOOL-01-GOAL-RUNNER-V1-2026-06-29T02-20-46-794Z-ed5534ef |
+| kilo-S-HC-TOOL-01-GOAL-RUNNER-V1-2026-06-29T02-20-46-794Z-ed5534ef | kilo | codex | ready_for_integration | released | task/S-HC-TOOL-01-GOAL-RUNNER-V1/S-HC-TOOL-01-GOAL-RUNNER-V1/kilo/kilo-S-HC-TOOL-01-GOAL-RUNNER-V1-2026-06-29T02-20-46-794Z-ed5534ef |
 | kilo-S-HC-TOOL-01-GOAL-RUNNER-V1-2026-06-29T02-19-43-008Z-33b124f7 | kilo | codex | ready_for_integration | released | task/S-HC-TOOL-01-GOAL-RUNNER-V1/S-HC-TOOL-01-GOAL-RUNNER-V1/kilo/kilo-S-HC-TOOL-01-GOAL-RUNNER-V1-2026-06-29T02-19-43-008Z-33b124f7 |
 | kilo-S-HC-TOOL-01-GOAL-RUNNER-V1-2026-06-29T02-07-54-626Z-6c79c9a6 | kilo | codex | ready_for_integration | released | task/S-HC-TOOL-01-GOAL-RUNNER-V1/S-HC-TOOL-01-GOAL-RUNNER-V1/kilo/kilo-S-HC-TOOL-01-GOAL-RUNNER-V1-2026-06-29T02-07-54-626Z-6c79c9a6 |
 

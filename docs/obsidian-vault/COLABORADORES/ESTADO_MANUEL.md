@@ -2,7 +2,7 @@
 type: collaborator-status
 project: "HeptaCore"
 operator: "Manuel"
-last_updated: "2026-06-29T02:21:00.880Z"
+last_updated: "2026-06-29T02:59:31.139Z"
 generated_by: "Oreshnik canonical-check"
 source: "var/oreshnik/task-board.json"
 ---
@@ -15,7 +15,6 @@ source: "var/oreshnik/task-board.json"
 
 | Sprint | Scope | Depende de |
 |---|---|---|
-| S-HC-OBS-01-PUBLISHING-OBSERVABILITY | Publishing observability: structured logging, metrics dashboard, alert thresholds | S-HC-PUB-05-RECONCILIATION-OPS |
 | S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE | LLM provider selection, cost estimation and governance policy | - |
 | S-HC-ASSET-02-FORMAT-DERIVATIVES | Format derivatives: badge interaction, format preview, intelligent crop, safe zones, asset variants | S-HC-PUB-03-MULTITENANT-ASSETS |
 | S-HC-PUB-06-REELS-STORIES-PUBLISHERS | Real publishing for Meta Reels and Stories: Instagram + Facebook | S-HC-PUB-03-MULTITENANT-ASSETS, S-HC-PUB-04-HOURLY-BATCH-CRON |
@@ -54,7 +53,7 @@ Zonas: `apps/web/lib/publishing-finalization.ts`, `apps/web/lib/draft-operationa
 
 ### S-HC-TOOL-01-GOAL-RUNNER-V1 - Goal Runner v1 for autonomous Kilo execution
 
-Estado: `claimed`
+Estado: `ready_for_integration`
 
 - Nucleo determinista implementado y probado
 - Maquina de estados, locks, evidencia y gates operativos
@@ -69,7 +68,7 @@ Zonas: `scripts/goal-runner/**`, `var/goal-runner/**`, `.kilo/command/goal.md`, 
 
 ### S-HC-OBS-01-PUBLISHING-OBSERVABILITY - Publishing observability: structured logging, metrics dashboard, alert thresholds
 
-Estado: `ready`
+Estado: `ready_for_integration`
 
 - Structured logging with correlation IDs
 - Publishing metrics dashboard (attempts, failures, latency)

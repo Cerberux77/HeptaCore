@@ -6,7 +6,7 @@ task_id: "S-HC-ASSET-01-STRATEGY-ASSET-MANIFEST"
 sprint: "assets"
 status: "blocked"
 owner: "Manuel"
-last_updated: "2026-06-29T02:20:46.799Z"
+last_updated: "2026-06-29T02:29:41.523Z"
 source: "var/oreshnik/tasks/S-HC-ASSET-01-STRATEGY-ASSET-MANIFEST.json"
 ---
 
