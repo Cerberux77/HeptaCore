@@ -203,7 +203,7 @@
       "title": "Goal Runner v1 for autonomous Kilo execution",
       "owner": "Manuel",
       "backupOwner": "Manuel",
-      "status": "ready",
+      "status": "integrated",
       "track": "tooling",
       "zone": [
         "scripts/goal-runner/**",
@@ -240,8 +240,15 @@
           "action": "status_reconciled",
           "operator": "manuel",
           "description": "Task status reconciled to ready: dependencies and conflicts are clear for execution"
+        },
+        {
+          "at": "2026-06-29T03:28:38.571Z",
+          "action": "integrated",
+          "operator": "manuel",
+          "description": "Integrated into MADRE/v50-s-hc-tool-01-goal-runner-v1-goal-runner-v1-deterministic-state-machine-locks-2026-06-29"
         }
-      ]
+      ],
+      "attempts": 3
     },
     {
       "id": "S-HC-DRIFT-001",

@@ -1,8 +1,9 @@
+<!-- ORESHNIK:GENERATED:START -->
 ---
 type: collaborator-status
 project: "HeptaCore"
 operator: "Manuel"
-last_updated: "2026-06-29T03:01:55.155Z"
+last_updated: "2026-06-29T03:28:46.455Z"
 generated_by: "Oreshnik canonical-check"
 source: "var/oreshnik/task-board.json"
 ---
@@ -15,7 +16,6 @@ source: "var/oreshnik/task-board.json"
 
 | Sprint | Scope | Depende de |
 |---|---|---|
-| S-HC-TOOL-01-GOAL-RUNNER-V1 | Goal Runner v1 for autonomous Kilo execution | S-HC-TEN-01-GLOBAL-TENANT-ADMIN |
 | S-HC-ASSET-02-FORMAT-DERIVATIVES | Format derivatives: badge interaction, format preview, intelligent crop, safe zones, asset variants | S-HC-PUB-03-MULTITENANT-ASSETS |
 | S-HC-PUB-06-REELS-STORIES-PUBLISHERS | Real publishing for Meta Reels and Stories: Instagram + Facebook | S-HC-PUB-03-MULTITENANT-ASSETS, S-HC-PUB-04-HOURLY-BATCH-CRON |
 | S-HC-PUB-07-YOUTUBE-PUBLISHING | Real publishing for YouTube: Video 16:9 and YouTube Shorts | S-HC-PUB-03-MULTITENANT-ASSETS, S-HC-PUB-04-HOURLY-BATCH-CRON |
@@ -53,7 +53,7 @@ Zonas: `apps/web/lib/publishing-finalization.ts`, `apps/web/lib/draft-operationa
 
 ### S-HC-TOOL-01-GOAL-RUNNER-V1 - Goal Runner v1 for autonomous Kilo execution
 
-Estado: `ready`
+Estado: `integrated`
 
 - Nucleo determinista implementado y probado
 - Maquina de estados, locks, evidencia y gates operativos
@@ -314,3 +314,5 @@ Estado: `blocked`
 
 Zonas: `examples/tenants/cepeg`, `apps/web`, `packages/db`
 
+
+<!-- ORESHNIK:GENERATED:END -->

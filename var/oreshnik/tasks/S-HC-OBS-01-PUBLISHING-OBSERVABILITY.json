@@ -32,5 +32,26 @@
     }
   ],
   "updatedAt": "2026-06-29T02:50:23.982Z",
-  "runs": []
+  "runs": [
+    {
+      "runId": "kilo-S-HC-OBS-01-PUBLISHING-OBSERVABILITY-2026-06-29T02-25-50-533Z-0b59e14b",
+      "operator": "kilo",
+      "worker": "kilo",
+      "workerMode": "codex",
+      "branch": "task/S-HC-OBS-01-PUBLISHING-OBSERVABILITY/S-HC-OBS-01-PUBLISHING-OBSERVABILITY/kilo/kilo-S-HC-OBS-01-PUBLISHING-OBSERVABILITY-2026-06-29T02-25-50-533Z-0b59e14b",
+      "worktreePath": "D:\\PROYECTOS\\WORKTREES\\HeptaCore_PUB04_GOAL\\var\\oreshnik\\wt\\S-HC-OBS-01-PUBLISHING-OBSERVABILITY\\S-HC-OBS-01-PUBLISHING-OBSERVABILITY\\r-226ffbae8a2e",
+      "zones": [
+        "apps/web",
+        "packages/core",
+        "docs"
+      ],
+      "taskStatus": "ready_for_integration",
+      "claimStatus": "released",
+      "claimedAt": "2026-06-29T02:25:50.533Z",
+      "updatedAt": "2026-06-29T02:29:41.536Z",
+      "expiresAt": "2026-06-29T03:25:50.533Z",
+      "releasedAt": "2026-06-29T02:29:41.536Z",
+      "manifestPath": "var/oreshnik/runs/S-HC-OBS-01-PUBLISHING-OBSERVABILITY/kilo-S-HC-OBS-01-PUBLISHING-OBSERVABILITY-2026-06-29T02-25-50-533Z-0b59e14b.json"
+    }
+  ]
 }

@@ -42,7 +42,13 @@
     "oreshnik:hook:install": "node -e \"const{cpSync}=require('fs');cpSync('scripts/oreshnik/hooks/pre-push','.git/hooks/pre-push');console.log('Pre-push drift hook installed.')\"",
     "deploy": "npx vercel deploy --prod --yes",
     "deploy:hook": "node -e \"fetch('https://api.vercel.com/v1/integrations/deploy/prj_flQUZNW03oOnxANUfH8pIQRvNoP7/yZQrdWODLs',{method:'POST'}).then(r=>r.json()).then(d=>{console.log(d.message||'Deploy triggered:',d.status);if(d.job)console.log('Job ID:',d.job.id)}).catch(e=>console.error(e))\"",
-    "push:deploy": "git push origin master && npm run deploy"
+    "push:deploy": "git push origin master && npm run deploy",
+    "goal:status": "node scripts/goal-runner/run.mjs status",
+    "goal:create": "node scripts/goal-runner/run.mjs create",
+    "goal:activate": "node scripts/goal-runner/run.mjs activate",
+    "goal:complete": "node scripts/goal-runner/run.mjs complete",
+    "goal:doctor": "node scripts/goal-runner/run.mjs doctor",
+    "goal:test": "node --test scripts/goal-runner/__tests__/*.test.mjs"
   },
   "engines": {
     "node": ">=20.0.0"

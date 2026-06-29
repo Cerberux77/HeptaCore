@@ -55,7 +55,7 @@ Publishing observability: structured logging, metrics dashboard, alert threshold
 
 | Run | Operator | Mode | Task Status | Claim | Branch |
 |---|---|---|---|---|---|
-| Ninguno | - | - | - | - | - |
+| kilo-S-HC-OBS-01-PUBLISHING-OBSERVABILITY-2026-06-29T02-25-50-533Z-0b59e14b | kilo | codex | ready_for_integration | released | task/S-HC-OBS-01-PUBLISHING-OBSERVABILITY/S-HC-OBS-01-PUBLISHING-OBSERVABILITY/kilo/kilo-S-HC-OBS-01-PUBLISHING-OBSERVABILITY-2026-06-29T02-25-50-533Z-0b59e14b |
 
 ## Integracion
 
