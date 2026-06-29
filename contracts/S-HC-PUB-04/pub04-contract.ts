@@ -192,6 +192,15 @@ export interface Pub04JobOutcome {
   reason?: string;
 }
 
+export interface Pub04ReconciliationAlert {
+  jobId: string;
+  draftId: string;
+  case: "CASE_A_AUTO" | "CASE_B_ALERT" | "CASE_C_BLOCK";
+  reason: string;
+  committed: boolean;
+  requiresHumanReview: boolean;
+}
+
 export interface Pub04CronSummary {
   totalDue: number;
   selected: number;
@@ -203,6 +212,7 @@ export interface Pub04CronSummary {
   skipped: number;
   remainingDue: number;
   timeBudgetExhausted: boolean;
+  reconciliationAlerts: Pub04ReconciliationAlert[];
 }
 
 export interface Pub04CronResult {

@@ -8,6 +8,7 @@ import type {
   Pub04Job,
   Pub04Publisher,
 } from "../../../contracts/S-HC-PUB-04/pub04-contract.js";
+import type { ReconciliationReportEntry } from "./publishing-observability.js";
 
 function findSocialAccount(ctx: Pub04Context): Pub04Context["socialAccounts"][0] | null {
   const draft = ctx.draft;
@@ -38,9 +39,10 @@ async function processJob(
   deps: Pub04CronDeps,
   input: Pub04CronInput,
   dryRun: boolean
-): Promise<{ outcome: Pub04JobOutcome; publishedCount: number; reconciliationCount: number }> {
+): Promise<{ outcome: Pub04JobOutcome; publishedCount: number; reconciliationCount: number; reconciliationAlerts: ReconciliationReportEntry[] }> {
   let publishedCount = 0;
   let reconciliationCount = 0;
+  const reconciliationAlerts: ReconciliationReportEntry[] = [];
 
   const now = deps.now();
   const claimToken = deps.newClaimToken();
@@ -48,7 +50,7 @@ async function processJob(
     if (dryRun) {
     const ctx = await deps.repo.loadContext(job.id);
     if (!ctx) {
-      return { outcome: { jobId: job.id, code: "DRY_RUN_BLOCKED", reason: "Context not found" }, publishedCount: 0, reconciliationCount: 0 };
+      return { outcome: { jobId: job.id, code: "DRY_RUN_BLOCKED", reason: "Context not found" }, publishedCount: 0, reconciliationCount: 0, reconciliationAlerts };
     }
     const publisher = deps.getPublisher(ctx.job.provider);
     const account = findSocialAccount(ctx);
@@ -120,9 +122,9 @@ async function processJob(
     }
 
     if (preflightErrors.length === 0) {
-      return { outcome: { jobId: job.id, code: "DRY_RUN_ELIGIBLE" }, publishedCount: 0, reconciliationCount: 0 };
+      return { outcome: { jobId: job.id, code: "DRY_RUN_ELIGIBLE" }, publishedCount: 0, reconciliationCount: 0, reconciliationAlerts };
     }
-    return { outcome: { jobId: job.id, code: "DRY_RUN_BLOCKED", reason: preflightErrors.join(", ") }, publishedCount: 0, reconciliationCount: 0 };
+    return { outcome: { jobId: job.id, code: "DRY_RUN_BLOCKED", reason: preflightErrors.join(", ") }, publishedCount: 0, reconciliationCount: 0, reconciliationAlerts };
   }
 
   let claimed = false;
@@ -154,9 +156,17 @@ async function processJob(
   if (!claimed) {
     if (job.status === "IN_REVIEW" && job.providerAttemptStartedAt) {
       await deps.repo.markReconciliation({ jobId: job.id, claimToken: job.claimToken, code: "RECONCILIATION_REQUIRED", now });
-      return { outcome: { jobId: job.id, code: "RECONCILIATION_REQUIRED", reason: "Post-provider lease expired" }, publishedCount: 0, reconciliationCount: 1 };
+      reconciliationAlerts.push({
+        jobId: job.id,
+        draftId: "",
+        case: "CASE_C_BLOCK",
+        reason: "Lease post-proveedor expiro sin confirmacion. Sin evidencia suficiente.",
+        committed: false,
+        requiresHumanReview: true,
+      });
+      return { outcome: { jobId: job.id, code: "RECONCILIATION_REQUIRED", reason: "Post-provider lease expired" }, publishedCount: 0, reconciliationCount: 1, reconciliationAlerts };
     }
-    return { outcome: { jobId: job.id, code: "SKIPPED_CLAIM_LOST", reason: "Claim lost" }, publishedCount: 0, reconciliationCount: 0 };
+    return { outcome: { jobId: job.id, code: "SKIPPED_CLAIM_LOST", reason: "Claim lost" }, publishedCount: 0, reconciliationCount: 0, reconciliationAlerts };
   }
 
   if (job.attempts >= input.maxAttempts) {
@@ -167,7 +177,7 @@ async function processJob(
       terminal: true,
       now,
     });
-    return { outcome: { jobId: job.id, code: "SKIPPED_MAX_ATTEMPTS" }, publishedCount: 0, reconciliationCount: 0 };
+    return { outcome: { jobId: job.id, code: "SKIPPED_MAX_ATTEMPTS" }, publishedCount: 0, reconciliationCount: 0, reconciliationAlerts };
   }
 
   const ctx = await deps.repo.loadContext(job.id);
@@ -179,7 +189,7 @@ async function processJob(
       terminal: true,
       now,
     });
-    return { outcome: { jobId: job.id, code: "PRE_PROVIDER_BLOCKED", reason: "Context not found" }, publishedCount: 0, reconciliationCount: 0 };
+    return { outcome: { jobId: job.id, code: "PRE_PROVIDER_BLOCKED", reason: "Context not found" }, publishedCount: 0, reconciliationCount: 0, reconciliationAlerts };
   }
 
   if (ctx.durableResult?.ok && ctx.durableResult.externalPostId) {
@@ -189,9 +199,25 @@ async function processJob(
       now,
     });
     if (reconciled === "committed") {
-      return { outcome: { jobId: job.id, code: "PUBLISHED" }, publishedCount: 1, reconciliationCount: 0 };
+      reconciliationAlerts.push({
+        jobId: job.id,
+        draftId: ctx.draft?.id ?? "",
+        case: "CASE_A_AUTO",
+        reason: "Reconciliacion automatica exitosa desde PublishingResult.",
+        committed: true,
+        requiresHumanReview: false,
+      });
+      return { outcome: { jobId: job.id, code: "PUBLISHED" }, publishedCount: 1, reconciliationCount: 0, reconciliationAlerts };
     }
-    return { outcome: { jobId: job.id, code: "RECONCILIATION_REQUIRED", reason: "Durable success conflict" }, publishedCount: 0, reconciliationCount: 1 };
+    reconciliationAlerts.push({
+      jobId: job.id,
+      draftId: ctx.draft?.id ?? "",
+      case: "CASE_A_AUTO",
+      reason: "Conflicto en reconciliacion de resultado durable.",
+      committed: false,
+      requiresHumanReview: false,
+    });
+    return { outcome: { jobId: job.id, code: "RECONCILIATION_REQUIRED", reason: "Durable success conflict" }, publishedCount: 0, reconciliationCount: 1, reconciliationAlerts };
   }
 
   const publisher = deps.getPublisher(ctx.job.provider);
@@ -205,7 +231,7 @@ async function processJob(
       terminal: true,
       now,
     });
-    return { outcome: { jobId: job.id, code: "PRE_PROVIDER_BLOCKED", reason: "Tenant not active" }, publishedCount: 0, reconciliationCount: 0 };
+    return { outcome: { jobId: job.id, code: "PRE_PROVIDER_BLOCKED", reason: "Tenant not active" }, publishedCount: 0, reconciliationCount: 0, reconciliationAlerts };
   }
 
   if (ctx.tenant.automationMode === "DRAFT_ONLY") {
@@ -216,7 +242,7 @@ async function processJob(
       terminal: true,
       now,
     });
-    return { outcome: { jobId: job.id, code: "PRE_PROVIDER_BLOCKED", reason: "Tenant is DRAFT_ONLY" }, publishedCount: 0, reconciliationCount: 0 };
+    return { outcome: { jobId: job.id, code: "PRE_PROVIDER_BLOCKED", reason: "Tenant is DRAFT_ONLY" }, publishedCount: 0, reconciliationCount: 0, reconciliationAlerts };
   }
 
   if (!ctx.draft || ctx.draft.status !== "SCHEDULED") {
@@ -227,7 +253,7 @@ async function processJob(
       terminal: true,
       now,
     });
-    return { outcome: { jobId: job.id, code: "PRE_PROVIDER_BLOCKED", reason: ctx.draft ? "Draft not in SCHEDULED" : "Draft not found" }, publishedCount: 0, reconciliationCount: 0 };
+    return { outcome: { jobId: job.id, code: "PRE_PROVIDER_BLOCKED", reason: ctx.draft ? "Draft not in SCHEDULED" : "Draft not found" }, publishedCount: 0, reconciliationCount: 0, reconciliationAlerts };
   }
 
   if (ctx.draft.network !== ctx.job.provider) {
@@ -238,7 +264,7 @@ async function processJob(
       terminal: true,
       now,
     });
-    return { outcome: { jobId: job.id, code: "PRE_PROVIDER_BLOCKED", reason: "Network mismatch" }, publishedCount: 0, reconciliationCount: 0 };
+    return { outcome: { jobId: job.id, code: "PRE_PROVIDER_BLOCKED", reason: "Network mismatch" }, publishedCount: 0, reconciliationCount: 0, reconciliationAlerts };
   }
 
   if (ctx.draft.externalPostId) {
@@ -249,7 +275,15 @@ async function processJob(
       terminal: true,
       now,
     });
-    return { outcome: { jobId: job.id, code: "PRE_PROVIDER_BLOCKED", reason: "Draft already published" }, publishedCount: 0, reconciliationCount: 0 };
+    reconciliationAlerts.push({
+      jobId: job.id,
+      draftId: ctx.draft.id,
+      case: "CASE_B_ALERT",
+      reason: "Draft tiene externalPostId pero no existe PublishingResult. Requiere revision humana.",
+      committed: false,
+      requiresHumanReview: true,
+    });
+    return { outcome: { jobId: job.id, code: "PRE_PROVIDER_BLOCKED", reason: "Draft already published" }, publishedCount: 0, reconciliationCount: 0, reconciliationAlerts };
   }
 
   if (ctx.publishedCountOnNetwork >= ctx.trialLimit) {
@@ -260,7 +294,7 @@ async function processJob(
       terminal: false,
       now,
     });
-    return { outcome: { jobId: job.id, code: "PRE_PROVIDER_BLOCKED", reason: "Trial limit reached" }, publishedCount: 0, reconciliationCount: 0 };
+    return { outcome: { jobId: job.id, code: "PRE_PROVIDER_BLOCKED", reason: "Trial limit reached" }, publishedCount: 0, reconciliationCount: 0, reconciliationAlerts };
   }
 
   if (!publisher) {
@@ -271,7 +305,7 @@ async function processJob(
       terminal: true,
       now,
     });
-    return { outcome: { jobId: job.id, code: "PRE_PROVIDER_BLOCKED", reason: "Publisher not implemented" }, publishedCount: 0, reconciliationCount: 0 };
+    return { outcome: { jobId: job.id, code: "PRE_PROVIDER_BLOCKED", reason: "Publisher not implemented" }, publishedCount: 0, reconciliationCount: 0, reconciliationAlerts };
   }
 
   const account = findSocialAccount(ctx);
@@ -283,7 +317,7 @@ async function processJob(
       terminal: false,
       now,
     });
-    return { outcome: { jobId: job.id, code: "PRE_PROVIDER_BLOCKED", reason: "No connected social account" }, publishedCount: 0, reconciliationCount: 0 };
+    return { outcome: { jobId: job.id, code: "PRE_PROVIDER_BLOCKED", reason: "No connected social account" }, publishedCount: 0, reconciliationCount: 0, reconciliationAlerts };
   }
 
   if (!checkFormatSupported(publisher, ctx.draft)) {
@@ -294,7 +328,7 @@ async function processJob(
       terminal: true,
       now,
     });
-    return { outcome: { jobId: job.id, code: "PRE_PROVIDER_BLOCKED", reason: "Format not supported for live" }, publishedCount: 0, reconciliationCount: 0 };
+    return { outcome: { jobId: job.id, code: "PRE_PROVIDER_BLOCKED", reason: "Format not supported for live" }, publishedCount: 0, reconciliationCount: 0, reconciliationAlerts };
   }
 
   const hasRequiredScopes = publisher.requiredScopes.every(
@@ -308,7 +342,7 @@ async function processJob(
       terminal: false,
       now,
     });
-    return { outcome: { jobId: job.id, code: "PRE_PROVIDER_BLOCKED", reason: "Missing required scopes" }, publishedCount: 0, reconciliationCount: 0 };
+    return { outcome: { jobId: job.id, code: "PRE_PROVIDER_BLOCKED", reason: "Missing required scopes" }, publishedCount: 0, reconciliationCount: 0, reconciliationAlerts };
   }
 
   const needsAsset = !publisher.textOnly || (ctx.draft?.assets?.length ?? 0) > 0;
@@ -320,7 +354,7 @@ async function processJob(
       terminal: false,
       now,
     });
-    return { outcome: { jobId: job.id, code: "PRE_PROVIDER_BLOCKED", reason: "Missing required asset" }, publishedCount: 0, reconciliationCount: 0 };
+    return { outcome: { jobId: job.id, code: "PRE_PROVIDER_BLOCKED", reason: "Missing required asset" }, publishedCount: 0, reconciliationCount: 0, reconciliationAlerts };
   }
 
   if (needsAsset && ctx.draft?.assets) {
@@ -333,7 +367,7 @@ async function processJob(
         terminal: false,
         now,
       });
-      return { outcome: { jobId: job.id, code: "PRE_PROVIDER_BLOCKED", reason: "Asset URL not public" }, publishedCount: 0, reconciliationCount: 0 };
+      return { outcome: { jobId: job.id, code: "PRE_PROVIDER_BLOCKED", reason: "Asset URL not public" }, publishedCount: 0, reconciliationCount: 0, reconciliationAlerts };
     }
   }
 
@@ -345,7 +379,7 @@ async function processJob(
       terminal: false,
       now,
     });
-    return { outcome: { jobId: job.id, code: "PRE_PROVIDER_BLOCKED", reason: "Missing external account ID" }, publishedCount: 0, reconciliationCount: 0 };
+    return { outcome: { jobId: job.id, code: "PRE_PROVIDER_BLOCKED", reason: "Missing external account ID" }, publishedCount: 0, reconciliationCount: 0, reconciliationAlerts };
   }
 
   const credential = await deps.resolveCredential({
@@ -361,7 +395,7 @@ async function processJob(
       terminal: false,
       now,
     });
-    return { outcome: { jobId: job.id, code: "PRE_PROVIDER_BLOCKED", reason: credential.code }, publishedCount: 0, reconciliationCount: 0 };
+    return { outcome: { jobId: job.id, code: "PRE_PROVIDER_BLOCKED", reason: credential.code }, publishedCount: 0, reconciliationCount: 0, reconciliationAlerts };
   }
 
   const started = await deps.repo.markProviderAttemptStarted({
@@ -370,7 +404,7 @@ async function processJob(
     now,
   });
   if (!started) {
-    return { outcome: { jobId: job.id, code: "SKIPPED_CLAIM_LOST", reason: "Claim token invalid after validation" }, publishedCount: 0, reconciliationCount: 0 };
+    return { outcome: { jobId: job.id, code: "SKIPPED_CLAIM_LOST", reason: "Claim token invalid after validation" }, publishedCount: 0, reconciliationCount: 0, reconciliationAlerts };
   }
 
   const mediaAsset = ctx.draft?.assets?.find((a) => a.publicUrl?.startsWith("https://"));
@@ -398,7 +432,7 @@ async function processJob(
       now,
     });
     if (finalizeResult === "committed") {
-      return { outcome: { jobId: job.id, code: "PUBLISHED" }, publishedCount: 1, reconciliationCount: 0 };
+      return { outcome: { jobId: job.id, code: "PUBLISHED" }, publishedCount: 1, reconciliationCount: 0, reconciliationAlerts };
     }
     await deps.repo.markReconciliation({
       jobId: job.id,
@@ -406,7 +440,15 @@ async function processJob(
       code: "FINALIZE_FAILED",
       now,
     });
-    return { outcome: { jobId: job.id, code: "RECONCILIATION_REQUIRED", reason: "Provider confirmed but local persistence failed" }, publishedCount: 0, reconciliationCount: 1 };
+    reconciliationAlerts.push({
+      jobId: job.id,
+      draftId: ctx.draft?.id ?? "",
+      case: "CASE_A_AUTO",
+      reason: "Proveedor confirmo pero la persistencia local fallo. Requiere reconciliacion.",
+      committed: false,
+      requiresHumanReview: false,
+    });
+    return { outcome: { jobId: job.id, code: "RECONCILIATION_REQUIRED", reason: "Provider confirmed but local persistence failed" }, publishedCount: 0, reconciliationCount: 1, reconciliationAlerts };
   }
 
   if (providerResult.kind === "ambiguous") {
@@ -416,7 +458,15 @@ async function processJob(
       code: "AMBIGUOUS",
       now,
     });
-    return { outcome: { jobId: job.id, code: "RECONCILIATION_REQUIRED", reason: providerResult.error }, publishedCount: 0, reconciliationCount: 1 };
+    reconciliationAlerts.push({
+      jobId: job.id,
+      draftId: ctx.draft?.id ?? "",
+      case: "CASE_C_BLOCK",
+      reason: `Resultado ambiguo del proveedor: ${providerResult.error}. Sin evidencia suficiente.`,
+      committed: false,
+      requiresHumanReview: true,
+    });
+    return { outcome: { jobId: job.id, code: "RECONCILIATION_REQUIRED", reason: providerResult.error }, publishedCount: 0, reconciliationCount: 1, reconciliationAlerts };
   }
 
   const isRetryable = providerResult.kind === "retryable_failure";
@@ -437,6 +487,7 @@ async function processJob(
     },
     publishedCount: 0,
     reconciliationCount: 0,
+    reconciliationAlerts,
   };
 }
 
@@ -455,6 +506,7 @@ export async function executePublishingCron(
   });
 
   const outcomes: Pub04JobOutcome[] = [];
+  const allReconciliationAlerts: ReconciliationReportEntry[] = [];
   let published = 0;
   let reconciliationRequired = 0;
   let retryableFailures = 0;
@@ -474,6 +526,7 @@ export async function executePublishingCron(
     outcomes.push(result.outcome);
     published += result.publishedCount;
     reconciliationRequired += result.reconciliationCount;
+    allReconciliationAlerts.push(...result.reconciliationAlerts);
 
     switch (result.outcome.code) {
       case "RETRYABLE_FAILURE":
@@ -526,6 +579,7 @@ export async function executePublishingCron(
     skipped,
     remainingDue: Math.max(0, remainingDue),
     timeBudgetExhausted: outcomes.some((o) => o.code === "SKIPPED_TIME_BUDGET"),
+    reconciliationAlerts: allReconciliationAlerts,
   };
 
   return { summary, outcomes };

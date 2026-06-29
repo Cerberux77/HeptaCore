@@ -31,6 +31,16 @@ export interface CronRunSummary {
   timeBudgetExhausted: boolean;
   durationMs: number;
   dryRun: boolean;
+  reconciliationAlerts: ReconciliationReportEntry[];
+}
+
+export interface ReconciliationReportEntry {
+  jobId: string;
+  draftId: string;
+  case: "CASE_A_AUTO" | "CASE_B_ALERT" | "CASE_C_BLOCK";
+  reason: string;
+  committed: boolean;
+  requiresHumanReview: boolean;
 }
 
 export function createEmptySummary(runId: string, startedAt: Date, windowStart: string, windowEnd: string, dryRun: boolean): CronRunSummary {
@@ -53,5 +63,6 @@ export function createEmptySummary(runId: string, startedAt: Date, windowStart: 
     timeBudgetExhausted: false,
     durationMs: 0,
     dryRun,
+    reconciliationAlerts: [],
   };
 }
