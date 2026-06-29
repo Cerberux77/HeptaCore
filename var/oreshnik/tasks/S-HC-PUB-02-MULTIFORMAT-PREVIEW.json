@@ -2,13 +2,13 @@
   "project": "HeptaCore",
   "taskId": "S-HC-PUB-02-MULTIFORMAT-PREVIEW",
   "sprint": "publishing",
-  "sprintOrderIndex": 31,
+  "sprintOrderIndex": 19,
   "taskOrderIndex": 24,
   "title": "Multiformat preview and dry-run: format model, asset manifest, platform previews, validations",
   "owner": "Manuel",
   "backupOwner": "Manuel",
   "status": "done",
-  "taskBoardPath": "D:\\PROYECTOS\\WORKTREES\\HeptaCore_PUB04_GOAL\\var\\oreshnik\\task-board.json",
+  "taskBoardPath": "D:\\PROYECTOS\\WORKTREES\\CODEX\\AI01\\var\\oreshnik\\task-board.json",
   "zone": [
     "apps/web",
     "apps/web/lib/publishers",
@@ -37,6 +37,6 @@
       "description": "multiformat previews, deterministic auth, approval UI and dry-run QA completed"
     }
   ],
-  "updatedAt": "2026-06-29T00:37:30.040Z",
+  "updatedAt": "2026-06-29T01:54:40.093Z",
   "runs": []
 }

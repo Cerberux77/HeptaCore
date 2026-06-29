@@ -2,13 +2,13 @@
   "project": "HeptaCore",
   "taskId": "S-HC-OPT-01-SENTIMENT-STRATEGY-ITERATION",
   "sprint": "optimization",
-  "sprintOrderIndex": 28,
+  "sprintOrderIndex": 16,
   "taskOrderIndex": 21,
   "title": "Sentiment-driven strategy iteration: results → improved strategy",
   "owner": "Manuel",
   "backupOwner": "Manuel",
   "status": "blocked",
-  "taskBoardPath": "D:\\PROYECTOS\\WORKTREES\\HeptaCore_PUB04_GOAL\\var\\oreshnik\\task-board.json",
+  "taskBoardPath": "D:\\PROYECTOS\\WORKTREES\\CODEX\\AI01\\var\\oreshnik\\task-board.json",
   "zone": [
     "packages/agents",
     "apps/web/components",
@@ -32,6 +32,6 @@
       "description": "Task status reconciled to blocked: dependency S-HC-AN-01-CAMPAIGN-PERFORMANCE still pending (S-HC-AN-01-CAMPAIGN-PERFORMANCE:pending) | dependency S-HC-INBOX-01-UNIFIED-ENGAGEMENT still pending (S-HC-INBOX-01-UNIFIED-ENGAGEMENT:pending)"
     }
   ],
-  "updatedAt": "2026-06-29T00:37:30.040Z",
+  "updatedAt": "2026-06-29T01:54:40.093Z",
   "runs": []
 }

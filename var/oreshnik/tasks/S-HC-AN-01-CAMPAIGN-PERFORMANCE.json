@@ -2,13 +2,13 @@
   "project": "HeptaCore",
   "taskId": "S-HC-AN-01-CAMPAIGN-PERFORMANCE",
   "sprint": "analytics",
-  "sprintOrderIndex": 18,
+  "sprintOrderIndex": 6,
   "taskOrderIndex": 8,
   "title": "Campaign performance analytics: reach, engagement, metrics per post and campaign",
   "owner": "Manuel",
   "backupOwner": "Manuel",
   "status": "blocked",
-  "taskBoardPath": "D:\\PROYECTOS\\WORKTREES\\HeptaCore_PUB04_GOAL\\var\\oreshnik\\task-board.json",
+  "taskBoardPath": "D:\\PROYECTOS\\WORKTREES\\CODEX\\AI01\\var\\oreshnik\\task-board.json",
   "zone": [
     "apps/web/components",
     "apps/web/app/api",
@@ -33,6 +33,6 @@
       "description": "Task status reconciled to blocked: dependency S-HC-OPS-01-CAMPAIGN-REVIEW-DEPLOYMENT still pending (S-HC-OPS-01-CAMPAIGN-REVIEW-DEPLOYMENT:pending) | dependency S-HC-OBS-01-PUBLISHING-OBSERVABILITY still pending (S-HC-OBS-01-PUBLISHING-OBSERVABILITY:pending)"
     }
   ],
-  "updatedAt": "2026-06-29T00:37:30.040Z",
+  "updatedAt": "2026-06-29T01:54:40.093Z",
   "runs": []
 }

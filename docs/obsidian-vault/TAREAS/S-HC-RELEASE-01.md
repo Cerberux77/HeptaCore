@@ -6,7 +6,7 @@ task_id: "S-HC-RELEASE-01"
 sprint: "release"
 status: "done"
 owner: "Manuel+Jean"
-last_updated: "2026-06-29T00:37:30.040Z"
+last_updated: "2026-06-29T01:54:40.093Z"
 source: "var/oreshnik/tasks/S-HC-RELEASE-01.json"
 ---
 

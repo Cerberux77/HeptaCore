@@ -2,7 +2,7 @@
 type: collaborator-status
 project: "HeptaCore"
 operator: "Manuel"
-last_updated: "2026-06-29T00:37:36.690Z"
+last_updated: "2026-06-29T02:30:08.613Z"
 generated_by: "Oreshnik canonical-check"
 source: "var/oreshnik/task-board.json"
 ---
@@ -43,7 +43,7 @@ Zonas: `apps/web/app/api/cron`, `apps/worker`, `packages/core`
 
 ### S-HC-PUB-05-RECONCILIATION-OPS - Operational reconciliation automation for ambiguous provider outcomes
 
-Estado: `ready_for_integration`
+Estado: `integrated`
 
 - Automatic reconciliation for Case A (Result ok + externalPostId + incomplete Draft)
 - Alert-only for Case B (Draft.externalPostId present + Result absent)

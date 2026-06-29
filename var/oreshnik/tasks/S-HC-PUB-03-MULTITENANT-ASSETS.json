@@ -2,13 +2,13 @@
   "project": "HeptaCore",
   "taskId": "S-HC-PUB-03-MULTITENANT-ASSETS",
   "sprint": "publishing",
-  "sprintOrderIndex": 31,
+  "sprintOrderIndex": 19,
   "taskOrderIndex": 25,
   "title": "Multi-tenant asset management: upload, replace, metadata extraction, compatibility classification",
   "owner": "Manuel",
   "backupOwner": "Manuel",
   "status": "done",
-  "taskBoardPath": "D:\\PROYECTOS\\WORKTREES\\HeptaCore_PUB04_GOAL\\var\\oreshnik\\task-board.json",
+  "taskBoardPath": "D:\\PROYECTOS\\WORKTREES\\CODEX\\AI01\\var\\oreshnik\\task-board.json",
   "zone": [
     "apps/web/app/api/tenants/[slug]/assets/**",
     "apps/web/app/api/tenant-assets/**",
@@ -49,6 +49,6 @@
       "description": "multitenant assets metadata compatibility batch uploads and production QA"
     }
   ],
-  "updatedAt": "2026-06-29T00:37:30.040Z",
+  "updatedAt": "2026-06-29T01:54:40.093Z",
   "runs": []
 }

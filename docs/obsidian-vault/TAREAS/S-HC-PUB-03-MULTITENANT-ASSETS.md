@@ -6,7 +6,7 @@ task_id: "S-HC-PUB-03-MULTITENANT-ASSETS"
 sprint: "publishing"
 status: "done"
 owner: "Manuel"
-last_updated: "2026-06-29T00:37:30.040Z"
+last_updated: "2026-06-29T01:54:40.093Z"
 source: "var/oreshnik/tasks/S-HC-PUB-03-MULTITENANT-ASSETS.json"
 ---
 

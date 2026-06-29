@@ -1,7 +1,7 @@
 ---
 type: status-board
 project: "HeptaCore"
-last_updated: "2026-06-29T00:37:36.701Z"
+last_updated: "2026-06-29T02:30:08.647Z"
 generated_by: "Oreshnik canonical-check"
 source: "var/oreshnik/task-board.json"
 ---
@@ -15,18 +15,6 @@ source: "var/oreshnik/task-board.json"
 - S-HC-PUB-04-HOURLY-BATCH-CRON
 - S-HC-PUB-05-RECONCILIATION-OPS
 - tooling
-- Fase completada: S-HC-TEN-01-GLOBAL-TENANT-ADMIN — tres roles canonicos (OWNER/ADMIN/VIEWER), normalizacion heredada, identidad en /admin y /tenant/*, 5/5 E2E en Preview (SHA 4b82628), 569 unit tests.
-- Fase completada: S-HC-REC-00A — baseline de publicacion recuperado y estabilizado (SHA 2fd9e249). Facebook e Instagram publican realmente desde la UI con durabilidad transaccional.
-- Fase completada: S-HC-REC-00C — integracion canonica en master (SHA 9329fe8). Documentacion y Oreshnik alineados.
-- Fase completada: oreshnik-cli@0.2.0-alpha.0 publicado. reconcile --check/--write operacional.
-- Fase completada: S-HC-PUB-02-MULTIFORMAT-PREVIEW — preview y dry-run multiformato para Instagram y Facebook.
-- Fase completada: S-HC-PUB-03-MULTITENANT-ASSETS — biblioteca multi-tenant, metadata, compatibilidad, colecciones, inspector (SHA 31dd93e).
-- Siguiente fase (un sprint por vez): S-HC-PUB-04-HOURLY-BATCH-CRON — batch cron publishing.
-- Fase activa: S-HC-TOOL-01-GOAL-RUNNER-V1 — Goal Runner v1 para ejecucion autonoma de Kilo. Nucleo implementado, integrado con /goal y /preflight. Pendiente goal piloto y posterior integracion en rama madre.
-- EMAIL-01 infraestructura de codigo preparada (modelos, templates, provider abstraction, webhook, Link-Only activo). Integracion externa bloqueada hasta dominio final.
-- Modo operacional actual: EMAIL_PROVIDER=disabled. Invitaciones se entregan via enlace copiable (inviteLink). Correos reales: 0.
-- Reels, Stories y YouTube forman parte obligatoria del alcance final de HeptaCore. Las combinaciones sin publisher real quedan pendientes de implementacion en PUB-06, PUB-07 o PUB-08.
-- Jean fuera de ruta critica. Responsabilidades reasignadas a Manuel.
 - ad-hoc
 - ai-generation
 - ai-infra
@@ -50,13 +38,25 @@ source: "var/oreshnik/task-board.json"
 - support
 - tenant-onboarding
 - tenant-platform
+- Fase completada: S-HC-TEN-01-GLOBAL-TENANT-ADMIN — tres roles canonicos (OWNER/ADMIN/VIEWER), normalizacion heredada, identidad en /admin y /tenant/*, 5/5 E2E en Preview (SHA 4b82628), 569 unit tests.
+- Fase completada: S-HC-REC-00A — baseline de publicacion recuperado y estabilizado (SHA 2fd9e249). Facebook e Instagram publican realmente desde la UI con durabilidad transaccional.
+- Fase completada: S-HC-REC-00C — integracion canonica en master (SHA 9329fe8). Documentacion y Oreshnik alineados.
+- Fase completada: oreshnik-cli@0.2.0-alpha.0 publicado. reconcile --check/--write operacional.
+- Fase completada: S-HC-PUB-02-MULTIFORMAT-PREVIEW — preview y dry-run multiformato para Instagram y Facebook.
+- Fase completada: S-HC-PUB-03-MULTITENANT-ASSETS — biblioteca multi-tenant, metadata, compatibilidad, colecciones, inspector (SHA 31dd93e).
+- Siguiente fase (un sprint por vez): S-HC-PUB-04-HOURLY-BATCH-CRON — batch cron publishing.
+- Fase activa: S-HC-TOOL-01-GOAL-RUNNER-V1 — Goal Runner v1 para ejecucion autonoma de Kilo. Nucleo implementado, integrado con /goal y /preflight. Pendiente goal piloto y posterior integracion en rama madre.
+- EMAIL-01 infraestructura de codigo preparada (modelos, templates, provider abstraction, webhook, Link-Only activo). Integracion externa bloqueada hasta dominio final.
+- Modo operacional actual: EMAIL_PROVIDER=disabled. Invitaciones se entregan via enlace copiable (inviteLink). Correos reales: 0.
+- Reels, Stories y YouTube forman parte obligatoria del alcance final de HeptaCore. Las combinaciones sin publisher real quedan pendientes de implementacion en PUB-06, PUB-07 o PUB-08.
+- Jean fuera de ruta critica. Responsabilidades reasignadas a Manuel.
 
 ## Tareas Ready/Pending
 
 | Sprint | Estado | Owner | Scope | Depende de |
 |---|---|---|---|---|
 | S-HC-PUB-04-HOURLY-BATCH-CRON | integrated | Manuel | Hourly batch cron publishing with timezone-aware scheduling | S-HC-PUB-02-MULTIFORMAT-PREVIEW, S-HC-PUB-03-MULTITENANT-ASSETS |
-| S-HC-PUB-05-RECONCILIATION-OPS | ready_for_integration | Manuel | Operational reconciliation automation for ambiguous provider outcomes | S-HC-PUB-04-HOURLY-BATCH-CRON |
+| S-HC-PUB-05-RECONCILIATION-OPS | integrated | Manuel | Operational reconciliation automation for ambiguous provider outcomes | S-HC-PUB-04-HOURLY-BATCH-CRON |
 | S-HC-TOOL-01-GOAL-RUNNER-V1 | ready | Manuel | Goal Runner v1 for autonomous Kilo execution | S-HC-TEN-01-GLOBAL-TENANT-ADMIN |
 | S-HC-AIGEN-01-ASSET-GENERATION-BROKER | blocked | Manuel | AI asset generation broker: provider-agnostic, metered and billed | S-HC-ASSET-01-STRATEGY-ASSET-MANIFEST, S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE, S-HC-COMM-02-BILLING-ACTIVATION |
 | S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE | ready | Manuel | LLM provider selection, cost estimation and governance policy | - |
@@ -108,4 +108,5 @@ source: "var/oreshnik/task-board.json"
 
 | Sprint | Resultado | Madre | Task | Source | Compatibility | Advance |
 |---|---|---|---|---|---|---|
+| S-HC-PUB-05-RECONCILIATION-OPS | succeeded | MADRE/v49-s-hc-pub-05-reconciliation-ops-implementa-automatizacion-operacional-de-reconci-2026-06-29 | S-HC-PUB-05-RECONCILIATION-OPS | Manuel/s-hc-pub-05-reconciliation-ops-sprint-2026-06-29 | integration-train/S-HC-PUB-05-RECONCILIATI/S-HC-PUB-05-RECONCILIATI/r-3030ee064340/a-4b83c9744f29 | runtime_projection_confirmed |
 | S-HC-PUB-04-HOURLY-BATCH-CRON | succeeded | MADRE/v48-s-hc-pub-04-hourly-batch-cron-hourly-batch-publishing-cron-and-pub-04-producti-2026-06-28 | S-HC-PUB-04-HOURLY-BATCH-CRON | Manuel/s-hc-pub-04-hourly-batch-goal | integration-train/S-HC-PUB-04-HOURLY-BATCH/S-HC-PUB-04-HOURLY-BATCH/r-c08e3c5d3afc/a-f62c2c114d4d | runtime_projection_confirmed |

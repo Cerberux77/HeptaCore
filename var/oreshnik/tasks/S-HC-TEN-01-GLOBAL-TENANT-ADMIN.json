@@ -2,13 +2,13 @@
   "project": "HeptaCore",
   "taskId": "S-HC-TEN-01-GLOBAL-TENANT-ADMIN",
   "sprint": "tenant-platform",
-  "sprintOrderIndex": 37,
+  "sprintOrderIndex": 25,
   "taskOrderIndex": 37,
   "title": "Global tenant administration and provisioning",
   "owner": "Manuel",
   "backupOwner": "Manuel",
   "status": "done",
-  "taskBoardPath": "D:\\PROYECTOS\\WORKTREES\\HeptaCore_PUB04_GOAL\\var\\oreshnik\\task-board.json",
+  "taskBoardPath": "D:\\PROYECTOS\\WORKTREES\\CODEX\\AI01\\var\\oreshnik\\task-board.json",
   "zone": [
     "packages/db/**",
     "apps/web/lib/tenant-admin-service.ts",
@@ -39,6 +39,6 @@
       "description": "Three canonical roles (OWNER/ADMIN/VIEWER), legacy role normalization, identity panel in /admin and /tenant/*, 5/5 E2E pass, 569 unit tests, production intact"
     }
   ],
-  "updatedAt": "2026-06-29T00:37:30.040Z",
+  "updatedAt": "2026-06-29T01:54:40.093Z",
   "runs": []
 }
