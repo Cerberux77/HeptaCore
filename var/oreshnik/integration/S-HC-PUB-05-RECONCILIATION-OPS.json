@@ -7,17 +7,6 @@
   "queue": [
     {
       "taskId": "S-HC-PUB-05-RECONCILIATION-OPS",
-      "runId": "manuel-S-HC-PUB-05-RECONCILIATION-OPS-2026-06-29T00-22-46-240Z-52eb7757",
-      "sourceBranch": "task/S-HC-PUB-05-RECONCILIATION-OPS/S-HC-PUB-05-RECONCILIATION-OPS/manuel/manuel-S-HC-PUB-05-RECONCILIATION-OPS-2026-06-29T00-22-46-240Z-52eb7757",
-      "owner": "Manuel",
-      "operator": "manuel",
-      "handoff": "docs/07_handoffs/S-HC-PUB-05-RECONCILIATION-OPS.md",
-      "queuedAt": "2026-06-29T00:36:47.156Z",
-      "updatedAt": "2026-06-29T00:37:36.657Z",
-      "status": "queued"
-    },
-    {
-      "taskId": "S-HC-PUB-05-RECONCILIATION-OPS",
       "runId": "manuel-S-HC-PUB-05-RECONCILIATION-OPS-2026-06-29T00-37-03-464Z-4e3d4eae",
       "sourceBranch": "task/S-HC-PUB-05-RECONCILIATION-OPS/S-HC-PUB-05-RECONCILIATION-OPS/manuel/manuel-S-HC-PUB-05-RECONCILIATION-OPS-2026-06-29T00-37-03-464Z-4e3d4eae",
       "owner": "Manuel",
