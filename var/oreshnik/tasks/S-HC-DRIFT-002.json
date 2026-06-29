@@ -2,7 +2,8 @@
   "project": "HeptaCore",
   "taskId": "S-HC-DRIFT-002",
   "sprint": "ad-hoc",
-  "taskOrderIndex": 36,
+  "sprintOrderIndex": 15,
+  "taskOrderIndex": 4,
   "title": "Codex multi-RRSS refactor, readiness gates, UI fixes, migrations, vercelignore",
   "owner": "Manuel",
   "backupOwner": "Manuel",
@@ -24,6 +25,6 @@
       "description": "Codex multi-RRSS refactor"
     }
   ],
-  "updatedAt": "2026-06-28T18:47:05.091Z",
+  "updatedAt": "2026-06-29T00:37:30.040Z",
   "runs": []
 }

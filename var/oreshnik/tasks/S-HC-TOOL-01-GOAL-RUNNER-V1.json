@@ -2,11 +2,12 @@
   "project": "HeptaCore",
   "taskId": "S-HC-TOOL-01-GOAL-RUNNER-V1",
   "sprint": "tooling",
-  "taskOrderIndex": 15,
+  "sprintOrderIndex": 2,
+  "taskOrderIndex": 2,
   "title": "Goal Runner v1 for autonomous Kilo execution",
   "owner": "Manuel",
   "backupOwner": "Manuel",
-  "status": "blocked",
+  "status": "ready",
   "taskBoardPath": "D:\\PROYECTOS\\WORKTREES\\HeptaCore_PUB04_GOAL\\var\\oreshnik\\task-board.json",
   "zone": [
     "scripts/goal-runner/**",
@@ -37,8 +38,14 @@
       "action": "status_reconciled",
       "operator": "manuel",
       "description": "Task status reconciled to blocked: status active is not claimable for a new run"
+    },
+    {
+      "at": "2026-06-29T00:12:30.056Z",
+      "action": "status_reconciled",
+      "operator": "manuel",
+      "description": "Task status reconciled to ready: dependencies and conflicts are clear for execution"
     }
   ],
-  "updatedAt": "2026-06-28T18:47:05.091Z",
+  "updatedAt": "2026-06-29T00:37:30.040Z",
   "runs": []
 }

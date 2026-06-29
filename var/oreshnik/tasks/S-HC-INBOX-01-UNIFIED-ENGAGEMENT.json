@@ -2,7 +2,8 @@
   "project": "HeptaCore",
   "taskId": "S-HC-INBOX-01-UNIFIED-ENGAGEMENT",
   "sprint": "engagement",
-  "taskOrderIndex": 30,
+  "sprintOrderIndex": 23,
+  "taskOrderIndex": 15,
   "title": "Unified engagement inbox: read and respond to messages and comments",
   "owner": "Manuel",
   "backupOwner": "Manuel",
@@ -30,6 +31,6 @@
       "description": "Task status reconciled to blocked: dependency S-HC-AN-01-CAMPAIGN-PERFORMANCE still pending (S-HC-AN-01-CAMPAIGN-PERFORMANCE:pending)"
     }
   ],
-  "updatedAt": "2026-06-28T18:47:05.091Z",
+  "updatedAt": "2026-06-29T00:37:30.040Z",
   "runs": []
 }

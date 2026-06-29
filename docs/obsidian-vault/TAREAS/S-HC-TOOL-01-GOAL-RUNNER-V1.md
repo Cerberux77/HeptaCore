@@ -4,9 +4,9 @@ type: task-runtime
 project: "HeptaCore"
 task_id: "S-HC-TOOL-01-GOAL-RUNNER-V1"
 sprint: "tooling"
-status: "blocked"
+status: "ready"
 owner: "Manuel"
-last_updated: "2026-06-28T18:47:05.091Z"
+last_updated: "2026-06-29T00:37:30.040Z"
 source: "var/oreshnik/tasks/S-HC-TOOL-01-GOAL-RUNNER-V1.json"
 ---
 
@@ -18,7 +18,7 @@ Goal Runner v1 for autonomous Kilo execution
 
 ## Runtime
 
-- estado: `blocked`
+- estado: `ready`
 - owner: `Manuel`
 - backup: `Manuel`
 - intentos: `0`

@@ -2,7 +2,8 @@
   "project": "HeptaCore",
   "taskId": "S-HC-COMM-01-SELF-SERVICE-SIGNUP",
   "sprint": "commercial",
-  "taskOrderIndex": 17,
+  "sprintOrderIndex": 20,
+  "taskOrderIndex": 11,
   "title": "Self-service tenant signup with trial gate and onboarding flow",
   "owner": "Manuel",
   "backupOwner": "Manuel",
@@ -32,6 +33,6 @@
       "description": "Task status reconciled to blocked: dependency S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION still pending (S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION:pending)"
     }
   ],
-  "updatedAt": "2026-06-28T18:47:05.091Z",
+  "updatedAt": "2026-06-29T00:37:30.040Z",
   "runs": []
 }

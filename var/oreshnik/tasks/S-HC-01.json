@@ -2,7 +2,8 @@
   "project": "HeptaCore",
   "taskId": "S-HC-01",
   "sprint": "product-ui",
-  "taskOrderIndex": 2,
+  "sprintOrderIndex": 29,
+  "taskOrderIndex": 22,
   "title": "Console shell: tenant dashboard, onboarding, checklist, draft queue",
   "owner": "Jean",
   "backupOwner": "Jean",
@@ -40,6 +41,6 @@
       "reason": "Manuel ausente - ruta critica bloqueada"
     }
   ],
-  "updatedAt": "2026-06-28T18:47:05.091Z",
+  "updatedAt": "2026-06-29T00:37:30.040Z",
   "runs": []
 }

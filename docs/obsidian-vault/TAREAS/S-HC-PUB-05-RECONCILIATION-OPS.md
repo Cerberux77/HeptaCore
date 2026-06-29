@@ -3,10 +3,10 @@
 type: task-runtime
 project: "HeptaCore"
 task_id: "S-HC-PUB-05-RECONCILIATION-OPS"
-sprint: "publishing"
-status: "ready"
+sprint: "S-HC-PUB-05-RECONCILIATION-OPS"
+status: "ready_for_integration"
 owner: "Manuel"
-last_updated: "2026-06-28T18:47:05.091Z"
+last_updated: "2026-06-29T00:37:30.040Z"
 source: "var/oreshnik/tasks/S-HC-PUB-05-RECONCILIATION-OPS.json"
 ---
 
@@ -18,11 +18,11 @@ Operational reconciliation automation for ambiguous provider outcomes
 
 ## Runtime
 
-- estado: `ready`
+- estado: `ready_for_integration`
 - owner: `Manuel`
 - backup: `Manuel`
-- intentos: `0`
-- handoff: -
+- intentos: `2`
+- handoff: docs/07_handoffs/S-HC-PUB-05-RECONCILIATION-OPS.md
 
 ## Dependencias
 
@@ -55,11 +55,15 @@ Operational reconciliation automation for ambiguous provider outcomes
 
 | Run | Operator | Mode | Task Status | Claim | Branch |
 |---|---|---|---|---|---|
-| Ninguno | - | - | - | - | - |
+| manuel-S-HC-PUB-05-RECONCILIATION-OPS-2026-06-29T00-37-03-464Z-4e3d4eae | manuel | codex | ready_for_integration | released | task/S-HC-PUB-05-RECONCILIATION-OPS/S-HC-PUB-05-RECONCILIATION-OPS/manuel/manuel-S-HC-PUB-05-RECONCILIATION-OPS-2026-06-29T00-37-03-464Z-4e3d4eae |
+| manuel-S-HC-PUB-05-RECONCILIATION-OPS-2026-06-29T00-22-46-240Z-52eb7757 | manuel | codex | ready_for_integration | released | task/S-HC-PUB-05-RECONCILIATION-OPS/S-HC-PUB-05-RECONCILIATION-OPS/manuel/manuel-S-HC-PUB-05-RECONCILIATION-OPS-2026-06-29T00-22-46-240Z-52eb7757 |
 
 ## Integracion
 
-- Ninguna
+- run: `manuel-S-HC-PUB-05-RECONCILIATION-OPS-2026-06-29T00-37-03-464Z-4e3d4eae`
+- estado: `queued`
+- madre: `MADRE/v49-s-hc-pub-05-reconciliation-ops-implementa-automatizacion-operacional-de-reconci-2026-06-29`
+- source: `task/S-HC-PUB-05-RECONCILIATION-OPS/S-HC-PUB-05-RECONCILIATION-OPS/manuel/manuel-S-HC-PUB-05-RECONCILIATION-OPS-2026-06-29T00-37-03-464Z-4e3d4eae`
 
 ## Train Mas Reciente
 

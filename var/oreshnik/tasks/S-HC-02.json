@@ -2,7 +2,8 @@
   "project": "HeptaCore",
   "taskId": "S-HC-02",
   "sprint": "data",
-  "taskOrderIndex": 3,
+  "sprintOrderIndex": 21,
+  "taskOrderIndex": 13,
   "title": "Turpial importer and Prisma seed",
   "owner": "Jean",
   "backupOwner": "Manuel",
@@ -31,6 +32,6 @@
       "description": "turpial importer and prisma seed"
     }
   ],
-  "updatedAt": "2026-06-28T18:47:05.091Z",
+  "updatedAt": "2026-06-29T00:37:30.040Z",
   "runs": []
 }

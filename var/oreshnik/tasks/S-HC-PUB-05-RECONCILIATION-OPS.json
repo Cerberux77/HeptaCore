@@ -1,12 +1,13 @@
 {
   "project": "HeptaCore",
   "taskId": "S-HC-PUB-05-RECONCILIATION-OPS",
-  "sprint": "publishing",
-  "taskOrderIndex": 10,
+  "sprint": "S-HC-PUB-05-RECONCILIATION-OPS",
+  "sprintOrderIndex": 1,
+  "taskOrderIndex": 1,
   "title": "Operational reconciliation automation for ambiguous provider outcomes",
   "owner": "Manuel",
   "backupOwner": "Manuel",
-  "status": "ready",
+  "status": "ready_for_integration",
   "taskBoardPath": "D:\\PROYECTOS\\WORKTREES\\HeptaCore_PUB04_GOAL\\var\\oreshnik\\task-board.json",
   "zone": [
     "apps/web/lib/publishing-finalization.ts",
@@ -22,14 +23,106 @@
     "Block and notify for Case C (no evidence)",
     "Never auto-retry provider calls"
   ],
+  "handoff": "docs/07_handoffs/S-HC-PUB-05-RECONCILIATION-OPS.md",
+  "attempts": 2,
   "history": [
     {
       "at": "2026-06-28T18:47:05.091Z",
       "action": "status_reconciled",
       "operator": "manuel",
       "description": "Task status reconciled to ready: dependencies and conflicts are clear for execution"
+    },
+    {
+      "at": "2026-06-29T00:22:46.246Z",
+      "action": "claimed",
+      "operator": "manuel",
+      "branch": "task/S-HC-PUB-05-RECONCILIATION-OPS/S-HC-PUB-05-RECONCILIATION-OPS/manuel/manuel-S-HC-PUB-05-RECONCILIATION-OPS-2026-06-29T00-22-46-240Z-52eb7757",
+      "description": "Run manuel-S-HC-PUB-05-RECONCILIATION-OPS-2026-06-29T00-22-46-240Z-52eb7757 claimed via codex"
+    },
+    {
+      "at": "2026-06-29T00:36:39.997Z",
+      "action": "claim_released",
+      "operator": "manuel",
+      "description": "Run manuel-S-HC-PUB-05-RECONCILIATION-OPS-2026-06-29T00-22-46-240Z-52eb7757 released"
+    },
+    {
+      "at": "2026-06-29T00:37:03.469Z",
+      "action": "claimed",
+      "operator": "manuel",
+      "branch": "task/S-HC-PUB-05-RECONCILIATION-OPS/S-HC-PUB-05-RECONCILIATION-OPS/manuel/manuel-S-HC-PUB-05-RECONCILIATION-OPS-2026-06-29T00-37-03-464Z-4e3d4eae",
+      "description": "Run manuel-S-HC-PUB-05-RECONCILIATION-OPS-2026-06-29T00-37-03-464Z-4e3d4eae claimed via codex"
+    },
+    {
+      "at": "2026-06-29T00:37:10.435Z",
+      "action": "validation_started",
+      "operator": "manuel",
+      "branch": "task/S-HC-PUB-05-RECONCILIATION-OPS/S-HC-PUB-05-RECONCILIATION-OPS/manuel/manuel-S-HC-PUB-05-RECONCILIATION-OPS-2026-06-29T00-37-03-464Z-4e3d4eae",
+      "description": "typecheck passed, build passed, worker-validate passed, 184 tests pass (18 reconciliation), contract tests 19/19 pass"
+    },
+    {
+      "at": "2026-06-29T00:37:30.040Z",
+      "action": "validated",
+      "operator": "manuel",
+      "branch": "task/S-HC-PUB-05-RECONCILIATION-OPS/S-HC-PUB-05-RECONCILIATION-OPS/manuel/manuel-S-HC-PUB-05-RECONCILIATION-OPS-2026-06-29T00-37-03-464Z-4e3d4eae",
+      "description": "All gates passed: typecheck, build, worker-validate. 184 tests. 19 contract acceptance tests. No provider calls during reconciliation. Never auto-retry."
+    },
+    {
+      "at": "2026-06-29T00:37:30.040Z",
+      "action": "ready_for_integration",
+      "operator": "manuel",
+      "branch": "task/S-HC-PUB-05-RECONCILIATION-OPS/S-HC-PUB-05-RECONCILIATION-OPS/manuel/manuel-S-HC-PUB-05-RECONCILIATION-OPS-2026-06-29T00-37-03-464Z-4e3d4eae",
+      "description": "Task delivered with handoff docs/07_handoffs/S-HC-PUB-05-RECONCILIATION-OPS.md"
     }
   ],
-  "updatedAt": "2026-06-28T18:47:05.091Z",
-  "runs": []
+  "updatedAt": "2026-06-29T00:37:30.040Z",
+  "runs": [
+    {
+      "runId": "manuel-S-HC-PUB-05-RECONCILIATION-OPS-2026-06-29T00-37-03-464Z-4e3d4eae",
+      "operator": "manuel",
+      "worker": "manuel",
+      "workerMode": "codex",
+      "branch": "task/S-HC-PUB-05-RECONCILIATION-OPS/S-HC-PUB-05-RECONCILIATION-OPS/manuel/manuel-S-HC-PUB-05-RECONCILIATION-OPS-2026-06-29T00-37-03-464Z-4e3d4eae",
+      "worktreePath": "D:\\PROYECTOS\\WORKTREES\\HeptaCore_PUB04_GOAL\\var\\oreshnik\\wt\\S-HC-PUB-05-RECONCILIATION-OPS\\S-HC-PUB-05-RECONCILIATION-OPS\\r-3030ee064340",
+      "zones": [
+        "apps/web/lib/publishing-finalization.ts",
+        "apps/web/lib/draft-operational-state.ts",
+        "packages/core"
+      ],
+      "taskStatus": "ready_for_integration",
+      "claimStatus": "released",
+      "claimedAt": "2026-06-29T00:37:03.464Z",
+      "updatedAt": "2026-06-29T00:37:30.052Z",
+      "expiresAt": "2026-06-29T01:37:03.464Z",
+      "releasedAt": "2026-06-29T00:37:30.052Z",
+      "manifestPath": "var/oreshnik/runs/S-HC-PUB-05-RECONCILIATION-OPS/manuel-S-HC-PUB-05-RECONCILIATION-OPS-2026-06-29T00-37-03-464Z-4e3d4eae.json"
+    },
+    {
+      "runId": "manuel-S-HC-PUB-05-RECONCILIATION-OPS-2026-06-29T00-22-46-240Z-52eb7757",
+      "operator": "manuel",
+      "worker": "manuel",
+      "workerMode": "codex",
+      "branch": "task/S-HC-PUB-05-RECONCILIATION-OPS/S-HC-PUB-05-RECONCILIATION-OPS/manuel/manuel-S-HC-PUB-05-RECONCILIATION-OPS-2026-06-29T00-22-46-240Z-52eb7757",
+      "worktreePath": "D:\\PROYECTOS\\WORKTREES\\HeptaCore_PUB04_GOAL\\var\\oreshnik\\wt\\S-HC-PUB-05-RECONCILIATION-OPS\\S-HC-PUB-05-RECONCILIATION-OPS\\r-d9c500bb15d4",
+      "zones": [
+        "apps/web/lib/publishing-finalization.ts",
+        "apps/web/lib/draft-operational-state.ts",
+        "packages/core"
+      ],
+      "taskStatus": "ready_for_integration",
+      "claimStatus": "released",
+      "claimedAt": "2026-06-29T00:22:46.240Z",
+      "updatedAt": "2026-06-29T00:36:40.003Z",
+      "expiresAt": "2026-06-29T01:22:46.240Z",
+      "releasedAt": "2026-06-29T00:36:40.003Z",
+      "manifestPath": "var/oreshnik/runs/S-HC-PUB-05-RECONCILIATION-OPS/manuel-S-HC-PUB-05-RECONCILIATION-OPS-2026-06-29T00-22-46-240Z-52eb7757.json"
+    }
+  ],
+  "integration": {
+    "runId": "manuel-S-HC-PUB-05-RECONCILIATION-OPS-2026-06-29T00-37-03-464Z-4e3d4eae",
+    "sourceBranch": "task/S-HC-PUB-05-RECONCILIATION-OPS/S-HC-PUB-05-RECONCILIATION-OPS/manuel/manuel-S-HC-PUB-05-RECONCILIATION-OPS-2026-06-29T00-37-03-464Z-4e3d4eae",
+    "status": "queued",
+    "motherBranch": "MADRE/v49-s-hc-pub-05-reconciliation-ops-implementa-automatizacion-operacional-de-reconci-2026-06-29",
+    "queuedAt": "2026-06-29T00:37:36.657Z",
+    "updatedAt": "2026-06-29T00:37:36.657Z"
+  }
 }

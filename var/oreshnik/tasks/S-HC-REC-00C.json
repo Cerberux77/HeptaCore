@@ -2,7 +2,8 @@
   "project": "HeptaCore",
   "taskId": "S-HC-REC-00C",
   "sprint": "recovery",
-  "taskOrderIndex": 6,
+  "sprintOrderIndex": 32,
+  "taskOrderIndex": 31,
   "title": "Canonical integration — recovered production baseline integrated into master",
   "owner": "Manuel",
   "backupOwner": "Manuel",
@@ -31,6 +32,6 @@
       "description": "canonical integration after recovery"
     }
   ],
-  "updatedAt": "2026-06-28T18:47:05.091Z",
+  "updatedAt": "2026-06-29T00:37:30.040Z",
   "runs": []
 }

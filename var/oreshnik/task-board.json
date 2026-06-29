@@ -1,6 +1,6 @@
 {
   "project": "HeptaCore",
-  "updatedAt": "2026-06-28T23:59:59.945Z",
+  "updatedAt": "2026-06-29T00:37:30.040Z",
   "resiliencePolicy": "If an owner is unavailable for more than one working block or blocks the critical path, backupOwner may take over after recording reassignment.",
   "closurePolicy": "No sprint may be closed until acceptance criteria, base tests, sprint-specific tests, docs/handoff, and Oreshnik zone checks pass.",
   "baseTestMatrix": [
@@ -10,6 +10,8 @@
   ],
   "currentExecutionOrder": [
     "S-HC-PUB-04-HOURLY-BATCH-CRON",
+    "S-HC-PUB-05-RECONCILIATION-OPS",
+    "tooling",
     "Fase completada: S-HC-TEN-01-GLOBAL-TENANT-ADMIN — tres roles canonicos (OWNER/ADMIN/VIEWER), normalizacion heredada, identidad en /admin y /tenant/*, 5/5 E2E en Preview (SHA 4b82628), 569 unit tests.",
     "Fase completada: S-HC-REC-00A — baseline de publicacion recuperado y estabilizado (SHA 2fd9e249). Facebook e Instagram publican realmente desde la UI con durabilidad transaccional.",
     "Fase completada: S-HC-REC-00C — integracion canonica en master (SHA 9329fe8). Documentacion y Oreshnik alineados.",
@@ -44,8 +46,7 @@
     "strategy",
     "support",
     "tenant-onboarding",
-    "tenant-platform",
-    "tooling"
+    "tenant-platform"
   ],
   "tasks": [
     {
@@ -108,6 +109,124 @@
           "operator": "manuel",
           "branch": "Manuel/s-hc-pub-04-hourly-batch-goal",
           "description": "Integrated Manuel/s-hc-pub-04-hourly-batch-goal into MADRE/v48-s-hc-pub-04-hourly-batch-cron-hourly-batch-publishing-cron-and-pub-04-producti-2026-06-28"
+        }
+      ]
+    },
+    {
+      "id": "S-HC-PUB-05-RECONCILIATION-OPS",
+      "title": "Operational reconciliation automation for ambiguous provider outcomes",
+      "owner": "Manuel",
+      "backupOwner": "Manuel",
+      "status": "ready_for_integration",
+      "track": "S-HC-PUB-05-RECONCILIATION-OPS",
+      "zone": [
+        "apps/web/lib/publishing-finalization.ts",
+        "apps/web/lib/draft-operational-state.ts",
+        "packages/core"
+      ],
+      "dependsOn": [
+        "S-HC-PUB-04-HOURLY-BATCH-CRON"
+      ],
+      "acceptance": [
+        "Automatic reconciliation for Case A (Result ok + externalPostId + incomplete Draft)",
+        "Alert-only for Case B (Draft.externalPostId present + Result absent)",
+        "Block and notify for Case C (no evidence)",
+        "Never auto-retry provider calls"
+      ],
+      "handoff": "docs/07_handoffs/S-HC-PUB-05-RECONCILIATION-OPS.md",
+      "attempts": 2,
+      "history": [
+        {
+          "at": "2026-06-28T18:47:05.091Z",
+          "action": "status_reconciled",
+          "operator": "manuel",
+          "description": "Task status reconciled to ready: dependencies and conflicts are clear for execution"
+        },
+        {
+          "at": "2026-06-29T00:22:46.246Z",
+          "action": "claimed",
+          "operator": "manuel",
+          "branch": "task/S-HC-PUB-05-RECONCILIATION-OPS/S-HC-PUB-05-RECONCILIATION-OPS/manuel/manuel-S-HC-PUB-05-RECONCILIATION-OPS-2026-06-29T00-22-46-240Z-52eb7757",
+          "description": "Run manuel-S-HC-PUB-05-RECONCILIATION-OPS-2026-06-29T00-22-46-240Z-52eb7757 claimed via codex"
+        },
+        {
+          "at": "2026-06-29T00:36:39.997Z",
+          "action": "claim_released",
+          "operator": "manuel",
+          "description": "Run manuel-S-HC-PUB-05-RECONCILIATION-OPS-2026-06-29T00-22-46-240Z-52eb7757 released"
+        },
+        {
+          "at": "2026-06-29T00:37:03.469Z",
+          "action": "claimed",
+          "operator": "manuel",
+          "branch": "task/S-HC-PUB-05-RECONCILIATION-OPS/S-HC-PUB-05-RECONCILIATION-OPS/manuel/manuel-S-HC-PUB-05-RECONCILIATION-OPS-2026-06-29T00-37-03-464Z-4e3d4eae",
+          "description": "Run manuel-S-HC-PUB-05-RECONCILIATION-OPS-2026-06-29T00-37-03-464Z-4e3d4eae claimed via codex"
+        },
+        {
+          "at": "2026-06-29T00:37:10.435Z",
+          "action": "validation_started",
+          "operator": "manuel",
+          "branch": "task/S-HC-PUB-05-RECONCILIATION-OPS/S-HC-PUB-05-RECONCILIATION-OPS/manuel/manuel-S-HC-PUB-05-RECONCILIATION-OPS-2026-06-29T00-37-03-464Z-4e3d4eae",
+          "description": "typecheck passed, build passed, worker-validate passed, 184 tests pass (18 reconciliation), contract tests 19/19 pass"
+        },
+        {
+          "at": "2026-06-29T00:37:30.040Z",
+          "action": "validated",
+          "operator": "manuel",
+          "branch": "task/S-HC-PUB-05-RECONCILIATION-OPS/S-HC-PUB-05-RECONCILIATION-OPS/manuel/manuel-S-HC-PUB-05-RECONCILIATION-OPS-2026-06-29T00-37-03-464Z-4e3d4eae",
+          "description": "All gates passed: typecheck, build, worker-validate. 184 tests. 19 contract acceptance tests. No provider calls during reconciliation. Never auto-retry."
+        },
+        {
+          "at": "2026-06-29T00:37:30.040Z",
+          "action": "ready_for_integration",
+          "operator": "manuel",
+          "branch": "task/S-HC-PUB-05-RECONCILIATION-OPS/S-HC-PUB-05-RECONCILIATION-OPS/manuel/manuel-S-HC-PUB-05-RECONCILIATION-OPS-2026-06-29T00-37-03-464Z-4e3d4eae",
+          "description": "Task delivered with handoff docs/07_handoffs/S-HC-PUB-05-RECONCILIATION-OPS.md"
+        }
+      ]
+    },
+    {
+      "id": "S-HC-TOOL-01-GOAL-RUNNER-V1",
+      "title": "Goal Runner v1 for autonomous Kilo execution",
+      "owner": "Manuel",
+      "backupOwner": "Manuel",
+      "status": "ready",
+      "track": "tooling",
+      "zone": [
+        "scripts/goal-runner/**",
+        "var/goal-runner/**",
+        ".kilo/command/goal.md",
+        ".kilo/command/preflight.md",
+        "AGENTS.md",
+        "package.json",
+        "docs/07_handoffs/**",
+        "docs/obsidian-vault/**"
+      ],
+      "dependsOn": [
+        "S-HC-TEN-01-GLOBAL-TENANT-ADMIN"
+      ],
+      "acceptance": [
+        "Nucleo determinista implementado y probado",
+        "Maquina de estados, locks, evidencia y gates operativos",
+        "Integracion /goal y /preflight disponible en Kilo",
+        "Anti-loop y limites de Playwright documentados",
+        "Goal piloto ejecutado completamente con el propio Goal Runner",
+        "Estado y evidencia sobreviven a clear y reinicio de sesion",
+        "Cero cambios en Production",
+        "Integracion posterior en la rama madre mediante cierre controlado"
+      ],
+      "history": [
+        {
+          "at": "2026-06-28T18:47:05.091Z",
+          "action": "status_reconciled",
+          "operator": "manuel",
+          "description": "Task status reconciled to blocked: status active is not claimable for a new run"
+        },
+        {
+          "at": "2026-06-29T00:12:30.056Z",
+          "action": "status_reconciled",
+          "operator": "manuel",
+          "description": "Task status reconciled to ready: dependencies and conflicts are clear for execution"
         }
       ]
     },
@@ -820,36 +939,6 @@
       ]
     },
     {
-      "id": "S-HC-PUB-05-RECONCILIATION-OPS",
-      "title": "Operational reconciliation automation for ambiguous provider outcomes",
-      "owner": "Manuel",
-      "backupOwner": "Manuel",
-      "status": "ready",
-      "track": "publishing",
-      "zone": [
-        "apps/web/lib/publishing-finalization.ts",
-        "apps/web/lib/draft-operational-state.ts",
-        "packages/core"
-      ],
-      "dependsOn": [
-        "S-HC-PUB-04-HOURLY-BATCH-CRON"
-      ],
-      "acceptance": [
-        "Automatic reconciliation for Case A (Result ok + externalPostId + incomplete Draft)",
-        "Alert-only for Case B (Draft.externalPostId present + Result absent)",
-        "Block and notify for Case C (no evidence)",
-        "Never auto-retry provider calls"
-      ],
-      "history": [
-        {
-          "at": "2026-06-28T18:47:05.091Z",
-          "action": "status_reconciled",
-          "operator": "manuel",
-          "description": "Task status reconciled to ready: dependencies and conflicts are clear for execution"
-        }
-      ]
-    },
-    {
       "id": "S-HC-PUB-06-REELS-STORIES-PUBLISHERS",
       "title": "Real publishing for Meta Reels and Stories: Instagram + Facebook",
       "owner": "Manuel",
@@ -1234,45 +1323,6 @@
           "operator": "Manuel",
           "branch": "Manuel/s-hc-ten-01-global-tenant-admin",
           "description": "Three canonical roles (OWNER/ADMIN/VIEWER), legacy role normalization, identity panel in /admin and /tenant/*, 5/5 E2E pass, 569 unit tests, production intact"
-        }
-      ]
-    },
-    {
-      "id": "S-HC-TOOL-01-GOAL-RUNNER-V1",
-      "title": "Goal Runner v1 for autonomous Kilo execution",
-      "owner": "Manuel",
-      "backupOwner": "Manuel",
-      "status": "blocked",
-      "track": "tooling",
-      "zone": [
-        "scripts/goal-runner/**",
-        "var/goal-runner/**",
-        ".kilo/command/goal.md",
-        ".kilo/command/preflight.md",
-        "AGENTS.md",
-        "package.json",
-        "docs/07_handoffs/**",
-        "docs/obsidian-vault/**"
-      ],
-      "dependsOn": [
-        "S-HC-TEN-01-GLOBAL-TENANT-ADMIN"
-      ],
-      "acceptance": [
-        "Nucleo determinista implementado y probado",
-        "Maquina de estados, locks, evidencia y gates operativos",
-        "Integracion /goal y /preflight disponible en Kilo",
-        "Anti-loop y limites de Playwright documentados",
-        "Goal piloto ejecutado completamente con el propio Goal Runner",
-        "Estado y evidencia sobreviven a clear y reinicio de sesion",
-        "Cero cambios en Production",
-        "Integracion posterior en la rama madre mediante cierre controlado"
-      ],
-      "history": [
-        {
-          "at": "2026-06-28T18:47:05.091Z",
-          "action": "status_reconciled",
-          "operator": "manuel",
-          "description": "Task status reconciled to blocked: status active is not claimable for a new run"
         }
       ]
     }

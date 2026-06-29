@@ -2,7 +2,8 @@
   "project": "HeptaCore",
   "taskId": "S-HC-RELEASE-01",
   "sprint": "release",
-  "taskOrderIndex": 34,
+  "sprintOrderIndex": 33,
+  "taskOrderIndex": 32,
   "title": "End-to-end Turpial Sound production proof",
   "owner": "Manuel+Jean",
   "backupOwner": "Manuel+Jean",
@@ -35,6 +36,6 @@
       "description": "E2E Turpial Sound production proof"
     }
   ],
-  "updatedAt": "2026-06-28T18:47:05.091Z",
+  "updatedAt": "2026-06-29T00:37:30.040Z",
   "runs": []
 }

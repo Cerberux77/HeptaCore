@@ -4,9 +4,9 @@ type: task-runtime
 project: "HeptaCore"
 task_id: "S-HC-PUB-04-HOURLY-BATCH-CRON"
 sprint: "S-HC-PUB-04-HOURLY-BATCH-CRON"
-status: "ready_for_integration"
+status: "integrated"
 owner: "Manuel"
-last_updated: "2026-06-28T18:47:05.091Z"
+last_updated: "2026-06-29T00:37:30.040Z"
 source: "var/oreshnik/tasks/S-HC-PUB-04-HOURLY-BATCH-CRON.json"
 ---
 
@@ -18,7 +18,7 @@ Hourly batch cron publishing with timezone-aware scheduling
 
 ## Runtime
 
-- estado: `ready_for_integration`
+- estado: `integrated`
 - owner: `Manuel`
 - backup: `Manuel`
 - intentos: `1`
@@ -57,17 +57,25 @@ Hourly batch cron publishing with timezone-aware scheduling
 
 | Run | Operator | Mode | Task Status | Claim | Branch |
 |---|---|---|---|---|---|
-| Manuel-S-HC-PUB-04-HOURLY-BATCH-CRON-2026-06-26T08-52-44-815Z-2487f474 | Manuel | manual | ready_for_integration | released | Manuel/s-hc-pub-04-hourly-batch-goal |
+| Manuel-S-HC-PUB-04-HOURLY-BATCH-CRON-2026-06-26T08-52-44-815Z-2487f474 | Manuel | manual | integrated | released | Manuel/s-hc-pub-04-hourly-batch-goal |
 
 ## Integracion
 
 - run: `Manuel-S-HC-PUB-04-HOURLY-BATCH-CRON-2026-06-26T08-52-44-815Z-2487f474`
-- estado: `queued`
+- estado: `integrated`
 - madre: `MADRE/v48-s-hc-pub-04-hourly-batch-cron-hourly-batch-publishing-cron-and-pub-04-producti-2026-06-28`
 - source: `Manuel/s-hc-pub-04-hourly-batch-goal`
+- target: `MADRE/v48-s-hc-pub-04-hourly-batch-cron-hourly-batch-publishing-cron-and-pub-04-producti-2026-06-28`
 
 ## Train Mas Reciente
 
-- Ninguno
+- intento: `train-Manuel-S-HC-PUB-04-HOURLY-BATCH-CRON-2026-06-26T-1782691034146`
+- run: `Manuel-S-HC-PUB-04-HOURLY-BATCH-CRON-2026-06-26T08-52-44-815Z-2487f474`
+- source: `Manuel/s-hc-pub-04-hourly-batch-goal`
+- target: `MADRE/v48-s-hc-pub-04-hourly-batch-cron-hourly-batch-publishing-cron-and-pub-04-producti-2026-06-28`
+- branch: `integration-train/S-HC-PUB-04-HOURLY-BATCH/S-HC-PUB-04-HOURLY-BATCH/r-c08e3c5d3afc/a-f62c2c114d4d`
+- estado: `succeeded`
+- advance: `runtime_projection_confirmed`
+- reason: Already contained on MADRE/v48-s-hc-pub-04-hourly-batch-cron-hourly-batch-publishing-cron-and-pub-04-producti-2026-06-28; runtime reconciled without merge
 
 <!-- ORESHNIK:GENERATED:END -->

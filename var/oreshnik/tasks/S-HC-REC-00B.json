@@ -2,7 +2,8 @@
   "project": "HeptaCore",
   "taskId": "S-HC-REC-00B",
   "sprint": "recovery",
-  "taskOrderIndex": 5,
+  "sprintOrderIndex": 32,
+  "taskOrderIndex": 30,
   "title": "Facebook duplicate cleanup",
   "owner": "Manuel",
   "backupOwner": "Manuel",
@@ -18,6 +19,6 @@
       "description": "Manuel elimino manualmente el duplicado en Facebook"
     }
   ],
-  "updatedAt": "2026-06-28T18:47:05.091Z",
+  "updatedAt": "2026-06-29T00:37:30.040Z",
   "runs": []
 }

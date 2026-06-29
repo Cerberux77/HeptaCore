@@ -2,7 +2,8 @@
   "project": "HeptaCore",
   "taskId": "S-HC-DRIFT-003",
   "sprint": "ad-hoc",
-  "taskOrderIndex": 37,
+  "sprintOrderIndex": 15,
+  "taskOrderIndex": 5,
   "title": "Sistema de publicacion con 3 modos, 24 crons Vercel, cron publisher idempotente",
   "owner": "Manuel",
   "backupOwner": "Manuel",
@@ -22,6 +23,6 @@
       "description": "Sistema de publicacion con 3 modos, 24 crons Vercel, cron publisher idempotente"
     }
   ],
-  "updatedAt": "2026-06-28T18:47:05.091Z",
+  "updatedAt": "2026-06-29T00:37:30.040Z",
   "runs": []
 }

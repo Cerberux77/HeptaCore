@@ -2,7 +2,8 @@
   "project": "HeptaCore",
   "taskId": "S-HC-ASSET-01-STRATEGY-ASSET-MANIFEST",
   "sprint": "assets",
-  "taskOrderIndex": 24,
+  "sprintOrderIndex": 19,
+  "taskOrderIndex": 9,
   "title": "Strategy-driven asset manifest: per-publication asset requirements",
   "owner": "Manuel",
   "backupOwner": "Manuel",
@@ -31,6 +32,6 @@
       "description": "Task status reconciled to blocked: dependency S-HC-STRAT-02-CONTENT-CALENDAR-BLUEPRINT still pending (S-HC-STRAT-02-CONTENT-CALENDAR-BLUEPRINT:pending)"
     }
   ],
-  "updatedAt": "2026-06-28T18:47:05.091Z",
+  "updatedAt": "2026-06-29T00:37:30.040Z",
   "runs": []
 }

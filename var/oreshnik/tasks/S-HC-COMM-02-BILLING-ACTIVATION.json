@@ -2,7 +2,8 @@
   "project": "HeptaCore",
   "taskId": "S-HC-COMM-02-BILLING-ACTIVATION",
   "sprint": "commercial",
-  "taskOrderIndex": 18,
+  "sprintOrderIndex": 20,
+  "taskOrderIndex": 12,
   "title": "Tenant billing activation: plan selection, usage tracking, payment integration",
   "owner": "Manuel",
   "backupOwner": "Manuel",
@@ -30,6 +31,6 @@
       "description": "Task status reconciled to blocked: dependency S-HC-COMM-01-SELF-SERVICE-SIGNUP still pending (S-HC-COMM-01-SELF-SERVICE-SIGNUP:pending)"
     }
   ],
-  "updatedAt": "2026-06-28T18:47:05.091Z",
+  "updatedAt": "2026-06-29T00:37:30.040Z",
   "runs": []
 }
