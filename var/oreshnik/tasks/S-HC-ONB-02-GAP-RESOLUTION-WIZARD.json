@@ -8,7 +8,7 @@
   "owner": "Manuel",
   "backupOwner": "Manuel",
   "status": "blocked",
-  "taskBoardPath": "D:\\PROYECTOS\\WORKTREES\\HeptaCore_PUB04_GOAL\\var\\oreshnik\\task-board.json",
+  "taskBoardPath": "var/oreshnik/task-board.json",
   "zone": [
     "apps/web/components",
     "packages/core"
@@ -30,6 +30,6 @@
       "description": "Task status reconciled to blocked: dependency S-HC-ONB-01-MASTER-BRIEF-INGESTION still pending (S-HC-ONB-01-MASTER-BRIEF-INGESTION:pending)"
     }
   ],
-  "updatedAt": "2026-06-29T02:29:41.523Z",
+  "updatedAt": "2026-06-29T20:10:14.115Z",
   "runs": []
 }

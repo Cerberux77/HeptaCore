@@ -8,7 +8,7 @@
   "owner": "Manuel",
   "backupOwner": "Manuel",
   "status": "integrated",
-  "taskBoardPath": "D:\\PROYECTOS\\WORKTREES\\HeptaCore_PUB04_GOAL\\var\\oreshnik\\task-board.json",
+  "taskBoardPath": "var/oreshnik/task-board.json",
   "zone": [
     "apps/web/lib/publishing-finalization.ts",
     "apps/web/lib/draft-operational-state.ts",
@@ -87,7 +87,7 @@
       "description": "Integrated Manuel/s-hc-pub-05-reconciliation-ops-sprint-2026-06-29 into MADRE/v49-s-hc-pub-05-reconciliation-ops-implementa-automatizacion-operacional-de-reconci-2026-06-29"
     }
   ],
-  "updatedAt": "2026-06-29T02:29:41.523Z",
+  "updatedAt": "2026-06-29T20:10:14.115Z",
   "runs": [
     {
       "runId": "manuel-S-HC-PUB-05-RECONCILIATION-OPS-2026-06-29T00-37-03-464Z-4e3d4eae",
@@ -95,7 +95,7 @@
       "worker": "manuel",
       "workerMode": "codex",
       "branch": "task/S-HC-PUB-05-RECONCILIATION-OPS/S-HC-PUB-05-RECONCILIATION-OPS/manuel/manuel-S-HC-PUB-05-RECONCILIATION-OPS-2026-06-29T00-37-03-464Z-4e3d4eae",
-      "worktreePath": "D:\\PROYECTOS\\WORKTREES\\HeptaCore_PUB04_GOAL\\var\\oreshnik\\wt\\S-HC-PUB-05-RECONCILIATION-OPS\\S-HC-PUB-05-RECONCILIATION-OPS\\r-3030ee064340",
+      "worktreePath": "var/oreshnik/wt/S-HC-PUB-05-RECONCILIATION-OPS/S-HC-PUB-05-RECONCILIATION-OPS/r-3030ee064340",
       "zones": [
         "apps/web/lib/publishing-finalization.ts",
         "apps/web/lib/draft-operational-state.ts",
@@ -115,7 +115,7 @@
       "worker": "manuel",
       "workerMode": "codex",
       "branch": "task/S-HC-PUB-05-RECONCILIATION-OPS/S-HC-PUB-05-RECONCILIATION-OPS/manuel/manuel-S-HC-PUB-05-RECONCILIATION-OPS-2026-06-29T00-22-46-240Z-52eb7757",
-      "worktreePath": "D:\\PROYECTOS\\WORKTREES\\HeptaCore_PUB04_GOAL\\var\\oreshnik\\wt\\S-HC-PUB-05-RECONCILIATION-OPS\\S-HC-PUB-05-RECONCILIATION-OPS\\r-d9c500bb15d4",
+      "worktreePath": "var/oreshnik/wt/S-HC-PUB-05-RECONCILIATION-OPS/S-HC-PUB-05-RECONCILIATION-OPS/r-d9c500bb15d4",
       "zones": [
         "apps/web/lib/publishing-finalization.ts",
         "apps/web/lib/draft-operational-state.ts",

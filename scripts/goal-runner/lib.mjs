@@ -36,8 +36,10 @@ export const ALLOWED_TRANSITIONS = new Map([
 export const GATE_ALLOWLIST = {
   "diff-check": { command: "git", args: ["diff", "--check"], timeout: 30000 },
   "typecheck": { command: "npm", args: ["run", "typecheck"], timeout: 120000 },
+  "tests": { command: "npm", args: ["run", "test"], timeout: 900000 },
   "test": { command: "npm", args: ["run", "test"], timeout: 300000 },
   "build": { command: "npm", args: ["run", "build"], timeout: 300000 },
+  "worker": { command: "npm", args: ["run", "worker:validate"], timeout: 120000 },
   "worker-validate": { command: "npm", args: ["run", "worker:validate"], timeout: 120000 },
   "oreshnik-reconcile": { command: "node", args: ["scripts/oreshnik/canonical-check.mjs"], timeout: 60000 },
   "oreshnik-drift": { command: "node", args: ["scripts/oreshnik/drift.mjs", "--check"], timeout: 30000 },

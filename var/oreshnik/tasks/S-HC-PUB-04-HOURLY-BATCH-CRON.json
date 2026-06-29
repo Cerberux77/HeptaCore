@@ -8,7 +8,7 @@
   "owner": "Manuel",
   "backupOwner": "Manuel",
   "status": "integrated",
-  "taskBoardPath": "D:\\PROYECTOS\\WORKTREES\\HeptaCore_PUB04_GOAL\\var\\oreshnik\\task-board.json",
+  "taskBoardPath": "var/oreshnik/task-board.json",
   "zone": [
     "apps/web/app/api/cron",
     "apps/worker",
@@ -64,7 +64,7 @@
       "description": "Integrated Manuel/s-hc-pub-04-hourly-batch-goal into MADRE/v48-s-hc-pub-04-hourly-batch-cron-hourly-batch-publishing-cron-and-pub-04-producti-2026-06-28"
     }
   ],
-  "updatedAt": "2026-06-29T02:29:41.523Z",
+  "updatedAt": "2026-06-29T20:10:14.115Z",
   "runs": [
     {
       "runId": "Manuel-S-HC-PUB-04-HOURLY-BATCH-CRON-2026-06-26T08-52-44-815Z-2487f474",
@@ -72,7 +72,7 @@
       "worker": "manuel-pub04-closeout",
       "workerMode": "manual",
       "branch": "Manuel/s-hc-pub-04-hourly-batch-goal",
-      "worktreePath": "D:\\PROYECTOS\\WORKTREES\\HeptaCore_PUB04_GOAL",
+      "worktreePath": "var/oreshnik/wt/S-HC-PUB-04-HOURLY-BATCH-CRON/S-HC-PUB-04-HOURLY-BATCH-CRON/r-2487f474",
       "zones": [
         "apps/web/app/api/cron",
         "apps/worker",

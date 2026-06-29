@@ -5,15 +5,90 @@
     "mainBranch": "master"
   },
   "operators": [
-    { "id": "manuel", "name": "Manuel Vera", "email": "manuel@heptacore.dev" },
-    { "id": "jean", "name": "Jean", "email": "jean@heptacore.dev" }
+    {
+      "id": "manuel",
+      "displayName": "Manuel Vera",
+      "name": "Manuel Vera",
+      "email": "manuel@heptacore.dev",
+      "projectRole": "owner",
+      "status": "active"
+    },
+    {
+      "id": "jean",
+      "displayName": "Jean",
+      "name": "Jean",
+      "email": "jean@heptacore.dev",
+      "projectRole": "operator",
+      "status": "active"
+    },
+    {
+      "id": "codex",
+      "displayName": "Codex Agent",
+      "name": "Codex Agent",
+      "projectRole": "operator",
+      "status": "active"
+    },
+    {
+      "id": "kilo",
+      "displayName": "Kilo Agent",
+      "name": "Kilo Agent",
+      "projectRole": "operator",
+      "status": "active"
+    }
   ],
+  "branching": {
+    "motherPrefix": "MADRE",
+    "childFormat": "{operator}/{sprint}-{desc}-{date}",
+    "integrationPrefix": "integration"
+  },
   "validation": {
     "gates": [
-      { "name": "typecheck", "command": "npm", "args": ["run", "typecheck"], "timeoutSeconds": 120 },
-      { "name": "build", "command": "npm", "args": ["run", "build"], "timeoutSeconds": 300 },
-      { "name": "worker", "command": "npm", "args": ["run", "worker:validate"], "timeoutSeconds": 120 }
+      {
+        "name": "typecheck",
+        "command": "npm",
+        "args": [
+          "run",
+          "typecheck"
+        ],
+        "timeoutSeconds": 120
+      },
+      {
+        "name": "build",
+        "command": "npm",
+        "args": [
+          "run",
+          "build"
+        ],
+        "timeoutSeconds": 300
+      },
+      {
+        "name": "worker",
+        "command": "npm",
+        "args": [
+          "run",
+          "worker:validate"
+        ],
+        "timeoutSeconds": 120
+      },
+      {
+        "name": "tests",
+        "command": "npm",
+        "args": [
+          "run",
+          "test"
+        ],
+        "timeoutSeconds": 900
+      }
     ]
+  },
+  "hardStops": {
+    "forbiddenPatterns": [],
+    "doubleLockPatterns": []
+  },
+  "vault": {
+    "enabled": true,
+    "path": "docs/obsidian-vault",
+    "centralDoc": "00_CENTRAL.md"
   },
   "canonical": {
     "derivedDocs": [
@@ -26,13 +101,17 @@
         "path": "docs/obsidian-vault/COLABORADORES/ESTADO_MANUEL.md",
         "type": "collaborator",
         "source": "task-board",
-        "filter": { "owner": "Manuel" }
+        "filter": {
+          "owner": "Manuel"
+        }
       },
       {
         "path": "docs/obsidian-vault/COLABORADORES/ESTADO_JEAN.md",
         "type": "collaborator",
         "source": "task-board",
-        "filter": { "owner": "Jean" }
+        "filter": {
+          "owner": "Jean"
+        }
       },
       {
         "path": "docs/obsidian-vault/PRODUCT/STATUS_BOARD.md",
@@ -40,5 +119,15 @@
         "source": "task-board"
       }
     ]
+  },
+  "checkpoints": {
+    "autoOnClose": true,
+    "autoPreRollback": true,
+    "snapshotDir": "var/oreshnik/checkpoints"
+  },
+  "security": {
+    "requireCleanTree": true,
+    "secretScanning": true,
+    "blockEnvDiffs": true
   }
 }

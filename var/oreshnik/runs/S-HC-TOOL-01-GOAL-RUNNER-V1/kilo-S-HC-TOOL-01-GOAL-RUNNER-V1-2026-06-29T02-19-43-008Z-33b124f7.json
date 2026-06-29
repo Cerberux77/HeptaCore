@@ -8,7 +8,7 @@
   "workerMode": "codex",
   "runId": "kilo-S-HC-TOOL-01-GOAL-RUNNER-V1-2026-06-29T02-19-43-008Z-33b124f7",
   "branch": "task/S-HC-TOOL-01-GOAL-RUNNER-V1/S-HC-TOOL-01-GOAL-RUNNER-V1/kilo/kilo-S-HC-TOOL-01-GOAL-RUNNER-V1-2026-06-29T02-19-43-008Z-33b124f7",
-  "worktreePath": "D:\\PROYECTOS\\WORKTREES\\HeptaCore_PUB04_GOAL\\var\\oreshnik\\wt\\S-HC-TOOL-01-GOAL-RUNNER-V1\\S-HC-TOOL-01-GOAL-RUNNER-V1\\r-ba423d0513f6",
+  "worktreePath": "var/oreshnik/wt/S-HC-TOOL-01-GOAL-RUNNER-V1/S-HC-TOOL-01-GOAL-RUNNER-V1/r-ba423d0513f6",
   "zones": [
     "scripts/goal-runner/**",
     "var/goal-runner/**",
@@ -19,7 +19,7 @@
     "docs/07_handoffs/**",
     "docs/obsidian-vault/**"
   ],
-  "taskBoardPath": "D:\\PROYECTOS\\WORKTREES\\HeptaCore_PUB04_GOAL\\var\\oreshnik\\task-board.json",
+  "taskBoardPath": "var/oreshnik/task-board.json",
   "taskStatus": "ready_for_integration",
   "claimStatus": "released",
   "claimedAt": "2026-06-29T02:19:43.008Z",

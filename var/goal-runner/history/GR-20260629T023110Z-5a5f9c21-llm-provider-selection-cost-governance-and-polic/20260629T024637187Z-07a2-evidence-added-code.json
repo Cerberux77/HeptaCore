@@ -1,0 +1,8 @@
+{
+  "at": "2026-06-29T02:46:37.188Z",
+  "event": "evidence-added-code",
+  "goalId": "GR-20260629T023110Z-5a5f9c21-llm-provider-selection-cost-governance-and-polic",
+  "id": "20260629T024637187Z-07a2-evidence-added-code",
+  "path": "apps/web/app/api/admin/llm-usage/route.ts",
+  "type": "code"
+}

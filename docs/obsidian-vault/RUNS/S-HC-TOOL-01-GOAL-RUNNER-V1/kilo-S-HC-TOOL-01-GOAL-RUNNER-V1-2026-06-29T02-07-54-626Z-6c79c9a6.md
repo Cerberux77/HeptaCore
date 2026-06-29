@@ -5,10 +5,10 @@ project: "HeptaCore"
 task_id: "S-HC-TOOL-01-GOAL-RUNNER-V1"
 run_id: "kilo-S-HC-TOOL-01-GOAL-RUNNER-V1-2026-06-29T02-07-54-626Z-6c79c9a6"
 sprint: "S-HC-TOOL-01-GOAL-RUNNER-V1"
-status: "ready_for_integration"
+status: "integrated"
 claim_status: "released"
 operator: "kilo"
-last_updated: "2026-06-29T02:19:25.752Z"
+last_updated: "2026-06-29T03:21:35.807Z"
 source: "var/oreshnik/runs/S-HC-TOOL-01-GOAL-RUNNER-V1/kilo-S-HC-TOOL-01-GOAL-RUNNER-V1-2026-06-29T02-07-54-626Z-6c79c9a6.json"
 ---
 
@@ -25,10 +25,10 @@ source: "var/oreshnik/runs/S-HC-TOOL-01-GOAL-RUNNER-V1/kilo-S-HC-TOOL-01-GOAL-RU
 - operator: `kilo`
 - worker: `kilo`
 - mode: `codex`
-- task status: `ready_for_integration`
+- task status: `integrated`
 - claim status: `released`
 - branch: `task/S-HC-TOOL-01-GOAL-RUNNER-V1/S-HC-TOOL-01-GOAL-RUNNER-V1/kilo/kilo-S-HC-TOOL-01-GOAL-RUNNER-V1-2026-06-29T02-07-54-626Z-6c79c9a6`
-- worktree: `D:\PROYECTOS\WORKTREES\HeptaCore_PUB04_GOAL\var\oreshnik\wt\S-HC-TOOL-01-GOAL-RUNNER-V1\S-HC-TOOL-01-GOAL-RUNNER-V1\r-2ff68e9be13b`
+- worktree: `var/oreshnik/wt/S-HC-TOOL-01-GOAL-RUNNER-V1/S-HC-TOOL-01-GOAL-RUNNER-V1/r-2ff68e9be13b`
 - claimed at: `2026-06-29T02:07:54.626Z`
 - expires at: `2026-06-29T03:07:54.626Z`
 - released at: `2026-06-29T02:19:25.752Z`
@@ -40,6 +40,12 @@ source: "var/oreshnik/runs/S-HC-TOOL-01-GOAL-RUNNER-V1/kilo-S-HC-TOOL-01-GOAL-RU
 
 ## Integration Train
 
-- Ninguno
+- attempt: `train-kilo-S-HC-TOOL-01-GOAL-RUNNER-V1-2026-06-29T02-0-1782703121744`
+- source: `kilo/s-hc-tool-01-goal-runner-v1`
+- target: `MADRE/v50-s-hc-tool-01-goal-runner-v1-goal-runner-v1-deterministic-state-machine-locks-2026-06-29`
+- integration branch: `integration-train/S-HC-TOOL-01-GOAL-RUNNER/S-HC-TOOL-01-GOAL-RUNNER/r-2ff68e9be13b/a-2cfa35e28f38`
+- status: `succeeded`
+- advance: `runtime_projection_confirmed`
+- reason: Already contained on MADRE/v50-s-hc-tool-01-goal-runner-v1-goal-runner-v1-deterministic-state-machine-locks-2026-06-29; runtime reconciled without merge
 
 <!-- ORESHNIK:GENERATED:END -->

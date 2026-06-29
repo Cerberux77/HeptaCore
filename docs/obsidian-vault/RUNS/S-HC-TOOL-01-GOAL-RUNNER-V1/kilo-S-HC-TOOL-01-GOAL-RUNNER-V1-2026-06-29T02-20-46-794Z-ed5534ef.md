@@ -28,7 +28,7 @@ source: "var/oreshnik/runs/S-HC-TOOL-01-GOAL-RUNNER-V1/kilo-S-HC-TOOL-01-GOAL-RU
 - task status: `ready_for_integration`
 - claim status: `released`
 - branch: `task/S-HC-TOOL-01-GOAL-RUNNER-V1/S-HC-TOOL-01-GOAL-RUNNER-V1/kilo/kilo-S-HC-TOOL-01-GOAL-RUNNER-V1-2026-06-29T02-20-46-794Z-ed5534ef`
-- worktree: `D:\PROYECTOS\WORKTREES\HeptaCore_PUB04_GOAL\var\oreshnik\wt\S-HC-TOOL-01-GOAL-RUNNER-V1\S-HC-TOOL-01-GOAL-RUNNER-V1\r-7fa3b13c04df`
+- worktree: `var/oreshnik/wt/S-HC-TOOL-01-GOAL-RUNNER-V1/S-HC-TOOL-01-GOAL-RUNNER-V1/r-7fa3b13c04df`
 - claimed at: `2026-06-29T02:20:46.793Z`
 - expires at: `2026-06-29T03:20:46.793Z`
 - released at: `2026-06-29T02:25:48.610Z`

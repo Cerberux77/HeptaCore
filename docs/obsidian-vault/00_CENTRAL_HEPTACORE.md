@@ -1,9 +1,10 @@
+<!-- ORESHNIK:GENERATED:START -->
 ---
 type: master-dashboard
 project: "HeptaCore"
 status: active-production
 phase: "Canonical Oreshnik task board governs current assignments"
-last_updated: "2026-06-29T03:02:46.932Z"
+last_updated: "2026-06-29T20:10:21.767Z"
 mother_branch: "MADRE/v47-s-hc-pub-03-multitenant-assets-multitenant-assets-metadata-compatibility-batch--2026-06-23"
 tags:
   - "#central"
@@ -18,7 +19,7 @@ tags:
 
 | Campo | Valor |
 |---|---|
-| Task board actualizado | 2026-06-29T02:29:41.523Z |
+| Task board actualizado | 2026-06-29T20:10:14.115Z |
 | Rama madre | MADRE/v47-s-hc-pub-03-multitenant-assets-multitenant-assets-metadata-compatibility-batch--2026-06-23 |
 
 
@@ -59,11 +60,12 @@ tags:
 - Fase completada: S-HC-PUB-02-MULTIFORMAT-PREVIEW — preview y dry-run multiformato para Instagram y Facebook.
 - Fase completada: S-HC-PUB-03-MULTITENANT-ASSETS — biblioteca multi-tenant, metadata, compatibilidad, colecciones, inspector (SHA 31dd93e).
 - Siguiente fase (un sprint por vez): S-HC-PUB-04-HOURLY-BATCH-CRON — batch cron publishing.
-- Fase activa: S-HC-TOOL-01-GOAL-RUNNER-V1 — Goal Runner v1 para ejecucion autonoma de Kilo. Nucleo implementado, integrado con /goal y /preflight. Pendiente goal piloto y posterior integracion en rama madre.
+- Fase completada: S-HC-TOOL-01-GOAL-RUNNER-V1 - Goal Runner v1 integrado en rama madre y listo para operar con Oreshnik dispatch.
 - EMAIL-01 infraestructura de codigo preparada (modelos, templates, provider abstraction, webhook, Link-Only activo). Integracion externa bloqueada hasta dominio final.
 - Modo operacional actual: EMAIL_PROVIDER=disabled. Invitaciones se entregan via enlace copiable (inviteLink). Correos reales: 0.
 - Reels, Stories y YouTube forman parte obligatoria del alcance final de HeptaCore. Las combinaciones sin publisher real quedan pendientes de implementacion en PUB-06, PUB-07 o PUB-08.
 - Jean fuera de ruta critica. Responsabilidades reasignadas a Manuel.
+- Fase completada: S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE - broker LLM, gobernanza de costo y evidencia estructurada integrados en ai-infra.
 
 ## Tareas Abiertas
 
@@ -71,10 +73,10 @@ tags:
 |---|---|---|---|---|
 | S-HC-PUB-04-HOURLY-BATCH-CRON | integrated | Manuel | Hourly batch cron publishing with timezone-aware scheduling | S-HC-PUB-02-MULTIFORMAT-PREVIEW, S-HC-PUB-03-MULTITENANT-ASSETS |
 | S-HC-PUB-05-RECONCILIATION-OPS | integrated | Manuel | Operational reconciliation automation for ambiguous provider outcomes | S-HC-PUB-04-HOURLY-BATCH-CRON |
-| S-HC-TOOL-01-GOAL-RUNNER-V1 | ready_for_integration | Manuel | Goal Runner v1 for autonomous Kilo execution | S-HC-TEN-01-GLOBAL-TENANT-ADMIN |
+| S-HC-TOOL-01-GOAL-RUNNER-V1 | integrated | Manuel | Goal Runner v1 for autonomous Kilo execution | S-HC-TEN-01-GLOBAL-TENANT-ADMIN |
 | S-HC-OBS-01-PUBLISHING-OBSERVABILITY | ready_for_integration | Manuel | Publishing observability: structured logging, metrics dashboard, alert thresholds | S-HC-PUB-05-RECONCILIATION-OPS |
 | S-HC-AIGEN-01-ASSET-GENERATION-BROKER | blocked | Manuel | AI asset generation broker: provider-agnostic, metered and billed | S-HC-ASSET-01-STRATEGY-ASSET-MANIFEST, S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE, S-HC-COMM-02-BILLING-ACTIVATION |
-| S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE | ready | Manuel | LLM provider selection, cost estimation and governance policy | - |
+| S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE | integrated | Manuel | LLM provider selection, cost estimation and governance policy | - |
 | S-HC-AN-01-CAMPAIGN-PERFORMANCE | blocked | Manuel | Campaign performance analytics: reach, engagement, metrics per post and campaign | S-HC-OPS-01-CAMPAIGN-REVIEW-DEPLOYMENT, S-HC-OBS-01-PUBLISHING-OBSERVABILITY |
 | S-HC-ASSET-01-STRATEGY-ASSET-MANIFEST | blocked | Manuel | Strategy-driven asset manifest: per-publication asset requirements | S-HC-STRAT-02-CONTENT-CALENDAR-BLUEPRINT, S-HC-PUB-03-MULTITENANT-ASSETS |
 | S-HC-ASSET-02-FORMAT-DERIVATIVES | ready | Manuel | Format derivatives: badge interaction, format preview, intelligent crop, safe zones, asset variants | S-HC-PUB-03-MULTITENANT-ASSETS |
@@ -98,7 +100,6 @@ tags:
 
 | Sprint | Owner | Scope |
 |---|---|---|
-| S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE | Manuel | LLM provider selection, cost estimation and governance policy |
 | S-HC-ASSET-02-FORMAT-DERIVATIVES | Manuel | Format derivatives: badge interaction, format preview, intelligent crop, safe zones, asset variants |
 | S-HC-PUB-06-REELS-STORIES-PUBLISHERS | Manuel | Real publishing for Meta Reels and Stories: Instagram + Facebook |
 | S-HC-PUB-07-YOUTUBE-PUBLISHING | Manuel | Real publishing for YouTube: Video 16:9 and YouTube Shorts |
@@ -114,3 +115,5 @@ tags:
 | Sprint | Resultado | Madre | Task | Source | Compatibility | Advance |
 |---|---|---|---|---|---|---|
 | Ninguno | - | - | - | - | - | - |
+
+<!-- ORESHNIK:GENERATED:END -->

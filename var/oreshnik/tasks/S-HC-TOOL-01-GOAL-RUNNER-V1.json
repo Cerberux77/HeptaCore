@@ -8,7 +8,7 @@
   "owner": "Manuel",
   "backupOwner": "Manuel",
   "status": "integrated",
-  "taskBoardPath": "D:\\PROYECTOS\\WORKTREES\\HeptaCore_PUB04_GOAL\\var\\oreshnik\\task-board.json",
+  "taskBoardPath": "var/oreshnik/task-board.json",
   "zone": [
     "scripts/goal-runner/**",
     "var/goal-runner/**",
@@ -107,7 +107,7 @@
       "description": "Integrated kilo/s-hc-tool-01-goal-runner-v1 into MADRE/v50-s-hc-tool-01-goal-runner-v1-goal-runner-v1-deterministic-state-machine-locks-2026-06-29"
     }
   ],
-  "updatedAt": "2026-06-29T03:21:35.807Z",
+  "updatedAt": "2026-06-29T20:10:14.115Z",
   "runs": [
     {
       "runId": "kilo-S-HC-TOOL-01-GOAL-RUNNER-V1-2026-06-29T02-07-54-626Z-6c79c9a6",
@@ -115,7 +115,7 @@
       "worker": "kilo",
       "workerMode": "codex",
       "branch": "task/S-HC-TOOL-01-GOAL-RUNNER-V1/S-HC-TOOL-01-GOAL-RUNNER-V1/kilo/kilo-S-HC-TOOL-01-GOAL-RUNNER-V1-2026-06-29T02-07-54-626Z-6c79c9a6",
-      "worktreePath": "D:\\PROYECTOS\\WORKTREES\\HeptaCore_PUB04_GOAL\\var\\oreshnik\\wt\\S-HC-TOOL-01-GOAL-RUNNER-V1\\S-HC-TOOL-01-GOAL-RUNNER-V1\\r-2ff68e9be13b",
+      "worktreePath": "var/oreshnik/wt/S-HC-TOOL-01-GOAL-RUNNER-V1/S-HC-TOOL-01-GOAL-RUNNER-V1/r-2ff68e9be13b",
       "zones": [
         "scripts/goal-runner/**",
         "var/goal-runner/**",
@@ -140,7 +140,7 @@
       "worker": "kilo",
       "workerMode": "codex",
       "branch": "task/S-HC-TOOL-01-GOAL-RUNNER-V1/S-HC-TOOL-01-GOAL-RUNNER-V1/kilo/kilo-S-HC-TOOL-01-GOAL-RUNNER-V1-2026-06-29T02-20-46-794Z-ed5534ef",
-      "worktreePath": "D:\\PROYECTOS\\WORKTREES\\HeptaCore_PUB04_GOAL\\var\\oreshnik\\wt\\S-HC-TOOL-01-GOAL-RUNNER-V1\\S-HC-TOOL-01-GOAL-RUNNER-V1\\r-7fa3b13c04df",
+      "worktreePath": "var/oreshnik/wt/S-HC-TOOL-01-GOAL-RUNNER-V1/S-HC-TOOL-01-GOAL-RUNNER-V1/r-7fa3b13c04df",
       "zones": [
         "scripts/goal-runner/**",
         "var/goal-runner/**",
@@ -165,7 +165,7 @@
       "worker": "kilo",
       "workerMode": "codex",
       "branch": "task/S-HC-TOOL-01-GOAL-RUNNER-V1/S-HC-TOOL-01-GOAL-RUNNER-V1/kilo/kilo-S-HC-TOOL-01-GOAL-RUNNER-V1-2026-06-29T02-19-43-008Z-33b124f7",
-      "worktreePath": "D:\\PROYECTOS\\WORKTREES\\HeptaCore_PUB04_GOAL\\var\\oreshnik\\wt\\S-HC-TOOL-01-GOAL-RUNNER-V1\\S-HC-TOOL-01-GOAL-RUNNER-V1\\r-ba423d0513f6",
+      "worktreePath": "var/oreshnik/wt/S-HC-TOOL-01-GOAL-RUNNER-V1/S-HC-TOOL-01-GOAL-RUNNER-V1/r-ba423d0513f6",
       "zones": [
         "scripts/goal-runner/**",
         "var/goal-runner/**",

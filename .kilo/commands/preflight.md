@@ -1,6 +1,6 @@
 # Oreshnik Preflight Command (HeptaCore)
 
-When a user identifies themselves or asks for pending tasks from HeptaCore, run Oreshnik preflight. CRITICAL: rebuild CLI first.
+When a user identifies themselves or asks for pending tasks from HeptaCore, run Oreshnik preflight using the repo-pinned CLI from `node_modules`.
 
 ## Trigger phrases
 - "soy Jean", "soy Architect", "soy Manuel"
@@ -9,14 +9,11 @@ When a user identifies themselves or asks for pending tasks from HeptaCore, run 
 
 ## Action (STRICT)
 1. Extract operator name (Jean, Architect, Manuel). Fallback: `git config user.name`.
-2. ALWAYS rebuild Oreshnik CLI:
-   ```
-   cd ..\oreshnik && npm run build
-   ```
+2. Use the installed pinned CLI. Do not resolve `../oreshnik`, smoke folders or a global binary.
 3. Generate sprint: `S-HC-{OPERATOR}-{today}`
 4. Run preflight from HeptaCore directory:
    ```
-   node ..\oreshnik\dist\cli.js preflight --sprint {sprint} --operator {name} --desc "trabajo en curso"
+   npx --no-install oreshnik preflight --sprint {sprint} --operator {name} --desc "trabajo en curso"
    ```
 5. Show preflight output AS-IS. Do NOT run your own task-board queries.
 

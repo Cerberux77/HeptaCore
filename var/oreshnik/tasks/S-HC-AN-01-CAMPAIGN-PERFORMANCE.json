@@ -8,7 +8,7 @@
   "owner": "Manuel",
   "backupOwner": "Manuel",
   "status": "blocked",
-  "taskBoardPath": "D:\\PROYECTOS\\WORKTREES\\HeptaCore_PUB04_GOAL\\var\\oreshnik\\task-board.json",
+  "taskBoardPath": "var/oreshnik/task-board.json",
   "zone": [
     "apps/web/components",
     "apps/web/app/api",
@@ -33,6 +33,6 @@
       "description": "Task status reconciled to blocked: dependency S-HC-OPS-01-CAMPAIGN-REVIEW-DEPLOYMENT still pending (S-HC-OPS-01-CAMPAIGN-REVIEW-DEPLOYMENT:pending) | dependency S-HC-OBS-01-PUBLISHING-OBSERVABILITY still pending (S-HC-OBS-01-PUBLISHING-OBSERVABILITY:pending)"
     }
   ],
-  "updatedAt": "2026-06-29T02:29:41.523Z",
+  "updatedAt": "2026-06-29T20:10:14.115Z",
   "runs": []
 }

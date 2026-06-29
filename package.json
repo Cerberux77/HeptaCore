@@ -14,7 +14,8 @@
     "build": "npm run build --workspaces --if-present",
     "lint": "npm run lint --workspaces --if-present",
     "typecheck": "npm run typecheck --workspaces --if-present",
-    "test": "node --test apps/web/lib/calendar-state.test.mjs && npm run test --workspaces --if-present",
+    "test:infra": "node --test scripts/goal-runner/__tests__/*.test.mjs scripts/oreshnik/__tests__/*.test.mjs",
+    "test": "node --test apps/web/lib/calendar-state.test.mjs && npm run test:infra && npm run test --workspaces --if-present",
     "worker": "npm run start -w @heptacore/worker",
     "worker:validate": "npm run validate -w @heptacore/worker",
     "auth:ensure-access": "node scripts/ensure-user-access.mjs",
@@ -32,10 +33,13 @@
     "oreshnik:timeline": "oreshnik timeline",
     "oreshnik:checkpoint": "oreshnik checkpoint",
     "oreshnik:integrate": "oreshnik integrate",
+    "oreshnik:dispatch:init": "oreshnik dispatch init",
+    "oreshnik:dispatch:status": "oreshnik dispatch status",
     "oreshnik:canonical": "node scripts/oreshnik/canonical-check.mjs",
     "oreshnik:sync": "node scripts/oreshnik/sync-from-mother.mjs",
     "oreshnik:sync:latest": "node scripts/oreshnik/sync-latest-mother.mjs",
     "oreshnik:obsidian-guard": "node scripts/oreshnik/obsidian-guard.mjs",
+    "oreshnik:ready": "node scripts/oreshnik/ready.mjs",
     "brand:generate": "node scripts/generate-brand-assets.mjs",
     "oreshnik:drift": "node scripts/oreshnik/drift.mjs",
     "oreshnik:drift:check": "node scripts/oreshnik/drift.mjs --check",
@@ -61,7 +65,7 @@
   "dependencies": {
     "@prisma/adapter-pg": "^7.8.0",
     "@react-email/components": "^1.0.12",
-    "oreshnik": "npm:oreshnik-cli@0.2.0-alpha.0",
+    "oreshnik-cli": "git+https://github.com/Cerberux77/oreshnik.git#05447110b2acecf94e41f76d9eaf7f7a81ccdfe2",
     "pg": "^8.21.0",
     "resend": "^6.14.0"
   }

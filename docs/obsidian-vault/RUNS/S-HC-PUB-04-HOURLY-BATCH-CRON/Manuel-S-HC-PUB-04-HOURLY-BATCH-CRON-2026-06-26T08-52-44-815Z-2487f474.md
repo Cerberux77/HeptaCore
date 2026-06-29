@@ -28,7 +28,7 @@ source: "var/oreshnik/runs/S-HC-PUB-04-HOURLY-BATCH-CRON/Manuel-S-HC-PUB-04-HOUR
 - task status: `integrated`
 - claim status: `released`
 - branch: `Manuel/s-hc-pub-04-hourly-batch-goal`
-- worktree: `D:\PROYECTOS\WORKTREES\HeptaCore_PUB04_GOAL`
+- worktree: `var/oreshnik/wt/S-HC-PUB-04-HOURLY-BATCH-CRON/S-HC-PUB-04-HOURLY-BATCH-CRON/r-2487f474`
 - claimed at: `2026-06-26T08:52:44.815Z`
 - expires at: `2026-06-26T09:52:44.815Z`
 - released at: `2026-06-26T08:55:47.509Z`

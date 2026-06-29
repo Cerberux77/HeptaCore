@@ -8,7 +8,7 @@
   "owner": "Manuel",
   "backupOwner": "Manuel",
   "status": "done",
-  "taskBoardPath": "D:\\PROYECTOS\\WORKTREES\\HeptaCore_PUB04_GOAL\\var\\oreshnik\\task-board.json",
+  "taskBoardPath": "var/oreshnik/task-board.json",
   "zone": [
     "apps/web",
     "apps/web/lib/publishers",
@@ -37,6 +37,6 @@
       "description": "multiformat previews, deterministic auth, approval UI and dry-run QA completed"
     }
   ],
-  "updatedAt": "2026-06-29T02:29:41.523Z",
+  "updatedAt": "2026-06-29T20:10:14.115Z",
   "runs": []
 }

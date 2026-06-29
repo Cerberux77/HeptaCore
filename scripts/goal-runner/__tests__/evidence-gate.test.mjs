@@ -115,6 +115,7 @@ describe("Evidence and Gates", () => {
     assert.throws(() => validateGateIds(["rm-rf"]), /Unknown/);
     assert.throws(() => validateGateIds(["not-a-gate"]), /Unknown/);
     assert.doesNotThrow(() => validateGateIds(["typecheck", "build"]));
+    assert.doesNotThrow(() => validateGateIds(["worker", "tests"]));
     assert.doesNotThrow(() => validateGateIds([]));
   });
 

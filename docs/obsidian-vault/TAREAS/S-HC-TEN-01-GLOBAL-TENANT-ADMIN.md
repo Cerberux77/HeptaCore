@@ -6,7 +6,7 @@ task_id: "S-HC-TEN-01-GLOBAL-TENANT-ADMIN"
 sprint: "tenant-platform"
 status: "done"
 owner: "Manuel"
-last_updated: "2026-06-29T02:29:41.523Z"
+last_updated: "2026-06-29T20:10:14.115Z"
 source: "var/oreshnik/tasks/S-HC-TEN-01-GLOBAL-TENANT-ADMIN.json"
 ---
 

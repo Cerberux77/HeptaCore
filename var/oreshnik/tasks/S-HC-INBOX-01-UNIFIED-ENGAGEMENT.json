@@ -8,7 +8,7 @@
   "owner": "Manuel",
   "backupOwner": "Manuel",
   "status": "blocked",
-  "taskBoardPath": "D:\\PROYECTOS\\WORKTREES\\HeptaCore_PUB04_GOAL\\var\\oreshnik\\task-board.json",
+  "taskBoardPath": "var/oreshnik/task-board.json",
   "zone": [
     "apps/web/components",
     "apps/web/app/api",
@@ -31,6 +31,6 @@
       "description": "Task status reconciled to blocked: dependency S-HC-AN-01-CAMPAIGN-PERFORMANCE still pending (S-HC-AN-01-CAMPAIGN-PERFORMANCE:pending)"
     }
   ],
-  "updatedAt": "2026-06-29T02:29:41.523Z",
+  "updatedAt": "2026-06-29T20:10:14.115Z",
   "runs": []
 }

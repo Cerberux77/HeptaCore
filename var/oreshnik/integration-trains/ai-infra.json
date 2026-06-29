@@ -1,0 +1,53 @@
+{
+  "project": "HeptaCore",
+  "sprint": "ai-infra",
+  "motherBranch": "MADRE/v50-ai-infra-llm-provider-selection-cost-governance-2026-06-29",
+  "lockKey": "integration-train/MADRE/v50-ai-infra-llm-provider-selection-cost-governance-2026-06-29",
+  "createdAt": "2026-06-29T16:54:11.800Z",
+  "updatedAt": "2026-06-29T16:55:18.073Z",
+  "results": [
+    {
+      "attemptId": "train-codex-S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE-2-1782752051800",
+      "taskId": "S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE",
+      "runId": "codex-S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE-2026-06-29T02-30-49-546Z-c443db0b",
+      "sourceBranch": "task/ai-infra/S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE/codex/codex-S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE-2026-06-29T02-30-49-546Z-c443db0b",
+      "targetBranch": "MADRE/v50-ai-infra-llm-provider-selection-cost-governance-2026-06-29",
+      "integrationBranch": "integration-train/ai-infra/S-HC-AI-01-LLM-SELECTION/r-c20ec67edeb3/a-3acf93d1c862",
+      "operator": "manuel",
+      "lockKey": "integration-train/MADRE/v50-ai-infra-llm-provider-selection-cost-governance-2026-06-29",
+      "startedAt": "2026-06-29T16:54:11.800Z",
+      "status": "succeeded",
+      "completedAt": "2026-06-29T16:55:18.073Z",
+      "reason": "Already contained on MADRE/v50-ai-infra-llm-provider-selection-cost-governance-2026-06-29; runtime reconciled without merge",
+      "gateResults": [
+        {
+          "name": "typecheck",
+          "passed": true
+        },
+        {
+          "name": "build",
+          "passed": true
+        },
+        {
+          "name": "test",
+          "passed": true
+        }
+      ],
+      "outcome": {
+        "mergeBase": "dc3186a13aa652b27235c3407ee2034f892295da",
+        "changedFiles": [],
+        "compatibilityBranchPushed": false,
+        "deliveryDisposition": "already_contained",
+        "projectedMotherBranch": "MADRE/v50-ai-infra-llm-provider-selection-cost-governance-2026-06-29",
+        "motherAdvanceState": "runtime_projection_confirmed",
+        "motherFunctionalExpectedCommit": "dc3186a13aa652b27235c3407ee2034f892295da",
+        "motherFunctionalRemoteCommit": "dc3186a13aa652b27235c3407ee2034f892295da",
+        "motherFunctionalPushVerified": true,
+        "motherFunctionalPushReconciled": false,
+        "projectedTaskStatus": "integrated",
+        "projectedRunStatus": "integrated",
+        "projectedSprintEntryStatus": "integrated"
+      }
+    }
+  ]
+}

@@ -1,6 +1,6 @@
 {
-  "contentHash": "sha256:fcc2a357cd1373c402d1fd7f0ec715dbf11a2c17cc7409e44e04261dcf445bc3",
-  "generatedFromStateUpdatedAt": "2026-06-26T06:57:45.950Z",
+  "contentHash": "sha256:2d7c8d03014b2e124a41efc5c0d0536afb822bcfbcc7120cccbb3f759f999827",
+  "generatedFromStateUpdatedAt": "2026-06-29T02:49:12.565Z",
   "goals": [
     {
       "branch": "Manuel/s-hc-goal-runner-v1",
@@ -51,6 +51,16 @@
       "status": "COMPLETED",
       "title": "Finalize PUB-04 production correctness",
       "updatedAt": "2026-06-26T06:57:45.950Z"
+    },
+    {
+      "branch": "codex-bootstrap/S-HC-AI-01",
+      "createdAt": "2026-06-29T02:31:10.387Z",
+      "goalId": "GR-20260629T023110Z-5a5f9c21-llm-provider-selection-cost-governance-and-polic",
+      "owner": "codex",
+      "sprintId": "S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE",
+      "status": "COMPLETED",
+      "title": "LLM provider selection cost governance and policy",
+      "updatedAt": "2026-06-29T02:49:12.565Z"
     }
   ],
   "version": 1

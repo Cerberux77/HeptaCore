@@ -23,6 +23,7 @@ Before closing a sprint:
 ```bash
 npm run typecheck
 npm run build
+npm run test
 npm run worker:validate
 npm run oreshnik:close -- --sprint S-HC-XX --operator Manuel --desc "descripcion"
 ```
@@ -103,6 +104,7 @@ Goal Runner manages isolated, deterministic work units within a sprint. It does 
 - **One goal ACTIVE per worktree.** Enforced by `scripts/goal-runner/run.mjs` via `.active-worktree.json`.
 - **Oreshnik is the authority for sprints, zones, and owners.** Goal Runner references `sprintId` from `var/oreshnik/task-board.json` but does not modify it.
 - **Goal Runner never replaces the task board.** Goals are execution units inside a sprint, not sprints themselves.
+- **Kilo must obtain tasks only via Oreshnik dispatch/claim flows.** No manual Run creation, no intuitive task picking, no direct runtime edits.
 - Production actions require explicit user authorization. Preview and Development permit QA, seeds, and automation.
 - **Kilo modifies code; `run.mjs` only manages state.** The script handles locks, transitions, gates, and evidence. It never inspects or modifies application code.
 - **Terminal states (COMPLETED, ABORTED_CRITICAL_DEVIATION) are immutable.** No reopening.
@@ -136,4 +138,4 @@ node scripts/goal-runner/run.mjs doctor
 
 ### Resumption
 
-When `/goal` or preflight detects a goal ACTIVE, PAUSED, or BLOCKED on the current branch, Kilo offers resumption. Never auto-resume without explicit confirmation. Stale locks must be confirmed before removal.
+When `/goal` starts, Kilo must first run `npm run oreshnik:ready`, then `oreshnik dispatch resume --operator kilo --repo . --json`, and only if nothing is resumable may it request `oreshnik dispatch next --operator kilo --repo . --json`. Resume the same Run when one exists; never create another active task in parallel.

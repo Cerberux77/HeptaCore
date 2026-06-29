@@ -1,6 +1,6 @@
 {
   "project": "HeptaCore",
-  "updatedAt": "2026-06-29T03:21:35.807Z",
+  "updatedAt": "2026-06-29T20:10:14.115Z",
   "resiliencePolicy": "If an owner is unavailable for more than one working block or blocks the critical path, backupOwner may take over after recording reassignment.",
   "closurePolicy": "No sprint may be closed until acceptance criteria, base tests, sprint-specific tests, docs/handoff, and Oreshnik zone checks pass.",
   "baseTestMatrix": [
@@ -44,11 +44,12 @@
     "Fase completada: S-HC-PUB-02-MULTIFORMAT-PREVIEW — preview y dry-run multiformato para Instagram y Facebook.",
     "Fase completada: S-HC-PUB-03-MULTITENANT-ASSETS — biblioteca multi-tenant, metadata, compatibilidad, colecciones, inspector (SHA 31dd93e).",
     "Siguiente fase (un sprint por vez): S-HC-PUB-04-HOURLY-BATCH-CRON — batch cron publishing.",
-    "Fase activa: S-HC-TOOL-01-GOAL-RUNNER-V1 — Goal Runner v1 para ejecucion autonoma de Kilo. Nucleo implementado, integrado con /goal y /preflight. Pendiente goal piloto y posterior integracion en rama madre.",
+    "Fase completada: S-HC-TOOL-01-GOAL-RUNNER-V1 - Goal Runner v1 integrado en rama madre y listo para operar con Oreshnik dispatch.",
     "EMAIL-01 infraestructura de codigo preparada (modelos, templates, provider abstraction, webhook, Link-Only activo). Integracion externa bloqueada hasta dominio final.",
     "Modo operacional actual: EMAIL_PROVIDER=disabled. Invitaciones se entregan via enlace copiable (inviteLink). Correos reales: 0.",
     "Reels, Stories y YouTube forman parte obligatoria del alcance final de HeptaCore. Las combinaciones sin publisher real quedan pendientes de implementacion en PUB-06, PUB-07 o PUB-08.",
-    "Jean fuera de ruta critica. Responsabilidades reasignadas a Manuel."
+    "Jean fuera de ruta critica. Responsabilidades reasignadas a Manuel.",
+    "Fase completada: S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE - broker LLM, gobernanza de costo y evidencia estructurada integrados en ai-infra."
   ],
   "tasks": [
     {
@@ -112,7 +113,87 @@
           "branch": "Manuel/s-hc-pub-04-hourly-batch-goal",
           "description": "Integrated Manuel/s-hc-pub-04-hourly-batch-goal into MADRE/v48-s-hc-pub-04-hourly-batch-cron-hourly-batch-publishing-cron-and-pub-04-producti-2026-06-28"
         }
-      ]
+      ],
+      "project": "HeptaCore",
+      "sprint": "S-HC-PUB-04-HOURLY-BATCH-CRON",
+      "sprintOrderIndex": 0,
+      "taskOrderIndex": 0,
+      "updatedAt": "2026-06-29T02:29:41.523Z",
+      "runs": [
+        {
+          "runId": "Manuel-S-HC-PUB-04-HOURLY-BATCH-CRON-2026-06-26T08-52-44-815Z-2487f474",
+          "operator": "Manuel",
+          "worker": "manuel-pub04-closeout",
+          "workerMode": "manual",
+          "branch": "Manuel/s-hc-pub-04-hourly-batch-goal",
+          "worktreePath": "var/oreshnik/wt/S-HC-PUB-04-HOURLY-BATCH-CRON/S-HC-PUB-04-HOURLY-BATCH-CRON/r-2487f474",
+          "zones": [
+            "apps/web/app/api/cron",
+            "apps/worker",
+            "packages/core"
+          ],
+          "taskStatus": "integrated",
+          "claimStatus": "released",
+          "claimedAt": "2026-06-26T08:52:44.815Z",
+          "updatedAt": "2026-06-28T23:59:59.945Z",
+          "expiresAt": "2026-06-26T09:52:44.815Z",
+          "releasedAt": "2026-06-26T08:55:47.509Z",
+          "manifestPath": "var/oreshnik/runs/S-HC-PUB-04-HOURLY-BATCH-CRON/Manuel-S-HC-PUB-04-HOURLY-BATCH-CRON-2026-06-26T08-52-44-815Z-2487f474.json"
+        }
+      ],
+      "integration": {
+        "runId": "Manuel-S-HC-PUB-04-HOURLY-BATCH-CRON-2026-06-26T08-52-44-815Z-2487f474",
+        "sourceBranch": "Manuel/s-hc-pub-04-hourly-batch-goal",
+        "status": "integrated",
+        "motherBranch": "MADRE/v48-s-hc-pub-04-hourly-batch-cron-hourly-batch-publishing-cron-and-pub-04-producti-2026-06-28",
+        "queuedAt": "2026-06-28T19:42:15.820Z",
+        "updatedAt": "2026-06-28T23:59:59.945Z",
+        "targetBranch": "MADRE/v48-s-hc-pub-04-hourly-batch-cron-hourly-batch-publishing-cron-and-pub-04-producti-2026-06-28",
+        "integratedAt": "2026-06-28T23:59:59.945Z"
+      },
+      "latestTrain": {
+        "attemptId": "train-Manuel-S-HC-PUB-04-HOURLY-BATCH-CRON-2026-06-26T-1782691034146",
+        "runId": "Manuel-S-HC-PUB-04-HOURLY-BATCH-CRON-2026-06-26T08-52-44-815Z-2487f474",
+        "sourceBranch": "Manuel/s-hc-pub-04-hourly-batch-goal",
+        "targetBranch": "MADRE/v48-s-hc-pub-04-hourly-batch-cron-hourly-batch-publishing-cron-and-pub-04-producti-2026-06-28",
+        "integrationBranch": "integration-train/S-HC-PUB-04-HOURLY-BATCH/S-HC-PUB-04-HOURLY-BATCH/r-c08e3c5d3afc/a-f62c2c114d4d",
+        "operator": "manuel",
+        "lockKey": "integration-train/MADRE/v48-s-hc-pub-04-hourly-batch-cron-hourly-batch-publishing-cron-and-pub-04-producti-2026-06-28",
+        "status": "succeeded",
+        "startedAt": "2026-06-28T23:57:14.146Z",
+        "completedAt": "2026-06-28T23:59:59.956Z",
+        "reason": "Already contained on MADRE/v48-s-hc-pub-04-hourly-batch-cron-hourly-batch-publishing-cron-and-pub-04-producti-2026-06-28; runtime reconciled without merge",
+        "motherAdvanceState": "runtime_projection_confirmed",
+        "gateResults": [
+          {
+            "name": "typecheck",
+            "passed": true
+          },
+          {
+            "name": "build",
+            "passed": true
+          },
+          {
+            "name": "test",
+            "passed": true
+          }
+        ],
+        "outcome": {
+          "mergeBase": "f301b7f8c2fe3e153ba006201c872ed0c825245c",
+          "changedFiles": [],
+          "compatibilityBranchPushed": false,
+          "deliveryDisposition": "already_contained",
+          "projectedMotherBranch": "MADRE/v48-s-hc-pub-04-hourly-batch-cron-hourly-batch-publishing-cron-and-pub-04-producti-2026-06-28",
+          "motherAdvanceState": "runtime_projection_confirmed",
+          "motherFunctionalExpectedCommit": "f301b7f8c2fe3e153ba006201c872ed0c825245c",
+          "motherFunctionalRemoteCommit": "f301b7f8c2fe3e153ba006201c872ed0c825245c",
+          "motherFunctionalPushVerified": true,
+          "motherFunctionalPushReconciled": false,
+          "projectedTaskStatus": "integrated",
+          "projectedRunStatus": "integrated",
+          "projectedSprintEntryStatus": "integrated"
+        }
+      }
     },
     {
       "id": "S-HC-PUB-05-RECONCILIATION-OPS",
@@ -198,7 +279,107 @@
           "branch": "Manuel/s-hc-pub-05-reconciliation-ops-sprint-2026-06-29",
           "description": "Integrated Manuel/s-hc-pub-05-reconciliation-ops-sprint-2026-06-29 into MADRE/v49-s-hc-pub-05-reconciliation-ops-implementa-automatizacion-operacional-de-reconci-2026-06-29"
         }
-      ]
+      ],
+      "project": "HeptaCore",
+      "sprint": "S-HC-PUB-05-RECONCILIATION-OPS",
+      "sprintOrderIndex": 1,
+      "taskOrderIndex": 1,
+      "updatedAt": "2026-06-29T02:29:41.523Z",
+      "runs": [
+        {
+          "runId": "manuel-S-HC-PUB-05-RECONCILIATION-OPS-2026-06-29T00-37-03-464Z-4e3d4eae",
+          "operator": "manuel",
+          "worker": "manuel",
+          "workerMode": "codex",
+          "branch": "task/S-HC-PUB-05-RECONCILIATION-OPS/S-HC-PUB-05-RECONCILIATION-OPS/manuel/manuel-S-HC-PUB-05-RECONCILIATION-OPS-2026-06-29T00-37-03-464Z-4e3d4eae",
+          "worktreePath": "var/oreshnik/wt/S-HC-PUB-05-RECONCILIATION-OPS/S-HC-PUB-05-RECONCILIATION-OPS/r-3030ee064340",
+          "zones": [
+            "apps/web/lib/publishing-finalization.ts",
+            "apps/web/lib/draft-operational-state.ts",
+            "packages/core"
+          ],
+          "taskStatus": "integrated",
+          "claimStatus": "released",
+          "claimedAt": "2026-06-29T00:37:03.464Z",
+          "updatedAt": "2026-06-29T01:54:40.093Z",
+          "expiresAt": "2026-06-29T01:37:03.464Z",
+          "releasedAt": "2026-06-29T00:37:30.052Z",
+          "manifestPath": "var/oreshnik/runs/S-HC-PUB-05-RECONCILIATION-OPS/manuel-S-HC-PUB-05-RECONCILIATION-OPS-2026-06-29T00-37-03-464Z-4e3d4eae.json"
+        },
+        {
+          "runId": "manuel-S-HC-PUB-05-RECONCILIATION-OPS-2026-06-29T00-22-46-240Z-52eb7757",
+          "operator": "manuel",
+          "worker": "manuel",
+          "workerMode": "codex",
+          "branch": "task/S-HC-PUB-05-RECONCILIATION-OPS/S-HC-PUB-05-RECONCILIATION-OPS/manuel/manuel-S-HC-PUB-05-RECONCILIATION-OPS-2026-06-29T00-22-46-240Z-52eb7757",
+          "worktreePath": "var/oreshnik/wt/S-HC-PUB-05-RECONCILIATION-OPS/S-HC-PUB-05-RECONCILIATION-OPS/r-d9c500bb15d4",
+          "zones": [
+            "apps/web/lib/publishing-finalization.ts",
+            "apps/web/lib/draft-operational-state.ts",
+            "packages/core"
+          ],
+          "taskStatus": "ready_for_integration",
+          "claimStatus": "released",
+          "claimedAt": "2026-06-29T00:22:46.240Z",
+          "updatedAt": "2026-06-29T00:36:40.003Z",
+          "expiresAt": "2026-06-29T01:22:46.240Z",
+          "releasedAt": "2026-06-29T00:36:40.003Z",
+          "manifestPath": "var/oreshnik/runs/S-HC-PUB-05-RECONCILIATION-OPS/manuel-S-HC-PUB-05-RECONCILIATION-OPS-2026-06-29T00-22-46-240Z-52eb7757.json"
+        }
+      ],
+      "integration": {
+        "runId": "manuel-S-HC-PUB-05-RECONCILIATION-OPS-2026-06-29T00-37-03-464Z-4e3d4eae",
+        "sourceBranch": "Manuel/s-hc-pub-05-reconciliation-ops-sprint-2026-06-29",
+        "status": "integrated",
+        "motherBranch": "MADRE/v49-s-hc-pub-05-reconciliation-ops-implementa-automatizacion-operacional-de-reconci-2026-06-29",
+        "queuedAt": "2026-06-29T00:37:36.657Z",
+        "updatedAt": "2026-06-29T01:54:40.093Z",
+        "targetBranch": "MADRE/v49-s-hc-pub-05-reconciliation-ops-implementa-automatizacion-operacional-de-reconci-2026-06-29",
+        "integratedAt": "2026-06-29T01:54:40.093Z"
+      },
+      "latestTrain": {
+        "attemptId": "train-manuel-S-HC-PUB-05-RECONCILIATION-OPS-2026-06-29-1782698014030",
+        "runId": "manuel-S-HC-PUB-05-RECONCILIATION-OPS-2026-06-29T00-37-03-464Z-4e3d4eae",
+        "sourceBranch": "Manuel/s-hc-pub-05-reconciliation-ops-sprint-2026-06-29",
+        "targetBranch": "MADRE/v49-s-hc-pub-05-reconciliation-ops-implementa-automatizacion-operacional-de-reconci-2026-06-29",
+        "integrationBranch": "integration-train/S-HC-PUB-05-RECONCILIATI/S-HC-PUB-05-RECONCILIATI/r-3030ee064340/a-4b83c9744f29",
+        "operator": "manuel",
+        "lockKey": "integration-train/MADRE/v49-s-hc-pub-05-reconciliation-ops-implementa-automatizacion-operacional-de-reconci-2026-06-29",
+        "status": "succeeded",
+        "startedAt": "2026-06-29T01:53:34.030Z",
+        "completedAt": "2026-06-29T01:54:40.108Z",
+        "reason": "Already contained on MADRE/v49-s-hc-pub-05-reconciliation-ops-implementa-automatizacion-operacional-de-reconci-2026-06-29; runtime reconciled without merge",
+        "motherAdvanceState": "runtime_projection_confirmed",
+        "gateResults": [
+          {
+            "name": "typecheck",
+            "passed": true
+          },
+          {
+            "name": "build",
+            "passed": true
+          },
+          {
+            "name": "test",
+            "passed": true
+          }
+        ],
+        "outcome": {
+          "mergeBase": "db3e69484e003f7ec674003c1a3c7e9c882745b5",
+          "changedFiles": [],
+          "compatibilityBranchPushed": false,
+          "deliveryDisposition": "already_contained",
+          "projectedMotherBranch": "MADRE/v49-s-hc-pub-05-reconciliation-ops-implementa-automatizacion-operacional-de-reconci-2026-06-29",
+          "motherAdvanceState": "runtime_projection_confirmed",
+          "motherFunctionalExpectedCommit": "db3e69484e003f7ec674003c1a3c7e9c882745b5",
+          "motherFunctionalRemoteCommit": "db3e69484e003f7ec674003c1a3c7e9c882745b5",
+          "motherFunctionalPushVerified": true,
+          "motherFunctionalPushReconciled": false,
+          "projectedTaskStatus": "integrated",
+          "projectedRunStatus": "integrated",
+          "projectedSprintEntryStatus": "integrated"
+        }
+      }
     },
     {
       "id": "S-HC-TOOL-01-GOAL-RUNNER-V1",
@@ -304,7 +485,142 @@
           "branch": "kilo/s-hc-tool-01-goal-runner-v1",
           "description": "Integrated kilo/s-hc-tool-01-goal-runner-v1 into MADRE/v50-s-hc-tool-01-goal-runner-v1-goal-runner-v1-deterministic-state-machine-locks-2026-06-29"
         }
-      ]
+      ],
+      "project": "HeptaCore",
+      "sprint": "S-HC-TOOL-01-GOAL-RUNNER-V1",
+      "sprintOrderIndex": 2,
+      "taskOrderIndex": 2,
+      "updatedAt": "2026-06-29T03:21:35.807Z",
+      "runs": [
+        {
+          "runId": "kilo-S-HC-TOOL-01-GOAL-RUNNER-V1-2026-06-29T02-07-54-626Z-6c79c9a6",
+          "operator": "kilo",
+          "worker": "kilo",
+          "workerMode": "codex",
+          "branch": "task/S-HC-TOOL-01-GOAL-RUNNER-V1/S-HC-TOOL-01-GOAL-RUNNER-V1/kilo/kilo-S-HC-TOOL-01-GOAL-RUNNER-V1-2026-06-29T02-07-54-626Z-6c79c9a6",
+          "worktreePath": "var/oreshnik/wt/S-HC-TOOL-01-GOAL-RUNNER-V1/S-HC-TOOL-01-GOAL-RUNNER-V1/r-2ff68e9be13b",
+          "zones": [
+            "scripts/goal-runner/**",
+            "var/goal-runner/**",
+            ".kilo/command/goal.md",
+            ".kilo/command/preflight.md",
+            "AGENTS.md",
+            "package.json",
+            "docs/07_handoffs/**",
+            "docs/obsidian-vault/**"
+          ],
+          "taskStatus": "integrated",
+          "claimStatus": "released",
+          "claimedAt": "2026-06-29T02:07:54.626Z",
+          "updatedAt": "2026-06-29T03:21:35.807Z",
+          "expiresAt": "2026-06-29T03:07:54.626Z",
+          "releasedAt": "2026-06-29T02:19:25.752Z",
+          "manifestPath": "var/oreshnik/runs/S-HC-TOOL-01-GOAL-RUNNER-V1/kilo-S-HC-TOOL-01-GOAL-RUNNER-V1-2026-06-29T02-07-54-626Z-6c79c9a6.json"
+        },
+        {
+          "runId": "kilo-S-HC-TOOL-01-GOAL-RUNNER-V1-2026-06-29T02-20-46-794Z-ed5534ef",
+          "operator": "kilo",
+          "worker": "kilo",
+          "workerMode": "codex",
+          "branch": "task/S-HC-TOOL-01-GOAL-RUNNER-V1/S-HC-TOOL-01-GOAL-RUNNER-V1/kilo/kilo-S-HC-TOOL-01-GOAL-RUNNER-V1-2026-06-29T02-20-46-794Z-ed5534ef",
+          "worktreePath": "var/oreshnik/wt/S-HC-TOOL-01-GOAL-RUNNER-V1/S-HC-TOOL-01-GOAL-RUNNER-V1/r-7fa3b13c04df",
+          "zones": [
+            "scripts/goal-runner/**",
+            "var/goal-runner/**",
+            ".kilo/command/goal.md",
+            ".kilo/command/preflight.md",
+            "AGENTS.md",
+            "package.json",
+            "docs/07_handoffs/**",
+            "docs/obsidian-vault/**"
+          ],
+          "taskStatus": "ready_for_integration",
+          "claimStatus": "released",
+          "claimedAt": "2026-06-29T02:20:46.793Z",
+          "updatedAt": "2026-06-29T02:25:48.610Z",
+          "expiresAt": "2026-06-29T03:20:46.793Z",
+          "releasedAt": "2026-06-29T02:25:48.610Z",
+          "manifestPath": "var/oreshnik/runs/S-HC-TOOL-01-GOAL-RUNNER-V1/kilo-S-HC-TOOL-01-GOAL-RUNNER-V1-2026-06-29T02-20-46-794Z-ed5534ef.json"
+        },
+        {
+          "runId": "kilo-S-HC-TOOL-01-GOAL-RUNNER-V1-2026-06-29T02-19-43-008Z-33b124f7",
+          "operator": "kilo",
+          "worker": "kilo",
+          "workerMode": "codex",
+          "branch": "task/S-HC-TOOL-01-GOAL-RUNNER-V1/S-HC-TOOL-01-GOAL-RUNNER-V1/kilo/kilo-S-HC-TOOL-01-GOAL-RUNNER-V1-2026-06-29T02-19-43-008Z-33b124f7",
+          "worktreePath": "var/oreshnik/wt/S-HC-TOOL-01-GOAL-RUNNER-V1/S-HC-TOOL-01-GOAL-RUNNER-V1/r-ba423d0513f6",
+          "zones": [
+            "scripts/goal-runner/**",
+            "var/goal-runner/**",
+            ".kilo/command/goal.md",
+            ".kilo/command/preflight.md",
+            "AGENTS.md",
+            "package.json",
+            "docs/07_handoffs/**",
+            "docs/obsidian-vault/**"
+          ],
+          "taskStatus": "ready_for_integration",
+          "claimStatus": "released",
+          "claimedAt": "2026-06-29T02:19:43.008Z",
+          "updatedAt": "2026-06-29T02:20:29.163Z",
+          "expiresAt": "2026-06-29T03:19:43.008Z",
+          "releasedAt": "2026-06-29T02:20:29.163Z",
+          "manifestPath": "var/oreshnik/runs/S-HC-TOOL-01-GOAL-RUNNER-V1/kilo-S-HC-TOOL-01-GOAL-RUNNER-V1-2026-06-29T02-19-43-008Z-33b124f7.json"
+        }
+      ],
+      "integration": {
+        "runId": "kilo-S-HC-TOOL-01-GOAL-RUNNER-V1-2026-06-29T02-07-54-626Z-6c79c9a6",
+        "sourceBranch": "kilo/s-hc-tool-01-goal-runner-v1",
+        "status": "integrated",
+        "motherBranch": "MADRE/v50-s-hc-tool-01-goal-runner-v1-goal-runner-v1-deterministic-state-machine-locks-2026-06-29",
+        "queuedAt": "2026-06-29T02:18:06.697Z",
+        "updatedAt": "2026-06-29T03:21:35.807Z",
+        "targetBranch": "MADRE/v50-s-hc-tool-01-goal-runner-v1-goal-runner-v1-deterministic-state-machine-locks-2026-06-29",
+        "integratedAt": "2026-06-29T03:21:35.807Z"
+      },
+      "latestTrain": {
+        "attemptId": "train-kilo-S-HC-TOOL-01-GOAL-RUNNER-V1-2026-06-29T02-0-1782703121744",
+        "runId": "kilo-S-HC-TOOL-01-GOAL-RUNNER-V1-2026-06-29T02-07-54-626Z-6c79c9a6",
+        "sourceBranch": "kilo/s-hc-tool-01-goal-runner-v1",
+        "targetBranch": "MADRE/v50-s-hc-tool-01-goal-runner-v1-goal-runner-v1-deterministic-state-machine-locks-2026-06-29",
+        "integrationBranch": "integration-train/S-HC-TOOL-01-GOAL-RUNNER/S-HC-TOOL-01-GOAL-RUNNER/r-2ff68e9be13b/a-2cfa35e28f38",
+        "operator": "manuel",
+        "lockKey": "integration-train/MADRE/v50-s-hc-tool-01-goal-runner-v1-goal-runner-v1-deterministic-state-machine-locks-2026-06-29",
+        "status": "succeeded",
+        "startedAt": "2026-06-29T03:18:41.744Z",
+        "completedAt": "2026-06-29T03:21:35.900Z",
+        "reason": "Already contained on MADRE/v50-s-hc-tool-01-goal-runner-v1-goal-runner-v1-deterministic-state-machine-locks-2026-06-29; runtime reconciled without merge",
+        "motherAdvanceState": "runtime_projection_confirmed",
+        "gateResults": [
+          {
+            "name": "typecheck",
+            "passed": true
+          },
+          {
+            "name": "build",
+            "passed": true
+          },
+          {
+            "name": "test",
+            "passed": true
+          }
+        ],
+        "outcome": {
+          "mergeBase": "4d986ac1e35c00c5b6950862b2d08a57e2347daf",
+          "changedFiles": [],
+          "compatibilityBranchPushed": false,
+          "deliveryDisposition": "already_contained",
+          "projectedMotherBranch": "MADRE/v50-s-hc-tool-01-goal-runner-v1-goal-runner-v1-deterministic-state-machine-locks-2026-06-29",
+          "motherAdvanceState": "runtime_projection_confirmed",
+          "motherFunctionalExpectedCommit": "4d986ac1e35c00c5b6950862b2d08a57e2347daf",
+          "motherFunctionalRemoteCommit": "4d986ac1e35c00c5b6950862b2d08a57e2347daf",
+          "motherFunctionalPushVerified": true,
+          "motherFunctionalPushReconciled": false,
+          "projectedTaskStatus": "integrated",
+          "projectedRunStatus": "integrated",
+          "projectedSprintEntryStatus": "integrated"
+        }
+      }
     },
     {
       "id": "S-HC-OBS-01-PUBLISHING-OBSERVABILITY",
@@ -354,7 +670,42 @@
           "operator": "kilo",
           "description": "Run kilo-S-HC-OBS-01-PUBLISHING-OBSERVABILITY-2026-06-29T02-25-50-533Z-0b59e14b released"
         }
-      ]
+      ],
+      "project": "HeptaCore",
+      "sprint": "S-HC-OBS-01-PUBLISHING-OBSERVABILITY",
+      "sprintOrderIndex": 3,
+      "taskOrderIndex": 3,
+      "updatedAt": "2026-06-29T02:29:41.523Z",
+      "runs": [
+        {
+          "runId": "kilo-S-HC-OBS-01-PUBLISHING-OBSERVABILITY-2026-06-29T02-25-50-533Z-0b59e14b",
+          "operator": "kilo",
+          "worker": "kilo",
+          "workerMode": "codex",
+          "branch": "task/S-HC-OBS-01-PUBLISHING-OBSERVABILITY/S-HC-OBS-01-PUBLISHING-OBSERVABILITY/kilo/kilo-S-HC-OBS-01-PUBLISHING-OBSERVABILITY-2026-06-29T02-25-50-533Z-0b59e14b",
+          "worktreePath": "var/oreshnik/wt/S-HC-OBS-01-PUBLISHING-OBSERVABILITY/S-HC-OBS-01-PUBLISHING-OBSERVABILITY/r-226ffbae8a2e",
+          "zones": [
+            "apps/web",
+            "packages/core",
+            "docs"
+          ],
+          "taskStatus": "ready_for_integration",
+          "claimStatus": "released",
+          "claimedAt": "2026-06-29T02:25:50.533Z",
+          "updatedAt": "2026-06-29T02:29:41.536Z",
+          "expiresAt": "2026-06-29T03:25:50.533Z",
+          "releasedAt": "2026-06-29T02:29:41.536Z",
+          "manifestPath": "var/oreshnik/runs/S-HC-OBS-01-PUBLISHING-OBSERVABILITY/kilo-S-HC-OBS-01-PUBLISHING-OBSERVABILITY-2026-06-29T02-25-50-533Z-0b59e14b.json"
+        }
+      ],
+      "integration": {
+        "runId": "kilo-S-HC-OBS-01-PUBLISHING-OBSERVABILITY-2026-06-29T02-25-50-533Z-0b59e14b",
+        "sourceBranch": "task/S-HC-OBS-01-PUBLISHING-OBSERVABILITY/S-HC-OBS-01-PUBLISHING-OBSERVABILITY/kilo/kilo-S-HC-OBS-01-PUBLISHING-OBSERVABILITY-2026-06-29T02-25-50-533Z-0b59e14b",
+        "status": "queued",
+        "motherBranch": "MADRE/v50-s-hc-obs-01-publishing-observability-publishing-observability-structured-logging-with-2026-06-29",
+        "queuedAt": "2026-06-29T02:29:51.888Z",
+        "updatedAt": "2026-06-29T02:29:51.888Z"
+      }
     },
     {
       "id": "S-HC-DRIFT-001",
@@ -377,7 +728,13 @@
           "operator": "Manuel",
           "description": "sprint"
         }
-      ]
+      ],
+      "project": "HeptaCore",
+      "sprint": "ad-hoc",
+      "sprintOrderIndex": 4,
+      "taskOrderIndex": 4,
+      "updatedAt": "2026-06-29T02:29:41.523Z",
+      "runs": []
     },
     {
       "id": "S-HC-DRIFT-002",
@@ -401,7 +758,13 @@
           "operator": "Manuel",
           "description": "Codex multi-RRSS refactor"
         }
-      ]
+      ],
+      "project": "HeptaCore",
+      "sprint": "ad-hoc",
+      "sprintOrderIndex": 4,
+      "taskOrderIndex": 5,
+      "updatedAt": "2026-06-29T02:29:41.523Z",
+      "runs": []
     },
     {
       "id": "S-HC-DRIFT-003",
@@ -423,7 +786,13 @@
           "operator": "Manuel",
           "description": "Sistema de publicacion con 3 modos, 24 crons Vercel, cron publisher idempotente"
         }
-      ]
+      ],
+      "project": "HeptaCore",
+      "sprint": "ad-hoc",
+      "sprintOrderIndex": 4,
+      "taskOrderIndex": 6,
+      "updatedAt": "2026-06-29T02:29:41.523Z",
+      "runs": []
     },
     {
       "id": "S-HC-AIGEN-01-ASSET-GENERATION-BROKER",
@@ -456,14 +825,20 @@
           "operator": "manuel",
           "description": "Task status reconciled to blocked: dependency S-HC-ASSET-01-STRATEGY-ASSET-MANIFEST still pending (S-HC-ASSET-01-STRATEGY-ASSET-MANIFEST:pending) | dependency S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE still pending (S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE:pending) | dependency S-HC-COMM-02-BILLING-ACTIVATION still pending (S-HC-COMM-02-BILLING-ACTIVATION:pending)"
         }
-      ]
+      ],
+      "project": "HeptaCore",
+      "sprint": "ai-generation",
+      "sprintOrderIndex": 5,
+      "taskOrderIndex": 7,
+      "updatedAt": "2026-06-29T02:29:41.523Z",
+      "runs": []
     },
     {
       "id": "S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE",
       "title": "LLM provider selection, cost estimation and governance policy",
       "owner": "Manuel",
       "backupOwner": "Manuel",
-      "status": "ready",
+      "status": "integrated",
       "track": "ai-infra",
       "zone": [
         "packages/agents",
@@ -484,8 +859,613 @@
           "action": "status_reconciled",
           "operator": "manuel",
           "description": "Task status reconciled to ready: dependencies and conflicts are clear for execution"
+        },
+        {
+          "at": "2026-06-29T02:30:49.553Z",
+          "action": "claimed",
+          "operator": "codex",
+          "branch": "task/ai-infra/S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE/codex/codex-S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE-2026-06-29T02-30-49-546Z-c443db0b",
+          "description": "Run codex-S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE-2026-06-29T02-30-49-546Z-c443db0b claimed via codex"
+        },
+        {
+          "at": "2026-06-29T02:50:23.982Z",
+          "action": "validation_started",
+          "operator": "codex",
+          "branch": "task/ai-infra/S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE/codex/codex-S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE-2026-06-29T02-30-49-546Z-c443db0b",
+          "description": "typecheck pass, build pass, worker-validate pass, 693 tests pass (23 core). All acceptance criteria met: provider-agnostic broker, task model selection, cost estimation, admin policy, usage tracking."
+        },
+        {
+          "at": "2026-06-29T16:10:34.987Z",
+          "action": "validated",
+          "operator": "codex",
+          "branch": "task/ai-infra/S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE/codex/codex-S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE-2026-06-29T02-30-49-546Z-c443db0b",
+          "description": "Reanudación del mismo Run. Handoff versionado registrado y tests ejecutados como gate estructurado.; typecheck passed; build passed; worker passed; tests passed"
+        },
+        {
+          "at": "2026-06-29T16:10:34.987Z",
+          "action": "ready_for_integration",
+          "operator": "codex",
+          "branch": "task/ai-infra/S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE/codex/codex-S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE-2026-06-29T02-30-49-546Z-c443db0b",
+          "description": "Task delivered with handoff docs/07_handoffs/S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE.md"
+        },
+        {
+          "at": "2026-06-29T16:55:18.048Z",
+          "action": "integrated",
+          "operator": "manuel",
+          "branch": "task/ai-infra/S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE/codex/codex-S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE-2026-06-29T02-30-49-546Z-c443db0b",
+          "description": "Integrated task/ai-infra/S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE/codex/codex-S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE-2026-06-29T02-30-49-546Z-c443db0b into MADRE/v50-ai-infra-llm-provider-selection-cost-governance-2026-06-29"
         }
-      ]
+      ],
+      "project": "HeptaCore",
+      "sprint": "ai-infra",
+      "sprintOrderIndex": 5,
+      "taskOrderIndex": 7,
+      "handoff": "docs/07_handoffs/S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE.md",
+      "attempts": 1,
+      "validationGateResults": [
+        {
+          "gateId": "typecheck",
+          "command": "npm",
+          "args": [
+            "run",
+            "typecheck"
+          ],
+          "cwd": "var/oreshnik/wt/ai-infra/S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE/r-c20ec67edeb3",
+          "startedAt": "2026-06-29T15:54:41.352Z",
+          "finishedAt": "2026-06-29T15:55:12.248Z",
+          "durationMs": 30891,
+          "exitCode": 0,
+          "signal": null,
+          "timedOut": false,
+          "spawnError": null,
+          "stdout": "\n> heptacore@0.1.0 typecheck\n> npm run typecheck --workspaces --if-present\n\n\n> @heptacore/web@0.1.0 typecheck\n> tsc --noEmit\n\n\n> @heptacore/worker@0.2.0 typecheck\n> tsc --noEmit\n\n\n> @heptacore/agents@0.1.0 typecheck\n> tsc --noEmit\n\n\n> @heptacore/core@0.1.0 typecheck\n> tsc --noEmit\n\n\n> @heptacore/db@0.1.0 typecheck\n> tsc --noEmit\n\n\n> @heptacore/integrations@0.1.0 typecheck\n> tsc --noEmit\n\n\n> @heptacore/ui@0.1.0 typecheck\n> tsc --noEmit\n\n",
+          "stderr": "",
+          "passed": true,
+          "attempt": 1,
+          "commandFingerprint": "36561058fd62fec31ab56e339b7c2f03a8fdc2a73700837c3079c7ea34fa5588",
+          "resultFingerprint": "48fb2d40d241a3182e463614d3cd9ac0fa65ec2e1255aeba3100dc7a7732bd9e",
+          "stdoutBytes": 440,
+          "stderrBytes": 0,
+          "stdoutTruncated": false,
+          "stderrTruncated": false
+        },
+        {
+          "gateId": "build",
+          "command": "npm",
+          "args": [
+            "run",
+            "build"
+          ],
+          "cwd": "var/oreshnik/wt/ai-infra/S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE/r-c20ec67edeb3",
+          "startedAt": "2026-06-29T15:55:12.249Z",
+          "finishedAt": "2026-06-29T15:57:00.964Z",
+          "durationMs": 108715,
+          "exitCode": 0,
+          "signal": null,
+          "timedOut": false,
+          "spawnError": null,
+          "stdout": "\n> heptacore@0.1.0 build\n> npm run build --workspaces --if-present\n\n\n> @heptacore/web@0.1.0 build\n> node scripts/copy-tenant-assets.mjs && prisma generate --schema ../../packages/db/prisma/schema.prisma && next build\n\n[copy-tenant-assets] Turpial assets copied to var/oreshnik/wt/ai-infra/S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE/r-c20ec67edeb3/apps/web/public/tenant-assets/turpial\n\n✔ Generated Prisma Client (v7.8.0) to .\\..\\..\\..\\..\\..\\..\\..\\..\\node_modules\\@prisma\\client in 845ms\n\nStart by importing your Prisma Client (See: https://pris.ly/d/importing-client)\n\n\n▲ Next.js 16.2.6 (Turbopack)\n\n  Creating an optimized production build ...\n✓ Compiled successfully in 54s\n  Running TypeScript ...\n  Finished TypeScript in 10.7s ...\n  Collecting page data using 7 workers ...\n  Generating static pages using 7 workers (0/27) ...\n  Generating static pages using 7 workers (6/27) \r\n  Generating static pages using 7 workers (13/27) \r\n  Generating static pages using 7 workers (20/27) \r\n✓ Generating static pages using 7 workers (27/27) in 459ms\n  Finalizing page optimization ...\n\nRoute (app)\n┌ ƒ /\n├ ○ /_not-found\n├ ƒ /accept-invitation\n├ ƒ /access-required\n├ ƒ /admin\n├ ƒ /admin/tenants\n├ ƒ /admin/tenants/[slug]\n├ ƒ /admin/tenants/new\n├ ƒ /api/admin/capabilities\n├ ƒ /api/admin/facebook-page/bootstrap\n├ ƒ /api/admin/llm-config\n├ ƒ /api/admin/llm-governance\n├ ƒ /api/admin/llm-usage\n├ ƒ /api/admin/tenants\n├ ƒ /api/admin/tenants/[slug]\n├ ƒ /api/admin/tenants/[slug]/invitations\n├ ƒ /api/admin/tenants/[slug]/invitations/[id]\n├ ƒ /api/admin/tenants/[slug]/invitations/[id]/resend\n├ ƒ /api/admin/tenants/[slug]/members\n├ ƒ /api/admin/tenants/[slug]/members/[membershipId]\n├ ƒ /api/admin/tenants/[slug]/status\n├ ƒ /api/assets/[id]\n├ ƒ /api/assets/upload\n├ ƒ /api/assistant\n├ ƒ /api/auth/[...nextauth]\n├ ƒ /api/auth/recover\n├ ƒ /api/auth/register\n├ ƒ /api/auth/reset-password\n├ ƒ /api/campaigns\n├ ƒ /api/campaigns/[id]/approve\n├ ƒ /api/cron/publisher\n├ ƒ /api/drafts/[id]\n├ ƒ /api/drafts/[id]/approve\n├ ƒ /api/drafts/[id]/asset\n├ ƒ /api/drafts/[id]/reject\n├ ƒ /api/drafts/new\n├ ƒ /api/drafts/reorder\n├ ƒ /api/invitations\n├ ƒ /api/invitations/accept\n├ ƒ /api/oauth/facebook/callback\n├ ƒ /api/oauth/facebook/login\n├ ƒ /api/oauth/instagram/callback\n├ ƒ /api/oauth/instagram/login\n├ ƒ /api/publishing/publish\n├ ƒ /api/publishing/rollback\n├ ƒ /api/session/capabilities\n├ ƒ /api/strategy/generate\n├ ƒ /api/strategy/update\n├ ƒ /api/tenant-assets/[[...path]]\n├ ƒ /api/tenant-networks\n├ ƒ /api/tenants/[slug]/assets\n├ ƒ /api/tenants/[slug]/assets/[assetId]\n├ ƒ /api/tenants/[slug]/assets/[assetId]/content\n├ ƒ /api/tenants/[slug]/assets/[assetId]/content/upload\n├ ƒ /api/tenants/[slug]/assets/by-storage-key\n├ ƒ /api/tenants/[slug]/assets/finalize\n├ ƒ /api/tenants/[slug]/assets/upload\n├ ƒ /api/webhooks/resend\n├ ƒ /app\n├ ○ /data-deletion\n├ ○ /icon.svg\n├ ○ /login\n├ ○ /privacy\n├ ○ /recover\n├ ○ /register\n├ ○ /reset-password\n├ ƒ /tenant/[slug]\n└ ○ /terms\n\n\nƒ Proxy (Middleware)\n\n○  (Static)   prerendered as static content\nƒ  (Dynamic)  server-rendered on demand\n\n",
+          "stderr": "Prisma schema loaded from ..\\..\\packages\\db\\prisma\\schema.prisma.\n⚠ Warning: Next.js inferred your workspace root, but it may not be correct.\n We detected multiple lockfiles and selected the directory of D:\\PROYECTOS\\WORKTREES\\CODEX\\AI01\\package-lock.json as the root directory.\n To silence this warning, set `turbopack.root` in your Next.js config, or consider removing one of the lockfiles if it's not needed.\n   See https://nextjs.org/docs/app/api-reference/config/next-config-js/turbopack#root-directory for more information.\n Detected additional lockfiles: \n   * var/oreshnik/wt/ai-infra/S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE/r-c20ec67edeb3/package-lock.json\n\n",
+          "passed": true,
+          "attempt": 1,
+          "commandFingerprint": "d5a25a40a8fbafbb2663414fbe364fb70dd437af3e82ab396fb83ce7f10a8f6b",
+          "resultFingerprint": "1af8cec16f5bc57bd0ecbbf992deb5543215d0adabf180c62b3114af735fff5e",
+          "stdoutBytes": 3311,
+          "stderrBytes": 704,
+          "stdoutTruncated": false,
+          "stderrTruncated": false
+        },
+        {
+          "gateId": "worker",
+          "command": "npm",
+          "args": [
+            "run",
+            "worker:validate"
+          ],
+          "cwd": "var/oreshnik/wt/ai-infra/S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE/r-c20ec67edeb3",
+          "startedAt": "2026-06-29T15:57:00.964Z",
+          "finishedAt": "2026-06-29T15:57:02.308Z",
+          "durationMs": 1344,
+          "exitCode": 0,
+          "signal": null,
+          "timedOut": false,
+          "spawnError": null,
+          "stdout": "\n> heptacore@0.1.0 worker:validate\n> npm run validate -w @heptacore/worker\n\n\n> @heptacore/worker@0.2.0 validate\n> node src/validate.mjs\n\n\n=== Validacion de Assets ===\n\nPresentes: 46/46\n✅ Todos los assets presentes.\n\n\n=== Validacion de Cola de Publicaciones ===\nTotal entries: 29\n\n\n=== Resumen de Validacion ===\nValidos: 29/29\nAssets faltantes: 0\nFechas faltantes: 0\n\n✅ Todos los drafts validos.\n",
+          "stderr": "[config] .env.rrss no encontrado. Usando solo variables de entorno del sistema.\n",
+          "passed": true,
+          "attempt": 1,
+          "commandFingerprint": "164e1516b9e128a54e6e11f80a46bd22642c18475a89dcdc7edfda5e09a4719e",
+          "resultFingerprint": "e9b26aa2d72798a015aa1076de55769dfc65eceafb86fbc37fcefb6302d4846b",
+          "stdoutBytes": 399,
+          "stderrBytes": 80,
+          "stdoutTruncated": false,
+          "stderrTruncated": false
+        },
+        {
+          "gateId": "typecheck",
+          "command": "npm",
+          "args": [
+            "run",
+            "typecheck"
+          ],
+          "cwd": "var/oreshnik/wt/ai-infra/S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE/r-c20ec67edeb3",
+          "startedAt": "2026-06-29T16:09:11.660Z",
+          "finishedAt": "2026-06-29T16:09:29.711Z",
+          "durationMs": 18050,
+          "exitCode": 0,
+          "signal": null,
+          "timedOut": false,
+          "spawnError": null,
+          "stdout": "\n> heptacore@0.1.0 typecheck\n> npm run typecheck --workspaces --if-present\n\n\n> @heptacore/web@0.1.0 typecheck\n> tsc --noEmit\n\n\n> @heptacore/worker@0.2.0 typecheck\n> tsc --noEmit\n\n\n> @heptacore/agents@0.1.0 typecheck\n> tsc --noEmit\n\n\n> @heptacore/core@0.1.0 typecheck\n> tsc --noEmit\n\n\n> @heptacore/db@0.1.0 typecheck\n> tsc --noEmit\n\n\n> @heptacore/integrations@0.1.0 typecheck\n> tsc --noEmit\n\n\n> @heptacore/ui@0.1.0 typecheck\n> tsc --noEmit\n\n",
+          "stderr": "",
+          "passed": true,
+          "attempt": 2,
+          "commandFingerprint": "4dcc76c98b29452855805f0ef59404d57a8d9f967ca081bc217387f1077b6921",
+          "resultFingerprint": "75292a46fe80d2bf23e3fb1da4e59dded52fafe8e4df44ca9f82170170668fee",
+          "stdoutBytes": 440,
+          "stderrBytes": 0,
+          "stdoutTruncated": false,
+          "stderrTruncated": false
+        },
+        {
+          "gateId": "build",
+          "command": "npm",
+          "args": [
+            "run",
+            "build"
+          ],
+          "cwd": "var/oreshnik/wt/ai-infra/S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE/r-c20ec67edeb3",
+          "startedAt": "2026-06-29T16:09:29.712Z",
+          "finishedAt": "2026-06-29T16:10:13.383Z",
+          "durationMs": 43671,
+          "exitCode": 0,
+          "signal": null,
+          "timedOut": false,
+          "spawnError": null,
+          "stdout": "\n> heptacore@0.1.0 build\n> npm run build --workspaces --if-present\n\n\n> @heptacore/web@0.1.0 build\n> node scripts/copy-tenant-assets.mjs && prisma generate --schema ../../packages/db/prisma/schema.prisma && next build\n\n[copy-tenant-assets] Turpial assets copied to var/oreshnik/wt/ai-infra/S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE/r-c20ec67edeb3/apps/web/public/tenant-assets/turpial\n\n✔ Generated Prisma Client (v7.8.0) to .\\..\\..\\..\\..\\..\\..\\..\\..\\..\\PROYECTOS\\WORKTREES\\CODEX\\AI01\\node_modules\\@prisma\\client in 805ms\n\nStart by importing your Prisma Client (See: https://pris.ly/d/importing-client)\n\n\n▲ Next.js 16.2.6 (Turbopack)\n\n  Creating an optimized production build ...\n✓ Compiled successfully in 12.3s\n  Running TypeScript ...\n  Finished TypeScript in 9.8s ...\n  Collecting page data using 7 workers ...\n  Generating static pages using 7 workers (0/27) ...\n  Generating static pages using 7 workers (6/27) \r\n  Generating static pages using 7 workers (13/27) \r\n  Generating static pages using 7 workers (20/27) \r\n✓ Generating static pages using 7 workers (27/27) in 436ms\n  Finalizing page optimization ...\n\nRoute (app)\n┌ ƒ /\n├ ○ /_not-found\n├ ƒ /accept-invitation\n├ ƒ /access-required\n├ ƒ /admin\n├ ƒ /admin/tenants\n├ ƒ /admin/tenants/[slug]\n├ ƒ /admin/tenants/new\n├ ƒ /api/admin/capabilities\n├ ƒ /api/admin/facebook-page/bootstrap\n├ ƒ /api/admin/llm-config\n├ ƒ /api/admin/llm-governance\n├ ƒ /api/admin/llm-usage\n├ ƒ /api/admin/tenants\n├ ƒ /api/admin/tenants/[slug]\n├ ƒ /api/admin/tenants/[slug]/invitations\n├ ƒ /api/admin/tenants/[slug]/invitations/[id]\n├ ƒ /api/admin/tenants/[slug]/invitations/[id]/resend\n├ ƒ /api/admin/tenants/[slug]/members\n├ ƒ /api/admin/tenants/[slug]/members/[membershipId]\n├ ƒ /api/admin/tenants/[slug]/status\n├ ƒ /api/assets/[id]\n├ ƒ /api/assets/upload\n├ ƒ /api/assistant\n├ ƒ /api/auth/[...nextauth]\n├ ƒ /api/auth/recover\n├ ƒ /api/auth/register\n├ ƒ /api/auth/reset-password\n├ ƒ /api/campaigns\n├ ƒ /api/campaigns/[id]/approve\n├ ƒ /api/cron/publisher\n├ ƒ /api/drafts/[id]\n├ ƒ /api/drafts/[id]/approve\n├ ƒ /api/drafts/[id]/asset\n├ ƒ /api/drafts/[id]/reject\n├ ƒ /api/drafts/new\n├ ƒ /api/drafts/reorder\n├ ƒ /api/invitations\n├ ƒ /api/invitations/accept\n├ ƒ /api/oauth/facebook/callback\n├ ƒ /api/oauth/facebook/login\n├ ƒ /api/oauth/instagram/callback\n├ ƒ /api/oauth/instagram/login\n├ ƒ /api/publishing/publish\n├ ƒ /api/publishing/rollback\n├ ƒ /api/session/capabilities\n├ ƒ /api/strategy/generate\n├ ƒ /api/strategy/update\n├ ƒ /api/tenant-assets/[[...path]]\n├ ƒ /api/tenant-networks\n├ ƒ /api/tenants/[slug]/assets\n├ ƒ /api/tenants/[slug]/assets/[assetId]\n├ ƒ /api/tenants/[slug]/assets/[assetId]/content\n├ ƒ /api/tenants/[slug]/assets/[assetId]/content/upload\n├ ƒ /api/tenants/[slug]/assets/by-storage-key\n├ ƒ /api/tenants/[slug]/assets/finalize\n├ ƒ /api/tenants/[slug]/assets/upload\n├ ƒ /api/webhooks/resend\n├ ƒ /app\n├ ○ /data-deletion\n├ ○ /icon.svg\n├ ○ /login\n├ ○ /privacy\n├ ○ /recover\n├ ○ /register\n├ ○ /reset-password\n├ ƒ /tenant/[slug]\n└ ○ /terms\n\n\nƒ Proxy (Middleware)\n\n○  (Static)   prerendered as static content\nƒ  (Dynamic)  server-rendered on demand\n\n",
+          "stderr": "Prisma schema loaded from ..\\..\\packages\\db\\prisma\\schema.prisma.\n⚠ Warning: Next.js inferred your workspace root, but it may not be correct.\n We detected multiple lockfiles and selected the directory of D:\\PROYECTOS\\WORKTREES\\CODEX\\AI01\\package-lock.json as the root directory.\n To silence this warning, set `turbopack.root` in your Next.js config, or consider removing one of the lockfiles if it's not needed.\n   See https://nextjs.org/docs/app/api-reference/config/next-config-js/turbopack#root-directory for more information.\n Detected additional lockfiles: \n   * var/oreshnik/wt/ai-infra/S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE/r-c20ec67edeb3/package-lock.json\n\n",
+          "passed": true,
+          "attempt": 2,
+          "commandFingerprint": "8d2ee923e5b7893c7772817f98e78159d47ed7fd6155a990953089a67c6adf49",
+          "resultFingerprint": "85f898fb203a57042378de4a4325f1200a99fc67cd7515d8a1306ee1cea38841",
+          "stdoutBytes": 3346,
+          "stderrBytes": 704,
+          "stdoutTruncated": false,
+          "stderrTruncated": false
+        },
+        {
+          "gateId": "worker",
+          "command": "npm",
+          "args": [
+            "run",
+            "worker:validate"
+          ],
+          "cwd": "var/oreshnik/wt/ai-infra/S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE/r-c20ec67edeb3",
+          "startedAt": "2026-06-29T16:10:13.384Z",
+          "finishedAt": "2026-06-29T16:10:14.645Z",
+          "durationMs": 1261,
+          "exitCode": 0,
+          "signal": null,
+          "timedOut": false,
+          "spawnError": null,
+          "stdout": "\n> heptacore@0.1.0 worker:validate\n> npm run validate -w @heptacore/worker\n\n\n> @heptacore/worker@0.2.0 validate\n> node src/validate.mjs\n\n",
+          "stderr": "[config] .env.rrss no encontrado. Usando solo variables de entorno del sistema.\n",
+          "passed": true,
+          "attempt": 2,
+          "commandFingerprint": "a3a5ab6a5897b2bd64f0c26b4120c2f195e2cce9aa8daaa13a9ccd4a1b740453",
+          "resultFingerprint": "c1bc0192dc895a6318c236fb7a5030dfaeac7d299ef5f970b059e23398f28578",
+          "stdoutBytes": 137,
+          "stderrBytes": 80,
+          "stdoutTruncated": false,
+          "stderrTruncated": false
+        },
+        {
+          "gateId": "tests",
+          "command": "npm",
+          "args": [
+            "run",
+            "test"
+          ],
+          "cwd": "var/oreshnik/wt/ai-infra/S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE/r-c20ec67edeb3",
+          "startedAt": "2026-06-29T16:10:14.646Z",
+          "finishedAt": "2026-06-29T16:10:32.082Z",
+          "durationMs": 17436,
+          "exitCode": 0,
+          "signal": null,
+          "timedOut": false,
+          "spawnError": null,
+          "stdout": "\n> heptacore@0.1.0 test\n> node --test apps/web/lib/calendar-state.test.mjs && npm run test --workspaces --if-present\n\n✔ calendar display state prefers operational state over approval status (1.0039ms)\nℹ tests 1\nℹ suites 0\nℹ pass 1\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 168.5856\n\n> @heptacore/web@0.1.0 test\n> tsx --test lib/__tests__/*.test.ts\n\n▶ resolveAdminCapabilities\n  ✔ throws UNAUTHORIZED when user does not exist (4.3546ms)\n  ✔ returns SUPER_ADMIN capabilities with all permissions (1.4215ms)\n  ✔ returns empty tenant context when no tenant slug (0.5363ms)\n  ✔ throws NOT_FOUND for non-existent tenant slug (0.8238ms)\n  ✔ returns tenant context with lifecycle status for ACTIVE (0.7435ms)\n  ✔ returns lifecycle block reason for PROVISIONING (0.6156ms)\n  ✔ returns lifecycle block reason for SUSPENDED (0.6316ms)\n  ✔ returns lifecycle block reason for ARCHIVED (1.4814ms)\n  ✔ includes tenant role when user is member (0.679ms)\n  ✔ response has zero secrets (0.545ms)\n  ✔ tenant permissions for SUPER_ADMIN in tenant show full access (0.686ms)\n  ✔ switch tenant slug returns different tenant data (0.4013ms)\n  ✔ no tenant slug returns full global permissions without tenant context (0.262ms)\n✔ resolveAdminCapabilities (16.1999ms)\n▶ tenant console — list with search/filter\n  ✔ search finds tenants by name (case insensitive) (5.8056ms)\n  ✔ search finds tenants by slug (case insensitive) (0.9259ms)\n  ✔ status filter returns only matching tenants (0.777ms)\n  ✔ invalid status filter throws 400 (1.8965ms)\n  ✔ combined search + status filters correctly (0.9532ms)\n  ✔ search with no results returns empty (0.6763ms)\n✔ tenant console — list with search/filter (13.667ms)\n▶ tenant console — create with timezone/locale\n  ✔ persists timezone and locale when provided (4.1793ms)\n  ✔ defaults to UTC/es when not provided (2.4993ms)\n  ✔ returns INVITATION_REQUIRED when user has no passwordHash (5.361ms)\n  ✔ returns EXISTING_ACCOUNT when user has passwordHash (3.2107ms)\n  ✔ serializes without exposing passwordHash or tokenHash (3.2344ms)\n✔ tenant console — create with timezone/locale (19.3498ms)\n▶ tenant console — getAdminTenant with owner email\n  ✔ returns real owner email from membership (0.8037ms)\n  ✔ does not expose sensitive fields (0.6577ms)\n✔ tenant console — getAdminTenant with owner email (1.7236ms)\n▶ tenant console — pagination\n  ✔ listAdminTenants paginates correctly (1.1738ms)\n✔ tenant console — pagination (1.31ms)\n▶ tenant console — SUPER_ADMIN guard via DB\n  ✔ rejects non-SUPER_ADMIN actors (0.5762ms)\n  ✔ allows SUPER_ADMIN actors (0.4109ms)\n✔ tenant console — SUPER_ADMIN guard via DB (1.2316ms)\n▶ asset compatibility\n  ✔ classifies Instagram Feed ideal (2.0201ms)\n  ✔ classifies Instagram Story ideal 9:16 (0.4279ms)\n  ✔ rejects images for Instagram Reel (0.2408ms)\n  ✔ accepts compatible vertical video for YouTube Short (0.9949ms)\n  ✔ evaluates horizontal video for YouTube Video (0.2392ms)\n  ✔ marks documents incompatible with visual targets (0.3073ms)\n  ✔ returns UNKNOWN for legacy assets without metadata (0.2932ms)\n  ✔ filters by target and compatibility status (1.5524ms)\n  ✔ does not import or call publisher adapters from metadata compatibility code (12.8846ms)\n✔ asset compatibility (21.8006ms)\n▶ finalizeTenantAssetFromBlob\n  ✔ creates an Asset from an existing blob (10.6554ms)\n  ✔ returns the existing Asset idempotently (1.4751ms)\n  ✔ does not duplicate when finalize and callback race (1.593ms)\n  ✔ rejects pathname from another tenant (1.6726ms)\n  ✔ rejects missing blobs (0.8221ms)\n✔ finalizeTenantAssetFromBlob (18.7539ms)\n▶ resolveUploadedAssetAfterUpload\n  ✔ returns the Asset from finalize without polling and can be added locally (1.3194ms)\n  ✔ uses storageKey fallback after finalize timeout (411.7911ms)\n  ✔ retry with existing blob finalizes without re-upload (0.9121ms)\n  ✔ retries finalize once before polling fallback (430.3933ms)\n✔ resolveUploadedAssetAfterUpload (846.7621ms)\n▶ asset inspector drawer\n  ✔ uses a portal mounted on document.body (1.6158ms)\n  ✔ renders overlay and drawer as separate elements (0.2417ms)\n  ✔ supports Escape close and restores body scroll (0.2374ms)\n  ✔ sets dialog accessibility attributes and focuses the close button (0.5164ms)\n  ✔ uses an explicit solid drawer background and separate opaque overlay (0.6524ms)\n✔ asset inspector drawer (5.2109ms)\n▶ asset library filters\n  ✔ defaults a concrete target to ELIGIBLE compatibility (2.1428ms)\n  ✔ filters target + ELIGIBLE to only compatible assets (2.3759ms)\n  ✔ Instagram Reel does not show images as compatible (0.2822ms)\n  ✔ Instagram Reel + image + incompatible shows incompatible images (0.2786ms)\n  ✔ Todos los evaluados keeps all assets evaluated against the target (0.7988ms)\n  ✔ clear filters restores the full inventory (0.5845ms)\n✔ asset library filters (14.7261ms)\n▶ asset metadata normalization\n  ✔ normalizes square image metadata (4.2994ms)\n  ✔ normalizes vertical image metadata (0.3777ms)\n  ✔ normalizes horizontal image metadata (0.2689ms)\n  ✔ normalizes vertical video metadata with duration (0.2779ms)\n  ✔ drops invalid technical values without trusting client shape (0.3804ms)\n✔ asset metadata normalization (7.6805ms)\n▶ tenant asset service\n  ✔ uploads assets into the authenticated tenant and records audit (9.617ms)\n  ✔ does not list, rename, replace, or delete assets across tenants (3.5491ms)\n  ✔ rejects invalid MIME, excessive size, and normalizes unsafe filenames (88.23ms)\n  ✔ cleans the uploaded blob when DB create fails (1.2281ms)\n  ✔ replaces content while preserving Asset.id, draft links, audit log, and invalidating approved drafts (1.5226ms)\n  ✔ renames, moves, deletes free assets, and blocks delete when in use (1.2786ms)\n  ✔ persists analyzed legacy metadata through tenant-scoped update (0.7916ms)\n  ✔ keeps Turpial legacy assets renderable and Blob URLs usable in multiformat previews (1.702ms)\n  ✔ does not import publisher adapters from tenant asset code (1.8401ms)\n✔ tenant asset service (113.8069ms)\n▶ waitForRegisteredAsset\n  ✔ finds asset after retries (83.921ms)\n  ✔ times out without false success (61.2873ms)\n  ✔ retry has exponential backoff (1545.6417ms)\n✔ waitForRegisteredAsset (1691.5069ms)\n▶ by-storage-key endpoint\n  ✔ requires auth (verified by route source) (1.5676ms)\n  ✔ requires tenant membership (verified by route source) (0.9495ms)\n  ✔ returns found:true for registered asset (0.44ms)\n  ✔ returns found:false for unknown storageKey (0.2722ms)\n✔ by-storage-key endpoint (3.4603ms)\n▶ collections management\n  ✔ collections list from existing assets (0.2813ms)\n  ✔ create collection inline (0.1197ms)\n  ✔ dedup case-insensitive (0.1026ms)\n✔ collections management (0.6154ms)\n▶ waitForRegisteredAsset error handling\n  ✔ continues polling after 500 temporary (26.5561ms)\n  ✔ handles non-JSON response gracefully (33.5144ms)\n  ✔ stops on 401/403 (0.7449ms)\n✔ waitForRegisteredAsset error handling (61.2634ms)\n▶ retry and upload behavior\n  ✔ retry does not create second row (0.2391ms)\n  ✔ retry of registration does not re-upload blob (0.3418ms)\n✔ retry and upload behavior (0.6934ms)\n▶ zero provider calls\n  ✔ zero provider calls (1.1823ms)\n✔ zero provider calls (1.2654ms)\n▶ auth access routing\n  ✔ visitor goes to login with app callback (1.8349ms)\n  ✔ login without callback falls back to /app (0.3438ms)\n  ✔ session without memberships goes to access-required without loop (1.7686ms)\n  ✔ one membership redirects to the real tenant slug (0.4145ms)\n  ✔ superadmin goes to admin (0.3562ms)\n  ✔ unauthorized tenant access goes to access-required (0.403ms)\n  ✔ external callbacks are rejected (0.4956ms)\n  ✔ proxy no longer sends anonymous users to a hardcoded tenant (4.6099ms)\n  ✔ login does not block legacy identifiers with browser email validation (1.8396ms)\n  ✔ membership added after login refreshes token claims (0.6677ms)\n✔ auth access routing (17.1574ms)\n▶ ensure-user-access tool\n  ✔ plans idempotent membership writes (0.4733ms)\n  ✔ is idempotent against an existi",
+          "stderr": "",
+          "passed": true,
+          "attempt": 1,
+          "commandFingerprint": "8c8a1cf9e4ac3655d7e1fa9923f52bb064e3e176f9c0f3d68a3dd473116927e7",
+          "resultFingerprint": "e7b8ac2481a13af4b04982b54e978a340177e6d3e01af62c920108bab72e51b2",
+          "stdoutBytes": 50360,
+          "stderrBytes": 0,
+          "stdoutTruncated": true,
+          "stderrTruncated": false
+        }
+      ],
+      "evidenceVerifications": [
+        {
+          "itemId": "build_passed",
+          "label": "build passed",
+          "verified": true,
+          "verifiedAt": "2026-06-29T16:10:13.383Z",
+          "runId": "codex-S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE-2026-06-29T02-30-49-546Z-c443db0b",
+          "gateId": "build",
+          "source": "gate",
+          "commandFingerprint": "8d2ee923e5b7893c7772817f98e78159d47ed7fd6155a990953089a67c6adf49",
+          "resultFingerprint": "85f898fb203a57042378de4a4325f1200a99fc67cd7515d8a1306ee1cea38841",
+          "summary": "S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE:build | exit=0 | timed_ok | signal=none | stdout=> heptacore@0.1.0 build | stderr=Prisma schema loaded from ..\\..\\packages\\db\\prisma\\schema.prisma."
+        },
+        {
+          "itemId": "changed_files_diff",
+          "label": "changed files diff",
+          "verified": true,
+          "verifiedAt": "2026-06-29T16:10:32.121Z",
+          "runId": "codex-S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE-2026-06-29T02-30-49-546Z-c443db0b",
+          "source": "git",
+          "resultFingerprint": "5b2ee786f4aac76998843638fdeaab6050a9b2c22935fcf49b1981475bc1e167",
+          "summary": "diff master..task/ai-infra/S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE/codex/codex-S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE-2026-06-29T02-30-49-546Z-c443db0b: .gitignore, .kilo/command/preflight.md, .kilo/commands/goal.md, .kilo/commands/preflight.md, .kilo/commands/pub04-correct.md, .kilo/commands/pub04-finalize.md, .oreshnik.json, AGENTS.md, apps/web/app/accept-invitation/accept-invitation-client.tsx, apps/web/app/accept-invitation/page.tsx, apps/web/app/access-required/page.tsx, apps/web/app/admin/page.tsx, apps/web/app/admin/tenants/[slug]/page.tsx, apps/web/app/admin/tenants/layout.tsx, apps/web/app/admin/tenants/new/page.tsx, apps/web/app/admin/tenants/page.tsx, apps/web/app/api/admin/capabilities/route.ts, apps/web/app/api/admin/llm-governance/route.ts, apps/web/app/api/admin/llm-usage/route.ts, apps/web/app/api/admin/tenants/[slug]/invitations/[id]/resend/route.ts"
+        },
+        {
+          "itemId": "tests_passed",
+          "label": "tests passed",
+          "verified": true,
+          "verifiedAt": "2026-06-29T16:10:32.082Z",
+          "runId": "codex-S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE-2026-06-29T02-30-49-546Z-c443db0b",
+          "gateId": "tests",
+          "source": "gate",
+          "commandFingerprint": "8c8a1cf9e4ac3655d7e1fa9923f52bb064e3e176f9c0f3d68a3dd473116927e7",
+          "resultFingerprint": "e7b8ac2481a13af4b04982b54e978a340177e6d3e01af62c920108bab72e51b2",
+          "summary": "S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE:tests | exit=0 | timed_ok | signal=none | stdout=> heptacore@0.1.0 test"
+        },
+        {
+          "itemId": "typecheck_passed",
+          "label": "typecheck passed",
+          "verified": true,
+          "verifiedAt": "2026-06-29T16:09:29.711Z",
+          "runId": "codex-S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE-2026-06-29T02-30-49-546Z-c443db0b",
+          "gateId": "typecheck",
+          "source": "gate",
+          "commandFingerprint": "4dcc76c98b29452855805f0ef59404d57a8d9f967ca081bc217387f1077b6921",
+          "resultFingerprint": "75292a46fe80d2bf23e3fb1da4e59dded52fafe8e4df44ca9f82170170668fee",
+          "summary": "S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE:typecheck | exit=0 | timed_ok | signal=none | stdout=> heptacore@0.1.0 typecheck"
+        },
+        {
+          "itemId": "worker_validation_passed",
+          "label": "worker validation passed",
+          "verified": true,
+          "verifiedAt": "2026-06-29T16:10:14.645Z",
+          "runId": "codex-S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE-2026-06-29T02-30-49-546Z-c443db0b",
+          "gateId": "worker",
+          "source": "gate",
+          "commandFingerprint": "a3a5ab6a5897b2bd64f0c26b4120c2f195e2cce9aa8daaa13a9ccd4a1b740453",
+          "resultFingerprint": "c1bc0192dc895a6318c236fb7a5030dfaeac7d299ef5f970b059e23398f28578",
+          "summary": "S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE:worker | exit=0 | timed_ok | signal=none | stdout=> heptacore@0.1.0 worker:validate | stderr=[config] .env.rrss no encontrado. Usando solo variables de entorno del sistema."
+        }
+      ],
+      "updatedAt": "2026-06-29T16:55:18.048Z",
+      "runs": [
+        {
+          "runId": "codex-S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE-2026-06-29T02-30-49-546Z-c443db0b",
+          "operator": "codex",
+          "worker": "codex",
+          "workerMode": "codex",
+          "branch": "task/ai-infra/S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE/codex/codex-S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE-2026-06-29T02-30-49-546Z-c443db0b",
+          "worktreePath": "var/oreshnik/wt/ai-infra/S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE/r-c20ec67edeb3",
+          "zones": [
+            "packages/agents",
+            "packages/core",
+            "apps/web/components"
+          ],
+          "taskStatus": "integrated",
+          "claimStatus": "released",
+          "claimedAt": "2026-06-29T02:30:49.546Z",
+          "updatedAt": "2026-06-29T16:55:18.048Z",
+          "expiresAt": "2026-06-29T03:30:49.546Z",
+          "releasedAt": "2026-06-29T16:10:34.999Z",
+          "manifestPath": "var/oreshnik/runs/S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE/codex-S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE-2026-06-29T02-30-49-546Z-c443db0b.json",
+          "validationGateResults": [
+            {
+              "gateId": "typecheck",
+              "command": "npm",
+              "args": [
+                "run",
+                "typecheck"
+              ],
+              "cwd": "var/oreshnik/wt/ai-infra/S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE/r-c20ec67edeb3",
+              "startedAt": "2026-06-29T15:54:41.352Z",
+              "finishedAt": "2026-06-29T15:55:12.248Z",
+              "durationMs": 30891,
+              "exitCode": 0,
+              "signal": null,
+              "timedOut": false,
+              "spawnError": null,
+              "stdout": "\n> heptacore@0.1.0 typecheck\n> npm run typecheck --workspaces --if-present\n\n\n> @heptacore/web@0.1.0 typecheck\n> tsc --noEmit\n\n\n> @heptacore/worker@0.2.0 typecheck\n> tsc --noEmit\n\n\n> @heptacore/agents@0.1.0 typecheck\n> tsc --noEmit\n\n\n> @heptacore/core@0.1.0 typecheck\n> tsc --noEmit\n\n\n> @heptacore/db@0.1.0 typecheck\n> tsc --noEmit\n\n\n> @heptacore/integrations@0.1.0 typecheck\n> tsc --noEmit\n\n\n> @heptacore/ui@0.1.0 typecheck\n> tsc --noEmit\n\n",
+              "stderr": "",
+              "passed": true,
+              "attempt": 1,
+              "commandFingerprint": "36561058fd62fec31ab56e339b7c2f03a8fdc2a73700837c3079c7ea34fa5588",
+              "resultFingerprint": "48fb2d40d241a3182e463614d3cd9ac0fa65ec2e1255aeba3100dc7a7732bd9e",
+              "stdoutBytes": 440,
+              "stderrBytes": 0,
+              "stdoutTruncated": false,
+              "stderrTruncated": false
+            },
+            {
+              "gateId": "build",
+              "command": "npm",
+              "args": [
+                "run",
+                "build"
+              ],
+              "cwd": "var/oreshnik/wt/ai-infra/S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE/r-c20ec67edeb3",
+              "startedAt": "2026-06-29T15:55:12.249Z",
+              "finishedAt": "2026-06-29T15:57:00.964Z",
+              "durationMs": 108715,
+              "exitCode": 0,
+              "signal": null,
+              "timedOut": false,
+              "spawnError": null,
+              "stdout": "\n> heptacore@0.1.0 build\n> npm run build --workspaces --if-present\n\n\n> @heptacore/web@0.1.0 build\n> node scripts/copy-tenant-assets.mjs && prisma generate --schema ../../packages/db/prisma/schema.prisma && next build\n\n[copy-tenant-assets] Turpial assets copied to var/oreshnik/wt/ai-infra/S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE/r-c20ec67edeb3/apps/web/public/tenant-assets/turpial\n\n✔ Generated Prisma Client (v7.8.0) to .\\..\\..\\..\\..\\..\\..\\..\\..\\node_modules\\@prisma\\client in 845ms\n\nStart by importing your Prisma Client (See: https://pris.ly/d/importing-client)\n\n\n▲ Next.js 16.2.6 (Turbopack)\n\n  Creating an optimized production build ...\n✓ Compiled successfully in 54s\n  Running TypeScript ...\n  Finished TypeScript in 10.7s ...\n  Collecting page data using 7 workers ...\n  Generating static pages using 7 workers (0/27) ...\n  Generating static pages using 7 workers (6/27) \r\n  Generating static pages using 7 workers (13/27) \r\n  Generating static pages using 7 workers (20/27) \r\n✓ Generating static pages using 7 workers (27/27) in 459ms\n  Finalizing page optimization ...\n\nRoute (app)\n┌ ƒ /\n├ ○ /_not-found\n├ ƒ /accept-invitation\n├ ƒ /access-required\n├ ƒ /admin\n├ ƒ /admin/tenants\n├ ƒ /admin/tenants/[slug]\n├ ƒ /admin/tenants/new\n├ ƒ /api/admin/capabilities\n├ ƒ /api/admin/facebook-page/bootstrap\n├ ƒ /api/admin/llm-config\n├ ƒ /api/admin/llm-governance\n├ ƒ /api/admin/llm-usage\n├ ƒ /api/admin/tenants\n├ ƒ /api/admin/tenants/[slug]\n├ ƒ /api/admin/tenants/[slug]/invitations\n├ ƒ /api/admin/tenants/[slug]/invitations/[id]\n├ ƒ /api/admin/tenants/[slug]/invitations/[id]/resend\n├ ƒ /api/admin/tenants/[slug]/members\n├ ƒ /api/admin/tenants/[slug]/members/[membershipId]\n├ ƒ /api/admin/tenants/[slug]/status\n├ ƒ /api/assets/[id]\n├ ƒ /api/assets/upload\n├ ƒ /api/assistant\n├ ƒ /api/auth/[...nextauth]\n├ ƒ /api/auth/recover\n├ ƒ /api/auth/register\n├ ƒ /api/auth/reset-password\n├ ƒ /api/campaigns\n├ ƒ /api/campaigns/[id]/approve\n├ ƒ /api/cron/publisher\n├ ƒ /api/drafts/[id]\n├ ƒ /api/drafts/[id]/approve\n├ ƒ /api/drafts/[id]/asset\n├ ƒ /api/drafts/[id]/reject\n├ ƒ /api/drafts/new\n├ ƒ /api/drafts/reorder\n├ ƒ /api/invitations\n├ ƒ /api/invitations/accept\n├ ƒ /api/oauth/facebook/callback\n├ ƒ /api/oauth/facebook/login\n├ ƒ /api/oauth/instagram/callback\n├ ƒ /api/oauth/instagram/login\n├ ƒ /api/publishing/publish\n├ ƒ /api/publishing/rollback\n├ ƒ /api/session/capabilities\n├ ƒ /api/strategy/generate\n├ ƒ /api/strategy/update\n├ ƒ /api/tenant-assets/[[...path]]\n├ ƒ /api/tenant-networks\n├ ƒ /api/tenants/[slug]/assets\n├ ƒ /api/tenants/[slug]/assets/[assetId]\n├ ƒ /api/tenants/[slug]/assets/[assetId]/content\n├ ƒ /api/tenants/[slug]/assets/[assetId]/content/upload\n├ ƒ /api/tenants/[slug]/assets/by-storage-key\n├ ƒ /api/tenants/[slug]/assets/finalize\n├ ƒ /api/tenants/[slug]/assets/upload\n├ ƒ /api/webhooks/resend\n├ ƒ /app\n├ ○ /data-deletion\n├ ○ /icon.svg\n├ ○ /login\n├ ○ /privacy\n├ ○ /recover\n├ ○ /register\n├ ○ /reset-password\n├ ƒ /tenant/[slug]\n└ ○ /terms\n\n\nƒ Proxy (Middleware)\n\n○  (Static)   prerendered as static content\nƒ  (Dynamic)  server-rendered on demand\n\n",
+              "stderr": "Prisma schema loaded from ..\\..\\packages\\db\\prisma\\schema.prisma.\n⚠ Warning: Next.js inferred your workspace root, but it may not be correct.\n We detected multiple lockfiles and selected the directory of D:\\PROYECTOS\\WORKTREES\\CODEX\\AI01\\package-lock.json as the root directory.\n To silence this warning, set `turbopack.root` in your Next.js config, or consider removing one of the lockfiles if it's not needed.\n   See https://nextjs.org/docs/app/api-reference/config/next-config-js/turbopack#root-directory for more information.\n Detected additional lockfiles: \n   * var/oreshnik/wt/ai-infra/S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE/r-c20ec67edeb3/package-lock.json\n\n",
+              "passed": true,
+              "attempt": 1,
+              "commandFingerprint": "d5a25a40a8fbafbb2663414fbe364fb70dd437af3e82ab396fb83ce7f10a8f6b",
+              "resultFingerprint": "1af8cec16f5bc57bd0ecbbf992deb5543215d0adabf180c62b3114af735fff5e",
+              "stdoutBytes": 3311,
+              "stderrBytes": 704,
+              "stdoutTruncated": false,
+              "stderrTruncated": false
+            },
+            {
+              "gateId": "worker",
+              "command": "npm",
+              "args": [
+                "run",
+                "worker:validate"
+              ],
+              "cwd": "var/oreshnik/wt/ai-infra/S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE/r-c20ec67edeb3",
+              "startedAt": "2026-06-29T15:57:00.964Z",
+              "finishedAt": "2026-06-29T15:57:02.308Z",
+              "durationMs": 1344,
+              "exitCode": 0,
+              "signal": null,
+              "timedOut": false,
+              "spawnError": null,
+              "stdout": "\n> heptacore@0.1.0 worker:validate\n> npm run validate -w @heptacore/worker\n\n\n> @heptacore/worker@0.2.0 validate\n> node src/validate.mjs\n\n\n=== Validacion de Assets ===\n\nPresentes: 46/46\n✅ Todos los assets presentes.\n\n\n=== Validacion de Cola de Publicaciones ===\nTotal entries: 29\n\n\n=== Resumen de Validacion ===\nValidos: 29/29\nAssets faltantes: 0\nFechas faltantes: 0\n\n✅ Todos los drafts validos.\n",
+              "stderr": "[config] .env.rrss no encontrado. Usando solo variables de entorno del sistema.\n",
+              "passed": true,
+              "attempt": 1,
+              "commandFingerprint": "164e1516b9e128a54e6e11f80a46bd22642c18475a89dcdc7edfda5e09a4719e",
+              "resultFingerprint": "e9b26aa2d72798a015aa1076de55769dfc65eceafb86fbc37fcefb6302d4846b",
+              "stdoutBytes": 399,
+              "stderrBytes": 80,
+              "stdoutTruncated": false,
+              "stderrTruncated": false
+            },
+            {
+              "gateId": "typecheck",
+              "command": "npm",
+              "args": [
+                "run",
+                "typecheck"
+              ],
+              "cwd": "var/oreshnik/wt/ai-infra/S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE/r-c20ec67edeb3",
+              "startedAt": "2026-06-29T16:09:11.660Z",
+              "finishedAt": "2026-06-29T16:09:29.711Z",
+              "durationMs": 18050,
+              "exitCode": 0,
+              "signal": null,
+              "timedOut": false,
+              "spawnError": null,
+              "stdout": "\n> heptacore@0.1.0 typecheck\n> npm run typecheck --workspaces --if-present\n\n\n> @heptacore/web@0.1.0 typecheck\n> tsc --noEmit\n\n\n> @heptacore/worker@0.2.0 typecheck\n> tsc --noEmit\n\n\n> @heptacore/agents@0.1.0 typecheck\n> tsc --noEmit\n\n\n> @heptacore/core@0.1.0 typecheck\n> tsc --noEmit\n\n\n> @heptacore/db@0.1.0 typecheck\n> tsc --noEmit\n\n\n> @heptacore/integrations@0.1.0 typecheck\n> tsc --noEmit\n\n\n> @heptacore/ui@0.1.0 typecheck\n> tsc --noEmit\n\n",
+              "stderr": "",
+              "passed": true,
+              "attempt": 2,
+              "commandFingerprint": "4dcc76c98b29452855805f0ef59404d57a8d9f967ca081bc217387f1077b6921",
+              "resultFingerprint": "75292a46fe80d2bf23e3fb1da4e59dded52fafe8e4df44ca9f82170170668fee",
+              "stdoutBytes": 440,
+              "stderrBytes": 0,
+              "stdoutTruncated": false,
+              "stderrTruncated": false
+            },
+            {
+              "gateId": "build",
+              "command": "npm",
+              "args": [
+                "run",
+                "build"
+              ],
+              "cwd": "var/oreshnik/wt/ai-infra/S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE/r-c20ec67edeb3",
+              "startedAt": "2026-06-29T16:09:29.712Z",
+              "finishedAt": "2026-06-29T16:10:13.383Z",
+              "durationMs": 43671,
+              "exitCode": 0,
+              "signal": null,
+              "timedOut": false,
+              "spawnError": null,
+              "stdout": "\n> heptacore@0.1.0 build\n> npm run build --workspaces --if-present\n\n\n> @heptacore/web@0.1.0 build\n> node scripts/copy-tenant-assets.mjs && prisma generate --schema ../../packages/db/prisma/schema.prisma && next build\n\n[copy-tenant-assets] Turpial assets copied to var/oreshnik/wt/ai-infra/S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE/r-c20ec67edeb3/apps/web/public/tenant-assets/turpial\n\n✔ Generated Prisma Client (v7.8.0) to .\\..\\..\\..\\..\\..\\..\\..\\..\\..\\PROYECTOS\\WORKTREES\\CODEX\\AI01\\node_modules\\@prisma\\client in 805ms\n\nStart by importing your Prisma Client (See: https://pris.ly/d/importing-client)\n\n\n▲ Next.js 16.2.6 (Turbopack)\n\n  Creating an optimized production build ...\n✓ Compiled successfully in 12.3s\n  Running TypeScript ...\n  Finished TypeScript in 9.8s ...\n  Collecting page data using 7 workers ...\n  Generating static pages using 7 workers (0/27) ...\n  Generating static pages using 7 workers (6/27) \r\n  Generating static pages using 7 workers (13/27) \r\n  Generating static pages using 7 workers (20/27) \r\n✓ Generating static pages using 7 workers (27/27) in 436ms\n  Finalizing page optimization ...\n\nRoute (app)\n┌ ƒ /\n├ ○ /_not-found\n├ ƒ /accept-invitation\n├ ƒ /access-required\n├ ƒ /admin\n├ ƒ /admin/tenants\n├ ƒ /admin/tenants/[slug]\n├ ƒ /admin/tenants/new\n├ ƒ /api/admin/capabilities\n├ ƒ /api/admin/facebook-page/bootstrap\n├ ƒ /api/admin/llm-config\n├ ƒ /api/admin/llm-governance\n├ ƒ /api/admin/llm-usage\n├ ƒ /api/admin/tenants\n├ ƒ /api/admin/tenants/[slug]\n├ ƒ /api/admin/tenants/[slug]/invitations\n├ ƒ /api/admin/tenants/[slug]/invitations/[id]\n├ ƒ /api/admin/tenants/[slug]/invitations/[id]/resend\n├ ƒ /api/admin/tenants/[slug]/members\n├ ƒ /api/admin/tenants/[slug]/members/[membershipId]\n├ ƒ /api/admin/tenants/[slug]/status\n├ ƒ /api/assets/[id]\n├ ƒ /api/assets/upload\n├ ƒ /api/assistant\n├ ƒ /api/auth/[...nextauth]\n├ ƒ /api/auth/recover\n├ ƒ /api/auth/register\n├ ƒ /api/auth/reset-password\n├ ƒ /api/campaigns\n├ ƒ /api/campaigns/[id]/approve\n├ ƒ /api/cron/publisher\n├ ƒ /api/drafts/[id]\n├ ƒ /api/drafts/[id]/approve\n├ ƒ /api/drafts/[id]/asset\n├ ƒ /api/drafts/[id]/reject\n├ ƒ /api/drafts/new\n├ ƒ /api/drafts/reorder\n├ ƒ /api/invitations\n├ ƒ /api/invitations/accept\n├ ƒ /api/oauth/facebook/callback\n├ ƒ /api/oauth/facebook/login\n├ ƒ /api/oauth/instagram/callback\n├ ƒ /api/oauth/instagram/login\n├ ƒ /api/publishing/publish\n├ ƒ /api/publishing/rollback\n├ ƒ /api/session/capabilities\n├ ƒ /api/strategy/generate\n├ ƒ /api/strategy/update\n├ ƒ /api/tenant-assets/[[...path]]\n├ ƒ /api/tenant-networks\n├ ƒ /api/tenants/[slug]/assets\n├ ƒ /api/tenants/[slug]/assets/[assetId]\n├ ƒ /api/tenants/[slug]/assets/[assetId]/content\n├ ƒ /api/tenants/[slug]/assets/[assetId]/content/upload\n├ ƒ /api/tenants/[slug]/assets/by-storage-key\n├ ƒ /api/tenants/[slug]/assets/finalize\n├ ƒ /api/tenants/[slug]/assets/upload\n├ ƒ /api/webhooks/resend\n├ ƒ /app\n├ ○ /data-deletion\n├ ○ /icon.svg\n├ ○ /login\n├ ○ /privacy\n├ ○ /recover\n├ ○ /register\n├ ○ /reset-password\n├ ƒ /tenant/[slug]\n└ ○ /terms\n\n\nƒ Proxy (Middleware)\n\n○  (Static)   prerendered as static content\nƒ  (Dynamic)  server-rendered on demand\n\n",
+              "stderr": "Prisma schema loaded from ..\\..\\packages\\db\\prisma\\schema.prisma.\n⚠ Warning: Next.js inferred your workspace root, but it may not be correct.\n We detected multiple lockfiles and selected the directory of D:\\PROYECTOS\\WORKTREES\\CODEX\\AI01\\package-lock.json as the root directory.\n To silence this warning, set `turbopack.root` in your Next.js config, or consider removing one of the lockfiles if it's not needed.\n   See https://nextjs.org/docs/app/api-reference/config/next-config-js/turbopack#root-directory for more information.\n Detected additional lockfiles: \n   * var/oreshnik/wt/ai-infra/S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE/r-c20ec67edeb3/package-lock.json\n\n",
+              "passed": true,
+              "attempt": 2,
+              "commandFingerprint": "8d2ee923e5b7893c7772817f98e78159d47ed7fd6155a990953089a67c6adf49",
+              "resultFingerprint": "85f898fb203a57042378de4a4325f1200a99fc67cd7515d8a1306ee1cea38841",
+              "stdoutBytes": 3346,
+              "stderrBytes": 704,
+              "stdoutTruncated": false,
+              "stderrTruncated": false
+            },
+            {
+              "gateId": "worker",
+              "command": "npm",
+              "args": [
+                "run",
+                "worker:validate"
+              ],
+              "cwd": "var/oreshnik/wt/ai-infra/S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE/r-c20ec67edeb3",
+              "startedAt": "2026-06-29T16:10:13.384Z",
+              "finishedAt": "2026-06-29T16:10:14.645Z",
+              "durationMs": 1261,
+              "exitCode": 0,
+              "signal": null,
+              "timedOut": false,
+              "spawnError": null,
+              "stdout": "\n> heptacore@0.1.0 worker:validate\n> npm run validate -w @heptacore/worker\n\n\n> @heptacore/worker@0.2.0 validate\n> node src/validate.mjs\n\n",
+              "stderr": "[config] .env.rrss no encontrado. Usando solo variables de entorno del sistema.\n",
+              "passed": true,
+              "attempt": 2,
+              "commandFingerprint": "a3a5ab6a5897b2bd64f0c26b4120c2f195e2cce9aa8daaa13a9ccd4a1b740453",
+              "resultFingerprint": "c1bc0192dc895a6318c236fb7a5030dfaeac7d299ef5f970b059e23398f28578",
+              "stdoutBytes": 137,
+              "stderrBytes": 80,
+              "stdoutTruncated": false,
+              "stderrTruncated": false
+            },
+            {
+              "gateId": "tests",
+              "command": "npm",
+              "args": [
+                "run",
+                "test"
+              ],
+              "cwd": "var/oreshnik/wt/ai-infra/S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE/r-c20ec67edeb3",
+              "startedAt": "2026-06-29T16:10:14.646Z",
+              "finishedAt": "2026-06-29T16:10:32.082Z",
+              "durationMs": 17436,
+              "exitCode": 0,
+              "signal": null,
+              "timedOut": false,
+              "spawnError": null,
+              "stdout": "\n> heptacore@0.1.0 test\n> node --test apps/web/lib/calendar-state.test.mjs && npm run test --workspaces --if-present\n\n✔ calendar display state prefers operational state over approval status (1.0039ms)\nℹ tests 1\nℹ suites 0\nℹ pass 1\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 168.5856\n\n> @heptacore/web@0.1.0 test\n> tsx --test lib/__tests__/*.test.ts\n\n▶ resolveAdminCapabilities\n  ✔ throws UNAUTHORIZED when user does not exist (4.3546ms)\n  ✔ returns SUPER_ADMIN capabilities with all permissions (1.4215ms)\n  ✔ returns empty tenant context when no tenant slug (0.5363ms)\n  ✔ throws NOT_FOUND for non-existent tenant slug (0.8238ms)\n  ✔ returns tenant context with lifecycle status for ACTIVE (0.7435ms)\n  ✔ returns lifecycle block reason for PROVISIONING (0.6156ms)\n  ✔ returns lifecycle block reason for SUSPENDED (0.6316ms)\n  ✔ returns lifecycle block reason for ARCHIVED (1.4814ms)\n  ✔ includes tenant role when user is member (0.679ms)\n  ✔ response has zero secrets (0.545ms)\n  ✔ tenant permissions for SUPER_ADMIN in tenant show full access (0.686ms)\n  ✔ switch tenant slug returns different tenant data (0.4013ms)\n  ✔ no tenant slug returns full global permissions without tenant context (0.262ms)\n✔ resolveAdminCapabilities (16.1999ms)\n▶ tenant console — list with search/filter\n  ✔ search finds tenants by name (case insensitive) (5.8056ms)\n  ✔ search finds tenants by slug (case insensitive) (0.9259ms)\n  ✔ status filter returns only matching tenants (0.777ms)\n  ✔ invalid status filter throws 400 (1.8965ms)\n  ✔ combined search + status filters correctly (0.9532ms)\n  ✔ search with no results returns empty (0.6763ms)\n✔ tenant console — list with search/filter (13.667ms)\n▶ tenant console — create with timezone/locale\n  ✔ persists timezone and locale when provided (4.1793ms)\n  ✔ defaults to UTC/es when not provided (2.4993ms)\n  ✔ returns INVITATION_REQUIRED when user has no passwordHash (5.361ms)\n  ✔ returns EXISTING_ACCOUNT when user has passwordHash (3.2107ms)\n  ✔ serializes without exposing passwordHash or tokenHash (3.2344ms)\n✔ tenant console — create with timezone/locale (19.3498ms)\n▶ tenant console — getAdminTenant with owner email\n  ✔ returns real owner email from membership (0.8037ms)\n  ✔ does not expose sensitive fields (0.6577ms)\n✔ tenant console — getAdminTenant with owner email (1.7236ms)\n▶ tenant console — pagination\n  ✔ listAdminTenants paginates correctly (1.1738ms)\n✔ tenant console — pagination (1.31ms)\n▶ tenant console — SUPER_ADMIN guard via DB\n  ✔ rejects non-SUPER_ADMIN actors (0.5762ms)\n  ✔ allows SUPER_ADMIN actors (0.4109ms)\n✔ tenant console — SUPER_ADMIN guard via DB (1.2316ms)\n▶ asset compatibility\n  ✔ classifies Instagram Feed ideal (2.0201ms)\n  ✔ classifies Instagram Story ideal 9:16 (0.4279ms)\n  ✔ rejects images for Instagram Reel (0.2408ms)\n  ✔ accepts compatible vertical video for YouTube Short (0.9949ms)\n  ✔ evaluates horizontal video for YouTube Video (0.2392ms)\n  ✔ marks documents incompatible with visual targets (0.3073ms)\n  ✔ returns UNKNOWN for legacy assets without metadata (0.2932ms)\n  ✔ filters by target and compatibility status (1.5524ms)\n  ✔ does not import or call publisher adapters from metadata compatibility code (12.8846ms)\n✔ asset compatibility (21.8006ms)\n▶ finalizeTenantAssetFromBlob\n  ✔ creates an Asset from an existing blob (10.6554ms)\n  ✔ returns the existing Asset idempotently (1.4751ms)\n  ✔ does not duplicate when finalize and callback race (1.593ms)\n  ✔ rejects pathname from another tenant (1.6726ms)\n  ✔ rejects missing blobs (0.8221ms)\n✔ finalizeTenantAssetFromBlob (18.7539ms)\n▶ resolveUploadedAssetAfterUpload\n  ✔ returns the Asset from finalize without polling and can be added locally (1.3194ms)\n  ✔ uses storageKey fallback after finalize timeout (411.7911ms)\n  ✔ retry with existing blob finalizes without re-upload (0.9121ms)\n  ✔ retries finalize once before polling fallback (430.3933ms)\n✔ resolveUploadedAssetAfterUpload (846.7621ms)\n▶ asset inspector drawer\n  ✔ uses a portal mounted on document.body (1.6158ms)\n  ✔ renders overlay and drawer as separate elements (0.2417ms)\n  ✔ supports Escape close and restores body scroll (0.2374ms)\n  ✔ sets dialog accessibility attributes and focuses the close button (0.5164ms)\n  ✔ uses an explicit solid drawer background and separate opaque overlay (0.6524ms)\n✔ asset inspector drawer (5.2109ms)\n▶ asset library filters\n  ✔ defaults a concrete target to ELIGIBLE compatibility (2.1428ms)\n  ✔ filters target + ELIGIBLE to only compatible assets (2.3759ms)\n  ✔ Instagram Reel does not show images as compatible (0.2822ms)\n  ✔ Instagram Reel + image + incompatible shows incompatible images (0.2786ms)\n  ✔ Todos los evaluados keeps all assets evaluated against the target (0.7988ms)\n  ✔ clear filters restores the full inventory (0.5845ms)\n✔ asset library filters (14.7261ms)\n▶ asset metadata normalization\n  ✔ normalizes square image metadata (4.2994ms)\n  ✔ normalizes vertical image metadata (0.3777ms)\n  ✔ normalizes horizontal image metadata (0.2689ms)\n  ✔ normalizes vertical video metadata with duration (0.2779ms)\n  ✔ drops invalid technical values without trusting client shape (0.3804ms)\n✔ asset metadata normalization (7.6805ms)\n▶ tenant asset service\n  ✔ uploads assets into the authenticated tenant and records audit (9.617ms)\n  ✔ does not list, rename, replace, or delete assets across tenants (3.5491ms)\n  ✔ rejects invalid MIME, excessive size, and normalizes unsafe filenames (88.23ms)\n  ✔ cleans the uploaded blob when DB create fails (1.2281ms)\n  ✔ replaces content while preserving Asset.id, draft links, audit log, and invalidating approved drafts (1.5226ms)\n  ✔ renames, moves, deletes free assets, and blocks delete when in use (1.2786ms)\n  ✔ persists analyzed legacy metadata through tenant-scoped update (0.7916ms)\n  ✔ keeps Turpial legacy assets renderable and Blob URLs usable in multiformat previews (1.702ms)\n  ✔ does not import publisher adapters from tenant asset code (1.8401ms)\n✔ tenant asset service (113.8069ms)\n▶ waitForRegisteredAsset\n  ✔ finds asset after retries (83.921ms)\n  ✔ times out without false success (61.2873ms)\n  ✔ retry has exponential backoff (1545.6417ms)\n✔ waitForRegisteredAsset (1691.5069ms)\n▶ by-storage-key endpoint\n  ✔ requires auth (verified by route source) (1.5676ms)\n  ✔ requires tenant membership (verified by route source) (0.9495ms)\n  ✔ returns found:true for registered asset (0.44ms)\n  ✔ returns found:false for unknown storageKey (0.2722ms)\n✔ by-storage-key endpoint (3.4603ms)\n▶ collections management\n  ✔ collections list from existing assets (0.2813ms)\n  ✔ create collection inline (0.1197ms)\n  ✔ dedup case-insensitive (0.1026ms)\n✔ collections management (0.6154ms)\n▶ waitForRegisteredAsset error handling\n  ✔ continues polling after 500 temporary (26.5561ms)\n  ✔ handles non-JSON response gracefully (33.5144ms)\n  ✔ stops on 401/403 (0.7449ms)\n✔ waitForRegisteredAsset error handling (61.2634ms)\n▶ retry and upload behavior\n  ✔ retry does not create second row (0.2391ms)\n  ✔ retry of registration does not re-upload blob (0.3418ms)\n✔ retry and upload behavior (0.6934ms)\n▶ zero provider calls\n  ✔ zero provider calls (1.1823ms)\n✔ zero provider calls (1.2654ms)\n▶ auth access routing\n  ✔ visitor goes to login with app callback (1.8349ms)\n  ✔ login without callback falls back to /app (0.3438ms)\n  ✔ session without memberships goes to access-required without loop (1.7686ms)\n  ✔ one membership redirects to the real tenant slug (0.4145ms)\n  ✔ superadmin goes to admin (0.3562ms)\n  ✔ unauthorized tenant access goes to access-required (0.403ms)\n  ✔ external callbacks are rejected (0.4956ms)\n  ✔ proxy no longer sends anonymous users to a hardcoded tenant (4.6099ms)\n  ✔ login does not block legacy identifiers with browser email validation (1.8396ms)\n  ✔ membership added after login refreshes token claims (0.6677ms)\n✔ auth access routing (17.1574ms)\n▶ ensure-user-access tool\n  ✔ plans idempotent membership writes (0.4733ms)\n  ✔ is idempotent against an existi",
+              "stderr": "",
+              "passed": true,
+              "attempt": 1,
+              "commandFingerprint": "8c8a1cf9e4ac3655d7e1fa9923f52bb064e3e176f9c0f3d68a3dd473116927e7",
+              "resultFingerprint": "e7b8ac2481a13af4b04982b54e978a340177e6d3e01af62c920108bab72e51b2",
+              "stdoutBytes": 50360,
+              "stderrBytes": 0,
+              "stdoutTruncated": true,
+              "stderrTruncated": false
+            }
+          ],
+          "evidenceVerifications": [
+            {
+              "itemId": "build_passed",
+              "label": "build passed",
+              "verified": true,
+              "verifiedAt": "2026-06-29T16:10:13.383Z",
+              "runId": "codex-S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE-2026-06-29T02-30-49-546Z-c443db0b",
+              "gateId": "build",
+              "source": "gate",
+              "commandFingerprint": "8d2ee923e5b7893c7772817f98e78159d47ed7fd6155a990953089a67c6adf49",
+              "resultFingerprint": "85f898fb203a57042378de4a4325f1200a99fc67cd7515d8a1306ee1cea38841",
+              "summary": "S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE:build | exit=0 | timed_ok | signal=none | stdout=> heptacore@0.1.0 build | stderr=Prisma schema loaded from ..\\..\\packages\\db\\prisma\\schema.prisma."
+            },
+            {
+              "itemId": "changed_files_diff",
+              "label": "changed files diff",
+              "verified": true,
+              "verifiedAt": "2026-06-29T16:10:32.121Z",
+              "runId": "codex-S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE-2026-06-29T02-30-49-546Z-c443db0b",
+              "source": "git",
+              "resultFingerprint": "5b2ee786f4aac76998843638fdeaab6050a9b2c22935fcf49b1981475bc1e167",
+              "summary": "diff master..task/ai-infra/S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE/codex/codex-S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE-2026-06-29T02-30-49-546Z-c443db0b: .gitignore, .kilo/command/preflight.md, .kilo/commands/goal.md, .kilo/commands/preflight.md, .kilo/commands/pub04-correct.md, .kilo/commands/pub04-finalize.md, .oreshnik.json, AGENTS.md, apps/web/app/accept-invitation/accept-invitation-client.tsx, apps/web/app/accept-invitation/page.tsx, apps/web/app/access-required/page.tsx, apps/web/app/admin/page.tsx, apps/web/app/admin/tenants/[slug]/page.tsx, apps/web/app/admin/tenants/layout.tsx, apps/web/app/admin/tenants/new/page.tsx, apps/web/app/admin/tenants/page.tsx, apps/web/app/api/admin/capabilities/route.ts, apps/web/app/api/admin/llm-governance/route.ts, apps/web/app/api/admin/llm-usage/route.ts, apps/web/app/api/admin/tenants/[slug]/invitations/[id]/resend/route.ts"
+            },
+            {
+              "itemId": "tests_passed",
+              "label": "tests passed",
+              "verified": true,
+              "verifiedAt": "2026-06-29T16:10:32.082Z",
+              "runId": "codex-S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE-2026-06-29T02-30-49-546Z-c443db0b",
+              "gateId": "tests",
+              "source": "gate",
+              "commandFingerprint": "8c8a1cf9e4ac3655d7e1fa9923f52bb064e3e176f9c0f3d68a3dd473116927e7",
+              "resultFingerprint": "e7b8ac2481a13af4b04982b54e978a340177e6d3e01af62c920108bab72e51b2",
+              "summary": "S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE:tests | exit=0 | timed_ok | signal=none | stdout=> heptacore@0.1.0 test"
+            },
+            {
+              "itemId": "typecheck_passed",
+              "label": "typecheck passed",
+              "verified": true,
+              "verifiedAt": "2026-06-29T16:09:29.711Z",
+              "runId": "codex-S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE-2026-06-29T02-30-49-546Z-c443db0b",
+              "gateId": "typecheck",
+              "source": "gate",
+              "commandFingerprint": "4dcc76c98b29452855805f0ef59404d57a8d9f967ca081bc217387f1077b6921",
+              "resultFingerprint": "75292a46fe80d2bf23e3fb1da4e59dded52fafe8e4df44ca9f82170170668fee",
+              "summary": "S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE:typecheck | exit=0 | timed_ok | signal=none | stdout=> heptacore@0.1.0 typecheck"
+            },
+            {
+              "itemId": "worker_validation_passed",
+              "label": "worker validation passed",
+              "verified": true,
+              "verifiedAt": "2026-06-29T16:10:14.645Z",
+              "runId": "codex-S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE-2026-06-29T02-30-49-546Z-c443db0b",
+              "gateId": "worker",
+              "source": "gate",
+              "commandFingerprint": "a3a5ab6a5897b2bd64f0c26b4120c2f195e2cce9aa8daaa13a9ccd4a1b740453",
+              "resultFingerprint": "c1bc0192dc895a6318c236fb7a5030dfaeac7d299ef5f970b059e23398f28578",
+              "summary": "S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE:worker | exit=0 | timed_ok | signal=none | stdout=> heptacore@0.1.0 worker:validate | stderr=[config] .env.rrss no encontrado. Usando solo variables de entorno del sistema."
+            }
+          ]
+        }
+      ],
+      "integration": {
+        "runId": "codex-S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE-2026-06-29T02-30-49-546Z-c443db0b",
+        "sourceBranch": "task/ai-infra/S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE/codex/codex-S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE-2026-06-29T02-30-49-546Z-c443db0b",
+        "status": "integrated",
+        "motherBranch": "MADRE/v50-ai-infra-llm-provider-selection-cost-governance-2026-06-29",
+        "queuedAt": "2026-06-29T16:17:34.752Z",
+        "updatedAt": "2026-06-29T16:55:18.048Z",
+        "targetBranch": "MADRE/v50-ai-infra-llm-provider-selection-cost-governance-2026-06-29",
+        "integratedAt": "2026-06-29T16:55:18.048Z"
+      },
+      "latestTrain": {
+        "attemptId": "train-codex-S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE-2-1782752051800",
+        "runId": "codex-S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE-2026-06-29T02-30-49-546Z-c443db0b",
+        "sourceBranch": "task/ai-infra/S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE/codex/codex-S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE-2026-06-29T02-30-49-546Z-c443db0b",
+        "targetBranch": "MADRE/v50-ai-infra-llm-provider-selection-cost-governance-2026-06-29",
+        "integrationBranch": "integration-train/ai-infra/S-HC-AI-01-LLM-SELECTION/r-c20ec67edeb3/a-3acf93d1c862",
+        "operator": "manuel",
+        "lockKey": "integration-train/MADRE/v50-ai-infra-llm-provider-selection-cost-governance-2026-06-29",
+        "status": "succeeded",
+        "startedAt": "2026-06-29T16:54:11.800Z",
+        "completedAt": "2026-06-29T16:55:18.073Z",
+        "reason": "Already contained on MADRE/v50-ai-infra-llm-provider-selection-cost-governance-2026-06-29; runtime reconciled without merge",
+        "motherAdvanceState": "runtime_projection_confirmed",
+        "gateResults": [
+          {
+            "name": "typecheck",
+            "passed": true
+          },
+          {
+            "name": "build",
+            "passed": true
+          },
+          {
+            "name": "test",
+            "passed": true
+          }
+        ],
+        "outcome": {
+          "mergeBase": "dc3186a13aa652b27235c3407ee2034f892295da",
+          "changedFiles": [],
+          "compatibilityBranchPushed": false,
+          "deliveryDisposition": "already_contained",
+          "projectedMotherBranch": "MADRE/v50-ai-infra-llm-provider-selection-cost-governance-2026-06-29",
+          "motherAdvanceState": "runtime_projection_confirmed",
+          "motherFunctionalExpectedCommit": "dc3186a13aa652b27235c3407ee2034f892295da",
+          "motherFunctionalRemoteCommit": "dc3186a13aa652b27235c3407ee2034f892295da",
+          "motherFunctionalPushVerified": true,
+          "motherFunctionalPushReconciled": false,
+          "projectedTaskStatus": "integrated",
+          "projectedRunStatus": "integrated",
+          "projectedSprintEntryStatus": "integrated"
+        }
+      }
     },
     {
       "id": "S-HC-AN-01-CAMPAIGN-PERFORMANCE",
@@ -517,7 +1497,13 @@
           "operator": "manuel",
           "description": "Task status reconciled to blocked: dependency S-HC-OPS-01-CAMPAIGN-REVIEW-DEPLOYMENT still pending (S-HC-OPS-01-CAMPAIGN-REVIEW-DEPLOYMENT:pending) | dependency S-HC-OBS-01-PUBLISHING-OBSERVABILITY still pending (S-HC-OBS-01-PUBLISHING-OBSERVABILITY:pending)"
         }
-      ]
+      ],
+      "project": "HeptaCore",
+      "sprint": "analytics",
+      "sprintOrderIndex": 7,
+      "taskOrderIndex": 9,
+      "updatedAt": "2026-06-29T02:29:41.523Z",
+      "runs": []
     },
     {
       "id": "S-HC-ASSET-01-STRATEGY-ASSET-MANIFEST",
@@ -548,7 +1534,13 @@
           "operator": "manuel",
           "description": "Task status reconciled to blocked: dependency S-HC-STRAT-02-CONTENT-CALENDAR-BLUEPRINT still pending (S-HC-STRAT-02-CONTENT-CALENDAR-BLUEPRINT:pending)"
         }
-      ]
+      ],
+      "project": "HeptaCore",
+      "sprint": "assets",
+      "sprintOrderIndex": 8,
+      "taskOrderIndex": 10,
+      "updatedAt": "2026-06-29T02:29:41.523Z",
+      "runs": []
     },
     {
       "id": "S-HC-ASSET-02-FORMAT-DERIVATIVES",
@@ -585,7 +1577,13 @@
           "operator": "manuel",
           "description": "Task status reconciled to ready: dependencies and conflicts are clear for execution"
         }
-      ]
+      ],
+      "project": "HeptaCore",
+      "sprint": "assets",
+      "sprintOrderIndex": 8,
+      "taskOrderIndex": 11,
+      "updatedAt": "2026-06-29T02:29:41.523Z",
+      "runs": []
     },
     {
       "id": "S-HC-COMM-01-SELF-SERVICE-SIGNUP",
@@ -617,7 +1615,13 @@
           "operator": "manuel",
           "description": "Task status reconciled to blocked: dependency S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION still pending (S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION:pending)"
         }
-      ]
+      ],
+      "project": "HeptaCore",
+      "sprint": "commercial",
+      "sprintOrderIndex": 9,
+      "taskOrderIndex": 12,
+      "updatedAt": "2026-06-29T02:29:41.523Z",
+      "runs": []
     },
     {
       "id": "S-HC-COMM-02-BILLING-ACTIVATION",
@@ -647,7 +1651,13 @@
           "operator": "manuel",
           "description": "Task status reconciled to blocked: dependency S-HC-COMM-01-SELF-SERVICE-SIGNUP still pending (S-HC-COMM-01-SELF-SERVICE-SIGNUP:pending)"
         }
-      ]
+      ],
+      "project": "HeptaCore",
+      "sprint": "commercial",
+      "sprintOrderIndex": 9,
+      "taskOrderIndex": 13,
+      "updatedAt": "2026-06-29T02:29:41.523Z",
+      "runs": []
     },
     {
       "id": "S-HC-02",
@@ -678,7 +1688,13 @@
           "branch": "Manuel/s-hc-prod-01-producto-operativo-tenant-admin-produccion-2026-06-09",
           "description": "turpial importer and prisma seed"
         }
-      ]
+      ],
+      "project": "HeptaCore",
+      "sprint": "data",
+      "sprintOrderIndex": 10,
+      "taskOrderIndex": 14,
+      "updatedAt": "2026-06-29T02:29:41.523Z",
+      "runs": []
     },
     {
       "id": "S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION",
@@ -699,7 +1715,13 @@
         "Proveedor de correo transaccional integrado (Resend, SendGrid o equivalente)",
         "Webhooks de eventos (delivered, bounced, complained) configurados",
         "Enlaces comerciales y de marca consistentes con el dominio final"
-      ]
+      ],
+      "project": "HeptaCore",
+      "sprint": "email-infra",
+      "sprintOrderIndex": 11,
+      "taskOrderIndex": 15,
+      "updatedAt": "2026-06-29T02:29:41.523Z",
+      "runs": []
     },
     {
       "id": "S-HC-INBOX-01-UNIFIED-ENGAGEMENT",
@@ -729,7 +1751,13 @@
           "operator": "manuel",
           "description": "Task status reconciled to blocked: dependency S-HC-AN-01-CAMPAIGN-PERFORMANCE still pending (S-HC-AN-01-CAMPAIGN-PERFORMANCE:pending)"
         }
-      ]
+      ],
+      "project": "HeptaCore",
+      "sprint": "engagement",
+      "sprintOrderIndex": 12,
+      "taskOrderIndex": 16,
+      "updatedAt": "2026-06-29T02:29:41.523Z",
+      "runs": []
     },
     {
       "id": "S-HC-00",
@@ -757,7 +1785,13 @@
           "branch": "Manuel/s-hc-prod-01-producto-operativo-tenant-admin-produccion-2026-06-09",
           "description": "foundation baseline commit"
         }
-      ]
+      ],
+      "project": "HeptaCore",
+      "sprint": "foundation",
+      "sprintOrderIndex": 13,
+      "taskOrderIndex": 17,
+      "updatedAt": "2026-06-29T02:29:41.523Z",
+      "runs": []
     },
     {
       "id": "S-HC-ONB-01-MASTER-BRIEF-INGESTION",
@@ -787,7 +1821,13 @@
           "operator": "manuel",
           "description": "Task status reconciled to blocked: dependency S-HC-COMM-02-BILLING-ACTIVATION still pending (S-HC-COMM-02-BILLING-ACTIVATION:pending)"
         }
-      ]
+      ],
+      "project": "HeptaCore",
+      "sprint": "onboarding",
+      "sprintOrderIndex": 14,
+      "taskOrderIndex": 18,
+      "updatedAt": "2026-06-29T02:29:41.523Z",
+      "runs": []
     },
     {
       "id": "S-HC-ONB-02-GAP-RESOLUTION-WIZARD",
@@ -816,7 +1856,13 @@
           "operator": "manuel",
           "description": "Task status reconciled to blocked: dependency S-HC-ONB-01-MASTER-BRIEF-INGESTION still pending (S-HC-ONB-01-MASTER-BRIEF-INGESTION:pending)"
         }
-      ]
+      ],
+      "project": "HeptaCore",
+      "sprint": "onboarding",
+      "sprintOrderIndex": 14,
+      "taskOrderIndex": 19,
+      "updatedAt": "2026-06-29T02:29:41.523Z",
+      "runs": []
     },
     {
       "id": "S-HC-OPS-01-CAMPAIGN-REVIEW-DEPLOYMENT",
@@ -849,7 +1895,13 @@
           "operator": "manuel",
           "description": "Task status reconciled to blocked: dependency S-HC-STRAT-02-CONTENT-CALENDAR-BLUEPRINT still pending (S-HC-STRAT-02-CONTENT-CALENDAR-BLUEPRINT:pending) | dependency S-HC-ASSET-01-STRATEGY-ASSET-MANIFEST still pending (S-HC-ASSET-01-STRATEGY-ASSET-MANIFEST:pending)"
         }
-      ]
+      ],
+      "project": "HeptaCore",
+      "sprint": "operations",
+      "sprintOrderIndex": 15,
+      "taskOrderIndex": 20,
+      "updatedAt": "2026-06-29T02:29:41.523Z",
+      "runs": []
     },
     {
       "id": "S-HC-OPT-01-SENTIMENT-STRATEGY-ITERATION",
@@ -880,7 +1932,13 @@
           "operator": "manuel",
           "description": "Task status reconciled to blocked: dependency S-HC-AN-01-CAMPAIGN-PERFORMANCE still pending (S-HC-AN-01-CAMPAIGN-PERFORMANCE:pending) | dependency S-HC-INBOX-01-UNIFIED-ENGAGEMENT still pending (S-HC-INBOX-01-UNIFIED-ENGAGEMENT:pending)"
         }
-      ]
+      ],
+      "project": "HeptaCore",
+      "sprint": "optimization",
+      "sprintOrderIndex": 16,
+      "taskOrderIndex": 21,
+      "updatedAt": "2026-06-29T02:29:41.523Z",
+      "runs": []
     },
     {
       "id": "S-HC-01",
@@ -911,7 +1969,22 @@
           "to": "Jean",
           "reason": "Manuel ausente - ruta critica bloqueada"
         }
-      ]
+      ],
+      "project": "HeptaCore",
+      "sprint": "product-ui",
+      "sprintOrderIndex": 17,
+      "taskOrderIndex": 22,
+      "reassignments": [
+        {
+          "at": "2026-06-09T19:56:42.980Z",
+          "task": "S-HC-01",
+          "from": "Manuel",
+          "to": "Jean",
+          "reason": "Manuel ausente - ruta critica bloqueada"
+        }
+      ],
+      "updatedAt": "2026-06-29T02:29:41.523Z",
+      "runs": []
     },
     {
       "id": "S-HC-PROD-02",
@@ -948,7 +2021,29 @@
           "branch": "Jean/s-hc-canonical-alignment-2026-06-09",
           "description": "production-db-auth-env-turpial-seed-smoke"
         }
-      ]
+      ],
+      "project": "HeptaCore",
+      "sprint": "production-infra",
+      "sprintOrderIndex": 18,
+      "taskOrderIndex": 23,
+      "reassignments": [
+        {
+          "at": "2026-06-11T00:20:00.000Z",
+          "task": "S-HC-PROD-02",
+          "from": "Manuel",
+          "to": "Jean",
+          "reason": "User-directed PROD closeout split"
+        },
+        {
+          "at": "2026-06-11T00:20:00.000Z",
+          "task": "S-HC-PROD-02",
+          "from": "Manuel",
+          "to": "Jean",
+          "reason": "User-directed reassignment to maximize parallel closeout."
+        }
+      ],
+      "updatedAt": "2026-06-29T02:29:41.523Z",
+      "runs": []
     },
     {
       "id": "S-HC-PUB-02-MULTIFORMAT-PREVIEW",
@@ -984,7 +2079,13 @@
           "branch": "Manuel/s-hc-pub-02-closeout",
           "description": "multiformat previews, deterministic auth, approval UI and dry-run QA completed"
         }
-      ]
+      ],
+      "project": "HeptaCore",
+      "sprint": "publishing",
+      "sprintOrderIndex": 19,
+      "taskOrderIndex": 24,
+      "updatedAt": "2026-06-29T02:29:41.523Z",
+      "runs": []
     },
     {
       "id": "S-HC-PUB-03-MULTITENANT-ASSETS",
@@ -1032,7 +2133,13 @@
           "branch": "Manuel/s-hc-pub-03-multitenant-assets",
           "description": "multitenant assets metadata compatibility batch uploads and production QA"
         }
-      ]
+      ],
+      "project": "HeptaCore",
+      "sprint": "publishing",
+      "sprintOrderIndex": 19,
+      "taskOrderIndex": 25,
+      "updatedAt": "2026-06-29T02:29:41.523Z",
+      "runs": []
     },
     {
       "id": "S-HC-PUB-06-REELS-STORIES-PUBLISHERS",
@@ -1069,7 +2176,13 @@
           "operator": "manuel",
           "description": "Task status reconciled to ready: dependencies and conflicts are clear for execution"
         }
-      ]
+      ],
+      "project": "HeptaCore",
+      "sprint": "publishing",
+      "sprintOrderIndex": 19,
+      "taskOrderIndex": 26,
+      "updatedAt": "2026-06-29T02:29:41.523Z",
+      "runs": []
     },
     {
       "id": "S-HC-PUB-07-YOUTUBE-PUBLISHING",
@@ -1103,7 +2216,13 @@
           "operator": "manuel",
           "description": "Task status reconciled to ready: dependencies and conflicts are clear for execution"
         }
-      ]
+      ],
+      "project": "HeptaCore",
+      "sprint": "publishing",
+      "sprintOrderIndex": 19,
+      "taskOrderIndex": 27,
+      "updatedAt": "2026-06-29T02:29:41.523Z",
+      "runs": []
     },
     {
       "id": "S-HC-PUB-08-PLATFORM-FORMAT-PARITY",
@@ -1137,7 +2256,13 @@
           "operator": "manuel",
           "description": "Task status reconciled to blocked: dependency S-HC-PUB-06-REELS-STORIES-PUBLISHERS still pending (S-HC-PUB-06-REELS-STORIES-PUBLISHERS:pending) | dependency S-HC-PUB-07-YOUTUBE-PUBLISHING still pending (S-HC-PUB-07-YOUTUBE-PUBLISHING:pending)"
         }
-      ]
+      ],
+      "project": "HeptaCore",
+      "sprint": "publishing",
+      "sprintOrderIndex": 19,
+      "taskOrderIndex": 28,
+      "updatedAt": "2026-06-29T02:29:41.523Z",
+      "runs": []
     },
     {
       "id": "S-HC-REC-00A",
@@ -1167,7 +2292,13 @@
           "branch": "manuel/s-hc-rec-00a-ui-publishing-baseline",
           "description": "Baseline de publicacion recuperado y estabilizado"
         }
-      ]
+      ],
+      "project": "HeptaCore",
+      "sprint": "recovery",
+      "sprintOrderIndex": 20,
+      "taskOrderIndex": 29,
+      "updatedAt": "2026-06-29T02:29:41.523Z",
+      "runs": []
     },
     {
       "id": "S-HC-REC-00B",
@@ -1185,7 +2316,13 @@
           "operator": "Manuel",
           "description": "Manuel elimino manualmente el duplicado en Facebook"
         }
-      ]
+      ],
+      "project": "HeptaCore",
+      "sprint": "recovery",
+      "sprintOrderIndex": 20,
+      "taskOrderIndex": 30,
+      "updatedAt": "2026-06-29T02:29:41.523Z",
+      "runs": []
     },
     {
       "id": "S-HC-REC-00C",
@@ -1216,7 +2353,13 @@
           "branch": "Manuel/s-hc-rec-00c-canonical-integration",
           "description": "canonical integration after recovery"
         }
-      ]
+      ],
+      "project": "HeptaCore",
+      "sprint": "recovery",
+      "sprintOrderIndex": 20,
+      "taskOrderIndex": 31,
+      "updatedAt": "2026-06-29T02:29:41.523Z",
+      "runs": []
     },
     {
       "id": "S-HC-RELEASE-01",
@@ -1251,7 +2394,13 @@
           "branch": "Manuel/s-hc-prod-01-producto-operativo-tenant-admin-produccion-2026-06-09",
           "description": "E2E Turpial Sound production proof"
         }
-      ]
+      ],
+      "project": "HeptaCore",
+      "sprint": "release",
+      "sprintOrderIndex": 21,
+      "taskOrderIndex": 32,
+      "updatedAt": "2026-06-29T02:29:41.523Z",
+      "runs": []
     },
     {
       "id": "S-HC-STRAT-01-MASTER-STRATEGY-WORKBENCH",
@@ -1286,7 +2435,13 @@
           "operator": "manuel",
           "description": "Task status reconciled to blocked: dependency S-HC-ONB-02-GAP-RESOLUTION-WIZARD still pending (S-HC-ONB-02-GAP-RESOLUTION-WIZARD:pending) | dependency S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE still pending (S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE:pending)"
         }
-      ]
+      ],
+      "project": "HeptaCore",
+      "sprint": "strategy",
+      "sprintOrderIndex": 22,
+      "taskOrderIndex": 33,
+      "updatedAt": "2026-06-29T02:29:41.523Z",
+      "runs": []
     },
     {
       "id": "S-HC-STRAT-02-CONTENT-CALENDAR-BLUEPRINT",
@@ -1317,7 +2472,13 @@
           "operator": "manuel",
           "description": "Task status reconciled to blocked: dependency S-HC-STRAT-01-MASTER-STRATEGY-WORKBENCH still pending (S-HC-STRAT-01-MASTER-STRATEGY-WORKBENCH:pending)"
         }
-      ]
+      ],
+      "project": "HeptaCore",
+      "sprint": "strategy",
+      "sprintOrderIndex": 22,
+      "taskOrderIndex": 34,
+      "updatedAt": "2026-06-29T02:29:41.523Z",
+      "runs": []
     },
     {
       "id": "S-HC-SUP-01-ASSISTED-CUSTOMER-CHANNELS",
@@ -1347,7 +2508,13 @@
           "operator": "manuel",
           "description": "Task status reconciled to blocked: dependency S-HC-COMM-02-BILLING-ACTIVATION still pending (S-HC-COMM-02-BILLING-ACTIVATION:pending)"
         }
-      ]
+      ],
+      "project": "HeptaCore",
+      "sprint": "support",
+      "sprintOrderIndex": 23,
+      "taskOrderIndex": 35,
+      "updatedAt": "2026-06-29T02:29:41.523Z",
+      "runs": []
     },
     {
       "id": "S-HC-TEN-02-CEPEG-ONBOARDING",
@@ -1382,7 +2549,13 @@
           "operator": "manuel",
           "description": "Task status reconciled to blocked: dependency S-HC-OPS-01-CAMPAIGN-REVIEW-DEPLOYMENT still pending (S-HC-OPS-01-CAMPAIGN-REVIEW-DEPLOYMENT:pending) | dependency S-HC-COMM-02-BILLING-ACTIVATION still pending (S-HC-COMM-02-BILLING-ACTIVATION:pending) | dependency S-HC-ONB-02-GAP-RESOLUTION-WIZARD still pending (S-HC-ONB-02-GAP-RESOLUTION-WIZARD:pending) | dependency S-HC-STRAT-02-CONTENT-CALENDAR-BLUEPRINT still pending (S-HC-STRAT-02-CONTENT-CALENDAR-BLUEPRINT:pending) | dependency S-HC-ASSET-01-STRATEGY-ASSET-MANIFEST still pending (S-HC-ASSET-01-STRATEGY-ASSET-MANIFEST:pending)"
         }
-      ]
+      ],
+      "project": "HeptaCore",
+      "sprint": "tenant-onboarding",
+      "sprintOrderIndex": 24,
+      "taskOrderIndex": 36,
+      "updatedAt": "2026-06-29T02:29:41.523Z",
+      "runs": []
     },
     {
       "id": "S-HC-TEN-01-GLOBAL-TENANT-ADMIN",
@@ -1420,7 +2593,13 @@
           "branch": "Manuel/s-hc-ten-01-global-tenant-admin",
           "description": "Three canonical roles (OWNER/ADMIN/VIEWER), legacy role normalization, identity panel in /admin and /tenant/*, 5/5 E2E pass, 569 unit tests, production intact"
         }
-      ]
+      ],
+      "project": "HeptaCore",
+      "sprint": "tenant-platform",
+      "sprintOrderIndex": 25,
+      "taskOrderIndex": 37,
+      "updatedAt": "2026-06-29T02:29:41.523Z",
+      "runs": []
     }
   ],
   "reassignments": [

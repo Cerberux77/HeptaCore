@@ -1,17 +1,13 @@
 #!/usr/bin/env node
 // Oreshnik Preflight Wrapper (HeptaCore edition)
-// Calls the Oreshnik CLI from the sibling oreshnik repo
-// Usage: node scripts/oreshnik/preflight.mjs --operator Jean [--sprint S-XX] [--desc "..."]
+// Uses the repo-pinned oreshnik-cli from node_modules.
 
-import { execSync } from "node:child_process";
-import { existsSync } from "node:fs";
+import { execFileSync } from "node:child_process";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const __dirname = fileURLToPath(new URL(".", import.meta.url));
 const heptaRoot = join(__dirname, "..", "..");
-const oreshnikRoot = join(heptaRoot, "..", "oreshnik");
-const oreshnikCli = join(oreshnikRoot, "dist", "cli.js");
 
 const args = process.argv.slice(2);
 let operator = "";
@@ -37,25 +33,15 @@ console.log("");
 console.log("ORESHNIK PREFLIGHT (HeptaCore)");
 console.log(`Operator: ${operator} | Sprint: ${sprint}`);
 
-// Build oreshnik if needed
-if (!existsSync(oreshnikCli)) {
-  console.log("Building oreshnik CLI...");
-  try {
-    execSync("npm run build", { cwd: oreshnikRoot, encoding: "utf8", stdio: "inherit", timeout: 60000 });
-  } catch (e) {
-    console.error("Failed to build oreshnik CLI:", e.message);
-    process.exit(1);
-  }
-}
-
 // Run oreshnik preflight from HeptaCore directory
 try {
-  execSync(`node "${oreshnikCli}" preflight --sprint "${sprint}" --operator "${operator}" --desc "${desc}"`, {
+  execFileSync("npx", ["--no-install", "oreshnik", "preflight", "--sprint", sprint, "--operator", operator, "--desc", desc], {
     cwd: heptaRoot,
     encoding: "utf8",
     stdio: "inherit",
     timeout: 120000,
   });
 } catch (e) {
-  // preflight exits with 1 on blockers — that's expected and informative
+  // preflight exits with 1 on blockers; preserve that behavior for callers
+  process.exit(e?.status ?? 1);
 }

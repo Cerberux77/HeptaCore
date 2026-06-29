@@ -8,13 +8,13 @@
   "workerMode": "codex",
   "runId": "kilo-S-HC-OBS-01-PUBLISHING-OBSERVABILITY-2026-06-29T02-25-50-533Z-0b59e14b",
   "branch": "task/S-HC-OBS-01-PUBLISHING-OBSERVABILITY/S-HC-OBS-01-PUBLISHING-OBSERVABILITY/kilo/kilo-S-HC-OBS-01-PUBLISHING-OBSERVABILITY-2026-06-29T02-25-50-533Z-0b59e14b",
-  "worktreePath": "D:\\PROYECTOS\\WORKTREES\\HeptaCore_PUB04_GOAL\\var\\oreshnik\\wt\\S-HC-OBS-01-PUBLISHING-OBSERVABILITY\\S-HC-OBS-01-PUBLISHING-OBSERVABILITY\\r-226ffbae8a2e",
+  "worktreePath": "var/oreshnik/wt/S-HC-OBS-01-PUBLISHING-OBSERVABILITY/S-HC-OBS-01-PUBLISHING-OBSERVABILITY/r-226ffbae8a2e",
   "zones": [
     "apps/web",
     "packages/core",
     "docs"
   ],
-  "taskBoardPath": "D:\\PROYECTOS\\WORKTREES\\HeptaCore_PUB04_GOAL\\var\\oreshnik\\task-board.json",
+  "taskBoardPath": "var/oreshnik/task-board.json",
   "taskStatus": "ready_for_integration",
   "claimStatus": "released",
   "claimedAt": "2026-06-29T02:25:50.533Z",

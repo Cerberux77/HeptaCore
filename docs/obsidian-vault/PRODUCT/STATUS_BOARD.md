@@ -1,7 +1,8 @@
+<!-- ORESHNIK:GENERATED:START -->
 ---
 type: status-board
 project: "HeptaCore"
-last_updated: "2026-06-29T03:02:47.066Z"
+last_updated: "2026-06-29T20:10:21.854Z"
 generated_by: "Oreshnik canonical-check"
 source: "var/oreshnik/task-board.json"
 ---
@@ -47,11 +48,12 @@ source: "var/oreshnik/task-board.json"
 - Fase completada: S-HC-PUB-02-MULTIFORMAT-PREVIEW — preview y dry-run multiformato para Instagram y Facebook.
 - Fase completada: S-HC-PUB-03-MULTITENANT-ASSETS — biblioteca multi-tenant, metadata, compatibilidad, colecciones, inspector (SHA 31dd93e).
 - Siguiente fase (un sprint por vez): S-HC-PUB-04-HOURLY-BATCH-CRON — batch cron publishing.
-- Fase activa: S-HC-TOOL-01-GOAL-RUNNER-V1 — Goal Runner v1 para ejecucion autonoma de Kilo. Nucleo implementado, integrado con /goal y /preflight. Pendiente goal piloto y posterior integracion en rama madre.
+- Fase completada: S-HC-TOOL-01-GOAL-RUNNER-V1 - Goal Runner v1 integrado en rama madre y listo para operar con Oreshnik dispatch.
 - EMAIL-01 infraestructura de codigo preparada (modelos, templates, provider abstraction, webhook, Link-Only activo). Integracion externa bloqueada hasta dominio final.
 - Modo operacional actual: EMAIL_PROVIDER=disabled. Invitaciones se entregan via enlace copiable (inviteLink). Correos reales: 0.
 - Reels, Stories y YouTube forman parte obligatoria del alcance final de HeptaCore. Las combinaciones sin publisher real quedan pendientes de implementacion en PUB-06, PUB-07 o PUB-08.
 - Jean fuera de ruta critica. Responsabilidades reasignadas a Manuel.
+- Fase completada: S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE - broker LLM, gobernanza de costo y evidencia estructurada integrados en ai-infra.
 
 ## Tareas Ready/Pending
 
@@ -59,10 +61,10 @@ source: "var/oreshnik/task-board.json"
 |---|---|---|---|---|
 | S-HC-PUB-04-HOURLY-BATCH-CRON | integrated | Manuel | Hourly batch cron publishing with timezone-aware scheduling | S-HC-PUB-02-MULTIFORMAT-PREVIEW, S-HC-PUB-03-MULTITENANT-ASSETS |
 | S-HC-PUB-05-RECONCILIATION-OPS | integrated | Manuel | Operational reconciliation automation for ambiguous provider outcomes | S-HC-PUB-04-HOURLY-BATCH-CRON |
-| S-HC-TOOL-01-GOAL-RUNNER-V1 | ready_for_integration | Manuel | Goal Runner v1 for autonomous Kilo execution | S-HC-TEN-01-GLOBAL-TENANT-ADMIN |
+| S-HC-TOOL-01-GOAL-RUNNER-V1 | integrated | Manuel | Goal Runner v1 for autonomous Kilo execution | S-HC-TEN-01-GLOBAL-TENANT-ADMIN |
 | S-HC-OBS-01-PUBLISHING-OBSERVABILITY | ready_for_integration | Manuel | Publishing observability: structured logging, metrics dashboard, alert thresholds | S-HC-PUB-05-RECONCILIATION-OPS |
 | S-HC-AIGEN-01-ASSET-GENERATION-BROKER | blocked | Manuel | AI asset generation broker: provider-agnostic, metered and billed | S-HC-ASSET-01-STRATEGY-ASSET-MANIFEST, S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE, S-HC-COMM-02-BILLING-ACTIVATION |
-| S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE | ready | Manuel | LLM provider selection, cost estimation and governance policy | - |
+| S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE | integrated | Manuel | LLM provider selection, cost estimation and governance policy | - |
 | S-HC-AN-01-CAMPAIGN-PERFORMANCE | blocked | Manuel | Campaign performance analytics: reach, engagement, metrics per post and campaign | S-HC-OPS-01-CAMPAIGN-REVIEW-DEPLOYMENT, S-HC-OBS-01-PUBLISHING-OBSERVABILITY |
 | S-HC-ASSET-01-STRATEGY-ASSET-MANIFEST | blocked | Manuel | Strategy-driven asset manifest: per-publication asset requirements | S-HC-STRAT-02-CONTENT-CALENDAR-BLUEPRINT, S-HC-PUB-03-MULTITENANT-ASSETS |
 | S-HC-ASSET-02-FORMAT-DERIVATIVES | ready | Manuel | Format derivatives: badge interaction, format preview, intelligent crop, safe zones, asset variants | S-HC-PUB-03-MULTITENANT-ASSETS |
@@ -110,5 +112,9 @@ source: "var/oreshnik/task-board.json"
 
 | Sprint | Resultado | Madre | Task | Source | Compatibility | Advance |
 |---|---|---|---|---|---|---|
+| ai-infra | succeeded | MADRE/v50-ai-infra-llm-provider-selection-cost-governance-2026-06-29 | S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE | task/ai-infra/S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE/codex/codex-S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE-2026-06-29T02-30-49-546Z-c443db0b | integration-train/ai-infra/S-HC-AI-01-LLM-SELECTION/r-c20ec67edeb3/a-3acf93d1c862 | runtime_projection_confirmed |
+| S-HC-TOOL-01-GOAL-RUNNER-V1 | succeeded | MADRE/v50-s-hc-tool-01-goal-runner-v1-goal-runner-v1-deterministic-state-machine-locks-2026-06-29 | S-HC-TOOL-01-GOAL-RUNNER-V1 | kilo/s-hc-tool-01-goal-runner-v1 | integration-train/S-HC-TOOL-01-GOAL-RUNNER/S-HC-TOOL-01-GOAL-RUNNER/r-2ff68e9be13b/a-2cfa35e28f38 | runtime_projection_confirmed |
 | S-HC-PUB-05-RECONCILIATION-OPS | succeeded | MADRE/v49-s-hc-pub-05-reconciliation-ops-implementa-automatizacion-operacional-de-reconci-2026-06-29 | S-HC-PUB-05-RECONCILIATION-OPS | Manuel/s-hc-pub-05-reconciliation-ops-sprint-2026-06-29 | integration-train/S-HC-PUB-05-RECONCILIATI/S-HC-PUB-05-RECONCILIATI/r-3030ee064340/a-4b83c9744f29 | runtime_projection_confirmed |
 | S-HC-PUB-04-HOURLY-BATCH-CRON | succeeded | MADRE/v48-s-hc-pub-04-hourly-batch-cron-hourly-batch-publishing-cron-and-pub-04-producti-2026-06-28 | S-HC-PUB-04-HOURLY-BATCH-CRON | Manuel/s-hc-pub-04-hourly-batch-goal | integration-train/S-HC-PUB-04-HOURLY-BATCH/S-HC-PUB-04-HOURLY-BATCH/r-c08e3c5d3afc/a-f62c2c114d4d | runtime_projection_confirmed |
+
+<!-- ORESHNIK:GENERATED:END -->
