@@ -1,6 +1,6 @@
 {
   "project": "HeptaCore",
-  "updatedAt": "2026-06-29T01:54:40.093Z",
+  "updatedAt": "2026-06-29T02:20:46.799Z",
   "resiliencePolicy": "If an owner is unavailable for more than one working block or blocks the critical path, backupOwner may take over after recording reassignment.",
   "closurePolicy": "No sprint may be closed until acceptance criteria, base tests, sprint-specific tests, docs/handoff, and Oreshnik zone checks pass.",
   "baseTestMatrix": [
@@ -11,7 +11,8 @@
   "currentExecutionOrder": [
     "S-HC-PUB-04-HOURLY-BATCH-CRON",
     "S-HC-PUB-05-RECONCILIATION-OPS",
-    "tooling",
+    "S-HC-TOOL-01-GOAL-RUNNER-V1",
+    "observability",
     "ad-hoc",
     "ai-generation",
     "ai-infra",
@@ -22,7 +23,6 @@
     "email-infra",
     "engagement",
     "foundation",
-    "observability",
     "onboarding",
     "operations",
     "optimization",
@@ -35,6 +35,7 @@
     "support",
     "tenant-onboarding",
     "tenant-platform",
+    "tooling",
     "Fase completada: S-HC-TEN-01-GLOBAL-TENANT-ADMIN — tres roles canonicos (OWNER/ADMIN/VIEWER), normalizacion heredada, identidad en /admin y /tenant/*, 5/5 E2E en Preview (SHA 4b82628), 569 unit tests.",
     "Fase completada: S-HC-REC-00A — baseline de publicacion recuperado y estabilizado (SHA 2fd9e249). Facebook e Instagram publican realmente desde la UI con durabilidad transaccional.",
     "Fase completada: S-HC-REC-00C — integracion canonica en master (SHA 9329fe8). Documentacion y Oreshnik alineados.",
@@ -203,8 +204,8 @@
       "title": "Goal Runner v1 for autonomous Kilo execution",
       "owner": "Manuel",
       "backupOwner": "Manuel",
-      "status": "ready",
-      "track": "tooling",
+      "status": "claimed",
+      "track": "S-HC-TOOL-01-GOAL-RUNNER-V1",
       "zone": [
         "scripts/goal-runner/**",
         "var/goal-runner/**",
@@ -228,6 +229,28 @@
         "Cero cambios en Production",
         "Integracion posterior en la rama madre mediante cierre controlado"
       ],
+      "attempts": 3,
+      "activeRun": {
+        "runId": "kilo-S-HC-TOOL-01-GOAL-RUNNER-V1-2026-06-29T02-20-46-794Z-ed5534ef",
+        "operator": "kilo",
+        "worker": "kilo",
+        "workerMode": "codex",
+        "claimedAt": "2026-06-29T02:20:46.793Z",
+        "updatedAt": "2026-06-29T02:20:46.798Z",
+        "expiresAt": "2026-06-29T03:20:46.793Z",
+        "branch": "task/S-HC-TOOL-01-GOAL-RUNNER-V1/S-HC-TOOL-01-GOAL-RUNNER-V1/kilo/kilo-S-HC-TOOL-01-GOAL-RUNNER-V1-2026-06-29T02-20-46-794Z-ed5534ef",
+        "worktreePath": "D:\\PROYECTOS\\WORKTREES\\HeptaCore_PUB04_GOAL\\var\\oreshnik\\wt\\S-HC-TOOL-01-GOAL-RUNNER-V1\\S-HC-TOOL-01-GOAL-RUNNER-V1\\r-7fa3b13c04df",
+        "zones": [
+          "scripts/goal-runner/**",
+          "var/goal-runner/**",
+          ".kilo/command/goal.md",
+          ".kilo/command/preflight.md",
+          "AGENTS.md",
+          "package.json",
+          "docs/07_handoffs/**",
+          "docs/obsidian-vault/**"
+        ]
+      },
       "history": [
         {
           "at": "2026-06-28T18:47:05.091Z",
@@ -237,6 +260,82 @@
         },
         {
           "at": "2026-06-29T00:12:30.056Z",
+          "action": "status_reconciled",
+          "operator": "manuel",
+          "description": "Task status reconciled to ready: dependencies and conflicts are clear for execution"
+        },
+        {
+          "at": "2026-06-29T02:07:54.635Z",
+          "action": "claimed",
+          "operator": "kilo",
+          "branch": "task/S-HC-TOOL-01-GOAL-RUNNER-V1/S-HC-TOOL-01-GOAL-RUNNER-V1/kilo/kilo-S-HC-TOOL-01-GOAL-RUNNER-V1-2026-06-29T02-07-54-626Z-6c79c9a6",
+          "description": "Run kilo-S-HC-TOOL-01-GOAL-RUNNER-V1-2026-06-29T02-07-54-626Z-6c79c9a6 claimed via codex"
+        },
+        {
+          "at": "2026-06-29T02:19:25.745Z",
+          "action": "claim_released",
+          "operator": "kilo",
+          "description": "Run kilo-S-HC-TOOL-01-GOAL-RUNNER-V1-2026-06-29T02-07-54-626Z-6c79c9a6 released"
+        },
+        {
+          "at": "2026-06-29T02:19:43.017Z",
+          "action": "claimed",
+          "operator": "kilo",
+          "branch": "task/S-HC-TOOL-01-GOAL-RUNNER-V1/S-HC-TOOL-01-GOAL-RUNNER-V1/kilo/kilo-S-HC-TOOL-01-GOAL-RUNNER-V1-2026-06-29T02-19-43-008Z-33b124f7",
+          "description": "Run kilo-S-HC-TOOL-01-GOAL-RUNNER-V1-2026-06-29T02-19-43-008Z-33b124f7 claimed via codex"
+        },
+        {
+          "at": "2026-06-29T02:20:03.203Z",
+          "action": "validation_started",
+          "operator": "kilo",
+          "branch": "task/S-HC-TOOL-01-GOAL-RUNNER-V1/S-HC-TOOL-01-GOAL-RUNNER-V1/kilo/kilo-S-HC-TOOL-01-GOAL-RUNNER-V1-2026-06-29T02-19-43-008Z-33b124f7",
+          "description": "Goal Runner v1: 149 tests pass (12 suites), typecheck/build/worker-validate OK, npm scripts and zone-map entries added, 6 historical goals COMPLETED"
+        },
+        {
+          "at": "2026-06-29T02:20:29.144Z",
+          "action": "claim_released",
+          "operator": "kilo",
+          "description": "Run kilo-S-HC-TOOL-01-GOAL-RUNNER-V1-2026-06-29T02-19-43-008Z-33b124f7 released"
+        },
+        {
+          "at": "2026-06-29T02:20:46.799Z",
+          "action": "claimed",
+          "operator": "kilo",
+          "branch": "task/S-HC-TOOL-01-GOAL-RUNNER-V1/S-HC-TOOL-01-GOAL-RUNNER-V1/kilo/kilo-S-HC-TOOL-01-GOAL-RUNNER-V1-2026-06-29T02-20-46-794Z-ed5534ef",
+          "description": "Run kilo-S-HC-TOOL-01-GOAL-RUNNER-V1-2026-06-29T02-20-46-794Z-ed5534ef claimed via codex"
+        }
+      ]
+    },
+    {
+      "id": "S-HC-OBS-01-PUBLISHING-OBSERVABILITY",
+      "title": "Publishing observability: structured logging, metrics dashboard, alert thresholds",
+      "owner": "Manuel",
+      "backupOwner": "Manuel",
+      "status": "ready",
+      "track": "observability",
+      "zone": [
+        "apps/web",
+        "packages/core",
+        "docs"
+      ],
+      "dependsOn": [
+        "S-HC-PUB-05-RECONCILIATION-OPS"
+      ],
+      "acceptance": [
+        "Structured logging with correlation IDs",
+        "Publishing metrics dashboard (attempts, failures, latency)",
+        "Alert thresholds for provider failures",
+        "Daily digest summarizing publishing activity"
+      ],
+      "history": [
+        {
+          "at": "2026-06-28T18:47:05.091Z",
+          "action": "status_reconciled",
+          "operator": "manuel",
+          "description": "Task status reconciled to blocked: dependency S-HC-PUB-05-RECONCILIATION-OPS still pending (S-HC-PUB-05-RECONCILIATION-OPS:pending)"
+        },
+        {
+          "at": "2026-06-29T02:04:58.523Z",
           "action": "status_reconciled",
           "operator": "manuel",
           "description": "Task status reconciled to ready: dependencies and conflicts are clear for execution"
@@ -643,36 +742,6 @@
           "operator": "Manuel",
           "branch": "Manuel/s-hc-prod-01-producto-operativo-tenant-admin-produccion-2026-06-09",
           "description": "foundation baseline commit"
-        }
-      ]
-    },
-    {
-      "id": "S-HC-OBS-01-PUBLISHING-OBSERVABILITY",
-      "title": "Publishing observability: structured logging, metrics dashboard, alert thresholds",
-      "owner": "Manuel",
-      "backupOwner": "Manuel",
-      "status": "blocked",
-      "track": "observability",
-      "zone": [
-        "apps/web",
-        "packages/core",
-        "docs"
-      ],
-      "dependsOn": [
-        "S-HC-PUB-05-RECONCILIATION-OPS"
-      ],
-      "acceptance": [
-        "Structured logging with correlation IDs",
-        "Publishing metrics dashboard (attempts, failures, latency)",
-        "Alert thresholds for provider failures",
-        "Daily digest summarizing publishing activity"
-      ],
-      "history": [
-        {
-          "at": "2026-06-28T18:47:05.091Z",
-          "action": "status_reconciled",
-          "operator": "manuel",
-          "description": "Task status reconciled to blocked: dependency S-HC-PUB-05-RECONCILIATION-OPS still pending (S-HC-PUB-05-RECONCILIATION-OPS:pending)"
         }
       ]
     },

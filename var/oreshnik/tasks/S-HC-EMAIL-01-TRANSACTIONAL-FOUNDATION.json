@@ -2,8 +2,8 @@
   "project": "HeptaCore",
   "taskId": "S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION",
   "sprint": "email-infra",
-  "sprintOrderIndex": 22,
-  "taskOrderIndex": 14,
+  "sprintOrderIndex": 11,
+  "taskOrderIndex": 15,
   "title": "Transactional email foundation: domain sender, DNS, reputation, provider integration",
   "owner": "Jean",
   "backupOwner": "Manuel",
@@ -22,6 +22,6 @@
     "Webhooks de eventos (delivered, bounced, complained) configurados",
     "Enlaces comerciales y de marca consistentes con el dominio final"
   ],
-  "updatedAt": "2026-06-29T00:37:30.040Z",
+  "updatedAt": "2026-06-29T02:20:46.799Z",
   "runs": []
 }

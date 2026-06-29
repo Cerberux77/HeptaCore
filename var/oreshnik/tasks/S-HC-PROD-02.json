@@ -2,7 +2,7 @@
   "project": "HeptaCore",
   "taskId": "S-HC-PROD-02",
   "sprint": "production-infra",
-  "sprintOrderIndex": 30,
+  "sprintOrderIndex": 18,
   "taskOrderIndex": 23,
   "title": "Production DB/Auth/env and Turpial seed smoke",
   "owner": "Jean",
@@ -54,6 +54,6 @@
       "reason": "User-directed reassignment to maximize parallel closeout."
     }
   ],
-  "updatedAt": "2026-06-29T00:37:30.040Z",
+  "updatedAt": "2026-06-29T02:20:46.799Z",
   "runs": []
 }

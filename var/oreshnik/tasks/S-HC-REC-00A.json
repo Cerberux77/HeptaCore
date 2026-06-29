@@ -2,7 +2,7 @@
   "project": "HeptaCore",
   "taskId": "S-HC-REC-00A",
   "sprint": "recovery",
-  "sprintOrderIndex": 32,
+  "sprintOrderIndex": 20,
   "taskOrderIndex": 29,
   "title": "UI Publishing Baseline Recovery — production publishing stabilized",
   "owner": "Manuel",
@@ -31,6 +31,6 @@
       "description": "Baseline de publicacion recuperado y estabilizado"
     }
   ],
-  "updatedAt": "2026-06-29T00:37:30.040Z",
+  "updatedAt": "2026-06-29T02:20:46.799Z",
   "runs": []
 }

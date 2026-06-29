@@ -2,7 +2,7 @@
   "project": "HeptaCore",
   "taskId": "S-HC-OPS-01-CAMPAIGN-REVIEW-DEPLOYMENT",
   "sprint": "operations",
-  "sprintOrderIndex": 27,
+  "sprintOrderIndex": 15,
   "taskOrderIndex": 20,
   "title": "Campaign review and deployment: batch approval, schedule, publish",
   "owner": "Manuel",
@@ -34,6 +34,6 @@
       "description": "Task status reconciled to blocked: dependency S-HC-STRAT-02-CONTENT-CALENDAR-BLUEPRINT still pending (S-HC-STRAT-02-CONTENT-CALENDAR-BLUEPRINT:pending) | dependency S-HC-ASSET-01-STRATEGY-ASSET-MANIFEST still pending (S-HC-ASSET-01-STRATEGY-ASSET-MANIFEST:pending)"
     }
   ],
-  "updatedAt": "2026-06-29T00:37:30.040Z",
+  "updatedAt": "2026-06-29T02:20:46.799Z",
   "runs": []
 }

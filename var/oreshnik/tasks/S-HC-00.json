@@ -2,8 +2,8 @@
   "project": "HeptaCore",
   "taskId": "S-HC-00",
   "sprint": "foundation",
-  "sprintOrderIndex": 24,
-  "taskOrderIndex": 16,
+  "sprintOrderIndex": 13,
+  "taskOrderIndex": 17,
   "title": "Foundation baseline commit",
   "owner": "Manuel",
   "backupOwner": "Jean",
@@ -29,6 +29,6 @@
       "description": "foundation baseline commit"
     }
   ],
-  "updatedAt": "2026-06-29T00:37:30.040Z",
+  "updatedAt": "2026-06-29T02:20:46.799Z",
   "runs": []
 }

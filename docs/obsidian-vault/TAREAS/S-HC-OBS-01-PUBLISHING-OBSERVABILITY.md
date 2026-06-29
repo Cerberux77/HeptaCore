@@ -4,9 +4,9 @@ type: task-runtime
 project: "HeptaCore"
 task_id: "S-HC-OBS-01-PUBLISHING-OBSERVABILITY"
 sprint: "observability"
-status: "blocked"
+status: "ready"
 owner: "Manuel"
-last_updated: "2026-06-29T00:37:30.040Z"
+last_updated: "2026-06-29T02:20:46.799Z"
 source: "var/oreshnik/tasks/S-HC-OBS-01-PUBLISHING-OBSERVABILITY.json"
 ---
 
@@ -18,7 +18,7 @@ Publishing observability: structured logging, metrics dashboard, alert threshold
 
 ## Runtime
 
-- estado: `blocked`
+- estado: `ready`
 - owner: `Manuel`
 - backup: `Manuel`
 - intentos: `0`

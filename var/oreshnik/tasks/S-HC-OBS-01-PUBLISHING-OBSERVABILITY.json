@@ -2,12 +2,12 @@
   "project": "HeptaCore",
   "taskId": "S-HC-OBS-01-PUBLISHING-OBSERVABILITY",
   "sprint": "observability",
-  "sprintOrderIndex": 25,
-  "taskOrderIndex": 17,
+  "sprintOrderIndex": 3,
+  "taskOrderIndex": 3,
   "title": "Publishing observability: structured logging, metrics dashboard, alert thresholds",
   "owner": "Manuel",
   "backupOwner": "Manuel",
-  "status": "blocked",
+  "status": "ready",
   "taskBoardPath": "D:\\PROYECTOS\\WORKTREES\\HeptaCore_PUB04_GOAL\\var\\oreshnik\\task-board.json",
   "zone": [
     "apps/web",
@@ -29,8 +29,14 @@
       "action": "status_reconciled",
       "operator": "manuel",
       "description": "Task status reconciled to blocked: dependency S-HC-PUB-05-RECONCILIATION-OPS still pending (S-HC-PUB-05-RECONCILIATION-OPS:pending)"
+    },
+    {
+      "at": "2026-06-29T02:04:58.523Z",
+      "action": "status_reconciled",
+      "operator": "manuel",
+      "description": "Task status reconciled to ready: dependencies and conflicts are clear for execution"
     }
   ],
-  "updatedAt": "2026-06-29T00:37:30.040Z",
+  "updatedAt": "2026-06-29T02:20:46.799Z",
   "runs": []
 }

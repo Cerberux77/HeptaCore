@@ -2,8 +2,8 @@
   "project": "HeptaCore",
   "taskId": "S-HC-ASSET-02-FORMAT-DERIVATIVES",
   "sprint": "assets",
-  "sprintOrderIndex": 19,
-  "taskOrderIndex": 10,
+  "sprintOrderIndex": 8,
+  "taskOrderIndex": 11,
   "title": "Format derivatives: badge interaction, format preview, intelligent crop, safe zones, asset variants",
   "owner": "Manuel",
   "backupOwner": "Manuel",
@@ -38,6 +38,6 @@
       "description": "Task status reconciled to ready: dependencies and conflicts are clear for execution"
     }
   ],
-  "updatedAt": "2026-06-29T00:37:30.040Z",
+  "updatedAt": "2026-06-29T02:20:46.799Z",
   "runs": []
 }

@@ -2,7 +2,7 @@
   "project": "HeptaCore",
   "taskId": "S-HC-ONB-02-GAP-RESOLUTION-WIZARD",
   "sprint": "onboarding",
-  "sprintOrderIndex": 26,
+  "sprintOrderIndex": 14,
   "taskOrderIndex": 19,
   "title": "Gap resolution wizard: dynamic form to resolve missing or conflicting data",
   "owner": "Manuel",
@@ -30,6 +30,6 @@
       "description": "Task status reconciled to blocked: dependency S-HC-ONB-01-MASTER-BRIEF-INGESTION still pending (S-HC-ONB-01-MASTER-BRIEF-INGESTION:pending)"
     }
   ],
-  "updatedAt": "2026-06-29T00:37:30.040Z",
+  "updatedAt": "2026-06-29T02:20:46.799Z",
   "runs": []
 }

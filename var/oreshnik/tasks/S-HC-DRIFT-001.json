@@ -2,8 +2,8 @@
   "project": "HeptaCore",
   "taskId": "S-HC-DRIFT-001",
   "sprint": "ad-hoc",
-  "sprintOrderIndex": 15,
-  "taskOrderIndex": 3,
+  "sprintOrderIndex": 4,
+  "taskOrderIndex": 4,
   "title": "sprint",
   "owner": "Manuel",
   "backupOwner": "Manuel",
@@ -24,6 +24,6 @@
       "description": "sprint"
     }
   ],
-  "updatedAt": "2026-06-29T00:37:30.040Z",
+  "updatedAt": "2026-06-29T02:20:46.799Z",
   "runs": []
 }

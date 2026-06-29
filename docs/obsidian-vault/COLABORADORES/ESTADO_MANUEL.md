@@ -2,7 +2,7 @@
 type: collaborator-status
 project: "HeptaCore"
 operator: "Manuel"
-last_updated: "2026-06-29T00:37:36.690Z"
+last_updated: "2026-06-29T02:21:00.880Z"
 generated_by: "Oreshnik canonical-check"
 source: "var/oreshnik/task-board.json"
 ---
@@ -15,7 +15,7 @@ source: "var/oreshnik/task-board.json"
 
 | Sprint | Scope | Depende de |
 |---|---|---|
-| S-HC-TOOL-01-GOAL-RUNNER-V1 | Goal Runner v1 for autonomous Kilo execution | S-HC-TEN-01-GLOBAL-TENANT-ADMIN |
+| S-HC-OBS-01-PUBLISHING-OBSERVABILITY | Publishing observability: structured logging, metrics dashboard, alert thresholds | S-HC-PUB-05-RECONCILIATION-OPS |
 | S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE | LLM provider selection, cost estimation and governance policy | - |
 | S-HC-ASSET-02-FORMAT-DERIVATIVES | Format derivatives: badge interaction, format preview, intelligent crop, safe zones, asset variants | S-HC-PUB-03-MULTITENANT-ASSETS |
 | S-HC-PUB-06-REELS-STORIES-PUBLISHERS | Real publishing for Meta Reels and Stories: Instagram + Facebook | S-HC-PUB-03-MULTITENANT-ASSETS, S-HC-PUB-04-HOURLY-BATCH-CRON |
@@ -43,7 +43,7 @@ Zonas: `apps/web/app/api/cron`, `apps/worker`, `packages/core`
 
 ### S-HC-PUB-05-RECONCILIATION-OPS - Operational reconciliation automation for ambiguous provider outcomes
 
-Estado: `ready_for_integration`
+Estado: `integrated`
 
 - Automatic reconciliation for Case A (Result ok + externalPostId + incomplete Draft)
 - Alert-only for Case B (Draft.externalPostId present + Result absent)
@@ -54,7 +54,7 @@ Zonas: `apps/web/lib/publishing-finalization.ts`, `apps/web/lib/draft-operationa
 
 ### S-HC-TOOL-01-GOAL-RUNNER-V1 - Goal Runner v1 for autonomous Kilo execution
 
-Estado: `ready`
+Estado: `claimed`
 
 - Nucleo determinista implementado y probado
 - Maquina de estados, locks, evidencia y gates operativos
@@ -66,6 +66,17 @@ Estado: `ready`
 - Integracion posterior en la rama madre mediante cierre controlado
 
 Zonas: `scripts/goal-runner/**`, `var/goal-runner/**`, `.kilo/command/goal.md`, `.kilo/command/preflight.md`, `AGENTS.md`, `package.json`, `docs/07_handoffs/**`, `docs/obsidian-vault/**`
+
+### S-HC-OBS-01-PUBLISHING-OBSERVABILITY - Publishing observability: structured logging, metrics dashboard, alert thresholds
+
+Estado: `ready`
+
+- Structured logging with correlation IDs
+- Publishing metrics dashboard (attempts, failures, latency)
+- Alert thresholds for provider failures
+- Daily digest summarizing publishing activity
+
+Zonas: `apps/web`, `packages/core`, `docs`
 
 ### S-HC-AIGEN-01-ASSET-GENERATION-BROKER - AI asset generation broker: provider-agnostic, metered and billed
 
@@ -165,17 +176,6 @@ Estado: `blocked`
 - Summary of themes and sentiment
 
 Zonas: `apps/web/components`, `apps/web/app/api`, `packages/integrations`
-
-### S-HC-OBS-01-PUBLISHING-OBSERVABILITY - Publishing observability: structured logging, metrics dashboard, alert thresholds
-
-Estado: `blocked`
-
-- Structured logging with correlation IDs
-- Publishing metrics dashboard (attempts, failures, latency)
-- Alert thresholds for provider failures
-- Daily digest summarizing publishing activity
-
-Zonas: `apps/web`, `packages/core`, `docs`
 
 ### S-HC-ONB-01-MASTER-BRIEF-INGESTION - Master document ingestion: extract structured info from company briefs
 
