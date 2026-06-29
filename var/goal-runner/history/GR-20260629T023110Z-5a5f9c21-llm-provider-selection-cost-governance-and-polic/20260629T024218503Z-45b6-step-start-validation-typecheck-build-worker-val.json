@@ -1,0 +1,7 @@
+{
+  "at": "2026-06-29T02:42:18.504Z",
+  "event": "step-start-validation-typecheck-build-worker-validate-full-",
+  "goalId": "GR-20260629T023110Z-5a5f9c21-llm-provider-selection-cost-governance-and-polic",
+  "id": "20260629T024218503Z-45b6-step-start-validation-typecheck-build-worker-val",
+  "step": "Validation: typecheck, build, worker-validate, full tests"
+}

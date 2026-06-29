@@ -1,0 +1,8 @@
+{
+  "at": "2026-06-29T02:46:36.537Z",
+  "event": "step-complete-validation-typecheck-build-worker-validate-full-",
+  "goalId": "GR-20260629T023110Z-5a5f9c21-llm-provider-selection-cost-governance-and-polic",
+  "id": "20260629T024636536Z-2fdc-step-complete-validation-typecheck-build-worker-",
+  "result": "typecheck pass (all 7 workspaces), build pass (Next.js compiled with llm-governance and llm-usage routes), worker:validate pass (29/29), 693 tests pass (23 core + 669 web + 1 calendar), 0 failures",
+  "step": "Validation: typecheck, build, worker-validate, full tests"
+}

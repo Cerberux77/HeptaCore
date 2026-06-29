@@ -6,7 +6,7 @@ task_id: "S-HC-PUB-05-RECONCILIATION-OPS"
 sprint: "S-HC-PUB-05-RECONCILIATION-OPS"
 status: "integrated"
 owner: "Manuel"
-last_updated: "2026-06-29T01:54:40.093Z"
+last_updated: "2026-06-29T02:50:23.982Z"
 source: "var/oreshnik/tasks/S-HC-PUB-05-RECONCILIATION-OPS.json"
 ---
 

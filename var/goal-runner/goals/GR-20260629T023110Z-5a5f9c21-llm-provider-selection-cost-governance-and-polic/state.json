@@ -1,0 +1,38 @@
+{
+  "baseSha": "4dcd24698b46b3657595dfff65915e1876ba2e4c",
+  "branch": "codex-bootstrap/S-HC-AI-01",
+  "createdAt": "2026-06-29T02:31:10.387Z",
+  "evidenceRequired": "code",
+  "goalId": "GR-20260629T023110Z-5a5f9c21-llm-provider-selection-cost-governance-and-polic",
+  "owner": "codex",
+  "previousStatus": "ACTIVE",
+  "sprintId": "S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE",
+  "status": "COMPLETED",
+  "title": "LLM provider selection cost governance and policy",
+  "transitions": [
+    {
+      "at": "2026-06-29T02:35:01.107Z",
+      "by": "codex",
+      "from": "DRAFT",
+      "to": "READY"
+    },
+    {
+      "at": "2026-06-29T02:35:01.361Z",
+      "by": "codex",
+      "from": "READY",
+      "to": "ACTIVE"
+    },
+    {
+      "at": "2026-06-29T02:49:12.565Z",
+      "by": "codex",
+      "from": "ACTIVE",
+      "to": "COMPLETED"
+    }
+  ],
+  "updatedAt": "2026-06-29T02:49:12.565Z",
+  "validationGates": [
+    "typecheck",
+    "build",
+    "worker-validate"
+  ]
+}

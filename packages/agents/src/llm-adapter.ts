@@ -1,6 +1,8 @@
 import type { ClientIntake } from "./index";
 import type { StrategyOutput } from "./strategy-runner";
 import { reframeOffer, generateDraftPlan } from "./strategy-runner";
+import type { LLMTaskType, LLMGovernancePolicy, LLMConfig, LLMUsageLogEntry, GovernanceCheckResult } from "@heptacore/core";
+import { enforceGovernance, DEFAULT_GOVERNANCE_POLICY, DEFAULT_LLM_CONFIG, DEFAULT_OVERHEAD_FACTOR, calculateApiCost, calculateTenantCost } from "@heptacore/core";
 
 export interface LLMProviderConfig {
   provider: string;
@@ -410,6 +412,113 @@ function buildDeterministicStrategy(
     assetChecklist: base.assetChecklist,
     draftPlan,
   };
+}
+
+export interface GovernedLLMResult {
+  strategy: StrategyOutput;
+  provider: string;
+  usage?: { promptTokens: number; completionTokens: number };
+  governance: GovernanceCheckResult;
+  usageLog?: LLMUsageLogEntry;
+  fallback: boolean;
+}
+
+export async function generateStrategyGoverned(
+  intake: ClientIntake,
+  context?: Partial<TurpialContext>,
+  providerConfig?: Partial<LLMProviderConfig>,
+  governancePolicy?: Partial<LLMGovernancePolicy>,
+  llmConfig?: Partial<LLMConfig>,
+  currentSpendUsd?: number,
+): Promise<GovernedLLMResult> {
+  const policy: LLMGovernancePolicy = {
+    ...DEFAULT_GOVERNANCE_POLICY,
+    ...governancePolicy,
+  };
+
+  const config: LLMConfig = {
+    ...DEFAULT_LLM_CONFIG,
+    provider: (providerConfig?.provider as LLMConfig["provider"]) ?? DEFAULT_LLM_CONFIG.provider,
+    model: providerConfig?.model,
+    apiKey: providerConfig?.apiKey,
+    ...llmConfig,
+  };
+
+  const taskType: LLMTaskType = "strategy";
+  const spend = currentSpendUsd ?? 0;
+
+  const check = enforceGovernance(policy, config, taskType, spend);
+
+  if (!check.allowed) {
+    console.warn(`LLM governance blocked: ${check.reason}. Falling back to deterministic.`);
+    const strategy = buildDeterministicStrategy(intake, context);
+    return {
+      strategy,
+      provider: `deterministic (governance: ${check.reason})`,
+      governance: check,
+      fallback: true,
+    };
+  }
+
+  try {
+    const provider = getLLMProvider(providerConfig);
+    const systemPrompt = buildSystemPrompt();
+    const userPrompt = buildUserPrompt(intake, context);
+
+    const result = await provider.generate({
+      systemPrompt,
+      userPrompt,
+      temperature: 0.7,
+      maxTokens: 3000,
+      responseFormat: "json_object",
+    });
+
+    const parsed = JSON.parse(result.content) as StrategyOutput;
+    const strategy = validateStrategyOutput(parsed, intake);
+    const usage = result.usage
+      ? { promptTokens: result.usage.promptTokens, completionTokens: result.usage.completionTokens }
+      : undefined;
+
+    const promptTokens = usage?.promptTokens ?? 0;
+    const completionTokens = usage?.completionTokens ?? 0;
+
+    const costCalc = calculateApiCost(check.model, promptTokens, completionTokens);
+
+    const tenantCostResult = calculateTenantCost(
+      costCalc.totalApiCost,
+      DEFAULT_OVERHEAD_FACTOR,
+    );
+
+    const usageLog: LLMUsageLogEntry = {
+      provider: config.provider,
+      model: check.model,
+      taskType,
+      promptTokens,
+      completionTokens,
+      apiCost: costCalc.totalApiCost,
+      tenantCost: tenantCostResult.tenantCost,
+      heptaCoreProfit: tenantCostResult.heptaCoreProfit,
+      at: new Date().toISOString(),
+    };
+
+    return {
+      strategy,
+      provider: provider.provider,
+      usage,
+      governance: check,
+      usageLog,
+      fallback: false,
+    };
+  } catch (err) {
+    console.warn(`LLM strategy generation failed (${config.provider}), falling back to deterministic:`, err instanceof Error ? err.message : err);
+    const strategy = buildDeterministicStrategy(intake, context);
+    return {
+      strategy,
+      provider: `deterministic (fallback from ${config.provider})`,
+      governance: check,
+      fallback: true,
+    };
+  }
 }
 
 function validateStrategyOutput(parsed: StrategyOutput, intake: ClientIntake): StrategyOutput {

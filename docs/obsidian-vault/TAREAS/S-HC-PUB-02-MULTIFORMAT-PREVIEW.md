@@ -6,7 +6,7 @@ task_id: "S-HC-PUB-02-MULTIFORMAT-PREVIEW"
 sprint: "publishing"
 status: "done"
 owner: "Manuel"
-last_updated: "2026-06-29T01:54:40.093Z"
+last_updated: "2026-06-29T02:50:23.982Z"
 source: "var/oreshnik/tasks/S-HC-PUB-02-MULTIFORMAT-PREVIEW.json"
 ---
 

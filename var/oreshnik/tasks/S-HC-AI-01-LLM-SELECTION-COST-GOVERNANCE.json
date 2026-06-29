@@ -7,7 +7,7 @@
   "title": "LLM provider selection, cost estimation and governance policy",
   "owner": "Manuel",
   "backupOwner": "Manuel",
-  "status": "ready",
+  "status": "validating",
   "taskBoardPath": "D:\\PROYECTOS\\WORKTREES\\CODEX\\AI01\\var\\oreshnik\\task-board.json",
   "zone": [
     "packages/agents",
@@ -22,14 +22,65 @@
     "Admin policy: authorized providers, models, max spend",
     "Usage tracking and billing integration"
   ],
+  "attempts": 1,
+  "activeRun": {
+    "runId": "codex-S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE-2026-06-29T02-30-49-546Z-c443db0b",
+    "operator": "codex",
+    "worker": "codex",
+    "workerMode": "codex",
+    "claimedAt": "2026-06-29T02:30:49.546Z",
+    "updatedAt": "2026-06-29T02:30:49.552Z",
+    "expiresAt": "2026-06-29T03:30:49.546Z",
+    "branch": "task/ai-infra/S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE/codex/codex-S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE-2026-06-29T02-30-49-546Z-c443db0b",
+    "worktreePath": "D:\\PROYECTOS\\WORKTREES\\CODEX\\AI01\\var\\oreshnik\\wt\\ai-infra\\S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE\\r-c20ec67edeb3",
+    "zones": [
+      "packages/agents",
+      "packages/core",
+      "apps/web/components"
+    ]
+  },
   "history": [
     {
       "at": "2026-06-28T18:47:05.091Z",
       "action": "status_reconciled",
       "operator": "manuel",
       "description": "Task status reconciled to ready: dependencies and conflicts are clear for execution"
+    },
+    {
+      "at": "2026-06-29T02:30:49.553Z",
+      "action": "claimed",
+      "operator": "codex",
+      "branch": "task/ai-infra/S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE/codex/codex-S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE-2026-06-29T02-30-49-546Z-c443db0b",
+      "description": "Run codex-S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE-2026-06-29T02-30-49-546Z-c443db0b claimed via codex"
+    },
+    {
+      "at": "2026-06-29T02:50:23.982Z",
+      "action": "validation_started",
+      "operator": "codex",
+      "branch": "task/ai-infra/S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE/codex/codex-S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE-2026-06-29T02-30-49-546Z-c443db0b",
+      "description": "typecheck pass, build pass, worker-validate pass, 693 tests pass (23 core). All acceptance criteria met: provider-agnostic broker, task model selection, cost estimation, admin policy, usage tracking."
     }
   ],
-  "updatedAt": "2026-06-29T01:54:40.093Z",
-  "runs": []
+  "updatedAt": "2026-06-29T02:50:23.982Z",
+  "runs": [
+    {
+      "runId": "codex-S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE-2026-06-29T02-30-49-546Z-c443db0b",
+      "operator": "codex",
+      "worker": "codex",
+      "workerMode": "codex",
+      "branch": "task/ai-infra/S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE/codex/codex-S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE-2026-06-29T02-30-49-546Z-c443db0b",
+      "worktreePath": "D:\\PROYECTOS\\WORKTREES\\CODEX\\AI01\\var\\oreshnik\\wt\\ai-infra\\S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE\\r-c20ec67edeb3",
+      "zones": [
+        "packages/agents",
+        "packages/core",
+        "apps/web/components"
+      ],
+      "taskStatus": "validating",
+      "claimStatus": "claimed",
+      "claimedAt": "2026-06-29T02:30:49.546Z",
+      "updatedAt": "2026-06-29T02:50:23.991Z",
+      "expiresAt": "2026-06-29T03:30:49.546Z",
+      "manifestPath": "var/oreshnik/runs/S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE/codex-S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE-2026-06-29T02-30-49-546Z-c443db0b.json"
+    }
+  ]
 }

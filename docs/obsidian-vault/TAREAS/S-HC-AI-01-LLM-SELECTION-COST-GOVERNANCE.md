@@ -4,9 +4,9 @@ type: task-runtime
 project: "HeptaCore"
 task_id: "S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE"
 sprint: "ai-infra"
-status: "ready"
+status: "validating"
 owner: "Manuel"
-last_updated: "2026-06-29T01:54:40.093Z"
+last_updated: "2026-06-29T02:50:23.982Z"
 source: "var/oreshnik/tasks/S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE.json"
 ---
 
@@ -18,10 +18,10 @@ LLM provider selection, cost estimation and governance policy
 
 ## Runtime
 
-- estado: `ready`
+- estado: `validating`
 - owner: `Manuel`
 - backup: `Manuel`
-- intentos: `0`
+- intentos: `1`
 - handoff: -
 
 ## Dependencias
@@ -56,7 +56,7 @@ LLM provider selection, cost estimation and governance policy
 
 | Run | Operator | Mode | Task Status | Claim | Branch |
 |---|---|---|---|---|---|
-| Ninguno | - | - | - | - | - |
+| codex-S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE-2026-06-29T02-30-49-546Z-c443db0b | codex | codex | validating | claimed | task/ai-infra/S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE/codex/codex-S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE-2026-06-29T02-30-49-546Z-c443db0b |
 
 ## Integracion
 

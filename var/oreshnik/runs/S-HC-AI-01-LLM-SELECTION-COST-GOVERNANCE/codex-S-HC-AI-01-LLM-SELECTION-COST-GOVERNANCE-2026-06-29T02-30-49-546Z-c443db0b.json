@@ -1,0 +1,23 @@
+{
+  "project": "HeptaCore",
+  "taskId": "S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE",
+  "sprint": "ai-infra",
+  "owner": "Manuel",
+  "operator": "codex",
+  "worker": "codex",
+  "workerMode": "codex",
+  "runId": "codex-S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE-2026-06-29T02-30-49-546Z-c443db0b",
+  "branch": "task/ai-infra/S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE/codex/codex-S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE-2026-06-29T02-30-49-546Z-c443db0b",
+  "worktreePath": "D:\\PROYECTOS\\WORKTREES\\CODEX\\AI01\\var\\oreshnik\\wt\\ai-infra\\S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE\\r-c20ec67edeb3",
+  "zones": [
+    "packages/agents",
+    "packages/core",
+    "apps/web/components"
+  ],
+  "taskBoardPath": "D:\\PROYECTOS\\WORKTREES\\CODEX\\AI01\\var\\oreshnik\\task-board.json",
+  "taskStatus": "validating",
+  "claimStatus": "claimed",
+  "claimedAt": "2026-06-29T02:30:49.546Z",
+  "updatedAt": "2026-06-29T02:50:23.991Z",
+  "expiresAt": "2026-06-29T03:30:49.546Z"
+}

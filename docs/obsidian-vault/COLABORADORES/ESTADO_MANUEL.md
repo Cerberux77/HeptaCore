@@ -1,8 +1,9 @@
+<!-- ORESHNIK:GENERATED:START -->
 ---
 type: collaborator-status
 project: "HeptaCore"
 operator: "Manuel"
-last_updated: "2026-06-29T02:30:08.613Z"
+last_updated: "2026-06-29T02:56:24.640Z"
 generated_by: "Oreshnik canonical-check"
 source: "var/oreshnik/task-board.json"
 ---
@@ -16,7 +17,6 @@ source: "var/oreshnik/task-board.json"
 | Sprint | Scope | Depende de |
 |---|---|---|
 | S-HC-TOOL-01-GOAL-RUNNER-V1 | Goal Runner v1 for autonomous Kilo execution | S-HC-TEN-01-GLOBAL-TENANT-ADMIN |
-| S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE | LLM provider selection, cost estimation and governance policy | - |
 | S-HC-ASSET-02-FORMAT-DERIVATIVES | Format derivatives: badge interaction, format preview, intelligent crop, safe zones, asset variants | S-HC-PUB-03-MULTITENANT-ASSETS |
 | S-HC-PUB-06-REELS-STORIES-PUBLISHERS | Real publishing for Meta Reels and Stories: Instagram + Facebook | S-HC-PUB-03-MULTITENANT-ASSETS, S-HC-PUB-04-HOURLY-BATCH-CRON |
 | S-HC-PUB-07-YOUTUBE-PUBLISHING | Real publishing for YouTube: Video 16:9 and YouTube Shorts | S-HC-PUB-03-MULTITENANT-ASSETS, S-HC-PUB-04-HOURLY-BATCH-CRON |
@@ -81,7 +81,7 @@ Zonas: `packages/agents`, `apps/web/app/api`, `packages/core`
 
 ### S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE - LLM provider selection, cost estimation and governance policy
 
-Estado: `ready`
+Estado: `validating`
 
 - Provider-agnostic LLM broker interface
 - Model selection per task (strategy, generation, analysis)
@@ -315,3 +315,5 @@ Estado: `blocked`
 
 Zonas: `examples/tenants/cepeg`, `apps/web`, `packages/db`
 
+
+<!-- ORESHNIK:GENERATED:END -->

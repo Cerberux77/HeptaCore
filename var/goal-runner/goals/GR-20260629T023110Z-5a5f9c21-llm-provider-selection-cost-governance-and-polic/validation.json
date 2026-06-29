@@ -1,0 +1,58 @@
+{
+  "evidence": [
+    {
+      "addedAt": "2026-06-29T02:46:36.696Z",
+      "hash": "sha256:8444ebb49a89379f8ca598f33b9d7146ebb0f77d7082319007d5038a8bc1e7cd",
+      "path": "packages/core/src/llm-governance.ts",
+      "type": "code"
+    },
+    {
+      "addedAt": "2026-06-29T02:46:36.810Z",
+      "hash": "sha256:c1f65ebfe5edbfc3802b4afbabd54acea6ad257fdb940af99d73514933a2c350",
+      "path": "packages/core/src/__tests__/llm-governance.test.ts",
+      "type": "code"
+    },
+    {
+      "addedAt": "2026-06-29T02:46:36.937Z",
+      "hash": "sha256:cc8c2c24b7311d298de2683a6020f7ca2fa0c99669f3626f4d5fc52e517155b6",
+      "path": "packages/agents/src/llm-adapter.ts",
+      "type": "code"
+    },
+    {
+      "addedAt": "2026-06-29T02:46:37.061Z",
+      "hash": "sha256:946f242b030012d21b544d7998d5f82d8837a3f48241647874bda212fbfed74e",
+      "path": "apps/web/app/api/admin/llm-governance/route.ts",
+      "type": "code"
+    },
+    {
+      "addedAt": "2026-06-29T02:46:37.183Z",
+      "hash": "sha256:cc4ede841f6f9108b6f435e7512fb09eecd221f57ac7215e1aa2c5bca55c2bb9",
+      "path": "apps/web/app/api/admin/llm-usage/route.ts",
+      "type": "code"
+    }
+  ],
+  "gates": [
+    {
+      "durationMs": 20216,
+      "exitCode": 0,
+      "gate": "typecheck",
+      "passed": true,
+      "summary": " > heptacore@0.1.0 typecheck > npm run typecheck --workspaces --if-present   > @heptacore/web@0.1.0 typecheck > tsc --noEmit   > @heptacore/worker@0.2.0 typecheck > tsc --noEmit   > @heptacore/agents@"
+    },
+    {
+      "durationMs": 54295,
+      "exitCode": 0,
+      "gate": "build",
+      "passed": true,
+      "summary": " > heptacore@0.1.0 build > npm run build --workspaces --if-present   > @heptacore/web@0.1.0 build > node scripts/copy-tenant-assets.mjs && prisma generate --schema ../../packages/db/prisma/schema.pris"
+    },
+    {
+      "durationMs": 1965,
+      "exitCode": 0,
+      "gate": "worker-validate",
+      "passed": true,
+      "summary": " > heptacore@0.1.0 worker:validate > npm run validate -w @heptacore/worker   > @heptacore/worker@0.2.0 validate > node src/validate.mjs   === Validacion de Assets ===  Presentes: 46/46 ✅ Todos los ass"
+    }
+  ],
+  "goalId": "GR-20260629T023110Z-5a5f9c21-llm-provider-selection-cost-governance-and-polic"
+}
