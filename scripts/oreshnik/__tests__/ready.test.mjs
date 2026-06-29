@@ -26,9 +26,9 @@ describe("oreshnik readiness helpers", () => {
   });
 
   it("accepts an exact git dependency pin", () => {
-    const result = parsePinnedGitDependency("git+https://github.com/Cerberux77/oreshnik.git#05447110b2acecf94e41f76d9eaf7f7a81ccdfe2");
+    const result = parsePinnedGitDependency("git+https://github.com/Cerberux77/oreshnik.git#ed079f4fee05062dc3aa044cf8329a55acc0fa2d");
     assert.equal(result.ok, true);
-    assert.equal(result.commit, "05447110b2acecf94e41f76d9eaf7f7a81ccdfe2");
+    assert.equal(result.commit, "ed079f4fee05062dc3aa044cf8329a55acc0fa2d");
   });
 
   it("rejects floating or aliased dependency specs", () => {
@@ -80,9 +80,9 @@ describe("oreshnik readiness helpers", () => {
   it("validates package contract scripts and dependency pin", () => {
     const { issues, pinnedCommit } = validatePackageContract({
       scripts: { "oreshnik:ready": "node scripts/oreshnik/ready.mjs", "test:infra": "node --test" },
-      dependencies: { "oreshnik-cli": "git+https://github.com/Cerberux77/oreshnik.git#05447110b2acecf94e41f76d9eaf7f7a81ccdfe2" }
+      dependencies: { "oreshnik-cli": "git+https://github.com/Cerberux77/oreshnik.git#ed079f4fee05062dc3aa044cf8329a55acc0fa2d" }
     });
     assert.deepStrictEqual(issues, []);
-    assert.equal(pinnedCommit, "05447110b2acecf94e41f76d9eaf7f7a81ccdfe2");
+    assert.equal(pinnedCommit, "ed079f4fee05062dc3aa044cf8329a55acc0fa2d");
   });
 });
