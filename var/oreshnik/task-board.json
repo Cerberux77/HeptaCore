@@ -1,6 +1,6 @@
 {
   "project": "HeptaCore",
-  "updatedAt": "2026-06-29T16:10:34.987Z",
+  "updatedAt": "2026-06-29T16:55:18.048Z",
   "resiliencePolicy": "If an owner is unavailable for more than one working block or blocks the critical path, backupOwner may take over after recording reassignment.",
   "closurePolicy": "No sprint may be closed until acceptance criteria, base tests, sprint-specific tests, docs/handoff, and Oreshnik zone checks pass.",
   "baseTestMatrix": [
@@ -350,7 +350,7 @@
       "title": "LLM provider selection, cost estimation and governance policy",
       "owner": "Manuel",
       "backupOwner": "Manuel",
-      "status": "ready_for_integration",
+      "status": "integrated",
       "track": "ai-infra",
       "zone": [
         "packages/agents",
@@ -401,6 +401,13 @@
           "operator": "codex",
           "branch": "task/ai-infra/S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE/codex/codex-S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE-2026-06-29T02-30-49-546Z-c443db0b",
           "description": "Task delivered with handoff docs/07_handoffs/S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE.md"
+        },
+        {
+          "at": "2026-06-29T16:55:18.048Z",
+          "action": "integrated",
+          "operator": "manuel",
+          "branch": "task/ai-infra/S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE/codex/codex-S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE-2026-06-29T02-30-49-546Z-c443db0b",
+          "description": "Integrated task/ai-infra/S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE/codex/codex-S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE-2026-06-29T02-30-49-546Z-c443db0b into MADRE/v50-ai-infra-llm-provider-selection-cost-governance-2026-06-29"
         }
       ],
       "validationGateResults": [

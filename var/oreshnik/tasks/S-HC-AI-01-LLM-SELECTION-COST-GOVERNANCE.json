@@ -7,8 +7,8 @@
   "title": "LLM provider selection, cost estimation and governance policy",
   "owner": "Manuel",
   "backupOwner": "Manuel",
-  "status": "ready_for_integration",
-  "taskBoardPath": "D:\\H1\\var\\oreshnik\\wt\\ai-infra\\S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE\\r-c20ec67edeb3\\var\\oreshnik\\task-board.json",
+  "status": "integrated",
+  "taskBoardPath": "D:\\PROYECTOS\\WORKTREES\\CODEX\\AI01\\var\\oreshnik\\wt\\ai-infra\\S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE\\r-c20ec67edeb3\\var\\oreshnik\\task-board.json",
   "zone": [
     "packages/agents",
     "packages/core",
@@ -58,6 +58,13 @@
       "operator": "codex",
       "branch": "task/ai-infra/S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE/codex/codex-S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE-2026-06-29T02-30-49-546Z-c443db0b",
       "description": "Task delivered with handoff docs/07_handoffs/S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE.md"
+    },
+    {
+      "at": "2026-06-29T16:55:18.048Z",
+      "action": "integrated",
+      "operator": "manuel",
+      "branch": "task/ai-infra/S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE/codex/codex-S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE-2026-06-29T02-30-49-546Z-c443db0b",
+      "description": "Integrated task/ai-infra/S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE/codex/codex-S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE-2026-06-29T02-30-49-546Z-c443db0b into MADRE/v50-ai-infra-llm-provider-selection-cost-governance-2026-06-29"
     }
   ],
   "validationGateResults": [
@@ -304,7 +311,7 @@
       "summary": "S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE:worker | exit=0 | timed_ok | signal=none | stdout=> heptacore@0.1.0 worker:validate | stderr=[config] .env.rrss no encontrado. Usando solo variables de entorno del sistema."
     }
   ],
-  "updatedAt": "2026-06-29T16:10:34.987Z",
+  "updatedAt": "2026-06-29T16:55:18.048Z",
   "runs": [
     {
       "runId": "codex-S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE-2026-06-29T02-30-49-546Z-c443db0b",
@@ -318,10 +325,10 @@
         "packages/core",
         "apps/web/components"
       ],
-      "taskStatus": "ready_for_integration",
+      "taskStatus": "integrated",
       "claimStatus": "released",
       "claimedAt": "2026-06-29T02:30:49.546Z",
-      "updatedAt": "2026-06-29T16:10:34.999Z",
+      "updatedAt": "2026-06-29T16:55:18.048Z",
       "expiresAt": "2026-06-29T03:30:49.546Z",
       "releasedAt": "2026-06-29T16:10:34.999Z",
       "manifestPath": "var/oreshnik/runs/S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE/codex-S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE-2026-06-29T02-30-49-546Z-c443db0b.json",
@@ -574,9 +581,54 @@
   "integration": {
     "runId": "codex-S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE-2026-06-29T02-30-49-546Z-c443db0b",
     "sourceBranch": "task/ai-infra/S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE/codex/codex-S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE-2026-06-29T02-30-49-546Z-c443db0b",
-    "status": "queued",
+    "status": "integrated",
     "motherBranch": "MADRE/v50-ai-infra-llm-provider-selection-cost-governance-2026-06-29",
     "queuedAt": "2026-06-29T16:17:34.752Z",
-    "updatedAt": "2026-06-29T16:17:34.752Z"
+    "updatedAt": "2026-06-29T16:55:18.048Z",
+    "targetBranch": "MADRE/v50-ai-infra-llm-provider-selection-cost-governance-2026-06-29",
+    "integratedAt": "2026-06-29T16:55:18.048Z"
+  },
+  "latestTrain": {
+    "attemptId": "train-codex-S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE-2-1782752051800",
+    "runId": "codex-S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE-2026-06-29T02-30-49-546Z-c443db0b",
+    "sourceBranch": "task/ai-infra/S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE/codex/codex-S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE-2026-06-29T02-30-49-546Z-c443db0b",
+    "targetBranch": "MADRE/v50-ai-infra-llm-provider-selection-cost-governance-2026-06-29",
+    "integrationBranch": "integration-train/ai-infra/S-HC-AI-01-LLM-SELECTION/r-c20ec67edeb3/a-3acf93d1c862",
+    "operator": "manuel",
+    "lockKey": "integration-train/MADRE/v50-ai-infra-llm-provider-selection-cost-governance-2026-06-29",
+    "status": "succeeded",
+    "startedAt": "2026-06-29T16:54:11.800Z",
+    "completedAt": "2026-06-29T16:55:18.073Z",
+    "reason": "Already contained on MADRE/v50-ai-infra-llm-provider-selection-cost-governance-2026-06-29; runtime reconciled without merge",
+    "motherAdvanceState": "runtime_projection_confirmed",
+    "gateResults": [
+      {
+        "name": "typecheck",
+        "passed": true
+      },
+      {
+        "name": "build",
+        "passed": true
+      },
+      {
+        "name": "test",
+        "passed": true
+      }
+    ],
+    "outcome": {
+      "mergeBase": "dc3186a13aa652b27235c3407ee2034f892295da",
+      "changedFiles": [],
+      "compatibilityBranchPushed": false,
+      "deliveryDisposition": "already_contained",
+      "projectedMotherBranch": "MADRE/v50-ai-infra-llm-provider-selection-cost-governance-2026-06-29",
+      "motherAdvanceState": "runtime_projection_confirmed",
+      "motherFunctionalExpectedCommit": "dc3186a13aa652b27235c3407ee2034f892295da",
+      "motherFunctionalRemoteCommit": "dc3186a13aa652b27235c3407ee2034f892295da",
+      "motherFunctionalPushVerified": true,
+      "motherFunctionalPushReconciled": false,
+      "projectedTaskStatus": "integrated",
+      "projectedRunStatus": "integrated",
+      "projectedSprintEntryStatus": "integrated"
+    }
   }
 }
