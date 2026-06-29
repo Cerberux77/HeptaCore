@@ -27,9 +27,10 @@ export function readJson(path) {
 
 export function parsePinnedGitDependency(spec) {
   if (typeof spec !== "string") return { ok: false, reason: "dependency must be a string" };
-  const match = spec.match(/^git\+https:\/\/github\.com\/Cerberux77\/oreshnik\.git#([0-9a-f]{40})$/i);
+  const match = spec.match(/^git\+https:\/\/github\.com\/Cerberux77\/oreshnik\.git#([0-9a-f]{40})$/i)
+    || spec.match(/^file:vendor\/oreshnik\/oreshnik-cli-[0-9A-Za-z.+-]+-([0-9a-f]{40})\.tgz$/i);
   if (!match) {
-    return { ok: false, reason: "dependency must pin oreshnik-cli to an exact git commit on github.com/Cerberux77/oreshnik" };
+    return { ok: false, reason: "dependency must pin oreshnik-cli to an exact github.com/Cerberux77/oreshnik commit via git+https or a vendored tarball with the full commit in its filename" };
   }
   return { ok: true, commit: match[1].toLowerCase() };
 }
@@ -67,6 +68,14 @@ export function validateOreshnikContract(config) {
 
 export function validateGoalContract(markdown) {
   return REQUIRED_GOAL_SNIPPETS.filter((snippet) => !markdown.includes(snippet)).map((snippet) => `goal contract missing snippet: ${snippet}`);
+}
+
+export function validateGitignoreContract(gitignoreText) {
+  const issues = [];
+  if (!String(gitignoreText || "").includes("var/goal-runner/")) {
+    issues.push(".gitignore must ignore var/goal-runner/");
+  }
+  return issues;
 }
 
 export function collectTextFileMatches(root, tokens, options = {}) {

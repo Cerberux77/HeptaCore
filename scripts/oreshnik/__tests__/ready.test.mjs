@@ -9,6 +9,7 @@ import {
   collectRuntimeIssues,
   parsePinnedGitDependency,
   validateEvidenceGateCoverage,
+  validateGitignoreContract,
   validateGoalContract,
   validateOreshnikContract,
   validatePackageContract
@@ -26,9 +27,15 @@ describe("oreshnik readiness helpers", () => {
   });
 
   it("accepts an exact git dependency pin", () => {
-    const result = parsePinnedGitDependency("git+https://github.com/Cerberux77/oreshnik.git#ed079f4fee05062dc3aa044cf8329a55acc0fa2d");
+    const result = parsePinnedGitDependency("git+https://github.com/Cerberux77/oreshnik.git#dd97517bc83f3372c97d1778e953f36198f9fe59");
     assert.equal(result.ok, true);
-    assert.equal(result.commit, "ed079f4fee05062dc3aa044cf8329a55acc0fa2d");
+    assert.equal(result.commit, "dd97517bc83f3372c97d1778e953f36198f9fe59");
+  });
+
+  it("accepts an exact vendored tarball pin", () => {
+    const result = parsePinnedGitDependency("file:vendor/oreshnik/oreshnik-cli-0.2.0-alpha.8-dd97517bc83f3372c97d1778e953f36198f9fe59.tgz");
+    assert.equal(result.ok, true);
+    assert.equal(result.commit, "dd97517bc83f3372c97d1778e953f36198f9fe59");
   });
 
   it("rejects floating or aliased dependency specs", () => {
@@ -80,9 +87,14 @@ describe("oreshnik readiness helpers", () => {
   it("validates package contract scripts and dependency pin", () => {
     const { issues, pinnedCommit } = validatePackageContract({
       scripts: { "oreshnik:ready": "node scripts/oreshnik/ready.mjs", "test:infra": "node --test" },
-      dependencies: { "oreshnik-cli": "git+https://github.com/Cerberux77/oreshnik.git#ed079f4fee05062dc3aa044cf8329a55acc0fa2d" }
+      dependencies: { "oreshnik-cli": "file:vendor/oreshnik/oreshnik-cli-0.2.0-alpha.8-dd97517bc83f3372c97d1778e953f36198f9fe59.tgz" }
     });
     assert.deepStrictEqual(issues, []);
-    assert.equal(pinnedCommit, "ed079f4fee05062dc3aa044cf8329a55acc0fa2d");
+    assert.equal(pinnedCommit, "dd97517bc83f3372c97d1778e953f36198f9fe59");
+  });
+
+  it("requires goal runner runtime artifacts to be gitignored", () => {
+    assert.deepStrictEqual(validateGitignoreContract("node_modules/\nvar/goal-runner/\n"), []);
+    assert.deepStrictEqual(validateGitignoreContract("node_modules/\n"), [".gitignore must ignore var/goal-runner/"]);
   });
 });

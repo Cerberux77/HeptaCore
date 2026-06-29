@@ -13,6 +13,7 @@ import {
   normalizeRoot,
   parsePinnedGitDependency,
   readJson,
+  validateGitignoreContract,
   validateGoalContract,
   validateOreshnikContract,
   validatePackageContract
@@ -41,6 +42,9 @@ try {
 
   const goalContract = readFileSync(join(ROOT, ".kilo", "commands", "goal.md"), "utf8");
   issues.push(...validateGoalContract(goalContract));
+
+  const gitignore = readFileSync(join(ROOT, ".gitignore"), "utf8");
+  issues.push(...validateGitignoreContract(gitignore));
 
   const board = readJson(join(ROOT, "var", "oreshnik", "task-board.json"));
   if (!board?.project || !Array.isArray(board?.tasks)) {
