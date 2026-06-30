@@ -26,14 +26,14 @@
       "displayName": "Codex Agent",
       "name": "Codex Agent",
       "projectRole": "operator",
-      "status": "active"
+      "status": "inactive"
     },
     {
       "id": "kilo",
       "displayName": "Kilo Agent",
       "name": "Kilo Agent",
       "projectRole": "operator",
-      "status": "active"
+      "status": "inactive"
     }
   ],
   "branching": {

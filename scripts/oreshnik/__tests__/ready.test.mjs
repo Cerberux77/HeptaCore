@@ -33,9 +33,9 @@ describe("oreshnik readiness helpers", () => {
   });
 
   it("accepts an exact vendored tarball pin", () => {
-    const result = parsePinnedGitDependency("file:vendor/oreshnik/oreshnik-cli-0.2.0-alpha.8-dd97517bc83f3372c97d1778e953f36198f9fe59.tgz");
+    const result = parsePinnedGitDependency("file:vendor/oreshnik/oreshnik-cli-0.2.0-alpha.9-1541addabe34463aaeca4a4fb6786bbc408cacbc.tgz");
     assert.equal(result.ok, true);
-    assert.equal(result.commit, "dd97517bc83f3372c97d1778e953f36198f9fe59");
+    assert.equal(result.commit, "1541addabe34463aaeca4a4fb6786bbc408cacbc");
   });
 
   it("rejects floating or aliased dependency specs", () => {
@@ -48,18 +48,21 @@ describe("oreshnik readiness helpers", () => {
     assert.deepStrictEqual(issues, ["missing required gate 'tests'"]);
   });
 
-  it("requires kilo in the Oreshnik operator registry and all mandatory gates", () => {
+  it("requires manuel as the active human operator and all mandatory gates", () => {
     const issues = validateOreshnikContract({
-      operators: [{ id: "codex" }],
+      operators: [{ id: "kilo", status: "active" }, { id: "codex", status: "active" }],
       validation: { gates: [{ name: "typecheck" }, { name: "build" }, { name: "worker" }] }
     });
-    assert.ok(issues.includes("operator registry must include kilo"));
+    assert.ok(issues.includes("operator registry must include manuel as the active human operator"));
+    assert.ok(issues.includes("operator registry must not keep kilo as an active human operator"));
+    assert.ok(issues.includes("operator registry must not keep codex as an active human operator"));
     assert.ok(issues.includes("missing required gate 'tests'"));
   });
 
   it("requires the autonomous /goal dispatch contract", () => {
-    const issues = validateGoalContract("npm run oreshnik:ready\noreshnik dispatch resume --operator kilo --repo . --json");
-    assert.ok(issues.some((issue) => issue.includes("dispatch next")));
+    const issues = validateGoalContract("npm run oreshnik:ready\noreshnik goal --harness kilo --json\n--operator kilo");
+    assert.ok(issues.some((issue) => issue.includes("authorized `worktreePath` and `functionalBranch`")));
+    assert.ok(issues.some((issue) => issue.includes("forbidden token: --operator kilo")));
   });
 
   it("detects duplicate active runs for the same task", () => {
@@ -87,10 +90,10 @@ describe("oreshnik readiness helpers", () => {
   it("validates package contract scripts and dependency pin", () => {
     const { issues, pinnedCommit } = validatePackageContract({
       scripts: { "oreshnik:ready": "node scripts/oreshnik/ready.mjs", "test:infra": "node --test" },
-      dependencies: { "oreshnik-cli": "file:vendor/oreshnik/oreshnik-cli-0.2.0-alpha.8-dd97517bc83f3372c97d1778e953f36198f9fe59.tgz" }
+      dependencies: { "oreshnik-cli": "file:vendor/oreshnik/oreshnik-cli-0.2.0-alpha.9-1541addabe34463aaeca4a4fb6786bbc408cacbc.tgz" }
     });
     assert.deepStrictEqual(issues, []);
-    assert.equal(pinnedCommit, "dd97517bc83f3372c97d1778e953f36198f9fe59");
+    assert.equal(pinnedCommit, "1541addabe34463aaeca4a4fb6786bbc408cacbc");
   });
 
   it("requires goal runner runtime artifacts to be gitignored", () => {

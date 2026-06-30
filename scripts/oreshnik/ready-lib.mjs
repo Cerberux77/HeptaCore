@@ -3,12 +3,12 @@ import { extname, join, relative, resolve } from "node:path";
 
 export const REQUIRED_GATE_NAMES = ["typecheck", "build", "worker", "tests"];
 export const REQUIRED_GOAL_SNIPPETS = [
-  "npm run oreshnik:ready",
-  "oreshnik dispatch resume --operator kilo --repo . --json",
-  "oreshnik dispatch next --operator kilo --repo . --json",
-  "Kilo nunca elige tareas por intuicion",
-  "nunca crea Runs manualmente"
+  "oreshnik goal --harness kilo --json",
+  "authorized `worktreePath` and `functionalBranch`",
+  "Do not hardcode any human operator ID.",
+  "oreshnik align --apply --harness kilo"
 ];
+export const FORBIDDEN_GOAL_SNIPPETS = ["--operator kilo", "--operator manuel", "--operator jean", "Owner: Kilo Agent"];
 export const FORBIDDEN_TEXT_TOKENS = ["D:\\H1", "D:\\PROYECTOS\\SMOKE", "../oreshnik"];
 export const READINESS_SCAN_EXCLUDES = new Set([
   "scripts/oreshnik/ready-lib.mjs",
@@ -58,8 +58,17 @@ export function validateEvidenceGateCoverage(gateNames) {
 
 export function validateOreshnikContract(config) {
   const issues = [];
-  const operatorIds = new Set((config?.operators || []).map((operator) => String(operator.id || "").toLowerCase()));
-  if (!operatorIds.has("kilo")) issues.push("operator registry must include kilo");
+  const operators = Array.isArray(config?.operators) ? config.operators : [];
+  const activeOperators = operators.filter((operator) => String(operator?.status || "").toLowerCase() === "active");
+  const activeOperatorIds = new Set(activeOperators.map((operator) => String(operator.id || "").toLowerCase()));
+  if (!activeOperatorIds.has("manuel")) {
+    issues.push("operator registry must include manuel as the active human operator");
+  }
+  for (const legacyId of ["kilo", "codex"]) {
+    if (activeOperatorIds.has(legacyId)) {
+      issues.push(`operator registry must not keep ${legacyId} as an active human operator`);
+    }
+  }
   const gates = Array.isArray(config?.validation?.gates) ? config.validation.gates : [];
   const gateNames = gates.map((gate) => gate.name);
   issues.push(...validateEvidenceGateCoverage(gateNames));
@@ -67,7 +76,15 @@ export function validateOreshnikContract(config) {
 }
 
 export function validateGoalContract(markdown) {
-  return REQUIRED_GOAL_SNIPPETS.filter((snippet) => !markdown.includes(snippet)).map((snippet) => `goal contract missing snippet: ${snippet}`);
+  const issues = REQUIRED_GOAL_SNIPPETS
+    .filter((snippet) => !markdown.includes(snippet))
+    .map((snippet) => `goal contract missing snippet: ${snippet}`);
+  for (const token of FORBIDDEN_GOAL_SNIPPETS) {
+    if (markdown.includes(token)) {
+      issues.push(`goal contract contains forbidden token: ${token}`);
+    }
+  }
+  return issues;
 }
 
 export function validateGitignoreContract(gitignoreText) {

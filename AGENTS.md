@@ -138,4 +138,4 @@ node scripts/goal-runner/run.mjs doctor
 
 ### Resumption
 
-When `/goal` starts, Kilo must first run `npm run oreshnik:ready`, then `oreshnik dispatch resume --operator kilo --repo . --json`, and only if nothing is resumable may it request `oreshnik dispatch next --operator kilo --repo . --json`. Resume the same Run when one exists; never create another active task in parallel.
+When `/goal` starts, Kilo must first run `npm run oreshnik:ready`, then invoke `oreshnik goal --harness kilo --repo . --json`. Kilo must never hardcode a human operator in the adapter. Oreshnik must resolve the aligned human operator, resume the same Run when one exists, and only dispatch a new compatible Run when nothing is resumable for that exact instance.

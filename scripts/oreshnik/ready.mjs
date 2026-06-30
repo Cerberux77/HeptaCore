@@ -40,8 +40,20 @@ try {
   const config = readJson(join(ROOT, ".oreshnik.json"));
   issues.push(...validateOreshnikContract(config));
 
-  const goalContract = readFileSync(join(ROOT, ".kilo", "commands", "goal.md"), "utf8");
-  issues.push(...validateGoalContract(goalContract));
+  const canonicalGoalPath = join(ROOT, ".kilo", "commands", "goal.md");
+  const legacyGoalPath = join(ROOT, ".kilo", "command", "goal.md");
+  if (!existsSync(canonicalGoalPath)) {
+    issues.push(`missing canonical Kilo adapter: ${canonicalGoalPath}`);
+  } else {
+    const goalContract = readFileSync(canonicalGoalPath, "utf8");
+    issues.push(...validateGoalContract(goalContract));
+  }
+  if (!existsSync(legacyGoalPath)) {
+    issues.push(`missing legacy-compatible Kilo adapter: ${legacyGoalPath}`);
+  } else {
+    const legacyGoalContract = readFileSync(legacyGoalPath, "utf8");
+    issues.push(...validateGoalContract(legacyGoalContract));
+  }
 
   const gitignore = readFileSync(join(ROOT, ".gitignore"), "utf8");
   issues.push(...validateGitignoreContract(gitignore));
@@ -73,6 +85,9 @@ try {
   }
 
   const installedPackage = readJson(installedPackagePath);
+  if (installedPackage.version !== "0.2.0-alpha.9") {
+    issues.push(`oreshnik package version must be 0.2.0-alpha.9, got ${installedPackage.version}`);
+  }
   const installedCliPath = join(dirname(installedPackagePath), "dist", "cli.js");
   const binVersion = run("node", [installedCliPath, "--version"]);
   if (binVersion !== installedPackage.version) {
