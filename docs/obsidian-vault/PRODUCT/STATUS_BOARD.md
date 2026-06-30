@@ -1,8 +1,7 @@
-<!-- ORESHNIK:GENERATED:START -->
 ---
 type: status-board
 project: "HeptaCore"
-last_updated: "2026-06-29T20:33:02.353Z"
+last_updated: "2026-06-30T22:02:22.233Z"
 generated_by: "Oreshnik canonical-check"
 source: "var/oreshnik/task-board.json"
 ---
@@ -116,5 +115,3 @@ source: "var/oreshnik/task-board.json"
 | S-HC-TOOL-01-GOAL-RUNNER-V1 | succeeded | MADRE/v50-s-hc-tool-01-goal-runner-v1-goal-runner-v1-deterministic-state-machine-locks-2026-06-29 | S-HC-TOOL-01-GOAL-RUNNER-V1 | kilo/s-hc-tool-01-goal-runner-v1 | integration-train/S-HC-TOOL-01-GOAL-RUNNER/S-HC-TOOL-01-GOAL-RUNNER/r-2ff68e9be13b/a-2cfa35e28f38 | runtime_projection_confirmed |
 | S-HC-PUB-05-RECONCILIATION-OPS | succeeded | MADRE/v49-s-hc-pub-05-reconciliation-ops-implementa-automatizacion-operacional-de-reconci-2026-06-29 | S-HC-PUB-05-RECONCILIATION-OPS | Manuel/s-hc-pub-05-reconciliation-ops-sprint-2026-06-29 | integration-train/S-HC-PUB-05-RECONCILIATI/S-HC-PUB-05-RECONCILIATI/r-3030ee064340/a-4b83c9744f29 | runtime_projection_confirmed |
 | S-HC-PUB-04-HOURLY-BATCH-CRON | succeeded | MADRE/v48-s-hc-pub-04-hourly-batch-cron-hourly-batch-publishing-cron-and-pub-04-producti-2026-06-28 | S-HC-PUB-04-HOURLY-BATCH-CRON | Manuel/s-hc-pub-04-hourly-batch-goal | integration-train/S-HC-PUB-04-HOURLY-BATCH/S-HC-PUB-04-HOURLY-BATCH/r-c08e3c5d3afc/a-f62c2c114d4d | runtime_projection_confirmed |
-
-<!-- ORESHNIK:GENERATED:END -->

@@ -8,7 +8,7 @@
   "owner": "Manuel",
   "backupOwner": "Manuel",
   "status": "blocked",
-  "taskBoardPath": "D:\\PROYECTOS\\WORKTREES\\HeptaCore_ORESHNIK_READY\\var\\oreshnik\\task-board.json",
+  "taskBoardPath": "D:\\PROYECTOS\\PROYECTOS VISUAL STUDIO\\_WORKTREES\\heptacore\\p-hc-or-operability-01-20260630-150409\\var\\oreshnik\\task-board.json",
   "zone": [
     "apps/web/app/register",
     "apps/web/app/api/auth",
