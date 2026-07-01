@@ -78,6 +78,7 @@ import {
 } from "../lib/asset-compatibility";
 import {
   applyManualDerivativeCrop,
+  IMAGE_DERIVATIVE_TARGETS,
   planBatchFormatDerivatives,
   toDerivativeRecord,
   type AssetDerivativeCrop,
@@ -222,6 +223,19 @@ function compatibilityLabel(status: AssetCompatibilityStatus) {
   if (status === "USABLE") return "Usable";
   if (status === "INCOMPATIBLE") return "No compatible";
   return "Sin analizar";
+}
+
+function isImageDerivativeTarget(target: string): target is ImageDerivativeTarget {
+  return (IMAGE_DERIVATIVE_TARGETS as readonly string[]).includes(target);
+}
+
+function derivativeMetadata(asset: TenantAssetItem | null | undefined): Record<string, unknown> | null {
+  const metadata = asset?.metadata;
+  if (!metadata || typeof metadata !== "object" || Array.isArray(metadata)) return null;
+  const derivative = (metadata as Record<string, unknown>).derivative;
+  return derivative && typeof derivative === "object" && !Array.isArray(derivative)
+    ? derivative as Record<string, unknown>
+    : null;
 }
 
 function Thumb({ item, slug }: { item: DraftQueueItem; slug: string }) {
@@ -400,22 +414,28 @@ function InspectorContent({
   inspectorAsset,
   tenantSlug,
   assetFolders,
+  localAssets,
+  selectedDerivativeTarget,
   onClose,
   onRename,
   onMove,
   onReplace,
   onDelete,
   onUpdateFolder,
+  onCreateDerivatives,
 }: {
   inspectorAsset: TenantAssetItem;
   tenantSlug: string;
   assetFolders: string[];
+  localAssets: TenantAssetItem[];
+  selectedDerivativeTarget: ImageDerivativeTarget | null;
   onClose: () => void;
   onRename: (id: string, name: string) => void;
   onMove: (id: string, folder: string) => void;
   onReplace: (id: string, file: File) => void;
   onDelete: (id: string) => void;
   onUpdateFolder: (id: string, folder: string) => void;
+  onCreateDerivatives: (assetId: string, plans: AssetFormatDerivativePlan[]) => Promise<TenantAssetItem[]>;
 }) {
   return (
     <>
@@ -465,7 +485,12 @@ function InspectorContent({
           })}
         </div>
       </div>
-      <FormatDerivativePanel inspectorAsset={inspectorAsset} />
+      <FormatDerivativePanel
+        inspectorAsset={inspectorAsset}
+        allAssets={localAssets}
+        initialTarget={selectedDerivativeTarget}
+        onPersistPlans={(plans) => onCreateDerivatives(inspectorAsset.id, plans)}
+      />
       <div style={{ display: "flex", gap: 6, marginTop: 18, flexWrap: "wrap" }}>
         <button onClick={() => { onClose(); onRename(inspectorAsset.id, inspectorAsset.filename); }} style={{ padding: "4px 10px", borderRadius: 4, border: "1px solid var(--hc-line)", background: "var(--hc-bone)", cursor: "pointer", fontSize: 12, color: "var(--hc-ink)" }}>Renombrar</button>
         <button onClick={() => { onClose(); onMove(inspectorAsset.id, inspectorAsset.folder ?? ""); }} style={{ padding: "4px 10px", borderRadius: 4, border: "1px solid var(--hc-line)", background: "var(--hc-bone)", cursor: "pointer", fontSize: 12, color: "var(--hc-ink)" }}>Mover</button>
@@ -496,15 +521,56 @@ function cropText(crop: AssetDerivativeCrop | null): string {
   return `x ${crop.xPercent}% / y ${crop.yPercent}% / w ${crop.widthPercent}% / h ${crop.heightPercent}%`;
 }
 
-function FormatDerivativePanel({ inspectorAsset }: { inspectorAsset: TenantAssetItem }) {
+function FormatDerivativePanel({
+  inspectorAsset,
+  allAssets,
+  initialTarget,
+  onPersistPlans,
+}: {
+  inspectorAsset: TenantAssetItem;
+  allAssets: TenantAssetItem[];
+  initialTarget: ImageDerivativeTarget | null;
+  onPersistPlans: (plans: AssetFormatDerivativePlan[]) => Promise<TenantAssetItem[]>;
+}) {
   const plans = planBatchFormatDerivatives(inspectorAsset.id, assetCompatibilityInput(inspectorAsset));
   const [activeTarget, setActiveTarget] = useState<ImageDerivativeTarget>(plans[0].target);
   const [manualTargets, setManualTargets] = useState<Partial<Record<ImageDerivativeTarget, boolean>>>({});
+  const [saving, setSaving] = useState(false);
+  const [message, setMessage] = useState<{ kind: "success" | "error"; text: string } | null>(null);
   const basePlan = plans.find((plan) => plan.target === activeTarget) ?? plans[0];
   const activePlan = manualTargets[activeTarget]
     ? applyManualDerivativeCrop(basePlan, manualCropPreset(basePlan))
     : basePlan;
   const record = toDerivativeRecord(activePlan);
+  const resolvedPlans = plans.map((plan) => manualTargets[plan.target] ? applyManualDerivativeCrop(plan, manualCropPreset(plan)) : plan);
+  const existingDerivatives = allAssets
+    .filter((asset) => derivativeMetadata(asset)?.sourceAssetId === inspectorAsset.id)
+    .sort((left, right) => left.filename.localeCompare(right.filename));
+
+  useEffect(() => {
+    if (initialTarget && plans.some((plan) => plan.target === initialTarget)) {
+      setActiveTarget(initialTarget);
+    }
+  }, [initialTarget, inspectorAsset.id, plans]);
+
+  async function handlePersist(plansToPersist: AssetFormatDerivativePlan[]) {
+    setSaving(true);
+    setMessage(null);
+    try {
+      const persisted = await onPersistPlans(plansToPersist);
+      setMessage({
+        kind: "success",
+        text: persisted.length === 1 ? "Derivada guardada." : `${persisted.length} derivadas guardadas.`,
+      });
+    } catch (error) {
+      setMessage({
+        kind: "error",
+        text: error instanceof Error ? error.message : "No se pudieron guardar las derivadas.",
+      });
+    } finally {
+      setSaving(false);
+    }
+  }
 
   return (
     <div style={{ marginTop: 16, padding: 12, border: "1px solid var(--hc-line)", borderRadius: 8, background: "#fbfaf7" }}>
@@ -512,7 +578,7 @@ function FormatDerivativePanel({ inspectorAsset }: { inspectorAsset: TenantAsset
         <div>
           <strong style={{ fontSize: 12, color: "var(--hc-ink)" }}>Derivadas por formato</strong>
           <div style={{ fontSize: 10, color: "var(--hc-fog)", marginTop: 2 }}>
-            Preview no destructivo: el original queda inmutable y cada variante conserva sourceAssetId.
+            Persistencia no destructiva: el original queda inmutable y cada variante conserva sourceAssetId.
           </div>
         </div>
         <span style={{ fontSize: 10, padding: "2px 6px", borderRadius: 999, background: activePlan.status === "READY" ? "#e8f7ef" : activePlan.status === "VIDEO_DEFERRED" ? "#eef2ff" : "#fff8e1", color: activePlan.status === "READY" ? "#0f6e3f" : activePlan.status === "VIDEO_DEFERRED" ? "#3730a3" : "#8d6e00", fontWeight: 700 }}>
@@ -550,6 +616,7 @@ function FormatDerivativePanel({ inspectorAsset }: { inspectorAsset: TenantAsset
           <div><strong>Zonas seguras:</strong> top {activePlan.safeZones.topPercent}% / bottom {activePlan.safeZones.bottomPercent}% / side {activePlan.safeZones.sidePercent}%</div>
         )}
         <div><strong>Record:</strong> <code style={{ fontSize: 10, wordBreak: "break-all" }}>{record.id} -&gt; sourceAssetId {record.sourceAssetId}</code></div>
+        <div><strong>Persistidas:</strong> {existingDerivatives.length > 0 ? existingDerivatives.map((asset) => asset.filename).join(", ") : "ninguna"}</div>
       </div>
       <div style={{ display: "flex", gap: 6, marginTop: 10, flexWrap: "wrap" }}>
         <button
@@ -566,10 +633,31 @@ function FormatDerivativePanel({ inspectorAsset }: { inspectorAsset: TenantAsset
         >
           Crop manual v{basePlan.version + 1}
         </button>
+        <button
+          type="button"
+          disabled={saving || activePlan.status === "BLOCKED" || activePlan.status === "VIDEO_DEFERRED"}
+          onClick={() => void handlePersist([activePlan])}
+          style={{ padding: "4px 8px", borderRadius: 4, border: "1px solid var(--hc-line)", background: "var(--hc-ink)", color: "#fff", cursor: saving ? "wait" : "pointer", fontSize: 11 }}
+        >
+          {saving ? "Guardando..." : "Guardar derivada"}
+        </button>
+        <button
+          type="button"
+          disabled={saving || resolvedPlans.some((plan) => plan.status === "BLOCKED" || plan.status === "VIDEO_DEFERRED")}
+          onClick={() => void handlePersist(resolvedPlans)}
+          style={{ padding: "4px 8px", borderRadius: 4, border: "1px solid var(--hc-line)", background: "#fff", color: "var(--hc-ink)", cursor: saving ? "wait" : "pointer", fontSize: 11 }}
+        >
+          Guardar lote
+        </button>
       </div>
       {activePlan.warnings.length > 0 && (
         <div style={{ marginTop: 8, color: "var(--hc-fog)", fontSize: 10 }}>
           {activePlan.warnings.join(" ")}
+        </div>
+      )}
+      {message && (
+        <div style={{ marginTop: 8, color: message.kind === "success" ? "#0f6e3f" : "#b42318", fontSize: 10 }}>
+          {message.text}
         </div>
       )}
     </div>
@@ -686,6 +774,7 @@ export function DashboardConsole({
   const [assetUsageFilter, setAssetUsageFilter] = useState<AssetUsageFilter>("ALL");
   const [assetSortOrder, setAssetSortOrder] = useState<AssetSortOrder>("NOMBRE");
   const [inspectorAsset, setInspectorAsset] = useState<TenantAssetItem | null>(null);
+  const [inspectorDerivativeTarget, setInspectorDerivativeTarget] = useState<ImageDerivativeTarget | null>(null);
   const analyzedAssetIdsRef = useRef<Set<string>>(new Set());
   const fileInputRef = useRef<HTMLInputElement>(null);
   const selected = selectedDraftFromQueue(localQueue, selectedId);
@@ -1569,6 +1658,25 @@ export function DashboardConsole({
     } finally {
       setDeletingAssetId("");
     }
+  }
+
+  async function handleCreateDerivatives(assetId: string, plans: AssetFormatDerivativePlan[]) {
+    const res = await fetch(`/api/tenants/${tenantSlug}/assets/${assetId}/derivatives`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ plans }),
+    });
+    const data = await res.json();
+    if (!res.ok || !data.ok) {
+      throw new Error(data.error || "Error al guardar derivadas");
+    }
+    const persisted = Array.isArray(data.assets) ? data.assets as TenantAssetItem[] : [];
+    setLocalAssets((prev) => persisted.reduce((items, asset) => upsertTenantAssetList(items, asset), prev));
+    setAssetMessage({
+      kind: "success",
+      text: persisted.length === 1 ? "Derivada registrada." : `${persisted.length} derivadas registradas.`,
+    });
+    return persisted;
   }
 
   return (
@@ -2580,7 +2688,7 @@ export function DashboardConsole({
                       .slice(0, 3);
                     const extraCount = allCompatResults.filter((entry) => entry.result.status !== "UNKNOWN").length - 3;
                     return (
-                      <div key={asset.id} style={{ border: "1px solid var(--hc-line)", borderRadius: 8, overflow: "hidden", background: "var(--hc-surface)", cursor: "pointer" }} onClick={() => setInspectorAsset(asset)}>
+                      <div key={asset.id} style={{ border: "1px solid var(--hc-line)", borderRadius: 8, overflow: "hidden", background: "var(--hc-surface)", cursor: "pointer" }} onClick={() => { setInspectorAsset(asset); setInspectorDerivativeTarget(null); }}>
                         {asset.path ? (
                           asset.kind === "VIDEO" || asset.path.toLowerCase().endsWith(".mp4") ? (
                             <video src={assetUrl(asset.path, tenantSlug)} style={{ width: "100%", height: 90, objectFit: "cover" }} preload="metadata" muted />
@@ -2607,9 +2715,15 @@ export function DashboardConsole({
                           </div>
                           <div style={{ display: "flex", gap: 3, marginTop: 4, flexWrap: "wrap" }}>
                             {topBadges.map((entry) => (
-                              <span
+                              <button
                                 key={entry.target}
+                                type="button"
                                 title={`${ASSET_COMPATIBILITY_CONFIGS[entry.target].label}: ${compatibilityLabel(entry.result.status)}`}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setInspectorAsset(asset);
+                                  setInspectorDerivativeTarget(isImageDerivativeTarget(entry.target) ? entry.target : null);
+                                }}
                                 style={{
                                   padding: "1px 5px",
                                   borderRadius: 3,
@@ -2619,14 +2733,16 @@ export function DashboardConsole({
                                   display: "flex",
                                   alignItems: "center",
                                   gap: 2,
+                                  border: "none",
+                                  cursor: "pointer",
                                 }}
                               >
                                 <span style={{ width: 6, height: 6, borderRadius: "50%", background: entry.result.status === "IDEAL" ? "#0f6e3f" : entry.result.status === "USABLE" ? "#f5a623" : "#b42318", display: "inline-block", flexShrink: 0 }} />
                                 {compatibilityLabel(entry.result.status).slice(0, 4)}
-                              </span>
+                              </button>
                             ))}
                             {extraCount > 0 && (
-                              <span style={{ fontSize: 9, color: "var(--hc-fog)", cursor: "pointer" }} onClick={(e) => { e.stopPropagation(); setInspectorAsset(asset); }}>+{extraCount} formatos</span>
+                              <span style={{ fontSize: 9, color: "var(--hc-fog)", cursor: "pointer" }} onClick={(e) => { e.stopPropagation(); setInspectorAsset(asset); setInspectorDerivativeTarget(null); }}>+{extraCount} formatos</span>
                             )}
                           </div>
                           {asset.draftCount > 0 && (
@@ -2683,7 +2799,7 @@ export function DashboardConsole({
                       .sort((a, b) => (a.result.status === "IDEAL" ? -1 : a.result.status === "USABLE" ? 0 : 1) - (b.result.status === "IDEAL" ? -1 : b.result.status === "USABLE" ? 0 : 1))
                       .slice(0, 2);
                     return (
-                      <div key={asset.id} style={{ display: "grid", gridTemplateColumns: "40px 2fr 1fr 1fr 80px 100px 120px 80px 120px", gap: 4, alignItems: "center", padding: "4px 8px", borderBottom: "1px solid var(--hc-line)", fontSize: 11, cursor: "pointer" }} onClick={() => setInspectorAsset(asset)}>
+                      <div key={asset.id} style={{ display: "grid", gridTemplateColumns: "40px 2fr 1fr 1fr 80px 100px 120px 80px 120px", gap: 4, alignItems: "center", padding: "4px 8px", borderBottom: "1px solid var(--hc-line)", fontSize: 11, cursor: "pointer" }} onClick={() => { setInspectorAsset(asset); setInspectorDerivativeTarget(null); }}>
                         {asset.path ? (
                           asset.kind === "VIDEO" || asset.path.toLowerCase().endsWith(".mp4") ? (
                             <video src={assetUrl(asset.path, tenantSlug)} style={{ width: 32, height: 32, objectFit: "cover", borderRadius: 4 }} preload="metadata" muted />
@@ -2700,19 +2816,27 @@ export function DashboardConsole({
                         <span>{asset.folder || "raiz"}</span>
                         <span style={{ display: "flex", gap: 2 }}>
                           {topBadges.map((entry) => (
-                            <span
+                            <button
                               key={entry.target}
+                              type="button"
                               title={`${ASSET_COMPATIBILITY_CONFIGS[entry.target].label}: ${compatibilityLabel(entry.result.status)}`}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setInspectorAsset(asset);
+                                setInspectorDerivativeTarget(isImageDerivativeTarget(entry.target) ? entry.target : null);
+                              }}
                               style={{
                                 padding: "0 4px",
                                 borderRadius: 3,
                                 fontSize: 9,
                                 background: entry.result.status === "IDEAL" ? "#e8f7ef" : entry.result.status === "USABLE" ? "#fff8e1" : "#fff1f0",
                                 color: entry.result.status === "IDEAL" ? "#0f6e3f" : entry.result.status === "USABLE" ? "#8d6e00" : "#b42318",
+                                border: "none",
+                                cursor: "pointer",
                               }}
                             >
                               {compatibilityLabel(entry.result.status).slice(0, 4)}
-                            </span>
+                            </button>
                           ))}
                         </span>
                         <span>{asset.draftCount > 0 ? `${asset.draftCount}` : "-"}</span>
@@ -2739,17 +2863,20 @@ export function DashboardConsole({
           <AssetInspectorDrawer
             open={!!inspectorAsset}
             title="Inspector de asset"
-            onClose={() => setInspectorAsset(null)}
+            onClose={() => { setInspectorAsset(null); setInspectorDerivativeTarget(null); }}
           >
             <InspectorContent
               inspectorAsset={inspectorAsset}
               tenantSlug={tenantSlug}
               assetFolders={assetFolders}
-              onClose={() => setInspectorAsset(null)}
+              localAssets={localAssets}
+              selectedDerivativeTarget={inspectorDerivativeTarget}
+              onClose={() => { setInspectorAsset(null); setInspectorDerivativeTarget(null); }}
               onRename={(id, name) => { setInspectorAsset(null); setRenamingAssetId(id); setRenameFilename(name); }}
               onMove={(id, folder) => { setInspectorAsset(null); setMovingAssetId(id); setMoveFolder(folder); }}
               onReplace={(id, file) => { setInspectorAsset(null); handleReplaceAsset(id, file); }}
               onDelete={(id) => { setInspectorAsset(null); handleDeleteAsset(id); }}
+              onCreateDerivatives={handleCreateDerivatives}
               onUpdateFolder={(id, folder) => {
                 setRenameSaving(true);
                 fetch(`/api/tenants/${tenantSlug}/assets/${id}`, {

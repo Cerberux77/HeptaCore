@@ -4,6 +4,7 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import {
   AssetServiceError,
+  createTenantAssetDerivatives,
   createTenantAssetFromBlob,
   deleteTenantAsset,
   listTenantAssets,
@@ -11,6 +12,7 @@ import {
   updateTenantAssetMetadata,
   uploadTenantAsset,
 } from "../asset-service";
+import { planFormatDerivative } from "../asset-format-derivatives";
 import { resolveAssetUrl } from "../asset-resolution";
 import { buildPreviewData, normalizeAssetManifest } from "../publishing-formats";
 import { waitForRegisteredAsset } from "../asset-upload";
@@ -250,6 +252,93 @@ describe("tenant asset service", () => {
   it("does not import publisher adapters from tenant asset code", () => {
     const source = readFileSync(join(process.cwd(), "lib", "asset-service.ts"), "utf8");
     assert.doesNotMatch(source, /from "\.\/publishers|from "\.\/publishers\/|getPublisher\(|\.publish\(/);
+  });
+
+  it("creates idempotent persisted format derivatives without mutating source storage", async () => {
+    const db = new FakeDb();
+    db.assets[0].metadata = {
+      sizeBytes: 100,
+      folder: "feed",
+      width: 1080,
+      height: 1080,
+      mimeType: "image/jpeg",
+    };
+
+    const plan = planFormatDerivative("asset-a", {
+      kind: "IMAGE",
+      mimeType: "image/jpeg",
+      width: 1080,
+      height: 1080,
+      metadata: db.assets[0].metadata,
+    }, "INSTAGRAM_STORY");
+
+    const first = await createTenantAssetDerivatives({
+      tenantSlug: "tenant-a",
+      userId: "user-a",
+      assetId: "asset-a",
+      plans: [plan],
+      db: db as any,
+      audit: async () => {},
+    });
+    const second = await createTenantAssetDerivatives({
+      tenantSlug: "tenant-a",
+      userId: "user-a",
+      assetId: "asset-a",
+      plans: [plan],
+      db: db as any,
+      audit: async () => {},
+    });
+
+    assert.equal(first.length, 1);
+    assert.equal(second.length, 1);
+    assert.equal(first[0].id, second[0].id);
+    assert.equal(first[0].storageKey, null);
+    assert.equal(first[0].sourcePath, "https://blob.test/old/a.jpg");
+    assert.equal((first[0].metadata as Row).width, 1080);
+    assert.equal((first[0].metadata as Row).height, 1920);
+    assert.equal(((first[0].metadata as Row).derivative as Row).target, "INSTAGRAM_STORY");
+    assert.equal(db.assets.length, 3);
+  });
+
+  it("deletes derivative records without deleting the source blob", async () => {
+    const db = new FakeDb();
+    db.assets[0].metadata = {
+      sizeBytes: 100,
+      folder: "feed",
+      width: 1080,
+      height: 1080,
+      mimeType: "image/jpeg",
+    };
+
+    const plan = planFormatDerivative("asset-a", {
+      kind: "IMAGE",
+      mimeType: "image/jpeg",
+      width: 1080,
+      height: 1080,
+      metadata: db.assets[0].metadata,
+    }, "FACEBOOK_FEED_IMAGE");
+
+    const [derivative] = await createTenantAssetDerivatives({
+      tenantSlug: "tenant-a",
+      userId: "user-a",
+      assetId: "asset-a",
+      plans: [plan],
+      db: db as any,
+      audit: async () => {},
+    });
+
+    const storage = new MemoryStorage();
+    await deleteTenantAsset({
+      tenantSlug: "tenant-a",
+      userId: "user-a",
+      assetId: derivative.id,
+      db: db as any,
+      storage,
+      audit: async () => {},
+    });
+
+    assert.deepEqual(storage.deleted, []);
+    assert.equal(db.assets.some((asset) => asset.id === derivative.id), false);
   });
 });
 
