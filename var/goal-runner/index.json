@@ -1,6 +1,6 @@
 {
-  "contentHash": "sha256:9874628ff8b54f19986a243eb31907f1c34f767430eeb4fab20bb49eb27bf0f8",
-  "generatedFromStateUpdatedAt": "2026-06-30T22:18:52.946Z",
+  "contentHash": "sha256:2d7c8d03014b2e124a41efc5c0d0536afb822bcfbcc7120cccbb3f759f999827",
+  "generatedFromStateUpdatedAt": "2026-06-29T02:49:12.565Z",
   "goals": [
     {
       "branch": "Manuel/s-hc-goal-runner-v1",
@@ -61,16 +61,6 @@
       "status": "COMPLETED",
       "title": "LLM provider selection cost governance and policy",
       "updatedAt": "2026-06-29T02:49:12.565Z"
-    },
-    {
-      "branch": "codex/p-hc-or-operability-01-20260630-150409",
-      "createdAt": "2026-06-30T22:18:06.358Z",
-      "goalId": "GR-20260630T221806Z-cc73f500-baseline-gates-recovery",
-      "owner": "Manuel",
-      "sprintId": "S-HC-INFRA-BASELINE-GATES-RECOVERY",
-      "status": "ACTIVE",
-      "title": "Baseline gates recovery",
-      "updatedAt": "2026-06-30T22:18:52.946Z"
     }
   ],
   "version": 1
