@@ -5,8 +5,8 @@
     "originUrl": "https://github.com/Cerberux77/HeptaCore.git",
     "canonicalMotherBranch": "master"
   },
-  "generation": 13,
-  "controlHead": "9080eb7985c4785f796ba8ed36376161c48b24ac",
+  "generation": 14,
+  "controlHead": "44b5490ce0e6af256030b533cf0db9dc81cf466e",
   "catalog": {
     "taskBoardPath": "var/oreshnik/task-board.json",
     "zoneMapPath": "docs/07_handoffs/zone-map.json",
@@ -55,6 +55,18 @@
       "createdAt": "2026-07-01T07:00:57.344Z",
       "updatedAt": "2026-07-01T08:41:11.184Z",
       "identityOrigin": "explicit"
+    },
+    {
+      "agentInstanceUid": "agent_dd3d3a480c02416683189c8a2ea38039",
+      "displayAlias": "manuel-kilo1",
+      "operatorId": "manuel",
+      "harnessId": "kilo",
+      "machineId": "machine-89814280-0079-4c35-82c8-3d533c515221",
+      "repositoryId": "32305cad03d6321a",
+      "slot": 1,
+      "createdAt": "2026-07-01T08:56:30.953Z",
+      "updatedAt": "2026-07-01T08:56:30.953Z",
+      "identityOrigin": "explicit"
     }
   ],
   "sessions": [
@@ -80,6 +92,17 @@
       "lastSeenAt": "2026-07-01T08:41:11.184Z",
       "status": "closed",
       "closedAt": "2026-07-01T08:41:11.184Z",
+      "identityOrigin": "explicit"
+    },
+    {
+      "sessionId": "session_ccf792d117a84998ad6292f4e2e188fe",
+      "agentInstanceUid": "agent_dd3d3a480c02416683189c8a2ea38039",
+      "operatorId": "manuel",
+      "harnessId": "kilo",
+      "machineId": "machine-89814280-0079-4c35-82c8-3d533c515221",
+      "startedAt": "2026-07-01T08:56:30.953Z",
+      "lastSeenAt": "2026-07-01T08:56:30.953Z",
+      "status": "active",
       "identityOrigin": "explicit"
     }
   ],
@@ -221,11 +244,12 @@
         "packages/core",
         "apps/web/lib"
       ],
-      "status": "provisioning",
+      "status": "active",
       "sourceTaskBoardHead": "f8ceb34af9cad34729a26c8a2e5b54788efef3fe",
       "catalogFingerprint": "fd8a82562bebf12da6462490af6379da8e6a321c",
       "createdAt": "2026-07-01T08:56:30.953Z",
-      "updatedAt": "2026-07-01T08:56:30.953Z",
+      "updatedAt": "2026-07-01T08:57:00.525Z",
+      "activatedAt": "2026-07-01T08:57:00.525Z",
       "resumedCount": 0,
       "harnessId": "kilo",
       "agentInstanceUid": "agent_dd3d3a480c02416683189c8a2ea38039",
@@ -323,7 +347,7 @@
       "worktreePath": "D:\\PROYECTOS\\WORKTREES\\HeptaCore_ORESHNIK_READY\\var\\oreshnik\\wt\\32305cad03d6321a\\manuel\\manuel-kilo1\\assets\\S-HC-ASSET-02-FORMAT-DERIVATIVES\\bde716a470",
       "status": "active",
       "createdAt": "2026-07-01T08:56:30.953Z",
-      "updatedAt": "2026-07-01T08:56:30.953Z",
+      "updatedAt": "2026-07-01T08:57:00.525Z",
       "harnessId": "kilo",
       "agentInstanceUid": "agent_dd3d3a480c02416683189c8a2ea38039",
       "agentInstanceAlias": "manuel-kilo1",
@@ -419,9 +443,9 @@
       "machineId": "machine-89814280-0079-4c35-82c8-3d533c515221",
       "branch": "dispatch/manuel/manuel-kilo1/assets/S-HC-ASSET-02-FORMAT-DERIVATIVES/bde716a470",
       "worktreePath": "D:\\PROYECTOS\\WORKTREES\\HeptaCore_ORESHNIK_READY\\var\\oreshnik\\wt\\32305cad03d6321a\\manuel\\manuel-kilo1\\assets\\S-HC-ASSET-02-FORMAT-DERIVATIVES\\bde716a470",
-      "status": "provisioning",
+      "status": "active",
       "createdAt": "2026-07-01T08:56:30.953Z",
-      "updatedAt": "2026-07-01T08:56:30.953Z",
+      "updatedAt": "2026-07-01T08:57:00.525Z",
       "sourceTaskBoardHead": "f8ceb34af9cad34729a26c8a2e5b54788efef3fe",
       "harnessId": "kilo",
       "agentInstanceUid": "agent_dd3d3a480c02416683189c8a2ea38039",
@@ -658,7 +682,7 @@
       "branch": "dispatch/manuel/manuel-kilo1/assets/S-HC-ASSET-02-FORMAT-DERIVATIVES/bde716a470",
       "status": "reserved",
       "createdAt": "2026-07-01T08:56:30.953Z",
-      "updatedAt": "2026-07-01T08:56:30.953Z",
+      "updatedAt": "2026-07-01T08:57:00.525Z",
       "harnessId": "kilo",
       "agentInstanceUid": "agent_dd3d3a480c02416683189c8a2ea38039",
       "agentInstanceAlias": "manuel-kilo1",
@@ -676,7 +700,7 @@
       "branch": "dispatch/manuel/manuel-kilo1/assets/S-HC-ASSET-02-FORMAT-DERIVATIVES/bde716a470",
       "status": "reserved",
       "createdAt": "2026-07-01T08:56:30.953Z",
-      "updatedAt": "2026-07-01T08:56:30.953Z",
+      "updatedAt": "2026-07-01T08:57:00.525Z",
       "harnessId": "kilo",
       "agentInstanceUid": "agent_dd3d3a480c02416683189c8a2ea38039",
       "agentInstanceAlias": "manuel-kilo1",
@@ -694,7 +718,7 @@
       "branch": "dispatch/manuel/manuel-kilo1/assets/S-HC-ASSET-02-FORMAT-DERIVATIVES/bde716a470",
       "status": "reserved",
       "createdAt": "2026-07-01T08:56:30.953Z",
-      "updatedAt": "2026-07-01T08:56:30.953Z",
+      "updatedAt": "2026-07-01T08:57:00.525Z",
       "harnessId": "kilo",
       "agentInstanceUid": "agent_dd3d3a480c02416683189c8a2ea38039",
       "agentInstanceAlias": "manuel-kilo1",
@@ -803,6 +827,14 @@
       "runId": "run-manuel-S-HC-ASSET-02-FORMAT-DERIVATIVES-20260701085630-e80b9eea",
       "operator": "manuel",
       "message": "Reserved S-HC-ASSET-02-FORMAT-DERIVATIVES for manuel."
+    },
+    {
+      "at": "2026-07-01T08:57:00.525Z",
+      "action": "dispatch.next.active",
+      "assignmentId": "asg-255625af-40e8-4044-8b20-9a28e81738a8",
+      "runId": "run-manuel-S-HC-ASSET-02-FORMAT-DERIVATIVES-20260701085630-e80b9eea",
+      "operator": "manuel",
+      "message": "Assignment asg-255625af-40e8-4044-8b20-9a28e81738a8 is active."
     }
   ],
   "reconciliation": {
@@ -812,5 +844,5 @@
     "pendingDiagnostics": []
   },
   "createdAt": "2026-06-29T20:17:43.302Z",
-  "updatedAt": "2026-07-01T08:56:30.953Z"
+  "updatedAt": "2026-07-01T08:57:00.525Z"
 }
