@@ -1,6 +1,6 @@
 {
   "project": "HeptaCore",
-  "updatedAt": "2026-07-01T08:41:11.169Z",
+  "updatedAt": "2026-07-01T10:57:05.058Z",
   "resiliencePolicy": "If an owner is unavailable for more than one working block or blocks the critical path, backupOwner may take over after recording reassignment.",
   "closurePolicy": "No sprint may be closed until acceptance criteria, base tests, sprint-specific tests, docs/handoff, and Oreshnik zone checks pass.",
   "baseTestMatrix": [
@@ -838,7 +838,7 @@
       "title": "Format derivatives: badge interaction, format preview, intelligent crop, safe zones, asset variants",
       "owner": "Manuel",
       "backupOwner": "Manuel",
-      "status": "ready",
+      "status": "ready_for_integration",
       "track": "assets",
       "zone": [
         "apps/web/components",
@@ -907,6 +907,12 @@
         },
         {
           "at": "2026-07-01T08:41:11.169Z",
+          "action": "claim_released",
+          "operator": "manuel",
+          "description": "Run run-manuel-S-HC-ASSET-02-FORMAT-DERIVATIVES-20260701070057-4b417034 released"
+        },
+        {
+          "at": "2026-07-01T10:57:05.058Z",
           "action": "claim_released",
           "operator": "manuel",
           "description": "Run run-manuel-S-HC-ASSET-02-FORMAT-DERIVATIVES-20260701070057-4b417034 released"
