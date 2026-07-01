@@ -59,6 +59,8 @@
   },
   "devDependencies": {
     "@playwright/test": "^1.61.1",
+    "eslint": "^9.39.1",
+    "eslint-config-next": "^16.2.9",
     "png-to-ico": "^3.0.1",
     "prisma": "^7.8.0"
   },
