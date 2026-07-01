@@ -5,15 +5,15 @@
     "originUrl": "https://github.com/Cerberux77/HeptaCore.git",
     "canonicalMotherBranch": "master"
   },
-  "generation": 4,
-  "controlHead": "2aaff2f073ab0882a0053ad888fca208e708f0c2",
+  "generation": 5,
+  "controlHead": "24b4bf0113cf42a448a1a195fdc0ae7e5be2d34c",
   "catalog": {
     "taskBoardPath": "var/oreshnik/task-board.json",
     "zoneMapPath": "docs/07_handoffs/zone-map.json",
-    "sourceTaskBoardHead": "efbd2fbd163999b2fddbfcf49b9fef3ab1e587a7",
-    "fingerprint": "6c42a4b47173dc7a8d32157974e578d2bd8ca9c8",
-    "taskCount": 38,
-    "updatedAt": "2026-07-01T01:13:23.780Z"
+    "sourceTaskBoardHead": "f8ceb34af9cad34729a26c8a2e5b54788efef3fe",
+    "fingerprint": "fd8a82562bebf12da6462490af6379da8e6a321c",
+    "taskCount": 39,
+    "updatedAt": "2026-07-01T06:55:09.757Z"
   },
   "policy": {
     "name": "deterministic-v1",
@@ -41,7 +41,7 @@
       "repositoryId": "32305cad03d6321a",
       "slot": 1,
       "createdAt": "2026-07-01T01:13:23.780Z",
-      "updatedAt": "2026-07-01T01:14:42.260Z",
+      "updatedAt": "2026-07-01T01:52:32.154Z",
       "identityOrigin": "explicit"
     }
   ],
@@ -53,8 +53,9 @@
       "harnessId": "codex",
       "machineId": "machine-89814280-0079-4c35-82c8-3d533c515221",
       "startedAt": "2026-07-01T01:13:23.780Z",
-      "lastSeenAt": "2026-07-01T01:14:42.260Z",
-      "status": "active",
+      "lastSeenAt": "2026-07-01T01:52:32.154Z",
+      "status": "closed",
+      "closedAt": "2026-07-01T01:52:32.154Z",
       "identityOrigin": "explicit"
     }
   ],
@@ -88,6 +89,35 @@
       "agentInstanceAlias": "manuel-codex1",
       "sessionId": "session_43c28ea865784938928c9848faf739c1",
       "identityOrigin": "explicit"
+    },
+    {
+      "assignmentId": "asg-9f17caa4-b38b-43cf-b85b-ea0beecc5376",
+      "taskId": "S-HC-ASSET-02-FORMAT-DERIVATIVES",
+      "sprintId": "assets",
+      "title": "Format derivatives: badge interaction, format preview, intelligent crop, safe zones, asset variants",
+      "operator": "manuel",
+      "machineId": "machine-89814280-0079-4c35-82c8-3d533c515221",
+      "functionalBranch": "dispatch/manuel/manuel-codex2/assets/S-HC-ASSET-02-FORMAT-DERIVATIVES/500fc24f91",
+      "motherBranch": "master",
+      "worktreePath": "D:\\PROYECTOS\\WORKTREES\\HeptaCore_ORESHNIK_READY\\var\\oreshnik\\wt\\32305cad03d6321a\\manuel\\manuel-codex2\\assets\\S-HC-ASSET-02-FORMAT-DERIVATIVES\\500fc24f91",
+      "runId": "run-manuel-S-HC-ASSET-02-FORMAT-DERIVATIVES-20260701065509-ce75dba7",
+      "claimId": "claim-asg-9f17caa4-b38b-43cf-b85b-ea0beecc5376",
+      "zones": [
+        "apps/web/components",
+        "packages/core",
+        "apps/web/lib"
+      ],
+      "status": "provisioning",
+      "sourceTaskBoardHead": "f8ceb34af9cad34729a26c8a2e5b54788efef3fe",
+      "catalogFingerprint": "fd8a82562bebf12da6462490af6379da8e6a321c",
+      "createdAt": "2026-07-01T06:55:09.757Z",
+      "updatedAt": "2026-07-01T06:55:09.757Z",
+      "resumedCount": 0,
+      "harnessId": "codex",
+      "agentInstanceUid": "agent_c48cba2103774a1e82f82d7b76ef3ec5",
+      "agentInstanceAlias": "manuel-codex2",
+      "sessionId": "session_e50cfb53e3d34a6ab154be98ff4de3d8",
+      "identityOrigin": "explicit"
     }
   ],
   "claims": [
@@ -109,6 +139,25 @@
       "agentInstanceAlias": "manuel-codex1",
       "sessionId": "session_43c28ea865784938928c9848faf739c1",
       "identityOrigin": "explicit"
+    },
+    {
+      "claimId": "claim-asg-9f17caa4-b38b-43cf-b85b-ea0beecc5376",
+      "assignmentId": "asg-9f17caa4-b38b-43cf-b85b-ea0beecc5376",
+      "taskId": "S-HC-ASSET-02-FORMAT-DERIVATIVES",
+      "sprintId": "assets",
+      "operator": "manuel",
+      "machineId": "machine-89814280-0079-4c35-82c8-3d533c515221",
+      "runId": "run-manuel-S-HC-ASSET-02-FORMAT-DERIVATIVES-20260701065509-ce75dba7",
+      "branch": "dispatch/manuel/manuel-codex2/assets/S-HC-ASSET-02-FORMAT-DERIVATIVES/500fc24f91",
+      "worktreePath": "D:\\PROYECTOS\\WORKTREES\\HeptaCore_ORESHNIK_READY\\var\\oreshnik\\wt\\32305cad03d6321a\\manuel\\manuel-codex2\\assets\\S-HC-ASSET-02-FORMAT-DERIVATIVES\\500fc24f91",
+      "status": "active",
+      "createdAt": "2026-07-01T06:55:09.757Z",
+      "updatedAt": "2026-07-01T06:55:09.757Z",
+      "harnessId": "codex",
+      "agentInstanceUid": "agent_c48cba2103774a1e82f82d7b76ef3ec5",
+      "agentInstanceAlias": "manuel-codex2",
+      "sessionId": "session_e50cfb53e3d34a6ab154be98ff4de3d8",
+      "identityOrigin": "explicit"
     }
   ],
   "runs": [
@@ -129,6 +178,25 @@
       "agentInstanceUid": "agent_d709c5d135a24e118bfcf184b48d3a81",
       "agentInstanceAlias": "manuel-codex1",
       "sessionId": "session_43c28ea865784938928c9848faf739c1",
+      "identityOrigin": "explicit"
+    },
+    {
+      "runId": "run-manuel-S-HC-ASSET-02-FORMAT-DERIVATIVES-20260701065509-ce75dba7",
+      "assignmentId": "asg-9f17caa4-b38b-43cf-b85b-ea0beecc5376",
+      "taskId": "S-HC-ASSET-02-FORMAT-DERIVATIVES",
+      "sprintId": "assets",
+      "operator": "manuel",
+      "machineId": "machine-89814280-0079-4c35-82c8-3d533c515221",
+      "branch": "dispatch/manuel/manuel-codex2/assets/S-HC-ASSET-02-FORMAT-DERIVATIVES/500fc24f91",
+      "worktreePath": "D:\\PROYECTOS\\WORKTREES\\HeptaCore_ORESHNIK_READY\\var\\oreshnik\\wt\\32305cad03d6321a\\manuel\\manuel-codex2\\assets\\S-HC-ASSET-02-FORMAT-DERIVATIVES\\500fc24f91",
+      "status": "provisioning",
+      "createdAt": "2026-07-01T06:55:09.757Z",
+      "updatedAt": "2026-07-01T06:55:09.757Z",
+      "sourceTaskBoardHead": "f8ceb34af9cad34729a26c8a2e5b54788efef3fe",
+      "harnessId": "codex",
+      "agentInstanceUid": "agent_c48cba2103774a1e82f82d7b76ef3ec5",
+      "agentInstanceAlias": "manuel-codex2",
+      "sessionId": "session_e50cfb53e3d34a6ab154be98ff4de3d8",
       "identityOrigin": "explicit"
     }
   ],
@@ -186,6 +254,60 @@
       "agentInstanceAlias": "manuel-codex1",
       "sessionId": "session_43c28ea865784938928c9848faf739c1",
       "identityOrigin": "explicit"
+    },
+    {
+      "zone": "apps/web/components",
+      "assignmentId": "asg-9f17caa4-b38b-43cf-b85b-ea0beecc5376",
+      "taskId": "S-HC-ASSET-02-FORMAT-DERIVATIVES",
+      "sprintId": "assets",
+      "operator": "manuel",
+      "machineId": "machine-89814280-0079-4c35-82c8-3d533c515221",
+      "runId": "run-manuel-S-HC-ASSET-02-FORMAT-DERIVATIVES-20260701065509-ce75dba7",
+      "branch": "dispatch/manuel/manuel-codex2/assets/S-HC-ASSET-02-FORMAT-DERIVATIVES/500fc24f91",
+      "status": "reserved",
+      "createdAt": "2026-07-01T06:55:09.757Z",
+      "updatedAt": "2026-07-01T06:55:09.757Z",
+      "harnessId": "codex",
+      "agentInstanceUid": "agent_c48cba2103774a1e82f82d7b76ef3ec5",
+      "agentInstanceAlias": "manuel-codex2",
+      "sessionId": "session_e50cfb53e3d34a6ab154be98ff4de3d8",
+      "identityOrigin": "explicit"
+    },
+    {
+      "zone": "packages/core",
+      "assignmentId": "asg-9f17caa4-b38b-43cf-b85b-ea0beecc5376",
+      "taskId": "S-HC-ASSET-02-FORMAT-DERIVATIVES",
+      "sprintId": "assets",
+      "operator": "manuel",
+      "machineId": "machine-89814280-0079-4c35-82c8-3d533c515221",
+      "runId": "run-manuel-S-HC-ASSET-02-FORMAT-DERIVATIVES-20260701065509-ce75dba7",
+      "branch": "dispatch/manuel/manuel-codex2/assets/S-HC-ASSET-02-FORMAT-DERIVATIVES/500fc24f91",
+      "status": "reserved",
+      "createdAt": "2026-07-01T06:55:09.757Z",
+      "updatedAt": "2026-07-01T06:55:09.757Z",
+      "harnessId": "codex",
+      "agentInstanceUid": "agent_c48cba2103774a1e82f82d7b76ef3ec5",
+      "agentInstanceAlias": "manuel-codex2",
+      "sessionId": "session_e50cfb53e3d34a6ab154be98ff4de3d8",
+      "identityOrigin": "explicit"
+    },
+    {
+      "zone": "apps/web/lib",
+      "assignmentId": "asg-9f17caa4-b38b-43cf-b85b-ea0beecc5376",
+      "taskId": "S-HC-ASSET-02-FORMAT-DERIVATIVES",
+      "sprintId": "assets",
+      "operator": "manuel",
+      "machineId": "machine-89814280-0079-4c35-82c8-3d533c515221",
+      "runId": "run-manuel-S-HC-ASSET-02-FORMAT-DERIVATIVES-20260701065509-ce75dba7",
+      "branch": "dispatch/manuel/manuel-codex2/assets/S-HC-ASSET-02-FORMAT-DERIVATIVES/500fc24f91",
+      "status": "reserved",
+      "createdAt": "2026-07-01T06:55:09.757Z",
+      "updatedAt": "2026-07-01T06:55:09.757Z",
+      "harnessId": "codex",
+      "agentInstanceUid": "agent_c48cba2103774a1e82f82d7b76ef3ec5",
+      "agentInstanceAlias": "manuel-codex2",
+      "sessionId": "session_e50cfb53e3d34a6ab154be98ff4de3d8",
+      "identityOrigin": "explicit"
     }
   ],
   "audit": [
@@ -217,13 +339,21 @@
       "runId": "run-manuel-S-HC-ASSET-02-FORMAT-DERIVATIVES-20260701011323-d6ba392a",
       "operator": "manuel",
       "message": "asg-635b0b4b-8d6e-4a89-9223-e2c5d486950a -> released"
+    },
+    {
+      "at": "2026-07-01T06:55:09.757Z",
+      "action": "dispatch.next.reserved",
+      "assignmentId": "asg-9f17caa4-b38b-43cf-b85b-ea0beecc5376",
+      "runId": "run-manuel-S-HC-ASSET-02-FORMAT-DERIVATIVES-20260701065509-ce75dba7",
+      "operator": "manuel",
+      "message": "Reserved S-HC-ASSET-02-FORMAT-DERIVATIVES for manuel."
     }
   ],
   "reconciliation": {
-    "lastAttemptAt": "2026-07-01T01:13:23.779Z",
+    "lastAttemptAt": "2026-07-01T06:55:09.756Z",
     "lastResult": "clean",
     "pendingDiagnostics": []
   },
   "createdAt": "2026-06-29T20:17:43.302Z",
-  "updatedAt": "2026-07-01T01:52:32.154Z"
+  "updatedAt": "2026-07-01T06:55:09.757Z"
 }
