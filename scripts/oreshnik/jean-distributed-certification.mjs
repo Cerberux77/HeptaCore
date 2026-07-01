@@ -61,6 +61,17 @@ if (existsSync(join(root, "docs/operations/jean-distributed-certification.md")))
   fail("jean-docs-present", "missing docs/operations/jean-distributed-certification.md");
 }
 
+for (const rel of [
+  "scripts/oreshnik/onboard-operator.ps1",
+  "scripts/oreshnik/verify-operator-ready.ps1",
+  "scripts/oreshnik/start-goal.ps1",
+  "docs/operators/JEAN-ONBOARDING.md",
+  "docs/operators/MULTIOPERATOR-OPERATIONS.md",
+]) {
+  if (existsSync(join(root, rel))) pass(`required:${rel}`, rel);
+  else fail(`required:${rel}`, `missing ${rel}`);
+}
+
 const failed = checks.filter((check) => !check.passed);
 const result = {
   ready: failed.length === 0,
