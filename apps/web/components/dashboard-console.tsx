@@ -77,6 +77,14 @@ import {
   type AssetCompatibilityTarget,
 } from "../lib/asset-compatibility";
 import {
+  applyManualDerivativeCrop,
+  planBatchFormatDerivatives,
+  toDerivativeRecord,
+  type AssetDerivativeCrop,
+  type AssetFormatDerivativePlan,
+  type ImageDerivativeTarget,
+} from "../lib/asset-format-derivatives";
+import {
   applyAssetLibraryFilters,
   clearAssetLibraryFilters,
   DEFAULT_ASSET_LIBRARY_FILTERS,
@@ -457,6 +465,7 @@ function InspectorContent({
           })}
         </div>
       </div>
+      <FormatDerivativePanel inspectorAsset={inspectorAsset} />
       <div style={{ display: "flex", gap: 6, marginTop: 18, flexWrap: "wrap" }}>
         <button onClick={() => { onClose(); onRename(inspectorAsset.id, inspectorAsset.filename); }} style={{ padding: "4px 10px", borderRadius: 4, border: "1px solid var(--hc-line)", background: "var(--hc-bone)", cursor: "pointer", fontSize: 12, color: "var(--hc-ink)" }}>Renombrar</button>
         <button onClick={() => { onClose(); onMove(inspectorAsset.id, inspectorAsset.folder ?? ""); }} style={{ padding: "4px 10px", borderRadius: 4, border: "1px solid var(--hc-line)", background: "var(--hc-bone)", cursor: "pointer", fontSize: 12, color: "var(--hc-ink)" }}>Mover</button>
@@ -467,6 +476,103 @@ function InspectorContent({
         <button onClick={() => { onClose(); onDelete(inspectorAsset.id); }} disabled={inspectorAsset.draftCount > 0} style={{ padding: "4px 10px", borderRadius: 4, border: "1px solid var(--hc-line)", background: inspectorAsset.draftCount > 0 ? "var(--hc-bone)" : "#fff1f0", color: inspectorAsset.draftCount > 0 ? "var(--hc-fog)" : "#b42318", cursor: inspectorAsset.draftCount > 0 ? "not-allowed" : "pointer", fontSize: 12 }}>Eliminar</button>
       </div>
     </>
+  );
+}
+
+function manualCropPreset(plan: AssetFormatDerivativePlan): AssetDerivativeCrop {
+  if (!plan.crop) {
+    return { xPercent: 5, yPercent: 5, widthPercent: 90, heightPercent: 90 };
+  }
+  return {
+    xPercent: Math.min(95 - plan.crop.widthPercent * 0.9, plan.crop.xPercent + 5),
+    yPercent: Math.min(95 - plan.crop.heightPercent * 0.9, plan.crop.yPercent + 5),
+    widthPercent: plan.crop.widthPercent * 0.9,
+    heightPercent: plan.crop.heightPercent * 0.9,
+  };
+}
+
+function cropText(crop: AssetDerivativeCrop | null): string {
+  if (!crop) return "frame completo";
+  return `x ${crop.xPercent}% / y ${crop.yPercent}% / w ${crop.widthPercent}% / h ${crop.heightPercent}%`;
+}
+
+function FormatDerivativePanel({ inspectorAsset }: { inspectorAsset: TenantAssetItem }) {
+  const plans = planBatchFormatDerivatives(inspectorAsset.id, assetCompatibilityInput(inspectorAsset));
+  const [activeTarget, setActiveTarget] = useState<ImageDerivativeTarget>(plans[0].target);
+  const [manualTargets, setManualTargets] = useState<Partial<Record<ImageDerivativeTarget, boolean>>>({});
+  const basePlan = plans.find((plan) => plan.target === activeTarget) ?? plans[0];
+  const activePlan = manualTargets[activeTarget]
+    ? applyManualDerivativeCrop(basePlan, manualCropPreset(basePlan))
+    : basePlan;
+  const record = toDerivativeRecord(activePlan);
+
+  return (
+    <div style={{ marginTop: 16, padding: 12, border: "1px solid var(--hc-line)", borderRadius: 8, background: "#fbfaf7" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", gap: 8, alignItems: "flex-start" }}>
+        <div>
+          <strong style={{ fontSize: 12, color: "var(--hc-ink)" }}>Derivadas por formato</strong>
+          <div style={{ fontSize: 10, color: "var(--hc-fog)", marginTop: 2 }}>
+            Preview no destructivo: el original queda inmutable y cada variante conserva sourceAssetId.
+          </div>
+        </div>
+        <span style={{ fontSize: 10, padding: "2px 6px", borderRadius: 999, background: activePlan.status === "READY" ? "#e8f7ef" : activePlan.status === "VIDEO_DEFERRED" ? "#eef2ff" : "#fff8e1", color: activePlan.status === "READY" ? "#0f6e3f" : activePlan.status === "VIDEO_DEFERRED" ? "#3730a3" : "#8d6e00", fontWeight: 700 }}>
+          {activePlan.status}
+        </span>
+      </div>
+      <div style={{ display: "flex", gap: 4, flexWrap: "wrap", marginTop: 10 }}>
+        {plans.map((plan) => (
+          <button
+            key={plan.target}
+            type="button"
+            onClick={() => setActiveTarget(plan.target)}
+            style={{
+              padding: "4px 7px",
+              borderRadius: 999,
+              border: plan.target === activeTarget ? "1px solid var(--hc-ink)" : "1px solid var(--hc-line)",
+              background: plan.target === activeTarget ? "var(--hc-ink)" : "#fff",
+              color: plan.target === activeTarget ? "#fff" : "var(--hc-ink)",
+              cursor: "pointer",
+              fontSize: 10,
+              fontWeight: 700,
+            }}
+          >
+            {plan.targetFrame.aspectRatioLabel}
+          </button>
+        ))}
+      </div>
+      <div style={{ marginTop: 10, display: "grid", gap: 5, fontSize: 11, color: "var(--hc-ink)" }}>
+        <div><strong>Formato:</strong> {activePlan.targetLabel} / {activePlan.targetFrame.width}x{activePlan.targetFrame.height}</div>
+        <div><strong>Source:</strong> <code style={{ fontSize: 10 }}>{activePlan.sourceAssetId}</code> / version {activePlan.version}</div>
+        <div><strong>Derivative:</strong> <code style={{ fontSize: 10, wordBreak: "break-all" }}>{activePlan.derivativeId}</code></div>
+        <div><strong>Crop:</strong> {cropText(activePlan.crop)}</div>
+        <div><strong>Fit:</strong> {activePlan.fitMode} / {activePlan.source}</div>
+        {activePlan.safeZones && (
+          <div><strong>Zonas seguras:</strong> top {activePlan.safeZones.topPercent}% / bottom {activePlan.safeZones.bottomPercent}% / side {activePlan.safeZones.sidePercent}%</div>
+        )}
+        <div><strong>Record:</strong> <code style={{ fontSize: 10, wordBreak: "break-all" }}>{record.id} -&gt; sourceAssetId {record.sourceAssetId}</code></div>
+      </div>
+      <div style={{ display: "flex", gap: 6, marginTop: 10, flexWrap: "wrap" }}>
+        <button
+          type="button"
+          onClick={() => setManualTargets((current) => ({ ...current, [activeTarget]: false }))}
+          style={{ padding: "4px 8px", borderRadius: 4, border: "1px solid var(--hc-line)", background: manualTargets[activeTarget] ? "#fff" : "var(--hc-ink)", color: manualTargets[activeTarget] ? "var(--hc-ink)" : "#fff", cursor: "pointer", fontSize: 11 }}
+        >
+          Smart crop
+        </button>
+        <button
+          type="button"
+          onClick={() => setManualTargets((current) => ({ ...current, [activeTarget]: true }))}
+          style={{ padding: "4px 8px", borderRadius: 4, border: "1px solid var(--hc-line)", background: manualTargets[activeTarget] ? "var(--hc-ink)" : "#fff", color: manualTargets[activeTarget] ? "#fff" : "var(--hc-ink)", cursor: "pointer", fontSize: 11 }}
+        >
+          Crop manual v{basePlan.version + 1}
+        </button>
+      </div>
+      {activePlan.warnings.length > 0 && (
+        <div style={{ marginTop: 8, color: "var(--hc-fog)", fontSize: 10 }}>
+          {activePlan.warnings.join(" ")}
+        </div>
+      )}
+    </div>
   );
 }
 
