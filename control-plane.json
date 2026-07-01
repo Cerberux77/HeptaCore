@@ -5,7 +5,7 @@
     "originUrl": "https://github.com/Cerberux77/HeptaCore.git",
     "canonicalMotherBranch": "master"
   },
-  "generation": 6,
+  "generation": 7,
   "controlHead": "24b4bf0113cf42a448a1a195fdc0ae7e5be2d34c",
   "catalog": {
     "taskBoardPath": "var/oreshnik/task-board.json",
@@ -53,7 +53,7 @@
       "repositoryId": "32305cad03d6321a",
       "slot": 2,
       "createdAt": "2026-07-01T06:55:09.757Z",
-      "updatedAt": "2026-07-01T06:55:09.757Z",
+      "updatedAt": "2026-07-01T06:55:27.040Z",
       "identityOrigin": "explicit"
     }
   ],
@@ -77,7 +77,7 @@
       "harnessId": "codex",
       "machineId": "machine-89814280-0079-4c35-82c8-3d533c515221",
       "startedAt": "2026-07-01T06:55:09.757Z",
-      "lastSeenAt": "2026-07-01T06:55:09.757Z",
+      "lastSeenAt": "2026-07-01T06:55:27.040Z",
       "status": "active",
       "identityOrigin": "explicit"
     }
@@ -130,11 +130,11 @@
         "packages/core",
         "apps/web/lib"
       ],
-      "status": "provisioning_failed",
+      "status": "released",
       "sourceTaskBoardHead": "f8ceb34af9cad34729a26c8a2e5b54788efef3fe",
       "catalogFingerprint": "fd8a82562bebf12da6462490af6379da8e6a321c",
       "createdAt": "2026-07-01T06:55:09.757Z",
-      "updatedAt": "2026-07-01T06:55:27.040Z",
+      "updatedAt": "2026-07-01T06:59:23.028Z",
       "lastError": "Failed to create worktree D:\\PROYECTOS\\WORKTREES\\HeptaCore_ORESHNIK_READY\\var\\oreshnik\\wt\\32305cad03d6321a\\manuel\\manuel-codex2\\assets\\S-HC-ASSET-02-FORMAT-DERIVATIVES\\500fc24f91: Failed to add worktree D:\\PROYECTOS\\WORKTREES\\HeptaCore_ORESHNIK_READY\\var\\oreshnik\\wt\\32305cad03d6321a\\manuel\\manuel-codex2\\assets\\S-HC-ASSET-02-FORMAT-DERIVATIVES\\500fc24f91 for dispatch/manuel/manuel-codex2/assets/S-HC-ASSET-02-FORMAT-DERIVATIVES/500fc24f91",
       "resumedCount": 0,
       "harnessId": "codex",
@@ -174,9 +174,9 @@
       "runId": "run-manuel-S-HC-ASSET-02-FORMAT-DERIVATIVES-20260701065509-ce75dba7",
       "branch": "dispatch/manuel/manuel-codex2/assets/S-HC-ASSET-02-FORMAT-DERIVATIVES/500fc24f91",
       "worktreePath": "D:\\PROYECTOS\\WORKTREES\\HeptaCore_ORESHNIK_READY\\var\\oreshnik\\wt\\32305cad03d6321a\\manuel\\manuel-codex2\\assets\\S-HC-ASSET-02-FORMAT-DERIVATIVES\\500fc24f91",
-      "status": "provisioning_failed",
+      "status": "released",
       "createdAt": "2026-07-01T06:55:09.757Z",
-      "updatedAt": "2026-07-01T06:55:27.040Z",
+      "updatedAt": "2026-07-01T06:59:23.028Z",
       "harnessId": "codex",
       "agentInstanceUid": "agent_c48cba2103774a1e82f82d7b76ef3ec5",
       "agentInstanceAlias": "manuel-codex2",
@@ -213,9 +213,9 @@
       "machineId": "machine-89814280-0079-4c35-82c8-3d533c515221",
       "branch": "dispatch/manuel/manuel-codex2/assets/S-HC-ASSET-02-FORMAT-DERIVATIVES/500fc24f91",
       "worktreePath": "D:\\PROYECTOS\\WORKTREES\\HeptaCore_ORESHNIK_READY\\var\\oreshnik\\wt\\32305cad03d6321a\\manuel\\manuel-codex2\\assets\\S-HC-ASSET-02-FORMAT-DERIVATIVES\\500fc24f91",
-      "status": "provisioning_failed",
+      "status": "released",
       "createdAt": "2026-07-01T06:55:09.757Z",
-      "updatedAt": "2026-07-01T06:55:27.040Z",
+      "updatedAt": "2026-07-01T06:59:23.028Z",
       "sourceTaskBoardHead": "f8ceb34af9cad34729a26c8a2e5b54788efef3fe",
       "lastError": "Failed to create worktree D:\\PROYECTOS\\WORKTREES\\HeptaCore_ORESHNIK_READY\\var\\oreshnik\\wt\\32305cad03d6321a\\manuel\\manuel-codex2\\assets\\S-HC-ASSET-02-FORMAT-DERIVATIVES\\500fc24f91: Failed to add worktree D:\\PROYECTOS\\WORKTREES\\HeptaCore_ORESHNIK_READY\\var\\oreshnik\\wt\\32305cad03d6321a\\manuel\\manuel-codex2\\assets\\S-HC-ASSET-02-FORMAT-DERIVATIVES\\500fc24f91 for dispatch/manuel/manuel-codex2/assets/S-HC-ASSET-02-FORMAT-DERIVATIVES/500fc24f91",
       "harnessId": "codex",
@@ -289,9 +289,9 @@
       "machineId": "machine-89814280-0079-4c35-82c8-3d533c515221",
       "runId": "run-manuel-S-HC-ASSET-02-FORMAT-DERIVATIVES-20260701065509-ce75dba7",
       "branch": "dispatch/manuel/manuel-codex2/assets/S-HC-ASSET-02-FORMAT-DERIVATIVES/500fc24f91",
-      "status": "provisioning_failed",
+      "status": "released",
       "createdAt": "2026-07-01T06:55:09.757Z",
-      "updatedAt": "2026-07-01T06:55:27.040Z",
+      "updatedAt": "2026-07-01T06:59:23.028Z",
       "harnessId": "codex",
       "agentInstanceUid": "agent_c48cba2103774a1e82f82d7b76ef3ec5",
       "agentInstanceAlias": "manuel-codex2",
@@ -307,9 +307,9 @@
       "machineId": "machine-89814280-0079-4c35-82c8-3d533c515221",
       "runId": "run-manuel-S-HC-ASSET-02-FORMAT-DERIVATIVES-20260701065509-ce75dba7",
       "branch": "dispatch/manuel/manuel-codex2/assets/S-HC-ASSET-02-FORMAT-DERIVATIVES/500fc24f91",
-      "status": "provisioning_failed",
+      "status": "released",
       "createdAt": "2026-07-01T06:55:09.757Z",
-      "updatedAt": "2026-07-01T06:55:27.040Z",
+      "updatedAt": "2026-07-01T06:59:23.028Z",
       "harnessId": "codex",
       "agentInstanceUid": "agent_c48cba2103774a1e82f82d7b76ef3ec5",
       "agentInstanceAlias": "manuel-codex2",
@@ -325,9 +325,9 @@
       "machineId": "machine-89814280-0079-4c35-82c8-3d533c515221",
       "runId": "run-manuel-S-HC-ASSET-02-FORMAT-DERIVATIVES-20260701065509-ce75dba7",
       "branch": "dispatch/manuel/manuel-codex2/assets/S-HC-ASSET-02-FORMAT-DERIVATIVES/500fc24f91",
-      "status": "provisioning_failed",
+      "status": "released",
       "createdAt": "2026-07-01T06:55:09.757Z",
-      "updatedAt": "2026-07-01T06:55:27.040Z",
+      "updatedAt": "2026-07-01T06:59:23.028Z",
       "harnessId": "codex",
       "agentInstanceUid": "agent_c48cba2103774a1e82f82d7b76ef3ec5",
       "agentInstanceAlias": "manuel-codex2",
@@ -380,6 +380,14 @@
       "runId": "run-manuel-S-HC-ASSET-02-FORMAT-DERIVATIVES-20260701065509-ce75dba7",
       "operator": "manuel",
       "message": "Failed to create worktree D:\\PROYECTOS\\WORKTREES\\HeptaCore_ORESHNIK_READY\\var\\oreshnik\\wt\\32305cad03d6321a\\manuel\\manuel-codex2\\assets\\S-HC-ASSET-02-FORMAT-DERIVATIVES\\500fc24f91: Failed to add worktree D:\\PROYECTOS\\WORKTREES\\HeptaCore_ORESHNIK_READY\\var\\oreshnik\\wt\\32305cad03d6321a\\manuel\\manuel-codex2\\assets\\S-HC-ASSET-02-FORMAT-DERIVATIVES\\500fc24f91 for dispatch/manuel/manuel-codex2/assets/S-HC-ASSET-02-FORMAT-DERIVATIVES/500fc24f91"
+    },
+    {
+      "at": "2026-07-01T06:59:23.028Z",
+      "action": "dispatch.released",
+      "assignmentId": "asg-9f17caa4-b38b-43cf-b85b-ea0beecc5376",
+      "runId": "run-manuel-S-HC-ASSET-02-FORMAT-DERIVATIVES-20260701065509-ce75dba7",
+      "operator": "manuel",
+      "message": "asg-9f17caa4-b38b-43cf-b85b-ea0beecc5376 -> released"
     }
   ],
   "reconciliation": {
@@ -388,5 +396,5 @@
     "pendingDiagnostics": []
   },
   "createdAt": "2026-06-29T20:17:43.302Z",
-  "updatedAt": "2026-07-01T06:55:27.040Z"
+  "updatedAt": "2026-07-01T06:59:23.028Z"
 }
