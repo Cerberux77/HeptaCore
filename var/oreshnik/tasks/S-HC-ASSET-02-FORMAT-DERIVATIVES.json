@@ -3,11 +3,11 @@
   "taskId": "S-HC-ASSET-02-FORMAT-DERIVATIVES",
   "sprint": "assets",
   "sprintOrderIndex": 8,
-  "taskOrderIndex": 11,
+  "taskOrderIndex": 12,
   "title": "Format derivatives: badge interaction, format preview, intelligent crop, safe zones, asset variants",
   "owner": "Manuel",
   "backupOwner": "Manuel",
-  "status": "ready_for_integration",
+  "status": "integrated",
   "taskBoardPath": "D:\\PROYECTOS\\WORKTREES\\HC_ASSET02_STATE_REPAIR\\var\\oreshnik\\task-board.json",
   "zone": [
     "apps/web/components",
@@ -92,6 +92,13 @@
       "operator": "manuel",
       "branch": "dispatch/manuel/manuel-codex2/assets/S-HC-ASSET-02-FORMAT-DERIVATIVES/396dfc38dd",
       "description": "QA-EVIDENCE-ASSET-02 UI change description: el badge de compatibilidad abre el inspector del formato seleccionado y presenta la planificación de sus derivadas. Screenshot or test result: la prueba automatizada asset-format-derivatives verificó crop inteligente, safe zones, fuente original inmutable, versionado del crop manual, generación determinista por lote y aplazamiento seguro de derivados de video. Operator confirmation: Manuel escribió CONFIRMO ASSET-02 y acepta esta evidencia automatizada y documental para integrar la entrega parcial; no se declara QA manual de navegador."
+    },
+    {
+      "at": "2026-07-01T21:10:33.990Z",
+      "action": "integrated",
+      "operator": "manuel",
+      "branch": "dispatch/manuel/manuel-codex2/assets/S-HC-ASSET-02-FORMAT-DERIVATIVES/396dfc38dd",
+      "description": "Integrated dispatch/manuel/manuel-codex2/assets/S-HC-ASSET-02-FORMAT-DERIVATIVES/396dfc38dd into MADRE/v54-assets-asset-02-validated-partial-delivery-2026-07-01"
     }
   ],
   "validationGateResults": [
@@ -260,7 +267,7 @@
       "summary": "S-HC-ASSET-02-FORMAT-DERIVATIVES:worker | exit=0 | timed_ok | signal=none | stdout=> heptacore@0.1.0 worker:validate | stderr=[config] .env.rrss no encontrado. Usando solo variables de entorno del sistema."
     }
   ],
-  "updatedAt": "2026-07-01T20:31:05.696Z",
+  "updatedAt": "2026-07-01T21:10:33.990Z",
   "runs": [
     {
       "runId": "run-manuel-S-HC-ASSET-02-FORMAT-DERIVATIVES-20260701070057-4b417034",
@@ -274,10 +281,10 @@
         "packages/core",
         "apps/web/lib"
       ],
-      "taskStatus": "ready_for_integration",
+      "taskStatus": "integrated",
       "claimStatus": "released",
       "claimedAt": "2026-07-01T07:01:19.729Z",
-      "updatedAt": "2026-07-01T08:39:46.620Z",
+      "updatedAt": "2026-07-01T21:10:33.990Z",
       "expiresAt": "2026-07-01T08:01:19.729Z",
       "releasedAt": "2026-07-01T08:39:46.620Z",
       "manifestPath": "var/oreshnik/runs/S-HC-ASSET-02-FORMAT-DERIVATIVES/run-manuel-S-HC-ASSET-02-FORMAT-DERIVATIVES-20260701070057-4b417034.json",
@@ -452,9 +459,54 @@
   "integration": {
     "runId": "run-manuel-S-HC-ASSET-02-FORMAT-DERIVATIVES-20260701070057-4b417034",
     "sourceBranch": "dispatch/manuel/manuel-codex2/assets/S-HC-ASSET-02-FORMAT-DERIVATIVES/396dfc38dd",
-    "status": "queued",
+    "status": "integrated",
     "motherBranch": "MADRE/v54-assets-asset-02-validated-partial-delivery-2026-07-01",
     "queuedAt": "2026-07-01T20:36:14.468Z",
-    "updatedAt": "2026-07-01T20:36:14.468Z"
+    "updatedAt": "2026-07-01T21:10:33.990Z",
+    "targetBranch": "MADRE/v54-assets-asset-02-validated-partial-delivery-2026-07-01",
+    "integratedAt": "2026-07-01T21:10:33.990Z"
+  },
+  "latestTrain": {
+    "attemptId": "train-run-manuel-S-HC-ASSET-02-FORMAT-DERIVATIVES-2026-1782940057654",
+    "runId": "run-manuel-S-HC-ASSET-02-FORMAT-DERIVATIVES-20260701070057-4b417034",
+    "sourceBranch": "dispatch/manuel/manuel-codex2/assets/S-HC-ASSET-02-FORMAT-DERIVATIVES/396dfc38dd",
+    "targetBranch": "MADRE/v54-assets-asset-02-validated-partial-delivery-2026-07-01",
+    "integrationBranch": "integration-train/assets/S-HC-ASSET-02-FORMAT-DER/r-5cdcee7b964f/a-98f25f84692b",
+    "operator": "manuel",
+    "lockKey": "integration-train/MADRE/v54-assets-asset-02-validated-partial-delivery-2026-07-01",
+    "status": "succeeded",
+    "startedAt": "2026-07-01T21:07:37.654Z",
+    "completedAt": "2026-07-01T21:10:34.025Z",
+    "reason": "Already contained on MADRE/v54-assets-asset-02-validated-partial-delivery-2026-07-01; runtime reconciled without merge",
+    "motherAdvanceState": "runtime_projection_confirmed",
+    "gateResults": [
+      {
+        "name": "typecheck",
+        "passed": true
+      },
+      {
+        "name": "build",
+        "passed": true
+      },
+      {
+        "name": "test",
+        "passed": true
+      }
+    ],
+    "outcome": {
+      "mergeBase": "61f30b59e0daa69981bc742d996ad24ac4f85562",
+      "changedFiles": [],
+      "compatibilityBranchPushed": false,
+      "deliveryDisposition": "already_contained",
+      "projectedMotherBranch": "MADRE/v54-assets-asset-02-validated-partial-delivery-2026-07-01",
+      "motherAdvanceState": "runtime_projection_confirmed",
+      "motherFunctionalExpectedCommit": "5b1425c6b51d1f6303ecb48b66333deda90e7d46",
+      "motherFunctionalRemoteCommit": "5b1425c6b51d1f6303ecb48b66333deda90e7d46",
+      "motherFunctionalPushVerified": true,
+      "motherFunctionalPushReconciled": false,
+      "projectedTaskStatus": "integrated",
+      "projectedRunStatus": "integrated",
+      "projectedSprintEntryStatus": "integrated"
+    }
   }
 }
