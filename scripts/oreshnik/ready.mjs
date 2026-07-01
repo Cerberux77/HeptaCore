@@ -21,6 +21,7 @@ import {
 
 const require = createRequire(import.meta.url);
 const ROOT = normalizeRoot(join(dirname(fileURLToPath(import.meta.url)), "..", ".."));
+const EXPECTED_ORESHNIK_VERSION = "0.2.0-alpha.11";
 const issues = [];
 
 function run(command, args) {
@@ -85,8 +86,8 @@ try {
   }
 
   const installedPackage = readJson(installedPackagePath);
-  if (installedPackage.version !== "0.2.0-alpha.9") {
-    issues.push(`oreshnik package version must be 0.2.0-alpha.9, got ${installedPackage.version}`);
+  if (installedPackage.version !== EXPECTED_ORESHNIK_VERSION) {
+    issues.push(`oreshnik package version must be ${EXPECTED_ORESHNIK_VERSION}, got ${installedPackage.version}`);
   }
   const installedCliPath = join(dirname(installedPackagePath), "dist", "cli.js");
   const binVersion = run("node", [installedCliPath, "--version"]);

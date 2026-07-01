@@ -33,9 +33,9 @@ describe("oreshnik readiness helpers", () => {
   });
 
   it("accepts an exact vendored tarball pin", () => {
-    const result = parsePinnedGitDependency("file:vendor/oreshnik/oreshnik-cli-0.2.0-alpha.9-1541addabe34463aaeca4a4fb6786bbc408cacbc.tgz");
+    const result = parsePinnedGitDependency("file:vendor/oreshnik/oreshnik-cli-0.2.0-alpha.11-924a85093d604f4491f4f2e257f150c4577f89ff.tgz");
     assert.equal(result.ok, true);
-    assert.equal(result.commit, "1541addabe34463aaeca4a4fb6786bbc408cacbc");
+    assert.equal(result.commit, "924a85093d604f4491f4f2e257f150c4577f89ff");
   });
 
   it("rejects floating or aliased dependency specs", () => {
@@ -90,10 +90,10 @@ describe("oreshnik readiness helpers", () => {
   it("validates package contract scripts and dependency pin", () => {
     const { issues, pinnedCommit } = validatePackageContract({
       scripts: { "oreshnik:ready": "node scripts/oreshnik/ready.mjs", "test:infra": "node --test" },
-      dependencies: { "oreshnik-cli": "file:vendor/oreshnik/oreshnik-cli-0.2.0-alpha.9-1541addabe34463aaeca4a4fb6786bbc408cacbc.tgz" }
+      dependencies: { "oreshnik-cli": "file:vendor/oreshnik/oreshnik-cli-0.2.0-alpha.11-924a85093d604f4491f4f2e257f150c4577f89ff.tgz" }
     });
     assert.deepStrictEqual(issues, []);
-    assert.equal(pinnedCommit, "1541addabe34463aaeca4a4fb6786bbc408cacbc");
+    assert.equal(pinnedCommit, "924a85093d604f4491f4f2e257f150c4577f89ff");
   });
 
   it("requires goal runner runtime artifacts to be gitignored", () => {
