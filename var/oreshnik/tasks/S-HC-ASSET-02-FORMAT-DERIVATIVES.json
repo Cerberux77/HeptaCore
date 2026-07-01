@@ -85,6 +85,13 @@
       "action": "claim_released",
       "operator": "manuel",
       "description": "Run run-manuel-S-HC-ASSET-02-FORMAT-DERIVATIVES-20260701070057-4b417034 released"
+    },
+    {
+      "at": "2026-07-01T20:31:05.696Z",
+      "action": "qa_passed",
+      "operator": "manuel",
+      "branch": "dispatch/manuel/manuel-codex2/assets/S-HC-ASSET-02-FORMAT-DERIVATIVES/396dfc38dd",
+      "description": "QA-EVIDENCE-ASSET-02 UI change description: el badge de compatibilidad abre el inspector del formato seleccionado y presenta la planificación de sus derivadas. Screenshot or test result: la prueba automatizada asset-format-derivatives verificó crop inteligente, safe zones, fuente original inmutable, versionado del crop manual, generación determinista por lote y aplazamiento seguro de derivados de video. Operator confirmation: Manuel escribió CONFIRMO ASSET-02 y acepta esta evidencia automatizada y documental para integrar la entrega parcial; no se declara QA manual de navegador."
     }
   ],
   "validationGateResults": [
@@ -253,7 +260,7 @@
       "summary": "S-HC-ASSET-02-FORMAT-DERIVATIVES:worker | exit=0 | timed_ok | signal=none | stdout=> heptacore@0.1.0 worker:validate | stderr=[config] .env.rrss no encontrado. Usando solo variables de entorno del sistema."
     }
   ],
-  "updatedAt": "2026-07-01T10:57:05.058Z",
+  "updatedAt": "2026-07-01T20:31:05.696Z",
   "runs": [
     {
       "runId": "run-manuel-S-HC-ASSET-02-FORMAT-DERIVATIVES-20260701070057-4b417034",
