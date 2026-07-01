@@ -6,7 +6,7 @@ task_id: "S-HC-PUB-04-HOURLY-BATCH-CRON"
 sprint: "S-HC-PUB-04-HOURLY-BATCH-CRON"
 status: "integrated"
 owner: "Manuel"
-last_updated: "2026-06-29T20:10:14.115Z"
+last_updated: "2026-07-01T01:00:48.254Z"
 source: "var/oreshnik/tasks/S-HC-PUB-04-HOURLY-BATCH-CRON.json"
 ---
 

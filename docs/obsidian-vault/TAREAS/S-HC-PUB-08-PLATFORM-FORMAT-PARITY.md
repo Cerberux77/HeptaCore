@@ -6,7 +6,7 @@ task_id: "S-HC-PUB-08-PLATFORM-FORMAT-PARITY"
 sprint: "publishing"
 status: "blocked"
 owner: "Manuel"
-last_updated: "2026-06-29T20:10:14.115Z"
+last_updated: "2026-07-01T01:00:48.254Z"
 source: "var/oreshnik/tasks/S-HC-PUB-08-PLATFORM-FORMAT-PARITY.json"
 ---
 

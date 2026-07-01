@@ -6,7 +6,7 @@ task_id: "S-HC-OBS-01-PUBLISHING-OBSERVABILITY"
 sprint: "S-HC-OBS-01-PUBLISHING-OBSERVABILITY"
 status: "ready_for_integration"
 owner: "Manuel"
-last_updated: "2026-06-29T20:10:14.115Z"
+last_updated: "2026-07-01T01:00:48.254Z"
 source: "var/oreshnik/tasks/S-HC-OBS-01-PUBLISHING-OBSERVABILITY.json"
 ---
 

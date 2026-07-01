@@ -2,7 +2,7 @@
 type: collaborator-status
 project: "HeptaCore"
 operator: "Manuel"
-last_updated: "2026-06-30T22:03:39.975Z"
+last_updated: "2026-07-01T01:22:04.826Z"
 generated_by: "Oreshnik canonical-check"
 source: "var/oreshnik/task-board.json"
 ---
@@ -163,6 +163,23 @@ Estado: `blocked`
 - Invoice generation and history
 
 Zonas: `apps/web/app/api/billing`, `packages/db`, `apps/web/components`
+
+### S-HC-INFRA-BASELINE-GATES-RECOVERY - Baseline gates recovery: Oreshnik alpha.9, identity v2, Prisma, typecheck, build and canonical suite
+
+Estado: `ready_for_integration`
+
+- npm ci PASS
+- Prisma generate PASS
+- Prisma validate PASS
+- npm run oreshnik:ready PASS
+- npm run typecheck PASS
+- npm run build PASS
+- npm run worker:validate PASS
+- canonical suite PASS
+- resume of the same Run is verified
+- claims, locks, reservations and dispatcher worktrees are clean after close
+
+Zonas: `package.json`, `package-lock.json`, `prisma.config.ts`, `packages/db/**`, `apps/worker/**`, `scripts/oreshnik/**`, `scripts/goal-runner/**`, `var/oreshnik/**`
 
 ### S-HC-INBOX-01-UNIFIED-ENGAGEMENT - Unified engagement inbox: read and respond to messages and comments
 

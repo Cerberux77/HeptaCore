@@ -2,13 +2,13 @@
   "project": "HeptaCore",
   "taskId": "S-HC-REC-00C",
   "sprint": "recovery",
-  "sprintOrderIndex": 20,
-  "taskOrderIndex": 31,
+  "sprintOrderIndex": 21,
+  "taskOrderIndex": 32,
   "title": "Canonical integration — recovered production baseline integrated into master",
   "owner": "Manuel",
   "backupOwner": "Manuel",
   "status": "done",
-  "taskBoardPath": "D:\\PROYECTOS\\PROYECTOS VISUAL STUDIO\\_WORKTREES\\heptacore\\p-hc-or-operability-01-20260630-150409\\var\\oreshnik\\task-board.json",
+  "taskBoardPath": "D:\\PROYECTOS\\WORKTREES\\HeptaCore_ORESHNIK_READY\\var\\oreshnik\\wt\\32305cad03d6321a\\manuel\\manuel-codex1\\assets\\S-HC-ASSET-02-FORMAT-DERIVATIVES\\8cd14a8134\\var\\oreshnik\\task-board.json",
   "zone": [
     "docs/obsidian-vault",
     "docs/07_handoffs",
@@ -32,6 +32,6 @@
       "description": "canonical integration after recovery"
     }
   ],
-  "updatedAt": "2026-06-29T20:10:14.115Z",
+  "updatedAt": "2026-07-01T01:00:48.254Z",
   "runs": []
 }
