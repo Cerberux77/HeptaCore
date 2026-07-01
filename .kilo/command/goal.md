@@ -1,3 +1,4 @@
+
 <!-- ORESHNIK:KILO_GOAL BEGIN version=oreshnik-kilo-goal/v1 -->
 # Oreshnik Goal
 
