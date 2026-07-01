@@ -448,5 +448,13 @@
         }
       ]
     }
-  ]
+  ],
+  "integration": {
+    "runId": "run-manuel-S-HC-ASSET-02-FORMAT-DERIVATIVES-20260701070057-4b417034",
+    "sourceBranch": "dispatch/manuel/manuel-codex2/assets/S-HC-ASSET-02-FORMAT-DERIVATIVES/396dfc38dd",
+    "status": "queued",
+    "motherBranch": "MADRE/v54-assets-asset-02-validated-partial-delivery-2026-07-01",
+    "queuedAt": "2026-07-01T20:36:14.468Z",
+    "updatedAt": "2026-07-01T20:36:14.468Z"
+  }
 }

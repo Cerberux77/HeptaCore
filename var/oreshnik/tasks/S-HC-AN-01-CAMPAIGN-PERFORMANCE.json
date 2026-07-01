@@ -8,7 +8,7 @@
   "owner": "Manuel",
   "backupOwner": "Manuel",
   "status": "blocked",
-  "taskBoardPath": "D:\\PROYECTOS\\WORKTREES\\HeptaCore_ORESHNIK_READY\\var\\oreshnik\\wt\\32305cad03d6321a\\manuel\\manuel-codex1\\assets\\S-HC-ASSET-02-FORMAT-DERIVATIVES\\8cd14a8134\\var\\oreshnik\\task-board.json",
+  "taskBoardPath": "D:\\PROYECTOS\\WORKTREES\\HC_ASSET02_STATE_REPAIR\\var\\oreshnik\\task-board.json",
   "zone": [
     "apps/web/components",
     "apps/web/app/api",
@@ -33,6 +33,6 @@
       "description": "Task status reconciled to blocked: dependency S-HC-OPS-01-CAMPAIGN-REVIEW-DEPLOYMENT still pending (S-HC-OPS-01-CAMPAIGN-REVIEW-DEPLOYMENT:pending) | dependency S-HC-OBS-01-PUBLISHING-OBSERVABILITY still pending (S-HC-OBS-01-PUBLISHING-OBSERVABILITY:pending)"
     }
   ],
-  "updatedAt": "2026-07-01T01:00:48.254Z",
+  "updatedAt": "2026-07-01T20:31:05.696Z",
   "runs": []
 }

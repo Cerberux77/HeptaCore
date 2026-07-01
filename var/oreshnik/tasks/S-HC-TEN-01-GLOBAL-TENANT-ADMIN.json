@@ -8,7 +8,7 @@
   "owner": "Manuel",
   "backupOwner": "Manuel",
   "status": "done",
-  "taskBoardPath": "D:\\PROYECTOS\\WORKTREES\\HeptaCore_ORESHNIK_READY\\var\\oreshnik\\wt\\32305cad03d6321a\\manuel\\manuel-codex1\\assets\\S-HC-ASSET-02-FORMAT-DERIVATIVES\\8cd14a8134\\var\\oreshnik\\task-board.json",
+  "taskBoardPath": "D:\\PROYECTOS\\WORKTREES\\HC_ASSET02_STATE_REPAIR\\var\\oreshnik\\task-board.json",
   "zone": [
     "packages/db/**",
     "apps/web/lib/tenant-admin-service.ts",
@@ -39,6 +39,6 @@
       "description": "Three canonical roles (OWNER/ADMIN/VIEWER), legacy role normalization, identity panel in /admin and /tenant/*, 5/5 E2E pass, 569 unit tests, production intact"
     }
   ],
-  "updatedAt": "2026-07-01T01:00:48.254Z",
+  "updatedAt": "2026-07-01T20:31:05.696Z",
   "runs": []
 }

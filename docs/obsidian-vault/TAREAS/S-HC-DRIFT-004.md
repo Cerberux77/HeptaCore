@@ -2,19 +2,19 @@
 ---
 type: task-runtime
 project: "HeptaCore"
-task_id: "S-HC-DRIFT-002"
+task_id: "S-HC-DRIFT-004"
 sprint: "ad-hoc"
 status: "done"
 owner: "Manuel"
 last_updated: "2026-07-01T20:31:05.696Z"
-source: "var/oreshnik/tasks/S-HC-DRIFT-002.json"
+source: "var/oreshnik/tasks/S-HC-DRIFT-004.json"
 ---
 
-# Task S-HC-DRIFT-002
+# Task S-HC-DRIFT-004
 
 ## Scope
 
-Codex multi-RRSS refactor, readiness gates, UI fixes, migrations, vercelignore
+Corregido bug preexistente de colision de goal IDs descubierto por gate global durante ASSET-02
 
 ## Runtime
 
@@ -22,19 +22,17 @@ Codex multi-RRSS refactor, readiness gates, UI fixes, migrations, vercelignore
 - owner: `Manuel`
 - backup: `Manuel`
 - intentos: `0`
-- handoff: -
+- handoff: Drift registered via preflight on 2026-07-01. Mode: silent.
 
 ## Dependencias
 
-- S-HC-PROD-01
+- S-HC-ASSET-02
 
 ## Zonas
 
 ### Compat
 
 - `apps/web`
-- `packages/agents`
-- `packages/integrations`
 
 ### Read
 
@@ -46,7 +44,7 @@ Codex multi-RRSS refactor, readiness gates, UI fixes, migrations, vercelignore
 
 ## Aceptacion
 
-- No registrada
+- Ad-hoc: Corregido bug preexistente de colision de goal IDs descubierto por gate global durante ASSET-02
 
 ## Runs
 

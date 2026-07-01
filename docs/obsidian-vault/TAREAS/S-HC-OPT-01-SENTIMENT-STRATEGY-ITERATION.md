@@ -6,7 +6,7 @@ task_id: "S-HC-OPT-01-SENTIMENT-STRATEGY-ITERATION"
 sprint: "optimization"
 status: "blocked"
 owner: "Manuel"
-last_updated: "2026-07-01T01:00:48.254Z"
+last_updated: "2026-07-01T20:31:05.696Z"
 source: "var/oreshnik/tasks/S-HC-OPT-01-SENTIMENT-STRATEGY-ITERATION.json"
 ---
 

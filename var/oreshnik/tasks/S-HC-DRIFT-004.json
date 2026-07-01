@@ -1,0 +1,32 @@
+{
+  "project": "HeptaCore",
+  "taskId": "S-HC-DRIFT-004",
+  "sprint": "ad-hoc",
+  "sprintOrderIndex": 4,
+  "taskOrderIndex": 39,
+  "title": "Corregido bug preexistente de colision de goal IDs descubierto por gate global durante ASSET-02",
+  "owner": "Manuel",
+  "backupOwner": "Manuel",
+  "status": "done",
+  "taskBoardPath": "D:\\PROYECTOS\\WORKTREES\\HC_ASSET02_STATE_REPAIR\\var\\oreshnik\\task-board.json",
+  "zone": [
+    "apps/web"
+  ],
+  "dependsOn": [
+    "S-HC-ASSET-02"
+  ],
+  "acceptance": [
+    "Ad-hoc: Corregido bug preexistente de colision de goal IDs descubierto por gate global durante ASSET-02"
+  ],
+  "handoff": "Drift registered via preflight on 2026-07-01. Mode: silent.",
+  "history": [
+    {
+      "at": "2026-07-01T08:17:29.585Z",
+      "action": "drift-recorded",
+      "operator": "Manuel",
+      "description": "Corregido bug preexistente de colision de goal IDs descubierto por gate global durante ASSET-02"
+    }
+  ],
+  "updatedAt": "2026-07-01T20:31:05.696Z",
+  "runs": []
+}

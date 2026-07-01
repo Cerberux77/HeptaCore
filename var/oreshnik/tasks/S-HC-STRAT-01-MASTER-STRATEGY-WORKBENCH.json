@@ -8,7 +8,7 @@
   "owner": "Manuel",
   "backupOwner": "Manuel",
   "status": "blocked",
-  "taskBoardPath": "D:\\PROYECTOS\\WORKTREES\\HeptaCore_ORESHNIK_READY\\var\\oreshnik\\wt\\32305cad03d6321a\\manuel\\manuel-codex1\\assets\\S-HC-ASSET-02-FORMAT-DERIVATIVES\\8cd14a8134\\var\\oreshnik\\task-board.json",
+  "taskBoardPath": "D:\\PROYECTOS\\WORKTREES\\HC_ASSET02_STATE_REPAIR\\var\\oreshnik\\task-board.json",
   "zone": [
     "packages/agents",
     "apps/web/components",
@@ -36,6 +36,6 @@
       "description": "Task status reconciled to blocked: dependency S-HC-ONB-02-GAP-RESOLUTION-WIZARD still pending (S-HC-ONB-02-GAP-RESOLUTION-WIZARD:pending) | dependency S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE still pending (S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE:pending)"
     }
   ],
-  "updatedAt": "2026-07-01T01:00:48.254Z",
+  "updatedAt": "2026-07-01T20:31:05.696Z",
   "runs": []
 }

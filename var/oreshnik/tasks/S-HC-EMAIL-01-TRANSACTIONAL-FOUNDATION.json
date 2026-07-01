@@ -8,7 +8,7 @@
   "owner": "Jean",
   "backupOwner": "Manuel",
   "status": "pending",
-  "taskBoardPath": "D:\\PROYECTOS\\WORKTREES\\HeptaCore_ORESHNIK_READY\\var\\oreshnik\\wt\\32305cad03d6321a\\manuel\\manuel-codex1\\assets\\S-HC-ASSET-02-FORMAT-DERIVATIVES\\8cd14a8134\\var\\oreshnik\\task-board.json",
+  "taskBoardPath": "D:\\PROYECTOS\\WORKTREES\\HC_ASSET02_STATE_REPAIR\\var\\oreshnik\\task-board.json",
   "zone": [
     "apps/web/app/api/email",
     "packages/core",
@@ -22,6 +22,6 @@
     "Webhooks de eventos (delivered, bounced, complained) configurados",
     "Enlaces comerciales y de marca consistentes con el dominio final"
   ],
-  "updatedAt": "2026-07-01T01:00:48.254Z",
+  "updatedAt": "2026-07-01T20:31:05.696Z",
   "runs": []
 }
