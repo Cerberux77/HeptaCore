@@ -1,0 +1,22 @@
+{
+  "project": "HeptaCore",
+  "sprint": "assets",
+  "motherBranch": "MADRE/v54-assets-asset-02-validated-partial-delivery-2026-07-01",
+  "createdAt": "2026-07-01T20:36:14.468Z",
+  "updatedAt": "2026-07-01T21:10:33.990Z",
+  "queue": [
+    {
+      "taskId": "S-HC-ASSET-02-FORMAT-DERIVATIVES",
+      "runId": "run-manuel-S-HC-ASSET-02-FORMAT-DERIVATIVES-20260701070057-4b417034",
+      "sourceBranch": "dispatch/manuel/manuel-codex2/assets/S-HC-ASSET-02-FORMAT-DERIVATIVES/396dfc38dd",
+      "owner": "Manuel",
+      "operator": "manuel",
+      "handoff": "docs/07_handoffs/S-HC-ASSET-02-FORMAT-DERIVATIVES.md",
+      "queuedAt": "2026-07-01T20:36:14.468Z",
+      "updatedAt": "2026-07-01T21:10:33.990Z",
+      "status": "integrated",
+      "integratedAt": "2026-07-01T21:10:33.990Z",
+      "targetBranch": "MADRE/v54-assets-asset-02-validated-partial-delivery-2026-07-01"
+    }
+  ]
+}

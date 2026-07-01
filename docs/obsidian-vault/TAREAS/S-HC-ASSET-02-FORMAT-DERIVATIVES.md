@@ -4,9 +4,9 @@ type: task-runtime
 project: "HeptaCore"
 task_id: "S-HC-ASSET-02-FORMAT-DERIVATIVES"
 sprint: "assets"
-status: "ready"
+status: "ready_for_integration"
 owner: "Manuel"
-last_updated: "2026-07-01T01:00:48.254Z"
+last_updated: "2026-07-01T20:31:05.696Z"
 source: "var/oreshnik/tasks/S-HC-ASSET-02-FORMAT-DERIVATIVES.json"
 ---
 
@@ -18,11 +18,11 @@ Format derivatives: badge interaction, format preview, intelligent crop, safe zo
 
 ## Runtime
 
-- estado: `ready`
+- estado: `ready_for_integration`
 - owner: `Manuel`
 - backup: `Manuel`
-- intentos: `0`
-- handoff: -
+- intentos: `1`
+- handoff: docs/07_handoffs/S-HC-ASSET-02-FORMAT-DERIVATIVES.md
 
 ## Dependencias
 
@@ -62,11 +62,14 @@ Format derivatives: badge interaction, format preview, intelligent crop, safe zo
 
 | Run | Operator | Mode | Task Status | Claim | Branch |
 |---|---|---|---|---|---|
-| Ninguno | - | - | - | - | - |
+| run-manuel-S-HC-ASSET-02-FORMAT-DERIVATIVES-20260701070057-4b417034 | manuel | codex | ready_for_integration | released | dispatch/manuel/manuel-codex2/assets/S-HC-ASSET-02-FORMAT-DERIVATIVES/396dfc38dd |
 
 ## Integracion
 
-- Ninguna
+- run: `run-manuel-S-HC-ASSET-02-FORMAT-DERIVATIVES-20260701070057-4b417034`
+- estado: `queued`
+- madre: `MADRE/v54-assets-asset-02-validated-partial-delivery-2026-07-01`
+- source: `dispatch/manuel/manuel-codex2/assets/S-HC-ASSET-02-FORMAT-DERIVATIVES/396dfc38dd`
 
 ## Train Mas Reciente
 

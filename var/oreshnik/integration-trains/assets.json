@@ -1,0 +1,53 @@
+{
+  "project": "HeptaCore",
+  "sprint": "assets",
+  "motherBranch": "MADRE/v54-assets-asset-02-validated-partial-delivery-2026-07-01",
+  "lockKey": "integration-train/MADRE/v54-assets-asset-02-validated-partial-delivery-2026-07-01",
+  "createdAt": "2026-07-01T21:07:37.654Z",
+  "updatedAt": "2026-07-01T21:10:34.025Z",
+  "results": [
+    {
+      "attemptId": "train-run-manuel-S-HC-ASSET-02-FORMAT-DERIVATIVES-2026-1782940057654",
+      "taskId": "S-HC-ASSET-02-FORMAT-DERIVATIVES",
+      "runId": "run-manuel-S-HC-ASSET-02-FORMAT-DERIVATIVES-20260701070057-4b417034",
+      "sourceBranch": "dispatch/manuel/manuel-codex2/assets/S-HC-ASSET-02-FORMAT-DERIVATIVES/396dfc38dd",
+      "targetBranch": "MADRE/v54-assets-asset-02-validated-partial-delivery-2026-07-01",
+      "integrationBranch": "integration-train/assets/S-HC-ASSET-02-FORMAT-DER/r-5cdcee7b964f/a-98f25f84692b",
+      "operator": "manuel",
+      "lockKey": "integration-train/MADRE/v54-assets-asset-02-validated-partial-delivery-2026-07-01",
+      "startedAt": "2026-07-01T21:07:37.654Z",
+      "status": "succeeded",
+      "completedAt": "2026-07-01T21:10:34.025Z",
+      "reason": "Already contained on MADRE/v54-assets-asset-02-validated-partial-delivery-2026-07-01; runtime reconciled without merge",
+      "gateResults": [
+        {
+          "name": "typecheck",
+          "passed": true
+        },
+        {
+          "name": "build",
+          "passed": true
+        },
+        {
+          "name": "test",
+          "passed": true
+        }
+      ],
+      "outcome": {
+        "mergeBase": "61f30b59e0daa69981bc742d996ad24ac4f85562",
+        "changedFiles": [],
+        "compatibilityBranchPushed": false,
+        "deliveryDisposition": "already_contained",
+        "projectedMotherBranch": "MADRE/v54-assets-asset-02-validated-partial-delivery-2026-07-01",
+        "motherAdvanceState": "runtime_projection_confirmed",
+        "motherFunctionalExpectedCommit": "5b1425c6b51d1f6303ecb48b66333deda90e7d46",
+        "motherFunctionalRemoteCommit": "5b1425c6b51d1f6303ecb48b66333deda90e7d46",
+        "motherFunctionalPushVerified": true,
+        "motherFunctionalPushReconciled": false,
+        "projectedTaskStatus": "integrated",
+        "projectedRunStatus": "integrated",
+        "projectedSprintEntryStatus": "integrated"
+      }
+    }
+  ]
+}

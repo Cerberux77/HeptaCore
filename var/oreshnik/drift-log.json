@@ -120,7 +120,29 @@
         "?? docs/07_handoffs/handoff-Jean-2026-06-14.md"
       ],
       "fileCount": 10
+    },
+    {
+      "id": "S-HC-DRIFT-004",
+      "title": "Corregido bug preexistente de colision de goal IDs descubierto por gate global durante ASSET-02",
+      "operator": "Manuel",
+      "status": "recorded",
+      "mode": "silent",
+      "parentSprint": "S-HC-ASSET-02",
+      "parentBranch": "dispatch/manuel/manuel-codex2/assets/S-HC-ASSET-02-FORMAT-DERIVATIVES/396dfc38dd",
+      "date": "2026-07-01",
+      "at": "2026-07-01T08:17:29.585Z",
+      "description": "Corregido bug preexistente de colision de goal IDs descubierto por gate global durante ASSET-02",
+      "zones": [
+        "apps/web"
+      ],
+      "changedFiles": [
+        "M apps/web/components/dashboard-console.tsx",
+        "M apps/web/lib/__tests__/asset-service.test.ts",
+        "M apps/web/lib/asset-service.ts",
+        "?? apps/web/app/api/tenants/[slug]/assets/[assetId]/derivatives/"
+      ],
+      "fileCount": 4
     }
   ],
-  "lastId": 3
+  "lastId": 4
 }

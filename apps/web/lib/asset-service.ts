@@ -1,6 +1,7 @@
 import { Prisma, type AssetKind } from "@prisma/client";
 import { auditLog } from "./audit";
 import { normalizeLogicalFolder, sanitizeFilename, validateAssetFile } from "./asset-config";
+import { type AssetFormatDerivativePlan } from "./asset-format-derivatives";
 import { normalizeTechnicalAssetMetadata } from "./asset-metadata";
 import { getAssetStorage, type AssetStorageAdapter } from "./asset-storage";
 import { prisma } from "./prisma";
@@ -11,15 +12,15 @@ type JsonObject = Record<string, unknown>;
 
 type AssetMetadata = JsonObject & {
   provider?: string;
-  sizeBytes?: number;
+  sizeBytes?: number | null;
   width?: number | null;
   height?: number | null;
   durationSeconds?: number | null;
   orientation?: string | null;
   aspectRatio?: unknown;
-  folder?: string;
-  originalFilename?: string;
-  uploadedBy?: string;
+  folder?: string | null;
+  originalFilename?: string | null;
+  uploadedBy?: string | null;
   etag?: string | null;
 };
 
@@ -33,6 +34,16 @@ export class AssetServiceError extends Error {
 
 function asObject(value: unknown): JsonObject {
   return value && typeof value === "object" && !Array.isArray(value) ? { ...(value as JsonObject) } : {};
+}
+
+function asArray(value: unknown): unknown[] {
+  return Array.isArray(value) ? value : [];
+}
+
+function numberFrom(value: unknown): number | null {
+  if (typeof value === "number" && Number.isFinite(value)) return value;
+  if (typeof value === "string" && value.trim() && Number.isFinite(Number(value))) return Number(value);
+  return null;
 }
 
 function buildStorageKey(tenantId: string, filename: string): string {
@@ -72,6 +83,89 @@ function buildAssetMetadata(params: {
 
 function normalizeBlobPathname(pathname: string): string {
   return pathname.replace(/\\/g, "/");
+}
+
+function withDraftCount<T extends { _count?: { drafts?: number } | null }>(asset: T) {
+  return {
+    ...asset,
+    _count: { drafts: asset._count?.drafts ?? 0 },
+  };
+}
+
+function derivativeFilename(sourceFilename: string, target: string, version: number): string {
+  const extIndex = sourceFilename.lastIndexOf(".");
+  const stem = extIndex > 0 ? sourceFilename.slice(0, extIndex) : sourceFilename;
+  const ext = extIndex > 0 ? sourceFilename.slice(extIndex) : "";
+  const targetSlug = target.toLowerCase().replace(/_/g, "-");
+  return sanitizeFilename(`${stem}--${targetSlug}-v${version}${ext}`);
+}
+
+function derivativeMetadataSignature(metadata: unknown): {
+  sourceAssetId: string;
+  target: string;
+  version: number;
+} | null {
+  const record = asObject(asObject(metadata).derivative);
+  const sourceAssetId = typeof record.sourceAssetId === "string"
+    ? record.sourceAssetId
+    : typeof record.derivativeOf === "string"
+      ? record.derivativeOf
+      : null;
+  const target = typeof record.target === "string" ? record.target : null;
+  const version = numberFrom(record.version);
+  if (!sourceAssetId || !target || !version) return null;
+  return { sourceAssetId, target, version };
+}
+
+function derivativeMetadataFor(params: {
+  sourceAsset: Awaited<ReturnType<typeof getTenantAssetOrThrow>>;
+  plan: AssetFormatDerivativePlan;
+  filename: string;
+  userId: string;
+}): AssetMetadata {
+  const sourceMetadata = asObject(params.sourceAsset.metadata);
+  const folder = typeof sourceMetadata.folder === "string" ? sourceMetadata.folder : "";
+  const sizeBytes = numberFrom(sourceMetadata.sizeBytes) ?? undefined;
+  const technical = normalizeTechnicalAssetMetadata({
+    ...sourceMetadata,
+    width: params.plan.targetFrame.width,
+    height: params.plan.targetFrame.height,
+    mimeType: params.sourceAsset.mimeType,
+    sizeBytes,
+    originalFilename: params.filename,
+    folder,
+  }, {
+    sizeBytes,
+    mimeType: params.sourceAsset.mimeType ?? undefined,
+    originalFilename: params.filename,
+    folder,
+  });
+
+  return {
+    ...sourceMetadata,
+    ...technical,
+    derivative: {
+      id: params.plan.derivativeId,
+      derivativeOf: params.plan.sourceAssetId,
+      sourceAssetId: params.plan.sourceAssetId,
+      target: params.plan.target,
+      version: params.plan.version,
+      fitMode: params.plan.fitMode,
+      crop: params.plan.crop,
+      targetFrame: params.plan.targetFrame,
+      safeZones: params.plan.safeZones,
+      immutableSource: true,
+      status: params.plan.status,
+      source: params.plan.source,
+      compatibilityStatus: params.plan.compatibilityStatus,
+      operations: params.plan.operations,
+      warnings: params.plan.warnings,
+      createdBy: params.userId,
+    },
+    derivativeVirtual: true,
+    derivativeSourceFilename: params.sourceAsset.filename,
+    derivativeSourcePath: params.sourceAsset.sourcePath ?? null,
+  };
 }
 
 async function findTenantAssetByStorageKey(
@@ -383,6 +477,108 @@ export async function updateTenantAssetMetadata(params: {
     metadata: { before, after: { filename: updated.filename, folder: asObject(updated.metadata).folder ?? "" } },
   });
   return updated;
+}
+
+export async function createTenantAssetDerivatives(params: {
+  tenantSlug: string;
+  userId: string;
+  assetId: string;
+  plans: AssetFormatDerivativePlan[];
+  audit?: AuditFn;
+  db?: typeof prisma;
+}) {
+  const db = params.db ?? prisma;
+  const { tenant } = await requireTenantAccess(db, { ...params, mutation: true });
+  const sourceAsset = await getTenantAssetOrThrow(db, { tenantId: tenant.id, assetId: params.assetId });
+
+  if (sourceAsset.kind !== "IMAGE") {
+    throw new AssetServiceError("ASSET_DERIVATIVE_UNSUPPORTED", "Format derivatives are only supported for image assets.", 400);
+  }
+
+  const uniquePlans = Array.from(
+    new Map(
+      asArray(params.plans)
+        .map((plan) => plan as AssetFormatDerivativePlan)
+        .map((plan) => [`${plan.target}:${plan.version}`, plan] as const),
+    ).values(),
+  );
+
+  if (uniquePlans.length === 0) {
+    throw new AssetServiceError("ASSET_DERIVATIVE_REQUIRED", "At least one derivative plan is required.", 400);
+  }
+
+  for (const plan of uniquePlans) {
+    if (plan.sourceAssetId !== sourceAsset.id) {
+      throw new AssetServiceError("ASSET_DERIVATIVE_SOURCE_MISMATCH", "Derivative plan does not match the selected source asset.", 409);
+    }
+    if (plan.status === "BLOCKED" || plan.status === "VIDEO_DEFERRED") {
+      throw new AssetServiceError("ASSET_DERIVATIVE_NOT_READY", `Derivative ${plan.target} is not ready to persist.`, 400);
+    }
+  }
+
+  const tenantAssets = await db.asset.findMany({
+    where: { tenantId: tenant.id },
+    include: { _count: { select: { drafts: true } } },
+  });
+  const existingBySignature = new Map<string, any>();
+  for (const asset of tenantAssets) {
+    const signature = derivativeMetadataSignature(asset.metadata);
+    if (signature) {
+      existingBySignature.set(`${signature.sourceAssetId}:${signature.target}:${signature.version}`, withDraftCount(asset));
+    }
+  }
+
+  const persisted: Array<any> = [];
+  for (const plan of uniquePlans) {
+    const signatureKey = `${plan.sourceAssetId}:${plan.target}:${plan.version}`;
+    const existing = existingBySignature.get(signatureKey);
+    if (existing) {
+      persisted.push(existing);
+      continue;
+    }
+
+    const filename = derivativeFilename(sourceAsset.filename, plan.target, plan.version);
+    const created = await db.asset.create({
+      data: {
+        tenantId: tenant.id,
+        projectId: sourceAsset.projectId ?? null,
+        kind: sourceAsset.kind as AssetKind,
+        filename,
+        mimeType: sourceAsset.mimeType,
+        sourcePath: sourceAsset.sourcePath ?? null,
+        storageKey: null,
+        metadata: derivativeMetadataFor({
+          sourceAsset,
+          plan,
+          filename,
+          userId: params.userId,
+        }) as any,
+        rightsStatus: sourceAsset.rightsStatus,
+      },
+      include: { _count: { select: { drafts: true } } },
+    });
+    const createdWithCount = withDraftCount(created);
+    existingBySignature.set(signatureKey, createdWithCount);
+    persisted.push(createdWithCount);
+  }
+
+  await (params.audit ?? auditLog)({
+    tenantId: tenant.id,
+    actorId: params.userId,
+    action: "asset_derivatives_created",
+    target: `asset:${sourceAsset.id}`,
+    metadata: {
+      sourceAssetId: sourceAsset.id,
+      derivativeIds: persisted.map((asset) => asset.id),
+      plans: uniquePlans.map((plan) => ({
+        target: plan.target,
+        version: plan.version,
+        derivativeId: plan.derivativeId,
+      })),
+    },
+  });
+
+  return persisted;
 }
 
 export async function replaceTenantAssetContent(params: {

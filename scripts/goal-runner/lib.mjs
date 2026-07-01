@@ -55,6 +55,12 @@ export const SENSITIVE_PATTERNS = [
 ];
 
 export const ID_PATTERN = /^GR-\d{8}T\d{6}Z-[a-f0-9]{8}-[a-z0-9]([a-z0-9-]{0,46}[a-z0-9])?$/;
+let goalEntropyCounter = randomBytes(4).readUInt32BE(0);
+
+function nextGoalEntropyHex() {
+  goalEntropyCounter = (goalEntropyCounter + 1) >>> 0;
+  return goalEntropyCounter.toString(16).padStart(8, "0");
+}
 
 // ─── ID Generation ───
 
@@ -63,7 +69,7 @@ export function generateGoalId(title) {
   const parts = now.toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
   const date = parts.slice(0, 8);
   const time = parts.slice(9, 15);
-  const rand = randomBytes(4).toString("hex");
+  const rand = nextGoalEntropyHex();
   const slug = sanitizeSlug(title);
   return `GR-${date}T${time}Z-${rand}-${slug}`;
 }
@@ -73,7 +79,7 @@ export function generateGoalIdWithTime(title, iso) {
   const parts = now.toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
   const date = parts.slice(0, 8);
   const time = parts.slice(9, 15);
-  const rand = randomBytes(4).toString("hex");
+  const rand = nextGoalEntropyHex();
   const slug = sanitizeSlug(title);
   return `GR-${date}T${time}Z-${rand}-${slug}`;
 }
