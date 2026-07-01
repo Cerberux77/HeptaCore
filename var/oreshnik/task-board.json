@@ -1,6 +1,6 @@
 {
   "project": "HeptaCore",
-  "updatedAt": "2026-07-01T01:00:48.254Z",
+  "updatedAt": "2026-07-01T08:41:11.169Z",
   "resiliencePolicy": "If an owner is unavailable for more than one working block or blocks the critical path, backupOwner may take over after recording reassignment.",
   "closurePolicy": "No sprint may be closed until acceptance criteria, base tests, sprint-specific tests, docs/handoff, and Oreshnik zone checks pass.",
   "baseTestMatrix": [
@@ -18,8 +18,8 @@
     "ai-infra",
     "analytics",
     "assets",
-    "S-HC-INFRA-BASELINE-GATES-RECOVERY",
     "commercial",
+    "S-HC-INFRA-BASELINE-GATES-RECOVERY",
     "data",
     "email-infra",
     "engagement",
@@ -861,12 +861,117 @@
         "Generacion por lote de variantes para todos los formatos requeridos",
         "Imagenes primero; video fuera de este sprint o como fase separada"
       ],
+      "handoff": "docs/07_handoffs/S-HC-ASSET-02-FORMAT-DERIVATIVES.md",
+      "attempts": 1,
       "history": [
         {
           "at": "2026-06-28T18:47:05.091Z",
           "action": "status_reconciled",
           "operator": "manuel",
           "description": "Task status reconciled to ready: dependencies and conflicts are clear for execution"
+        },
+        {
+          "at": "2026-07-01T07:01:19.731Z",
+          "action": "claimed",
+          "operator": "manuel",
+          "branch": "dispatch/manuel/manuel-codex2/assets/S-HC-ASSET-02-FORMAT-DERIVATIVES/396dfc38dd",
+          "description": "Run run-manuel-S-HC-ASSET-02-FORMAT-DERIVATIVES-20260701070057-4b417034 claimed via codex"
+        },
+        {
+          "at": "2026-07-01T07:07:48.348Z",
+          "action": "status_reconciled",
+          "operator": "Manuel",
+          "branch": "dispatch/manuel/manuel-codex2/assets/S-HC-ASSET-02-FORMAT-DERIVATIVES/396dfc38dd",
+          "description": "Task status reconciled to active: claimed run is now the active operator workload"
+        },
+        {
+          "at": "2026-07-01T08:35:22.278Z",
+          "action": "validation_started",
+          "operator": "manuel",
+          "branch": "dispatch/manuel/manuel-codex2/assets/S-HC-ASSET-02-FORMAT-DERIVATIVES/396dfc38dd",
+          "description": "Validation started for run run-manuel-S-HC-ASSET-02-FORMAT-DERIVATIVES-20260701070057-4b417034"
+        },
+        {
+          "at": "2026-07-01T08:39:46.592Z",
+          "action": "validated",
+          "operator": "manuel",
+          "branch": "dispatch/manuel/manuel-codex2/assets/S-HC-ASSET-02-FORMAT-DERIVATIVES/396dfc38dd",
+          "description": "format derivatives persisted; idempotent batch save; goal-runner ID collision fixed; typecheck/lint/test/build/worker validated; typecheck passed; build passed; worker passed; tests passed"
+        },
+        {
+          "at": "2026-07-01T08:39:46.592Z",
+          "action": "ready_for_integration",
+          "operator": "manuel",
+          "branch": "dispatch/manuel/manuel-codex2/assets/S-HC-ASSET-02-FORMAT-DERIVATIVES/396dfc38dd",
+          "description": "Task delivered with handoff docs/07_handoffs/S-HC-ASSET-02-FORMAT-DERIVATIVES.md"
+        },
+        {
+          "at": "2026-07-01T08:41:11.169Z",
+          "action": "claim_released",
+          "operator": "manuel",
+          "description": "Run run-manuel-S-HC-ASSET-02-FORMAT-DERIVATIVES-20260701070057-4b417034 released"
+        }
+      ]
+    },
+    {
+      "id": "S-HC-COMM-01-SELF-SERVICE-SIGNUP",
+      "title": "Self-service tenant signup with trial gate and onboarding flow",
+      "owner": "Manuel",
+      "backupOwner": "Manuel",
+      "status": "blocked",
+      "track": "commercial",
+      "zone": [
+        "apps/web/app/register",
+        "apps/web/app/api/auth",
+        "packages/db",
+        "apps/web/components"
+      ],
+      "dependsOn": [
+        "S-HC-TEN-01-GLOBAL-TENANT-ADMIN",
+        "S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION"
+      ],
+      "acceptance": [
+        "Self-service registration with email verification",
+        "Trial tenant creation with default config",
+        "Guided onboarding wizard (brand, networks, first draft)",
+        "Trial gate enforcement before publishing"
+      ],
+      "history": [
+        {
+          "at": "2026-06-28T18:47:05.091Z",
+          "action": "status_reconciled",
+          "operator": "manuel",
+          "description": "Task status reconciled to blocked: dependency S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION still pending (S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION:pending)"
+        }
+      ]
+    },
+    {
+      "id": "S-HC-COMM-02-BILLING-ACTIVATION",
+      "title": "Tenant billing activation: plan selection, usage tracking, payment integration",
+      "owner": "Manuel",
+      "backupOwner": "Manuel",
+      "status": "blocked",
+      "track": "commercial",
+      "zone": [
+        "apps/web/app/api/billing",
+        "packages/db",
+        "apps/web/components"
+      ],
+      "dependsOn": [
+        "S-HC-COMM-01-SELF-SERVICE-SIGNUP"
+      ],
+      "acceptance": [
+        "Plan selection (Free, Pro, Agency)",
+        "Usage tracking (posts, assets, tenants)",
+        "Payment gateway integration (Stripe)",
+        "Invoice generation and history"
+      ],
+      "history": [
+        {
+          "at": "2026-06-28T18:47:05.091Z",
+          "action": "status_reconciled",
+          "operator": "manuel",
+          "description": "Task status reconciled to blocked: dependency S-HC-COMM-01-SELF-SERVICE-SIGNUP still pending (S-HC-COMM-01-SELF-SERVICE-SIGNUP:pending)"
         }
       ]
     },
@@ -1127,68 +1232,6 @@
           "commandFingerprint": "56026e7abb3b80f9b313eae496086c340a3700402d490994bb04666e139ec6a5",
           "resultFingerprint": "ea39909da30aa49ba9f71b9c8a7aeaa7c589a64be0ad7c55afb0de894595a94d",
           "summary": "S-HC-INFRA-BASELINE-GATES-RECOVERY:worker | exit=0 | timed_ok | signal=none | stdout=> heptacore@0.1.0 worker:validate | stderr=[config] .env.rrss no encontrado. Usando solo variables de entorno del sistema."
-        }
-      ]
-    },
-    {
-      "id": "S-HC-COMM-01-SELF-SERVICE-SIGNUP",
-      "title": "Self-service tenant signup with trial gate and onboarding flow",
-      "owner": "Manuel",
-      "backupOwner": "Manuel",
-      "status": "blocked",
-      "track": "commercial",
-      "zone": [
-        "apps/web/app/register",
-        "apps/web/app/api/auth",
-        "packages/db",
-        "apps/web/components"
-      ],
-      "dependsOn": [
-        "S-HC-TEN-01-GLOBAL-TENANT-ADMIN",
-        "S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION"
-      ],
-      "acceptance": [
-        "Self-service registration with email verification",
-        "Trial tenant creation with default config",
-        "Guided onboarding wizard (brand, networks, first draft)",
-        "Trial gate enforcement before publishing"
-      ],
-      "history": [
-        {
-          "at": "2026-06-28T18:47:05.091Z",
-          "action": "status_reconciled",
-          "operator": "manuel",
-          "description": "Task status reconciled to blocked: dependency S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION still pending (S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION:pending)"
-        }
-      ]
-    },
-    {
-      "id": "S-HC-COMM-02-BILLING-ACTIVATION",
-      "title": "Tenant billing activation: plan selection, usage tracking, payment integration",
-      "owner": "Manuel",
-      "backupOwner": "Manuel",
-      "status": "blocked",
-      "track": "commercial",
-      "zone": [
-        "apps/web/app/api/billing",
-        "packages/db",
-        "apps/web/components"
-      ],
-      "dependsOn": [
-        "S-HC-COMM-01-SELF-SERVICE-SIGNUP"
-      ],
-      "acceptance": [
-        "Plan selection (Free, Pro, Agency)",
-        "Usage tracking (posts, assets, tenants)",
-        "Payment gateway integration (Stripe)",
-        "Invoice generation and history"
-      ],
-      "history": [
-        {
-          "at": "2026-06-28T18:47:05.091Z",
-          "action": "status_reconciled",
-          "operator": "manuel",
-          "description": "Task status reconciled to blocked: dependency S-HC-COMM-01-SELF-SERVICE-SIGNUP still pending (S-HC-COMM-01-SELF-SERVICE-SIGNUP:pending)"
         }
       ]
     },
@@ -1962,6 +2005,32 @@
           "operator": "Manuel",
           "branch": "Manuel/s-hc-ten-01-global-tenant-admin",
           "description": "Three canonical roles (OWNER/ADMIN/VIEWER), legacy role normalization, identity panel in /admin and /tenant/*, 5/5 E2E pass, 569 unit tests, production intact"
+        }
+      ]
+    },
+    {
+      "id": "S-HC-DRIFT-004",
+      "title": "Corregido bug preexistente de colision de goal IDs descubierto por gate global durante ASSET-02",
+      "owner": "Manuel",
+      "backupOwner": "Manuel",
+      "status": "done",
+      "track": "ad-hoc",
+      "zone": [
+        "apps/web"
+      ],
+      "dependsOn": [
+        "S-HC-ASSET-02"
+      ],
+      "acceptance": [
+        "Ad-hoc: Corregido bug preexistente de colision de goal IDs descubierto por gate global durante ASSET-02"
+      ],
+      "handoff": "Drift registered via preflight on 2026-07-01. Mode: silent.",
+      "history": [
+        {
+          "at": "2026-07-01T08:17:29.585Z",
+          "action": "drift-recorded",
+          "operator": "Manuel",
+          "description": "Corregido bug preexistente de colision de goal IDs descubierto por gate global durante ASSET-02"
         }
       ]
     }
