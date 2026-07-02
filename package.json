@@ -67,7 +67,7 @@
   "dependencies": {
     "@prisma/adapter-pg": "^7.8.0",
     "@react-email/components": "^1.0.12",
-    "oreshnik-cli": "file:vendor/oreshnik/oreshnik-cli-0.2.0-alpha.11-924a85093d604f4491f4f2e257f150c4577f89ff.tgz",
+    "oreshnik-cli": "file:vendor/oreshnik/oreshnik-cli-0.2.0-alpha.12-35de242a26d4c7022725c3c042b9d69ff30ef7e3.tgz",
     "pg": "^8.21.0",
     "resend": "^6.14.0"
   }
