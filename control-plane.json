@@ -5,7 +5,7 @@
     "originUrl": "https://github.com/Cerberux77/HeptaCore.git",
     "canonicalMotherBranch": "master"
   },
-  "generation": 17,
+  "generation": 18,
   "controlHead": "722ade911a61249dc2b030bbf5ee702d93fabd8a",
   "catalog": {
     "taskBoardPath": "var/oreshnik/task-board.json",
@@ -77,7 +77,7 @@
       "repositoryId": "32305cad03d6321a",
       "slot": 3,
       "createdAt": "2026-07-04T05:00:56.124Z",
-      "updatedAt": "2026-07-04T05:00:56.124Z",
+      "updatedAt": "2026-07-04T05:01:34.114Z",
       "identityOrigin": "explicit"
     }
   ],
@@ -125,7 +125,7 @@
       "harnessId": "codex",
       "machineId": "machine-89814280-0079-4c35-82c8-3d533c515221",
       "startedAt": "2026-07-04T05:00:56.124Z",
-      "lastSeenAt": "2026-07-04T05:00:56.124Z",
+      "lastSeenAt": "2026-07-04T05:01:34.114Z",
       "status": "active",
       "identityOrigin": "explicit"
     }
@@ -308,11 +308,11 @@
         "apps/web/app/api/publishing",
         "packages/integrations"
       ],
-      "status": "active",
+      "status": "ready_for_integration",
       "sourceTaskBoardHead": "37c88d4f1877c0444b610a2b1422e9a015d2bd07",
       "catalogFingerprint": "598085002c5244d04ba764c6865934cdc726e23c",
       "createdAt": "2026-07-04T05:00:56.124Z",
-      "updatedAt": "2026-07-04T05:01:34.114Z",
+      "updatedAt": "2026-07-04T05:46:22.447Z",
       "activatedAt": "2026-07-04T05:01:34.114Z",
       "resumedCount": 0,
       "takeoverCount": 0,
@@ -435,9 +435,9 @@
       "runId": "run-manuel-S-HC-PUB-06-REELS-STORIES-PUBLISHERS-20260704050056-dbcefd7d",
       "branch": "dispatch/manuel/manuel-codex3/publishing/S-HC-PUB-06-REELS-STORIES-PUBLISHERS/57a46a194e",
       "worktreePath": "D:\\PROYECTOS\\WORKTREES\\HeptaCore_ORESHNIK_READY\\var\\oreshnik\\wt\\32305cad03d6321a\\manuel\\manuel-codex3\\publishing\\S-HC-PUB-06-REELS-STORIES-PUBLISHERS\\57a46a194e",
-      "status": "active",
+      "status": "released",
       "createdAt": "2026-07-04T05:00:56.124Z",
-      "updatedAt": "2026-07-04T05:01:34.114Z",
+      "updatedAt": "2026-07-04T05:46:22.447Z",
       "ownershipGeneration": 1,
       "harnessId": "codex",
       "agentInstanceUid": "agent_181e9938433f43d49f64de00eb23fd4f",
@@ -558,9 +558,9 @@
       "machineId": "machine-89814280-0079-4c35-82c8-3d533c515221",
       "branch": "dispatch/manuel/manuel-codex3/publishing/S-HC-PUB-06-REELS-STORIES-PUBLISHERS/57a46a194e",
       "worktreePath": "D:\\PROYECTOS\\WORKTREES\\HeptaCore_ORESHNIK_READY\\var\\oreshnik\\wt\\32305cad03d6321a\\manuel\\manuel-codex3\\publishing\\S-HC-PUB-06-REELS-STORIES-PUBLISHERS\\57a46a194e",
-      "status": "active",
+      "status": "released",
       "createdAt": "2026-07-04T05:00:56.124Z",
-      "updatedAt": "2026-07-04T05:01:34.114Z",
+      "updatedAt": "2026-07-04T05:46:22.447Z",
       "sourceTaskBoardHead": "37c88d4f1877c0444b610a2b1422e9a015d2bd07",
       "ownershipGeneration": 1,
       "harnessId": "codex",
@@ -850,9 +850,9 @@
       "machineId": "machine-89814280-0079-4c35-82c8-3d533c515221",
       "runId": "run-manuel-S-HC-PUB-06-REELS-STORIES-PUBLISHERS-20260704050056-dbcefd7d",
       "branch": "dispatch/manuel/manuel-codex3/publishing/S-HC-PUB-06-REELS-STORIES-PUBLISHERS/57a46a194e",
-      "status": "reserved",
+      "status": "released",
       "createdAt": "2026-07-04T05:00:56.124Z",
-      "updatedAt": "2026-07-04T05:01:34.114Z",
+      "updatedAt": "2026-07-04T05:46:22.447Z",
       "harnessId": "codex",
       "agentInstanceUid": "agent_181e9938433f43d49f64de00eb23fd4f",
       "agentInstanceAlias": "manuel-codex3",
@@ -868,9 +868,9 @@
       "machineId": "machine-89814280-0079-4c35-82c8-3d533c515221",
       "runId": "run-manuel-S-HC-PUB-06-REELS-STORIES-PUBLISHERS-20260704050056-dbcefd7d",
       "branch": "dispatch/manuel/manuel-codex3/publishing/S-HC-PUB-06-REELS-STORIES-PUBLISHERS/57a46a194e",
-      "status": "reserved",
+      "status": "released",
       "createdAt": "2026-07-04T05:00:56.124Z",
-      "updatedAt": "2026-07-04T05:01:34.114Z",
+      "updatedAt": "2026-07-04T05:46:22.447Z",
       "harnessId": "codex",
       "agentInstanceUid": "agent_181e9938433f43d49f64de00eb23fd4f",
       "agentInstanceAlias": "manuel-codex3",
@@ -886,9 +886,9 @@
       "machineId": "machine-89814280-0079-4c35-82c8-3d533c515221",
       "runId": "run-manuel-S-HC-PUB-06-REELS-STORIES-PUBLISHERS-20260704050056-dbcefd7d",
       "branch": "dispatch/manuel/manuel-codex3/publishing/S-HC-PUB-06-REELS-STORIES-PUBLISHERS/57a46a194e",
-      "status": "reserved",
+      "status": "released",
       "createdAt": "2026-07-04T05:00:56.124Z",
-      "updatedAt": "2026-07-04T05:01:34.114Z",
+      "updatedAt": "2026-07-04T05:46:22.447Z",
       "harnessId": "codex",
       "agentInstanceUid": "agent_181e9938433f43d49f64de00eb23fd4f",
       "agentInstanceAlias": "manuel-codex3",
@@ -1029,6 +1029,14 @@
       "runId": "run-manuel-S-HC-PUB-06-REELS-STORIES-PUBLISHERS-20260704050056-dbcefd7d",
       "operator": "manuel",
       "message": "Assignment asg-0f1585a0-dade-43e5-9da0-c2193188fdb8 is active."
+    },
+    {
+      "at": "2026-07-04T05:46:22.447Z",
+      "action": "dispatch.released",
+      "assignmentId": "asg-0f1585a0-dade-43e5-9da0-c2193188fdb8",
+      "runId": "run-manuel-S-HC-PUB-06-REELS-STORIES-PUBLISHERS-20260704050056-dbcefd7d",
+      "operator": "manuel",
+      "message": "asg-0f1585a0-dade-43e5-9da0-c2193188fdb8 -> released"
     }
   ],
   "reconciliation": {
@@ -1038,5 +1046,5 @@
     "pendingDiagnostics": []
   },
   "createdAt": "2026-06-29T20:17:43.302Z",
-  "updatedAt": "2026-07-04T05:01:34.114Z"
+  "updatedAt": "2026-07-04T05:46:22.447Z"
 }
