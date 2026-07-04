@@ -422,5 +422,13 @@
         }
       ]
     }
-  ]
+  ],
+  "integration": {
+    "runId": "run-manuel-S-HC-PUB-06-REELS-STORIES-PUBLISHERS-20260704050056-dbcefd7d",
+    "sourceBranch": "dispatch/manuel/manuel-codex3/publishing/S-HC-PUB-06-REELS-STORIES-PUBLISHERS/57a46a194e",
+    "status": "queued",
+    "motherBranch": "MADRE/v55-publishing-meta-reels-stories-publishers-2026-07-04",
+    "queuedAt": "2026-07-04T05:48:34.264Z",
+    "updatedAt": "2026-07-04T05:48:34.264Z"
+  }
 }

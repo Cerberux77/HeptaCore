@@ -1,0 +1,20 @@
+{
+  "project": "HeptaCore",
+  "sprint": "publishing",
+  "motherBranch": "MADRE/v55-publishing-meta-reels-stories-publishers-2026-07-04",
+  "createdAt": "2026-07-04T05:48:34.264Z",
+  "updatedAt": "2026-07-04T05:48:34.264Z",
+  "queue": [
+    {
+      "taskId": "S-HC-PUB-06-REELS-STORIES-PUBLISHERS",
+      "runId": "run-manuel-S-HC-PUB-06-REELS-STORIES-PUBLISHERS-20260704050056-dbcefd7d",
+      "sourceBranch": "dispatch/manuel/manuel-codex3/publishing/S-HC-PUB-06-REELS-STORIES-PUBLISHERS/57a46a194e",
+      "owner": "Manuel",
+      "operator": "manuel",
+      "handoff": "docs/07_handoffs/S-HC-PUB-06-REELS-STORIES-PUBLISHERS.md",
+      "queuedAt": "2026-07-04T05:48:34.264Z",
+      "updatedAt": "2026-07-04T05:48:34.264Z",
+      "status": "queued"
+    }
+  ]
+}

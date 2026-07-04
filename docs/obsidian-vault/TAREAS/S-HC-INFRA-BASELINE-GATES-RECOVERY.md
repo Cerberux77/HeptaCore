@@ -6,7 +6,7 @@ task_id: "S-HC-INFRA-BASELINE-GATES-RECOVERY"
 sprint: "S-HC-INFRA-BASELINE-GATES-RECOVERY"
 status: "ready_for_integration"
 owner: "Manuel"
-last_updated: "2026-07-01T21:10:33.990Z"
+last_updated: "2026-07-04T05:39:30.129Z"
 source: "var/oreshnik/tasks/S-HC-INFRA-BASELINE-GATES-RECOVERY.json"
 ---
 

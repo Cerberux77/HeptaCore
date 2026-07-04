@@ -6,7 +6,7 @@ task_id: "S-HC-COMM-02-BILLING-ACTIVATION"
 sprint: "commercial"
 status: "blocked"
 owner: "Manuel"
-last_updated: "2026-07-01T21:10:33.990Z"
+last_updated: "2026-07-04T05:39:30.129Z"
 source: "var/oreshnik/tasks/S-HC-COMM-02-BILLING-ACTIVATION.json"
 ---
 

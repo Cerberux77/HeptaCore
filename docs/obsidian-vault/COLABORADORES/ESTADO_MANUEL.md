@@ -2,7 +2,7 @@
 type: collaborator-status
 project: "HeptaCore"
 operator: "Manuel"
-last_updated: "2026-07-04T04:59:14.291Z"
+last_updated: "2026-07-04T05:48:34.307Z"
 generated_by: "Oreshnik canonical-check"
 source: "var/oreshnik/task-board.json"
 ---
@@ -15,7 +15,6 @@ source: "var/oreshnik/task-board.json"
 
 | Sprint | Scope | Depende de |
 |---|---|---|
-| S-HC-PUB-06-REELS-STORIES-PUBLISHERS | Real publishing for Meta Reels and Stories: Instagram + Facebook | S-HC-PUB-03-MULTITENANT-ASSETS, S-HC-PUB-04-HOURLY-BATCH-CRON |
 | S-HC-PUB-07-YOUTUBE-PUBLISHING | Real publishing for YouTube: Video 16:9 and YouTube Shorts | S-HC-PUB-03-MULTITENANT-ASSETS, S-HC-PUB-04-HOURLY-BATCH-CRON |
 
 ## Pending
@@ -238,7 +237,7 @@ Zonas: `packages/agents`, `apps/web/components`, `packages/core`
 
 ### S-HC-PUB-06-REELS-STORIES-PUBLISHERS - Real publishing for Meta Reels and Stories: Instagram + Facebook
 
-Estado: `ready`
+Estado: `ready_for_integration`
 
 - Instagram Reel publishing real con durabilidad transaccional
 - Instagram Story imagen publishing real

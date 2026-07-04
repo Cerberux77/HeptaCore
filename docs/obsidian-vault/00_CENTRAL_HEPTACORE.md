@@ -3,7 +3,7 @@ type: master-dashboard
 project: "HeptaCore"
 status: active-production
 phase: "Canonical Oreshnik task board governs current assignments"
-last_updated: "2026-07-04T04:59:14.289Z"
+last_updated: "2026-07-04T05:48:34.306Z"
 mother_branch: "MADRE/v47-s-hc-pub-03-multitenant-assets-multitenant-assets-metadata-compatibility-batch--2026-06-23"
 tags:
   - "#central"
@@ -18,7 +18,7 @@ tags:
 
 | Campo | Valor |
 |---|---|
-| Task board actualizado | 2026-07-01T21:10:33.990Z |
+| Task board actualizado | 2026-07-04T05:39:30.129Z |
 | Rama madre | MADRE/v47-s-hc-pub-03-multitenant-assets-multitenant-assets-metadata-compatibility-batch--2026-06-23 |
 
 
@@ -89,7 +89,7 @@ tags:
 | S-HC-ONB-02-GAP-RESOLUTION-WIZARD | blocked | Manuel | Gap resolution wizard: dynamic form to resolve missing or conflicting data | S-HC-ONB-01-MASTER-BRIEF-INGESTION |
 | S-HC-OPS-01-CAMPAIGN-REVIEW-DEPLOYMENT | blocked | Manuel | Campaign review and deployment: batch approval, schedule, publish | S-HC-STRAT-02-CONTENT-CALENDAR-BLUEPRINT, S-HC-ASSET-01-STRATEGY-ASSET-MANIFEST, S-HC-PUB-04-HOURLY-BATCH-CRON |
 | S-HC-OPT-01-SENTIMENT-STRATEGY-ITERATION | blocked | Manuel | Sentiment-driven strategy iteration: results → improved strategy | S-HC-AN-01-CAMPAIGN-PERFORMANCE, S-HC-INBOX-01-UNIFIED-ENGAGEMENT |
-| S-HC-PUB-06-REELS-STORIES-PUBLISHERS | ready | Manuel | Real publishing for Meta Reels and Stories: Instagram + Facebook | S-HC-PUB-03-MULTITENANT-ASSETS, S-HC-PUB-04-HOURLY-BATCH-CRON |
+| S-HC-PUB-06-REELS-STORIES-PUBLISHERS | ready_for_integration | Manuel | Real publishing for Meta Reels and Stories: Instagram + Facebook | S-HC-PUB-03-MULTITENANT-ASSETS, S-HC-PUB-04-HOURLY-BATCH-CRON |
 | S-HC-PUB-07-YOUTUBE-PUBLISHING | ready | Manuel | Real publishing for YouTube: Video 16:9 and YouTube Shorts | S-HC-PUB-03-MULTITENANT-ASSETS, S-HC-PUB-04-HOURLY-BATCH-CRON |
 | S-HC-PUB-08-PLATFORM-FORMAT-PARITY | blocked | Manuel | Platform-format parity: manifest, preview, dry-run, scheduling and publishing for every supported format | S-HC-PUB-06-REELS-STORIES-PUBLISHERS, S-HC-PUB-07-YOUTUBE-PUBLISHING |
 | S-HC-STRAT-01-MASTER-STRATEGY-WORKBENCH | blocked | Manuel | Master strategy workbench: LLM-powered strategy generation and conversational refinement | S-HC-ONB-02-GAP-RESOLUTION-WIZARD, S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE |
@@ -101,7 +101,6 @@ tags:
 
 | Sprint | Owner | Scope |
 |---|---|---|
-| S-HC-PUB-06-REELS-STORIES-PUBLISHERS | Manuel | Real publishing for Meta Reels and Stories: Instagram + Facebook |
 | S-HC-PUB-07-YOUTUBE-PUBLISHING | Manuel | Real publishing for YouTube: Video 16:9 and YouTube Shorts |
 
 ## Pendientes Bloqueados por Dependencias
