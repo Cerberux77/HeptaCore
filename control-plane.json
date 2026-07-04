@@ -5,15 +5,15 @@
     "originUrl": "https://github.com/Cerberux77/HeptaCore.git",
     "canonicalMotherBranch": "master"
   },
-  "generation": 27,
-  "controlHead": "ced97d2eb28a4c710f6cd6ce4f6cabb170ee62c1",
+  "generation": 28,
+  "controlHead": "b31d210eda22a9cfd6d123756c8259d7dc54071c",
   "catalog": {
     "taskBoardPath": "var/oreshnik/task-board.json",
     "zoneMapPath": "docs/07_handoffs/zone-map.json",
     "sourceTaskBoardHead": "37c88d4f1877c0444b610a2b1422e9a015d2bd07",
     "fingerprint": "598085002c5244d04ba764c6865934cdc726e23c",
     "taskCount": 40,
-    "updatedAt": "2026-07-04T08:13:18.452Z"
+    "updatedAt": "2026-07-04T17:12:15.117Z"
   },
   "policy": {
     "name": "deterministic-v1",
@@ -89,7 +89,7 @@
       "repositoryId": "32305cad03d6321a",
       "slot": 5,
       "createdAt": "2026-07-04T08:13:18.452Z",
-      "updatedAt": "2026-07-04T08:14:27.433Z",
+      "updatedAt": "2026-07-04T08:52:05.647Z",
       "identityOrigin": "explicit"
     }
   ],
@@ -149,8 +149,9 @@
       "harnessId": "codex",
       "machineId": "machine-89814280-0079-4c35-82c8-3d533c515221",
       "startedAt": "2026-07-04T08:13:18.452Z",
-      "lastSeenAt": "2026-07-04T08:14:27.433Z",
-      "status": "active",
+      "lastSeenAt": "2026-07-04T08:52:05.647Z",
+      "status": "closed",
+      "closedAt": "2026-07-04T08:52:05.647Z",
       "identityOrigin": "explicit"
     }
   ],
@@ -443,6 +444,37 @@
       "agentInstanceAlias": "manuel-codex5",
       "sessionId": "session_36ae790d7c16487394f5c96ce2fd806b",
       "identityOrigin": "explicit"
+    },
+    {
+      "assignmentId": "asg-528b38b5-bd4b-4044-a2c0-3d1d14708abd",
+      "taskId": "S-HC-PUB-07-YOUTUBE-PUBLISHING",
+      "sprintId": "publishing",
+      "title": "Real publishing for YouTube: Video 16:9 and YouTube Shorts",
+      "operator": "manuel",
+      "machineId": "machine-89814280-0079-4c35-82c8-3d533c515221",
+      "functionalBranch": "dispatch/manuel/manuel-codex6/publishing/S-HC-PUB-07-YOUTUBE-PUBLISHING/03d2a46dcd",
+      "motherBranch": "master",
+      "worktreePath": "D:\\PROYECTOS\\WORKTREES\\HeptaCore_ORESHNIK_READY\\var\\oreshnik\\wt\\32305cad03d6321a\\manuel\\manuel-codex6\\publishing\\S-HC-PUB-07-YOUTUBE-PUBLISHING\\03d2a46dcd",
+      "runId": "run-manuel-S-HC-PUB-07-YOUTUBE-PUBLISHING-20260704171215-752eb7a1",
+      "claimId": "claim-asg-528b38b5-bd4b-4044-a2c0-3d1d14708abd",
+      "zones": [
+        "apps/web/lib/publishers",
+        "apps/web/app/api/publishing",
+        "packages/integrations"
+      ],
+      "status": "provisioning",
+      "sourceTaskBoardHead": "37c88d4f1877c0444b610a2b1422e9a015d2bd07",
+      "catalogFingerprint": "598085002c5244d04ba764c6865934cdc726e23c",
+      "createdAt": "2026-07-04T17:12:15.117Z",
+      "updatedAt": "2026-07-04T17:12:15.117Z",
+      "resumedCount": 0,
+      "takeoverCount": 0,
+      "ownershipGeneration": 1,
+      "harnessId": "codex",
+      "agentInstanceUid": "agent_dd0f5142d4654c8b9a2e00b2d18d969a",
+      "agentInstanceAlias": "manuel-codex6",
+      "sessionId": "session_c209591f270c4c8a91c0045277170c14",
+      "identityOrigin": "explicit"
     }
   ],
   "claims": [
@@ -624,6 +656,26 @@
       "agentInstanceUid": "agent_86b234d8f60742cc8e6ad35a074a7b9c",
       "agentInstanceAlias": "manuel-codex5",
       "sessionId": "session_36ae790d7c16487394f5c96ce2fd806b",
+      "identityOrigin": "explicit"
+    },
+    {
+      "claimId": "claim-asg-528b38b5-bd4b-4044-a2c0-3d1d14708abd",
+      "assignmentId": "asg-528b38b5-bd4b-4044-a2c0-3d1d14708abd",
+      "taskId": "S-HC-PUB-07-YOUTUBE-PUBLISHING",
+      "sprintId": "publishing",
+      "operator": "manuel",
+      "machineId": "machine-89814280-0079-4c35-82c8-3d533c515221",
+      "runId": "run-manuel-S-HC-PUB-07-YOUTUBE-PUBLISHING-20260704171215-752eb7a1",
+      "branch": "dispatch/manuel/manuel-codex6/publishing/S-HC-PUB-07-YOUTUBE-PUBLISHING/03d2a46dcd",
+      "worktreePath": "D:\\PROYECTOS\\WORKTREES\\HeptaCore_ORESHNIK_READY\\var\\oreshnik\\wt\\32305cad03d6321a\\manuel\\manuel-codex6\\publishing\\S-HC-PUB-07-YOUTUBE-PUBLISHING\\03d2a46dcd",
+      "status": "active",
+      "createdAt": "2026-07-04T17:12:15.117Z",
+      "updatedAt": "2026-07-04T17:12:15.117Z",
+      "ownershipGeneration": 1,
+      "harnessId": "codex",
+      "agentInstanceUid": "agent_dd0f5142d4654c8b9a2e00b2d18d969a",
+      "agentInstanceAlias": "manuel-codex6",
+      "sessionId": "session_c209591f270c4c8a91c0045277170c14",
       "identityOrigin": "explicit"
     }
   ],
@@ -810,6 +862,26 @@
       "agentInstanceUid": "agent_86b234d8f60742cc8e6ad35a074a7b9c",
       "agentInstanceAlias": "manuel-codex5",
       "sessionId": "session_36ae790d7c16487394f5c96ce2fd806b",
+      "identityOrigin": "explicit"
+    },
+    {
+      "runId": "run-manuel-S-HC-PUB-07-YOUTUBE-PUBLISHING-20260704171215-752eb7a1",
+      "assignmentId": "asg-528b38b5-bd4b-4044-a2c0-3d1d14708abd",
+      "taskId": "S-HC-PUB-07-YOUTUBE-PUBLISHING",
+      "sprintId": "publishing",
+      "operator": "manuel",
+      "machineId": "machine-89814280-0079-4c35-82c8-3d533c515221",
+      "branch": "dispatch/manuel/manuel-codex6/publishing/S-HC-PUB-07-YOUTUBE-PUBLISHING/03d2a46dcd",
+      "worktreePath": "D:\\PROYECTOS\\WORKTREES\\HeptaCore_ORESHNIK_READY\\var\\oreshnik\\wt\\32305cad03d6321a\\manuel\\manuel-codex6\\publishing\\S-HC-PUB-07-YOUTUBE-PUBLISHING\\03d2a46dcd",
+      "status": "provisioning",
+      "createdAt": "2026-07-04T17:12:15.117Z",
+      "updatedAt": "2026-07-04T17:12:15.117Z",
+      "sourceTaskBoardHead": "37c88d4f1877c0444b610a2b1422e9a015d2bd07",
+      "ownershipGeneration": 1,
+      "harnessId": "codex",
+      "agentInstanceUid": "agent_dd0f5142d4654c8b9a2e00b2d18d969a",
+      "agentInstanceAlias": "manuel-codex6",
+      "sessionId": "session_c209591f270c4c8a91c0045277170c14",
       "identityOrigin": "explicit"
     }
   ],
@@ -1299,6 +1371,60 @@
       "agentInstanceAlias": "manuel-codex5",
       "sessionId": "session_36ae790d7c16487394f5c96ce2fd806b",
       "identityOrigin": "explicit"
+    },
+    {
+      "zone": "apps/web/lib/publishers",
+      "assignmentId": "asg-528b38b5-bd4b-4044-a2c0-3d1d14708abd",
+      "taskId": "S-HC-PUB-07-YOUTUBE-PUBLISHING",
+      "sprintId": "publishing",
+      "operator": "manuel",
+      "machineId": "machine-89814280-0079-4c35-82c8-3d533c515221",
+      "runId": "run-manuel-S-HC-PUB-07-YOUTUBE-PUBLISHING-20260704171215-752eb7a1",
+      "branch": "dispatch/manuel/manuel-codex6/publishing/S-HC-PUB-07-YOUTUBE-PUBLISHING/03d2a46dcd",
+      "status": "reserved",
+      "createdAt": "2026-07-04T17:12:15.117Z",
+      "updatedAt": "2026-07-04T17:12:15.117Z",
+      "harnessId": "codex",
+      "agentInstanceUid": "agent_dd0f5142d4654c8b9a2e00b2d18d969a",
+      "agentInstanceAlias": "manuel-codex6",
+      "sessionId": "session_c209591f270c4c8a91c0045277170c14",
+      "identityOrigin": "explicit"
+    },
+    {
+      "zone": "apps/web/app/api/publishing",
+      "assignmentId": "asg-528b38b5-bd4b-4044-a2c0-3d1d14708abd",
+      "taskId": "S-HC-PUB-07-YOUTUBE-PUBLISHING",
+      "sprintId": "publishing",
+      "operator": "manuel",
+      "machineId": "machine-89814280-0079-4c35-82c8-3d533c515221",
+      "runId": "run-manuel-S-HC-PUB-07-YOUTUBE-PUBLISHING-20260704171215-752eb7a1",
+      "branch": "dispatch/manuel/manuel-codex6/publishing/S-HC-PUB-07-YOUTUBE-PUBLISHING/03d2a46dcd",
+      "status": "reserved",
+      "createdAt": "2026-07-04T17:12:15.117Z",
+      "updatedAt": "2026-07-04T17:12:15.117Z",
+      "harnessId": "codex",
+      "agentInstanceUid": "agent_dd0f5142d4654c8b9a2e00b2d18d969a",
+      "agentInstanceAlias": "manuel-codex6",
+      "sessionId": "session_c209591f270c4c8a91c0045277170c14",
+      "identityOrigin": "explicit"
+    },
+    {
+      "zone": "packages/integrations",
+      "assignmentId": "asg-528b38b5-bd4b-4044-a2c0-3d1d14708abd",
+      "taskId": "S-HC-PUB-07-YOUTUBE-PUBLISHING",
+      "sprintId": "publishing",
+      "operator": "manuel",
+      "machineId": "machine-89814280-0079-4c35-82c8-3d533c515221",
+      "runId": "run-manuel-S-HC-PUB-07-YOUTUBE-PUBLISHING-20260704171215-752eb7a1",
+      "branch": "dispatch/manuel/manuel-codex6/publishing/S-HC-PUB-07-YOUTUBE-PUBLISHING/03d2a46dcd",
+      "status": "reserved",
+      "createdAt": "2026-07-04T17:12:15.117Z",
+      "updatedAt": "2026-07-04T17:12:15.117Z",
+      "harnessId": "codex",
+      "agentInstanceUid": "agent_dd0f5142d4654c8b9a2e00b2d18d969a",
+      "agentInstanceAlias": "manuel-codex6",
+      "sessionId": "session_c209591f270c4c8a91c0045277170c14",
+      "identityOrigin": "explicit"
     }
   ],
   "audit": [
@@ -1514,14 +1640,22 @@
       "runId": "run-manuel-S-HC-PUB-07-YOUTUBE-PUBLISHING-20260704081318-00079d96",
       "operator": "manuel",
       "message": "asg-061998a5-c29a-4290-8761-00f3ba559274 -> released"
+    },
+    {
+      "at": "2026-07-04T17:12:15.117Z",
+      "action": "dispatch.next.reserved",
+      "assignmentId": "asg-528b38b5-bd4b-4044-a2c0-3d1d14708abd",
+      "runId": "run-manuel-S-HC-PUB-07-YOUTUBE-PUBLISHING-20260704171215-752eb7a1",
+      "operator": "manuel",
+      "message": "Reserved S-HC-PUB-07-YOUTUBE-PUBLISHING for manuel."
     }
   ],
   "reconciliation": {
-    "lastAttemptAt": "2026-07-04T08:13:18.417Z",
+    "lastAttemptAt": "2026-07-04T17:12:13.790Z",
     "lastAppliedAt": "2026-07-01T07:00:56.759Z",
     "lastResult": "clean",
     "pendingDiagnostics": []
   },
   "createdAt": "2026-06-29T20:17:43.302Z",
-  "updatedAt": "2026-07-04T08:52:05.647Z"
+  "updatedAt": "2026-07-04T17:12:15.117Z"
 }
