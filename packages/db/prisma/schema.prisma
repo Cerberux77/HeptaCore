@@ -564,5 +564,6 @@ enum ContentStatus {
 enum OAuthProvider {
   FACEBOOK
   INSTAGRAM
+  YOUTUBE
   WHATSAPP
 }

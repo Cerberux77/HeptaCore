@@ -49,15 +49,28 @@ function buildPublicAssetUrl(tenantSlug: string, asset: { storageKey?: string | 
 
 function adaptPublisher(raw: ReturnType<typeof getPublisher>): Pub04Publisher | null {
   if (!raw) return null;
+  const supportedFormats =
+    raw.network === "FACEBOOK"
+      ? ["FACEBOOK_FEED"]
+      : raw.network === "INSTAGRAM"
+        ? ["INSTAGRAM_FEED", "INSTAGRAM_REEL"]
+        : raw.network === "YOUTUBE"
+          ? ["YOUTUBE_SHORT", "YOUTUBE_VIDEO"]
+          : [];
   return {
     textOnly: raw.capabilities.textOnly,
-    supportedFormats: ["FACEBOOK_FEED", "INSTAGRAM_FEED"],
+    supportedFormats,
     requiredScopes: raw.requiredScopes,
     async publish(input) {
       const result = await raw.publish({
         targetId: input.targetId,
         accessToken: input.accessToken,
+        refreshToken: input.refreshToken,
         caption: input.caption,
+        title: input.title,
+        description: input.description,
+        thumbnailUrl: input.thumbnailUrl,
+        format: input.format,
         mediaUrl: input.mediaUrl,
         mediaType: input.mediaType,
       });
@@ -307,14 +320,15 @@ export async function GET(req: Request) {
       return adaptPublisher(getPublisher(network));
     },
     async resolveCredential({ tenantId, provider, socialAccountId }) {
+      const rawPublisher = getPublisher(provider);
       const result = await resolveAndDecryptOAuthCredential({
         tenantId,
         provider,
         socialAccountId,
-        credentialLabel: "facebook_page_oauth",
+        credentialLabel: rawPublisher?.credentialLabel,
       });
       if (!result.ok) return { ok: false, code: result.code };
-      return { ok: true, accessToken: result.accessToken, targetId: result.providerUserId };
+      return { ok: true, accessToken: result.accessToken, refreshToken: result.refreshToken, targetId: result.providerUserId };
     },
     now() {
       return new Date();

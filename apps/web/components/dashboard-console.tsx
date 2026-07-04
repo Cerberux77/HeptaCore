@@ -1,7 +1,7 @@
 "use client";
 
 import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { upload as uploadBlob } from "@vercel/blob/client";
 import {
   AlertTriangle,
@@ -66,6 +66,7 @@ import {
   type FinalizeUploadedAssetPayload,
 } from "../lib/asset-upload";
 import AssetCollectionPicker from "./asset-collection-picker";
+import YoutubeIntegrationPanel from "./youtube-integration-panel";
 import {
   ASSET_COMPATIBILITY_CONFIGS,
   ASSET_COMPATIBILITY_TARGETS,
@@ -96,7 +97,7 @@ import {
 } from "../lib/asset-library-filters";
 import { upsertTenantAssetList } from "../lib/asset-presentation";
 
-type View = "overview" | "strategy" | "queue" | "assets" | "calendar" | "checklist" | "reports" | "readiness";
+type View = "overview" | "strategy" | "integrations" | "queue" | "assets" | "calendar" | "checklist" | "reports" | "readiness";
 type CalendarView = "list" | "week" | "month";
 type UploadFileState = "PENDING" | "UPLOADING" | "FINALIZING" | "READY" | "FAILED";
 type UploadQueueItem = {
@@ -158,12 +159,13 @@ function channelLabel(item: DraftQueueItem) {
 }
 
 function getPlatformFrameClass(item: DraftQueueItem) {
-  if (item.format === "INSTAGRAM_STORY") return "frame-ig-vertical";
-  if (item.format === "INSTAGRAM_CAROUSEL") return "frame-ig-portrait";
-  if (item.format === "INSTAGRAM_FEED") return "frame-ig-square";
-  if (item.format === "FACEBOOK_FEED") return "frame-facebook";
+  const format = String(item.format ?? "");
+  if (format === "INSTAGRAM_STORY" || format === "INSTAGRAM_REEL" || format === "FACEBOOK_STORY" || format === "FACEBOOK_REEL") return "frame-ig-vertical";
+  if (format === "INSTAGRAM_CAROUSEL") return "frame-ig-portrait";
+  if (format === "INSTAGRAM_FEED") return "frame-ig-square";
+  if (format === "FACEBOOK_FEED") return "frame-facebook";
   const ch = item.network.toLowerCase();
-  const fmt = String(item.format ?? "").toLowerCase();
+  const fmt = format.toLowerCase();
   if (ch === "tiktok" || (ch === "youtube" && (fmt === "short" || fmt === "vertical_video"))) return "frame-ig-vertical";
   if (ch === "youtube") return "frame-youtube";
   if (ch === "linkedin") return "frame-linkedin";
@@ -300,7 +302,7 @@ function PlatformPreview({
         ) : (
           <div className="platform-empty"><ImageIcon size={24} /></div>
         )}
-        {item.format === "INSTAGRAM_STORY" && (
+        {(String(item.format ?? "") === "INSTAGRAM_STORY" || String(item.format ?? "") === "FACEBOOK_STORY") && (
           <div className="story-safe-areas" aria-hidden="true">
             <span className="story-safe-top" />
             <span className="story-safe-bottom" />
@@ -689,7 +691,9 @@ export function DashboardConsole({
   adminMode?: boolean;
   trial?: TrialStatus;
 }) {
-  const [view, setView] = useState<View>("overview");
+  const searchParams = useSearchParams();
+  const requestedView = searchParams.get("view");
+  const [view, setView] = useState<View>(requestedView === "integrations" ? "integrations" : "overview");
   const [selectedId, setSelectedIdRaw] = useState(queue[0]?.id ?? "");
   const [publishDraftId, setPublishDraftId] = useState("");
   const [localQueue, setLocalQueue] = useState(queue);
@@ -824,6 +828,12 @@ export function DashboardConsole({
   useEffect(() => {
     setLocalAssets(assets);
   }, [assets]);
+
+  useEffect(() => {
+    if (requestedView === "integrations") {
+      setView("integrations");
+    }
+  }, [requestedView]);
 
   function handleAssetTargetFilterChange(target: AssetCompatibilityTarget | "ALL") {
     const next = updateAssetLibraryTarget(currentAssetFilters, target);
@@ -1693,6 +1703,7 @@ export function DashboardConsole({
         <nav className="app-nav">
           <NavButton icon={<Gauge size={17} />} active={view === "overview"} onClick={() => setView("overview")}>Operaciones</NavButton>
           <NavButton icon={<Bot size={17} />} active={view === "strategy"} onClick={() => setView("strategy")}>Estrategia</NavButton>
+          <NavButton icon={<Settings2 size={17} />} active={view === "integrations"} onClick={() => setView("integrations")}>Integraciones</NavButton>
           <NavButton icon={<ClipboardList size={17} />} active={view === "queue"} onClick={() => setView("queue")}>Cola de drafts</NavButton>
           <NavButton icon={<PackageSearch size={17} />} active={view === "assets"} onClick={() => setView("assets")}>Activos</NavButton>
           <NavButton icon={<CalendarDays size={17} />} active={view === "calendar"} onClick={() => setView("calendar")}>Cronograma</NavButton>
@@ -2095,6 +2106,10 @@ export function DashboardConsole({
               </div>
             </section>
           </div>
+        )}
+
+        {view === "integrations" && (
+          <YoutubeIntegrationPanel tenantSlug={tenantSlug} />
         )}
 
         {view === "queue" && selected && (
