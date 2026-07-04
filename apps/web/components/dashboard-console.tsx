@@ -158,7 +158,7 @@ function channelLabel(item: DraftQueueItem) {
 }
 
 function getPlatformFrameClass(item: DraftQueueItem) {
-  if (item.format === "INSTAGRAM_STORY") return "frame-ig-vertical";
+  if (item.format === "INSTAGRAM_STORY" || item.format === "INSTAGRAM_REEL" || item.format === "FACEBOOK_STORY" || item.format === "FACEBOOK_REEL") return "frame-ig-vertical";
   if (item.format === "INSTAGRAM_CAROUSEL") return "frame-ig-portrait";
   if (item.format === "INSTAGRAM_FEED") return "frame-ig-square";
   if (item.format === "FACEBOOK_FEED") return "frame-facebook";
@@ -300,7 +300,7 @@ function PlatformPreview({
         ) : (
           <div className="platform-empty"><ImageIcon size={24} /></div>
         )}
-        {item.format === "INSTAGRAM_STORY" && (
+        {(item.format === "INSTAGRAM_STORY" || item.format === "FACEBOOK_STORY") && (
           <div className="story-safe-areas" aria-hidden="true">
             <span className="story-safe-top" />
             <span className="story-safe-bottom" />

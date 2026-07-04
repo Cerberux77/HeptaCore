@@ -58,6 +58,7 @@ const VIDEO_MIMES = ["video/mp4", "video/quicktime"];
 
 function formatConfig(format: PublishingFormat, mediaTypes: AssetMediaType[] = ["image", "video"]): AssetCompatibilityConfig {
   const current = PUBLISHING_FORMAT_CONFIGS[format];
+  const isVertical = format === "INSTAGRAM_STORY" || format === "INSTAGRAM_REEL" || format === "FACEBOOK_STORY" || format === "FACEBOOK_REEL";
   return {
     label: current.label,
     enabledForPublishing: true,
@@ -71,9 +72,9 @@ function formatConfig(format: PublishingFormat, mediaTypes: AssetMediaType[] = [
     },
     ideal: {
       aspectRatios: current.assetRule.aspectRatios,
-      orientation: format === "INSTAGRAM_STORY" ? "portrait" : undefined,
+      orientation: isVertical ? "portrait" : undefined,
       width: format === "INSTAGRAM_STORY" ? 1080 : 1080,
-      height: format === "INSTAGRAM_STORY" ? 1920 : 1080,
+      height: isVertical ? 1920 : 1080,
     },
   };
 }
@@ -82,24 +83,7 @@ export const ASSET_COMPATIBILITY_CONFIGS: Record<AssetCompatibilityTarget, Asset
   INSTAGRAM_FEED: formatConfig("INSTAGRAM_FEED"),
   INSTAGRAM_CAROUSEL: formatConfig("INSTAGRAM_CAROUSEL"),
   INSTAGRAM_STORY: formatConfig("INSTAGRAM_STORY"),
-  INSTAGRAM_REEL: {
-    label: "Instagram Reel",
-    enabledForPublishing: false,
-    mediaTypes: ["video"],
-    acceptedMimeTypes: VIDEO_MIMES,
-    blocking: {
-      minWidth: 720,
-      minHeight: 1280,
-      maxDurationSeconds: 90,
-      aspectRatios: [{ label: "9:16", ratio: 9 / 16, tolerance: 0.04 }],
-    },
-    ideal: {
-      aspectRatios: [{ label: "9:16", ratio: 9 / 16, tolerance: 0.02 }],
-      orientation: "portrait",
-      width: 1080,
-      height: 1920,
-    },
-  },
+  INSTAGRAM_REEL: formatConfig("INSTAGRAM_REEL", ["video"]),
   FACEBOOK_FEED_IMAGE: {
     ...formatConfig("FACEBOOK_FEED", ["image"]),
     label: "Facebook Feed Image",
@@ -110,42 +94,8 @@ export const ASSET_COMPATIBILITY_CONFIGS: Record<AssetCompatibilityTarget, Asset
     label: "Facebook Feed Video",
     acceptedMimeTypes: VIDEO_MIMES,
   },
-  FACEBOOK_STORY: {
-    label: "Facebook Story",
-    enabledForPublishing: false,
-    mediaTypes: ["image", "video"],
-    acceptedMimeTypes: [...IMAGE_MIMES, ...VIDEO_MIMES],
-    blocking: {
-      minWidth: 720,
-      minHeight: 1280,
-      maxDurationSeconds: 60,
-      aspectRatios: [{ label: "9:16", ratio: 9 / 16, tolerance: 0.05 }],
-    },
-    ideal: {
-      aspectRatios: [{ label: "9:16", ratio: 9 / 16, tolerance: 0.02 }],
-      orientation: "portrait",
-      width: 1080,
-      height: 1920,
-    },
-  },
-  FACEBOOK_REEL: {
-    label: "Facebook Reel",
-    enabledForPublishing: false,
-    mediaTypes: ["video"],
-    acceptedMimeTypes: VIDEO_MIMES,
-    blocking: {
-      minWidth: 720,
-      minHeight: 1280,
-      maxDurationSeconds: 90,
-      aspectRatios: [{ label: "9:16", ratio: 9 / 16, tolerance: 0.04 }],
-    },
-    ideal: {
-      aspectRatios: [{ label: "9:16", ratio: 9 / 16, tolerance: 0.02 }],
-      orientation: "portrait",
-      width: 1080,
-      height: 1920,
-    },
-  },
+  FACEBOOK_STORY: formatConfig("FACEBOOK_STORY"),
+  FACEBOOK_REEL: formatConfig("FACEBOOK_REEL", ["video"]),
   YOUTUBE_SHORT: {
     label: "YouTube Short",
     enabledForPublishing: false,
