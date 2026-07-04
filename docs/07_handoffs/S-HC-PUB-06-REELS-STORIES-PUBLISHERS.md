@@ -17,17 +17,17 @@
 
 ## Pruebas ejecutadas
 
-- `npm run typecheck` ✅
-- `npm run test -w @heptacore/web -- --runInBand` ✅
-- `npm run build` ✅
-- `npm run worker:validate` ✅
+- `npm run typecheck` OK
+- `npm run test -w @heptacore/web -- --runInBand` OK
+- `npm run build` OK
+- `npm run worker:validate` OK
+- `npm run test` OK
 
-## Gap actual
+## Validacion complementaria
 
-- `npm run test` del repo raiz falla en `scripts/oreshnik/__tests__/smoke-end-to-end.test.mjs`.
-- Causa observada: el smoke usa una ruta fija a `node_modules/oreshnik-cli/dist/cli.js` relativa al dispatcher worktree, y en este contexto el modulo no existe en esa ruta.
-- El fallo no viene de `apps/web` ni de PUB-06; afecta la suite infra de Oreshnik dentro del worktree despachado.
+- Se corrigio el smoke infra de Oreshnik para resolver `oreshnik-cli` desde el paquete instalado en el worktree en lugar de depender de una ruta fija.
+- La limpieza de fixtures Git en Windows ahora reintenta `rmSync` ante `EPERM`, `EBUSY` y `ENOTEMPTY`, reduciendo flakes del smoke en worktrees despachados.
 
 ## Siguiente paso recomendado
 
-- Decidir si el fix del smoke de Oreshnik entra como drift/infra separada o si se valida el cierre de PUB-06 con las gates funcionales ya verdes y el gap infra explicitado.
+- Registrar evidencia, marcar `ready_for_integration` y continuar con el cierre e integracion de la Task desde este mismo Run.
