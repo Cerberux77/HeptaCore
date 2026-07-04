@@ -5,7 +5,7 @@
     "originUrl": "https://github.com/Cerberux77/HeptaCore.git",
     "canonicalMotherBranch": "master"
   },
-  "generation": 20,
+  "generation": 21,
   "controlHead": "f34ecfb11b0b419d7ecfde303605c5fd018b1016",
   "catalog": {
     "taskBoardPath": "var/oreshnik/task-board.json",
@@ -76,8 +76,8 @@
       "machineId": "machine-89814280-0079-4c35-82c8-3d533c515221",
       "repositoryId": "32305cad03d6321a",
       "slot": 3,
-      "createdAt": "2026-07-04T05:00:56.124Z",
-      "updatedAt": "2026-07-04T06:06:07.146Z",
+      "createdAt": "2026-07-04T06:07:21.463Z",
+      "updatedAt": "2026-07-04T06:07:21.463Z",
       "identityOrigin": "explicit"
     }
   ],
@@ -124,10 +124,9 @@
       "operatorId": "manuel",
       "harnessId": "codex",
       "machineId": "machine-89814280-0079-4c35-82c8-3d533c515221",
-      "startedAt": "2026-07-04T05:00:56.124Z",
-      "lastSeenAt": "2026-07-04T06:06:07.146Z",
-      "status": "closed",
-      "closedAt": "2026-07-04T06:06:07.146Z",
+      "startedAt": "2026-07-04T06:07:21.463Z",
+      "lastSeenAt": "2026-07-04T06:07:21.463Z",
+      "status": "active",
       "identityOrigin": "explicit"
     }
   ],
@@ -342,11 +341,12 @@
         "apps/web/app/api/publishing",
         "packages/integrations"
       ],
-      "status": "provisioning",
+      "status": "provisioning_failed",
       "sourceTaskBoardHead": "37c88d4f1877c0444b610a2b1422e9a015d2bd07",
       "catalogFingerprint": "598085002c5244d04ba764c6865934cdc726e23c",
       "createdAt": "2026-07-04T06:07:21.463Z",
-      "updatedAt": "2026-07-04T06:07:21.463Z",
+      "updatedAt": "2026-07-04T06:08:20.980Z",
+      "lastError": "Failed to publish branch dispatch/manuel/manuel-codex3/publishing/S-HC-PUB-07-YOUTUBE-PUBLISHING/35da6af908: Failed to push dispatch/manuel/manuel-codex3/publishing/S-HC-PUB-07-YOUTUBE-PUBLISHING/35da6af908 to origin",
       "resumedCount": 0,
       "takeoverCount": 0,
       "ownershipGeneration": 1,
@@ -488,9 +488,9 @@
       "runId": "run-manuel-S-HC-PUB-07-YOUTUBE-PUBLISHING-20260704060721-082921a3",
       "branch": "dispatch/manuel/manuel-codex3/publishing/S-HC-PUB-07-YOUTUBE-PUBLISHING/35da6af908",
       "worktreePath": "D:\\PROYECTOS\\WORKTREES\\HeptaCore_ORESHNIK_READY\\var\\oreshnik\\wt\\32305cad03d6321a\\manuel\\manuel-codex3\\publishing\\S-HC-PUB-07-YOUTUBE-PUBLISHING\\35da6af908",
-      "status": "active",
+      "status": "provisioning_failed",
       "createdAt": "2026-07-04T06:07:21.463Z",
-      "updatedAt": "2026-07-04T06:07:21.463Z",
+      "updatedAt": "2026-07-04T06:08:20.980Z",
       "ownershipGeneration": 1,
       "harnessId": "codex",
       "agentInstanceUid": "agent_181e9938433f43d49f64de00eb23fd4f",
@@ -632,10 +632,11 @@
       "machineId": "machine-89814280-0079-4c35-82c8-3d533c515221",
       "branch": "dispatch/manuel/manuel-codex3/publishing/S-HC-PUB-07-YOUTUBE-PUBLISHING/35da6af908",
       "worktreePath": "D:\\PROYECTOS\\WORKTREES\\HeptaCore_ORESHNIK_READY\\var\\oreshnik\\wt\\32305cad03d6321a\\manuel\\manuel-codex3\\publishing\\S-HC-PUB-07-YOUTUBE-PUBLISHING\\35da6af908",
-      "status": "provisioning",
+      "status": "provisioning_failed",
       "createdAt": "2026-07-04T06:07:21.463Z",
-      "updatedAt": "2026-07-04T06:07:21.463Z",
+      "updatedAt": "2026-07-04T06:08:20.980Z",
       "sourceTaskBoardHead": "37c88d4f1877c0444b610a2b1422e9a015d2bd07",
+      "lastError": "Failed to publish branch dispatch/manuel/manuel-codex3/publishing/S-HC-PUB-07-YOUTUBE-PUBLISHING/35da6af908: Failed to push dispatch/manuel/manuel-codex3/publishing/S-HC-PUB-07-YOUTUBE-PUBLISHING/35da6af908 to origin",
       "ownershipGeneration": 1,
       "harnessId": "codex",
       "agentInstanceUid": "agent_181e9938433f43d49f64de00eb23fd4f",
@@ -978,9 +979,9 @@
       "machineId": "machine-89814280-0079-4c35-82c8-3d533c515221",
       "runId": "run-manuel-S-HC-PUB-07-YOUTUBE-PUBLISHING-20260704060721-082921a3",
       "branch": "dispatch/manuel/manuel-codex3/publishing/S-HC-PUB-07-YOUTUBE-PUBLISHING/35da6af908",
-      "status": "reserved",
+      "status": "provisioning_failed",
       "createdAt": "2026-07-04T06:07:21.463Z",
-      "updatedAt": "2026-07-04T06:07:21.463Z",
+      "updatedAt": "2026-07-04T06:08:20.980Z",
       "harnessId": "codex",
       "agentInstanceUid": "agent_181e9938433f43d49f64de00eb23fd4f",
       "agentInstanceAlias": "manuel-codex3",
@@ -996,9 +997,9 @@
       "machineId": "machine-89814280-0079-4c35-82c8-3d533c515221",
       "runId": "run-manuel-S-HC-PUB-07-YOUTUBE-PUBLISHING-20260704060721-082921a3",
       "branch": "dispatch/manuel/manuel-codex3/publishing/S-HC-PUB-07-YOUTUBE-PUBLISHING/35da6af908",
-      "status": "reserved",
+      "status": "provisioning_failed",
       "createdAt": "2026-07-04T06:07:21.463Z",
-      "updatedAt": "2026-07-04T06:07:21.463Z",
+      "updatedAt": "2026-07-04T06:08:20.980Z",
       "harnessId": "codex",
       "agentInstanceUid": "agent_181e9938433f43d49f64de00eb23fd4f",
       "agentInstanceAlias": "manuel-codex3",
@@ -1014,9 +1015,9 @@
       "machineId": "machine-89814280-0079-4c35-82c8-3d533c515221",
       "runId": "run-manuel-S-HC-PUB-07-YOUTUBE-PUBLISHING-20260704060721-082921a3",
       "branch": "dispatch/manuel/manuel-codex3/publishing/S-HC-PUB-07-YOUTUBE-PUBLISHING/35da6af908",
-      "status": "reserved",
+      "status": "provisioning_failed",
       "createdAt": "2026-07-04T06:07:21.463Z",
-      "updatedAt": "2026-07-04T06:07:21.463Z",
+      "updatedAt": "2026-07-04T06:08:20.980Z",
       "harnessId": "codex",
       "agentInstanceUid": "agent_181e9938433f43d49f64de00eb23fd4f",
       "agentInstanceAlias": "manuel-codex3",
@@ -1181,6 +1182,14 @@
       "runId": "run-manuel-S-HC-PUB-07-YOUTUBE-PUBLISHING-20260704060721-082921a3",
       "operator": "manuel",
       "message": "Reserved S-HC-PUB-07-YOUTUBE-PUBLISHING for manuel."
+    },
+    {
+      "at": "2026-07-04T06:08:20.980Z",
+      "action": "dispatch.provisioning_failed",
+      "assignmentId": "asg-29c63e75-9cc1-4f15-8573-99001a63822d",
+      "runId": "run-manuel-S-HC-PUB-07-YOUTUBE-PUBLISHING-20260704060721-082921a3",
+      "operator": "manuel",
+      "message": "Failed to publish branch dispatch/manuel/manuel-codex3/publishing/S-HC-PUB-07-YOUTUBE-PUBLISHING/35da6af908: Failed to push dispatch/manuel/manuel-codex3/publishing/S-HC-PUB-07-YOUTUBE-PUBLISHING/35da6af908 to origin"
     }
   ],
   "reconciliation": {
@@ -1190,5 +1199,5 @@
     "pendingDiagnostics": []
   },
   "createdAt": "2026-06-29T20:17:43.302Z",
-  "updatedAt": "2026-07-04T06:07:21.463Z"
+  "updatedAt": "2026-07-04T06:08:20.980Z"
 }
