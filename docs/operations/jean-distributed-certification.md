@@ -6,7 +6,7 @@ Estado: READY_TO_PUBLISH_FOR_JEAN, pendiente solo de publicacion externa autoriz
 
 - Manuel/Codex: `operator=manuel`, `harness=codex`, instancia asignada por `oreshnik align --instance new`.
 - Jean/Kilo: `operator=jean`, `harness=kilo`, instancia asignada por `oreshnik align --instance new`.
-- Kilo no debe hardcodear operador humano. Debe ejecutar `npm run oreshnik:ready` y luego `oreshnik goal --harness kilo --repo . --json`.
+- Kilo no debe hardcodear operador humano. La UX canónica de una sola orden para HeptaCore es `npm run oreshnik:goal`; internamente ejecuta `npm run oreshnik:ready` y luego `oreshnik goal --harness kilo --repo . --json`.
 
 ## Onboarding Universal
 
@@ -69,4 +69,9 @@ git fetch origin refs/remotes/origin/oreshnik/control:refs/remotes/origin/oreshn
 2. Empujar ramas `master` y `MADRE/v52-s-hc-asset-02-format-derivatives-2026-07-01`.
 3. Entregar a Jean este documento, el tarball Oreshnik alpha.11 certificado y la ruta de evidence.
 4. Jean valida clean-room con `npm ci`, `oreshnik:ready`, `align --check`, `dispatch status`.
+
+## UX Canonica
+
+- Comando unico para continuar el siguiente sprint desde HeptaCore: `npm run oreshnik:goal`
+- El wrapper no duplica logica del control plane: solo valida readiness y delega en `oreshnik goal --harness kilo --repo . --json`.
 5. Solo despues de revision humana, habilitar publicacion externa.

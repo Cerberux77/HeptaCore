@@ -35,6 +35,7 @@
     "oreshnik:integrate": "oreshnik integrate",
     "oreshnik:dispatch:init": "oreshnik dispatch init",
     "oreshnik:dispatch:status": "oreshnik dispatch status",
+    "oreshnik:goal": "node scripts/oreshnik/goal.mjs",
     "oreshnik:canonical": "node scripts/oreshnik/canonical-check.mjs",
     "oreshnik:sync": "node scripts/oreshnik/sync-from-mother.mjs",
     "oreshnik:sync:latest": "node scripts/oreshnik/sync-latest-mother.mjs",
@@ -67,7 +68,7 @@
   "dependencies": {
     "@prisma/adapter-pg": "^7.8.0",
     "@react-email/components": "^1.0.12",
-    "oreshnik-cli": "file:vendor/oreshnik/oreshnik-cli-0.2.0-alpha.12-35de242a26d4c7022725c3c042b9d69ff30ef7e3.tgz",
+    "oreshnik-cli": "file:vendor/oreshnik/oreshnik-cli-0.2.0-alpha.13-3ab90695a6da2c7e6f5c35e9164461cf8a1fde20.tgz",
     "pg": "^8.21.0",
     "resend": "^6.14.0"
   }
