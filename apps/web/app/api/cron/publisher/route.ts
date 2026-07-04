@@ -51,13 +51,14 @@ function adaptPublisher(raw: ReturnType<typeof getPublisher>): Pub04Publisher | 
   if (!raw) return null;
   return {
     textOnly: raw.capabilities.textOnly,
-    supportedFormats: ["FACEBOOK_FEED", "INSTAGRAM_FEED"],
+    supportedFormats: raw.supportedFormats,
     requiredScopes: raw.requiredScopes,
     async publish(input) {
       const result = await raw.publish({
         targetId: input.targetId,
         accessToken: input.accessToken,
         caption: input.caption,
+        format: input.format,
         mediaUrl: input.mediaUrl,
         mediaType: input.mediaType,
       });
@@ -307,11 +308,12 @@ export async function GET(req: Request) {
       return adaptPublisher(getPublisher(network));
     },
     async resolveCredential({ tenantId, provider, socialAccountId }) {
+      const publisher = getPublisher(provider);
       const result = await resolveAndDecryptOAuthCredential({
         tenantId,
         provider,
         socialAccountId,
-        credentialLabel: "facebook_page_oauth",
+        credentialLabel: publisher?.credentialLabel ?? "facebook_page_oauth",
       });
       if (!result.ok) return { ok: false, code: result.code };
       return { ok: true, accessToken: result.accessToken, targetId: result.providerUserId };

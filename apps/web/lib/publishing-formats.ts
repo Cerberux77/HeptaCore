@@ -2,7 +2,10 @@ export const MULTIFORMAT_VALUES = [
   "INSTAGRAM_FEED",
   "INSTAGRAM_CAROUSEL",
   "INSTAGRAM_STORY",
+  "INSTAGRAM_REEL",
   "FACEBOOK_FEED",
+  "FACEBOOK_STORY",
+  "FACEBOOK_REEL",
 ] as const;
 
 export type PublishingFormat = (typeof MULTIFORMAT_VALUES)[number];
@@ -140,6 +143,25 @@ export const PUBLISHING_FORMAT_CONFIGS: Record<PublishingFormat, PublishingForma
       safeAreas: { topPercent: 13, bottomPercent: 16, sidePercent: 5 },
     },
   },
+  INSTAGRAM_REEL: {
+    format: "INSTAGRAM_REEL",
+    platform: "INSTAGRAM",
+    label: "Instagram Reel",
+    assetRule: {
+      min: 1,
+      max: 1,
+      acceptedMimeTypes: [...VIDEO_MIMES],
+      aspectRatios: [{ label: "9:16", ratio: 9 / 16, tolerance: 0.03 }],
+      minWidth: 720,
+      minHeight: 1280,
+      maxSizeBytes: 100 * 1024 * 1024,
+      maxDurationSeconds: 90,
+    },
+    preview: {
+      aspectRatio: "9 / 16",
+      safeAreas: { topPercent: 10, bottomPercent: 14, sidePercent: 5 },
+    },
+  },
   FACEBOOK_FEED: {
     format: "FACEBOOK_FEED",
     platform: "FACEBOOK",
@@ -160,6 +182,44 @@ export const PUBLISHING_FORMAT_CONFIGS: Record<PublishingFormat, PublishingForma
       maxDurationSeconds: 240,
     },
     preview: { aspectRatio: "1.91 / 1" },
+  },
+  FACEBOOK_STORY: {
+    format: "FACEBOOK_STORY",
+    platform: "FACEBOOK",
+    label: "Facebook Story",
+    assetRule: {
+      min: 1,
+      max: 1,
+      acceptedMimeTypes: [...IMAGE_MIMES, ...VIDEO_MIMES],
+      aspectRatios: [{ label: "9:16", ratio: 9 / 16, tolerance: 0.05 }],
+      minWidth: 720,
+      minHeight: 1280,
+      maxSizeBytes: 100 * 1024 * 1024,
+      maxDurationSeconds: 60,
+    },
+    preview: {
+      aspectRatio: "9 / 16",
+      safeAreas: { topPercent: 13, bottomPercent: 16, sidePercent: 5 },
+    },
+  },
+  FACEBOOK_REEL: {
+    format: "FACEBOOK_REEL",
+    platform: "FACEBOOK",
+    label: "Facebook Reel",
+    assetRule: {
+      min: 1,
+      max: 1,
+      acceptedMimeTypes: [...VIDEO_MIMES],
+      aspectRatios: [{ label: "9:16", ratio: 9 / 16, tolerance: 0.04 }],
+      minWidth: 720,
+      minHeight: 1280,
+      maxSizeBytes: 100 * 1024 * 1024,
+      maxDurationSeconds: 90,
+    },
+    preview: {
+      aspectRatio: "9 / 16",
+      safeAreas: { topPercent: 10, bottomPercent: 14, sidePercent: 5 },
+    },
   },
 };
 
@@ -194,7 +254,12 @@ export function inferMimeType(asset: Pick<DraftFormatAsset, "mimeType" | "filena
 export function normalizePublishingFormat(network: string, format?: string | null): PublishingFormat {
   const raw = String(format ?? "").trim().toUpperCase();
   if (MULTIFORMAT_VALUES.includes(raw as PublishingFormat)) return raw as PublishingFormat;
-  if (network === "FACEBOOK") return "FACEBOOK_FEED";
+  if (network === "FACEBOOK") {
+    if (raw.includes("REEL")) return "FACEBOOK_REEL";
+    if (raw.includes("STORY") || raw.includes("HISTORIA")) return "FACEBOOK_STORY";
+    return "FACEBOOK_FEED";
+  }
+  if (raw.includes("REEL")) return "INSTAGRAM_REEL";
   if (raw.includes("CAROUSEL") || raw.includes("CARRUSEL")) return "INSTAGRAM_CAROUSEL";
   if (raw.includes("STORY") || raw.includes("HISTORIA")) return "INSTAGRAM_STORY";
   return "INSTAGRAM_FEED";

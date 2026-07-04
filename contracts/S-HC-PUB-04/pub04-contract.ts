@@ -71,6 +71,7 @@ export interface Pub04Publisher {
     targetId: string;
     accessToken: string;
     caption: string;
+    format: string;
     mediaUrl?: string;
     mediaType?: "IMAGE" | "VIDEO";
   }): Promise<

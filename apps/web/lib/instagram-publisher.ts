@@ -3,6 +3,7 @@ interface PublishInstagramMediaInput {
   accessToken: string;
   mediaUrl: string;
   caption: string;
+  format?: string | null;
   mediaType?: "IMAGE" | "VIDEO" | "CAROUSEL";
 }
 
@@ -96,7 +97,7 @@ export async function waitForInstagramContainerReady(
 export async function publishInstagramMedia(
   input: PublishInstagramMediaInput
 ): Promise<PublishInstagramMediaOutput> {
-  const { igUserId, accessToken, mediaUrl, caption, mediaType } = input;
+  const { igUserId, accessToken, mediaUrl, caption, format, mediaType } = input;
   const apiVersion = process.env.INSTAGRAM_GRAPH_API_VERSION || "v25.0";
   const baseUrl = `https://graph.instagram.com/${apiVersion}`;
 
@@ -116,6 +117,7 @@ export async function publishInstagramMedia(
   const storedIdMismatch = igUserId !== authenticatedUserId;
 
   const isVideo = mediaType === "VIDEO";
+  const publishFormat = String(format ?? "INSTAGRAM_FEED").toUpperCase();
 
   // Create media container via /me/media
   const createParams = new URLSearchParams();
@@ -124,9 +126,18 @@ export async function publishInstagramMedia(
 
   if (isVideo) {
     createParams.append("video_url", mediaUrl);
-    createParams.append("media_type", "REELS");
+    if (publishFormat === "INSTAGRAM_REEL") {
+      createParams.append("media_type", "REELS");
+    } else if (publishFormat === "INSTAGRAM_STORY") {
+      createParams.append("media_type", "STORIES");
+    } else {
+      createParams.append("media_type", "VIDEO");
+    }
   } else {
     createParams.append("image_url", mediaUrl);
+    if (publishFormat === "INSTAGRAM_STORY") {
+      createParams.append("media_type", "STORIES");
+    }
   }
 
   const createRes = await fetch(`${baseUrl}/me/media`, {
