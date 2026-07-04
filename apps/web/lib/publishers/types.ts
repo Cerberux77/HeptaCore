@@ -11,8 +11,13 @@ export interface PublisherCapabilities {
 export interface PublishInput {
   targetId: string;
   accessToken: string;
+  refreshToken?: string;
   mediaUrl?: string | null;
   caption: string;
+  title?: string;
+  description?: string;
+  thumbnailUrl?: string | null;
+  format?: string;
   mediaType?: "IMAGE" | "VIDEO" | "CAROUSEL";
 }
 

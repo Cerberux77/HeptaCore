@@ -409,13 +409,20 @@ async function processJob(
 
   const mediaAsset = ctx.draft?.assets?.find((a) => a.publicUrl?.startsWith("https://"));
   const mediaUrl = mediaAsset?.publicUrl ?? undefined;
+  const thumbnailAsset = ctx.draft?.assets?.find((a) => a.kind === "IMAGE" && a.publicUrl?.startsWith("https://"));
+  const thumbnailUrl = thumbnailAsset?.publicUrl ?? undefined;
 
   let providerResult: Awaited<ReturnType<Pub04Publisher["publish"]>>;
   try {
     providerResult = await publisher.publish({
       targetId: credential.targetId,
       accessToken: credential.accessToken,
+      refreshToken: credential.refreshToken,
       caption: ctx.draft?.caption ?? ctx.draft?.title ?? "",
+      title: ctx.draft?.title ?? "",
+      description: ctx.draft?.caption ?? ctx.draft?.title ?? "",
+      thumbnailUrl,
+      format: ctx.draft?.format,
       mediaUrl,
       mediaType: mediaAsset ? (mediaAsset.kind === "VIDEO" ? "VIDEO" : "IMAGE") : undefined,
     });

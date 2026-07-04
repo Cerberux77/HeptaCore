@@ -380,6 +380,7 @@ export async function POST(req: Request) {
   }
 
   const accessToken = credentialResolution.accessToken;
+  const refreshToken = credentialResolution.refreshToken;
   const targetId = credentialResolution.providerUserId;
   const credentialId = credentialResolution.credentialId;
   const connectionId = credentialResolution.connectionId;
@@ -400,6 +401,8 @@ export async function POST(req: Request) {
   let mediaUrl: string | undefined | null;
   let mediaType: "IMAGE" | "VIDEO" | undefined;
   const primaryAsset = needsAsset ? (draft.assets.find((a) => a.role === "primary") ?? draft.assets[0]) : null;
+  const thumbnailAsset = draft.assets.find((asset) => asset.asset.kind === "IMAGE" && asset.asset.id !== primaryAsset?.asset.id);
+  const thumbnailUrl = thumbnailAsset ? buildPublicAssetUrl(tenantSlug, thumbnailAsset.asset) : null;
 
   if (primaryAsset) {
     mediaUrl = buildPublicAssetUrl(tenantSlug, primaryAsset.asset);
@@ -503,8 +506,13 @@ export async function POST(req: Request) {
   const publishInput: PublishInput = {
     targetId,
     accessToken,
+    refreshToken,
     mediaUrl,
     caption: draft.caption || draft.title,
+    title: draft.title,
+    description: draft.caption || draft.title,
+    thumbnailUrl,
+    format,
     mediaType,
   };
 

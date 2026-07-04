@@ -21,6 +21,7 @@ function getKeyFingerprint(): string {
 export interface DecryptResult {
   ok: true;
   accessToken: string;
+  refreshToken?: string;
   credentialId: string;
   connectionId: string;
   socialAccountId: string;
@@ -68,14 +69,6 @@ export async function resolveAndDecryptOAuthCredential(params: {
     };
   }
 
-  if (oauthConnection.expiresAt && oauthConnection.expiresAt < new Date()) {
-    return {
-      ok: false,
-      code: "LIVE_BLOCKED_NO_CREDENTIAL",
-      error: `${provider} OAuth connection is expired.`,
-    };
-  }
-
   // 2. Load exactly the credential referenced by tokenRef
   const credential = await prisma.credentialVaultItem.findFirst({
     where: {
@@ -95,18 +88,10 @@ export async function resolveAndDecryptOAuthCredential(params: {
     };
   }
 
-  if (credential.expiresAt && credential.expiresAt < new Date()) {
-    return {
-      ok: false,
-      code: "LIVE_BLOCKED_NO_CREDENTIAL",
-      error: `${provider} credential is expired.`,
-    };
-  }
-
   // 3. Decrypt
-  let decrypted: { access_token: string };
+  let decrypted: { access_token?: string; refresh_token?: string };
   try {
-    decrypted = decryptJson<{ access_token: string }>(credential.encryptedBlob);
+    decrypted = decryptJson<{ access_token?: string; refresh_token?: string }>(credential.encryptedBlob);
   } catch (err) {
     return {
       ok: false,
@@ -125,7 +110,25 @@ export async function resolveAndDecryptOAuthCredential(params: {
     };
   }
 
-  if (!decrypted?.access_token) {
+  const allowRefreshableYoutube = provider === "YOUTUBE" && Boolean(decrypted?.refresh_token);
+
+  if (oauthConnection.expiresAt && oauthConnection.expiresAt < new Date() && !allowRefreshableYoutube) {
+    return {
+      ok: false,
+      code: "LIVE_BLOCKED_NO_CREDENTIAL",
+      error: `${provider} OAuth connection is expired.`,
+    };
+  }
+
+  if (credential.expiresAt && credential.expiresAt < new Date() && !allowRefreshableYoutube) {
+    return {
+      ok: false,
+      code: "LIVE_BLOCKED_NO_CREDENTIAL",
+      error: `${provider} credential is expired.`,
+    };
+  }
+
+  if (!decrypted?.access_token && !allowRefreshableYoutube) {
     return {
       ok: false,
       code: "LIVE_BLOCKED_DECRYPT_FAILED",
@@ -135,7 +138,8 @@ export async function resolveAndDecryptOAuthCredential(params: {
 
   return {
     ok: true,
-    accessToken: decrypted.access_token,
+    accessToken: decrypted.access_token || "",
+    refreshToken: decrypted.refresh_token,
     credentialId: credential.id,
     connectionId: oauthConnection.id,
     socialAccountId: oauthConnection.socialAccountId!,

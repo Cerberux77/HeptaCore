@@ -70,7 +70,12 @@ export interface Pub04Publisher {
   publish(input: {
     targetId: string;
     accessToken: string;
+    refreshToken?: string;
     caption: string;
+    title?: string;
+    description?: string;
+    thumbnailUrl?: string;
+    format?: string;
     mediaUrl?: string;
     mediaType?: "IMAGE" | "VIDEO";
   }): Promise<
@@ -158,7 +163,7 @@ export interface Pub04CronDeps {
     provider: string;
     socialAccountId: string;
   }): Promise<
-    | { ok: true; accessToken: string; targetId: string }
+    | { ok: true; accessToken: string; refreshToken?: string; targetId: string }
     | { ok: false; code: string }
   >;
   now(): Date;
