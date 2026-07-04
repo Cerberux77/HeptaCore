@@ -31,12 +31,20 @@ function run(command, args) {
 }
 
 function collectUnauthorizedGitStatusPaths(statusText, allowedPaths) {
+  const isAllowedPath = (path) => {
+    if (allowedPaths.has(path)) return true;
+    for (const allowedPath of allowedPaths) {
+      if (allowedPath.startsWith(`${path}/`)) return true;
+    }
+    return false;
+  };
+
   return statusText
     .split(/\r?\n/)
     .map((line) => line.trimEnd())
     .filter(Boolean)
     .map((line) => normalizeRelativePath(line.slice(3).split(" -> ").at(-1)))
-    .filter((path) => !allowedPaths.has(path));
+    .filter((path) => !isAllowedPath(path));
 }
 
 try {
