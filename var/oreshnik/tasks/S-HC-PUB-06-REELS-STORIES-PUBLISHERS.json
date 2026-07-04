@@ -3,12 +3,12 @@
   "taskId": "S-HC-PUB-06-REELS-STORIES-PUBLISHERS",
   "sprint": "publishing",
   "sprintOrderIndex": 20,
-  "taskOrderIndex": 27,
+  "taskOrderIndex": 28,
   "title": "Real publishing for Meta Reels and Stories: Instagram + Facebook",
   "owner": "Manuel",
   "backupOwner": "Manuel",
-  "status": "ready",
-  "taskBoardPath": "D:\\PROYECTOS\\WORKTREES\\HC_ASSET02_STATE_REPAIR\\var\\oreshnik\\task-board.json",
+  "status": "ready_for_integration",
+  "taskBoardPath": "D:\\PROYECTOS\\WORKTREES\\HeptaCore_ORESHNIK_READY\\var\\oreshnik\\wt\\32305cad03d6321a\\manuel\\manuel-codex3\\publishing\\S-HC-PUB-06-REELS-STORIES-PUBLISHERS\\57a46a194e\\var\\oreshnik\\task-board.json",
   "zone": [
     "apps/web/lib/publishers",
     "apps/web/app/api/publishing",
@@ -30,14 +30,397 @@
     "Reutilizacion de transactional finalization y IN_REVIEW state machine",
     "Cero declaracion de soporte hasta que la combinacion concreta haya sido validada"
   ],
+  "handoff": "docs/07_handoffs/S-HC-PUB-06-REELS-STORIES-PUBLISHERS.md",
+  "attempts": 1,
   "history": [
     {
       "at": "2026-06-28T18:47:05.091Z",
       "action": "status_reconciled",
       "operator": "manuel",
       "description": "Task status reconciled to ready: dependencies and conflicts are clear for execution"
+    },
+    {
+      "at": "2026-07-04T05:01:25.610Z",
+      "action": "claimed",
+      "operator": "manuel",
+      "branch": "dispatch/manuel/manuel-codex3/publishing/S-HC-PUB-06-REELS-STORIES-PUBLISHERS/57a46a194e",
+      "description": "Run run-manuel-S-HC-PUB-06-REELS-STORIES-PUBLISHERS-20260704050056-dbcefd7d claimed via codex"
+    },
+    {
+      "at": "2026-07-04T05:33:55.293Z",
+      "action": "validation_started",
+      "operator": "manuel",
+      "branch": "dispatch/manuel/manuel-codex3/publishing/S-HC-PUB-06-REELS-STORIES-PUBLISHERS/57a46a194e",
+      "description": "Validation started for run run-manuel-S-HC-PUB-06-REELS-STORIES-PUBLISHERS-20260704050056-dbcefd7d"
+    },
+    {
+      "at": "2026-07-04T05:39:30.129Z",
+      "action": "validated",
+      "operator": "manuel",
+      "branch": "dispatch/manuel/manuel-codex3/publishing/S-HC-PUB-06-REELS-STORIES-PUBLISHERS/57a46a194e",
+      "description": "typecheck passed; build passed; worker passed; tests passed"
+    },
+    {
+      "at": "2026-07-04T05:39:30.129Z",
+      "action": "ready_for_integration",
+      "operator": "manuel",
+      "branch": "dispatch/manuel/manuel-codex3/publishing/S-HC-PUB-06-REELS-STORIES-PUBLISHERS/57a46a194e",
+      "description": "Task delivered with handoff docs/07_handoffs/S-HC-PUB-06-REELS-STORIES-PUBLISHERS.md"
     }
   ],
-  "updatedAt": "2026-07-01T20:31:05.696Z",
-  "runs": []
+  "validationGateResults": [
+    {
+      "gateId": "typecheck",
+      "command": "npm",
+      "args": [
+        "run",
+        "typecheck"
+      ],
+      "cwd": "D:\\PROYECTOS\\WORKTREES\\HeptaCore_ORESHNIK_READY\\var\\oreshnik\\wt\\32305cad03d6321a\\manuel\\manuel-codex3\\publishing\\S-HC-PUB-06-REELS-STORIES-PUBLISHERS\\57a46a194e",
+      "startedAt": "2026-07-04T05:36:21.220Z",
+      "finishedAt": "2026-07-04T05:36:37.228Z",
+      "durationMs": 16007,
+      "exitCode": 0,
+      "signal": null,
+      "timedOut": false,
+      "spawnError": null,
+      "stdout": "\n> heptacore@0.1.0 typecheck\n> npm run typecheck --workspaces --if-present\n\n\n> @heptacore/web@0.1.0 typecheck\n> tsc --noEmit\n\n\n> @heptacore/worker@0.2.0 typecheck\n> tsc --noEmit\n\n\n> @heptacore/agents@0.1.0 typecheck\n> tsc --noEmit\n\n\n> @heptacore/core@0.1.0 typecheck\n> tsc --noEmit\n\n\n> @heptacore/db@0.1.0 typecheck\n> tsc --noEmit\n\n\n> @heptacore/integrations@0.1.0 typecheck\n> tsc --noEmit\n\n\n> @heptacore/ui@0.1.0 typecheck\n> tsc --noEmit\n\n",
+      "stderr": "",
+      "passed": true,
+      "attempt": 1,
+      "commandFingerprint": "a33bebeb805798e18875dd7e82054f68231feb259d53d6ba25563b5f4c4ce3d1",
+      "resultFingerprint": "8f6680d1b634f0bc4b551a9863c5b7cbda02524061f2540b3f449a4d8eca083e",
+      "stdoutBytes": 440,
+      "stderrBytes": 0,
+      "stdoutTruncated": false,
+      "stderrTruncated": false
+    },
+    {
+      "gateId": "build",
+      "command": "npm",
+      "args": [
+        "run",
+        "build"
+      ],
+      "cwd": "D:\\PROYECTOS\\WORKTREES\\HeptaCore_ORESHNIK_READY\\var\\oreshnik\\wt\\32305cad03d6321a\\manuel\\manuel-codex3\\publishing\\S-HC-PUB-06-REELS-STORIES-PUBLISHERS\\57a46a194e",
+      "startedAt": "2026-07-04T05:36:37.229Z",
+      "finishedAt": "2026-07-04T05:37:34.622Z",
+      "durationMs": 57393,
+      "exitCode": 0,
+      "signal": null,
+      "timedOut": false,
+      "spawnError": null,
+      "stdout": "\n> heptacore@0.1.0 build\n> npm run build --workspaces --if-present\n\n\n> @heptacore/web@0.1.0 build\n> node scripts/copy-tenant-assets.mjs && prisma generate --schema ../../packages/db/prisma/schema.prisma && next build --webpack\n\n[copy-tenant-assets] Turpial assets copied to D:\\PROYECTOS\\WORKTREES\\HeptaCore_ORESHNIK_READY\\var\\oreshnik\\wt\\32305cad03d6321a\\manuel\\manuel-codex3\\publishing\\S-HC-PUB-06-REELS-STORIES-PUBLISHERS\\57a46a194e\\apps\\web\\public\\tenant-assets\\turpial\n\n✔ Generated Prisma Client (v7.8.0) to .\\..\\..\\..\\..\\..\\..\\..\\..\\..\\..\\..\\node_modules\\@prisma\\client in 659ms\n\nStart by importing your Prisma Client (See: https://pris.ly/d/importing-client)\n\n\n▲ Next.js 16.2.9 (webpack)\n\n  Creating an optimized production build ...\n✓ Compiled successfully in 6.8s\n  Running TypeScript ...\n  Finished TypeScript in 13.0s ...\n  Collecting page data using 7 workers ...\n  Generating static pages using 7 workers (0/27) ...\n  Generating static pages using 7 workers (6/27) \r\n  Generating static pages using 7 workers (13/27) \r\n  Generating static pages using 7 workers (20/27) \r\n✓ Generating static pages using 7 workers (27/27) in 2.8s\n  Finalizing page optimization ...\n  Collecting build traces ...\n\nRoute (app)\n┌ ƒ /\n├ ○ /_not-found\n├ ƒ /accept-invitation\n├ ƒ /access-required\n├ ƒ /admin\n├ ƒ /admin/tenants\n├ ƒ /admin/tenants/[slug]\n├ ƒ /admin/tenants/new\n├ ƒ /api/admin/capabilities\n├ ƒ /api/admin/facebook-page/bootstrap\n├ ƒ /api/admin/llm-config\n├ ƒ /api/admin/llm-governance\n├ ƒ /api/admin/llm-usage\n├ ƒ /api/admin/tenants\n├ ƒ /api/admin/tenants/[slug]\n├ ƒ /api/admin/tenants/[slug]/invitations\n├ ƒ /api/admin/tenants/[slug]/invitations/[id]\n├ ƒ /api/admin/tenants/[slug]/invitations/[id]/resend\n├ ƒ /api/admin/tenants/[slug]/members\n├ ƒ /api/admin/tenants/[slug]/members/[membershipId]\n├ ƒ /api/admin/tenants/[slug]/status\n├ ƒ /api/assets/[id]\n├ ƒ /api/assets/upload\n├ ƒ /api/assistant\n├ ƒ /api/auth/[...nextauth]\n├ ƒ /api/auth/recover\n├ ƒ /api/auth/register\n├ ƒ /api/auth/reset-password\n├ ƒ /api/campaigns\n├ ƒ /api/campaigns/[id]/approve\n├ ƒ /api/cron/publisher\n├ ƒ /api/drafts/[id]\n├ ƒ /api/drafts/[id]/approve\n├ ƒ /api/drafts/[id]/asset\n├ ƒ /api/drafts/[id]/reject\n├ ƒ /api/drafts/new\n├ ƒ /api/drafts/reorder\n├ ƒ /api/invitations\n├ ƒ /api/invitations/accept\n├ ƒ /api/oauth/facebook/callback\n├ ƒ /api/oauth/facebook/login\n├ ƒ /api/oauth/instagram/callback\n├ ƒ /api/oauth/instagram/login\n├ ƒ /api/publishing/publish\n├ ƒ /api/publishing/rollback\n├ ƒ /api/session/capabilities\n├ ƒ /api/strategy/generate\n├ ƒ /api/strategy/update\n├ ƒ /api/tenant-assets/[[...path]]\n├ ƒ /api/tenant-networks\n├ ƒ /api/tenants/[slug]/assets\n├ ƒ /api/tenants/[slug]/assets/[assetId]\n├ ƒ /api/tenants/[slug]/assets/[assetId]/content\n├ ƒ /api/tenants/[slug]/assets/[assetId]/content/upload\n├ ƒ /api/tenants/[slug]/assets/[assetId]/derivatives\n├ ƒ /api/tenants/[slug]/assets/by-storage-key\n├ ƒ /api/tenants/[slug]/assets/finalize\n├ ƒ /api/tenants/[slug]/assets/upload\n├ ƒ /api/webhooks/resend\n├ ƒ /app\n├ ○ /data-deletion\n├ ○ /icon.svg\n├ ○ /login\n├ ○ /privacy\n├ ○ /recover\n├ ○ /register\n├ ○ /reset-password\n├ ƒ /tenant/[slug]\n└ ○ /terms\n\n\nƒ Proxy (Middleware)\n\n○  (Static)   prerendered as static content\nƒ  (Dynamic)  server-rendered on demand\n\n",
+      "stderr": "Prisma schema loaded from ..\\..\\packages\\db\\prisma\\schema.prisma.\n⚠ Warning: Next.js inferred your workspace root, but it may not be correct.\n We detected multiple lockfiles and selected the directory of D:\\PROYECTOS\\WORKTREES\\HeptaCore_ORESHNIK_READY\\package-lock.json as the root directory.\n To silence this warning, set `outputFileTracingRoot` in your Next.js config, or consider removing one of the lockfiles if it's not needed.\n   See https://nextjs.org/docs/app/api-reference/config/next-config-js/output#caveats for more information.\n Detected additional lockfiles: \n   * D:\\PROYECTOS\\WORKTREES\\HeptaCore_ORESHNIK_READY\\var\\oreshnik\\wt\\32305cad03d6321a\\manuel\\manuel-codex3\\publishing\\S-HC-PUB-06-REELS-STORIES-PUBLISHERS\\57a46a194e\\package-lock.json\n\n",
+      "passed": true,
+      "attempt": 1,
+      "commandFingerprint": "1effd326fd5639134a83958bd989c7c154e878a79b237d4becd1323562c7efac",
+      "resultFingerprint": "5752da7e40f284961b60bdc10c01f21d1c3337fb2e8350f1e85bba83b0d93b69",
+      "stdoutBytes": 3460,
+      "stderrBytes": 761,
+      "stdoutTruncated": false,
+      "stderrTruncated": false
+    },
+    {
+      "gateId": "worker",
+      "command": "npm",
+      "args": [
+        "run",
+        "worker:validate"
+      ],
+      "cwd": "D:\\PROYECTOS\\WORKTREES\\HeptaCore_ORESHNIK_READY\\var\\oreshnik\\wt\\32305cad03d6321a\\manuel\\manuel-codex3\\publishing\\S-HC-PUB-06-REELS-STORIES-PUBLISHERS\\57a46a194e",
+      "startedAt": "2026-07-04T05:37:34.623Z",
+      "finishedAt": "2026-07-04T05:37:36.599Z",
+      "durationMs": 1976,
+      "exitCode": 0,
+      "signal": null,
+      "timedOut": false,
+      "spawnError": null,
+      "stdout": "\n> heptacore@0.1.0 worker:validate\n> npm run validate -w @heptacore/worker\n\n\n> @heptacore/worker@0.2.0 validate\n> node src/validate.mjs\n\n\n=== Validacion de Assets ===\n\nPresentes: 46/46\n✅ Todos los assets presentes.\n\n\n=== Validacion de Cola de Publicaciones ===\nTotal entries: 29\n\n\n=== Resumen de Validacion ===\nValidos: 29/29\nAssets faltantes: 0\nFechas faltantes: 0\n\n✅ Todos los drafts validos.\n",
+      "stderr": "[config] .env.rrss no encontrado. Usando solo variables de entorno del sistema.\n",
+      "passed": true,
+      "attempt": 1,
+      "commandFingerprint": "01ab9ce3164b319816af698e9b96b0b8b4cb86624d200a18a663fbae24a11d0f",
+      "resultFingerprint": "5977c3fa93f4264a1f1ffe5a00495b348c345f2c7a0556138f7668d47863a21a",
+      "stdoutBytes": 399,
+      "stderrBytes": 80,
+      "stdoutTruncated": false,
+      "stderrTruncated": false
+    },
+    {
+      "gateId": "tests",
+      "command": "npm",
+      "args": [
+        "run",
+        "test"
+      ],
+      "cwd": "D:\\PROYECTOS\\WORKTREES\\HeptaCore_ORESHNIK_READY\\var\\oreshnik\\wt\\32305cad03d6321a\\manuel\\manuel-codex3\\publishing\\S-HC-PUB-06-REELS-STORIES-PUBLISHERS\\57a46a194e",
+      "startedAt": "2026-07-04T05:37:36.599Z",
+      "finishedAt": "2026-07-04T05:39:29.709Z",
+      "durationMs": 113110,
+      "exitCode": 0,
+      "signal": null,
+      "timedOut": false,
+      "spawnError": null,
+      "stdout": "\n> heptacore@0.1.0 test\n> node --test apps/web/lib/calendar-state.test.mjs && npm run test:infra && npm run test --workspaces --if-present\n\n✔ calendar display state prefers operational state over approval status (1.0455ms)\nℹ tests 1\nℹ suites 0\nℹ pass 1\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 225.5814\n\n> heptacore@0.1.0 test:infra\n> node --test scripts/goal-runner/__tests__/*.test.mjs scripts/oreshnik/__tests__/*.test.mjs\n\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\n▶ Doctor Command\n  ✔ reports healthy for empty clean worktree (159.2742ms)\n  ✔ detects stale lock when state status is not ACTIVE (353.412ms)\n  ✔ detects stale lock when state file is missing (540.7672ms)\n  ✔ reports DOCTOR-I002 for valid lock and ACTIVE state (361.8021ms)\n  ✔ detects state validation failure (corrupt state) (274.8082ms)\n  ✔ detects index inconsistency (stale content hash) (229.4062ms)\n  ✔ detects index entry with no goal directory (211.4271ms)\n  ✔ detects resumable goals when no lock exists (134.4311ms)\n  ✔ reports missing history directory as warning (124.881ms)\n  ✔ reports missing schema file as error (112.0752ms)\n  ✔ resolveGateSpawn wraps npm in cmd.exe /c on Windows (0.4776ms)\n  ✔ resolveGateSpawn preserves non-aliased commands unchanged (1.8759ms)\n  ✔ resolveGateSpawn wraps aliased commands via cmd.exe /c on Windows (0.3652ms)\n✔ Doctor Command (2540.2648ms)\n▶ Evidence and Gates\n  ✔ complete fails without evidence (17.4395ms)\n  ✔ complete fails with wrong evidence type (9.0193ms)\n  ✔ evidence-add rejects sensitive paths (6.0379ms)\n  ✔ evidence-add rejects absolute paths (6.6996ms)\n  ✔ evidence-add rejects non-existent file (4.4477ms)\n  ✔ evidence-add rejects directory (2.4325ms)\n  ✔ evidence-add rejects path traversal (2.1847ms)\n  ✔ evidence-add accepts valid relative path and computes hash (8.9859ms)\n  ✔ validateGateIds rejects unknown gates (1.2204ms)\n  ✔ validateGateIds rejects non-array (0.5458ms)\n  ✔ setGates works for DRAFT and READY statuses (8.9318ms)\n  ✔ setGates rejects after ACTIVE (3.7739ms)\n  ✔ setGates rejects unknown gate IDs (2.5658ms)\n  ✔ setGates deduplicates while preserving order (8.5003ms)\n  ✔ validateEvidencePath rejects absolute paths (1.1099ms)\n✔ Evidence and Gates (104.9868ms)\n▶ ID Generation\n  ✔ generates valid goal IDs (8.473ms)\n  ✔ generates 5000 IDs with same title without collisions (72.9829ms)\n  ✔ generates 5000 IDs with fixed timestamp without collisions (54.6547ms)\n  ✔ rejects path traversal in IDs (0.4616ms)\n  ✔ rejects Windows reserved characters (0.5017ms)\n  ✔ rejects control characters (0.3733ms)\n  ✔ rejects invalid goal ID format (0.2823ms)\n  ✔ sanitizeSlug handles edge cases (0.3334ms)\n  ✔ generated IDs contain no Windows-problematic chars (12.4727ms)\n  ✔ goal ID has 8 hex chars of entropy suffix (1.5818ms)\n✔ ID Generation (155.4926ms)\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nError: Worktree already locked by active goal: GR-20260704T053743Z-6f33e9cd-first-active-goal\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nError: Cannot complete: No evidence submitted\nfatal: not a git repository (or any of the parent directories): .git\nfile:///D:/PROYECTOS/WORKTREES/HeptaCore_ORESHNIK_READY/var/oreshnik/wt/32305cad03d6321a/manuel/manuel-codex3/publishing/S-HC-PUB-06-REELS-STORIES-PUBLISHERS/57a46a194e/scripts/goal-runner/lib.mjs:189\n  if (!check.valid) throw new Error(check.reason);\n                          ^\n\nError: Status COMPLETED is terminal and immutable\n    at applyTransition (file:///D:/PROYECTOS/WORKTREES/HeptaCore_ORESHNIK_READY/var/oreshnik/wt/32305cad03d6321a/manuel/manuel-codex3/publishing/S-HC-PUB-06-REELS-STORIES-PUBLISHERS/57a46a194e/scripts/goal-runner/lib.mjs:189:27)\n    at cmdActivate (file:///D:/PROYECTOS/WORKTREES/HeptaCore_ORESHNIK_READY/var/oreshnik/wt/32305cad03d6321a/manuel/manuel-codex3/publishing/S-HC-PUB-06-REELS-STORIES-PUBLISHERS/57a46a194e/scripts/goal-runner/run.mjs:183:3)\n    at file:///D:/PROYECTOS/WORKTREES/HeptaCore_ORESHNIK_READY/var/oreshnik/wt/32305cad03d6321a/manuel/manuel-codex3/publishing/S-HC-PUB-06-REELS-STORIES-PUBLISHERS/57a46a194e/scripts/goal-runner/run.mjs:559:20\n    at ModuleJob.run (node:internal/modules/esm/module_job:439:25)\n    at async node:internal/modules/esm/loader:633:26\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5)\n\nNode.js v24.16.0\nError: Goal is not ACTIVE (current: COMPLETED)\n▶ Goal Runner CLI Integration\n  ✔ 1. create (787.8614ms)\n  ✔ 2. plan-record (374.7421ms)\n  ✔ 3. gates-set (385.4776ms)\n  ✔ 4. activate (331.7556ms)\n  ✔ 5. step-start and step-complete (355.6425ms)\n  ✔ 6. finding-add (185.5698ms)\n  ✔ 7. evidence-add (144.4885ms)\n  ✔ 8. complete (150.9409ms)\n  ✔ 9. resume from PAUSED (1145.1928ms)\n  ✔ 10. second ACTIVE goal is rejected (1679.4528ms)\n  ✔ 11. stale lock detection (917.6268ms)\n  ✔ 12. complete is rejected without evidence (1121.6729ms)\n  ✔ 13. terminal state is immutable after complete (322.7896ms)\n✔ Goal Runner CLI Integration (7934.8735ms)\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\n▶ Lock Exclusivity\n  ✔ readLock returns null when no lock exists (3.9365ms)\n  ✔ stale lock on wrong worktreeRoot (13.7567ms)\n  ✔ stale lock on different branch (196.7941ms)\n  ✔ non-existent goal state makes lock stale (201.676ms)\n  ✔ stale lock has inva",
+      "stderr": "",
+      "passed": true,
+      "attempt": 1,
+      "commandFingerprint": "55eeffc0fa18d755cf5cc8b916a094e69648085418425541a7967d30ed2eaf44",
+      "resultFingerprint": "e5577cb83b1adde95a00d61b09107cf88cf477d2db236ca21e3f3e4c68ecced9",
+      "stdoutBytes": 68041,
+      "stderrBytes": 0,
+      "stdoutTruncated": true,
+      "stderrTruncated": false
+    }
+  ],
+  "evidenceVerifications": [
+    {
+      "itemId": "build_passed",
+      "label": "build passed",
+      "verified": true,
+      "verifiedAt": "2026-07-04T05:37:34.622Z",
+      "runId": "run-manuel-S-HC-PUB-06-REELS-STORIES-PUBLISHERS-20260704050056-dbcefd7d",
+      "gateId": "build",
+      "source": "gate",
+      "commandFingerprint": "1effd326fd5639134a83958bd989c7c154e878a79b237d4becd1323562c7efac",
+      "resultFingerprint": "5752da7e40f284961b60bdc10c01f21d1c3337fb2e8350f1e85bba83b0d93b69",
+      "summary": "S-HC-PUB-06-REELS-STORIES-PUBLISHERS:build | exit=0 | timed_ok | signal=none | stdout=> heptacore@0.1.0 build | stderr=Prisma schema loaded from ..\\..\\packages\\db\\prisma\\schema.prisma."
+    },
+    {
+      "itemId": "changed_files_diff",
+      "label": "changed files diff",
+      "verified": true,
+      "verifiedAt": "2026-07-04T05:39:29.756Z",
+      "runId": "run-manuel-S-HC-PUB-06-REELS-STORIES-PUBLISHERS-20260704050056-dbcefd7d",
+      "source": "git",
+      "resultFingerprint": "a133b404d90362a55d7cacddfd0951c569d517f55d976d90cc17b23aafb52fc7",
+      "summary": "diff master..dispatch/manuel/manuel-codex3/publishing/S-HC-PUB-06-REELS-STORIES-PUBLISHERS/57a46a194e: apps/web/app/api/cron/publisher/route.ts, apps/web/app/api/publishing/publish/route.ts, apps/web/components/dashboard-console.tsx, apps/web/lib/__tests__/meta-publishers.test.ts, apps/web/lib/asset-compatibility.ts, apps/web/lib/instagram-publisher.ts, apps/web/lib/publishers/facebook-page.ts, apps/web/lib/publishers/instagram.ts, apps/web/lib/publishers/registry.ts, apps/web/lib/publishers/types.ts, apps/web/lib/publishing-cron-executor.ts, apps/web/lib/publishing-formats.ts, contracts/S-HC-PUB-04/pub04-contract.ts, docs/07_handoffs/S-HC-PUB-06-REELS-STORIES-PUBLISHERS.md, scripts/oreshnik/__tests__/smoke-end-to-end.test.mjs, var/oreshnik/task-board.json, var/oreshnik/tasks/S-HC-PUB-06-REELS-STORIES-PUBLISHERS.json"
+    },
+    {
+      "itemId": "tests_passed",
+      "label": "tests passed",
+      "verified": true,
+      "verifiedAt": "2026-07-04T05:39:29.709Z",
+      "runId": "run-manuel-S-HC-PUB-06-REELS-STORIES-PUBLISHERS-20260704050056-dbcefd7d",
+      "gateId": "tests",
+      "source": "gate",
+      "commandFingerprint": "55eeffc0fa18d755cf5cc8b916a094e69648085418425541a7967d30ed2eaf44",
+      "resultFingerprint": "e5577cb83b1adde95a00d61b09107cf88cf477d2db236ca21e3f3e4c68ecced9",
+      "summary": "S-HC-PUB-06-REELS-STORIES-PUBLISHERS:tests | exit=0 | timed_ok | signal=none | stdout=> heptacore@0.1.0 test"
+    },
+    {
+      "itemId": "typecheck_passed",
+      "label": "typecheck passed",
+      "verified": true,
+      "verifiedAt": "2026-07-04T05:36:37.228Z",
+      "runId": "run-manuel-S-HC-PUB-06-REELS-STORIES-PUBLISHERS-20260704050056-dbcefd7d",
+      "gateId": "typecheck",
+      "source": "gate",
+      "commandFingerprint": "a33bebeb805798e18875dd7e82054f68231feb259d53d6ba25563b5f4c4ce3d1",
+      "resultFingerprint": "8f6680d1b634f0bc4b551a9863c5b7cbda02524061f2540b3f449a4d8eca083e",
+      "summary": "S-HC-PUB-06-REELS-STORIES-PUBLISHERS:typecheck | exit=0 | timed_ok | signal=none | stdout=> heptacore@0.1.0 typecheck"
+    },
+    {
+      "itemId": "worker_validation_passed",
+      "label": "worker validation passed",
+      "verified": true,
+      "verifiedAt": "2026-07-04T05:37:36.599Z",
+      "runId": "run-manuel-S-HC-PUB-06-REELS-STORIES-PUBLISHERS-20260704050056-dbcefd7d",
+      "gateId": "worker",
+      "source": "gate",
+      "commandFingerprint": "01ab9ce3164b319816af698e9b96b0b8b4cb86624d200a18a663fbae24a11d0f",
+      "resultFingerprint": "5977c3fa93f4264a1f1ffe5a00495b348c345f2c7a0556138f7668d47863a21a",
+      "summary": "S-HC-PUB-06-REELS-STORIES-PUBLISHERS:worker | exit=0 | timed_ok | signal=none | stdout=> heptacore@0.1.0 worker:validate | stderr=[config] .env.rrss no encontrado. Usando solo variables de entorno del sistema."
+    }
+  ],
+  "updatedAt": "2026-07-04T05:39:30.129Z",
+  "runs": [
+    {
+      "runId": "run-manuel-S-HC-PUB-06-REELS-STORIES-PUBLISHERS-20260704050056-dbcefd7d",
+      "operator": "manuel",
+      "worker": "manuel-dispatcher",
+      "workerMode": "codex",
+      "branch": "dispatch/manuel/manuel-codex3/publishing/S-HC-PUB-06-REELS-STORIES-PUBLISHERS/57a46a194e",
+      "worktreePath": "D:\\PROYECTOS\\WORKTREES\\HeptaCore_ORESHNIK_READY\\var\\oreshnik\\wt\\32305cad03d6321a\\manuel\\manuel-codex3\\publishing\\S-HC-PUB-06-REELS-STORIES-PUBLISHERS\\57a46a194e",
+      "zones": [
+        "apps/web/lib/publishers",
+        "apps/web/app/api/publishing",
+        "packages/integrations"
+      ],
+      "taskStatus": "ready_for_integration",
+      "claimStatus": "released",
+      "claimedAt": "2026-07-04T05:01:25.608Z",
+      "updatedAt": "2026-07-04T05:39:30.159Z",
+      "expiresAt": "2026-07-04T06:01:25.608Z",
+      "releasedAt": "2026-07-04T05:39:30.159Z",
+      "manifestPath": "var/oreshnik/runs/S-HC-PUB-06-REELS-STORIES-PUBLISHERS/run-manuel-S-HC-PUB-06-REELS-STORIES-PUBLISHERS-20260704050056-dbcefd7d.json",
+      "validationGateResults": [
+        {
+          "gateId": "typecheck",
+          "command": "npm",
+          "args": [
+            "run",
+            "typecheck"
+          ],
+          "cwd": "D:\\PROYECTOS\\WORKTREES\\HeptaCore_ORESHNIK_READY\\var\\oreshnik\\wt\\32305cad03d6321a\\manuel\\manuel-codex3\\publishing\\S-HC-PUB-06-REELS-STORIES-PUBLISHERS\\57a46a194e",
+          "startedAt": "2026-07-04T05:36:21.220Z",
+          "finishedAt": "2026-07-04T05:36:37.228Z",
+          "durationMs": 16007,
+          "exitCode": 0,
+          "signal": null,
+          "timedOut": false,
+          "spawnError": null,
+          "stdout": "\n> heptacore@0.1.0 typecheck\n> npm run typecheck --workspaces --if-present\n\n\n> @heptacore/web@0.1.0 typecheck\n> tsc --noEmit\n\n\n> @heptacore/worker@0.2.0 typecheck\n> tsc --noEmit\n\n\n> @heptacore/agents@0.1.0 typecheck\n> tsc --noEmit\n\n\n> @heptacore/core@0.1.0 typecheck\n> tsc --noEmit\n\n\n> @heptacore/db@0.1.0 typecheck\n> tsc --noEmit\n\n\n> @heptacore/integrations@0.1.0 typecheck\n> tsc --noEmit\n\n\n> @heptacore/ui@0.1.0 typecheck\n> tsc --noEmit\n\n",
+          "stderr": "",
+          "passed": true,
+          "attempt": 1,
+          "commandFingerprint": "a33bebeb805798e18875dd7e82054f68231feb259d53d6ba25563b5f4c4ce3d1",
+          "resultFingerprint": "8f6680d1b634f0bc4b551a9863c5b7cbda02524061f2540b3f449a4d8eca083e",
+          "stdoutBytes": 440,
+          "stderrBytes": 0,
+          "stdoutTruncated": false,
+          "stderrTruncated": false
+        },
+        {
+          "gateId": "build",
+          "command": "npm",
+          "args": [
+            "run",
+            "build"
+          ],
+          "cwd": "D:\\PROYECTOS\\WORKTREES\\HeptaCore_ORESHNIK_READY\\var\\oreshnik\\wt\\32305cad03d6321a\\manuel\\manuel-codex3\\publishing\\S-HC-PUB-06-REELS-STORIES-PUBLISHERS\\57a46a194e",
+          "startedAt": "2026-07-04T05:36:37.229Z",
+          "finishedAt": "2026-07-04T05:37:34.622Z",
+          "durationMs": 57393,
+          "exitCode": 0,
+          "signal": null,
+          "timedOut": false,
+          "spawnError": null,
+          "stdout": "\n> heptacore@0.1.0 build\n> npm run build --workspaces --if-present\n\n\n> @heptacore/web@0.1.0 build\n> node scripts/copy-tenant-assets.mjs && prisma generate --schema ../../packages/db/prisma/schema.prisma && next build --webpack\n\n[copy-tenant-assets] Turpial assets copied to D:\\PROYECTOS\\WORKTREES\\HeptaCore_ORESHNIK_READY\\var\\oreshnik\\wt\\32305cad03d6321a\\manuel\\manuel-codex3\\publishing\\S-HC-PUB-06-REELS-STORIES-PUBLISHERS\\57a46a194e\\apps\\web\\public\\tenant-assets\\turpial\n\n✔ Generated Prisma Client (v7.8.0) to .\\..\\..\\..\\..\\..\\..\\..\\..\\..\\..\\..\\node_modules\\@prisma\\client in 659ms\n\nStart by importing your Prisma Client (See: https://pris.ly/d/importing-client)\n\n\n▲ Next.js 16.2.9 (webpack)\n\n  Creating an optimized production build ...\n✓ Compiled successfully in 6.8s\n  Running TypeScript ...\n  Finished TypeScript in 13.0s ...\n  Collecting page data using 7 workers ...\n  Generating static pages using 7 workers (0/27) ...\n  Generating static pages using 7 workers (6/27) \r\n  Generating static pages using 7 workers (13/27) \r\n  Generating static pages using 7 workers (20/27) \r\n✓ Generating static pages using 7 workers (27/27) in 2.8s\n  Finalizing page optimization ...\n  Collecting build traces ...\n\nRoute (app)\n┌ ƒ /\n├ ○ /_not-found\n├ ƒ /accept-invitation\n├ ƒ /access-required\n├ ƒ /admin\n├ ƒ /admin/tenants\n├ ƒ /admin/tenants/[slug]\n├ ƒ /admin/tenants/new\n├ ƒ /api/admin/capabilities\n├ ƒ /api/admin/facebook-page/bootstrap\n├ ƒ /api/admin/llm-config\n├ ƒ /api/admin/llm-governance\n├ ƒ /api/admin/llm-usage\n├ ƒ /api/admin/tenants\n├ ƒ /api/admin/tenants/[slug]\n├ ƒ /api/admin/tenants/[slug]/invitations\n├ ƒ /api/admin/tenants/[slug]/invitations/[id]\n├ ƒ /api/admin/tenants/[slug]/invitations/[id]/resend\n├ ƒ /api/admin/tenants/[slug]/members\n├ ƒ /api/admin/tenants/[slug]/members/[membershipId]\n├ ƒ /api/admin/tenants/[slug]/status\n├ ƒ /api/assets/[id]\n├ ƒ /api/assets/upload\n├ ƒ /api/assistant\n├ ƒ /api/auth/[...nextauth]\n├ ƒ /api/auth/recover\n├ ƒ /api/auth/register\n├ ƒ /api/auth/reset-password\n├ ƒ /api/campaigns\n├ ƒ /api/campaigns/[id]/approve\n├ ƒ /api/cron/publisher\n├ ƒ /api/drafts/[id]\n├ ƒ /api/drafts/[id]/approve\n├ ƒ /api/drafts/[id]/asset\n├ ƒ /api/drafts/[id]/reject\n├ ƒ /api/drafts/new\n├ ƒ /api/drafts/reorder\n├ ƒ /api/invitations\n├ ƒ /api/invitations/accept\n├ ƒ /api/oauth/facebook/callback\n├ ƒ /api/oauth/facebook/login\n├ ƒ /api/oauth/instagram/callback\n├ ƒ /api/oauth/instagram/login\n├ ƒ /api/publishing/publish\n├ ƒ /api/publishing/rollback\n├ ƒ /api/session/capabilities\n├ ƒ /api/strategy/generate\n├ ƒ /api/strategy/update\n├ ƒ /api/tenant-assets/[[...path]]\n├ ƒ /api/tenant-networks\n├ ƒ /api/tenants/[slug]/assets\n├ ƒ /api/tenants/[slug]/assets/[assetId]\n├ ƒ /api/tenants/[slug]/assets/[assetId]/content\n├ ƒ /api/tenants/[slug]/assets/[assetId]/content/upload\n├ ƒ /api/tenants/[slug]/assets/[assetId]/derivatives\n├ ƒ /api/tenants/[slug]/assets/by-storage-key\n├ ƒ /api/tenants/[slug]/assets/finalize\n├ ƒ /api/tenants/[slug]/assets/upload\n├ ƒ /api/webhooks/resend\n├ ƒ /app\n├ ○ /data-deletion\n├ ○ /icon.svg\n├ ○ /login\n├ ○ /privacy\n├ ○ /recover\n├ ○ /register\n├ ○ /reset-password\n├ ƒ /tenant/[slug]\n└ ○ /terms\n\n\nƒ Proxy (Middleware)\n\n○  (Static)   prerendered as static content\nƒ  (Dynamic)  server-rendered on demand\n\n",
+          "stderr": "Prisma schema loaded from ..\\..\\packages\\db\\prisma\\schema.prisma.\n⚠ Warning: Next.js inferred your workspace root, but it may not be correct.\n We detected multiple lockfiles and selected the directory of D:\\PROYECTOS\\WORKTREES\\HeptaCore_ORESHNIK_READY\\package-lock.json as the root directory.\n To silence this warning, set `outputFileTracingRoot` in your Next.js config, or consider removing one of the lockfiles if it's not needed.\n   See https://nextjs.org/docs/app/api-reference/config/next-config-js/output#caveats for more information.\n Detected additional lockfiles: \n   * D:\\PROYECTOS\\WORKTREES\\HeptaCore_ORESHNIK_READY\\var\\oreshnik\\wt\\32305cad03d6321a\\manuel\\manuel-codex3\\publishing\\S-HC-PUB-06-REELS-STORIES-PUBLISHERS\\57a46a194e\\package-lock.json\n\n",
+          "passed": true,
+          "attempt": 1,
+          "commandFingerprint": "1effd326fd5639134a83958bd989c7c154e878a79b237d4becd1323562c7efac",
+          "resultFingerprint": "5752da7e40f284961b60bdc10c01f21d1c3337fb2e8350f1e85bba83b0d93b69",
+          "stdoutBytes": 3460,
+          "stderrBytes": 761,
+          "stdoutTruncated": false,
+          "stderrTruncated": false
+        },
+        {
+          "gateId": "worker",
+          "command": "npm",
+          "args": [
+            "run",
+            "worker:validate"
+          ],
+          "cwd": "D:\\PROYECTOS\\WORKTREES\\HeptaCore_ORESHNIK_READY\\var\\oreshnik\\wt\\32305cad03d6321a\\manuel\\manuel-codex3\\publishing\\S-HC-PUB-06-REELS-STORIES-PUBLISHERS\\57a46a194e",
+          "startedAt": "2026-07-04T05:37:34.623Z",
+          "finishedAt": "2026-07-04T05:37:36.599Z",
+          "durationMs": 1976,
+          "exitCode": 0,
+          "signal": null,
+          "timedOut": false,
+          "spawnError": null,
+          "stdout": "\n> heptacore@0.1.0 worker:validate\n> npm run validate -w @heptacore/worker\n\n\n> @heptacore/worker@0.2.0 validate\n> node src/validate.mjs\n\n\n=== Validacion de Assets ===\n\nPresentes: 46/46\n✅ Todos los assets presentes.\n\n\n=== Validacion de Cola de Publicaciones ===\nTotal entries: 29\n\n\n=== Resumen de Validacion ===\nValidos: 29/29\nAssets faltantes: 0\nFechas faltantes: 0\n\n✅ Todos los drafts validos.\n",
+          "stderr": "[config] .env.rrss no encontrado. Usando solo variables de entorno del sistema.\n",
+          "passed": true,
+          "attempt": 1,
+          "commandFingerprint": "01ab9ce3164b319816af698e9b96b0b8b4cb86624d200a18a663fbae24a11d0f",
+          "resultFingerprint": "5977c3fa93f4264a1f1ffe5a00495b348c345f2c7a0556138f7668d47863a21a",
+          "stdoutBytes": 399,
+          "stderrBytes": 80,
+          "stdoutTruncated": false,
+          "stderrTruncated": false
+        },
+        {
+          "gateId": "tests",
+          "command": "npm",
+          "args": [
+            "run",
+            "test"
+          ],
+          "cwd": "D:\\PROYECTOS\\WORKTREES\\HeptaCore_ORESHNIK_READY\\var\\oreshnik\\wt\\32305cad03d6321a\\manuel\\manuel-codex3\\publishing\\S-HC-PUB-06-REELS-STORIES-PUBLISHERS\\57a46a194e",
+          "startedAt": "2026-07-04T05:37:36.599Z",
+          "finishedAt": "2026-07-04T05:39:29.709Z",
+          "durationMs": 113110,
+          "exitCode": 0,
+          "signal": null,
+          "timedOut": false,
+          "spawnError": null,
+          "stdout": "\n> heptacore@0.1.0 test\n> node --test apps/web/lib/calendar-state.test.mjs && npm run test:infra && npm run test --workspaces --if-present\n\n✔ calendar display state prefers operational state over approval status (1.0455ms)\nℹ tests 1\nℹ suites 0\nℹ pass 1\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 225.5814\n\n> heptacore@0.1.0 test:infra\n> node --test scripts/goal-runner/__tests__/*.test.mjs scripts/oreshnik/__tests__/*.test.mjs\n\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\n▶ Doctor Command\n  ✔ reports healthy for empty clean worktree (159.2742ms)\n  ✔ detects stale lock when state status is not ACTIVE (353.412ms)\n  ✔ detects stale lock when state file is missing (540.7672ms)\n  ✔ reports DOCTOR-I002 for valid lock and ACTIVE state (361.8021ms)\n  ✔ detects state validation failure (corrupt state) (274.8082ms)\n  ✔ detects index inconsistency (stale content hash) (229.4062ms)\n  ✔ detects index entry with no goal directory (211.4271ms)\n  ✔ detects resumable goals when no lock exists (134.4311ms)\n  ✔ reports missing history directory as warning (124.881ms)\n  ✔ reports missing schema file as error (112.0752ms)\n  ✔ resolveGateSpawn wraps npm in cmd.exe /c on Windows (0.4776ms)\n  ✔ resolveGateSpawn preserves non-aliased commands unchanged (1.8759ms)\n  ✔ resolveGateSpawn wraps aliased commands via cmd.exe /c on Windows (0.3652ms)\n✔ Doctor Command (2540.2648ms)\n▶ Evidence and Gates\n  ✔ complete fails without evidence (17.4395ms)\n  ✔ complete fails with wrong evidence type (9.0193ms)\n  ✔ evidence-add rejects sensitive paths (6.0379ms)\n  ✔ evidence-add rejects absolute paths (6.6996ms)\n  ✔ evidence-add rejects non-existent file (4.4477ms)\n  ✔ evidence-add rejects directory (2.4325ms)\n  ✔ evidence-add rejects path traversal (2.1847ms)\n  ✔ evidence-add accepts valid relative path and computes hash (8.9859ms)\n  ✔ validateGateIds rejects unknown gates (1.2204ms)\n  ✔ validateGateIds rejects non-array (0.5458ms)\n  ✔ setGates works for DRAFT and READY statuses (8.9318ms)\n  ✔ setGates rejects after ACTIVE (3.7739ms)\n  ✔ setGates rejects unknown gate IDs (2.5658ms)\n  ✔ setGates deduplicates while preserving order (8.5003ms)\n  ✔ validateEvidencePath rejects absolute paths (1.1099ms)\n✔ Evidence and Gates (104.9868ms)\n▶ ID Generation\n  ✔ generates valid goal IDs (8.473ms)\n  ✔ generates 5000 IDs with same title without collisions (72.9829ms)\n  ✔ generates 5000 IDs with fixed timestamp without collisions (54.6547ms)\n  ✔ rejects path traversal in IDs (0.4616ms)\n  ✔ rejects Windows reserved characters (0.5017ms)\n  ✔ rejects control characters (0.3733ms)\n  ✔ rejects invalid goal ID format (0.2823ms)\n  ✔ sanitizeSlug handles edge cases (0.3334ms)\n  ✔ generated IDs contain no Windows-problematic chars (12.4727ms)\n  ✔ goal ID has 8 hex chars of entropy suffix (1.5818ms)\n✔ ID Generation (155.4926ms)\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nError: Worktree already locked by active goal: GR-20260704T053743Z-6f33e9cd-first-active-goal\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nError: Cannot complete: No evidence submitted\nfatal: not a git repository (or any of the parent directories): .git\nfile:///D:/PROYECTOS/WORKTREES/HeptaCore_ORESHNIK_READY/var/oreshnik/wt/32305cad03d6321a/manuel/manuel-codex3/publishing/S-HC-PUB-06-REELS-STORIES-PUBLISHERS/57a46a194e/scripts/goal-runner/lib.mjs:189\n  if (!check.valid) throw new Error(check.reason);\n                          ^\n\nError: Status COMPLETED is terminal and immutable\n    at applyTransition (file:///D:/PROYECTOS/WORKTREES/HeptaCore_ORESHNIK_READY/var/oreshnik/wt/32305cad03d6321a/manuel/manuel-codex3/publishing/S-HC-PUB-06-REELS-STORIES-PUBLISHERS/57a46a194e/scripts/goal-runner/lib.mjs:189:27)\n    at cmdActivate (file:///D:/PROYECTOS/WORKTREES/HeptaCore_ORESHNIK_READY/var/oreshnik/wt/32305cad03d6321a/manuel/manuel-codex3/publishing/S-HC-PUB-06-REELS-STORIES-PUBLISHERS/57a46a194e/scripts/goal-runner/run.mjs:183:3)\n    at file:///D:/PROYECTOS/WORKTREES/HeptaCore_ORESHNIK_READY/var/oreshnik/wt/32305cad03d6321a/manuel/manuel-codex3/publishing/S-HC-PUB-06-REELS-STORIES-PUBLISHERS/57a46a194e/scripts/goal-runner/run.mjs:559:20\n    at ModuleJob.run (node:internal/modules/esm/module_job:439:25)\n    at async node:internal/modules/esm/loader:633:26\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5)\n\nNode.js v24.16.0\nError: Goal is not ACTIVE (current: COMPLETED)\n▶ Goal Runner CLI Integration\n  ✔ 1. create (787.8614ms)\n  ✔ 2. plan-record (374.7421ms)\n  ✔ 3. gates-set (385.4776ms)\n  ✔ 4. activate (331.7556ms)\n  ✔ 5. step-start and step-complete (355.6425ms)\n  ✔ 6. finding-add (185.5698ms)\n  ✔ 7. evidence-add (144.4885ms)\n  ✔ 8. complete (150.9409ms)\n  ✔ 9. resume from PAUSED (1145.1928ms)\n  ✔ 10. second ACTIVE goal is rejected (1679.4528ms)\n  ✔ 11. stale lock detection (917.6268ms)\n  ✔ 12. complete is rejected without evidence (1121.6729ms)\n  ✔ 13. terminal state is immutable after complete (322.7896ms)\n✔ Goal Runner CLI Integration (7934.8735ms)\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\n▶ Lock Exclusivity\n  ✔ readLock returns null when no lock exists (3.9365ms)\n  ✔ stale lock on wrong worktreeRoot (13.7567ms)\n  ✔ stale lock on different branch (196.7941ms)\n  ✔ non-existent goal state makes lock stale (201.676ms)\n  ✔ stale lock has inva",
+          "stderr": "",
+          "passed": true,
+          "attempt": 1,
+          "commandFingerprint": "55eeffc0fa18d755cf5cc8b916a094e69648085418425541a7967d30ed2eaf44",
+          "resultFingerprint": "e5577cb83b1adde95a00d61b09107cf88cf477d2db236ca21e3f3e4c68ecced9",
+          "stdoutBytes": 68041,
+          "stderrBytes": 0,
+          "stdoutTruncated": true,
+          "stderrTruncated": false
+        }
+      ],
+      "evidenceVerifications": [
+        {
+          "itemId": "build_passed",
+          "label": "build passed",
+          "verified": true,
+          "verifiedAt": "2026-07-04T05:37:34.622Z",
+          "runId": "run-manuel-S-HC-PUB-06-REELS-STORIES-PUBLISHERS-20260704050056-dbcefd7d",
+          "gateId": "build",
+          "source": "gate",
+          "commandFingerprint": "1effd326fd5639134a83958bd989c7c154e878a79b237d4becd1323562c7efac",
+          "resultFingerprint": "5752da7e40f284961b60bdc10c01f21d1c3337fb2e8350f1e85bba83b0d93b69",
+          "summary": "S-HC-PUB-06-REELS-STORIES-PUBLISHERS:build | exit=0 | timed_ok | signal=none | stdout=> heptacore@0.1.0 build | stderr=Prisma schema loaded from ..\\..\\packages\\db\\prisma\\schema.prisma."
+        },
+        {
+          "itemId": "changed_files_diff",
+          "label": "changed files diff",
+          "verified": true,
+          "verifiedAt": "2026-07-04T05:39:29.756Z",
+          "runId": "run-manuel-S-HC-PUB-06-REELS-STORIES-PUBLISHERS-20260704050056-dbcefd7d",
+          "source": "git",
+          "resultFingerprint": "a133b404d90362a55d7cacddfd0951c569d517f55d976d90cc17b23aafb52fc7",
+          "summary": "diff master..dispatch/manuel/manuel-codex3/publishing/S-HC-PUB-06-REELS-STORIES-PUBLISHERS/57a46a194e: apps/web/app/api/cron/publisher/route.ts, apps/web/app/api/publishing/publish/route.ts, apps/web/components/dashboard-console.tsx, apps/web/lib/__tests__/meta-publishers.test.ts, apps/web/lib/asset-compatibility.ts, apps/web/lib/instagram-publisher.ts, apps/web/lib/publishers/facebook-page.ts, apps/web/lib/publishers/instagram.ts, apps/web/lib/publishers/registry.ts, apps/web/lib/publishers/types.ts, apps/web/lib/publishing-cron-executor.ts, apps/web/lib/publishing-formats.ts, contracts/S-HC-PUB-04/pub04-contract.ts, docs/07_handoffs/S-HC-PUB-06-REELS-STORIES-PUBLISHERS.md, scripts/oreshnik/__tests__/smoke-end-to-end.test.mjs, var/oreshnik/task-board.json, var/oreshnik/tasks/S-HC-PUB-06-REELS-STORIES-PUBLISHERS.json"
+        },
+        {
+          "itemId": "tests_passed",
+          "label": "tests passed",
+          "verified": true,
+          "verifiedAt": "2026-07-04T05:39:29.709Z",
+          "runId": "run-manuel-S-HC-PUB-06-REELS-STORIES-PUBLISHERS-20260704050056-dbcefd7d",
+          "gateId": "tests",
+          "source": "gate",
+          "commandFingerprint": "55eeffc0fa18d755cf5cc8b916a094e69648085418425541a7967d30ed2eaf44",
+          "resultFingerprint": "e5577cb83b1adde95a00d61b09107cf88cf477d2db236ca21e3f3e4c68ecced9",
+          "summary": "S-HC-PUB-06-REELS-STORIES-PUBLISHERS:tests | exit=0 | timed_ok | signal=none | stdout=> heptacore@0.1.0 test"
+        },
+        {
+          "itemId": "typecheck_passed",
+          "label": "typecheck passed",
+          "verified": true,
+          "verifiedAt": "2026-07-04T05:36:37.228Z",
+          "runId": "run-manuel-S-HC-PUB-06-REELS-STORIES-PUBLISHERS-20260704050056-dbcefd7d",
+          "gateId": "typecheck",
+          "source": "gate",
+          "commandFingerprint": "a33bebeb805798e18875dd7e82054f68231feb259d53d6ba25563b5f4c4ce3d1",
+          "resultFingerprint": "8f6680d1b634f0bc4b551a9863c5b7cbda02524061f2540b3f449a4d8eca083e",
+          "summary": "S-HC-PUB-06-REELS-STORIES-PUBLISHERS:typecheck | exit=0 | timed_ok | signal=none | stdout=> heptacore@0.1.0 typecheck"
+        },
+        {
+          "itemId": "worker_validation_passed",
+          "label": "worker validation passed",
+          "verified": true,
+          "verifiedAt": "2026-07-04T05:37:36.599Z",
+          "runId": "run-manuel-S-HC-PUB-06-REELS-STORIES-PUBLISHERS-20260704050056-dbcefd7d",
+          "gateId": "worker",
+          "source": "gate",
+          "commandFingerprint": "01ab9ce3164b319816af698e9b96b0b8b4cb86624d200a18a663fbae24a11d0f",
+          "resultFingerprint": "5977c3fa93f4264a1f1ffe5a00495b348c345f2c7a0556138f7668d47863a21a",
+          "summary": "S-HC-PUB-06-REELS-STORIES-PUBLISHERS:worker | exit=0 | timed_ok | signal=none | stdout=> heptacore@0.1.0 worker:validate | stderr=[config] .env.rrss no encontrado. Usando solo variables de entorno del sistema."
+        }
+      ]
+    }
+  ]
 }
