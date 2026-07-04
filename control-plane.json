@@ -5,8 +5,8 @@
     "originUrl": "https://github.com/Cerberux77/HeptaCore.git",
     "canonicalMotherBranch": "master"
   },
-  "generation": 22,
-  "controlHead": "219ba8e2b0791d3e9dd599e5875a34eb909e96c3",
+  "generation": 23,
+  "controlHead": "754f6df72665fc2dd3a3f4461e19ef4d24c020fc",
   "catalog": {
     "taskBoardPath": "var/oreshnik/task-board.json",
     "zoneMapPath": "docs/07_handoffs/zone-map.json",
@@ -76,8 +76,8 @@
       "machineId": "machine-89814280-0079-4c35-82c8-3d533c515221",
       "repositoryId": "32305cad03d6321a",
       "slot": 3,
-      "createdAt": "2026-07-04T06:07:21.463Z",
-      "updatedAt": "2026-07-04T06:08:20.980Z",
+      "createdAt": "2026-07-04T06:10:13.471Z",
+      "updatedAt": "2026-07-04T06:10:13.471Z",
       "identityOrigin": "explicit"
     }
   ],
@@ -124,8 +124,8 @@
       "operatorId": "manuel",
       "harnessId": "codex",
       "machineId": "machine-89814280-0079-4c35-82c8-3d533c515221",
-      "startedAt": "2026-07-04T06:07:21.463Z",
-      "lastSeenAt": "2026-07-04T06:08:20.980Z",
+      "startedAt": "2026-07-04T06:10:13.471Z",
+      "lastSeenAt": "2026-07-04T06:10:13.471Z",
       "status": "active",
       "identityOrigin": "explicit"
     }
@@ -373,11 +373,12 @@
         "apps/web/app/api/publishing",
         "packages/integrations"
       ],
-      "status": "provisioning",
+      "status": "active",
       "sourceTaskBoardHead": "37c88d4f1877c0444b610a2b1422e9a015d2bd07",
       "catalogFingerprint": "598085002c5244d04ba764c6865934cdc726e23c",
       "createdAt": "2026-07-04T06:10:13.471Z",
-      "updatedAt": "2026-07-04T06:10:13.471Z",
+      "updatedAt": "2026-07-04T06:11:07.759Z",
+      "activatedAt": "2026-07-04T06:11:07.759Z",
       "resumedCount": 0,
       "takeoverCount": 0,
       "ownershipGeneration": 1,
@@ -541,7 +542,7 @@
       "worktreePath": "D:\\PROYECTOS\\WORKTREES\\HeptaCore_ORESHNIK_READY\\var\\oreshnik\\wt\\32305cad03d6321a\\manuel\\manuel-codex3\\publishing\\S-HC-PUB-07-YOUTUBE-PUBLISHING\\8243846fcc",
       "status": "active",
       "createdAt": "2026-07-04T06:10:13.471Z",
-      "updatedAt": "2026-07-04T06:10:13.471Z",
+      "updatedAt": "2026-07-04T06:11:07.759Z",
       "ownershipGeneration": 1,
       "harnessId": "codex",
       "agentInstanceUid": "agent_181e9938433f43d49f64de00eb23fd4f",
@@ -704,9 +705,9 @@
       "machineId": "machine-89814280-0079-4c35-82c8-3d533c515221",
       "branch": "dispatch/manuel/manuel-codex3/publishing/S-HC-PUB-07-YOUTUBE-PUBLISHING/8243846fcc",
       "worktreePath": "D:\\PROYECTOS\\WORKTREES\\HeptaCore_ORESHNIK_READY\\var\\oreshnik\\wt\\32305cad03d6321a\\manuel\\manuel-codex3\\publishing\\S-HC-PUB-07-YOUTUBE-PUBLISHING\\8243846fcc",
-      "status": "provisioning",
+      "status": "active",
       "createdAt": "2026-07-04T06:10:13.471Z",
-      "updatedAt": "2026-07-04T06:10:13.471Z",
+      "updatedAt": "2026-07-04T06:11:07.759Z",
       "sourceTaskBoardHead": "37c88d4f1877c0444b610a2b1422e9a015d2bd07",
       "ownershipGeneration": 1,
       "harnessId": "codex",
@@ -1106,7 +1107,7 @@
       "branch": "dispatch/manuel/manuel-codex3/publishing/S-HC-PUB-07-YOUTUBE-PUBLISHING/8243846fcc",
       "status": "reserved",
       "createdAt": "2026-07-04T06:10:13.471Z",
-      "updatedAt": "2026-07-04T06:10:13.471Z",
+      "updatedAt": "2026-07-04T06:11:07.759Z",
       "harnessId": "codex",
       "agentInstanceUid": "agent_181e9938433f43d49f64de00eb23fd4f",
       "agentInstanceAlias": "manuel-codex3",
@@ -1124,7 +1125,7 @@
       "branch": "dispatch/manuel/manuel-codex3/publishing/S-HC-PUB-07-YOUTUBE-PUBLISHING/8243846fcc",
       "status": "reserved",
       "createdAt": "2026-07-04T06:10:13.471Z",
-      "updatedAt": "2026-07-04T06:10:13.471Z",
+      "updatedAt": "2026-07-04T06:11:07.759Z",
       "harnessId": "codex",
       "agentInstanceUid": "agent_181e9938433f43d49f64de00eb23fd4f",
       "agentInstanceAlias": "manuel-codex3",
@@ -1142,7 +1143,7 @@
       "branch": "dispatch/manuel/manuel-codex3/publishing/S-HC-PUB-07-YOUTUBE-PUBLISHING/8243846fcc",
       "status": "reserved",
       "createdAt": "2026-07-04T06:10:13.471Z",
-      "updatedAt": "2026-07-04T06:10:13.471Z",
+      "updatedAt": "2026-07-04T06:11:07.759Z",
       "harnessId": "codex",
       "agentInstanceUid": "agent_181e9938433f43d49f64de00eb23fd4f",
       "agentInstanceAlias": "manuel-codex3",
@@ -1323,6 +1324,14 @@
       "runId": "run-manuel-S-HC-PUB-07-YOUTUBE-PUBLISHING-20260704061013-241462f1",
       "operator": "manuel",
       "message": "Reserved S-HC-PUB-07-YOUTUBE-PUBLISHING for manuel."
+    },
+    {
+      "at": "2026-07-04T06:11:07.759Z",
+      "action": "dispatch.next.active",
+      "assignmentId": "asg-3e5047c8-5423-4447-9e62-9be97d2074f7",
+      "runId": "run-manuel-S-HC-PUB-07-YOUTUBE-PUBLISHING-20260704061013-241462f1",
+      "operator": "manuel",
+      "message": "Assignment asg-3e5047c8-5423-4447-9e62-9be97d2074f7 is active."
     }
   ],
   "reconciliation": {
@@ -1332,5 +1341,5 @@
     "pendingDiagnostics": []
   },
   "createdAt": "2026-06-29T20:17:43.302Z",
-  "updatedAt": "2026-07-04T06:10:13.471Z"
+  "updatedAt": "2026-07-04T06:11:07.759Z"
 }
