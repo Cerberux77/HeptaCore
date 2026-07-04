@@ -4,7 +4,7 @@ import { execFileSync } from "node:child_process";
 import { existsSync, mkdtempSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = join(__dirname, "..", "..", "..");
@@ -252,7 +252,7 @@ function createFixtureRepository() {
   runGit(repoRoot, ["config", "user.name", "Kilo"]);
   runGit(repoRoot, ["add", "."]);
   runGit(repoRoot, ["commit", "-m", "seed fixture"]);
-  runGit(repoRoot, ["remote", "add", "origin", bareRemote]);
+  runGit(repoRoot, ["remote", "add", "origin", pathToFileURL(bareRemote).href]);
   runGit(repoRoot, ["push", "-u", "origin", "master"]);
 
   return { base, bareRemote, repoRoot, worktreeRoot, sprintId, taskId };
