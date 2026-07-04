@@ -5,15 +5,15 @@
     "originUrl": "https://github.com/Cerberux77/HeptaCore.git",
     "canonicalMotherBranch": "master"
   },
-  "generation": 19,
-  "controlHead": "722ade911a61249dc2b030bbf5ee702d93fabd8a",
+  "generation": 20,
+  "controlHead": "f34ecfb11b0b419d7ecfde303605c5fd018b1016",
   "catalog": {
     "taskBoardPath": "var/oreshnik/task-board.json",
     "zoneMapPath": "docs/07_handoffs/zone-map.json",
     "sourceTaskBoardHead": "37c88d4f1877c0444b610a2b1422e9a015d2bd07",
     "fingerprint": "598085002c5244d04ba764c6865934cdc726e23c",
     "taskCount": 40,
-    "updatedAt": "2026-07-04T05:00:56.124Z"
+    "updatedAt": "2026-07-04T06:07:21.463Z"
   },
   "policy": {
     "name": "deterministic-v1",
@@ -77,7 +77,7 @@
       "repositoryId": "32305cad03d6321a",
       "slot": 3,
       "createdAt": "2026-07-04T05:00:56.124Z",
-      "updatedAt": "2026-07-04T05:46:22.447Z",
+      "updatedAt": "2026-07-04T06:06:07.146Z",
       "identityOrigin": "explicit"
     }
   ],
@@ -125,8 +125,9 @@
       "harnessId": "codex",
       "machineId": "machine-89814280-0079-4c35-82c8-3d533c515221",
       "startedAt": "2026-07-04T05:00:56.124Z",
-      "lastSeenAt": "2026-07-04T05:46:22.447Z",
-      "status": "active",
+      "lastSeenAt": "2026-07-04T06:06:07.146Z",
+      "status": "closed",
+      "closedAt": "2026-07-04T06:06:07.146Z",
       "identityOrigin": "explicit"
     }
   ],
@@ -323,6 +324,37 @@
       "agentInstanceAlias": "manuel-codex3",
       "sessionId": "session_a3dea9d656094291af9d972016713bee",
       "identityOrigin": "explicit"
+    },
+    {
+      "assignmentId": "asg-29c63e75-9cc1-4f15-8573-99001a63822d",
+      "taskId": "S-HC-PUB-07-YOUTUBE-PUBLISHING",
+      "sprintId": "publishing",
+      "title": "Real publishing for YouTube: Video 16:9 and YouTube Shorts",
+      "operator": "manuel",
+      "machineId": "machine-89814280-0079-4c35-82c8-3d533c515221",
+      "functionalBranch": "dispatch/manuel/manuel-codex3/publishing/S-HC-PUB-07-YOUTUBE-PUBLISHING/35da6af908",
+      "motherBranch": "master",
+      "worktreePath": "D:\\PROYECTOS\\WORKTREES\\HeptaCore_ORESHNIK_READY\\var\\oreshnik\\wt\\32305cad03d6321a\\manuel\\manuel-codex3\\publishing\\S-HC-PUB-07-YOUTUBE-PUBLISHING\\35da6af908",
+      "runId": "run-manuel-S-HC-PUB-07-YOUTUBE-PUBLISHING-20260704060721-082921a3",
+      "claimId": "claim-asg-29c63e75-9cc1-4f15-8573-99001a63822d",
+      "zones": [
+        "apps/web/lib/publishers",
+        "apps/web/app/api/publishing",
+        "packages/integrations"
+      ],
+      "status": "provisioning",
+      "sourceTaskBoardHead": "37c88d4f1877c0444b610a2b1422e9a015d2bd07",
+      "catalogFingerprint": "598085002c5244d04ba764c6865934cdc726e23c",
+      "createdAt": "2026-07-04T06:07:21.463Z",
+      "updatedAt": "2026-07-04T06:07:21.463Z",
+      "resumedCount": 0,
+      "takeoverCount": 0,
+      "ownershipGeneration": 1,
+      "harnessId": "codex",
+      "agentInstanceUid": "agent_181e9938433f43d49f64de00eb23fd4f",
+      "agentInstanceAlias": "manuel-codex3",
+      "sessionId": "session_a3dea9d656094291af9d972016713bee",
+      "identityOrigin": "explicit"
     }
   ],
   "claims": [
@@ -439,6 +471,26 @@
       "status": "superseded",
       "createdAt": "2026-07-04T05:00:56.124Z",
       "updatedAt": "2026-07-04T06:06:07.146Z",
+      "ownershipGeneration": 1,
+      "harnessId": "codex",
+      "agentInstanceUid": "agent_181e9938433f43d49f64de00eb23fd4f",
+      "agentInstanceAlias": "manuel-codex3",
+      "sessionId": "session_a3dea9d656094291af9d972016713bee",
+      "identityOrigin": "explicit"
+    },
+    {
+      "claimId": "claim-asg-29c63e75-9cc1-4f15-8573-99001a63822d",
+      "assignmentId": "asg-29c63e75-9cc1-4f15-8573-99001a63822d",
+      "taskId": "S-HC-PUB-07-YOUTUBE-PUBLISHING",
+      "sprintId": "publishing",
+      "operator": "manuel",
+      "machineId": "machine-89814280-0079-4c35-82c8-3d533c515221",
+      "runId": "run-manuel-S-HC-PUB-07-YOUTUBE-PUBLISHING-20260704060721-082921a3",
+      "branch": "dispatch/manuel/manuel-codex3/publishing/S-HC-PUB-07-YOUTUBE-PUBLISHING/35da6af908",
+      "worktreePath": "D:\\PROYECTOS\\WORKTREES\\HeptaCore_ORESHNIK_READY\\var\\oreshnik\\wt\\32305cad03d6321a\\manuel\\manuel-codex3\\publishing\\S-HC-PUB-07-YOUTUBE-PUBLISHING\\35da6af908",
+      "status": "active",
+      "createdAt": "2026-07-04T06:07:21.463Z",
+      "updatedAt": "2026-07-04T06:07:21.463Z",
       "ownershipGeneration": 1,
       "harnessId": "codex",
       "agentInstanceUid": "agent_181e9938433f43d49f64de00eb23fd4f",
@@ -564,6 +616,26 @@
       "updatedAt": "2026-07-04T06:06:07.146Z",
       "sourceTaskBoardHead": "37c88d4f1877c0444b610a2b1422e9a015d2bd07",
       "lastError": "post-integration cleanup after alpha13 release-order bug left assignment stuck in ready_for_integration",
+      "ownershipGeneration": 1,
+      "harnessId": "codex",
+      "agentInstanceUid": "agent_181e9938433f43d49f64de00eb23fd4f",
+      "agentInstanceAlias": "manuel-codex3",
+      "sessionId": "session_a3dea9d656094291af9d972016713bee",
+      "identityOrigin": "explicit"
+    },
+    {
+      "runId": "run-manuel-S-HC-PUB-07-YOUTUBE-PUBLISHING-20260704060721-082921a3",
+      "assignmentId": "asg-29c63e75-9cc1-4f15-8573-99001a63822d",
+      "taskId": "S-HC-PUB-07-YOUTUBE-PUBLISHING",
+      "sprintId": "publishing",
+      "operator": "manuel",
+      "machineId": "machine-89814280-0079-4c35-82c8-3d533c515221",
+      "branch": "dispatch/manuel/manuel-codex3/publishing/S-HC-PUB-07-YOUTUBE-PUBLISHING/35da6af908",
+      "worktreePath": "D:\\PROYECTOS\\WORKTREES\\HeptaCore_ORESHNIK_READY\\var\\oreshnik\\wt\\32305cad03d6321a\\manuel\\manuel-codex3\\publishing\\S-HC-PUB-07-YOUTUBE-PUBLISHING\\35da6af908",
+      "status": "provisioning",
+      "createdAt": "2026-07-04T06:07:21.463Z",
+      "updatedAt": "2026-07-04T06:07:21.463Z",
+      "sourceTaskBoardHead": "37c88d4f1877c0444b610a2b1422e9a015d2bd07",
       "ownershipGeneration": 1,
       "harnessId": "codex",
       "agentInstanceUid": "agent_181e9938433f43d49f64de00eb23fd4f",
@@ -896,6 +968,60 @@
       "agentInstanceAlias": "manuel-codex3",
       "sessionId": "session_a3dea9d656094291af9d972016713bee",
       "identityOrigin": "explicit"
+    },
+    {
+      "zone": "apps/web/lib/publishers",
+      "assignmentId": "asg-29c63e75-9cc1-4f15-8573-99001a63822d",
+      "taskId": "S-HC-PUB-07-YOUTUBE-PUBLISHING",
+      "sprintId": "publishing",
+      "operator": "manuel",
+      "machineId": "machine-89814280-0079-4c35-82c8-3d533c515221",
+      "runId": "run-manuel-S-HC-PUB-07-YOUTUBE-PUBLISHING-20260704060721-082921a3",
+      "branch": "dispatch/manuel/manuel-codex3/publishing/S-HC-PUB-07-YOUTUBE-PUBLISHING/35da6af908",
+      "status": "reserved",
+      "createdAt": "2026-07-04T06:07:21.463Z",
+      "updatedAt": "2026-07-04T06:07:21.463Z",
+      "harnessId": "codex",
+      "agentInstanceUid": "agent_181e9938433f43d49f64de00eb23fd4f",
+      "agentInstanceAlias": "manuel-codex3",
+      "sessionId": "session_a3dea9d656094291af9d972016713bee",
+      "identityOrigin": "explicit"
+    },
+    {
+      "zone": "apps/web/app/api/publishing",
+      "assignmentId": "asg-29c63e75-9cc1-4f15-8573-99001a63822d",
+      "taskId": "S-HC-PUB-07-YOUTUBE-PUBLISHING",
+      "sprintId": "publishing",
+      "operator": "manuel",
+      "machineId": "machine-89814280-0079-4c35-82c8-3d533c515221",
+      "runId": "run-manuel-S-HC-PUB-07-YOUTUBE-PUBLISHING-20260704060721-082921a3",
+      "branch": "dispatch/manuel/manuel-codex3/publishing/S-HC-PUB-07-YOUTUBE-PUBLISHING/35da6af908",
+      "status": "reserved",
+      "createdAt": "2026-07-04T06:07:21.463Z",
+      "updatedAt": "2026-07-04T06:07:21.463Z",
+      "harnessId": "codex",
+      "agentInstanceUid": "agent_181e9938433f43d49f64de00eb23fd4f",
+      "agentInstanceAlias": "manuel-codex3",
+      "sessionId": "session_a3dea9d656094291af9d972016713bee",
+      "identityOrigin": "explicit"
+    },
+    {
+      "zone": "packages/integrations",
+      "assignmentId": "asg-29c63e75-9cc1-4f15-8573-99001a63822d",
+      "taskId": "S-HC-PUB-07-YOUTUBE-PUBLISHING",
+      "sprintId": "publishing",
+      "operator": "manuel",
+      "machineId": "machine-89814280-0079-4c35-82c8-3d533c515221",
+      "runId": "run-manuel-S-HC-PUB-07-YOUTUBE-PUBLISHING-20260704060721-082921a3",
+      "branch": "dispatch/manuel/manuel-codex3/publishing/S-HC-PUB-07-YOUTUBE-PUBLISHING/35da6af908",
+      "status": "reserved",
+      "createdAt": "2026-07-04T06:07:21.463Z",
+      "updatedAt": "2026-07-04T06:07:21.463Z",
+      "harnessId": "codex",
+      "agentInstanceUid": "agent_181e9938433f43d49f64de00eb23fd4f",
+      "agentInstanceAlias": "manuel-codex3",
+      "sessionId": "session_a3dea9d656094291af9d972016713bee",
+      "identityOrigin": "explicit"
     }
   ],
   "audit": [
@@ -1047,14 +1173,22 @@
       "runId": "run-manuel-S-HC-PUB-06-REELS-STORIES-PUBLISHERS-20260704050056-dbcefd7d",
       "operator": "manuel",
       "message": "post-integration cleanup after alpha13 release-order bug left assignment stuck in ready_for_integration"
+    },
+    {
+      "at": "2026-07-04T06:07:21.463Z",
+      "action": "dispatch.next.reserved",
+      "assignmentId": "asg-29c63e75-9cc1-4f15-8573-99001a63822d",
+      "runId": "run-manuel-S-HC-PUB-07-YOUTUBE-PUBLISHING-20260704060721-082921a3",
+      "operator": "manuel",
+      "message": "Reserved S-HC-PUB-07-YOUTUBE-PUBLISHING for manuel."
     }
   ],
   "reconciliation": {
-    "lastAttemptAt": "2026-07-04T05:00:55.907Z",
+    "lastAttemptAt": "2026-07-04T06:07:21.435Z",
     "lastAppliedAt": "2026-07-01T07:00:56.759Z",
     "lastResult": "clean",
     "pendingDiagnostics": []
   },
   "createdAt": "2026-06-29T20:17:43.302Z",
-  "updatedAt": "2026-07-04T06:06:07.146Z"
+  "updatedAt": "2026-07-04T06:07:21.463Z"
 }
