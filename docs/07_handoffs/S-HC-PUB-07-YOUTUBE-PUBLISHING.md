@@ -186,3 +186,118 @@ Alpha.13 also does not expose a clear `blocked_external` task-runtime transition
 1. Preserve this branch and run as the active governed PUB-07 implementation.
 2. When explicitly authorized for real external validation, use tenant-scoped Google credentials and execute staged real proof for both `YOUTUBE_VIDEO` and `YOUTUBE_SHORT`.
 3. Only after real evidence exists, run the normal Oreshnik evidence lifecycle, sprint close, and integration.
+
+## OAuth Onboarding Continuation (2026-07-04)
+
+### Added in this continuation
+
+- `apps/web/lib/youtube-oauth.ts`
+- `apps/web/lib/__tests__/youtube-oauth.test.ts`
+- `apps/web/components/youtube-integration-panel.tsx`
+- `apps/web/app/api/oauth/youtube/callback/route.ts`
+- `apps/web/app/api/tenants/[slug]/oauth/youtube/connect/route.ts`
+- `apps/web/app/api/tenants/[slug]/oauth/youtube/reconnect/route.ts`
+- `apps/web/app/api/tenants/[slug]/oauth/youtube/status/route.ts`
+- `apps/web/app/api/tenants/[slug]/oauth/youtube/disconnect/route.ts`
+
+### Updated in this continuation
+
+- `apps/web/components/dashboard-console.tsx`
+
+### Capability matrix for this continuation
+
+Exists and reused:
+- `SocialAccount`, `OAuthConnection`, `CredentialVaultItem`, and AES-GCM vault encryption.
+- Tenant session resolution, membership claims, and RBAC permission `INTEGRATIONS_MANAGE`.
+- Existing tenant dashboard shell.
+- The previously completed YouTube publisher, resolver, cron forwarding, and migration baseline.
+
+Exists partially:
+- Existing Meta OAuth routes already persisted encrypted credentials and tenant-scoped social accounts, but their `state` handling was not strong enough to reuse as-is for this YouTube onboarding.
+- Existing tenant network configuration already exposed selected networks, but only as sandbox/profile toggles rather than a real YouTube OAuth onboarding.
+
+Missing before this continuation:
+- No tenant-facing YouTube OAuth onboarding route.
+- No signed state plus replay-protected callback for YouTube.
+- No tenant dashboard card to connect, reconnect, disconnect, and inspect YouTube state.
+- No focused tests for YouTube OAuth onboarding and reconnection behavior.
+
+### Exact routes
+
+- Connect: `/api/tenants/[slug]/oauth/youtube/connect`
+- Reconnect: `/api/tenants/[slug]/oauth/youtube/reconnect`
+- Status: `/api/tenants/[slug]/oauth/youtube/status`
+- Disconnect: `/api/tenants/[slug]/oauth/youtube/disconnect`
+- Callback: `/api/oauth/youtube/callback`
+
+### Redirect URI
+
+Exact runtime pattern:
+- `{PUBLIC_ORIGIN}/api/oauth/youtube/callback`
+
+Examples:
+- local: `http://localhost:3000/api/oauth/youtube/callback`
+- preview/prod: `https://<your-heptacore-origin>/api/oauth/youtube/callback`
+
+The code derives this from request origin via `resolvePublicOrigin`; there is no dedicated redirect-URI env var.
+
+### Variables required
+
+- `GOOGLE_CLIENT_ID`
+- `GOOGLE_CLIENT_SECRET`
+- `YOUTUBE_DEFAULT_PRIVACY_STATUS`
+- existing vault secret (`TOKEN_VAULT_SECRET` or equivalent current secret source)
+
+### Google Cloud setup still required before live proof
+
+1. Enable YouTube Data API v3 in the Google Cloud project used by HeptaCore.
+2. Configure the OAuth consent screen for the intended validation users.
+3. Create a Web OAuth client.
+4. Register the exact callback URI `{PUBLIC_ORIGIN}/api/oauth/youtube/callback`.
+5. Load `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` into the target environment.
+6. Keep `YOUTUBE_DEFAULT_PRIVACY_STATUS` aligned with the validation plan, normally `private`.
+
+### Tenant UI connect procedure
+
+1. Sign in as a tenant member with a role that grants `INTEGRATIONS_MANAGE`.
+2. Open the tenant dashboard and switch to `Integraciones`.
+3. Use the YouTube card action `Conectar YouTube`.
+4. Complete Google consent.
+5. Return to HeptaCore callback and verify that the card now shows channel title, handle or channelId, thumbnail, scopes, and connection timestamp.
+6. Use `Reconectar` when scopes or expiry need renewal.
+7. Use `Desconectar` to revoke the local tenant binding without exposing tokens or editing vault rows manually.
+
+### Security guarantees implemented in this continuation
+
+- signed expiring OAuth state bound to `tenantId + tenantSlug + userId + provider`
+- one-time `httpOnly` cookie check to reject replay when callback state does not match
+- tenant membership and RBAC validation before connect, callback persistence, status, reconnect, and disconnect
+- tenant-scoped encrypted token storage in existing vault
+- no token values returned to the browser
+- reconnect preserves the previous refresh token when Google omits a replacement
+- disconnect marks the connection revoked and the social account disconnected
+
+### Focused validation added in this continuation
+
+- `npm run typecheck -w @heptacore/web`
+- `npx tsx --test apps/web/lib/__tests__/youtube-oauth.test.ts apps/web/lib/__tests__/youtube-publisher.test.ts`
+
+Covered by the new OAuth-focused tests:
+- tenant-local return URL sanitization
+- signed auth state generation
+- altered and expired state rejection
+- callback persistence of encrypted credentials and tenant social account
+- replay rejection when cookie and callback state diverge
+- refresh-token preservation on reconnect
+- `reconnect_required` status when token is expired and not refreshable
+- disconnect state transition
+
+### Post-onboarding live validation still pending
+
+After external authorization is permitted, validate both formats through the tenant UI-backed credential:
+
+1. Connect the tenant channel from `Integraciones`.
+2. Run one controlled `YOUTUBE_VIDEO` publish and record the confirmed `videoId`.
+3. Run one controlled `YOUTUBE_SHORT` publish and record the confirmed `videoId`.
+4. Verify provider confirmation, durable persistence, and absence of false `PUBLISHED` without confirmation.
+5. Only then advance Oreshnik evidence/close/integrate for PUB-07.
