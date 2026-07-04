@@ -15,10 +15,10 @@
     "packages/integrations"
   ],
   "taskBoardPath": "D:\\PROYECTOS\\WORKTREES\\HeptaCore_ORESHNIK_READY\\var\\oreshnik\\wt\\32305cad03d6321a\\manuel\\manuel-codex3\\publishing\\S-HC-PUB-06-REELS-STORIES-PUBLISHERS\\57a46a194e\\var\\oreshnik\\task-board.json",
-  "taskStatus": "ready_for_integration",
+  "taskStatus": "integrated",
   "claimStatus": "released",
   "claimedAt": "2026-07-04T05:01:25.608Z",
-  "updatedAt": "2026-07-04T05:39:30.159Z",
+  "updatedAt": "2026-07-04T05:59:02.580Z",
   "expiresAt": "2026-07-04T06:01:25.608Z",
   "releasedAt": "2026-07-04T05:39:30.159Z",
   "validationGateResults": [

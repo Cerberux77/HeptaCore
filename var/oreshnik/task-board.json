@@ -1,6 +1,6 @@
 {
   "project": "HeptaCore",
-  "updatedAt": "2026-07-04T05:39:30.129Z",
+  "updatedAt": "2026-07-04T05:59:02.580Z",
   "resiliencePolicy": "If an owner is unavailable for more than one working block or blocks the critical path, backupOwner may take over after recording reassignment.",
   "closurePolicy": "No sprint may be closed until acceptance criteria, base tests, sprint-specific tests, docs/handoff, and Oreshnik zone checks pass.",
   "baseTestMatrix": [
@@ -1837,7 +1837,7 @@
       "title": "Real publishing for Meta Reels and Stories: Instagram + Facebook",
       "owner": "Manuel",
       "backupOwner": "Manuel",
-      "status": "ready_for_integration",
+      "status": "integrated",
       "track": "publishing",
       "zone": [
         "apps/web/lib/publishers",
@@ -1896,6 +1896,13 @@
           "operator": "manuel",
           "branch": "dispatch/manuel/manuel-codex3/publishing/S-HC-PUB-06-REELS-STORIES-PUBLISHERS/57a46a194e",
           "description": "Task delivered with handoff docs/07_handoffs/S-HC-PUB-06-REELS-STORIES-PUBLISHERS.md"
+        },
+        {
+          "at": "2026-07-04T05:59:02.580Z",
+          "action": "integrated",
+          "operator": "manuel",
+          "branch": "dispatch/manuel/manuel-codex3/publishing/S-HC-PUB-06-REELS-STORIES-PUBLISHERS/57a46a194e",
+          "description": "Integrated dispatch/manuel/manuel-codex3/publishing/S-HC-PUB-06-REELS-STORIES-PUBLISHERS/57a46a194e into MADRE/v55-publishing-meta-reels-stories-publishers-2026-07-04"
         }
       ],
       "validationGateResults": [

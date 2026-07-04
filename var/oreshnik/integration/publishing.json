@@ -3,7 +3,7 @@
   "sprint": "publishing",
   "motherBranch": "MADRE/v55-publishing-meta-reels-stories-publishers-2026-07-04",
   "createdAt": "2026-07-04T05:48:34.264Z",
-  "updatedAt": "2026-07-04T05:48:34.264Z",
+  "updatedAt": "2026-07-04T05:59:02.580Z",
   "queue": [
     {
       "taskId": "S-HC-PUB-06-REELS-STORIES-PUBLISHERS",
@@ -13,8 +13,10 @@
       "operator": "manuel",
       "handoff": "docs/07_handoffs/S-HC-PUB-06-REELS-STORIES-PUBLISHERS.md",
       "queuedAt": "2026-07-04T05:48:34.264Z",
-      "updatedAt": "2026-07-04T05:48:34.264Z",
-      "status": "queued"
+      "updatedAt": "2026-07-04T05:59:02.580Z",
+      "status": "integrated",
+      "integratedAt": "2026-07-04T05:59:02.580Z",
+      "targetBranch": "MADRE/v55-publishing-meta-reels-stories-publishers-2026-07-04"
     }
   ]
 }
