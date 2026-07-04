@@ -95,7 +95,7 @@ try {
     issues.push(`forbidden reference '${match.token}' found in ${match.path}`);
   }
 
-  const gitStatus = run("git", ["status", "--porcelain"]);
+  const gitStatus = execFileSync("git", ["status", "--porcelain"], { cwd: ROOT, encoding: "utf8" });
   const dirtyPaths = collectUnauthorizedGitStatusPaths(gitStatus, authorizedRuntime?.allowedPaths || new Set());
   if (dirtyPaths.length > 0) issues.push("working tree is not clean");
 
