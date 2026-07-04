@@ -32,9 +32,10 @@ function run(command, args) {
 
 function collectUnauthorizedGitStatusPaths(statusText, allowedPaths) {
   const isAllowedPath = (path) => {
-    if (allowedPaths.has(path)) return true;
+    const normalizedPath = path.replace(/\/+$/, "");
+    if (allowedPaths.has(normalizedPath)) return true;
     for (const allowedPath of allowedPaths) {
-      if (allowedPath.startsWith(`${path}/`)) return true;
+      if (allowedPath.startsWith(`${normalizedPath}/`)) return true;
     }
     return false;
   };
