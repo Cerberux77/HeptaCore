@@ -2,7 +2,7 @@
 type: collaborator-status
 project: "HeptaCore"
 operator: "Manuel"
-last_updated: "2026-07-01T20:36:14.546Z"
+last_updated: "2026-07-04T04:59:14.291Z"
 generated_by: "Oreshnik canonical-check"
 source: "var/oreshnik/task-board.json"
 ---
@@ -125,7 +125,7 @@ Zonas: `apps/web/components`, `packages/core`
 
 ### S-HC-ASSET-02-FORMAT-DERIVATIVES - Format derivatives: badge interaction, format preview, intelligent crop, safe zones, asset variants
 
-Estado: `ready_for_integration`
+Estado: `integrated`
 
 - Badge de compatibilidad clickeable que abre detalle de formato
 - Preview especifico de formato con crop y safe zones visuales

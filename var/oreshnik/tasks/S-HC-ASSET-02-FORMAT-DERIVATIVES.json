@@ -8,7 +8,7 @@
   "owner": "Manuel",
   "backupOwner": "Manuel",
   "status": "integrated",
-  "taskBoardPath": "D:\\PROYECTOS\\WORKTREES\\HC_ASSET02_STATE_REPAIR\\var\\oreshnik\\task-board.json",
+  "taskBoardPath": "D:\\PROYECTOS\\PROYECTOS VISUAL STUDIO\\HeptaCore\\var\\oreshnik\\task-board.json",
   "zone": [
     "apps/web/components",
     "packages/core",

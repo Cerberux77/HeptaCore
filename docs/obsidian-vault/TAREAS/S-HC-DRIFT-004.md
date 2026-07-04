@@ -6,7 +6,7 @@ task_id: "S-HC-DRIFT-004"
 sprint: "ad-hoc"
 status: "done"
 owner: "Manuel"
-last_updated: "2026-07-01T20:31:05.696Z"
+last_updated: "2026-07-01T21:10:33.990Z"
 source: "var/oreshnik/tasks/S-HC-DRIFT-004.json"
 ---
 

@@ -3,12 +3,12 @@
   "taskId": "S-HC-02",
   "sprint": "data",
   "sprintOrderIndex": 11,
-  "taskOrderIndex": 15,
+  "taskOrderIndex": 16,
   "title": "Turpial importer and Prisma seed",
   "owner": "Jean",
   "backupOwner": "Manuel",
   "status": "done",
-  "taskBoardPath": "D:\\PROYECTOS\\WORKTREES\\HC_ASSET02_STATE_REPAIR\\var\\oreshnik\\task-board.json",
+  "taskBoardPath": "D:\\PROYECTOS\\PROYECTOS VISUAL STUDIO\\HeptaCore\\var\\oreshnik\\task-board.json",
   "zone": [
     "packages/db",
     "examples/tenants/turpial",
@@ -32,6 +32,6 @@
       "description": "turpial importer and prisma seed"
     }
   ],
-  "updatedAt": "2026-07-01T20:31:05.696Z",
+  "updatedAt": "2026-07-01T21:10:33.990Z",
   "runs": []
 }

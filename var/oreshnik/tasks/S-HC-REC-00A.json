@@ -3,12 +3,12 @@
   "taskId": "S-HC-REC-00A",
   "sprint": "recovery",
   "sprintOrderIndex": 21,
-  "taskOrderIndex": 30,
+  "taskOrderIndex": 31,
   "title": "UI Publishing Baseline Recovery — production publishing stabilized",
   "owner": "Manuel",
   "backupOwner": "Manuel",
   "status": "done",
-  "taskBoardPath": "D:\\PROYECTOS\\WORKTREES\\HC_ASSET02_STATE_REPAIR\\var\\oreshnik\\task-board.json",
+  "taskBoardPath": "D:\\PROYECTOS\\PROYECTOS VISUAL STUDIO\\HeptaCore\\var\\oreshnik\\task-board.json",
   "zone": [
     "apps/web",
     "docs/07_handoffs",
@@ -31,6 +31,6 @@
       "description": "Baseline de publicacion recuperado y estabilizado"
     }
   ],
-  "updatedAt": "2026-07-01T20:31:05.696Z",
+  "updatedAt": "2026-07-01T21:10:33.990Z",
   "runs": []
 }

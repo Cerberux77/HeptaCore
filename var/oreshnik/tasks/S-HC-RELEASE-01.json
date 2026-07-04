@@ -3,12 +3,12 @@
   "taskId": "S-HC-RELEASE-01",
   "sprint": "release",
   "sprintOrderIndex": 22,
-  "taskOrderIndex": 33,
+  "taskOrderIndex": 34,
   "title": "End-to-end Turpial Sound production proof",
   "owner": "Manuel+Jean",
   "backupOwner": "Manuel+Jean",
   "status": "done",
-  "taskBoardPath": "D:\\PROYECTOS\\WORKTREES\\HC_ASSET02_STATE_REPAIR\\var\\oreshnik\\task-board.json",
+  "taskBoardPath": "D:\\PROYECTOS\\PROYECTOS VISUAL STUDIO\\HeptaCore\\var\\oreshnik\\task-board.json",
   "zone": [
     "docs",
     "apps/web",
@@ -36,6 +36,6 @@
       "description": "E2E Turpial Sound production proof"
     }
   ],
-  "updatedAt": "2026-07-01T20:31:05.696Z",
+  "updatedAt": "2026-07-01T21:10:33.990Z",
   "runs": []
 }

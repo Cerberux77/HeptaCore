@@ -1,7 +1,7 @@
 ---
 type: status-board
 project: "HeptaCore"
-last_updated: "2026-07-01T20:36:14.566Z"
+last_updated: "2026-07-04T04:59:14.355Z"
 generated_by: "Oreshnik canonical-check"
 source: "var/oreshnik/task-board.json"
 ---
@@ -67,7 +67,7 @@ source: "var/oreshnik/task-board.json"
 | S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE | integrated | Manuel | LLM provider selection, cost estimation and governance policy | - |
 | S-HC-AN-01-CAMPAIGN-PERFORMANCE | blocked | Manuel | Campaign performance analytics: reach, engagement, metrics per post and campaign | S-HC-OPS-01-CAMPAIGN-REVIEW-DEPLOYMENT, S-HC-OBS-01-PUBLISHING-OBSERVABILITY |
 | S-HC-ASSET-01-STRATEGY-ASSET-MANIFEST | blocked | Manuel | Strategy-driven asset manifest: per-publication asset requirements | S-HC-STRAT-02-CONTENT-CALENDAR-BLUEPRINT, S-HC-PUB-03-MULTITENANT-ASSETS |
-| S-HC-ASSET-02-FORMAT-DERIVATIVES | ready_for_integration | Manuel | Format derivatives: badge interaction, format preview, intelligent crop, safe zones, asset variants | S-HC-PUB-03-MULTITENANT-ASSETS |
+| S-HC-ASSET-02-FORMAT-DERIVATIVES | integrated | Manuel | Format derivatives: badge interaction, format preview, intelligent crop, safe zones, asset variants | S-HC-PUB-03-MULTITENANT-ASSETS |
 | S-HC-COMM-01-SELF-SERVICE-SIGNUP | blocked | Manuel | Self-service tenant signup with trial gate and onboarding flow | S-HC-TEN-01-GLOBAL-TENANT-ADMIN, S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION |
 | S-HC-COMM-02-BILLING-ACTIVATION | blocked | Manuel | Tenant billing activation: plan selection, usage tracking, payment integration | S-HC-COMM-01-SELF-SERVICE-SIGNUP |
 | S-HC-INFRA-BASELINE-GATES-RECOVERY | ready_for_integration | Manuel | Baseline gates recovery: Oreshnik alpha.9, identity v2, Prisma, typecheck, build and canonical suite | - |
@@ -97,6 +97,7 @@ source: "var/oreshnik/task-board.json"
 | S-HC-DRIFT-001 | Manuel | sprint |
 | S-HC-DRIFT-002 | Manuel | Codex multi-RRSS refactor, readiness gates, UI fixes, migrations, vercelignore |
 | S-HC-DRIFT-003 | Manuel | Sistema de publicacion con 3 modos, 24 crons Vercel, cron publisher idempotente |
+| S-HC-DRIFT-004 | Manuel | Corregido bug preexistente de colision de goal IDs descubierto por gate global durante ASSET-02 |
 | S-HC-02 | Jean | Turpial importer and Prisma seed |
 | S-HC-00 | Manuel | Foundation baseline commit |
 | S-HC-01 | Jean | Console shell: tenant dashboard, onboarding, checklist, draft queue |
@@ -108,12 +109,12 @@ source: "var/oreshnik/task-board.json"
 | S-HC-REC-00C | Manuel | Canonical integration — recovered production baseline integrated into master |
 | S-HC-RELEASE-01 | Manuel+Jean | End-to-end Turpial Sound production proof |
 | S-HC-TEN-01-GLOBAL-TENANT-ADMIN | Manuel | Global tenant administration and provisioning |
-| S-HC-DRIFT-004 | Manuel | Corregido bug preexistente de colision de goal IDs descubierto por gate global durante ASSET-02 |
 
 ## Integration Train Outcomes Recientes
 
 | Sprint | Resultado | Madre | Task | Source | Compatibility | Advance |
 |---|---|---|---|---|---|---|
+| assets | succeeded | MADRE/v54-assets-asset-02-validated-partial-delivery-2026-07-01 | S-HC-ASSET-02-FORMAT-DERIVATIVES | dispatch/manuel/manuel-codex2/assets/S-HC-ASSET-02-FORMAT-DERIVATIVES/396dfc38dd | integration-train/assets/S-HC-ASSET-02-FORMAT-DER/r-5cdcee7b964f/a-98f25f84692b | runtime_projection_confirmed |
 | ai-infra | succeeded | MADRE/v50-ai-infra-llm-provider-selection-cost-governance-2026-06-29 | S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE | task/ai-infra/S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE/codex/codex-S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE-2026-06-29T02-30-49-546Z-c443db0b | integration-train/ai-infra/S-HC-AI-01-LLM-SELECTION/r-c20ec67edeb3/a-3acf93d1c862 | runtime_projection_confirmed |
 | S-HC-TOOL-01-GOAL-RUNNER-V1 | succeeded | MADRE/v50-s-hc-tool-01-goal-runner-v1-goal-runner-v1-deterministic-state-machine-locks-2026-06-29 | S-HC-TOOL-01-GOAL-RUNNER-V1 | kilo/s-hc-tool-01-goal-runner-v1 | integration-train/S-HC-TOOL-01-GOAL-RUNNER/S-HC-TOOL-01-GOAL-RUNNER/r-2ff68e9be13b/a-2cfa35e28f38 | runtime_projection_confirmed |
 | S-HC-PUB-05-RECONCILIATION-OPS | succeeded | MADRE/v49-s-hc-pub-05-reconciliation-ops-implementa-automatizacion-operacional-de-reconci-2026-06-29 | S-HC-PUB-05-RECONCILIATION-OPS | Manuel/s-hc-pub-05-reconciliation-ops-sprint-2026-06-29 | integration-train/S-HC-PUB-05-RECONCILIATI/S-HC-PUB-05-RECONCILIATI/r-3030ee064340/a-4b83c9744f29 | runtime_projection_confirmed |

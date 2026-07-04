@@ -8,7 +8,7 @@
   "owner": "Manuel",
   "backupOwner": "Manuel",
   "status": "done",
-  "taskBoardPath": "D:\\PROYECTOS\\WORKTREES\\HC_ASSET02_STATE_REPAIR\\var\\oreshnik\\task-board.json",
+  "taskBoardPath": "D:\\PROYECTOS\\PROYECTOS VISUAL STUDIO\\HeptaCore\\var\\oreshnik\\task-board.json",
   "zone": [
     "apps/web",
     "vercel.json",
@@ -23,6 +23,6 @@
       "description": "Sistema de publicacion con 3 modos, 24 crons Vercel, cron publisher idempotente"
     }
   ],
-  "updatedAt": "2026-07-01T20:31:05.696Z",
+  "updatedAt": "2026-07-01T21:10:33.990Z",
   "runs": []
 }

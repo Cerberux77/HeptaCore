@@ -3,12 +3,12 @@
   "taskId": "S-HC-PUB-08-PLATFORM-FORMAT-PARITY",
   "sprint": "publishing",
   "sprintOrderIndex": 20,
-  "taskOrderIndex": 29,
+  "taskOrderIndex": 30,
   "title": "Platform-format parity: manifest, preview, dry-run, scheduling and publishing for every supported format",
   "owner": "Manuel",
   "backupOwner": "Manuel",
   "status": "blocked",
-  "taskBoardPath": "D:\\PROYECTOS\\WORKTREES\\HC_ASSET02_STATE_REPAIR\\var\\oreshnik\\task-board.json",
+  "taskBoardPath": "D:\\PROYECTOS\\PROYECTOS VISUAL STUDIO\\HeptaCore\\var\\oreshnik\\task-board.json",
   "zone": [
     "apps/web/lib/publishers",
     "apps/web/lib/publishing-formats.ts",
@@ -35,6 +35,6 @@
       "description": "Task status reconciled to blocked: dependency S-HC-PUB-06-REELS-STORIES-PUBLISHERS still pending (S-HC-PUB-06-REELS-STORIES-PUBLISHERS:pending) | dependency S-HC-PUB-07-YOUTUBE-PUBLISHING still pending (S-HC-PUB-07-YOUTUBE-PUBLISHING:pending)"
     }
   ],
-  "updatedAt": "2026-07-01T20:31:05.696Z",
+  "updatedAt": "2026-07-01T21:10:33.990Z",
   "runs": []
 }
