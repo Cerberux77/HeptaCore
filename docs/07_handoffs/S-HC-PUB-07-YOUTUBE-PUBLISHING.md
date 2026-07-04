@@ -150,6 +150,20 @@ Meaning in this task:
 - contractual live evidence is still missing
 - alpha.13 does not model that state cleanly without either leaving the run active or pretending the task is integration-ready
 
+### Verified manifestation in this session
+
+- After the branch was pushed and the task was moved to `blocked` via supported `claim --release --status blocked`, alpha.13 kept the task blocked correctly.
+- After `dispatch release`, the assignment and reserved zones were released correctly.
+- `dispatch reconcile` reported no fixes and no ambiguity.
+- Even after that, `dispatch next --dry-run` still proposed a fresh new assignment for `S-HC-PUB-07-YOUTUBE-PUBLISHING` instead of a distinct next task.
+- At the same moment, the only distinct `ready` task visible in the board was `S-HC-PUB-06-REELS-STORIES-PUBLISHERS`, whose acceptance also requires real external Meta evidence and therefore is not safe for this session.
+
+### Recorded dry-run repro
+
+- proposed assignment: `asg-1196efa1-ffa2-44d8-b2b7-d82d33642ea1`
+- proposed run: `run-manuel-S-HC-PUB-07-YOUTUBE-PUBLISHING-20260704085654-f5120c74`
+- proposed branch: `dispatch/manuel/manuel-codex5/publishing/S-HC-PUB-07-YOUTUBE-PUBLISHING/277caa8532`
+
 ## Resumption Procedure
 
 1. Resume or take over only the preserved governed branch/worktree lineage for this exact task if it remains available through supported alpha.13 surfaces.
