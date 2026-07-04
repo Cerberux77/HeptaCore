@@ -7,10 +7,13 @@ PARTIAL DELIVERY. CODE COMPLETE FOR OFFLINE VALIDATION. REAL PROVIDER ACCEPTANCE
 ## Task Runtime
 
 - Task: `S-HC-PUB-07-YOUTUBE-PUBLISHING`
-- Run: `run-manuel-S-HC-PUB-07-YOUTUBE-PUBLISHING-20260704081318-00079d96`
-- Assignment: `asg-061998a5-c29a-4290-8761-00f3ba559274`
-- Branch: `dispatch/manuel/manuel-codex5/publishing/S-HC-PUB-07-YOUTUBE-PUBLISHING/3f656fa8ff`
-- Worktree: `var/oreshnik/wt/32305cad03d6321a/manuel/manuel-codex5/publishing/S-HC-PUB-07-YOUTUBE-PUBLISHING/3f656fa8ff`
+- Run: `run-manuel-S-HC-PUB-07-YOUTUBE-PUBLISHING-20260704171215-752eb7a1`
+- Assignment: `asg-528b38b5-bd4b-4044-a2c0-3d1d14708abd`
+- Claim: `claim-asg-528b38b5-bd4b-4044-a2c0-3d1d14708abd`
+- Branch: `dispatch/manuel/manuel-codex6/publishing/S-HC-PUB-07-YOUTUBE-PUBLISHING/03d2a46dcd`
+- Worktree: `var/oreshnik/wt/32305cad03d6321a/manuel/manuel-codex6/publishing/S-HC-PUB-07-YOUTUBE-PUBLISHING/03d2a46dcd`
+- Adopted preserved remote head: `b1186624b378bda6b57656073afc4fb7027ed00c`
+- Current task runtime state: active claimed run; not advanced to validation, close, or integration
 
 ## Audit Summary
 
@@ -203,6 +206,9 @@ Alpha.13 also does not expose a clear `blocked_external` task-runtime transition
 ### Updated in this continuation
 
 - `apps/web/components/dashboard-console.tsx`
+- `scripts/oreshnik/ready-lib.mjs`
+- `scripts/oreshnik/ready.mjs`
+- `scripts/oreshnik/__tests__/ready.test.mjs`
 
 ### Capability matrix for this continuation
 
@@ -221,6 +227,7 @@ Missing before this continuation:
 - No signed state plus replay-protected callback for YouTube.
 - No tenant dashboard card to connect, reconnect, disconnect, and inspect YouTube state.
 - No focused tests for YouTube OAuth onboarding and reconnection behavior.
+- `npm run oreshnik:ready` did not tolerate authorized dispatch runtime artifacts in a governed worktree.
 
 ### Exact routes
 
@@ -241,12 +248,20 @@ Examples:
 
 The code derives this from request origin via `resolvePublicOrigin`; there is no dedicated redirect-URI env var.
 
+### Exact tenant UI route
+
+- Fallback integrations route after OAuth: `/tenant/{tenantSlug}?view=integrations`
+- Connect UI location: tenant dashboard -> `Integraciones` -> YouTube card -> `Conectar YouTube`
+
 ### Variables required
 
 - `GOOGLE_CLIENT_ID`
 - `GOOGLE_CLIENT_SECRET`
 - `YOUTUBE_DEFAULT_PRIVACY_STATUS`
-- existing vault secret (`TOKEN_VAULT_SECRET` or equivalent current secret source)
+- one of: `AUTH_SECRET`, `NEXTAUTH_SECRET`, or `TOKEN_VAULT_SECRET` for OAuth state signing
+- existing tenant/session auth configuration already used by HeptaCore
+
+No dedicated YouTube redirect env var exists. The callback URI is always derived as `{PUBLIC_ORIGIN}/api/oauth/youtube/callback`.
 
 ### Google Cloud setup still required before live proof
 
@@ -256,6 +271,15 @@ The code derives this from request origin via `resolvePublicOrigin`; there is no
 4. Register the exact callback URI `{PUBLIC_ORIGIN}/api/oauth/youtube/callback`.
 5. Load `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` into the target environment.
 6. Keep `YOUTUBE_DEFAULT_PRIVACY_STATUS` aligned with the validation plan, normally `private`.
+
+### Preview setup still required before live proof
+
+1. Set `GOOGLE_CLIENT_ID` in the Preview environment.
+2. Set `GOOGLE_CLIENT_SECRET` in the Preview environment.
+3. Set `YOUTUBE_DEFAULT_PRIVACY_STATUS=private` in the Preview environment unless the validation plan explicitly requires another value.
+4. Ensure one of `AUTH_SECRET`, `NEXTAUTH_SECRET`, or `TOKEN_VAULT_SECRET` is present in Preview so OAuth state signing and vault encryption stay valid.
+5. Discover the exact Preview origin and register that exact origin callback in Google Cloud as `{PREVIEW_ORIGIN}/api/oauth/youtube/callback`.
+6. Deploy the governed branch before attempting the OAuth handshake.
 
 ### Tenant UI connect procedure
 
@@ -281,6 +305,9 @@ The code derives this from request origin via `resolvePublicOrigin`; there is no
 
 - `npm run typecheck -w @heptacore/web`
 - `npx tsx --test apps/web/lib/__tests__/youtube-oauth.test.ts apps/web/lib/__tests__/youtube-publisher.test.ts`
+- `npx tsx --test apps/web/lib/__tests__/youtube-oauth.test.ts apps/web/lib/__tests__/youtube-publisher.test.ts apps/web/lib/__tests__/publish-flow.test.ts`
+- `node --test scripts/oreshnik/__tests__/ready.test.mjs`
+- `npm run oreshnik:ready`
 
 Covered by the new OAuth-focused tests:
 - tenant-local return URL sanitization
@@ -301,3 +328,14 @@ After external authorization is permitted, validate both formats through the ten
 3. Run one controlled `YOUTUBE_SHORT` publish and record the confirmed `videoId`.
 4. Verify provider confirmation, durable persistence, and absence of false `PUBLISHED` without confirmation.
 5. Only then advance Oreshnik evidence/close/integrate for PUB-07.
+
+### Exact post-authorized validation procedure
+
+1. Configure Google Cloud and Preview exactly as described above.
+2. Open `/tenant/{tenantSlug}?view=integrations`.
+3. Connect the YouTube channel with `Conectar YouTube`.
+4. Validate one private `YOUTUBE_VIDEO` 16:9 publish from the tenant UI and capture the confirmed `videoId`.
+5. Validate one private `YOUTUBE_SHORT` publish from the tenant UI and capture the confirmed `videoId`.
+6. Confirm the callback returns to `/tenant/{tenantSlug}?view=integrations&oauth=youtube_connected` or `...youtube_reconnected`.
+7. Confirm `OAuthConnection` and `SocialAccount` stay tenant-scoped, encrypted, and idempotent, and that reconnect preserves `refresh_token` when Google omits a replacement.
+8. Only after live proof exists, move into Oreshnik evidence lifecycle; do not mark this task ready for integration from offline validation alone.
