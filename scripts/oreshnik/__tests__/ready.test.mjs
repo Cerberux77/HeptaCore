@@ -7,7 +7,9 @@ import {
   READINESS_SCAN_EXCLUDES,
   collectTextFileMatches,
   collectRuntimeIssues,
+  normalizeRoot,
   parsePinnedGitDependency,
+  resolveAuthorizedDispatchRuntime,
   validateEvidenceGateCoverage,
   validateGitignoreContract,
   validateGoalContract,
@@ -72,6 +74,45 @@ describe("oreshnik readiness helpers", () => {
     writeFileSync(join(runsDir, "run-b.json"), JSON.stringify({ taskId: "T-01", runId: "run-b", taskStatus: "ready_for_integration", claimStatus: "claimed" }));
     const issues = collectRuntimeIssues(root);
     assert.deepStrictEqual(issues, ["task T-01 has multiple active runs: run-a, run-b"]);
+  });
+
+  it("accepts runtime claim artifacts for the authorized dispatch worktree", () => {
+    const runtimeRoot = join(root, "authorized-runtime");
+    const branch = "dispatch/manuel/manuel-codex6/publishing/S-HC-PUB-07-YOUTUBE-PUBLISHING/03d2a46dcd";
+    const taskId = "S-HC-PUB-07-YOUTUBE-PUBLISHING";
+    const runId = "run-manuel-S-HC-PUB-07-YOUTUBE-PUBLISHING-20260704171215-752eb7a1";
+    const claimsDir = join(runtimeRoot, "var", "oreshnik", "claims");
+    const runsDir = join(runtimeRoot, "var", "oreshnik", "runs", taskId);
+    const tasksDir = join(runtimeRoot, "var", "oreshnik", "tasks");
+    mkdirSync(claimsDir, { recursive: true });
+    mkdirSync(runsDir, { recursive: true });
+    mkdirSync(tasksDir, { recursive: true });
+
+    const worktreePath = normalizeRoot(runtimeRoot);
+    const activeRun = { runId, branch, worktreePath };
+    writeFileSync(join(claimsDir, `${taskId}.json`), JSON.stringify({
+      taskId,
+      runId,
+      branch,
+      worktreePath,
+      status: "claimed"
+    }));
+    writeFileSync(join(tasksDir, `${taskId}.json`), JSON.stringify({ taskId, activeRun }));
+    writeFileSync(join(runtimeRoot, "var", "oreshnik", "task-board.json"), JSON.stringify({
+      tasks: [{ id: taskId, activeRun }]
+    }));
+    writeFileSync(join(runsDir, `${runId}.json`), JSON.stringify({
+      taskId,
+      runId,
+      branch,
+      worktreePath,
+      taskStatus: "claimed",
+      claimStatus: "claimed"
+    }));
+
+    const authorizedRuntime = resolveAuthorizedDispatchRuntime(runtimeRoot, { branch });
+    assert.ok(authorizedRuntime);
+    assert.deepStrictEqual(collectRuntimeIssues(runtimeRoot, { authorizedRuntime }), []);
   });
 
   it("skips readiness detector source files when scanning forbidden tokens", () => {

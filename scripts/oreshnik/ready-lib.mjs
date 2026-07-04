@@ -113,11 +113,82 @@ export function collectTextFileMatches(root, tokens, options = {}) {
   return matches;
 }
 
-export function collectRuntimeIssues(root) {
+export function resolveAuthorizedDispatchRuntime(root, options = {}) {
+  const normalizedRoot = normalizeRoot(root);
+  const currentBranch = typeof options.branch === "string" ? options.branch.trim() : "";
+  if (!currentBranch) return null;
+
+  const claimsDir = join(root, "var", "oreshnik", "claims");
+  if (!existsSync(claimsDir)) return null;
+
+  for (const entry of readdirSync(claimsDir)) {
+    if (!entry.endsWith(".json")) continue;
+    const claimPath = join(claimsDir, entry);
+    const claim = readJson(claimPath);
+    const claimBranch = String(claim?.branch || "").trim();
+    const claimWorktree = normalizeRoot(String(claim?.worktreePath || ""));
+    const claimStatus = String(claim?.status || "").toLowerCase();
+    if (claimBranch !== currentBranch || claimWorktree !== normalizedRoot) continue;
+    if (!ACTIVE_CLAIM_STATUSES.has(claimStatus)) continue;
+    if (!claim?.taskId || !claim?.runId) continue;
+
+    const taskPath = join(root, "var", "oreshnik", "tasks", `${claim.taskId}.json`);
+    const boardPath = join(root, "var", "oreshnik", "task-board.json");
+    const runPath = join(root, "var", "oreshnik", "runs", claim.taskId, `${claim.runId}.json`);
+    if (!existsSync(taskPath) || !existsSync(boardPath) || !existsSync(runPath)) continue;
+
+    const task = readJson(taskPath);
+    const board = readJson(boardPath);
+    const boardTask = Array.isArray(board?.tasks)
+      ? board.tasks.find((candidate) => String(candidate?.id || "") === claim.taskId)
+      : null;
+    const run = readJson(runPath);
+    const taskRunId = String(task?.activeRun?.runId || "");
+    const boardRunId = String(boardTask?.activeRun?.runId || "");
+    const runManifestId = String(run?.runId || "");
+    const taskBranch = String(task?.activeRun?.branch || "");
+    const boardBranch = String(boardTask?.activeRun?.branch || "");
+    const runBranch = String(run?.branch || "");
+    const taskWorktree = normalizeRoot(String(task?.activeRun?.worktreePath || ""));
+    const boardWorktree = normalizeRoot(String(boardTask?.activeRun?.worktreePath || ""));
+    const runWorktree = normalizeRoot(String(run?.worktreePath || ""));
+    if (
+      taskRunId !== claim.runId ||
+      boardRunId !== claim.runId ||
+      runManifestId !== claim.runId ||
+      taskBranch !== currentBranch ||
+      boardBranch !== currentBranch ||
+      runBranch !== currentBranch ||
+      taskWorktree !== normalizedRoot ||
+      boardWorktree !== normalizedRoot ||
+      runWorktree !== normalizedRoot
+    ) {
+      continue;
+    }
+
+    return {
+      taskId: claim.taskId,
+      runId: claim.runId,
+      allowedPaths: new Set([
+        normalizeRelativePath(relative(root, claimPath)),
+        normalizeRelativePath(relative(root, taskPath)),
+        normalizeRelativePath(relative(root, boardPath)),
+        normalizeRelativePath(relative(root, runPath))
+      ])
+    };
+  }
+
+  return null;
+}
+
+export function collectRuntimeIssues(root, options = {}) {
   const issues = [];
+  const allowedPaths = options.authorizedRuntime?.allowedPaths || new Set();
   const claimsDir = join(root, "var", "oreshnik", "claims");
   if (existsSync(claimsDir)) {
-    const claimFiles = readdirSync(claimsDir).filter((entry) => !entry.startsWith("."));
+    const claimFiles = readdirSync(claimsDir)
+      .filter((entry) => !entry.startsWith("."))
+      .filter((entry) => !allowedPaths.has(normalizeRelativePath(join("var", "oreshnik", "claims", entry))));
     if (claimFiles.length > 0) {
       issues.push(`orphan claim files present: ${claimFiles.join(", ")}`);
     }
@@ -173,6 +244,6 @@ export function normalizeRoot(path) {
   return resolve(path);
 }
 
-function normalizeRelativePath(path) {
+export function normalizeRelativePath(path) {
   return String(path).replace(/\\/g, "/");
 }

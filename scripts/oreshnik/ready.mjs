@@ -10,9 +10,11 @@ import {
   collectRuntimeIssues,
   collectTextFileMatches,
   normalizeIssueList,
+  normalizeRelativePath,
   normalizeRoot,
   parsePinnedGitDependency,
   readJson,
+  resolveAuthorizedDispatchRuntime,
   validateGitignoreContract,
   validateGoalContract,
   validateOreshnikContract,
@@ -26,6 +28,15 @@ const issues = [];
 
 function run(command, args) {
   return execFileSync(command, args, { cwd: ROOT, encoding: "utf8" }).trim();
+}
+
+function collectUnauthorizedGitStatusPaths(statusText, allowedPaths) {
+  return statusText
+    .split(/\r?\n/)
+    .map((line) => line.trimEnd())
+    .filter(Boolean)
+    .map((line) => normalizeRelativePath(line.slice(3).split(" -> ").at(-1)))
+    .filter((path) => !allowedPaths.has(path));
 }
 
 try {
@@ -64,7 +75,9 @@ try {
     issues.push("var/oreshnik/task-board.json is missing project/tasks");
   }
 
-  issues.push(...collectRuntimeIssues(ROOT));
+  const currentBranch = run("git", ["branch", "--show-current"]);
+  const authorizedRuntime = resolveAuthorizedDispatchRuntime(ROOT, { branch: currentBranch });
+  issues.push(...collectRuntimeIssues(ROOT, { authorizedRuntime }));
 
   const forbiddenMatches = collectTextFileMatches(ROOT, FORBIDDEN_TEXT_TOKENS, {
     excludePaths: Array.from(READINESS_SCAN_EXCLUDES)
@@ -74,7 +87,8 @@ try {
   }
 
   const gitStatus = run("git", ["status", "--porcelain"]);
-  if (gitStatus) issues.push("working tree is not clean");
+  const dirtyPaths = collectUnauthorizedGitStatusPaths(gitStatus, authorizedRuntime?.allowedPaths || new Set());
+  if (dirtyPaths.length > 0) issues.push("working tree is not clean");
 
   run("git", ["ls-remote", "--heads", "origin"]);
   run("git", ["rev-parse", "--verify", "origin/master"]);
