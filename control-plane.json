@@ -5,7 +5,7 @@
     "originUrl": "https://github.com/Cerberux77/HeptaCore.git",
     "canonicalMotherBranch": "master"
   },
-  "generation": 33,
+  "generation": 34,
   "controlHead": "877030c38816fb49da3e0a8ab819a66fc06a99fd",
   "catalog": {
     "taskBoardPath": "var/oreshnik/task-board.json",
@@ -120,7 +120,7 @@
       "repositoryId": "32305cad03d6321a",
       "slot": 2,
       "createdAt": "2026-07-05T20:55:28.413Z",
-      "updatedAt": "2026-07-05T20:55:28.413Z",
+      "updatedAt": "2026-07-05T20:55:41.507Z",
       "identityOrigin": "explicit"
     }
   ],
@@ -204,7 +204,7 @@
       "harnessId": "kilo",
       "machineId": "machine-247aafe4-6445-4b4c-aded-562d44ad62f8",
       "startedAt": "2026-07-05T20:55:28.413Z",
-      "lastSeenAt": "2026-07-05T20:55:28.413Z",
+      "lastSeenAt": "2026-07-05T20:55:41.507Z",
       "status": "active",
       "identityOrigin": "explicit"
     }
@@ -548,11 +548,11 @@
         "apps/web/app/api/publishing",
         "packages/integrations"
       ],
-      "status": "provisioning_failed",
+      "status": "released",
       "sourceTaskBoardHead": "37c88d4f1877c0444b610a2b1422e9a015d2bd07",
       "catalogFingerprint": "598085002c5244d04ba764c6865934cdc726e23c",
       "createdAt": "2026-07-05T20:55:28.413Z",
-      "updatedAt": "2026-07-05T20:55:41.507Z",
+      "updatedAt": "2026-07-05T21:02:56.665Z",
       "lastError": "Failed to create worktree C:\\proyectos\\HeptaCore\\var\\oreshnik\\wt\\32305cad03d6321a\\jean\\jean-kilo2\\publishing\\S-HC-PUB-06-REELS-STORIES-PUBLISHERS\\23c292f94a: Failed to add worktree C:\\proyectos\\HeptaCore\\var\\oreshnik\\wt\\32305cad03d6321a\\jean\\jean-kilo2\\publishing\\S-HC-PUB-06-REELS-STORIES-PUBLISHERS\\23c292f94a for dispatch/jean/jean-kilo2/publishing/S-HC-PUB-06-REELS-STORIES-PUBLISHERS/23c292f94a",
       "resumedCount": 0,
       "takeoverCount": 0,
@@ -775,9 +775,9 @@
       "runId": "run-jean-S-HC-PUB-06-REELS-STORIES-PUBLISHERS-20260705205528-d6fc984e",
       "branch": "dispatch/jean/jean-kilo2/publishing/S-HC-PUB-06-REELS-STORIES-PUBLISHERS/23c292f94a",
       "worktreePath": "C:\\proyectos\\HeptaCore\\var\\oreshnik\\wt\\32305cad03d6321a\\jean\\jean-kilo2\\publishing\\S-HC-PUB-06-REELS-STORIES-PUBLISHERS\\23c292f94a",
-      "status": "provisioning_failed",
+      "status": "released",
       "createdAt": "2026-07-05T20:55:28.413Z",
-      "updatedAt": "2026-07-05T20:55:41.507Z",
+      "updatedAt": "2026-07-05T21:02:56.665Z",
       "ownershipGeneration": 1,
       "harnessId": "kilo",
       "agentInstanceUid": "agent_d4f3ebf0bdbb44c89ff973a54602f3f0",
@@ -1000,9 +1000,9 @@
       "machineId": "machine-247aafe4-6445-4b4c-aded-562d44ad62f8",
       "branch": "dispatch/jean/jean-kilo2/publishing/S-HC-PUB-06-REELS-STORIES-PUBLISHERS/23c292f94a",
       "worktreePath": "C:\\proyectos\\HeptaCore\\var\\oreshnik\\wt\\32305cad03d6321a\\jean\\jean-kilo2\\publishing\\S-HC-PUB-06-REELS-STORIES-PUBLISHERS\\23c292f94a",
-      "status": "provisioning_failed",
+      "status": "released",
       "createdAt": "2026-07-05T20:55:28.413Z",
-      "updatedAt": "2026-07-05T20:55:41.507Z",
+      "updatedAt": "2026-07-05T21:02:56.665Z",
       "sourceTaskBoardHead": "37c88d4f1877c0444b610a2b1422e9a015d2bd07",
       "lastError": "Failed to create worktree C:\\proyectos\\HeptaCore\\var\\oreshnik\\wt\\32305cad03d6321a\\jean\\jean-kilo2\\publishing\\S-HC-PUB-06-REELS-STORIES-PUBLISHERS\\23c292f94a: Failed to add worktree C:\\proyectos\\HeptaCore\\var\\oreshnik\\wt\\32305cad03d6321a\\jean\\jean-kilo2\\publishing\\S-HC-PUB-06-REELS-STORIES-PUBLISHERS\\23c292f94a for dispatch/jean/jean-kilo2/publishing/S-HC-PUB-06-REELS-STORIES-PUBLISHERS/23c292f94a",
       "ownershipGeneration": 1,
@@ -1563,9 +1563,9 @@
       "machineId": "machine-247aafe4-6445-4b4c-aded-562d44ad62f8",
       "runId": "run-jean-S-HC-PUB-06-REELS-STORIES-PUBLISHERS-20260705205528-d6fc984e",
       "branch": "dispatch/jean/jean-kilo2/publishing/S-HC-PUB-06-REELS-STORIES-PUBLISHERS/23c292f94a",
-      "status": "provisioning_failed",
+      "status": "released",
       "createdAt": "2026-07-05T20:55:28.413Z",
-      "updatedAt": "2026-07-05T20:55:41.507Z",
+      "updatedAt": "2026-07-05T21:02:56.665Z",
       "harnessId": "kilo",
       "agentInstanceUid": "agent_d4f3ebf0bdbb44c89ff973a54602f3f0",
       "agentInstanceAlias": "jean-kilo2",
@@ -1581,9 +1581,9 @@
       "machineId": "machine-247aafe4-6445-4b4c-aded-562d44ad62f8",
       "runId": "run-jean-S-HC-PUB-06-REELS-STORIES-PUBLISHERS-20260705205528-d6fc984e",
       "branch": "dispatch/jean/jean-kilo2/publishing/S-HC-PUB-06-REELS-STORIES-PUBLISHERS/23c292f94a",
-      "status": "provisioning_failed",
+      "status": "released",
       "createdAt": "2026-07-05T20:55:28.413Z",
-      "updatedAt": "2026-07-05T20:55:41.507Z",
+      "updatedAt": "2026-07-05T21:02:56.665Z",
       "harnessId": "kilo",
       "agentInstanceUid": "agent_d4f3ebf0bdbb44c89ff973a54602f3f0",
       "agentInstanceAlias": "jean-kilo2",
@@ -1599,9 +1599,9 @@
       "machineId": "machine-247aafe4-6445-4b4c-aded-562d44ad62f8",
       "runId": "run-jean-S-HC-PUB-06-REELS-STORIES-PUBLISHERS-20260705205528-d6fc984e",
       "branch": "dispatch/jean/jean-kilo2/publishing/S-HC-PUB-06-REELS-STORIES-PUBLISHERS/23c292f94a",
-      "status": "provisioning_failed",
+      "status": "released",
       "createdAt": "2026-07-05T20:55:28.413Z",
-      "updatedAt": "2026-07-05T20:55:41.507Z",
+      "updatedAt": "2026-07-05T21:02:56.665Z",
       "harnessId": "kilo",
       "agentInstanceUid": "agent_d4f3ebf0bdbb44c89ff973a54602f3f0",
       "agentInstanceAlias": "jean-kilo2",
@@ -1867,6 +1867,14 @@
       "runId": "run-jean-S-HC-PUB-06-REELS-STORIES-PUBLISHERS-20260705205528-d6fc984e",
       "operator": "jean",
       "message": "Failed to create worktree C:\\proyectos\\HeptaCore\\var\\oreshnik\\wt\\32305cad03d6321a\\jean\\jean-kilo2\\publishing\\S-HC-PUB-06-REELS-STORIES-PUBLISHERS\\23c292f94a: Failed to add worktree C:\\proyectos\\HeptaCore\\var\\oreshnik\\wt\\32305cad03d6321a\\jean\\jean-kilo2\\publishing\\S-HC-PUB-06-REELS-STORIES-PUBLISHERS\\23c292f94a for dispatch/jean/jean-kilo2/publishing/S-HC-PUB-06-REELS-STORIES-PUBLISHERS/23c292f94a"
+    },
+    {
+      "at": "2026-07-05T21:02:56.665Z",
+      "action": "dispatch.released",
+      "assignmentId": "asg-d6f59946-3b46-4f38-9c78-b6a268096d51",
+      "runId": "run-jean-S-HC-PUB-06-REELS-STORIES-PUBLISHERS-20260705205528-d6fc984e",
+      "operator": "jean",
+      "message": "asg-d6f59946-3b46-4f38-9c78-b6a268096d51 -> released"
     }
   ],
   "reconciliation": {
@@ -1876,5 +1884,5 @@
     "pendingDiagnostics": []
   },
   "createdAt": "2026-06-29T20:17:43.302Z",
-  "updatedAt": "2026-07-05T20:55:41.507Z"
+  "updatedAt": "2026-07-05T21:02:56.665Z"
 }
