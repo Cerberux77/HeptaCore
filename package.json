@@ -15,7 +15,7 @@
     "lint": "npm run lint --workspaces --if-present",
     "typecheck": "npm run typecheck --workspaces --if-present",
     "test:infra": "node --test scripts/goal-runner/__tests__/*.test.mjs scripts/oreshnik/__tests__/*.test.mjs",
-    "test": "node --test apps/web/lib/calendar-state.test.mjs && npm run test:infra && npm run test --workspaces --if-present",
+    "test": "npm exec -w @heptacore/web -- tsx --test lib/calendar-state.test.mjs && npm run test:infra && npm run test --workspaces --if-present",
     "worker": "npm run start -w @heptacore/worker",
     "worker:validate": "npm run validate -w @heptacore/worker",
     "auth:ensure-access": "node scripts/ensure-user-access.mjs",
