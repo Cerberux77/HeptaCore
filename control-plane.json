@@ -5,15 +5,15 @@
     "originUrl": "https://github.com/Cerberux77/HeptaCore.git",
     "canonicalMotherBranch": "master"
   },
-  "generation": 30,
-  "controlHead": "2a1c544a742cb39fb519dff112792b3077005a79",
+  "generation": 31,
+  "controlHead": "927270b3273917a2581d9f0566fec0655bc46d47",
   "catalog": {
     "taskBoardPath": "var/oreshnik/task-board.json",
     "zoneMapPath": "docs/07_handoffs/zone-map.json",
     "sourceTaskBoardHead": "37c88d4f1877c0444b610a2b1422e9a015d2bd07",
     "fingerprint": "598085002c5244d04ba764c6865934cdc726e23c",
     "taskCount": 40,
-    "updatedAt": "2026-07-04T17:12:15.117Z"
+    "updatedAt": "2026-07-05T20:55:12.454Z"
   },
   "policy": {
     "name": "deterministic-v1",
@@ -29,6 +29,13 @@
       "hostname": "PA-ORI-L-0092",
       "registeredAt": "2026-06-29T20:17:41.440Z",
       "updatedAt": "2026-06-29T20:17:41.441Z"
+    },
+    {
+      "machineId": "machine-247aafe4-6445-4b4c-aded-562d44ad62f8",
+      "worktreeRoot": "C:\\proyectos\\HeptaCore\\var\\oreshnik\\wt",
+      "hostname": "LAPTOP-KH8GC6TH",
+      "registeredAt": "2026-07-05T20:55:10.288Z",
+      "updatedAt": "2026-07-05T20:55:10.289Z"
     }
   ],
   "agentInstances": [
@@ -101,7 +108,7 @@
       "repositoryId": "32305cad03d6321a",
       "slot": 6,
       "createdAt": "2026-07-04T17:12:15.117Z",
-      "updatedAt": "2026-07-04T17:13:30.671Z",
+      "updatedAt": "2026-07-04T17:40:43.519Z",
       "identityOrigin": "explicit"
     }
   ],
@@ -173,8 +180,9 @@
       "harnessId": "codex",
       "machineId": "machine-89814280-0079-4c35-82c8-3d533c515221",
       "startedAt": "2026-07-04T17:12:15.117Z",
-      "lastSeenAt": "2026-07-04T17:13:30.671Z",
-      "status": "active",
+      "lastSeenAt": "2026-07-04T17:40:43.519Z",
+      "status": "closed",
+      "closedAt": "2026-07-04T17:40:43.519Z",
       "identityOrigin": "explicit"
     }
   ],
@@ -1688,6 +1696,11 @@
       "runId": "run-manuel-S-HC-PUB-07-YOUTUBE-PUBLISHING-20260704171215-752eb7a1",
       "operator": "manuel",
       "message": "asg-528b38b5-bd4b-4044-a2c0-3d1d14708abd -> released"
+    },
+    {
+      "at": "2026-07-05T20:55:12.454Z",
+      "action": "dispatch.init",
+      "message": "Registered machine machine-247aafe4-6445-4b4c-aded-562d44ad62f8 with root C:\\proyectos\\HeptaCore\\var\\oreshnik\\wt."
     }
   ],
   "reconciliation": {
@@ -1697,5 +1710,5 @@
     "pendingDiagnostics": []
   },
   "createdAt": "2026-06-29T20:17:43.302Z",
-  "updatedAt": "2026-07-04T17:40:43.519Z"
+  "updatedAt": "2026-07-05T20:55:12.454Z"
 }
