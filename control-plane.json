@@ -5,15 +5,15 @@
     "originUrl": "https://github.com/Cerberux77/HeptaCore.git",
     "canonicalMotherBranch": "master"
   },
-  "generation": 31,
-  "controlHead": "927270b3273917a2581d9f0566fec0655bc46d47",
+  "generation": 32,
+  "controlHead": "877030c38816fb49da3e0a8ab819a66fc06a99fd",
   "catalog": {
     "taskBoardPath": "var/oreshnik/task-board.json",
     "zoneMapPath": "docs/07_handoffs/zone-map.json",
     "sourceTaskBoardHead": "37c88d4f1877c0444b610a2b1422e9a015d2bd07",
     "fingerprint": "598085002c5244d04ba764c6865934cdc726e23c",
     "taskCount": 40,
-    "updatedAt": "2026-07-05T20:55:12.454Z"
+    "updatedAt": "2026-07-05T20:55:28.413Z"
   },
   "policy": {
     "name": "deterministic-v1",
@@ -507,6 +507,37 @@
       "agentInstanceAlias": "manuel-codex6",
       "sessionId": "session_c209591f270c4c8a91c0045277170c14",
       "identityOrigin": "explicit"
+    },
+    {
+      "assignmentId": "asg-d6f59946-3b46-4f38-9c78-b6a268096d51",
+      "taskId": "S-HC-PUB-06-REELS-STORIES-PUBLISHERS",
+      "sprintId": "publishing",
+      "title": "Real publishing for Meta Reels and Stories: Instagram + Facebook",
+      "operator": "jean",
+      "machineId": "machine-247aafe4-6445-4b4c-aded-562d44ad62f8",
+      "functionalBranch": "dispatch/jean/jean-kilo2/publishing/S-HC-PUB-06-REELS-STORIES-PUBLISHERS/23c292f94a",
+      "motherBranch": "master",
+      "worktreePath": "C:\\proyectos\\HeptaCore\\var\\oreshnik\\wt\\32305cad03d6321a\\jean\\jean-kilo2\\publishing\\S-HC-PUB-06-REELS-STORIES-PUBLISHERS\\23c292f94a",
+      "runId": "run-jean-S-HC-PUB-06-REELS-STORIES-PUBLISHERS-20260705205528-d6fc984e",
+      "claimId": "claim-asg-d6f59946-3b46-4f38-9c78-b6a268096d51",
+      "zones": [
+        "apps/web/lib/publishers",
+        "apps/web/app/api/publishing",
+        "packages/integrations"
+      ],
+      "status": "provisioning",
+      "sourceTaskBoardHead": "37c88d4f1877c0444b610a2b1422e9a015d2bd07",
+      "catalogFingerprint": "598085002c5244d04ba764c6865934cdc726e23c",
+      "createdAt": "2026-07-05T20:55:28.413Z",
+      "updatedAt": "2026-07-05T20:55:28.413Z",
+      "resumedCount": 0,
+      "takeoverCount": 0,
+      "ownershipGeneration": 1,
+      "harnessId": "kilo",
+      "agentInstanceUid": "agent_d4f3ebf0bdbb44c89ff973a54602f3f0",
+      "agentInstanceAlias": "jean-kilo2",
+      "sessionId": "session_dd99180f3b6b4a90b252590bf188e6eb",
+      "identityOrigin": "explicit"
     }
   ],
   "claims": [
@@ -708,6 +739,26 @@
       "agentInstanceUid": "agent_dd0f5142d4654c8b9a2e00b2d18d969a",
       "agentInstanceAlias": "manuel-codex6",
       "sessionId": "session_c209591f270c4c8a91c0045277170c14",
+      "identityOrigin": "explicit"
+    },
+    {
+      "claimId": "claim-asg-d6f59946-3b46-4f38-9c78-b6a268096d51",
+      "assignmentId": "asg-d6f59946-3b46-4f38-9c78-b6a268096d51",
+      "taskId": "S-HC-PUB-06-REELS-STORIES-PUBLISHERS",
+      "sprintId": "publishing",
+      "operator": "jean",
+      "machineId": "machine-247aafe4-6445-4b4c-aded-562d44ad62f8",
+      "runId": "run-jean-S-HC-PUB-06-REELS-STORIES-PUBLISHERS-20260705205528-d6fc984e",
+      "branch": "dispatch/jean/jean-kilo2/publishing/S-HC-PUB-06-REELS-STORIES-PUBLISHERS/23c292f94a",
+      "worktreePath": "C:\\proyectos\\HeptaCore\\var\\oreshnik\\wt\\32305cad03d6321a\\jean\\jean-kilo2\\publishing\\S-HC-PUB-06-REELS-STORIES-PUBLISHERS\\23c292f94a",
+      "status": "active",
+      "createdAt": "2026-07-05T20:55:28.413Z",
+      "updatedAt": "2026-07-05T20:55:28.413Z",
+      "ownershipGeneration": 1,
+      "harnessId": "kilo",
+      "agentInstanceUid": "agent_d4f3ebf0bdbb44c89ff973a54602f3f0",
+      "agentInstanceAlias": "jean-kilo2",
+      "sessionId": "session_dd99180f3b6b4a90b252590bf188e6eb",
       "identityOrigin": "explicit"
     }
   ],
@@ -914,6 +965,26 @@
       "agentInstanceUid": "agent_dd0f5142d4654c8b9a2e00b2d18d969a",
       "agentInstanceAlias": "manuel-codex6",
       "sessionId": "session_c209591f270c4c8a91c0045277170c14",
+      "identityOrigin": "explicit"
+    },
+    {
+      "runId": "run-jean-S-HC-PUB-06-REELS-STORIES-PUBLISHERS-20260705205528-d6fc984e",
+      "assignmentId": "asg-d6f59946-3b46-4f38-9c78-b6a268096d51",
+      "taskId": "S-HC-PUB-06-REELS-STORIES-PUBLISHERS",
+      "sprintId": "publishing",
+      "operator": "jean",
+      "machineId": "machine-247aafe4-6445-4b4c-aded-562d44ad62f8",
+      "branch": "dispatch/jean/jean-kilo2/publishing/S-HC-PUB-06-REELS-STORIES-PUBLISHERS/23c292f94a",
+      "worktreePath": "C:\\proyectos\\HeptaCore\\var\\oreshnik\\wt\\32305cad03d6321a\\jean\\jean-kilo2\\publishing\\S-HC-PUB-06-REELS-STORIES-PUBLISHERS\\23c292f94a",
+      "status": "provisioning",
+      "createdAt": "2026-07-05T20:55:28.413Z",
+      "updatedAt": "2026-07-05T20:55:28.413Z",
+      "sourceTaskBoardHead": "37c88d4f1877c0444b610a2b1422e9a015d2bd07",
+      "ownershipGeneration": 1,
+      "harnessId": "kilo",
+      "agentInstanceUid": "agent_d4f3ebf0bdbb44c89ff973a54602f3f0",
+      "agentInstanceAlias": "jean-kilo2",
+      "sessionId": "session_dd99180f3b6b4a90b252590bf188e6eb",
       "identityOrigin": "explicit"
     }
   ],
@@ -1457,6 +1528,60 @@
       "agentInstanceAlias": "manuel-codex6",
       "sessionId": "session_c209591f270c4c8a91c0045277170c14",
       "identityOrigin": "explicit"
+    },
+    {
+      "zone": "apps/web/lib/publishers",
+      "assignmentId": "asg-d6f59946-3b46-4f38-9c78-b6a268096d51",
+      "taskId": "S-HC-PUB-06-REELS-STORIES-PUBLISHERS",
+      "sprintId": "publishing",
+      "operator": "jean",
+      "machineId": "machine-247aafe4-6445-4b4c-aded-562d44ad62f8",
+      "runId": "run-jean-S-HC-PUB-06-REELS-STORIES-PUBLISHERS-20260705205528-d6fc984e",
+      "branch": "dispatch/jean/jean-kilo2/publishing/S-HC-PUB-06-REELS-STORIES-PUBLISHERS/23c292f94a",
+      "status": "reserved",
+      "createdAt": "2026-07-05T20:55:28.413Z",
+      "updatedAt": "2026-07-05T20:55:28.413Z",
+      "harnessId": "kilo",
+      "agentInstanceUid": "agent_d4f3ebf0bdbb44c89ff973a54602f3f0",
+      "agentInstanceAlias": "jean-kilo2",
+      "sessionId": "session_dd99180f3b6b4a90b252590bf188e6eb",
+      "identityOrigin": "explicit"
+    },
+    {
+      "zone": "apps/web/app/api/publishing",
+      "assignmentId": "asg-d6f59946-3b46-4f38-9c78-b6a268096d51",
+      "taskId": "S-HC-PUB-06-REELS-STORIES-PUBLISHERS",
+      "sprintId": "publishing",
+      "operator": "jean",
+      "machineId": "machine-247aafe4-6445-4b4c-aded-562d44ad62f8",
+      "runId": "run-jean-S-HC-PUB-06-REELS-STORIES-PUBLISHERS-20260705205528-d6fc984e",
+      "branch": "dispatch/jean/jean-kilo2/publishing/S-HC-PUB-06-REELS-STORIES-PUBLISHERS/23c292f94a",
+      "status": "reserved",
+      "createdAt": "2026-07-05T20:55:28.413Z",
+      "updatedAt": "2026-07-05T20:55:28.413Z",
+      "harnessId": "kilo",
+      "agentInstanceUid": "agent_d4f3ebf0bdbb44c89ff973a54602f3f0",
+      "agentInstanceAlias": "jean-kilo2",
+      "sessionId": "session_dd99180f3b6b4a90b252590bf188e6eb",
+      "identityOrigin": "explicit"
+    },
+    {
+      "zone": "packages/integrations",
+      "assignmentId": "asg-d6f59946-3b46-4f38-9c78-b6a268096d51",
+      "taskId": "S-HC-PUB-06-REELS-STORIES-PUBLISHERS",
+      "sprintId": "publishing",
+      "operator": "jean",
+      "machineId": "machine-247aafe4-6445-4b4c-aded-562d44ad62f8",
+      "runId": "run-jean-S-HC-PUB-06-REELS-STORIES-PUBLISHERS-20260705205528-d6fc984e",
+      "branch": "dispatch/jean/jean-kilo2/publishing/S-HC-PUB-06-REELS-STORIES-PUBLISHERS/23c292f94a",
+      "status": "reserved",
+      "createdAt": "2026-07-05T20:55:28.413Z",
+      "updatedAt": "2026-07-05T20:55:28.413Z",
+      "harnessId": "kilo",
+      "agentInstanceUid": "agent_d4f3ebf0bdbb44c89ff973a54602f3f0",
+      "agentInstanceAlias": "jean-kilo2",
+      "sessionId": "session_dd99180f3b6b4a90b252590bf188e6eb",
+      "identityOrigin": "explicit"
     }
   ],
   "audit": [
@@ -1701,14 +1826,22 @@
       "at": "2026-07-05T20:55:12.454Z",
       "action": "dispatch.init",
       "message": "Registered machine machine-247aafe4-6445-4b4c-aded-562d44ad62f8 with root C:\\proyectos\\HeptaCore\\var\\oreshnik\\wt."
+    },
+    {
+      "at": "2026-07-05T20:55:28.413Z",
+      "action": "dispatch.next.reserved",
+      "assignmentId": "asg-d6f59946-3b46-4f38-9c78-b6a268096d51",
+      "runId": "run-jean-S-HC-PUB-06-REELS-STORIES-PUBLISHERS-20260705205528-d6fc984e",
+      "operator": "jean",
+      "message": "Reserved S-HC-PUB-06-REELS-STORIES-PUBLISHERS for jean."
     }
   ],
   "reconciliation": {
-    "lastAttemptAt": "2026-07-04T17:12:13.790Z",
+    "lastAttemptAt": "2026-07-05T20:55:28.411Z",
     "lastAppliedAt": "2026-07-01T07:00:56.759Z",
     "lastResult": "clean",
     "pendingDiagnostics": []
   },
   "createdAt": "2026-06-29T20:17:43.302Z",
-  "updatedAt": "2026-07-05T20:55:12.454Z"
+  "updatedAt": "2026-07-05T20:55:28.413Z"
 }
