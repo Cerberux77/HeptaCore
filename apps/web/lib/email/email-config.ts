@@ -2,7 +2,7 @@ export function getEmailConfig() {
   const provider = (process.env.EMAIL_PROVIDER || "disabled") as "disabled" | "resend";
   const resendApiKey = process.env.RESEND_API_KEY;
   const webhookSecret = process.env.RESEND_WEBHOOK_SECRET;
-  const from = process.env.EMAIL_FROM || "HeptaCore <noreply@heptacore.vercel.app>";
+  const from = process.env.EMAIL_FROM || "HeptaCore <noreply@heptacore.dev>";
   const replyTo = process.env.EMAIL_REPLY_TO;
   const appUrl = process.env.HEPTACORE_APP_URL || process.env.VERCEL_URL || "http://localhost:3000";
 

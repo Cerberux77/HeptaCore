@@ -418,6 +418,7 @@ async function processJob(
       caption: ctx.draft?.caption ?? ctx.draft?.title ?? "",
       mediaUrl,
       mediaType: mediaAsset ? (mediaAsset.kind === "VIDEO" ? "VIDEO" : "IMAGE") : undefined,
+      format: ctx.draft?.format,
     });
   } catch {
     providerResult = { kind: "terminal_failure", error: "Publisher threw unexpectedly" };

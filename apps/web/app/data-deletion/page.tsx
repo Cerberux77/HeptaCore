@@ -1,4 +1,7 @@
+import { getPrivacyEmail } from "../../lib/email/brand";
+
 export default function DataDeletionPage() {
+  const privacyEmail = getPrivacyEmail();
   return (
     <main style={{ maxWidth: 720, margin: "4rem auto", padding: "0 1.5rem", fontFamily: "system-ui, sans-serif", lineHeight: 1.7, color: "#111" }}>
       <h1 style={{ fontSize: "2rem", marginBottom: "0.5rem" }}>Data Deletion Instructions</h1>
@@ -18,7 +21,7 @@ export default function DataDeletionPage() {
       <h3>Option 2: Account Deletion</h3>
       <p>To delete your entire HeptaCore account and all associated data:</p>
       <ol>
-        <li>Send an email to <a href="mailto:privacy@heptacore.vercel.app">privacy@heptacore.vercel.app</a></li>
+        <li>Send an email to <a href={`mailto:${privacyEmail}`}>{privacyEmail}</a></li>
         <li>Include your registered email address and tenant name.</li>
         <li>We will process your request within 30 days and confirm completion.</li>
       </ol>
@@ -35,7 +38,7 @@ export default function DataDeletionPage() {
       <p>Content already published to social platforms (Instagram, Facebook) through HeptaCore is subject to those platforms&apos; data retention policies. You must delete such content directly on the respective platform.</p>
 
       <h2>Contact</h2>
-      <p>For data deletion requests: <a href="mailto:privacy@heptacore.vercel.app">privacy@heptacore.vercel.app</a></p>
+      <p>For data deletion requests: <a href={`mailto:${privacyEmail}`}>{privacyEmail}</a></p>
     </main>
   );
 }

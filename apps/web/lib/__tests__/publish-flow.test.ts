@@ -301,6 +301,8 @@ describe("multiformatPublishingModel", async () => {
     assert.equal(normalizePublishingFormat("INSTAGRAM", "FEED"), "INSTAGRAM_FEED");
     assert.equal(normalizePublishingFormat("INSTAGRAM", "POST"), "INSTAGRAM_FEED");
     assert.equal(normalizePublishingFormat("FACEBOOK", "FEED"), "FACEBOOK_FEED");
+    assert.equal(normalizePublishingFormat("INSTAGRAM", "REELS"), "INSTAGRAM_REEL");
+    assert.equal(normalizePublishingFormat("FACEBOOK", "STORY"), "FACEBOOK_STORY");
   });
 
   it("preserves carousel asset order from roles", () => {
@@ -331,6 +333,32 @@ describe("multiformatPublishingModel", async () => {
       ...imageSquare,
       id: "story-1",
       filename: "story.jpg",
+      width: 1080,
+      height: 1920,
+    }]);
+    assert.equal(story.valid, true);
+  });
+
+  it("accepts valid 9:16 reel video", () => {
+    const reel = validateFormatAssets("INSTAGRAM_REEL", [{
+      id: "reel-1",
+      url: "/tenant-assets/turpial/reel.mp4",
+      filename: "reel.mp4",
+      mimeType: "video/mp4",
+      width: 1080,
+      height: 1920,
+      sizeBytes: 4_000_000,
+      durationSeconds: 45,
+      order: 1,
+    }]);
+    assert.equal(reel.valid, true);
+  });
+
+  it("accepts valid Facebook story image", () => {
+    const story = validateFormatAssets("FACEBOOK_STORY", [{
+      ...imageSquare,
+      id: "fb-story-1",
+      filename: "fb-story.jpg",
       width: 1080,
       height: 1920,
     }]);

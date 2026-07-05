@@ -1,4 +1,7 @@
+import { getPrivacyEmail } from "../../lib/email/brand";
+
 export default function PrivacyPage() {
+  const privacyEmail = getPrivacyEmail();
   return (
     <main style={{ maxWidth: 720, margin: "4rem auto", padding: "0 1.5rem", fontFamily: "system-ui, sans-serif", lineHeight: 1.7, color: "#111" }}>
       <h1 style={{ fontSize: "2rem", marginBottom: "0.5rem" }}>Privacy Policy</h1>
@@ -34,7 +37,7 @@ export default function PrivacyPage() {
       </ul>
 
       <h2>6. Contact</h2>
-      <p>For privacy inquiries: <a href="mailto:privacy@heptacore.vercel.app">privacy@heptacore.vercel.app</a></p>
+      <p>For privacy inquiries: <a href={`mailto:${privacyEmail}`}>{privacyEmail}</a></p>
     </main>
   );
 }

@@ -1,4 +1,7 @@
+import { getBrandContactEmail } from "../../lib/email/brand";
+
 export default function TermsPage() {
+  const contactEmail = getBrandContactEmail("en");
   return (
     <main style={{ maxWidth: 720, margin: "4rem auto", padding: "0 1.5rem", fontFamily: "system-ui, sans-serif", lineHeight: 1.7, color: "#111" }}>
       <h1 style={{ fontSize: "2rem", marginBottom: "0.5rem" }}>Terms of Service</h1>
@@ -30,7 +33,7 @@ export default function TermsPage() {
       <p>We may update these terms at any time. Continued use of the Service after changes constitutes acceptance of the new terms.</p>
 
       <h2>8. Contact</h2>
-      <p>For questions about these terms: <a href="mailto:privacy@heptacore.vercel.app">privacy@heptacore.vercel.app</a></p>
+      <p>For questions about these terms: <a href={`mailto:${contactEmail}`}>{contactEmail}</a></p>
     </main>
   );
 }

@@ -49,9 +49,15 @@ function buildPublicAssetUrl(tenantSlug: string, asset: { storageKey?: string | 
 
 function adaptPublisher(raw: ReturnType<typeof getPublisher>): Pub04Publisher | null {
   if (!raw) return null;
+  const supportedFormats =
+    raw.network === "INSTAGRAM"
+      ? ["INSTAGRAM_FEED", "INSTAGRAM_STORY", "INSTAGRAM_REEL"]
+      : raw.network === "FACEBOOK"
+        ? ["FACEBOOK_FEED", "FACEBOOK_STORY", "FACEBOOK_REEL"]
+        : ["FACEBOOK_FEED", "INSTAGRAM_FEED"];
   return {
     textOnly: raw.capabilities.textOnly,
-    supportedFormats: ["FACEBOOK_FEED", "INSTAGRAM_FEED"],
+    supportedFormats,
     requiredScopes: raw.requiredScopes,
     async publish(input) {
       const result = await raw.publish({
@@ -60,6 +66,7 @@ function adaptPublisher(raw: ReturnType<typeof getPublisher>): Pub04Publisher | 
         caption: input.caption,
         mediaUrl: input.mediaUrl,
         mediaType: input.mediaType,
+        format: input.format,
       });
       return { kind: "success", externalPostId: result.externalPostId, providerResponse: result.providerResponse };
     },

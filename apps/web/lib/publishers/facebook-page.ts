@@ -18,15 +18,179 @@ const capabilities: PublisherCapabilities = {
   image: true,
   video: true,
   carousel: false,
-  story: false,
-  reels: false,
+  story: true,
+  reels: true,
   scheduling: false,
 };
+
+function providerError(json: unknown, status: number): ProviderError {
+  const errMeta = (json as Record<string, unknown>)?.error as Record<string, unknown> | undefined;
+  const code = errMeta?.code as number | undefined;
+  const subcode = errMeta?.error_subcode as number | undefined;
+  const isAmbiguous = code === 1 || (status >= 500 && status < 600);
+  return new ProviderError(formatMetaError(json, status), {
+    code,
+    subcode,
+    fbtrace: (json as Record<string, unknown>)?.fbtrace_id as string | undefined,
+    httpStatus: status,
+    isAmbiguous,
+  });
+}
+
+async function parseJsonResponse(res: Response): Promise<Record<string, unknown>> {
+  return (await res.json()) as Record<string, unknown>;
+}
+
+async function publishFacebookStory(
+  input: PublishInput,
+  baseUrl: string,
+  pageId: string,
+  accessToken: string,
+  mediaUrl: string,
+  caption: string,
+  mediaType?: "IMAGE" | "VIDEO" | "CAROUSEL",
+): Promise<PublishResult> {
+  if (mediaType === "VIDEO") {
+    const uploadParams = new URLSearchParams();
+    uploadParams.append("file_url", mediaUrl);
+    uploadParams.append("published", "false");
+    uploadParams.append("access_token", accessToken);
+
+    const uploadRes = await fetch(`https://graph-video.facebook.com/${process.env.FACEBOOK_GRAPH_API_VERSION || "v25.0"}/${pageId}/videos`, {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: uploadParams.toString(),
+    });
+    const uploadJson = await parseJsonResponse(uploadRes);
+    if (!uploadRes.ok || !uploadJson.id) {
+      throw providerError(uploadJson, uploadRes.status);
+    }
+
+    const videoId = uploadJson.id as string;
+    const publishParams = new URLSearchParams();
+    publishParams.append("video_id", videoId);
+    publishParams.append("access_token", accessToken);
+
+    const publishRes = await fetch(`${baseUrl}/${pageId}/video_stories`, {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: publishParams.toString(),
+    });
+    const publishJson = await parseJsonResponse(publishRes);
+    if (!publishRes.ok || !(publishJson.id || publishJson.post_id || publishJson.story_id)) {
+      throw providerError(publishJson, publishRes.status);
+    }
+
+    const storyId = (publishJson.id || publishJson.post_id || publishJson.story_id) as string;
+    return {
+      externalPostId: storyId,
+      providerResponse: {
+        type: "video_story",
+        videoId,
+        storyId,
+        status: publishRes.status,
+      },
+    };
+  }
+
+  const uploadParams = new URLSearchParams();
+  uploadParams.append("url", mediaUrl);
+  uploadParams.append("published", "false");
+  uploadParams.append("access_token", accessToken);
+
+  const uploadRes = await fetch(`${baseUrl}/${pageId}/photos`, {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: uploadParams.toString(),
+  });
+  const uploadJson = await parseJsonResponse(uploadRes);
+  if (!uploadRes.ok || !uploadJson.id) {
+    throw providerError(uploadJson, uploadRes.status);
+  }
+
+  const photoId = uploadJson.id as string;
+  const publishParams = new URLSearchParams();
+  publishParams.append("photo_id", photoId);
+  publishParams.append("access_token", accessToken);
+
+  const publishRes = await fetch(`${baseUrl}/${pageId}/photo_stories`, {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: publishParams.toString(),
+  });
+  const publishJson = await parseJsonResponse(publishRes);
+  if (!publishRes.ok || !(publishJson.id || publishJson.post_id || publishJson.story_id)) {
+    throw providerError(publishJson, publishRes.status);
+  }
+
+  const storyId = (publishJson.id || publishJson.post_id || publishJson.story_id) as string;
+  return {
+    externalPostId: storyId,
+    providerResponse: {
+      type: "photo_story",
+      photoId,
+      storyId,
+      status: publishRes.status,
+    },
+  };
+}
+
+async function publishFacebookReel(
+  baseUrl: string,
+  pageId: string,
+  accessToken: string,
+  mediaUrl: string,
+  caption: string,
+): Promise<PublishResult> {
+  const params = new URLSearchParams();
+  params.append("file_url", mediaUrl);
+  params.append("caption", caption);
+  params.append("access_token", accessToken);
+
+  const res = await fetch(`${baseUrl}/${pageId}/video_reels`, {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: params.toString(),
+  });
+
+  const json = await parseJsonResponse(res);
+  if (!res.ok || !(json.id || json.video_id || json.post_id)) {
+    throw providerError(json, res.status);
+  }
+
+  const reelId = (json.id || json.video_id || json.post_id) as string;
+  return {
+    externalPostId: reelId,
+    providerResponse: {
+      type: "reel",
+      reelId,
+      status: res.status,
+    },
+  };
+}
 
 async function publishToFacebookPage(input: PublishInput): Promise<PublishResult> {
   const { targetId: pageId, accessToken, mediaUrl, caption, mediaType } = input;
   const apiVersion = process.env.FACEBOOK_GRAPH_API_VERSION || "v25.0";
   const baseUrl = `https://graph.facebook.com/${apiVersion}`;
+  const normalizedFormat = String(input.format ?? "").trim().toUpperCase();
+
+  if (normalizedFormat === "FACEBOOK_STORY") {
+    if (!mediaUrl) {
+      throw new Error("Facebook stories require a media URL.");
+    }
+    return publishFacebookStory(input, baseUrl, pageId, accessToken, mediaUrl, caption, mediaType);
+  }
+
+  if (normalizedFormat === "FACEBOOK_REEL") {
+    if (!mediaUrl) {
+      throw new Error("Facebook reels require a media URL.");
+    }
+    if (mediaType !== "VIDEO") {
+      throw new Error("Facebook reels require a video asset.");
+    }
+    return publishFacebookReel(baseUrl, pageId, accessToken, mediaUrl, caption);
+  }
 
   if (!mediaUrl || (!mediaType && caption)) {
     // Text-only post to /feed
@@ -43,12 +207,7 @@ async function publishToFacebookPage(input: PublishInput): Promise<PublishResult
     const json = await res.json();
 
     if (!res.ok || !json.id) {
-      const errMeta = (json as Record<string, unknown>)?.error as Record<string, unknown> | undefined;
-      const code = errMeta?.code as number | undefined;
-      const subcode = errMeta?.error_subcode as number | undefined;
-      const isAmbiguous = code === 1 || (res.status >= 500 && res.status < 600);
-      const msg = formatMetaError(json, res.status);
-      throw new ProviderError(msg, { code, subcode, fbtrace: (json as Record<string, unknown>)?.fbtrace_id as string | undefined, httpStatus: res.status, isAmbiguous });
+      throw providerError(json, res.status);
     }
 
     return { externalPostId: json.id as string, providerResponse: { feed: true, status: res.status } };
@@ -70,10 +229,7 @@ async function publishToFacebookPage(input: PublishInput): Promise<PublishResult
     const json = await res.json();
 
     if (!res.ok || !json.id) {
-      const errMeta = (json as Record<string, unknown>)?.error as Record<string, unknown> | undefined;
-      const code = errMeta?.code as number | undefined;
-      const isAmbiguous = code === 1 || (res.status >= 500 && res.status < 600);
-      throw new ProviderError(formatMetaError(json, res.status), { code, subcode: errMeta?.error_subcode as number | undefined, fbtrace: (json as Record<string, unknown>)?.fbtrace_id as string | undefined, httpStatus: res.status, isAmbiguous });
+      throw providerError(json, res.status);
     }
 
     const videoId = json.id as string;
@@ -107,10 +263,7 @@ async function publishToFacebookPage(input: PublishInput): Promise<PublishResult
   const json = await res.json();
 
   if (!res.ok || !json.id) {
-    const errMeta = (json as Record<string, unknown>)?.error as Record<string, unknown> | undefined;
-    const code = errMeta?.code as number | undefined;
-    const isAmbiguous = code === 1 || (res.status >= 500 && res.status < 600);
-    throw new ProviderError(formatMetaError(json, res.status), { code, subcode: errMeta?.error_subcode as number | undefined, fbtrace: (json as Record<string, unknown>)?.fbtrace_id as string | undefined, httpStatus: res.status, isAmbiguous });
+    throw providerError(json, res.status);
   }
 
   const photoId = json.id as string;

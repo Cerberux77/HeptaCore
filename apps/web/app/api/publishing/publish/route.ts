@@ -162,11 +162,11 @@ export async function POST(req: Request) {
     });
   }
 
-  if (format === "INSTAGRAM_CAROUSEL" || format === "INSTAGRAM_STORY") {
+  if (format === "INSTAGRAM_CAROUSEL") {
     return NextResponse.json({
       code: "LIVE_BLOCKED_FORMAT_PREVIEW_ONLY",
       error: `${format} is available for preview and dry-run only in this sprint.`,
-      action: "Use dry-run for Carousel or Story. Real publishing remains disabled for this format.",
+      action: "Use dry-run for Carousel. Real publishing remains disabled for this format.",
     }, { status: 409 });
   }
 
@@ -506,6 +506,7 @@ export async function POST(req: Request) {
     mediaUrl,
     caption: draft.caption || draft.title,
     mediaType,
+    format,
   };
 
   let publishResult: { externalPostId: string; providerResponse: unknown };

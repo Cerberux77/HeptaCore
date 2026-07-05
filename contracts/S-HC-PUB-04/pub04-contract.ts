@@ -73,6 +73,7 @@ export interface Pub04Publisher {
     caption: string;
     mediaUrl?: string;
     mediaType?: "IMAGE" | "VIDEO";
+    format?: string;
   }): Promise<
     | { kind: "success"; externalPostId: string; providerResponse: unknown }
     | { kind: "retryable_failure"; error: string }

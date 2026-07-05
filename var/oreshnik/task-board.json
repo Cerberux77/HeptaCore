@@ -1,6 +1,6 @@
 {
   "project": "HeptaCore",
-  "updatedAt": "2026-07-01T01:00:48.254Z",
+  "updatedAt": "2026-07-01T08:42:54.914Z",
   "resiliencePolicy": "If an owner is unavailable for more than one working block or blocks the critical path, backupOwner may take over after recording reassignment.",
   "closurePolicy": "No sprint may be closed until acceptance criteria, base tests, sprint-specific tests, docs/handoff, and Oreshnik zone checks pass.",
   "baseTestMatrix": [
@@ -205,7 +205,7 @@
     {
       "id": "S-HC-TOOL-01-GOAL-RUNNER-V1",
       "title": "Goal Runner v1 for autonomous Kilo execution",
-      "owner": "Manuel",
+      "owner": "Jean",
       "backupOwner": "Manuel",
       "status": "integrated",
       "track": "S-HC-TOOL-01-GOAL-RUNNER-V1",
@@ -305,6 +305,15 @@
           "operator": "manuel",
           "branch": "kilo/s-hc-tool-01-goal-runner-v1",
           "description": "Integrated kilo/s-hc-tool-01-goal-runner-v1 into MADRE/v50-s-hc-tool-01-goal-runner-v1-goal-runner-v1-deterministic-state-machine-locks-2026-06-29"
+        },
+        {
+          "at": "2026-07-01T08:42:54.914Z",
+          "action": "reassigned",
+          "operator": "Manuel",
+          "from": "Manuel",
+          "to": "Jean",
+          "reason": "rebalance: Manuel overloaded, Jean underloaded; moved pending work while respecting explicit assignments and zone conflicts",
+          "description": "Reassigned via rebalance from Manuel to Jean to reduce workload imbalance."
         }
       ]
     },
@@ -873,7 +882,7 @@
     {
       "id": "S-HC-INFRA-BASELINE-GATES-RECOVERY",
       "title": "Baseline gates recovery: Oreshnik alpha.9, identity v2, Prisma, typecheck, build and canonical suite",
-      "owner": "Manuel",
+      "owner": "Jean",
       "backupOwner": "Manuel",
       "status": "ready_for_integration",
       "track": "S-HC-INFRA-BASELINE-GATES-RECOVERY",
@@ -961,6 +970,15 @@
           "operator": "manuel",
           "branch": "codex/p-hc-or-operability-01-20260630-150409",
           "description": "Task delivered with handoff var/goal-runner/goals/GR-20260630T221806Z-cc73f500-baseline-gates-recovery/run-a-gates-evidence.md"
+        },
+        {
+          "at": "2026-07-01T08:42:54.914Z",
+          "action": "reassigned",
+          "operator": "Manuel",
+          "from": "Manuel",
+          "to": "Jean",
+          "reason": "rebalance: Manuel overloaded, Jean underloaded; moved pending work while respecting explicit assignments and zone conflicts",
+          "description": "Reassigned via rebalance from Manuel to Jean to reduce workload imbalance."
         }
       ],
       "validationGateResults": [
@@ -1133,7 +1151,7 @@
     {
       "id": "S-HC-COMM-01-SELF-SERVICE-SIGNUP",
       "title": "Self-service tenant signup with trial gate and onboarding flow",
-      "owner": "Manuel",
+      "owner": "Jean",
       "backupOwner": "Manuel",
       "status": "blocked",
       "track": "commercial",
@@ -1159,13 +1177,22 @@
           "action": "status_reconciled",
           "operator": "manuel",
           "description": "Task status reconciled to blocked: dependency S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION still pending (S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION:pending)"
+        },
+        {
+          "at": "2026-07-01T08:42:54.914Z",
+          "action": "reassigned",
+          "operator": "Manuel",
+          "from": "Manuel",
+          "to": "Jean",
+          "reason": "rebalance: Manuel overloaded, Jean underloaded; moved pending work while respecting explicit assignments and zone conflicts",
+          "description": "Reassigned via rebalance from Manuel to Jean to reduce workload imbalance."
         }
       ]
     },
     {
       "id": "S-HC-COMM-02-BILLING-ACTIVATION",
       "title": "Tenant billing activation: plan selection, usage tracking, payment integration",
-      "owner": "Manuel",
+      "owner": "Jean",
       "backupOwner": "Manuel",
       "status": "blocked",
       "track": "commercial",
@@ -1189,6 +1216,15 @@
           "action": "status_reconciled",
           "operator": "manuel",
           "description": "Task status reconciled to blocked: dependency S-HC-COMM-01-SELF-SERVICE-SIGNUP still pending (S-HC-COMM-01-SELF-SERVICE-SIGNUP:pending)"
+        },
+        {
+          "at": "2026-07-01T08:42:54.914Z",
+          "action": "reassigned",
+          "operator": "Manuel",
+          "from": "Manuel",
+          "to": "Jean",
+          "reason": "rebalance: Manuel overloaded, Jean underloaded; moved pending work while respecting explicit assignments and zone conflicts",
+          "description": "Reassigned via rebalance from Manuel to Jean to reduce workload imbalance."
         }
       ]
     },
@@ -1247,7 +1283,7 @@
     {
       "id": "S-HC-INBOX-01-UNIFIED-ENGAGEMENT",
       "title": "Unified engagement inbox: read and respond to messages and comments",
-      "owner": "Manuel",
+      "owner": "Jean",
       "backupOwner": "Manuel",
       "status": "blocked",
       "track": "engagement",
@@ -1271,6 +1307,15 @@
           "action": "status_reconciled",
           "operator": "manuel",
           "description": "Task status reconciled to blocked: dependency S-HC-AN-01-CAMPAIGN-PERFORMANCE still pending (S-HC-AN-01-CAMPAIGN-PERFORMANCE:pending)"
+        },
+        {
+          "at": "2026-07-01T08:42:54.914Z",
+          "action": "reassigned",
+          "operator": "Manuel",
+          "from": "Manuel",
+          "to": "Jean",
+          "reason": "rebalance: Manuel overloaded, Jean underloaded; moved pending work while respecting explicit assignments and zone conflicts",
+          "description": "Reassigned via rebalance from Manuel to Jean to reduce workload imbalance."
         }
       ]
     },
@@ -1580,7 +1625,7 @@
     {
       "id": "S-HC-PUB-06-REELS-STORIES-PUBLISHERS",
       "title": "Real publishing for Meta Reels and Stories: Instagram + Facebook",
-      "owner": "Manuel",
+      "owner": "Jean",
       "backupOwner": "Manuel",
       "status": "ready",
       "track": "publishing",
@@ -1611,13 +1656,22 @@
           "action": "status_reconciled",
           "operator": "manuel",
           "description": "Task status reconciled to ready: dependencies and conflicts are clear for execution"
+        },
+        {
+          "at": "2026-07-01T08:42:54.914Z",
+          "action": "reassigned",
+          "operator": "Manuel",
+          "from": "Manuel",
+          "to": "Jean",
+          "reason": "rebalance: Manuel overloaded, Jean underloaded; moved pending work while respecting explicit assignments and zone conflicts",
+          "description": "Reassigned via rebalance from Manuel to Jean to reduce workload imbalance."
         }
       ]
     },
     {
       "id": "S-HC-PUB-07-YOUTUBE-PUBLISHING",
       "title": "Real publishing for YouTube: Video 16:9 and YouTube Shorts",
-      "owner": "Manuel",
+      "owner": "Jean",
       "backupOwner": "Manuel",
       "status": "ready",
       "track": "publishing",
@@ -1645,13 +1699,22 @@
           "action": "status_reconciled",
           "operator": "manuel",
           "description": "Task status reconciled to ready: dependencies and conflicts are clear for execution"
+        },
+        {
+          "at": "2026-07-01T08:42:54.914Z",
+          "action": "reassigned",
+          "operator": "Manuel",
+          "from": "Manuel",
+          "to": "Jean",
+          "reason": "rebalance: Manuel overloaded, Jean underloaded; moved pending work while respecting explicit assignments and zone conflicts",
+          "description": "Reassigned via rebalance from Manuel to Jean to reduce workload imbalance."
         }
       ]
     },
     {
       "id": "S-HC-PUB-08-PLATFORM-FORMAT-PARITY",
       "title": "Platform-format parity: manifest, preview, dry-run, scheduling and publishing for every supported format",
-      "owner": "Manuel",
+      "owner": "Jean",
       "backupOwner": "Manuel",
       "status": "blocked",
       "track": "publishing",
@@ -1679,6 +1742,15 @@
           "action": "status_reconciled",
           "operator": "manuel",
           "description": "Task status reconciled to blocked: dependency S-HC-PUB-06-REELS-STORIES-PUBLISHERS still pending (S-HC-PUB-06-REELS-STORIES-PUBLISHERS:pending) | dependency S-HC-PUB-07-YOUTUBE-PUBLISHING still pending (S-HC-PUB-07-YOUTUBE-PUBLISHING:pending)"
+        },
+        {
+          "at": "2026-07-01T08:42:54.914Z",
+          "action": "reassigned",
+          "operator": "Manuel",
+          "from": "Manuel",
+          "to": "Jean",
+          "reason": "rebalance: Manuel overloaded, Jean underloaded; moved pending work while respecting explicit assignments and zone conflicts",
+          "description": "Reassigned via rebalance from Manuel to Jean to reduce workload imbalance."
         }
       ]
     },
@@ -1895,7 +1967,7 @@
     {
       "id": "S-HC-TEN-02-CEPEG-ONBOARDING",
       "title": "CEPEG tenant onboarding: brand, assets, network configuration",
-      "owner": "Manuel",
+      "owner": "Jean",
       "backupOwner": "Manuel",
       "status": "blocked",
       "track": "tenant-onboarding",
@@ -1924,6 +1996,15 @@
           "action": "status_reconciled",
           "operator": "manuel",
           "description": "Task status reconciled to blocked: dependency S-HC-OPS-01-CAMPAIGN-REVIEW-DEPLOYMENT still pending (S-HC-OPS-01-CAMPAIGN-REVIEW-DEPLOYMENT:pending) | dependency S-HC-COMM-02-BILLING-ACTIVATION still pending (S-HC-COMM-02-BILLING-ACTIVATION:pending) | dependency S-HC-ONB-02-GAP-RESOLUTION-WIZARD still pending (S-HC-ONB-02-GAP-RESOLUTION-WIZARD:pending) | dependency S-HC-STRAT-02-CONTENT-CALENDAR-BLUEPRINT still pending (S-HC-STRAT-02-CONTENT-CALENDAR-BLUEPRINT:pending) | dependency S-HC-ASSET-01-STRATEGY-ASSET-MANIFEST still pending (S-HC-ASSET-01-STRATEGY-ASSET-MANIFEST:pending)"
+        },
+        {
+          "at": "2026-07-01T08:42:54.914Z",
+          "action": "reassigned",
+          "operator": "Manuel",
+          "from": "Manuel",
+          "to": "Jean",
+          "reason": "rebalance: Manuel overloaded, Jean underloaded; moved pending work while respecting explicit assignments and zone conflicts",
+          "description": "Reassigned via rebalance from Manuel to Jean to reduce workload imbalance."
         }
       ]
     },
@@ -1994,6 +2075,69 @@
       "from": "Jean",
       "to": "Manuel",
       "reason": "Jean fuera de ruta critica. Responsabilidades pendientes reasignadas temporalmente a Manuel."
+    },
+    {
+      "at": "2026-07-01T08:42:54.914Z",
+      "task": "S-HC-TOOL-01-GOAL-RUNNER-V1",
+      "from": "Manuel",
+      "to": "Jean",
+      "reason": "rebalance: Manuel overloaded, Jean underloaded; moved pending work while respecting explicit assignments and zone conflicts"
+    },
+    {
+      "at": "2026-07-01T08:42:54.914Z",
+      "task": "S-HC-INFRA-BASELINE-GATES-RECOVERY",
+      "from": "Manuel",
+      "to": "Jean",
+      "reason": "rebalance: Manuel overloaded, Jean underloaded; moved pending work while respecting explicit assignments and zone conflicts"
+    },
+    {
+      "at": "2026-07-01T08:42:54.914Z",
+      "task": "S-HC-COMM-01-SELF-SERVICE-SIGNUP",
+      "from": "Manuel",
+      "to": "Jean",
+      "reason": "rebalance: Manuel overloaded, Jean underloaded; moved pending work while respecting explicit assignments and zone conflicts"
+    },
+    {
+      "at": "2026-07-01T08:42:54.914Z",
+      "task": "S-HC-COMM-02-BILLING-ACTIVATION",
+      "from": "Manuel",
+      "to": "Jean",
+      "reason": "rebalance: Manuel overloaded, Jean underloaded; moved pending work while respecting explicit assignments and zone conflicts"
+    },
+    {
+      "at": "2026-07-01T08:42:54.914Z",
+      "task": "S-HC-INBOX-01-UNIFIED-ENGAGEMENT",
+      "from": "Manuel",
+      "to": "Jean",
+      "reason": "rebalance: Manuel overloaded, Jean underloaded; moved pending work while respecting explicit assignments and zone conflicts"
+    },
+    {
+      "at": "2026-07-01T08:42:54.914Z",
+      "task": "S-HC-PUB-06-REELS-STORIES-PUBLISHERS",
+      "from": "Manuel",
+      "to": "Jean",
+      "reason": "rebalance: Manuel overloaded, Jean underloaded; moved pending work while respecting explicit assignments and zone conflicts"
+    },
+    {
+      "at": "2026-07-01T08:42:54.914Z",
+      "task": "S-HC-PUB-07-YOUTUBE-PUBLISHING",
+      "from": "Manuel",
+      "to": "Jean",
+      "reason": "rebalance: Manuel overloaded, Jean underloaded; moved pending work while respecting explicit assignments and zone conflicts"
+    },
+    {
+      "at": "2026-07-01T08:42:54.914Z",
+      "task": "S-HC-PUB-08-PLATFORM-FORMAT-PARITY",
+      "from": "Manuel",
+      "to": "Jean",
+      "reason": "rebalance: Manuel overloaded, Jean underloaded; moved pending work while respecting explicit assignments and zone conflicts"
+    },
+    {
+      "at": "2026-07-01T08:42:54.914Z",
+      "task": "S-HC-TEN-02-CEPEG-ONBOARDING",
+      "from": "Manuel",
+      "to": "Jean",
+      "reason": "rebalance: Manuel overloaded, Jean underloaded; moved pending work while respecting explicit assignments and zone conflicts"
     }
   ]
 }

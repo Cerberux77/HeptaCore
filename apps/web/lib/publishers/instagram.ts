@@ -6,7 +6,7 @@ const capabilities: PublisherCapabilities = {
   image: true,
   video: true,
   carousel: false,
-  story: false,
+  story: true,
   reels: true,
   scheduling: false,
 };
@@ -18,6 +18,7 @@ async function publishViaInstagram(input: PublishInput): Promise<PublishResult> 
     mediaUrl: input.mediaUrl!,
     caption: input.caption,
     mediaType: input.mediaType,
+    format: input.format,
   });
 
   return {

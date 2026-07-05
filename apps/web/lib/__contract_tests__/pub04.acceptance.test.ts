@@ -89,7 +89,14 @@ function makeHarness(options: {
 
   const publisher: Pub04Publisher = {
     textOnly: false,
-    supportedFormats: ["FACEBOOK_FEED", "INSTAGRAM_FEED"],
+    supportedFormats: [
+      "FACEBOOK_FEED",
+      "FACEBOOK_STORY",
+      "FACEBOOK_REEL",
+      "INSTAGRAM_FEED",
+      "INSTAGRAM_STORY",
+      "INSTAGRAM_REEL",
+    ],
     requiredScopes: ["pages_manage_posts"],
     async publish() {
       const mode = options.publisherMode ?? "success";
@@ -313,7 +320,7 @@ describe("PUB-04 immutable acceptance contract", () => {
     );
   });
 
-  it("Instagram Story is blocked for live execution", async () => {
+  it("Instagram Story can execute live", async () => {
     const job = baseJob({ provider: "INSTAGRAM" });
     const ctx = baseContext(job);
     ctx.draft!.network = "INSTAGRAM";
@@ -321,8 +328,20 @@ describe("PUB-04 immutable acceptance contract", () => {
     ctx.socialAccounts[0].network = "INSTAGRAM";
     const h = makeHarness({ jobs: [job], contexts: new Map([[job.id, ctx]]) });
     const result = await executePublishingCron(input, h.deps);
-    assert.equal(job.attempts, 0);
-    assert.equal(result.outcomes[0]?.code, "PRE_PROVIDER_BLOCKED");
+    assert.equal(job.attempts, 1);
+    assert.equal(result.outcomes[0]?.code, "PUBLISHED");
+  });
+
+  it("Facebook Reel can execute live", async () => {
+    const job = baseJob({ provider: "FACEBOOK" });
+    const ctx = baseContext(job);
+    ctx.draft!.network = "FACEBOOK";
+    ctx.draft!.format = "FACEBOOK_REEL";
+    ctx.draft!.assets = [{ kind: "VIDEO", publicUrl: "https://cdn.example.test/reel.mp4" }];
+    const h = makeHarness({ jobs: [job], contexts: new Map([[job.id, ctx]]) });
+    const result = await executePublishingCron(input, h.deps);
+    assert.equal(job.attempts, 1);
+    assert.equal(result.outcomes[0]?.code, "PUBLISHED");
   });
 
   it("a real provider call increments attempts exactly once and finalizes success", async () => {

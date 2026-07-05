@@ -2,6 +2,7 @@ import { render } from "@react-email/components";
 import { TenantOwnerInvitationEmail, tenantOwnerInvitationText } from "./tenant-owner-invitation";
 import { TenantAccessGrantedEmail, tenantAccessGrantedText } from "./tenant-access-granted";
 import { MemberInvitationEmail, memberInvitationText } from "./member-invitation";
+import { getBrandContactEmail } from "../brand";
 import * as React from "react";
 
 type TemplateType = "owner-invitation" | "access-granted" | "member-invitation";
@@ -18,13 +19,14 @@ export async function renderTemplate(
   switch (type) {
     case "owner-invitation": {
       const t = texts[lang];
+      const supportEmail = getBrandContactEmail(lang, params.emailFrom);
       subject = params.isExistingAccount
         ? (lang === "es" ? `Acceso a ${params.tenantName} en HeptaCore` : `Access to ${params.tenantName} on HeptaCore`)
         : t.subject(params.tenantName);
       html = await render(
-        React.createElement(TenantOwnerInvitationEmail, { ...params, lang }),
+        React.createElement(TenantOwnerInvitationEmail, { ...params, lang, supportEmail }),
       );
-      text = tenantOwnerInvitationText({ ...params, lang });
+      text = tenantOwnerInvitationText({ ...params, lang, supportEmail });
       break;
     }
     case "access-granted": {

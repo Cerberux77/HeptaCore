@@ -26,6 +26,7 @@ export async function sendTenantOwnerInvitation(params: {
     inviteLink,
     expiresAt: params.expiresAt,
     isExistingAccount: params.ownerAccountState === "EXISTING_ACCOUNT",
+    emailFrom: config.from,
   });
 
   const idempotencyKey = `heptacore/email/invitation/${params.invitationId}`;

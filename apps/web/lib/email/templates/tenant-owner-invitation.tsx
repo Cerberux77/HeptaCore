@@ -1,13 +1,10 @@
 import {
   Html,
   Text,
-  Link,
   Button,
   Container,
   Section,
   Heading,
-  Row,
-  Column,
 } from "@react-email/components";
 import * as React from "react";
 
@@ -18,6 +15,7 @@ interface OwnerInvitationProps {
   inviteLink: string;
   expiresAt: Date;
   isExistingAccount: boolean;
+  supportEmail: string;
   lang: "es" | "en";
 }
 
@@ -27,15 +25,15 @@ const texts = {
     heading: "Bienvenido a HeptaCore",
     subtitle: (name: string) => `Has sido designado como OWNER del tenant ${name}`,
     activate: "Activar mi cuenta",
-    expires: (date: string) => `Esta invitación expira el ${date}`,
+    expires: (date: string) => `Esta invitacion expira el ${date}`,
     security: "Por seguridad, este enlace es personal e intransferible. No lo compartas con nadie.",
-    footer: "HeptaCore — Gestión de contenido para redes sociales",
+    footer: "HeptaCore - Gestion de contenido para redes sociales",
     roleOwner: "Rol: OWNER",
-    question: "¿Preguntas? Contáctanos en soporte@heptacore.vercel.app",
-    loginInstead: "Ya tienes cuenta? Inicia sesión aquí",
+    question: (supportEmail: string) => `Preguntas? Contactanos en ${supportEmail}`,
+    loginInstead: "Ya tienes cuenta? Inicia sesion aqui",
     existingHeading: "Acceso a nuevo tenant",
     existingSubtitle: (name: string) => `Se te ha otorgado acceso como OWNER al tenant ${name}`,
-    login: "Iniciar sesión",
+    login: "Iniciar sesion",
   },
   en: {
     subject: (name: string) => `Activate your access to ${name} on HeptaCore`,
@@ -44,9 +42,9 @@ const texts = {
     activate: "Activate my account",
     expires: (date: string) => `This invitation expires on ${date}`,
     security: "For security, this link is personal and non-transferable. Do not share it with anyone.",
-    footer: "HeptaCore — Social Media Content Management",
+    footer: "HeptaCore - Social Media Content Management",
     roleOwner: "Role: OWNER",
-    question: "Questions? Contact us at support@heptacore.vercel.app",
+    question: (supportEmail: string) => `Questions? Contact us at ${supportEmail}`,
     loginInstead: "Already have an account? Log in here",
     existingHeading: "New Tenant Access",
     existingSubtitle: (name: string) => `You have been granted OWNER access to the ${name} tenant`,
@@ -57,7 +55,9 @@ const texts = {
 export function TenantOwnerInvitationEmail(props: OwnerInvitationProps) {
   const t = texts[props.lang];
   const expiryStr = props.expiresAt.toLocaleDateString(props.lang === "es" ? "es-VE" : "en-US", {
-    year: "numeric", month: "long", day: "numeric",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
   });
 
   if (props.isExistingAccount) {
@@ -73,10 +73,11 @@ export function TenantOwnerInvitationEmail(props: OwnerInvitationProps) {
             <Text style={paragraph}>{props.email}</Text>
             <Button href={props.inviteLink} style={button}>{t.login}</Button>
             <Text style={securityNote}>{t.security}</Text>
+            <Text style={securityNote}>{t.question(props.supportEmail)}</Text>
           </Section>
           <Section style={footer}>
             <Text style={footerText}>{t.footer}</Text>
-            <Text style={footerText}>{t.question}</Text>
+            <Text style={footerText}>{t.question(props.supportEmail)}</Text>
           </Section>
         </Container>
       </Html>
@@ -96,10 +97,11 @@ export function TenantOwnerInvitationEmail(props: OwnerInvitationProps) {
           <Button href={props.inviteLink} style={button}>{t.activate}</Button>
           <Text style={expiry}>{t.expires(expiryStr)}</Text>
           <Text style={securityNote}>{t.security}</Text>
+          <Text style={securityNote}>{t.question(props.supportEmail)}</Text>
         </Section>
         <Section style={footer}>
           <Text style={footerText}>{t.footer}</Text>
-          <Text style={footerText}>{t.question}</Text>
+          <Text style={footerText}>{t.question(props.supportEmail)}</Text>
         </Section>
       </Container>
     </Html>
@@ -109,14 +111,16 @@ export function TenantOwnerInvitationEmail(props: OwnerInvitationProps) {
 export function tenantOwnerInvitationText(props: OwnerInvitationProps): string {
   const t = texts[props.lang];
   const expiryStr = props.expiresAt.toLocaleDateString(props.lang === "es" ? "es-VE" : "en-US", {
-    year: "numeric", month: "long", day: "numeric",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
   });
 
   if (props.isExistingAccount) {
-    return `${t.existingSubtitle(props.tenantName)}\n\n${t.roleOwner}: ${props.email}\n\n${t.login}: ${props.inviteLink}\n\n${t.security}\n\n${t.footer}`;
+    return `${t.existingSubtitle(props.tenantName)}\n\n${t.roleOwner}: ${props.email}\n\n${t.login}: ${props.inviteLink}\n\n${t.security}\n\n${t.question(props.supportEmail)}\n\n${t.footer}`;
   }
 
-  return `${t.subtitle(props.tenantName)}\n\n${t.roleOwner}: ${props.email}\n\n${t.activate}: ${props.inviteLink}\n\n${t.expires(expiryStr)}\n\n${t.security}\n\n${t.footer}`;
+  return `${t.subtitle(props.tenantName)}\n\n${t.roleOwner}: ${props.email}\n\n${t.activate}: ${props.inviteLink}\n\n${t.expires(expiryStr)}\n\n${t.security}\n\n${t.question(props.supportEmail)}\n\n${t.footer}`;
 }
 
 const container: React.CSSProperties = {

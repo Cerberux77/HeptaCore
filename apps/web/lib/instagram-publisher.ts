@@ -4,6 +4,7 @@ interface PublishInstagramMediaInput {
   mediaUrl: string;
   caption: string;
   mediaType?: "IMAGE" | "VIDEO" | "CAROUSEL";
+  format?: string | null;
 }
 
 interface PublishInstagramMediaOutput {
@@ -96,7 +97,7 @@ export async function waitForInstagramContainerReady(
 export async function publishInstagramMedia(
   input: PublishInstagramMediaInput
 ): Promise<PublishInstagramMediaOutput> {
-  const { igUserId, accessToken, mediaUrl, caption, mediaType } = input;
+  const { igUserId, accessToken, mediaUrl, caption, mediaType, format } = input;
   const apiVersion = process.env.INSTAGRAM_GRAPH_API_VERSION || "v25.0";
   const baseUrl = `https://graph.instagram.com/${apiVersion}`;
 
@@ -116,13 +117,34 @@ export async function publishInstagramMedia(
   const storedIdMismatch = igUserId !== authenticatedUserId;
 
   const isVideo = mediaType === "VIDEO";
+  const normalizedFormat = String(format ?? "").trim().toUpperCase();
+  const isStory = normalizedFormat === "INSTAGRAM_STORY";
+  const isReel = normalizedFormat === "INSTAGRAM_REEL";
+
+  if (isReel && !isVideo) {
+    throw new Error("Instagram reels require a video asset.");
+  }
+
+  if (isStory && !mediaUrl) {
+    throw new Error("Instagram stories require a media URL.");
+  }
 
   // Create media container via /me/media
   const createParams = new URLSearchParams();
   createParams.append("caption", caption);
   createParams.append("access_token", accessToken);
 
-  if (isVideo) {
+  if (isReel) {
+    createParams.append("video_url", mediaUrl);
+    createParams.append("media_type", "REELS");
+  } else if (isStory) {
+    if (isVideo) {
+      createParams.append("video_url", mediaUrl);
+    } else {
+      createParams.append("image_url", mediaUrl);
+    }
+    createParams.append("media_type", "STORIES");
+  } else if (isVideo) {
     createParams.append("video_url", mediaUrl);
     createParams.append("media_type", "REELS");
   } else {
@@ -227,6 +249,7 @@ export async function publishInstagramMedia(
       mediaCount,
       storedIdMismatch,
       containerId,
+      format: normalizedFormat || (isVideo ? "VIDEO" : "IMAGE"),
       status: publishRes.status,
     },
   };

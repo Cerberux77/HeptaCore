@@ -8,6 +8,7 @@ import {
   getEmailConfig,
   EmailConfigError,
 } from "../email/email-config";
+import { getBrandContactEmail, getPrivacyEmail } from "../email/brand";
 import {
   createAndSendEmail,
   getEmailProvider,
@@ -872,6 +873,15 @@ describe("email-config", () => {
       const config = getEmailConfig();
       assert.equal(config.provider, "resend");
       assert.equal(config.resendApiKey, "re_test");
+    } finally { r(); }
+  });
+
+  it("brand helper derives contact emails from sender domain", () => {
+    const r = saveEnvAndSet({ EMAIL_FROM: "HeptaCore <noreply@heptacore.dev>" });
+    try {
+      assert.equal(getBrandContactEmail("es"), "soporte@heptacore.dev");
+      assert.equal(getBrandContactEmail("en"), "support@heptacore.dev");
+      assert.equal(getPrivacyEmail(), "privacy@heptacore.dev");
     } finally { r(); }
   });
 });

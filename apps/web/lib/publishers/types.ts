@@ -14,6 +14,7 @@ export interface PublishInput {
   mediaUrl?: string | null;
   caption: string;
   mediaType?: "IMAGE" | "VIDEO" | "CAROUSEL";
+  format?: string | null;
 }
 
 export interface PublishResult {
