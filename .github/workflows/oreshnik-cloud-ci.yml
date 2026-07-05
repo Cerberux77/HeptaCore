@@ -1,0 +1,58 @@
+name: Oreshnik Cloud CI
+
+on:
+  pull_request:
+    branches:
+      - master
+  push:
+    branches-ignore:
+      - master
+
+jobs:
+  oreshnik-cloud-ci:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout full history
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Ensure Oreshnik refs
+        run: |
+          git fetch origin master
+          git fetch origin oreshnik/control:refs/remotes/origin/oreshnik/control || true
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Oreshnik ready
+        run: npm run oreshnik:ready
+
+      - name: Oreshnik canonical
+        run: npm run oreshnik:canonical
+
+      - name: Oreshnik drift CI
+        run: npm run oreshnik:drift:ci
+
+      - name: Oreshnik gate
+        run: npm run oreshnik:gate
+
+      - name: Upload Oreshnik evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: oreshnik-cloud-ci-evidence
+          path: |
+            var/oreshnik/**
+            var/goal-runner/**
+            docs/operations/oreshnik-cloud-ci-contract.md
+            docs/operations/oreshnik-cloud-ci-runbook.md
+          if-no-files-found: ignore

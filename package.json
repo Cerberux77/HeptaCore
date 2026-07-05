@@ -37,6 +37,8 @@
     "oreshnik:dispatch:status": "oreshnik dispatch status",
     "oreshnik:goal": "node scripts/oreshnik/goal.mjs",
     "oreshnik:canonical": "node scripts/oreshnik/canonical-check.mjs",
+    "oreshnik:drift:ci": "node scripts/oreshnik/drift-ci.mjs",
+    "oreshnik:ci": "npm run oreshnik:ready && npm run oreshnik:canonical && npm run oreshnik:drift:ci && npm run oreshnik:gate",
     "oreshnik:sync": "node scripts/oreshnik/sync-from-mother.mjs",
     "oreshnik:sync:latest": "node scripts/oreshnik/sync-latest-mother.mjs",
     "oreshnik:obsidian-guard": "node scripts/oreshnik/obsidian-guard.mjs",
