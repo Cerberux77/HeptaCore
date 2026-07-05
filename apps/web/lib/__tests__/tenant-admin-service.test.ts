@@ -407,58 +407,58 @@ describe("provisioning with fake DB", () => {
       const hash = hashInvitationToken(token);
       const invite = fake.collections.invitations.create({
         data: { id: "inv_x", tenantId: "t1", email: "x@test.com", role: "OWNER", tokenHash: hash, expiresAt: new Date(Date.now() + 86400000) },
-});
-
-describe("validatePagination", () => {
-  it("defaults when no params provided", () => {
-    const r = validatePagination({});
-    assert.equal(r.page, 1);
-    assert.equal(r.limit, 20);
-  });
-
-  it("accepts valid values", () => {
-    const r = validatePagination({ page: 2, limit: 50 });
-    assert.equal(r.page, 2);
-    assert.equal(r.limit, 50);
-  });
-
-  it("accepts limit 100", () => {
-    const r = validatePagination({ page: 1, limit: 100 });
-    assert.equal(r.limit, 100);
-  });
-
-  it("rejects limit 101", () => {
-    assert.throws(() => validatePagination({ limit: 101 }), TenantAdminError);
-  });
-
-  const invalidPages: Array<[string, unknown]> = [
-    ["abc", "abc"],
-    ["0", 0],
-    ["-1", -1],
-    ["1.5", 1.5],
-  ];
-
-  for (const [label, value] of invalidPages) {
-    it(`rejects invalid page: ${label}`, () => {
-      assert.throws(() => validatePagination({ page: value }), TenantAdminError);
-    });
-  }
-
-  const invalidLimits: Array<[string, unknown]> = [
-    ["abc", "abc"],
-    ["0", 0],
-    ["-1", -1],
-    ["1.5", 1.5],
-  ];
-
-  for (const [label, value] of invalidLimits) {
-    it(`rejects invalid limit: ${label}`, () => {
-      assert.throws(() => validatePagination({ limit: value }), TenantAdminError);
-    });
-  }
-});
+      });
       assert.ok(!("token" in invite));
       assert.ok(!("plainToken" in invite));
+    });
+
+    describe("validatePagination", () => {
+      it("defaults when no params provided", () => {
+        const r = validatePagination({});
+        assert.equal(r.page, 1);
+        assert.equal(r.limit, 20);
+      });
+
+      it("accepts valid values", () => {
+        const r = validatePagination({ page: 2, limit: 50 });
+        assert.equal(r.page, 2);
+        assert.equal(r.limit, 50);
+      });
+
+      it("accepts limit 100", () => {
+        const r = validatePagination({ page: 1, limit: 100 });
+        assert.equal(r.limit, 100);
+      });
+
+      it("rejects limit 101", () => {
+        assert.throws(() => validatePagination({ limit: 101 }), TenantAdminError);
+      });
+
+      const invalidPages: Array<[string, unknown]> = [
+        ["abc", "abc"],
+        ["0", 0],
+        ["-1", -1],
+        ["1.5", 1.5],
+      ];
+
+      for (const [label, value] of invalidPages) {
+        it(`rejects invalid page: ${label}`, () => {
+          assert.throws(() => validatePagination({ page: value }), TenantAdminError);
+        });
+      }
+
+      const invalidLimits: Array<[string, unknown]> = [
+        ["abc", "abc"],
+        ["0", 0],
+        ["-1", -1],
+        ["1.5", 1.5],
+      ];
+
+      for (const [label, value] of invalidLimits) {
+        it(`rejects invalid limit: ${label}`, () => {
+          assert.throws(() => validatePagination({ limit: value }), TenantAdminError);
+        });
+      }
     });
 
     it("ADMIN cannot create tenant", async () => {
