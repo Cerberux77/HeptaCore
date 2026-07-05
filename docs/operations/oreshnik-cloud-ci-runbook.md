@@ -117,3 +117,7 @@ Recommended next step after this phase:
 - The cloud workflow is additive and should not break local Oreshnik usage.
 - `scripts/oreshnik/drift.mjs` remains the interactive/local path.
 - `scripts/oreshnik/drift-ci.mjs` exists only for non-interactive CI execution.
+
+## Smoke validation
+
+- Cloud CI smoke validation: documentation-only change used to verify push and pull_request checks.
