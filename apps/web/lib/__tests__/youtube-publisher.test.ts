@@ -255,4 +255,94 @@ describe("youtube live route contract", async () => {
     assert.ok(finalizeIdx > 0, "uses transactional finalization");
     assert.ok(publishedIdx > finalizeIdx, "PUBLISHED only after finalization");
   });
+
+  it("runs the YouTube format/asset gate before scheduled and immediate paths", () => {
+    const gateIdx = source.indexOf("evaluateYouTubePublishGate");
+    const scheduledIdx = source.indexOf('if (requestMode === "scheduled")');
+    const immediateIdx = source.indexOf("=== IMMEDIATE");
+    assert.ok(gateIdx > 0, "gate is invoked");
+    assert.ok(gateIdx < scheduledIdx, "gate runs before the scheduled path");
+    assert.ok(gateIdx < immediateIdx, "gate runs before the immediate path");
+    assert.match(source, /LIVE_BLOCKED_FORMAT_VALIDATION/);
+  });
+
+  it("ambiguous provider error is network-generic (no Meta/Facebook literals)", () => {
+    const reconcileIdx = source.indexOf("LIVE_RECONCILIATION_REQUIRED");
+    const section = source.slice(reconcileIdx, reconcileIdx + 400);
+    assert.match(section, /\$\{network\} devolvio un resultado ambiguo/);
+    assert.doesNotMatch(section, /Meta devolvio/);
+    assert.doesNotMatch(section, /verificar Facebook/);
+  });
+
+  it("selects the video asset (not the thumbnail) as the upload media", () => {
+    assert.match(source, /nonThumbnailAssets/);
+    assert.match(source, /asset\.role !== "thumbnail"/);
+  });
 });
+
+describe("youtube publish gate (immediate + scheduled share one gate)", async () => {
+  const { evaluateYouTubePublishGate } = await import("../publishing-formats.js");
+
+  const video16x9 = {
+    id: "vid",
+    url: "/tenant-assets/t/v.mp4",
+    filename: "v.mp4",
+    mimeType: "video/mp4",
+    width: 1920,
+    height: 1080,
+    sizeBytes: 10_000_000,
+    durationSeconds: 300,
+    order: 1,
+    role: "primary",
+  };
+  const shortVertical = { ...video16x9, id: "short", filename: "s.mp4", width: 1080, height: 1920, durationSeconds: 45 };
+  const shortHorizontalLong = { ...video16x9, id: "bad", width: 1920, height: 1080, durationSeconds: 200 };
+  const thumbnailImage = {
+    id: "thumb",
+    url: "/tenant-assets/t/thumb.jpg",
+    filename: "thumb.jpg",
+    mimeType: "image/jpeg",
+    width: 1280,
+    height: 720,
+    sizeBytes: 200_000,
+    order: 2,
+    role: "thumbnail",
+  };
+
+  it("blocks an invalid Short (horizontal + too long) before any provider/job", () => {
+    const gate = evaluateYouTubePublishGate({ format: "YOUTUBE_SHORT", videoAssets: [shortHorizontalLong], thumbnail: null });
+    assert.equal(gate.blocked, true);
+    assert.equal(gate.code, "LIVE_BLOCKED_FORMAT_VALIDATION");
+    assert.ok(gate.problems.includes("ASSET_ASPECT_RATIO"));
+    assert.ok(gate.problems.includes("ASSET_DURATION"));
+  });
+
+  it("allows a valid Short", () => {
+    const gate = evaluateYouTubePublishGate({ format: "YOUTUBE_SHORT", videoAssets: [shortVertical], thumbnail: null });
+    assert.equal(gate.blocked, false);
+    assert.equal(gate.code, null);
+  });
+
+  it("Video with video + thumbnail does not fail by asset count", () => {
+    const gate = evaluateYouTubePublishGate({ format: "YOUTUBE_VIDEO", videoAssets: [video16x9], thumbnail: thumbnailImage });
+    assert.equal(gate.blocked, false, "thumbnail is not counted as a second video");
+    assert.ok(!gate.problems.includes("ASSET_COUNT_MAX"));
+  });
+
+  it("Video without thumbnail is blocked (thumbnail mandatory)", () => {
+    const gate = evaluateYouTubePublishGate({ format: "YOUTUBE_VIDEO", videoAssets: [video16x9], thumbnail: null });
+    assert.equal(gate.blocked, true);
+    assert.ok(gate.problems.includes("THUMBNAIL_REQUIRED"));
+  });
+
+  it("Video with a non-image thumbnail is blocked", () => {
+    const gate = evaluateYouTubePublishGate({
+      format: "YOUTUBE_VIDEO",
+      videoAssets: [video16x9],
+      thumbnail: { ...thumbnailImage, mimeType: "application/pdf", filename: "thumb.pdf" },
+    });
+    assert.equal(gate.blocked, true);
+    assert.ok(gate.problems.includes("THUMBNAIL_MIME"));
+  });
+});
+

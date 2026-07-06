@@ -419,3 +419,47 @@ export function buildMultiformatDryRun(format: PublishingFormat, assets: DraftFo
     previewData: buildPreviewData(format, assets),
   };
 }
+
+export const YOUTUBE_THUMBNAIL_MIMES = ["image/jpeg", "image/png", "image/webp"];
+
+export type YouTubePublishGateResult = {
+  blocked: boolean;
+  code: "LIVE_BLOCKED_FORMAT_VALIDATION" | null;
+  problems: string[];
+  validation: MultiformatDryRunResult;
+};
+
+/**
+ * Shared decision used by the publish route for YouTube live + scheduled modes.
+ *
+ * It validates the main video asset(s) against the format rule (the thumbnail is
+ * NOT counted as a second video asset) and, for YOUTUBE_VIDEO, requires a valid
+ * public image thumbnail. The same gate protects both `immediate` and
+ * `scheduled`, so a horizontal / over-long / wrong-MIME short or a video without
+ * a valid thumbnail can never bypass dry-run into a real publish or a job.
+ */
+export function evaluateYouTubePublishGate(params: {
+  format: PublishingFormat;
+  videoAssets: DraftFormatAsset[];
+  thumbnail: DraftFormatAsset | null;
+}): YouTubePublishGateResult {
+  const validation = buildMultiformatDryRun(params.format, params.videoAssets);
+  const problems = validation.errors.map((error) => error.code);
+
+  if (params.format === "YOUTUBE_VIDEO") {
+    if (!params.thumbnail) {
+      problems.push("THUMBNAIL_REQUIRED");
+    } else {
+      const mime = inferMimeType(params.thumbnail);
+      if (!mime || !YOUTUBE_THUMBNAIL_MIMES.includes(mime)) {
+        problems.push("THUMBNAIL_MIME");
+      }
+      if (!params.thumbnail.url) {
+        problems.push("THUMBNAIL_NOT_PUBLIC");
+      }
+    }
+  }
+
+  const blocked = !validation.valid || problems.length > 0;
+  return { blocked, code: blocked ? "LIVE_BLOCKED_FORMAT_VALIDATION" : null, problems, validation };
+}

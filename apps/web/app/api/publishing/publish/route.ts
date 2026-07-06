@@ -8,7 +8,7 @@ import { getPublisher, PublishInput } from "../../../../lib/publishers";
 import { buildImmediateJobId, checkExistingJobForRetry, getAllPossibleJobIds, buildDeterministicScheduledJobId } from "../../../../lib/publishing-execution";
 import { commitConfirmedPublication, recordUnconfirmedProviderFailure } from "../../../../lib/publishing-finalization";
 import { ProviderError } from "../../../../lib/publishers/types";
-import { buildMultiformatDryRun, normalizeAssetManifest, normalizePublishingFormat } from "../../../../lib/publishing-formats";
+import { buildMultiformatDryRun, evaluateYouTubePublishGate, normalizeAssetManifest, normalizePublishingFormat } from "../../../../lib/publishing-formats";
 import { resolveAssetUrl } from "../../../../lib/asset-resolution";
 import { resolveTenantAccessWithLifecycle } from "../../../../lib/tenant-access";
 import { Permission } from "../../../../lib/permissions";
@@ -122,11 +122,20 @@ export async function POST(req: Request) {
     return buildPublicAssetUrl(tenantSlug, asset);
   });
 
+  // YouTube stores an optional thumbnail as an asset with role="thumbnail".
+  // It must never be counted as a second video asset by the single-video
+  // format rule: format validation runs against the main video asset(s) only.
+  const isYouTube = network === "YOUTUBE";
+  const youtubeThumbnail = isYouTube ? orderedAssets.find((asset) => asset.role === "thumbnail") ?? null : null;
+  const formatAssets = isYouTube
+    ? orderedAssets.filter((asset) => asset.role !== "thumbnail")
+    : orderedAssets;
+
   const draftOnly = tenant.automationMode === "DRAFT_ONLY";
   const approvalRequired = tenant.automationMode === "APPROVAL_REQUIRED";
 
   if (requestMode === "dry_run") {
-    const dryRun = buildMultiformatDryRun(format, orderedAssets);
+    const dryRun = buildMultiformatDryRun(format, formatAssets);
 
     await auditLog({
       tenantId: tenant.id,
@@ -184,6 +193,25 @@ export async function POST(req: Request) {
       error: "Este tenant requiere aprobacion manual explicita para publicar o programar.",
       action: "Marca el checkbox de aprobacion manual antes de ejecutar.",
     }, { status: 409 });
+  }
+
+  // Format/asset validation gate for YouTube live + scheduled. This guarantees a
+  // horizontal, over-long, or wrong-MIME YOUTUBE_SHORT (or a YOUTUBE_VIDEO
+  // missing/invalid thumbnail) can never bypass dry-run into publish/schedule.
+  if (isYouTube) {
+    const gate = evaluateYouTubePublishGate({ format, videoAssets: formatAssets, thumbnail: youtubeThumbnail });
+    if (gate.blocked) {
+      return NextResponse.json({
+        code: "LIVE_BLOCKED_FORMAT_VALIDATION",
+        error: `${format} no cumple los requisitos de formato/asset de YouTube. No se publico ni se programo.`,
+        action: "Corrige orientacion, duracion, MIME, dimensiones o thumbnail y usa dry-run para verificar.",
+        draftId: draft.id,
+        format,
+        problems: gate.problems,
+        errors: gate.validation.errors,
+        warnings: gate.validation.warnings,
+      }, { status: 409 });
+    }
   }
 
   if (requestMode === "scheduled") {
@@ -399,7 +427,10 @@ export async function POST(req: Request) {
   // Asset URL gate (only if asset is needed)
   let mediaUrl: string | undefined | null;
   let mediaType: "IMAGE" | "VIDEO" | undefined;
-  const primaryAsset = needsAsset ? (draft.assets.find((a) => a.role === "primary") ?? draft.assets[0]) : null;
+  const nonThumbnailAssets = isYouTube ? draft.assets.filter((a) => a.role !== "thumbnail") : draft.assets;
+  const primaryAsset = needsAsset
+    ? (nonThumbnailAssets.find((a) => a.role === "primary") ?? nonThumbnailAssets[0] ?? null)
+    : null;
 
   if (primaryAsset) {
     mediaUrl = buildPublicAssetUrl(tenantSlug, primaryAsset.asset);
@@ -542,8 +573,8 @@ export async function POST(req: Request) {
         code: "LIVE_RECONCILIATION_REQUIRED",
         status: "RECONCILIATION_REQUIRED",
         draftId: draft.id,
-        error: "Meta devolvio un resultado ambiguo. Verifique la pagina antes de reintentar.",
-        action: "No vuelva a publicar hasta verificar Facebook. El job permanece IN_REVIEW.",
+        error: `${network} devolvio un resultado ambiguo. Verifique la publicacion en ${network} antes de reintentar.`,
+        action: `No vuelva a publicar hasta verificar ${network}. El job permanece IN_REVIEW.`,
       }, { status: 202 });
     }
 
