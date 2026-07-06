@@ -61,7 +61,7 @@ describe("oreshnik readiness helpers", () => {
 
   it("requires the autonomous /goal dispatch contract", () => {
     const issues = validateGoalContract("npm run oreshnik:ready\noreshnik goal --harness kilo --json\n--operator kilo");
-    assert.ok(issues.some((issue) => issue.includes("authorized `worktreePath` and `functionalBranch`")));
+    assert.ok(issues.some((issue) => issue.includes("oreshnik goal --harness kilo --auto-align --json")));
     assert.ok(issues.some((issue) => issue.includes("forbidden token: --operator kilo")));
   });
 
