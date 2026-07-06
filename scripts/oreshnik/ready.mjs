@@ -21,7 +21,7 @@ import {
 
 const require = createRequire(import.meta.url);
 const ROOT = normalizeRoot(join(dirname(fileURLToPath(import.meta.url)), "..", ".."));
-const EXPECTED_ORESHNIK_VERSION = "0.2.0-alpha.13";
+const EXPECTED_ORESHNIK_VERSION = "0.2.0-alpha.14";
 const issues = [];
 
 function run(command, args) {
