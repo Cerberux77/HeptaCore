@@ -9,10 +9,10 @@ import {
 /**
  * YouTube provider (Data API v3).
  *
- * Self-contained within the authorized publishers zone. It implements two
- * differentiated formats:
+ * Self-contained within the authorized publishers zone. Two differentiated
+ * formats are validated by the unified pipeline in `publishing-formats.ts`:
  *   - YOUTUBE_VIDEO  : landscape 16:9 long-form video
- *   - YOUTUBE_SHORTS : vertical 9:16 short (<= 180s, tagged #Shorts)
+ *   - YOUTUBE_SHORT  : vertical 9:16 short (<= 180s, tagged #Shorts)
  *
  * Real publishing uses the resumable upload protocol:
  *   1. POST .../upload/youtube/v3/videos?uploadType=resumable&part=snippet,status
@@ -24,218 +24,23 @@ import {
  * provider response containing a video id.
  */
 
-export type YouTubeFormat = "YOUTUBE_VIDEO" | "YOUTUBE_SHORTS";
-
-export type YouTubeValidationMessage = {
-  code: string;
-  message: string;
-  assetId?: string;
-};
-
-export type YouTubeDryRunAsset = {
-  id: string;
-  url: string | null;
-  filename?: string;
-  mimeType: string | null;
-  width: number | null;
-  height: number | null;
-  sizeBytes: number | null;
-  durationSeconds?: number | null;
-};
-
-export type YouTubeFormatValidation = {
-  valid: boolean;
-  errors: YouTubeValidationMessage[];
-  warnings: YouTubeValidationMessage[];
-};
-
-export type YouTubePreviewData = {
-  platform: "YOUTUBE";
-  format: YouTubeFormat;
-  label: string;
-  aspectRatio: string;
-  assets: YouTubeDryRunAsset[];
-};
-
-export type YouTubeDryRunResult = YouTubeFormatValidation & {
-  format: YouTubeFormat;
-  assets: YouTubeDryRunAsset[];
-  previewData: YouTubePreviewData;
-};
-
-type YouTubeFormatRule = {
-  format: YouTubeFormat;
-  label: string;
-  aspectRatio: string;
-  aspectRatioValue: number;
-  aspectTolerance: number;
-  minWidth: number;
-  minHeight: number;
-  maxDurationSeconds: number;
-  maxSizeBytes: number;
-  acceptedMimeTypes: string[];
-};
-
-const VIDEO_MIMES = ["video/mp4", "video/quicktime", "video/webm"];
-const MAX_YOUTUBE_SIZE_BYTES = 256 * 1024 * 1024 * 1024; // 256GB API ceiling
-
-export const YOUTUBE_FORMAT_RULES: Record<YouTubeFormat, YouTubeFormatRule> = {
-  YOUTUBE_VIDEO: {
-    format: "YOUTUBE_VIDEO",
-    label: "YouTube Video 16:9",
-    aspectRatio: "16 / 9",
-    aspectRatioValue: 16 / 9,
-    aspectTolerance: 0.05,
-    minWidth: 1280,
-    minHeight: 720,
-    maxDurationSeconds: 12 * 60 * 60,
-    maxSizeBytes: MAX_YOUTUBE_SIZE_BYTES,
-    acceptedMimeTypes: VIDEO_MIMES,
-  },
-  YOUTUBE_SHORTS: {
-    format: "YOUTUBE_SHORTS",
-    label: "YouTube Shorts",
-    aspectRatio: "9 / 16",
-    aspectRatioValue: 9 / 16,
-    aspectTolerance: 0.05,
-    minWidth: 720,
-    minHeight: 1280,
-    maxDurationSeconds: 180,
-    maxSizeBytes: MAX_YOUTUBE_SIZE_BYTES,
-    acceptedMimeTypes: VIDEO_MIMES,
-  },
-};
-
-const EXTENSION_MIMES: Record<string, string> = {
-  mp4: "video/mp4",
-  mov: "video/quicktime",
-  webm: "video/webm",
-};
+export type YouTubeFormat = "YOUTUBE_VIDEO" | "YOUTUBE_SHORT";
 
 export function normalizeYouTubeFormat(format?: string | null): YouTubeFormat {
   const raw = String(format ?? "").trim().toUpperCase();
-  if (raw === "YOUTUBE_VIDEO" || raw === "YOUTUBE_SHORTS") return raw;
-  if (raw.includes("SHORT")) return "YOUTUBE_SHORTS";
+  if (raw === "YOUTUBE_VIDEO" || raw === "YOUTUBE_SHORT") return raw;
+  if (raw.includes("SHORT")) return "YOUTUBE_SHORT";
   return "YOUTUBE_VIDEO";
-}
-
-export function inferYouTubeMime(
-  asset: Pick<YouTubeDryRunAsset, "mimeType" | "filename" | "url">
-): string | null {
-  if (asset.mimeType) return asset.mimeType.toLowerCase();
-  const source = asset.filename || asset.url || "";
-  const ext = source.split("?")[0]?.split(".").pop()?.toLowerCase();
-  return ext ? EXTENSION_MIMES[ext] ?? null : null;
-}
-
-export function validateYouTubeAssets(
-  format: YouTubeFormat,
-  assets: YouTubeDryRunAsset[]
-): YouTubeFormatValidation {
-  const rule = YOUTUBE_FORMAT_RULES[format];
-  const errors: YouTubeValidationMessage[] = [];
-  const warnings: YouTubeValidationMessage[] = [];
-
-  if (assets.length < 1) {
-    errors.push({ code: "ASSET_COUNT_MIN", message: `${rule.label} requires exactly 1 video asset.` });
-  }
-  if (assets.length > 1) {
-    errors.push({ code: "ASSET_COUNT_MAX", message: `${rule.label} accepts a single video asset.` });
-  }
-
-  for (const asset of assets) {
-    const mimeType = inferYouTubeMime(asset);
-    if (!mimeType || !rule.acceptedMimeTypes.includes(mimeType)) {
-      errors.push({
-        code: "ASSET_MIME",
-        assetId: asset.id,
-        message: `${asset.filename ?? asset.id} has unsupported MIME type ${mimeType ?? "unknown"}. YouTube requires ${rule.acceptedMimeTypes.join(", ")}.`,
-      });
-    }
-
-    if (asset.sizeBytes != null && asset.sizeBytes > rule.maxSizeBytes) {
-      errors.push({
-        code: "ASSET_SIZE",
-        assetId: asset.id,
-        message: `${asset.filename ?? asset.id} exceeds the YouTube upload size ceiling.`,
-      });
-    }
-
-    if (asset.width != null && asset.height != null) {
-      if (asset.width < rule.minWidth || asset.height < rule.minHeight) {
-        errors.push({
-          code: "ASSET_DIMENSIONS",
-          assetId: asset.id,
-          message: `${asset.filename ?? asset.id} is ${asset.width}x${asset.height}px, below the ${rule.minWidth}x${rule.minHeight}px minimum for ${rule.label}.`,
-        });
-      }
-      const ratio = asset.width / asset.height;
-      if (Math.abs(ratio - rule.aspectRatioValue) > rule.aspectTolerance) {
-        errors.push({
-          code: "ASSET_ASPECT_RATIO",
-          assetId: asset.id,
-          message: `${asset.filename ?? asset.id} aspect ratio ${ratio.toFixed(2)} does not match ${rule.aspectRatio} required by ${rule.label}.`,
-        });
-      }
-    } else {
-      warnings.push({
-        code: "ASSET_DIMENSIONS_UNKNOWN",
-        assetId: asset.id,
-        message: `${asset.filename ?? asset.id} has no stored dimensions metadata; aspect ratio cannot be verified before upload.`,
-      });
-    }
-
-    if (asset.durationSeconds != null) {
-      if (asset.durationSeconds > rule.maxDurationSeconds) {
-        errors.push({
-          code: "ASSET_DURATION",
-          assetId: asset.id,
-          message: `${asset.filename ?? asset.id} duration ${asset.durationSeconds}s exceeds ${rule.maxDurationSeconds}s for ${rule.label}.`,
-        });
-      }
-    } else {
-      warnings.push({
-        code: "ASSET_DURATION_UNKNOWN",
-        assetId: asset.id,
-        message: `${asset.filename ?? asset.id} has no stored duration metadata.`,
-      });
-    }
-  }
-
-  return { valid: errors.length === 0, errors, warnings };
-}
-
-export function buildYouTubePreview(
-  format: YouTubeFormat,
-  assets: YouTubeDryRunAsset[]
-): YouTubePreviewData {
-  const rule = YOUTUBE_FORMAT_RULES[format];
-  return {
-    platform: "YOUTUBE",
-    format,
-    label: rule.label,
-    aspectRatio: rule.aspectRatio,
-    assets,
-  };
-}
-
-export function buildYouTubeDryRun(
-  format: YouTubeFormat,
-  assets: YouTubeDryRunAsset[]
-): YouTubeDryRunResult {
-  const validation = validateYouTubeAssets(format, assets);
-  return {
-    ...validation,
-    format,
-    assets,
-    previewData: buildYouTubePreview(format, assets),
-  };
 }
 
 const SHORTS_TAG = "#Shorts";
 
-export function withShortsMarker(format: YouTubeFormat, title: string, description: string): { title: string; description: string } {
-  if (format !== "YOUTUBE_SHORTS") return { title, description };
+export function withShortsMarker(
+  format: YouTubeFormat,
+  title: string,
+  description: string
+): { title: string; description: string } {
+  if (format !== "YOUTUBE_SHORT") return { title, description };
   const hasMarker = `${title} ${description}`.toLowerCase().includes("#shorts");
   if (hasMarker) return { title, description };
   const nextDescription = description ? `${description}\n\n${SHORTS_TAG}` : SHORTS_TAG;
@@ -308,10 +113,17 @@ async function setThumbnail(videoId: string, accessToken: string, thumbnailUrl: 
 async function publishToYouTube(input: PublishInput): Promise<PublishResult> {
   const { accessToken, mediaUrl } = input;
   const format = normalizeYouTubeFormat(input.format);
-  const rule = YOUTUBE_FORMAT_RULES[format];
+  const label = format === "YOUTUBE_SHORT" ? "YouTube Shorts" : "YouTube Video 16:9";
+
+  if (!accessToken) {
+    throw new ProviderError("YouTube requires a resolved OAuth access token.", {
+      httpStatus: 401,
+      isAmbiguous: false,
+    });
+  }
 
   if (!mediaUrl) {
-    throw new ProviderError(`${rule.label} requires a public video asset URL.`, {
+    throw new ProviderError(`${label} requires a public video asset URL.`, {
       httpStatus: 400,
       isAmbiguous: false,
     });

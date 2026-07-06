@@ -9,7 +9,6 @@ import { buildImmediateJobId, checkExistingJobForRetry, getAllPossibleJobIds, bu
 import { commitConfirmedPublication, recordUnconfirmedProviderFailure } from "../../../../lib/publishing-finalization";
 import { ProviderError } from "../../../../lib/publishers/types";
 import { buildMultiformatDryRun, normalizeAssetManifest, normalizePublishingFormat } from "../../../../lib/publishing-formats";
-import { buildYouTubeDryRun, normalizeYouTubeFormat, type YouTubeDryRunAsset } from "../../../../lib/publishers/youtube";
 import { resolveAssetUrl } from "../../../../lib/asset-resolution";
 import { resolveTenantAccessWithLifecycle } from "../../../../lib/tenant-access";
 import { Permission } from "../../../../lib/permissions";
@@ -127,54 +126,6 @@ export async function POST(req: Request) {
   const approvalRequired = tenant.automationMode === "APPROVAL_REQUIRED";
 
   if (requestMode === "dry_run") {
-    if (network === "YOUTUBE") {
-      const ytFormat = normalizeYouTubeFormat(draft.format);
-      const ytAssets: YouTubeDryRunAsset[] = orderedAssets.map((asset) => ({
-        id: asset.id,
-        url: asset.url,
-        filename: asset.filename,
-        mimeType: asset.mimeType,
-        width: asset.width,
-        height: asset.height,
-        sizeBytes: asset.sizeBytes,
-        durationSeconds: asset.durationSeconds ?? null,
-      }));
-      const ytDryRun = buildYouTubeDryRun(ytFormat, ytAssets);
-
-      await auditLog({
-        tenantId: tenant.id,
-        actorId: session.user.id,
-        action: "publish_dry_run_youtube_validated",
-        target: `draft:${draft.id}`,
-        metadata: {
-          tenant: tenant.name,
-          title: draft.title,
-          network,
-          format: ytFormat,
-          valid: ytDryRun.valid,
-          errorCodes: ytDryRun.errors.map((error) => error.code),
-          warningCodes: ytDryRun.warnings.map((warning) => warning.code),
-          assetIds: ytAssets.map((asset) => asset.id),
-          tenantAutomationMode: tenant.automationMode,
-        },
-      });
-
-      return NextResponse.json({
-        ok: ytDryRun.valid,
-        mode: "dry_run",
-        message: ytDryRun.valid
-          ? "YouTube dry-run passed. No provider call executed."
-          : "YouTube dry-run found blocking validation errors. No provider call executed.",
-        draftId: draft.id,
-        valid: ytDryRun.valid,
-        errors: ytDryRun.errors,
-        warnings: ytDryRun.warnings,
-        format: ytDryRun.format,
-        assets: ytDryRun.assets,
-        previewData: ytDryRun.previewData,
-      });
-    }
-
     const dryRun = buildMultiformatDryRun(format, orderedAssets);
 
     await auditLog({
@@ -561,7 +512,7 @@ export async function POST(req: Request) {
     const thumbnailAsset = draft.assets.find((a) => a.role === "thumbnail");
     publishInput.title = draft.title;
     publishInput.description = draft.caption ?? draft.title;
-    publishInput.format = normalizeYouTubeFormat(draft.format);
+    publishInput.format = format;
     if (thumbnailAsset) {
       publishInput.thumbnailUrl = buildPublicAssetUrl(tenantSlug, thumbnailAsset.asset);
     }
