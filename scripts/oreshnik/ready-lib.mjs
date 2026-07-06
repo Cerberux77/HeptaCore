@@ -3,10 +3,10 @@ import { extname, join, relative, resolve } from "node:path";
 
 export const REQUIRED_GATE_NAMES = ["typecheck", "build", "worker", "tests"];
 export const REQUIRED_GOAL_SNIPPETS = [
-  "oreshnik goal --harness kilo --json",
-  "authorized `worktreePath` and `functionalBranch`",
-  "Do not hardcode any human operator ID.",
-  "oreshnik align --apply --harness kilo"
+  "oreshnik goal --harness kilo --auto-align --json",
+  "authorized `worktreePath` and",
+  "`functionalBranch` returned by the contract",
+  "Never hardcode a human operator ID."
 ];
 export const FORBIDDEN_GOAL_SNIPPETS = ["--operator kilo", "--operator manuel", "--operator jean", "Owner: Kilo Agent"];
 export const FORBIDDEN_TEXT_TOKENS = ["D:\\H1", "D:\\PROYECTOS\\SMOKE", "../oreshnik"];
