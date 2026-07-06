@@ -14,6 +14,19 @@ export interface PublishInput {
   mediaUrl?: string | null;
   caption: string;
   mediaType?: "IMAGE" | "VIDEO" | "CAROUSEL";
+  /**
+   * Optional provider-specific metadata. Providers that do not use a field
+   * ignore it. YouTube consumes title/description/tags/thumbnail/format.
+   */
+  title?: string | null;
+  description?: string | null;
+  tags?: string[] | null;
+  thumbnailUrl?: string | null;
+  categoryId?: string | null;
+  privacyStatus?: "public" | "unlisted" | "private" | null;
+  madeForKids?: boolean | null;
+  /** Differentiated publishing format hint (e.g. YOUTUBE_VIDEO, YOUTUBE_SHORTS). */
+  format?: string | null;
 }
 
 export interface PublishResult {
