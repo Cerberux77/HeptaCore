@@ -121,3 +121,7 @@ Recommended next step after this phase:
 ## Smoke validation
 
 - Cloud CI smoke validation: documentation-only change used to verify push and pull_request checks.
+
+## Manuel smoke validation
+
+- Independent smoke validation by Manuel to confirm Oreshnik Cloud CI runs from GitHub.
