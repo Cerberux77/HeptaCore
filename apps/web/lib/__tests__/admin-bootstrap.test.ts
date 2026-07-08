@@ -3,13 +3,44 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 
 const seedAdmin = await import("../../../../scripts/seed-admin.mjs");
-const { requireAdminBootstrapEnv, assertSuperAdminRole, upsertSuperAdmin } = seedAdmin;
+const { requireAdminBootstrapEnv, assertSuperAdminRole, upsertSuperAdmin } = seedAdmin as {
+  requireAdminBootstrapEnv: (env: Record<string, string | undefined>) => {
+    email: string;
+    password: string;
+    role: string;
+    tenantSlug: string;
+    name: string | null;
+  };
+  assertSuperAdminRole: (role: string) => void;
+  upsertSuperAdmin: (args: {
+    prisma: any;
+    hashPassword: (plain: string) => Promise<string>;
+    email: string;
+    name: string | null;
+    password: string;
+    role: string;
+    tenantSlug: string;
+  }) => Promise<{
+    userId: string;
+    tenantId: string;
+    userCreated: boolean;
+    membershipAction: string;
+    role: string;
+    tenantSlug: string;
+  }>;
+};
 const { resolveAppAccess } = await import("../access-routing.js");
 
 const SEED_ADMIN_SOURCE = readFileSync(new URL("../../../../scripts/seed-admin.mjs", import.meta.url), "utf8");
 
-function makeFakePrisma(initialTenants) {
-  const state = {
+type FakeState = {
+  tenants: Array<{ id: string; slug: string; name: string }>;
+  users: Array<Record<string, any>>;
+  memberships: Array<Record<string, any>>;
+};
+
+function makeFakePrisma(initialTenants: Array<{ id?: string; slug: string; name?: string }>) {
+  const state: FakeState = {
     tenants: initialTenants.map((t, i) => ({ id: t.id ?? `tenant-${i + 1}`, slug: t.slug, name: t.name ?? t.slug })),
     users: [],
     memberships: [],
@@ -18,32 +49,32 @@ function makeFakePrisma(initialTenants) {
   let memSeq = 0;
   const prisma = {
     tenant: {
-      findFirst: async ({ where }) => state.tenants.find((t) => t.slug === where.slug) ?? null,
+      findFirst: async ({ where }: any) => state.tenants.find((t) => t.slug === where.slug) ?? null,
     },
     user: {
-      findUnique: async ({ where }) => state.users.find((u) => u.email === where.email) ?? null,
-      create: async ({ data }) => {
+      findUnique: async ({ where }: any) => state.users.find((u) => u.email === where.email) ?? null,
+      create: async ({ data }: any) => {
         const u = { id: `user-${++userSeq}`, ...data };
         state.users.push(u);
         return u;
       },
-      update: async ({ where, data }) => {
+      update: async ({ where, data }: any) => {
         const u = state.users.find((x) => x.id === where.id);
-        Object.assign(u, data);
+        Object.assign(u as Record<string, any>, data);
         return u;
       },
     },
     membership: {
-      findFirst: async ({ where }) =>
+      findFirst: async ({ where }: any) =>
         state.memberships.find((m) => m.tenantId === where.tenantId && m.userId === where.userId) ?? null,
-      create: async ({ data }) => {
+      create: async ({ data }: any) => {
         const m = { id: `mem-${++memSeq}`, ...data };
         state.memberships.push(m);
         return m;
       },
-      update: async ({ where, data }) => {
+      update: async ({ where, data }: any) => {
         const m = state.memberships.find((x) => x.id === where.id);
-        Object.assign(m, data);
+        Object.assign(m as Record<string, any>, data);
         return m;
       },
     },
@@ -51,20 +82,23 @@ function makeFakePrisma(initialTenants) {
   return { prisma, state };
 }
 
-const hashPassword = async (plain) => `hash(${plain})`;
+const hashPassword = async (plain: string) => `hash(${plain})`;
 
 describe("admin bootstrap: env + role guards", () => {
   it("aborts when any required variable is missing", () => {
-    assert.throws(() => requireAdminBootstrapEnv({}), (err) => {
-      assert.equal(err.code, "MISSING_ADMIN_ENV");
-      assert.deepEqual(err.missing, [
-        "HEPTACORE_ADMIN_EMAIL",
-        "HEPTACORE_ADMIN_PASSWORD",
-        "HEPTACORE_ADMIN_ROLE",
-        "HEPTACORE_TENANT_SLUG",
-      ]);
-      return true;
-    });
+    assert.throws(
+      () => requireAdminBootstrapEnv({}),
+      (err: any) => {
+        assert.equal(err.code, "MISSING_ADMIN_ENV");
+        assert.deepEqual(err.missing, [
+          "HEPTACORE_ADMIN_EMAIL",
+          "HEPTACORE_ADMIN_PASSWORD",
+          "HEPTACORE_ADMIN_ROLE",
+          "HEPTACORE_TENANT_SLUG",
+        ]);
+        return true;
+      },
+    );
   });
 
   it("does not leak the password value in the missing-env error", () => {
@@ -75,7 +109,7 @@ describe("admin bootstrap: env + role guards", () => {
           HEPTACORE_ADMIN_ROLE: "SUPER_ADMIN",
           HEPTACORE_TENANT_SLUG: "turpial-sound",
         }),
-      (err) => {
+      (err: any) => {
         assert.equal(err.code, "MISSING_ADMIN_ENV");
         assert.deepEqual(err.missing, ["HEPTACORE_ADMIN_EMAIL"]);
         assert.doesNotMatch(err.message, /s3cr3t-value/);
@@ -97,15 +131,14 @@ describe("admin bootstrap: env + role guards", () => {
   });
 
   it("rejects a role other than SUPER_ADMIN", () => {
-    assert.throws(() => assertSuperAdminRole("ADMIN"), (err) => err.code === "INVALID_ADMIN_ROLE");
-    assert.throws(() => assertSuperAdminRole("OWNER"), (err) => err.code === "INVALID_ADMIN_ROLE");
+    assert.throws(() => assertSuperAdminRole("ADMIN"), (err: any) => err.code === "INVALID_ADMIN_ROLE");
+    assert.throws(() => assertSuperAdminRole("OWNER"), (err: any) => err.code === "INVALID_ADMIN_ROLE");
     assert.doesNotThrow(() => assertSuperAdminRole("SUPER_ADMIN"));
   });
 
   it("contains no hardcoded default credentials", () => {
     assert.doesNotMatch(SEED_ADMIN_SOURCE, /jean@heptacore\.dev/);
     assert.doesNotMatch(SEED_ADMIN_SOURCE, /admin123/);
-    // No "|| default" fallbacks on the required admin env variables.
     assert.doesNotMatch(SEED_ADMIN_SOURCE, /HEPTACORE_ADMIN_EMAIL\s*\|\|/);
     assert.doesNotMatch(SEED_ADMIN_SOURCE, /HEPTACORE_ADMIN_PASSWORD\s*\|\|/);
   });
@@ -184,7 +217,7 @@ describe("admin bootstrap: idempotent super admin upsert", () => {
           role: "SUPER_ADMIN",
           tenantSlug: "missing-tenant",
         }),
-      (err) => {
+      (err: any) => {
         assert.equal(err.code, "TENANT_NOT_FOUND");
         assert.match(err.message, /HEPTACORE_TENANT_SLUG/);
         return true;
