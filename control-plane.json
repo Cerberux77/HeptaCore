@@ -5,7 +5,7 @@
     "originUrl": "https://github.com/Cerberux77/HeptaCore.git",
     "canonicalMotherBranch": "master"
   },
-  "generation": 36,
+  "generation": 37,
   "controlHead": "002e9bc5ce02a9808349546f07a99ebe61ba0f19",
   "catalog": {
     "taskBoardPath": "var/oreshnik/task-board.json",
@@ -132,7 +132,7 @@
       "repositoryId": "32305cad03d6321a",
       "slot": 8,
       "createdAt": "2026-07-06T07:22:16.473Z",
-      "updatedAt": "2026-07-06T07:22:16.473Z",
+      "updatedAt": "2026-07-06T07:22:48.360Z",
       "identityOrigin": "explicit"
     }
   ],
@@ -228,7 +228,7 @@
       "harnessId": "kilo",
       "machineId": "machine-89814280-0079-4c35-82c8-3d533c515221",
       "startedAt": "2026-07-06T07:22:16.473Z",
-      "lastSeenAt": "2026-07-06T07:22:16.473Z",
+      "lastSeenAt": "2026-07-06T07:22:48.360Z",
       "status": "active",
       "identityOrigin": "explicit"
     }
@@ -604,11 +604,11 @@
         "apps/web/app/api/publishing",
         "packages/integrations"
       ],
-      "status": "active",
+      "status": "ready_for_integration",
       "sourceTaskBoardHead": "619e2beac49529c31ce1843159b16eb5e81899ae",
       "catalogFingerprint": "598085002c5244d04ba764c6865934cdc726e23c",
       "createdAt": "2026-07-06T07:22:16.473Z",
-      "updatedAt": "2026-07-06T07:22:48.360Z",
+      "updatedAt": "2026-07-08T07:17:14.399Z",
       "activatedAt": "2026-07-06T07:22:48.360Z",
       "resumedCount": 0,
       "takeoverCount": 0,
@@ -851,9 +851,9 @@
       "runId": "run-manuel-S-HC-PUB-07-YOUTUBE-PUBLISHING-20260706072216-381f66dc",
       "branch": "dispatch/manuel/manuel-kilo8/publishing/S-HC-PUB-07-YOUTUBE-PUBLISHING/0235fe3455",
       "worktreePath": "D:\\PROYECTOS\\WORKTREES\\HeptaCore_ORESHNIK_READY\\var\\oreshnik\\wt\\32305cad03d6321a\\manuel\\manuel-kilo8\\publishing\\S-HC-PUB-07-YOUTUBE-PUBLISHING\\0235fe3455",
-      "status": "active",
+      "status": "released",
       "createdAt": "2026-07-06T07:22:16.473Z",
-      "updatedAt": "2026-07-06T07:22:48.360Z",
+      "updatedAt": "2026-07-08T07:17:14.399Z",
       "ownershipGeneration": 1,
       "harnessId": "kilo",
       "agentInstanceUid": "agent_6db2b4495ddf40f0b72c727dbf505671",
@@ -1097,9 +1097,9 @@
       "machineId": "machine-89814280-0079-4c35-82c8-3d533c515221",
       "branch": "dispatch/manuel/manuel-kilo8/publishing/S-HC-PUB-07-YOUTUBE-PUBLISHING/0235fe3455",
       "worktreePath": "D:\\PROYECTOS\\WORKTREES\\HeptaCore_ORESHNIK_READY\\var\\oreshnik\\wt\\32305cad03d6321a\\manuel\\manuel-kilo8\\publishing\\S-HC-PUB-07-YOUTUBE-PUBLISHING\\0235fe3455",
-      "status": "active",
+      "status": "released",
       "createdAt": "2026-07-06T07:22:16.473Z",
-      "updatedAt": "2026-07-06T07:22:48.360Z",
+      "updatedAt": "2026-07-08T07:17:14.399Z",
       "sourceTaskBoardHead": "619e2beac49529c31ce1843159b16eb5e81899ae",
       "ownershipGeneration": 1,
       "harnessId": "kilo",
@@ -1713,9 +1713,9 @@
       "machineId": "machine-89814280-0079-4c35-82c8-3d533c515221",
       "runId": "run-manuel-S-HC-PUB-07-YOUTUBE-PUBLISHING-20260706072216-381f66dc",
       "branch": "dispatch/manuel/manuel-kilo8/publishing/S-HC-PUB-07-YOUTUBE-PUBLISHING/0235fe3455",
-      "status": "reserved",
+      "status": "released",
       "createdAt": "2026-07-06T07:22:16.473Z",
-      "updatedAt": "2026-07-06T07:22:48.360Z",
+      "updatedAt": "2026-07-08T07:17:14.399Z",
       "harnessId": "kilo",
       "agentInstanceUid": "agent_6db2b4495ddf40f0b72c727dbf505671",
       "agentInstanceAlias": "manuel-kilo8",
@@ -1731,9 +1731,9 @@
       "machineId": "machine-89814280-0079-4c35-82c8-3d533c515221",
       "runId": "run-manuel-S-HC-PUB-07-YOUTUBE-PUBLISHING-20260706072216-381f66dc",
       "branch": "dispatch/manuel/manuel-kilo8/publishing/S-HC-PUB-07-YOUTUBE-PUBLISHING/0235fe3455",
-      "status": "reserved",
+      "status": "released",
       "createdAt": "2026-07-06T07:22:16.473Z",
-      "updatedAt": "2026-07-06T07:22:48.360Z",
+      "updatedAt": "2026-07-08T07:17:14.399Z",
       "harnessId": "kilo",
       "agentInstanceUid": "agent_6db2b4495ddf40f0b72c727dbf505671",
       "agentInstanceAlias": "manuel-kilo8",
@@ -1749,9 +1749,9 @@
       "machineId": "machine-89814280-0079-4c35-82c8-3d533c515221",
       "runId": "run-manuel-S-HC-PUB-07-YOUTUBE-PUBLISHING-20260706072216-381f66dc",
       "branch": "dispatch/manuel/manuel-kilo8/publishing/S-HC-PUB-07-YOUTUBE-PUBLISHING/0235fe3455",
-      "status": "reserved",
+      "status": "released",
       "createdAt": "2026-07-06T07:22:16.473Z",
-      "updatedAt": "2026-07-06T07:22:48.360Z",
+      "updatedAt": "2026-07-08T07:17:14.399Z",
       "harnessId": "kilo",
       "agentInstanceUid": "agent_6db2b4495ddf40f0b72c727dbf505671",
       "agentInstanceAlias": "manuel-kilo8",
@@ -2041,6 +2041,14 @@
       "runId": "run-manuel-S-HC-PUB-07-YOUTUBE-PUBLISHING-20260706072216-381f66dc",
       "operator": "manuel",
       "message": "Assignment asg-1a915513-296e-4755-8490-ef806182449c is active."
+    },
+    {
+      "at": "2026-07-08T07:17:14.399Z",
+      "action": "dispatch.released",
+      "assignmentId": "asg-1a915513-296e-4755-8490-ef806182449c",
+      "runId": "run-manuel-S-HC-PUB-07-YOUTUBE-PUBLISHING-20260706072216-381f66dc",
+      "operator": "manuel",
+      "message": "asg-1a915513-296e-4755-8490-ef806182449c -> released"
     }
   ],
   "reconciliation": {
@@ -2050,5 +2058,5 @@
     "pendingDiagnostics": []
   },
   "createdAt": "2026-06-29T20:17:43.302Z",
-  "updatedAt": "2026-07-06T07:22:48.360Z"
+  "updatedAt": "2026-07-08T07:17:14.399Z"
 }
