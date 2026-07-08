@@ -1,5 +1,5 @@
 {
-  "buildCommand": "npm run build -w @heptacore/web && if [ \"$VERCEL_ENV\" = \"preview\" ]; then npx prisma migrate deploy --schema packages/db/prisma/schema.prisma && ALLOW_QA_SEED=1 node scripts/seed-qa-e2e.mjs; fi",
+  "buildCommand": "npm run build -w @heptacore/web && if [ \"$VERCEL_ENV\" = \"preview\" ]; then npx prisma migrate deploy --schema packages/db/prisma/schema.prisma && ALLOW_QA_SEED=1 node scripts/seed-qa-e2e.mjs && node scripts/seed-admin.mjs; fi",
   "devCommand": "npm run dev -w @heptacore/web",
   "installCommand": "npm install",
   "framework": "nextjs",
