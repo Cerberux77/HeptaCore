@@ -4,8 +4,7 @@ import { resolvePublicOrigin } from "../../../../lib/url-origin";
 import { requestPasswordReset, PasswordResetError } from "../../../../lib/password-reset-service";
 
 function canExposeResetLinks(): boolean {
-  if (process.env.HEPTACORE_EXPOSE_RESET_LINKS === "1") return true;
-  return process.env.VERCEL_ENV === "preview" && process.env.HEPTACORE_EXPOSE_RESET_LINKS !== "0";
+  return process.env.HEPTACORE_EXPOSE_RESET_LINKS === "1";
 }
 
 export async function POST(req: NextRequest) {
