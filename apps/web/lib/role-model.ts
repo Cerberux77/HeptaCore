@@ -36,8 +36,11 @@ export function isAmbiguousLegacyTenantRole(role: string | null | undefined): ro
 }
 
 export function normalizeFunctionalTenantRole(role: UserRole | string | null | undefined): CanonicalTenantRole | null {
+  return isCanonicalTenantRole(role) ? role : null;
+}
+
+export function convertSafeLegacyTenantRole(role: string | null | undefined): CanonicalTenantRole | null {
   if (!role) return null;
-  if (isCanonicalTenantRole(role)) return role;
   if (role in SAFE_LEGACY_TENANT_ROLE_CONVERSIONS) {
     return SAFE_LEGACY_TENANT_ROLE_CONVERSIONS[role as ConvertibleLegacyTenantRole];
   }
@@ -50,8 +53,7 @@ export function hasCanonicalTenantAccess(
   allowedRoles: readonly CanonicalTenantRole[],
 ): boolean {
   if (isPlatformSuperAdmin(platformRole)) return true;
-  const canonicalRole = normalizeFunctionalTenantRole(role);
-  return canonicalRole !== null && allowedRoles.includes(canonicalRole);
+  return isCanonicalTenantRole(role) && allowedRoles.includes(role);
 }
 
 export function getTenantRoleLabel(role: string | null | undefined): string {
