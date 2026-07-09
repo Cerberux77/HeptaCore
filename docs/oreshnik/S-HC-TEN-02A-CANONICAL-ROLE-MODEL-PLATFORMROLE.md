@@ -15,7 +15,8 @@ Repair the current HeptaCore auth model so the platform role and tenant roles ma
   - preserve platform admin identifiers exactly;
   - remove runtime legacy role aliases;
   - move legacy conversion to repair-only path;
-  - keep `SUPER_ADMIN` out of tenant role badge.
+  - keep `SUPER_ADMIN` out of tenant role badge;
+  - update canonical role tests so runtime aliases are rejected and repair conversion is tested separately.
 
 ## Current mismatch
 
@@ -106,6 +107,7 @@ Main areas changed in the WIP branch:
 - `apps/web/lib/admin-capabilities.ts`
 - `apps/web/lib/session-capabilities.ts`
 - `apps/web/lib/password-reset-service.ts`
+- `apps/web/lib/__tests__/canonical-tenant-role.test.ts`
 - password reset routes/pages/tests
 - tenant/admin API routes and tests
 - this Oreshnik evidence file
@@ -119,18 +121,24 @@ Local validation reported before the WIP checkpoint:
 - `npm run test -w @heptacore/web -- tenant-admin-service`: OK, 608/608 tests passing
 - `npm run test -w @heptacore/web -- error-messages tenant-admin-service`: OK
 
-Validation still required after the follow-up remote fixes:
+Local validation after follow-up remote fixes:
 
-- `npm run typecheck`
-- `npm run build`
-- `npm run test:infra`
-- `npm run test -w @heptacore/web`
-- `git diff --check`
-- `npm run oreshnik:ready` if available/applicable
+- `npm run typecheck`: PASS
+- `npm run build`: PASS
+- `npm run test:infra`: PASS, 160/160 tests passing
+- `npm run test -w @heptacore/web`: PASS, 609/609 tests passing
+- `git diff --check`: PASS
+- `npm run oreshnik:ready`: PASS, `ORESHNIK READY FOR KILO + GOAL RUNNER`
 
 ## Vercel status
 
-The checkpoint commit `f024918` had Vercel failing. The Vercel log was not accessible through this evidence pass. The failure must be inspected and fixed or documented as external/unrelated before this task can be marked ready for integration.
+The latest checked remote commit `3926d18ec776bdd9bd27416ed6ad798514fdff36` still reported Vercel failure from GitHub status. The Vercel log was not accessible through this evidence pass. The failure must be inspected and fixed or documented as external/unrelated before this task can be marked ready for integration.
+
+## Integration status
+
+- Local gates are green.
+- Remote Vercel is still blocking integration.
+- Do not merge until Vercel is green or the failure is explicitly explained and accepted.
 
 ## Guardrails
 
