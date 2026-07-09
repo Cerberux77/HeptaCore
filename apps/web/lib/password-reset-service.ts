@@ -4,7 +4,17 @@ import { z } from "zod";
 import type { Prisma } from "@prisma/client";
 
 export const RecoverPasswordRequestSchema = z.object({
-  email: z.string().trim().email(),
+  identifier: z.string().trim().min(1).optional(),
+  email: z.string().trim().min(1).optional(),
+}).superRefine((value, ctx) => {
+  const identifier = value.identifier ?? value.email;
+  if (!identifier || !identifier.trim()) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ["identifier"],
+      message: "identifier is required",
+    });
+  }
 });
 
 export const ResetPasswordRequestSchema = z.object({
@@ -36,6 +46,11 @@ function hashPasswordResetToken(token: string): string {
 
 function createPlainPasswordResetToken(): string {
   return randomBytes(32).toString("base64url");
+}
+
+function normalizeRecoveryIdentifier(value: string): string {
+  const trimmed = value.trim();
+  return trimmed.includes("@") ? trimmed.toLowerCase() : trimmed;
 }
 
 export async function issuePasswordResetForUser(
@@ -105,12 +120,12 @@ export async function requestPasswordReset(
 ): Promise<{ ok: true; token: string | null }> {
   const parsed = RecoverPasswordRequestSchema.safeParse(rawInput);
   if (!parsed.success) {
-    throw new PasswordResetError("email is required", "INVALID_REQUEST", 400);
+    throw new PasswordResetError("identifier is required", "INVALID_REQUEST", 400);
   }
 
-  const email = parsed.data.email.toLowerCase().trim();
+  const identifier = normalizeRecoveryIdentifier((parsed.data.identifier ?? parsed.data.email) as string);
   const user = await db.user.findUnique({
-    where: { email },
+    where: { email: identifier },
     select: { id: true },
   });
 
