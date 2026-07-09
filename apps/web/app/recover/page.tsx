@@ -4,20 +4,22 @@ import { useState, type FormEvent } from "react";
 import Link from "next/link";
 
 export default function RecoverPage() {
-  const [email, setEmail] = useState("");
+  const [identifier, setIdentifier] = useState("");
   const [sent, setSent] = useState(false);
+  const [debugResetLink, setDebugResetLink] = useState<string | null>(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     setError("");
+    setDebugResetLink(null);
     setLoading(true);
 
     const res = await fetch("/api/auth/recover", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email }),
+      body: JSON.stringify({ identifier }),
     });
 
     const data = await res.json();
@@ -28,6 +30,7 @@ export default function RecoverPage() {
       return;
     }
 
+    setDebugResetLink(typeof data.debugResetLink === "string" ? data.debugResetLink : null);
     setSent(true);
   }
 
@@ -40,16 +43,16 @@ export default function RecoverPage() {
         {!sent ? (
           <form onSubmit={handleSubmit} className="login-form">
             <label className="login-label">
-              Email registrado
+              Identificador registrado
               <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                type="text"
+                value={identifier}
+                onChange={(e) => setIdentifier(e.target.value)}
                 required
                 autoFocus
                 className="login-input"
-                placeholder="usuario@ejemplo.com"
-                autoComplete="email"
+                placeholder="jean o usuario@ejemplo.com"
+                autoComplete="username"
               />
             </label>
 
@@ -65,8 +68,13 @@ export default function RecoverPage() {
         ) : (
           <div style={{ padding: 16, textAlign: "center" }}>
             <p style={{ color: "var(--hc-teal)", fontSize: 14, marginBottom: 8 }}>
-              Si el email esta registrado, recibiras un link de recuperacion.
+              Si el identificador esta registrado, se genero una solicitud de recuperacion.
             </p>
+            {debugResetLink ? (
+              <p style={{ fontSize: 14, marginTop: 12, wordBreak: "break-all" }}>
+                Link de preview: <a href={debugResetLink}>{debugResetLink}</a>
+              </p>
+            ) : null}
             <div className="login-links" style={{ marginTop: 16 }}>
               <Link href="/login" className="login-link">Volver al inicio de sesion</Link>
             </div>
