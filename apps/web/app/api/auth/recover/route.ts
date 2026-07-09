@@ -3,12 +3,17 @@ import { prisma } from "../../../../lib/prisma";
 import { resolvePublicOrigin } from "../../../../lib/url-origin";
 import { requestPasswordReset, PasswordResetError } from "../../../../lib/password-reset-service";
 
+function canExposeResetLinks(): boolean {
+  if (process.env.HEPTACORE_EXPOSE_RESET_LINKS === "1") return true;
+  return process.env.VERCEL_ENV === "preview" && process.env.HEPTACORE_EXPOSE_RESET_LINKS !== "0";
+}
+
 export async function POST(req: NextRequest) {
   const body = await req.json().catch(() => null);
   try {
     const result = await prisma.$transaction((tx) => requestPasswordReset(body, tx));
     const origin = resolvePublicOrigin(req.nextUrl.origin);
-    const debugResetLink = process.env.HEPTACORE_EXPOSE_RESET_LINKS === "1" && result.token
+    const debugResetLink = canExposeResetLinks() && result.token
       ? `${origin}/reset-password?token=${encodeURIComponent(result.token)}`
       : null;
 
