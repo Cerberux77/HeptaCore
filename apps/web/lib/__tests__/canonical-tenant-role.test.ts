@@ -11,6 +11,7 @@ import {
   AMBIGUOUS_LEGACY_TENANT_ROLES,
   PLATFORM_ROLE_SUPER_ADMIN,
   TENANT_FUNCTIONAL_ROLES,
+  convertSafeLegacyTenantRole,
   getTenantRoleLabel,
   isAmbiguousLegacyTenantRole,
   isCanonicalTenantRole,
@@ -29,11 +30,18 @@ describe("canonical tenant roles", () => {
     assert.equal(normalizeTenantRole("PUBLISHER"), "PUBLISHER");
   });
 
-  it("maps safe legacy tenant roles to canonical roles", () => {
-    assert.equal(normalizeFunctionalTenantRole("OWNER"), "TENANT_ADMIN");
-    assert.equal(normalizeFunctionalTenantRole("ADMIN"), "TENANT_ADMIN");
+  it("does not grant runtime access through safe legacy aliases", () => {
+    assert.equal(normalizeFunctionalTenantRole("OWNER"), null);
+    assert.equal(normalizeFunctionalTenantRole("ADMIN"), null);
     assert.equal(normalizeFunctionalTenantRole("TENANT_ADMIN"), "TENANT_ADMIN");
     assert.equal(normalizeFunctionalTenantRole("PUBLISHER"), "PUBLISHER");
+  });
+
+  it("maps safe legacy tenant roles only through explicit repair conversion", () => {
+    assert.equal(convertSafeLegacyTenantRole("OWNER"), "TENANT_ADMIN");
+    assert.equal(convertSafeLegacyTenantRole("ADMIN"), "TENANT_ADMIN");
+    assert.equal(convertSafeLegacyTenantRole("TENANT_ADMIN"), "TENANT_ADMIN");
+    assert.equal(convertSafeLegacyTenantRole("PUBLISHER"), "PUBLISHER");
   });
 
   it("does not normalize SUPER_ADMIN as a tenant role", () => {
@@ -44,6 +52,7 @@ describe("canonical tenant roles", () => {
   it("does not auto-convert ambiguous legacy roles", () => {
     for (const role of AMBIGUOUS_LEGACY_TENANT_ROLES) {
       assert.equal(normalizeFunctionalTenantRole(role), null, `${role} must require manual migration`);
+      assert.equal(convertSafeLegacyTenantRole(role), null, `${role} must not be safely converted`);
       assert.equal(isAmbiguousLegacyTenantRole(role), true);
     }
   });
