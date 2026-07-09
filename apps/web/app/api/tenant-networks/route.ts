@@ -2,13 +2,12 @@ import { NextResponse } from "next/server";
 import { auditLog } from "../../../lib/audit";
 import { auth } from "../../../lib/auth";
 import { prisma } from "../../../lib/prisma";
+import { hasCanonicalTenantAccess } from "../../../lib/role-model";
 
 export const dynamic = "force-dynamic";
 
 const NETWORKS = ["INSTAGRAM", "FACEBOOK", "YOUTUBE", "TIKTOK", "LINKEDIN", "X"] as const;
 const NETWORK_SET = new Set<string>(NETWORKS);
-const ADMIN_ROLES = ["OWNER", "ADMIN", "STRATEGIST", "SUPER_ADMIN", "TENANT_ADMIN"];
-
 function normalizeNetworks(value: unknown) {
   if (!Array.isArray(value)) return [];
   return value
@@ -42,7 +41,7 @@ export async function PUT(req: Request) {
     where: { tenantId: tenant.id, userId: session.user.id },
     select: { role: true },
   });
-  if (!membership || !ADMIN_ROLES.includes(membership.role)) {
+  if (!hasCanonicalTenantAccess(session.user.platformRole, membership?.role, ["TENANT_ADMIN"])) {
     return NextResponse.json({ error: "Forbidden: admin or strategist role required" }, { status: 403 });
   }
 

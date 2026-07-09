@@ -1,6 +1,6 @@
 import { type UserRole } from "@prisma/client";
 import { TenantAccessError, type TenantAdminDb } from "./tenant-access";
-import { normalizeTenantRole } from "./canonical-tenant-role";
+import { PLATFORM_ROLE_SUPER_ADMIN, isPlatformSuperAdmin, normalizeFunctionalTenantRole } from "./role-model";
 
 export const Permission = {
   TENANT_READ: "TENANT_READ",
@@ -31,7 +31,7 @@ function superAdminPermissions(): Set<Permission> {
   return new Set(ALL_TENANT_PERMISSIONS);
 }
 
-const ADMIN_OPERATIONAL_PERMISSIONS: Permission[] = [
+const TENANT_ADMIN_PERMISSIONS: Permission[] = [
   Permission.TENANT_READ,
   Permission.MEMBERS_READ,
   Permission.MEMBERS_ADD,
@@ -50,48 +50,50 @@ const ADMIN_OPERATIONAL_PERMISSIONS: Permission[] = [
   Permission.ANALYTICS_READ,
 ];
 
-const VIEWER_PERMISSIONS: Permission[] = [
+const PUBLISHER_PERMISSIONS: Permission[] = [
   Permission.TENANT_READ,
+  Permission.PROJECTS_WRITE,
+  Permission.CONTENT_WRITE,
+  Permission.CONTENT_APPROVE,
+  Permission.CONTENT_PUBLISH,
   Permission.ANALYTICS_READ,
 ];
 
 const CANONICAL_PERMISSION_MAP: Record<string, Set<Permission>> = {
-  SUPER_ADMIN: superAdminPermissions(),
-  OWNER: new Set(ALL_TENANT_PERMISSIONS),
-  ADMIN: new Set(ADMIN_OPERATIONAL_PERMISSIONS),
-  VIEWER: new Set(VIEWER_PERMISSIONS),
+  [PLATFORM_ROLE_SUPER_ADMIN]: superAdminPermissions(),
+  TENANT_ADMIN: new Set(TENANT_ADMIN_PERMISSIONS),
+  PUBLISHER: new Set(PUBLISHER_PERMISSIONS),
 };
 
-export function getPermissionsForRole(role: UserRole): ReadonlySet<Permission> {
-  if (role === "SUPER_ADMIN") return CANONICAL_PERMISSION_MAP["SUPER_ADMIN"];
-  const canonical = normalizeTenantRole(role);
+export function getPermissionsForRole(role: UserRole | string): ReadonlySet<Permission> {
+  if (role === PLATFORM_ROLE_SUPER_ADMIN) return CANONICAL_PERMISSION_MAP[PLATFORM_ROLE_SUPER_ADMIN];
+  const canonical = normalizeFunctionalTenantRole(role);
   if (canonical === null) return new Set();
   return CANONICAL_PERMISSION_MAP[canonical] ?? new Set();
 }
 
-export function hasRolePermission(role: UserRole, permission: Permission): boolean {
-  if (role === "SUPER_ADMIN") return (CANONICAL_PERMISSION_MAP["SUPER_ADMIN"]?.has(permission)) ?? false;
-  const canonical = normalizeTenantRole(role);
+export function hasRolePermission(role: UserRole | string, permission: Permission): boolean {
+  if (role === PLATFORM_ROLE_SUPER_ADMIN) return (CANONICAL_PERMISSION_MAP[PLATFORM_ROLE_SUPER_ADMIN]?.has(permission)) ?? false;
+  const canonical = normalizeFunctionalTenantRole(role);
   if (canonical === null) return false;
   return CANONICAL_PERMISSION_MAP[canonical]?.has(permission) ?? false;
 }
 
 export interface PermissionAccessDb {
   user: {
-    findUnique(args: { where: { id: string }; select: { id: true } }): Promise<{ id: string } | null>;
+    findUnique(args: { where: { id: string }; select: { id: true; platformRole: true } }): Promise<{ id: string; platformRole: "SUPER_ADMIN" | null } | null>;
   };
   membership: {
     findUnique(args: { where: { tenantId_userId: { tenantId: string; userId: string } }; select: { role: true } }): Promise<{ role: UserRole } | null>;
-    findMany(args: { where: { userId: string }; select: { role: true } }): Promise<Array<{ role: UserRole }>>;
   };
 }
 
-async function isGlobalSuperAdmin(userId: string, db: Pick<PermissionAccessDb, "membership">): Promise<boolean> {
-  const memberships = await db.membership.findMany({
-    where: { userId },
-    select: { role: true },
+async function isGlobalSuperAdmin(userId: string, db: Pick<PermissionAccessDb, "user">): Promise<boolean> {
+  const user = await db.user.findUnique({
+    where: { id: userId },
+    select: { id: true, platformRole: true },
   });
-  return memberships.some((m) => m.role === "SUPER_ADMIN");
+  return isPlatformSuperAdmin(user?.platformRole ?? null);
 }
 
 export async function hasTenantPermission(
@@ -102,11 +104,11 @@ export async function hasTenantPermission(
 ): Promise<boolean> {
   const user = await db.user.findUnique({
     where: { id: userId },
-    select: { id: true },
+    select: { id: true, platformRole: true },
   });
   if (!user) return false;
 
-  if (await isGlobalSuperAdmin(userId, db)) return true;
+  if (isPlatformSuperAdmin(user.platformRole)) return true;
 
   const membership = await db.membership.findUnique({
     where: { tenantId_userId: { tenantId, userId } },
@@ -125,12 +127,12 @@ export async function requireTenantPermission(
 ): Promise<{ role: UserRole }> {
   const user = await db.user.findUnique({
     where: { id: userId },
-    select: { id: true },
+    select: { id: true, platformRole: true },
   });
   if (!user) throw new TenantAccessError("User not found", "UNAUTHORIZED", 401);
 
-  if (await isGlobalSuperAdmin(userId, db)) {
-    return { role: "SUPER_ADMIN" as UserRole };
+  if (isPlatformSuperAdmin(user.platformRole)) {
+    return { role: PLATFORM_ROLE_SUPER_ADMIN as UserRole };
   }
 
   const membership = await db.membership.findUnique({

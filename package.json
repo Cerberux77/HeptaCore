@@ -70,6 +70,7 @@
     "@react-email/components": "^1.0.12",
     "oreshnik-cli": "file:vendor/oreshnik/oreshnik-cli-0.2.0-alpha.14-920811c58e97c56f1674e944d0c793df7d5a92fc.tgz",
     "pg": "^8.21.0",
-    "resend": "^6.14.0"
+    "resend": "^6.14.0",
+    "zod": "^4.4.3"
   }
 }

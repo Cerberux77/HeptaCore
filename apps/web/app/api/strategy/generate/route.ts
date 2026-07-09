@@ -12,6 +12,7 @@ import {
   calculateTenantCost,
   DEFAULT_OVERHEAD_FACTOR,
 } from "@heptacore/core";
+import { hasCanonicalTenantAccess } from "../../../../lib/role-model";
 
 export const dynamic = "force-dynamic";
 
@@ -49,7 +50,7 @@ export async function POST(req: Request) {
     where: { tenantId: tenant.id, userId: session.user.id },
     select: { role: true },
   });
-  if (!membership || !["OWNER", "ADMIN", "STRATEGIST", "EDITOR", "SUPER_ADMIN", "TENANT_ADMIN"].includes(membership.role)) {
+  if (!hasCanonicalTenantAccess(session.user.platformRole, membership?.role, ["TENANT_ADMIN", "PUBLISHER"])) {
     return NextResponse.json({ error: "Forbidden: strategist role required" }, { status: 403 });
   }
 

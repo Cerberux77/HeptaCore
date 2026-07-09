@@ -13,6 +13,7 @@ export interface AcceptRegistrationParams {
   token: string;
   email: string;
   password: string;
+  confirmPassword?: string;
   name?: string;
 }
 
@@ -25,11 +26,14 @@ export async function acceptRegistrationInvitation(
   params: AcceptRegistrationParams,
   tx: Prisma.TransactionClient,
 ): Promise<AcceptRegistrationResult> {
-  const { token, email, password, name } = params;
+  const { token, email, password, confirmPassword, name } = params;
   const normalizedEmail = email.toLowerCase().trim();
 
   if (!password || password.length < 8) {
     throw new InvitationAcceptanceError("Password must be at least 8 characters", "WEAK_PASSWORD", 400);
+  }
+  if (confirmPassword !== undefined && password !== confirmPassword) {
+    throw new InvitationAcceptanceError("Passwords do not match", "PASSWORD_MISMATCH", 400);
   }
 
   const tokenHash = hashInvitationToken(token);

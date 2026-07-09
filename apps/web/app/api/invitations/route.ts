@@ -4,6 +4,8 @@ import { prisma } from "../../../lib/prisma";
 import { randomUUID } from "node:crypto";
 import { hashInvitationToken, generateInvitationToken, getInvitationExpiration } from "../../../lib/invitation-token";
 import { resolvePublicOrigin } from "../../../lib/url-origin";
+import { isAssignableTenantRole } from "../../../lib/canonical-tenant-role";
+import { hasCanonicalTenantAccess } from "../../../lib/role-model";
 
 export async function GET(req: NextRequest) {
   const session = await auth();
@@ -24,8 +26,9 @@ export async function GET(req: NextRequest) {
 
   const membership = await prisma.membership.findFirst({
     where: { tenantId: tenant.id, userId: session.user.id },
+    select: { role: true },
   });
-  if (!membership || !["OWNER", "ADMIN", "SUPER_ADMIN", "TENANT_ADMIN"].includes(membership.role)) {
+  if (!hasCanonicalTenantAccess(session.user.platformRole, membership?.role, ["TENANT_ADMIN"])) {
     return NextResponse.json({ error: "Forbidden: admin role required" }, { status: 403 });
   }
 
@@ -58,6 +61,9 @@ export async function POST(req: NextRequest) {
   }
 
   const { tenantSlug, email, role } = body as { tenantSlug: string; email: string; role: string };
+  if (!isAssignableTenantRole(role)) {
+    return NextResponse.json({ error: "Invalid canonical tenant role" }, { status: 400 });
+  }
 
   const tenant = await prisma.tenant.findFirst({ where: { slug: tenantSlug }, select: { id: true, name: true } });
   if (!tenant) {
@@ -66,8 +72,9 @@ export async function POST(req: NextRequest) {
 
   const membership = await prisma.membership.findFirst({
     where: { tenantId: tenant.id, userId: session.user.id },
+    select: { role: true },
   });
-  if (!membership || !["OWNER", "ADMIN", "SUPER_ADMIN", "TENANT_ADMIN"].includes(membership.role)) {
+  if (!hasCanonicalTenantAccess(session.user.platformRole, membership?.role, ["TENANT_ADMIN"])) {
     return NextResponse.json({ error: "Forbidden: admin role required" }, { status: 403 });
   }
 
@@ -81,12 +88,12 @@ export async function POST(req: NextRequest) {
       id: randomUUID(),
       tenantId: tenant.id,
       email: normalizedEmail,
-      role: role as any,
+      role,
       tokenHash,
       expiresAt: getInvitationExpiration(),
     },
     update: {
-      role: role as any,
+      role,
       tokenHash,
       expiresAt: getInvitationExpiration(),
       acceptedById: null,
@@ -119,8 +126,9 @@ export async function DELETE(req: NextRequest) {
 
   const membership = await prisma.membership.findFirst({
     where: { tenantId: invitation.tenantId, userId: session.user.id },
+    select: { role: true },
   });
-  if (!membership || !["OWNER", "ADMIN", "SUPER_ADMIN", "TENANT_ADMIN"].includes(membership.role)) {
+  if (!hasCanonicalTenantAccess(session.user.platformRole, membership?.role, ["TENANT_ADMIN"])) {
     return NextResponse.json({ error: "Forbidden: admin role required" }, { status: 403 });
   }
 

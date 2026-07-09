@@ -1,10 +1,12 @@
 import type { UserRole } from "@prisma/client";
+import { isPlatformSuperAdmin } from "./role-model";
 
 export type AuthSession = {
   user?: {
     id: string;
     email: string;
     name?: string | null;
+    platformRole: "SUPER_ADMIN" | null;
     tenantId: string | null;
     role: UserRole | null;
     memberships: Array<{ tenantId: string; role: UserRole }>;
@@ -14,18 +16,13 @@ export type AuthSession = {
 /**
  * Roles allowed to perform admin-level actions.
  */
-const ADMIN_ROLES: UserRole[] = ["OWNER", "ADMIN", "SUPER_ADMIN", "TENANT_ADMIN"];
+const ADMIN_ROLES: UserRole[] = ["TENANT_ADMIN"];
 
 /**
  * Roles allowed to create or modify content.
  */
 const EDITOR_ROLES: UserRole[] = [
-  "OWNER",
-  "ADMIN",
-  "SUPER_ADMIN",
   "TENANT_ADMIN",
-  "STRATEGIST",
-  "EDITOR",
   "PUBLISHER",
 ];
 
@@ -38,6 +35,7 @@ export function hasTenantRole(
   allowedRoles: UserRole[],
 ): boolean {
   if (!session?.user?.memberships) return false;
+  if (isPlatformSuperAdmin(session.user.platformRole)) return true;
   return session.user.memberships.some(
     (m) => m.tenantId === tenantId && allowedRoles.includes(m.role),
   );

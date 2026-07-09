@@ -11,6 +11,7 @@ function RegisterForm() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState(searchParams.get("email") || "");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [done, setDone] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -23,7 +24,7 @@ function RegisterForm() {
     const res = await fetch("/api/auth/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ token, name, email, password }),
+      body: JSON.stringify({ token, name, email, password, confirmPassword }),
     });
 
     const data = await res.json();
@@ -92,6 +93,19 @@ function RegisterForm() {
               minLength={8}
               className="login-input"
               placeholder="Minimo 8 caracteres"
+              autoComplete="new-password"
+            />
+          </label>
+          <label className="login-label">
+            Confirmar contrasena
+            <input
+              type="password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              required
+              minLength={8}
+              className="login-input"
+              placeholder="Repite la contrasena"
               autoComplete="new-password"
             />
           </label>

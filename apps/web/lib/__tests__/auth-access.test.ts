@@ -36,13 +36,14 @@ describe("auth access routing", () => {
 
   it("superadmin goes to admin", () => {
     const resolved = resolveAppAccess([
-      { tenantId: "tenant-1", role: "SUPER_ADMIN", tenant: { slug: "real-slug", name: "Real Tenant" } },
-    ]);
+      { tenantId: "tenant-1", role: "TENANT_ADMIN", tenant: { slug: "real-slug", name: "Real Tenant" } },
+    ], "SUPER_ADMIN");
     assert.deepEqual(resolved, { kind: "admin", href: "/admin" });
   });
 
   it("unauthorized tenant access goes to access-required", () => {
     assert.equal(hasTenantMembership([{ tenantId: "tenant-1", role: "TENANT_ADMIN" }], "tenant-2"), false);
+    assert.equal(hasTenantMembership([{ tenantId: "tenant-1", role: "TENANT_ADMIN" }], "tenant-2", "SUPER_ADMIN"), true);
     assert.equal(tenantAccessRequiredHref("tenant-2"), "/access-required?tenant=tenant-2");
   });
 
