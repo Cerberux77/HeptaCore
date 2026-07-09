@@ -2,7 +2,11 @@ import { PrismaClient } from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import pg from "pg";
 
-const PLATFORM_ADMINS = (process.env.HEPTACORE_PLATFORM_ADMINS || "mvera,jean")
+const PLATFORM_ADMIN_IDENTIFIERS = (
+  process.env.HEPTACORE_PLATFORM_ADMIN_IDENTIFIERS
+    || process.env.HEPTACORE_PLATFORM_ADMINS
+    || "mvera,jean"
+)
   .split(",")
   .map((value) => value.trim())
   .filter(Boolean);
@@ -11,13 +15,19 @@ const pool = new pg.Pool({ connectionString: process.env.DATABASE_URL });
 const adapter = new PrismaPg(pool);
 const prisma = new PrismaClient({ adapter });
 
-function normalizeAdminEmail(value) {
-  return value.includes("@") ? value.toLowerCase() : `${value.toLowerCase()}@heptacore.dev`;
+function normalizePlatformAdminIdentifier(value) {
+  const trimmed = String(value || "").trim();
+  if (!trimmed) throw new Error("Empty platform admin identifier is not allowed");
+  return trimmed.includes("@") ? trimmed.toLowerCase() : trimmed;
 }
 
-for (const admin of PLATFORM_ADMINS) {
-  const email = normalizeAdminEmail(admin);
-  const name = admin.includes("@") ? admin.split("@")[0] : admin;
+function displayNameFromIdentifier(identifier) {
+  return identifier.includes("@") ? identifier.split("@")[0] : identifier;
+}
+
+for (const configuredIdentifier of PLATFORM_ADMIN_IDENTIFIERS) {
+  const email = normalizePlatformAdminIdentifier(configuredIdentifier);
+  const name = displayNameFromIdentifier(email);
 
   const existing = await prisma.user.findUnique({ where: { email } });
   if (!existing) {
