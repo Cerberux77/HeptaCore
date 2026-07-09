@@ -11,7 +11,7 @@ export const runtime = "nodejs";
 const ALL_PERMISSIONS = Object.values(Permission);
 
 const LIFECYCLE_MUTATION_BLOCKED: Record<string, string | null> = {
-  PROVISIONING: "El tenant esta en PROVISIONING. Solo se permiten invitaciones OWNER y configuracion.",
+  PROVISIONING: "El tenant esta en PROVISIONING. Solo se permiten invitaciones TENANT_ADMIN y configuracion.",
   SUSPENDED: "El tenant esta SUSPENDED. Las mutaciones estan bloqueadas hasta su reactivacion.",
   ARCHIVED: "El tenant esta ARCHIVED. Las mutaciones estan bloqueadas hasta su reactivacion.",
   ACTIVE: null,

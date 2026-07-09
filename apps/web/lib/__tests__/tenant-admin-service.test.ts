@@ -213,21 +213,20 @@ describe("tenant-access hardening", () => {
 
   describe("requireSuperAdminActor", () => {
     it("SUPER_ADMIN actor passes real DB check", async () => {
-      fake.collections.users.create({ data: { id: "sa1", email: "sa@test.com" } });
-      fake.collections.memberships.create({ data: { tenantId: "t1", userId: "sa1", role: "SUPER_ADMIN" } });
+      fake.collections.users.create({ data: { id: "sa1", email: "sa@test.com", platformRole: "SUPER_ADMIN" } });
       const id = await requireSuperAdminActor("sa1", db);
       assert.equal(id, "sa1");
     });
 
     it("OWNER cannot pass admin check", async () => {
       fake.collections.users.create({ data: { id: "o1", email: "owner@test.com" } });
-      fake.collections.memberships.create({ data: { tenantId: "t1", userId: "o1", role: "OWNER" } });
+      fake.collections.memberships.create({ data: { tenantId: "t1", userId: "o1", role: "TENANT_ADMIN" } });
       await assert.rejects(() => requireSuperAdminActor("o1", db), TenantAccessError);
     });
 
     it("ADMIN cannot pass admin check", async () => {
       fake.collections.users.create({ data: { id: "a1", email: "admin@test.com" } });
-      fake.collections.memberships.create({ data: { tenantId: "t1", userId: "a1", role: "ADMIN" } });
+      fake.collections.memberships.create({ data: { tenantId: "t1", userId: "a1", role: "TENANT_ADMIN" } });
       await assert.rejects(() => requireSuperAdminActor("a1", db), TenantAccessError);
     });
 
@@ -240,7 +239,7 @@ describe("tenant-access hardening", () => {
 
     it("arbitrary actorId does not get privileges", async () => {
       fake.collections.users.create({ data: { id: "v1", email: "viewer@test.com" } });
-      fake.collections.memberships.create({ data: { tenantId: "t1", userId: "v1", role: "VIEWER" } });
+      fake.collections.memberships.create({ data: { tenantId: "t1", userId: "v1", role: "PUBLISHER" } });
       await assert.rejects(() => requireSuperAdminActor("v1", db), TenantAccessError);
     });
   });
@@ -307,8 +306,7 @@ describe("provisioning with fake DB", () => {
     failNext = null;
     fake = buildFakeDb();
     db = fake.db;
-    fake.collections.users.create({ data: { id: "sa1", email: "sa@test.com" } });
-    fake.collections.memberships.create({ data: { tenantId: "global", userId: "sa1", role: "SUPER_ADMIN" } });
+    fake.collections.users.create({ data: { id: "sa1", email: "sa@test.com", platformRole: "SUPER_ADMIN" } });
   });
 
   describe("listAdminTenants", () => {
@@ -320,7 +318,7 @@ describe("provisioning with fake DB", () => {
 
     it("OWNER cannot list tenants", async () => {
       fake.collections.users.create({ data: { id: "o1", email: "owner@test.com" } });
-      fake.collections.memberships.create({ data: { tenantId: "t1", userId: "o1", role: "OWNER" } });
+      fake.collections.memberships.create({ data: { tenantId: "t1", userId: "o1", role: "TENANT_ADMIN" } });
       await assert.rejects(() => listAdminTenants("o1", db), TenantAccessError);
     });
   });
@@ -344,12 +342,12 @@ describe("provisioning with fake DB", () => {
       assert.ok(owner, "owner user should exist");
 
       const membership = fake.collections.memberships.records.find(
-        (m: any) => m.userId === owner.id && m.role === "OWNER",
+        (m: any) => m.userId === owner.id && m.role === "TENANT_ADMIN",
       );
-      assert.ok(membership, "OWNER membership should exist");
+      assert.ok(membership, "TENANT_ADMIN membership should exist");
 
       const inv = fake.collections.invitations.records.find(
-        (i: any) => i.email === "owner@test.com" && i.role === "OWNER",
+        (i: any) => i.email === "owner@test.com" && i.role === "TENANT_ADMIN",
       );
       assert.ok(inv, "invitation should exist");
       assert.ok(inv.tokenHash, "tokenHash should be stored");
@@ -378,7 +376,7 @@ describe("provisioning with fake DB", () => {
         () => createAdminTenant({ actorId: "sa1", slug: "tr3", name: "T3", ownerEmail: "o3@test.com" }, db),
       );
       assert.equal(fake.collections.tenants.records.length, 0, "no tenant should persist");
-      assert.equal(fake.collections.memberships.records.filter((m: any) => m.role !== "SUPER_ADMIN").length, 0, "no orphan memberships");
+      assert.equal(fake.collections.memberships.records.length, 0, "no orphan memberships");
     });
 
     it("invitation hash is verified against existing register format", () => {
@@ -406,64 +404,22 @@ describe("provisioning with fake DB", () => {
       const token = generateInvitationToken();
       const hash = hashInvitationToken(token);
       const invite = fake.collections.invitations.create({
-        data: { id: "inv_x", tenantId: "t1", email: "x@test.com", role: "OWNER", tokenHash: hash, expiresAt: new Date(Date.now() + 86400000) },
-});
-
-describe("validatePagination", () => {
-  it("defaults when no params provided", () => {
-    const r = validatePagination({});
-    assert.equal(r.page, 1);
-    assert.equal(r.limit, 20);
-  });
-
-  it("accepts valid values", () => {
-    const r = validatePagination({ page: 2, limit: 50 });
-    assert.equal(r.page, 2);
-    assert.equal(r.limit, 50);
-  });
-
-  it("accepts limit 100", () => {
-    const r = validatePagination({ page: 1, limit: 100 });
-    assert.equal(r.limit, 100);
-  });
-
-  it("rejects limit 101", () => {
-    assert.throws(() => validatePagination({ limit: 101 }), TenantAdminError);
-  });
-
-  const invalidPages: Array<[string, unknown]> = [
-    ["abc", "abc"],
-    ["0", 0],
-    ["-1", -1],
-    ["1.5", 1.5],
-  ];
-
-  for (const [label, value] of invalidPages) {
-    it(`rejects invalid page: ${label}`, () => {
-      assert.throws(() => validatePagination({ page: value }), TenantAdminError);
-    });
-  }
-
-  const invalidLimits: Array<[string, unknown]> = [
-    ["abc", "abc"],
-    ["0", 0],
-    ["-1", -1],
-    ["1.5", 1.5],
-  ];
-
-  for (const [label, value] of invalidLimits) {
-    it(`rejects invalid limit: ${label}`, () => {
-      assert.throws(() => validatePagination({ limit: value }), TenantAdminError);
-    });
-  }
-});
+        data: {
+          id: "inv_x",
+          tenantId: "t1",
+          email: "x@test.com",
+          role: "TENANT_ADMIN",
+          tokenHash: hash,
+          expiresAt: new Date(Date.now() + 86400000),
+        },
+      });
       assert.ok(!("token" in invite));
       assert.ok(!("plainToken" in invite));
     });
 
     it("ADMIN cannot create tenant", async () => {
       fake.collections.users.create({ data: { id: "a1", email: "admin@test.com" } });
-      fake.collections.memberships.create({ data: { tenantId: "t1", userId: "a1", role: "ADMIN" } });
+      fake.collections.memberships.create({ data: { tenantId: "t1", userId: "a1", role: "TENANT_ADMIN" } });
       await assert.rejects(
         () => createAdminTenant({ actorId: "a1", slug: "tr2", name: "T2", ownerEmail: "x@test.com" }, db),
         TenantAccessError,
@@ -501,7 +457,7 @@ describe("validatePagination", () => {
       const userCreated = fake.collections.users.records.find((u: any) => u.email === "r3@test.com");
       assert.equal(userCreated, undefined, "user should NOT be created after rollback");
       assert.equal(fake.collections.tenants.records.length, 0, "tenant should NOT be persisted");
-      assert.equal(fake.collections.memberships.records.filter((m: any) => m.role !== "SUPER_ADMIN").length, 0, "no orphan memberships");
+      assert.equal(fake.collections.memberships.records.length, 0, "no orphan memberships");
     });
 
     it("createAdminTenant rollback on auditLog.create failure", async () => {
@@ -513,7 +469,7 @@ describe("validatePagination", () => {
       const userCreated = fake.collections.users.records.find((u: any) => u.email === "r4@test.com");
       assert.equal(userCreated, undefined, "user should NOT be created after rollback");
       assert.equal(fake.collections.tenants.records.length, 0, "tenant should NOT be persisted");
-      assert.equal(fake.collections.memberships.records.filter((m: any) => m.role !== "SUPER_ADMIN").length, 0, "no orphan memberships");
+      assert.equal(fake.collections.memberships.records.length, 0, "no orphan memberships");
       assert.equal(fake.collections.invitations.records.length, 0, "no invitation should persist");
     });
   });
@@ -624,7 +580,7 @@ describe("validatePagination", () => {
     it("returns real ownerEmail when OWNER membership exists", async () => {
       fake.collections.tenants.create({ data: { id: "t2", slug: "test-tenant", name: "Test", status: "ACTIVE", plan: "PILOT", timezone: "UTC", locale: "es", createdAt: new Date() } });
       fake.collections.users.create({ data: { id: "owner1", email: "owner@test.com", passwordHash: "hash" } });
-      fake.collections.memberships.create({ data: { tenantId: "t2", userId: "owner1", role: "OWNER" } });
+      fake.collections.memberships.create({ data: { tenantId: "t2", userId: "owner1", role: "TENANT_ADMIN" } });
       const result = await listAdminTenants("sa1", db);
       const t2 = result.items.find((t) => t.id === "t2");
       assert.ok(t2, "tenant should exist");
@@ -636,7 +592,7 @@ describe("validatePagination", () => {
     it("placeholder with null passwordHash requires invitation", async () => {
       fake.collections.tenants.create({ data: { id: "t1", slug: "t1-tenant", name: "T1", status: "ACTIVE", plan: "PILOT", timezone: "UTC", locale: "es", createdAt: new Date() } });
       await assert.rejects(
-        () => addTenantMember("sa1", "t1", { email: "sa@test.com", role: "ADMIN" }, db),
+        () => addTenantMember("sa1", "t1", { email: "sa@test.com", role: "TENANT_ADMIN" }, db),
         (e: unknown) => (e as TenantAdminError).code === "ACCOUNT_REQUIRES_INVITATION",
       );
     });
@@ -644,7 +600,7 @@ describe("validatePagination", () => {
     it("non-existent user requires invitation", async () => {
       fake.collections.tenants.create({ data: { id: "t1", slug: "t1-tenant", name: "T1", status: "ACTIVE", plan: "PILOT", timezone: "UTC", locale: "es", createdAt: new Date() } });
       await assert.rejects(
-        () => addTenantMember("sa1", "t1", { email: "nonexistent@test.com", role: "ADMIN" }, db),
+        () => addTenantMember("sa1", "t1", { email: "nonexistent@test.com", role: "TENANT_ADMIN" }, db),
         (e: unknown) => (e as TenantAdminError).code === "ACCOUNT_REQUIRES_INVITATION",
       );
     });
@@ -652,12 +608,61 @@ describe("validatePagination", () => {
     it("active account with passwordHash can be added", async () => {
       fake.collections.users.create({ data: { id: "active1", email: "active@test.com", passwordHash: "some_hash" } });
       fake.collections.tenants.create({ data: { id: "t_active", slug: "active-tenant", name: "Active", status: "ACTIVE", plan: "PILOT", timezone: "UTC", locale: "es", createdAt: new Date() } });
-      const member = await addTenantMember("sa1", "t_active", { email: "active@test.com", role: "ADMIN" }, db);
+      const member = await addTenantMember("sa1", "t_active", { email: "active@test.com", role: "TENANT_ADMIN" }, db);
       assert.equal(member.email, "active@test.com");
-      assert.equal(member.role, "ADMIN");
+      assert.equal(member.role, "TENANT_ADMIN");
     });
   });
 
+});
+
+describe("validatePagination", () => {
+  it("defaults when no params provided", () => {
+    const r = validatePagination({});
+    assert.equal(r.page, 1);
+    assert.equal(r.limit, 20);
+  });
+
+  it("accepts valid values", () => {
+    const r = validatePagination({ page: 2, limit: 50 });
+    assert.equal(r.page, 2);
+    assert.equal(r.limit, 50);
+  });
+
+  it("accepts limit 100", () => {
+    const r = validatePagination({ page: 1, limit: 100 });
+    assert.equal(r.limit, 100);
+  });
+
+  it("rejects limit 101", () => {
+    assert.throws(() => validatePagination({ limit: 101 }), TenantAdminError);
+  });
+
+  const invalidPages: Array<[string, unknown]> = [
+    ["abc", "abc"],
+    ["0", 0],
+    ["-1", -1],
+    ["1.5", 1.5],
+  ];
+
+  for (const [label, value] of invalidPages) {
+    it(`rejects invalid page: ${label}`, () => {
+      assert.throws(() => validatePagination({ page: value }), TenantAdminError);
+    });
+  }
+
+  const invalidLimits: Array<[string, unknown]> = [
+    ["abc", "abc"],
+    ["0", 0],
+    ["-1", -1],
+    ["1.5", 1.5],
+  ];
+
+  for (const [label, value] of invalidLimits) {
+    it(`rejects invalid limit: ${label}`, () => {
+      assert.throws(() => validatePagination({ limit: value }), TenantAdminError);
+    });
+  }
 });
 
 describe("slug functions", () => {
@@ -741,8 +746,7 @@ describe("owner invitation activation", () => {
     failNext = null;
     fake = buildFakeDb();
     db = fake.db;
-    fake.collections.users.create({ data: { id: "sa1", email: "sa@test.com" } });
-    fake.collections.memberships.create({ data: { tenantId: "global", userId: "sa1", role: "SUPER_ADMIN" } });
+    fake.collections.users.create({ data: { id: "sa1", email: "sa@test.com", platformRole: "SUPER_ADMIN" } });
   });
 
   it("createAdminTenant creates placeholder owner", async () => {
@@ -808,9 +812,9 @@ describe("owner invitation activation", () => {
       token, email: "om@test.com", password: "securePassword123",
     }, tx));
     const user = fake.collections.users.records.find((u: any) => u.email === "om@test.com")!;
-    const memberships = fake.collections.memberships.records.filter(
-      (m: any) => m.userId === user.id && m.role === "OWNER",
-    );
+      const memberships = fake.collections.memberships.records.filter(
+        (m: any) => m.userId === user.id && m.role === "TENANT_ADMIN",
+      );
     assert.equal(memberships.length, 1);
   });
 
@@ -969,7 +973,7 @@ describe("owner invitation activation", () => {
         id: "inv_legacy",
         tenantId,
         email: "legacy@test.com",
-        role: "OWNER",
+        role: "TENANT_ADMIN",
         tokenHash,
         expiresAt: getInvitationExpiration(),
       },
@@ -981,7 +985,7 @@ describe("owner invitation activation", () => {
     assert.ok(user, "user should be created");
     assert.ok(user.passwordHash, "passwordHash should be set");
     const membership = fake.collections.memberships.records.find(
-      (m: any) => m.tenantId === tenantId && m.userId === user.id && m.role === "OWNER",
+      (m: any) => m.tenantId === tenantId && m.userId === user.id && m.role === "TENANT_ADMIN",
     );
     assert.ok(membership, "membership should be created");
     const inv = fake.collections.invitations.records.find((i: any) => i.id === "inv_legacy");
@@ -997,7 +1001,7 @@ describe("owner invitation activation", () => {
         id: "inv_active",
         tenantId: "t_active",
         email: "active@test.com",
-        role: "OWNER",
+        role: "TENANT_ADMIN",
         tokenHash,
         expiresAt: getInvitationExpiration(),
       },
@@ -1030,9 +1034,9 @@ describe("owner invitation activation", () => {
     await db.$transaction((tx) => acceptRegistrationInvitation({
       token, email: "ndm@test.com", password: "securePassword123",
     }, tx));
-    const memberships = fake.collections.memberships.records.filter(
-      (m: any) => m.userId === userBefore.id && m.role === "OWNER",
-    );
+      const memberships = fake.collections.memberships.records.filter(
+        (m: any) => m.userId === userBefore.id && m.role === "TENANT_ADMIN",
+      );
     assert.equal(memberships.length, 1, "should not create duplicate membership");
   });
 

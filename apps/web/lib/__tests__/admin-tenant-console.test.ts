@@ -36,7 +36,7 @@ function buildFakeDb() {
 
   function applyInclude(results: StoredRecord[]): StoredRecord[] {
     return results.map((r) => {
-      const m = memberships.find((m: StoredRecord) => m.tenantId === r.id && m.role === "OWNER");
+      const m = memberships.find((m: StoredRecord) => m.tenantId === r.id && m.role === "TENANT_ADMIN");
       if (m) {
         const u = users.find((u: StoredRecord) => u.id === m.userId);
         return { ...r, memberships: u?.email ? [{ user: { email: u.email } }] : [] };
@@ -184,15 +184,14 @@ describe("tenant console — list with search/filter", () => {
 
   beforeEach(() => {
     reset();
-    db.user.create({ data: { id: "sa1", email: "sa@test.com", passwordHash: "hash" } });
-    db.membership.create({ data: { tenantId: "global", userId: "sa1", role: "SUPER_ADMIN" } });
+    db.user.create({ data: { id: "sa1", email: "sa@test.com", passwordHash: "hash", platformRole: "SUPER_ADMIN" } });
     db.tenant.create({ data: { id: "global", slug: "global", name: "Global", status: "ACTIVE", timezone: "UTC", locale: "es", createdAt: new Date() } });
     db.tenant.create({ data: { slug: "alpha-corp", name: "Alpha Corp", status: "ACTIVE", timezone: "America/New_York", locale: "en", createdAt: new Date("2024-01-01") } });
     db.tenant.create({ data: { slug: "beta-lab", name: "Beta Lab", status: "PROVISIONING", timezone: "UTC", locale: "es", createdAt: new Date("2024-06-01") } });
     db.user.create({ data: { id: "u1", email: "alpha@corp.com", passwordHash: "hash" } });
     db.user.create({ data: { id: "u2", email: "beta@lab.com", passwordHash: null } });
-    db.membership.create({ data: { tenantId: "t_1", userId: "u1", role: "OWNER" } });
-    db.membership.create({ data: { tenantId: "t_3", userId: "u2", role: "OWNER" } });
+    db.membership.create({ data: { tenantId: "t_1", userId: "u1", role: "TENANT_ADMIN" } });
+    db.membership.create({ data: { tenantId: "t_3", userId: "u2", role: "TENANT_ADMIN" } });
   });
 
   it("search finds tenants by name (case insensitive)", async () => {
@@ -241,8 +240,7 @@ describe("tenant console — create with timezone/locale", () => {
 
   beforeEach(() => {
     reset();
-    db.user.create({ data: { id: "sa1", email: "sa@test.com", passwordHash: "hash" } });
-    db.membership.create({ data: { tenantId: "global", userId: "sa1", role: "SUPER_ADMIN" } });
+    db.user.create({ data: { id: "sa1", email: "sa@test.com", passwordHash: "hash", platformRole: "SUPER_ADMIN" } });
     db.tenant.create({ data: { id: "global", slug: "global", name: "Global", status: "ACTIVE", timezone: "UTC", locale: "es", createdAt: new Date() } });
   });
 
@@ -294,12 +292,11 @@ describe("tenant console — getAdminTenant with owner email", () => {
 
   beforeEach(() => {
     reset();
-    db.user.create({ data: { id: "sa1", email: "sa@test.com", passwordHash: "hash" } });
-    db.membership.create({ data: { tenantId: "global", userId: "sa1", role: "SUPER_ADMIN" } });
+    db.user.create({ data: { id: "sa1", email: "sa@test.com", passwordHash: "hash", platformRole: "SUPER_ADMIN" } });
     db.tenant.create({ data: { id: "global", slug: "global", name: "Global", status: "ACTIVE", timezone: "UTC", locale: "es", createdAt: new Date() } });
     db.tenant.create({ data: { id: "t1", slug: "test-tenant", name: "Test", status: "ACTIVE", timezone: "UTC", locale: "es", createdAt: new Date() } });
     db.user.create({ data: { id: "owner1", email: "owner@test.com", passwordHash: "hash" } });
-    db.membership.create({ data: { tenantId: "t1", userId: "owner1", role: "OWNER" } });
+    db.membership.create({ data: { tenantId: "t1", userId: "owner1", role: "TENANT_ADMIN" } });
   });
 
   it("returns real owner email from membership", async () => {
@@ -320,13 +317,12 @@ describe("tenant console — pagination", () => {
   it("listAdminTenants paginates correctly", async () => {
     const { db, reset } = buildFakeDb();
     reset();
-    db.user.create({ data: { id: "sa1", email: "sa@test.com", passwordHash: "hash" } });
-    db.membership.create({ data: { tenantId: "global", userId: "sa1", role: "SUPER_ADMIN" } });
+    db.user.create({ data: { id: "sa1", email: "sa@test.com", passwordHash: "hash", platformRole: "SUPER_ADMIN" } });
     db.tenant.create({ data: { id: "global", slug: "global", name: "Global", status: "ACTIVE", timezone: "UTC", locale: "es", createdAt: new Date() } });
     for (let i = 1; i <= 25; i++) {
       db.tenant.create({ data: { slug: `t-${i}`, name: `Tenant ${i}`, status: "ACTIVE", timezone: "UTC", locale: "es", createdAt: new Date() } });
       db.user.create({ data: { id: `u${i}`, email: `u${i}@test.com`, passwordHash: "hash" } });
-      db.membership.create({ data: { tenantId: `t_${i + 1}`, userId: `u${i}`, role: "OWNER" } });
+      db.membership.create({ data: { tenantId: `t_${i + 1}`, userId: `u${i}`, role: "TENANT_ADMIN" } });
     }
     const page1 = await listAdminTenants("sa1", db, { page: 1, limit: 10 });
     assert.equal(page1.items.length, 10);
@@ -344,7 +340,7 @@ describe("tenant console — SUPER_ADMIN guard via DB", () => {
     reset();
     db.user.create({ data: { id: "normal", email: "normal@test.com", passwordHash: "hash" } });
     db.tenant.create({ data: { id: "t1", slug: "t1", name: "T1", status: "ACTIVE", timezone: "UTC", locale: "es", createdAt: new Date() } });
-    db.membership.create({ data: { tenantId: "t1", userId: "normal", role: "OWNER" } });
+    db.membership.create({ data: { tenantId: "t1", userId: "normal", role: "TENANT_ADMIN" } });
     await assert.rejects(
       () => listAdminTenants("normal", db),
       (e: unknown) => {
@@ -357,8 +353,7 @@ describe("tenant console — SUPER_ADMIN guard via DB", () => {
   it("allows SUPER_ADMIN actors", async () => {
     const { db, reset } = buildFakeDb();
     reset();
-    db.user.create({ data: { id: "sa1", email: "sa@test.com", passwordHash: "hash" } });
-    db.membership.create({ data: { tenantId: "global", userId: "sa1", role: "SUPER_ADMIN" } });
+    db.user.create({ data: { id: "sa1", email: "sa@test.com", passwordHash: "hash", platformRole: "SUPER_ADMIN" } });
     db.tenant.create({ data: { id: "global", slug: "global", name: "Global", status: "ACTIVE", timezone: "UTC", locale: "es", createdAt: new Date() } });
     const result = await listAdminTenants("sa1", db);
     assert.ok(result.items !== undefined);

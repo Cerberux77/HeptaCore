@@ -1,11 +1,12 @@
 import { Permission, getPermissionsForRole } from "./permissions";
 import { normalizeTenantRole } from "./canonical-tenant-role";
-import type { UserRole, TenantStatus } from "@prisma/client";
+import type { PlatformRole, UserRole, TenantStatus } from "@prisma/client";
+import { PLATFORM_ROLE_SUPER_ADMIN, isPlatformSuperAdmin } from "./role-model";
 
 const ALL_PERMISSIONS = Object.values(Permission);
 
 const LIFECYCLE_BLOCKED: Record<string, string | null> = {
-  PROVISIONING: "El tenant esta en PROVISIONING. Solo se permiten invitaciones OWNER y configuracion.",
+  PROVISIONING: "El tenant esta en PROVISIONING. Solo se permiten invitaciones TENANT_ADMIN y configuracion.",
   SUSPENDED: "El tenant esta SUSPENDED. Las mutaciones estan bloqueadas hasta su reactivacion.",
   ARCHIVED: "El tenant esta ARCHIVED. Las mutaciones estan bloqueadas hasta su reactivacion.",
   ACTIVE: null,
@@ -44,7 +45,7 @@ export interface SessionCapabilities {
 
 export interface SessionCapabilityResolverDb {
   user: {
-    findUnique(args: { where: { id: string }; select: { id: true; email: true; name: true } }): Promise<{ id: string; email: string; name: string | null } | null>;
+    findUnique(args: { where: { id: string }; select: { id: true; email: true; name: true; platformRole: true } }): Promise<{ id: string; email: string; name: string | null; platformRole: PlatformRole | null } | null>;
   };
   membership: {
     findMany(args: { where: { userId: string }; select: { tenantId: true; role: true } }): Promise<Array<{ tenantId: string; role: UserRole }>>;
@@ -68,7 +69,7 @@ export async function resolveSessionCapabilities(
 ): Promise<SessionCapabilities> {
   const user = await db.user.findUnique({
     where: { id: userId },
-    select: { id: true, email: true, name: true },
+    select: { id: true, email: true, name: true, platformRole: true },
   });
   if (!user) {
     throw new SessionCapabilityError("Usuario no encontrado", "UNAUTHORIZED", 401);
@@ -79,7 +80,7 @@ export async function resolveSessionCapabilities(
     select: { tenantId: true, role: true },
   });
 
-  const isGlobalSuperAdmin = memberships.some((m) => m.role === "SUPER_ADMIN");
+  const superAdmin = isPlatformSuperAdmin(user.platformRole);
 
   let tenantContext: SessionCapabilityTenantContext = {};
   let effectivePermissions: SessionCapabilityPermission[] = [];
@@ -95,15 +96,18 @@ export async function resolveSessionCapabilities(
 
     const membership = memberships.find((m) => m.tenantId === tenant.id);
 
-    if (!membership && !isGlobalSuperAdmin) {
+    if (!membership && !superAdmin) {
       throw new SessionCapabilityError("No tienes acceso a este tenant", "FORBIDDEN", 403);
     }
 
     const tenantRole = membership?.role ?? null;
     const canonicalRole = tenantRole ? normalizeTenantRole(tenantRole) : null;
 
-    const roleForPerms = isGlobalSuperAdmin ? "SUPER_ADMIN" : (tenantRole ?? "VIEWER");
-    const rolePermissions = getPermissionsForRole(roleForPerms);
+    const rolePermissions = superAdmin
+      ? getPermissionsForRole(PLATFORM_ROLE_SUPER_ADMIN)
+      : tenantRole
+        ? getPermissionsForRole(tenantRole)
+        : new Set<Permission>();
 
     const tenantPerms = ALL_PERMISSIONS.map((p) => ({
       permission: p as string,
@@ -141,7 +145,7 @@ export async function resolveSessionCapabilities(
       name: user.name,
       identifier,
       emailIsValid,
-      globalRole: isGlobalSuperAdmin ? "SUPER_ADMIN" : null,
+      globalRole: superAdmin ? PLATFORM_ROLE_SUPER_ADMIN : null,
     },
     effectivePermissions,
     tenant: tenantContext,

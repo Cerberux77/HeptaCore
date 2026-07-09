@@ -17,6 +17,7 @@ import {
 import { Permission } from "./permissions";
 import { isAssignableTenantRole, isLegacyTenantRole, CANONICAL_TENANT_ROLES } from "./canonical-tenant-role";
 import type { Prisma, UserRole } from "@prisma/client";
+import { PLATFORM_ROLE_SUPER_ADMIN } from "./role-model";
 
 export type TenantAdminTx = Prisma.TransactionClient;
 
@@ -187,7 +188,7 @@ export async function listAdminTenants(
       orderBy: { createdAt: "desc" },
       include: {
         memberships: {
-          where: { role: "OWNER" },
+          where: { role: "TENANT_ADMIN" },
           select: { user: { select: { email: true } } },
         },
       },
@@ -221,7 +222,7 @@ export async function getAdminTenant(
     where: { id: tenantId },
     include: {
       memberships: {
-        where: { role: "OWNER" },
+        where: { role: "TENANT_ADMIN" },
         select: { user: { select: { email: true } } },
       },
     },
@@ -279,7 +280,7 @@ export async function createAdminTenant(
     });
 
     await tx.membership.create({
-      data: { tenantId: tenant.id, userId: owner.id, role: "OWNER" },
+      data: { tenantId: tenant.id, userId: owner.id, role: "TENANT_ADMIN" },
     });
 
     let plainToken: string | undefined;
@@ -292,7 +293,7 @@ export async function createAdminTenant(
           id: `inv_${randomUUID()}`,
           tenantId: tenant.id,
           email: ownerEmail,
-          role: "OWNER",
+          role: "TENANT_ADMIN",
           tokenHash,
           expiresAt: getInvitationExpiration(),
         },
@@ -375,7 +376,7 @@ export async function changeTenantStatus(
     });
 
     const owner = await tx.membership.findFirst({
-      where: { tenantId, role: "OWNER" },
+      where: { tenantId, role: "TENANT_ADMIN" },
       select: { user: { select: { email: true } } },
     });
 
@@ -430,7 +431,7 @@ export async function updateAdminTenantConfiguration(
     });
 
     const owner = await tx.membership.findFirst({
-      where: { tenantId, role: "OWNER" },
+      where: { tenantId, role: "TENANT_ADMIN" },
       select: { user: { select: { email: true } } },
     });
 
@@ -497,10 +498,6 @@ export async function addTenantMember(
   const email = params.email.toLowerCase().trim();
   if (!email || !email.includes("@")) {
     throw new TenantAdminError("Invalid email", "INVALID_EMAIL", 400);
-  }
-
-  if (params.role === "SUPER_ADMIN") {
-    throw new TenantAdminError("Cannot assign SUPER_ADMIN to a tenant", "INVALID_ROLE", 400);
   }
 
   if (isLegacyTenantRole(params.role)) {
@@ -573,10 +570,6 @@ export async function changeTenantMemberRole(
   params: ChangeRoleParams,
   db: TenantAdminDbWithTx = defaultPrisma as unknown as TenantAdminDbWithTx,
 ): Promise<SerializedMember> {
-  if (params.role === "SUPER_ADMIN") {
-    throw new TenantAdminError("Cannot assign SUPER_ADMIN to a tenant", "INVALID_ROLE", 400);
-  }
-
   if (isLegacyTenantRole(params.role)) {
     throw new TenantAdminError(
       "Este rol pertenece al modelo anterior y ya no puede asignarse.",
@@ -605,20 +598,6 @@ export async function changeTenantMemberRole(
         }
 
         const previousRole = membership.role;
-
-        if (previousRole === "OWNER" && params.role !== "OWNER") {
-          await tx.$executeRawUnsafe(`SELECT id FROM "Membership" WHERE "tenantId" = $1 AND role = $2 FOR UPDATE`, tenantId, "OWNER");
-          const ownerCount = await tx.membership.count({
-            where: { tenantId, role: "OWNER" },
-          });
-          if (ownerCount <= 1) {
-            throw new TenantAdminError(
-              "Cannot downgrade the last OWNER of the tenant",
-              "LAST_OWNER",
-              409,
-            );
-          }
-        }
 
         const updated = await tx.membership.update({
           where: { id: membershipId },
@@ -679,20 +658,6 @@ export async function removeTenantMember(
           throw new TenantAdminError("Membership not found", "NOT_FOUND", 404);
         }
 
-        if (membership.role === "OWNER") {
-          await tx.$executeRawUnsafe(`SELECT id FROM "Membership" WHERE "tenantId" = $1 AND role = $2 FOR UPDATE`, tenantId, "OWNER");
-          const ownerCount = await tx.membership.count({
-            where: { tenantId, role: "OWNER" },
-          });
-          if (ownerCount <= 1) {
-            throw new TenantAdminError(
-              "Cannot remove the last OWNER of the tenant",
-              "LAST_OWNER",
-              409,
-            );
-          }
-        }
-
         await tx.membership.delete({ where: { id: membershipId } });
 
         await tx.auditLog.create({
@@ -734,10 +699,6 @@ export async function createTenantInvitation(
     throw new TenantAdminError("Invalid email", "INVALID_EMAIL", 400);
   }
 
-  if (params.role === "SUPER_ADMIN") {
-    throw new TenantAdminError("Cannot invite SUPER_ADMIN to a tenant", "INVALID_ROLE", 400);
-  }
-
   if (isLegacyTenantRole(params.role)) {
     throw new TenantAdminError(
       "Este rol pertenece al modelo anterior y ya no puede asignarse.",
@@ -752,7 +713,7 @@ export async function createTenantInvitation(
 
   return db.$transaction(async (tx) => {
     const accessResult = await resolveTenantAccess(actorId, tenantId, Permission.INVITATIONS_CREATE, tx as unknown as AccessResolutionDb);
-    const capability = invitationCapabilityForLifecycle(accessResult.status, params.role as UserRole);
+    const capability = invitationCapabilityForLifecycle(accessResult.status, params.role);
     assertTenantLifecycleAllowsMutation(accessResult.status, capability);
 
     const tenant = await tx.tenant.findUnique({

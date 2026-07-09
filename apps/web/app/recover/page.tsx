@@ -8,7 +8,6 @@ export default function RecoverPage() {
   const [sent, setSent] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const [resetLink, setResetLink] = useState("");
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -30,9 +29,6 @@ export default function RecoverPage() {
     }
 
     setSent(true);
-    if (data.resetLink) {
-      setResetLink(data.resetLink);
-    }
   }
 
   return (
@@ -71,13 +67,6 @@ export default function RecoverPage() {
             <p style={{ color: "var(--hc-teal)", fontSize: 14, marginBottom: 8 }}>
               Si el email esta registrado, recibiras un link de recuperacion.
             </p>
-            {resetLink && (
-              <div style={{ fontSize: 12, color: "var(--hc-fog)", marginTop: 12, wordBreak: "break-all" }}>
-                <strong>Link de desarrollo:</strong>
-                <br />
-                <a href={resetLink} style={{ color: "var(--hc-ink)" }}>{resetLink}</a>
-              </div>
-            )}
             <div className="login-links" style={{ marginTop: 16 }}>
               <Link href="/login" className="login-link">Volver al inicio de sesion</Link>
             </div>

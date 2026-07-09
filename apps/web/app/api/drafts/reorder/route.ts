@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { auth } from "../../../../lib/auth";
 import { prisma } from "../../../../lib/prisma";
+import { hasCanonicalTenantAccess } from "../../../../lib/role-model";
 
 export async function POST(req: Request) {
   const session = await auth();
@@ -26,7 +27,7 @@ export async function POST(req: Request) {
   const membership = await prisma.membership.findFirst({
     where: { tenantId: draft.tenantId, userId: session.user.id },
   });
-  if (!membership || !["OWNER", "ADMIN", "EDITOR", "PUBLISHER", "SUPER_ADMIN", "TENANT_ADMIN"].includes(membership.role)) {
+  if (!hasCanonicalTenantAccess(session.user.platformRole, membership?.role, ["TENANT_ADMIN", "PUBLISHER"])) {
     return NextResponse.json({ error: "Forbidden: editor role required" }, { status: 403 });
   }
 

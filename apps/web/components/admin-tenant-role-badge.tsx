@@ -3,9 +3,8 @@
 import { normalizeTenantRole, getCanonicalRoleLabel } from "../lib/canonical-tenant-role";
 
 const ROLE_COLORS: Record<string, string> = {
-  OWNER: "#8a1d1d",
-  ADMIN: "#0b756f",
-  VIEWER: "#8e8e93",
+  TENANT_ADMIN: "#0b756f",
+  PUBLISHER: "#8a5f00",
   SUPER_ADMIN: "#0b756f",
 };
 

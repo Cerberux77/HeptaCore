@@ -20,6 +20,7 @@ function buildFakeDb() {
         if (args.select.id) result.id = u.id;
         if (args.select.email) result.email = u.email;
         if (args.select.name) result.name = u.name;
+        if (args.select.platformRole) result.platformRole = u.platformRole ?? null;
         return result as any;
       },
     },
@@ -78,8 +79,7 @@ describe("resolveSessionCapabilities", () => {
   });
 
   it("identifies SUPER_ADMIN global role", async () => {
-    fake.users.push({ id: "sa1", email: "sa@test.com", name: "Super" });
-    fake.memberships.push({ userId: "sa1", tenantId: "t1", role: "SUPER_ADMIN" });
+    fake.users.push({ id: "sa1", email: "sa@test.com", name: "Super", platformRole: "SUPER_ADMIN" });
 
     const result = await resolveSessionCapabilities("sa1", null, fake.db);
 
@@ -98,8 +98,7 @@ describe("resolveSessionCapabilities", () => {
   });
 
   it("allows SUPER_ADMIN access to any tenant without membership", async () => {
-    fake.users.push({ id: "sa1", email: "sa@test.com", name: "SA" });
-    fake.memberships.push({ userId: "sa1", tenantId: "any", role: "SUPER_ADMIN" });
+    fake.users.push({ id: "sa1", email: "sa@test.com", name: "SA", platformRole: "SUPER_ADMIN" });
     fake.tenants.push({ id: "t1", slug: "my-tenant", name: "My Tenant", status: "ACTIVE" });
 
     const result = await resolveSessionCapabilities("sa1", "my-tenant", fake.db);
@@ -109,59 +108,59 @@ describe("resolveSessionCapabilities", () => {
     assert.ok(result.tenant.tenantPermissions!.some((p) => p.granted));
   });
 
-  it("returns tenant data with canonical role for valid member", async () => {
+  it("returns tenant data with canonical role for tenant admin member", async () => {
     fake.users.push({ id: "u1", email: "user@test.com", name: "User" });
     fake.tenants.push({ id: "t1", slug: "my-tenant", name: "My Tenant", status: "ACTIVE" });
-    fake.memberships.push({ userId: "u1", tenantId: "t1", role: "EDITOR" });
+    fake.memberships.push({ userId: "u1", tenantId: "t1", role: "TENANT_ADMIN" });
 
     const result = await resolveSessionCapabilities("u1", "my-tenant", fake.db);
 
-    assert.equal(result.tenant.tenantRole, "EDITOR");
-    assert.equal(result.tenant.canonicalTenantRole, "ADMIN");
+    assert.equal(result.tenant.tenantRole, "TENANT_ADMIN");
+    assert.equal(result.tenant.canonicalTenantRole, "TENANT_ADMIN");
     assert.equal(result.tenant.tenantStatus, "ACTIVE");
     assert.equal(result.tenant.tenantPermissions!.some((p) => p.granted), true);
   });
 
-  it("shows canonical VIEWER role for ANALYST member", async () => {
+  it("shows canonical PUBLISHER role for publisher member", async () => {
     fake.users.push({ id: "u1", email: "user@test.com", name: "User" });
     fake.tenants.push({ id: "t1", slug: "my-tenant", name: "My Tenant", status: "ACTIVE" });
-    fake.memberships.push({ userId: "u1", tenantId: "t1", role: "ANALYST" });
+    fake.memberships.push({ userId: "u1", tenantId: "t1", role: "PUBLISHER" });
 
     const result = await resolveSessionCapabilities("u1", "my-tenant", fake.db);
 
-    assert.equal(result.tenant.canonicalTenantRole, "VIEWER");
-    assert.equal(result.tenant.tenantPermissions!.filter((p) => p.granted).length, 2);
+    assert.equal(result.tenant.canonicalTenantRole, "PUBLISHER");
+    assert.ok(result.tenant.tenantPermissions!.filter((p) => p.granted).length > 0);
   });
 
-  it("VIEWER has only TENANT_READ and ANALYTICS_READ", async () => {
-    fake.users.push({ id: "u1", email: "viewer@test.com", name: "Viewer" });
+  it("PUBLISHER has content access but no member/config access", async () => {
+    fake.users.push({ id: "u1", email: "publisher@test.com", name: "Publisher" });
     fake.tenants.push({ id: "t1", slug: "my-tenant", name: "My Tenant", status: "ACTIVE" });
-    fake.memberships.push({ userId: "u1", tenantId: "t1", role: "VIEWER" });
+    fake.memberships.push({ userId: "u1", tenantId: "t1", role: "PUBLISHER" });
 
     const result = await resolveSessionCapabilities("u1", "my-tenant", fake.db);
 
     const granted = result.tenant.tenantPermissions!.filter((p) => p.granted);
-    assert.equal(granted.length, 2);
     assert.ok(granted.some((p) => p.permission === "TENANT_READ"));
     assert.ok(granted.some((p) => p.permission === "ANALYTICS_READ"));
     assert.ok(!granted.some((p) => p.permission === "MEMBERS_ADD"));
-    assert.ok(!granted.some((p) => p.permission === "CONTENT_PUBLISH"));
+    assert.ok(!granted.some((p) => p.permission === "TENANT_CONFIG_UPDATE"));
   });
 
-  it("OWNER has all tenant permissions", async () => {
+  it("TENANT_ADMIN has tenant administrative permissions without global-only powers", async () => {
     fake.users.push({ id: "u1", email: "owner@test.com", name: "Owner" });
     fake.tenants.push({ id: "t1", slug: "my-tenant", name: "My Tenant", status: "ACTIVE" });
-    fake.memberships.push({ userId: "u1", tenantId: "t1", role: "OWNER" });
+    fake.memberships.push({ userId: "u1", tenantId: "t1", role: "TENANT_ADMIN" });
 
     const result = await resolveSessionCapabilities("u1", "my-tenant", fake.db);
 
-    assert.equal(result.tenant.tenantPermissions!.every((p) => p.granted), true);
+    assert.equal(result.tenant.tenantPermissions!.find((p) => p.permission === "MEMBERS_ADD")!.granted, true);
+    assert.equal(result.tenant.tenantPermissions!.find((p) => p.permission === "TENANT_STATUS_CHANGE")!.granted, false);
   });
 
-  it("ADMIN has TENANT_READ and lacks SECURITY_MANAGE", async () => {
+  it("TENANT_ADMIN has TENANT_READ and lacks SECURITY_MANAGE", async () => {
     fake.users.push({ id: "u1", email: "admin@test.com", name: "Admin" });
     fake.tenants.push({ id: "t1", slug: "my-tenant", name: "My Tenant", status: "ACTIVE" });
-    fake.memberships.push({ userId: "u1", tenantId: "t1", role: "ADMIN" });
+    fake.memberships.push({ userId: "u1", tenantId: "t1", role: "TENANT_ADMIN" });
 
     const result = await resolveSessionCapabilities("u1", "my-tenant", fake.db);
 
@@ -176,7 +175,7 @@ describe("resolveSessionCapabilities", () => {
   it("does not expose tokens, hashes, or secrets in response", async () => {
     fake.users.push({ id: "u1", email: "user@test.com", name: "User" });
     fake.tenants.push({ id: "t1", slug: "my-tenant", name: "My Tenant", status: "ACTIVE" });
-    fake.memberships.push({ userId: "u1", tenantId: "t1", role: "OWNER" });
+    fake.memberships.push({ userId: "u1", tenantId: "t1", role: "TENANT_ADMIN" });
 
     const result = await resolveSessionCapabilities("u1", "my-tenant", fake.db);
     const json = JSON.stringify(result);
@@ -200,7 +199,7 @@ describe("resolveSessionCapabilities", () => {
   it("includes lifecycle block reason for SUSPENDED tenant", async () => {
     fake.users.push({ id: "u1", email: "user@test.com", name: "User" });
     fake.tenants.push({ id: "t1", slug: "my-tenant", name: "My Tenant", status: "SUSPENDED" });
-    fake.memberships.push({ userId: "u1", tenantId: "t1", role: "OWNER" });
+    fake.memberships.push({ userId: "u1", tenantId: "t1", role: "TENANT_ADMIN" });
 
     const result = await resolveSessionCapabilities("u1", "my-tenant", fake.db);
 
@@ -211,7 +210,7 @@ describe("resolveSessionCapabilities", () => {
     fake.users.push({ id: "u1", email: "user@test.com", name: "User" });
     fake.tenants.push({ id: "t1", slug: "tenant-a", name: "Tenant A", status: "ACTIVE" });
     fake.tenants.push({ id: "t2", slug: "tenant-b", name: "Tenant B", status: "ACTIVE" });
-    fake.memberships.push({ userId: "u1", tenantId: "t1", role: "OWNER" });
+    fake.memberships.push({ userId: "u1", tenantId: "t1", role: "TENANT_ADMIN" });
 
     await assert.rejects(
       () => resolveSessionCapabilities("u1", "tenant-b", fake.db),
@@ -226,7 +225,7 @@ describe("resolveSessionCapabilities", () => {
 
     const result = await resolveSessionCapabilities("u1", "my-tenant", fake.db);
 
-    assert.equal(result.tenant.canonicalTenantRole, "ADMIN");
+    assert.equal(result.tenant.canonicalTenantRole, "TENANT_ADMIN");
     assert.equal(result.tenant.tenantPermissions!.find((p) => p.permission === "CONTENT_WRITE")!.granted, true);
     assert.equal(result.tenant.tenantPermissions!.find((p) => p.permission === "SECURITY_MANAGE")!.granted, false);
   });

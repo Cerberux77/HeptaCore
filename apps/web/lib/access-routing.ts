@@ -1,4 +1,5 @@
-import type { UserRole } from "@prisma/client";
+import type { PlatformRole, UserRole } from "@prisma/client";
+import { isPlatformSuperAdmin } from "./role-model";
 
 export type TenantRouteMembership = {
   tenantId: string;
@@ -60,8 +61,11 @@ export function tenantAccessRequiredHref(slug: string): string {
   return `/access-required?tenant=${encodeURIComponent(slug)}`;
 }
 
-export function resolveAppAccess(memberships: TenantRouteMembership[]): AppAccessResolution {
-  if (memberships.some((membership) => membership.role === "SUPER_ADMIN")) {
+export function resolveAppAccess(
+  memberships: TenantRouteMembership[],
+  platformRole?: PlatformRole | null,
+): AppAccessResolution {
+  if (isPlatformSuperAdmin(platformRole ?? null)) {
     return { kind: "admin", href: "/admin" };
   }
 
@@ -84,6 +88,8 @@ export function resolveAppAccess(memberships: TenantRouteMembership[]): AppAcces
 export function hasTenantMembership(
   memberships: Array<{ tenantId: string; role: UserRole | string }>,
   tenantId: string,
+  platformRole?: PlatformRole | null,
 ): boolean {
-  return memberships.some((membership) => membership.tenantId === tenantId || membership.role === "SUPER_ADMIN");
+  if (isPlatformSuperAdmin(platformRole ?? null)) return true;
+  return memberships.some((membership) => membership.tenantId === tenantId);
 }

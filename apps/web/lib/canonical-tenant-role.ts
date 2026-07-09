@@ -1,24 +1,12 @@
 import type { UserRole } from "@prisma/client";
+import { getTenantRoleLabel, normalizeFunctionalTenantRole, type CanonicalTenantRole } from "./role-model";
 
-export type CanonicalTenantRole = "OWNER" | "ADMIN" | "VIEWER";
+export type { CanonicalTenantRole };
 
-export const CANONICAL_TENANT_ROLES: readonly CanonicalTenantRole[] = ["OWNER", "ADMIN", "VIEWER"];
-
-const LEGACY_TO_CANONICAL_MAP: Partial<Record<UserRole, CanonicalTenantRole>> = {
-  TENANT_ADMIN: "ADMIN",
-  ADMIN: "ADMIN",
-  STRATEGIST: "ADMIN",
-  EDITOR: "ADMIN",
-  APPROVER: "ADMIN",
-  PUBLISHER: "ADMIN",
-  ANALYST: "VIEWER",
-  VIEWER: "VIEWER",
-};
+export const CANONICAL_TENANT_ROLES: readonly CanonicalTenantRole[] = ["TENANT_ADMIN", "PUBLISHER"];
 
 export function normalizeTenantRole(role: UserRole): CanonicalTenantRole | null {
-  if (role === "OWNER") return "OWNER";
-  if (role === "SUPER_ADMIN") return null;
-  return LEGACY_TO_CANONICAL_MAP[role] ?? null;
+  return normalizeFunctionalTenantRole(role);
 }
 
 export function isAssignableTenantRole(role: string): role is CanonicalTenantRole {
@@ -26,16 +14,10 @@ export function isAssignableTenantRole(role: string): role is CanonicalTenantRol
 }
 
 export function isLegacyTenantRole(role: string): boolean {
-  const legacyRoles: UserRole[] = ["TENANT_ADMIN", "STRATEGIST", "EDITOR", "APPROVER", "PUBLISHER", "ANALYST"];
-  return legacyRoles.includes(role as UserRole);
+  const legacyRoles: string[] = ["OWNER", "ADMIN", "STRATEGIST", "EDITOR", "ANALYST", "APPROVER", "VIEWER", "SUPER_ADMIN"];
+  return legacyRoles.includes(role);
 }
 
-export const CANONICAL_ROLE_LABELS: Record<CanonicalTenantRole, string> = {
-  OWNER: "Propietario",
-  ADMIN: "Administrador",
-  VIEWER: "Consulta",
-};
-
 export function getCanonicalRoleLabel(role: string): string {
-  return CANONICAL_ROLE_LABELS[role as CanonicalTenantRole] ?? role;
+  return getTenantRoleLabel(role);
 }
