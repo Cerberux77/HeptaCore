@@ -29,14 +29,29 @@ function summarize(records) {
   return byRole;
 }
 
+function redactIdentifier(value) {
+  const text = String(value || "");
+  if (!text) return text;
+  if (!text.includes("@")) return text;
+  const [local, domain] = text.split("@");
+  return `${local.slice(0, 2)}***@${domain}`;
+}
+
 try {
-  const memberships = await prisma.membership.findMany({
-    include: {
-      tenant: { select: { id: true, slug: true } },
-      user: { select: { id: true, email: true, platformRole: true } },
-    },
-    orderBy: [{ tenantId: "asc" }, { userId: "asc" }],
-  });
+  const memberships = await prisma.$queryRawUnsafe(`
+    SELECT
+      m.id AS "membershipId",
+      m."tenantId" AS "tenantId",
+      m."userId" AS "userId",
+      m.role::text AS "role",
+      t.slug AS "tenantSlug",
+      u.email AS "userIdentifier",
+      u."platformRole"::text AS "platformRole"
+    FROM "Membership" m
+    JOIN "Tenant" t ON t.id = m."tenantId"
+    JOIN "User" u ON u.id = m."userId"
+    ORDER BY m."tenantId", m."userId"
+  `);
 
   const ambiguous = memberships.filter((membership) => AMBIGUOUS_ROLES.has(membership.role));
   const report = {
@@ -46,28 +61,30 @@ try {
     superAdminMemberships: memberships
       .filter((membership) => membership.role === "SUPER_ADMIN")
       .map((membership) => ({
-        membershipId: membership.id,
+        membershipId: membership.membershipId,
         userId: membership.userId,
         tenantId: membership.tenantId,
-        tenantSlug: membership.tenant.slug,
-        currentPlatformRole: membership.user.platformRole,
+        tenantSlug: membership.tenantSlug,
+        userIdentifier: redactIdentifier(membership.userIdentifier),
+        currentPlatformRole: membership.platformRole,
       })),
     ambiguousMemberships: ambiguous.map((membership) => ({
-      membershipId: membership.id,
+      membershipId: membership.membershipId,
       role: membership.role,
       userId: membership.userId,
       tenantId: membership.tenantId,
-      tenantSlug: membership.tenant.slug,
+      tenantSlug: membership.tenantSlug,
+      userIdentifier: redactIdentifier(membership.userIdentifier),
     })),
     safeConversions: memberships
       .filter((membership) => SAFE_CONVERSIONS.has(membership.role))
       .map((membership) => ({
-        membershipId: membership.id,
+        membershipId: membership.membershipId,
         from: membership.role,
         to: SAFE_CONVERSIONS.get(membership.role),
         userId: membership.userId,
         tenantId: membership.tenantId,
-        tenantSlug: membership.tenant.slug,
+        tenantSlug: membership.tenantSlug,
       })),
   };
 
@@ -84,30 +101,27 @@ try {
   }
 
   await prisma.$transaction(async (tx) => {
-    const superAdminUserIds = [...new Set(
-      memberships.filter((membership) => membership.role === "SUPER_ADMIN").map((membership) => membership.userId),
-    )];
+    await tx.$executeRawUnsafe(`
+      UPDATE "User" u
+      SET "platformRole" = 'SUPER_ADMIN'::"PlatformRole"
+      WHERE EXISTS (
+        SELECT 1
+        FROM "Membership" m
+        WHERE m."userId" = u.id
+          AND m.role::text = 'SUPER_ADMIN'
+      )
+    `);
 
-    for (const userId of superAdminUserIds) {
-      await tx.user.update({
-        where: { id: userId },
-        data: { platformRole: "SUPER_ADMIN" },
-      });
-    }
+    await tx.$executeRawUnsafe(`
+      DELETE FROM "Membership"
+      WHERE role::text = 'SUPER_ADMIN'
+    `);
 
-    await tx.membership.deleteMany({
-      where: { role: "SUPER_ADMIN" },
-    });
-
-    await tx.membership.updateMany({
-      where: { role: "OWNER" },
-      data: { role: "TENANT_ADMIN" },
-    });
-
-    await tx.membership.updateMany({
-      where: { role: "ADMIN" },
-      data: { role: "TENANT_ADMIN" },
-    });
+    await tx.$executeRawUnsafe(`
+      UPDATE "Membership"
+      SET role = 'TENANT_ADMIN'::"UserRole"
+      WHERE role::text IN ('OWNER', 'ADMIN')
+    `);
   });
 
   console.log("[DONE] Canonical role repair applied successfully.");
