@@ -1,5 +1,5 @@
 {
-  "buildCommand": "npm run build -w @heptacore/web && if [ \"$VERCEL_ENV\" = \"preview\" ]; then ALLOW_PREVIEW_SCHEMA_SYNC=1 node scripts/prepare-preview-canonical-role-model.mjs && HEPTACORE_PLATFORM_ADMIN_IDENTIFIERS=mvera,jean node scripts/seed-admin.mjs && ALLOW_QA_SEED=1 node scripts/seed-qa-e2e.mjs; fi",
+  "buildCommand": "npm run build -w @heptacore/web && if [ \"$VERCEL_ENV\" = \"preview\" ]; then ALLOW_PREVIEW_SCHEMA_SYNC=1 node scripts/prepare-preview-canonical-role-model.mjs && node scripts/seed-admin.mjs && ALLOW_QA_SEED=1 node scripts/seed-qa-e2e.mjs; fi",
   "devCommand": "npm run dev -w @heptacore/web",
   "installCommand": "npm install",
   "framework": "nextjs",
