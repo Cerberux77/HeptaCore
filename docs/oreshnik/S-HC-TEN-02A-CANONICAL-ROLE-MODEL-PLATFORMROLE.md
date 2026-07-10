@@ -157,15 +157,16 @@ Operational Oreshnik checks executed during evidence refresh:
 
 ## Integration status
 
-- TEN-02A is now rebased on the validated `master` that already contains PR #8 and PR #7.
-- Local Oreshnik release-governance gates listed above are green on the rebased worktree.
-- This evidence update does not change auth behavior, Prisma schema contents, or role semantics beyond documenting the already rebased state.
+- Implementation PR #9 merged into `master` at `2026-07-10T01:52:37Z`.
+- Post-merge reconciliation PR #12 merged into `master` at `2026-07-10T17:46:36Z`.
+- The git-native task and task-board projections are `integrated`; no historical Run, claim, assignment, or evidence was synthesized to fill the absent runtime history.
+- This state repair does not change auth behavior, Prisma schema contents, or role semantics.
 
 ## Guardrails
 
 - No secrets committed.
 - No production DB mutated.
-- No merge performed.
+- No remote control-plane state was edited manually.
 - No force-push performed.
 - PR #7 was not modified.
 - Oreshnik alpha.15 adoption was not touched.
