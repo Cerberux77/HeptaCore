@@ -261,6 +261,17 @@
       "summary": "S-HC-INFRA-BASELINE-GATES-RECOVERY:worker | exit=0 | timed_ok | signal=none | stdout=> heptacore@0.1.0 worker:validate | stderr=[config] .env.rrss no encontrado. Usando solo variables de entorno del sistema."
     }
   ],
+  "handoffs": [
+    {
+      "id": "handoff-20260710T220159194Z-31711ebba025",
+      "schema": "oreshnik-handoff/v1",
+      "createdAt": "2026-07-10T22:01:59.194Z",
+      "jsonPath": "var/oreshnik/handoffs/S-HC-INFRA-BASELINE-GATES-RECOVERY/handoff-20260710T220159194Z-31711ebba025.json",
+      "markdownPath": "docs/oreshnik/handoffs/S-HC-INFRA-BASELINE-GATES-RECOVERY/handoff-20260710T220159194Z-31711ebba025.md",
+      "digest": "b1955e9a89f13764f300ead91f1b7890122994c2e41d0ff8060039c59a81f4be",
+      "classification": "BLOCKED_EXTERNAL"
+    }
+  ],
   "updatedAt": "2026-07-01T20:31:05.696Z",
   "runs": [
     {
