@@ -3,24 +3,29 @@ type: master-dashboard
 project: "HeptaCore"
 status: active-production
 phase: "Canonical Oreshnik task board governs current assignments"
-last_updated: "2026-07-01T20:36:14.545Z"
+last_updated: "2026-07-10T17:42:27.958Z"
 mother_branch: "MADRE/v47-s-hc-pub-03-multitenant-assets-multitenant-assets-metadata-compatibility-batch--2026-06-23"
 tags:
   - "#central"
   - "#status/live-source"
+  - "#manuel"
+  - "#jean"
+  - "#heptacore"
 ---
 
 # HeptaCore - Dashboard Canonico
 
-> Fuente operativa compatible: `var/oreshnik/task-board.json`. Cuando existen artefactos durables por task/run, este board se reproyecta desde ellos y desde los journals de runtime antes de regenerar documentacion derivada.
+> Fuente operativa: `var/oreshnik/task-board.json`. Los documentos de colaborador y status son derivados y deben ser regenerados si cambian las asignaciones.
 
 ## Estado Actual
 
 | Campo | Valor |
 |---|---|
-| Task board actualizado | 2026-07-01T20:31:05.696Z |
+| Task board actualizado | 2026-07-01T21:10:33.990Z |
 | Rama madre | MADRE/v47-s-hc-pub-03-multitenant-assets-multitenant-assets-metadata-compatibility-batch--2026-06-23 |
-
+| Publicacion RRSS real | Bloqueada hasta aprobacion explicita |
+| Campaign spend | Bloqueado |
+| Real scraping | Bloqueado |
 
 ## Orden de Ejecucion
 
@@ -79,7 +84,7 @@ tags:
 | S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE | integrated | Manuel | LLM provider selection, cost estimation and governance policy | - |
 | S-HC-AN-01-CAMPAIGN-PERFORMANCE | blocked | Manuel | Campaign performance analytics: reach, engagement, metrics per post and campaign | S-HC-OPS-01-CAMPAIGN-REVIEW-DEPLOYMENT, S-HC-OBS-01-PUBLISHING-OBSERVABILITY |
 | S-HC-ASSET-01-STRATEGY-ASSET-MANIFEST | blocked | Manuel | Strategy-driven asset manifest: per-publication asset requirements | S-HC-STRAT-02-CONTENT-CALENDAR-BLUEPRINT, S-HC-PUB-03-MULTITENANT-ASSETS |
-| S-HC-ASSET-02-FORMAT-DERIVATIVES | ready_for_integration | Manuel | Format derivatives: badge interaction, format preview, intelligent crop, safe zones, asset variants | S-HC-PUB-03-MULTITENANT-ASSETS |
+| S-HC-ASSET-02-FORMAT-DERIVATIVES | integrated | Manuel | Format derivatives: badge interaction, format preview, intelligent crop, safe zones, asset variants | S-HC-PUB-03-MULTITENANT-ASSETS |
 | S-HC-COMM-01-SELF-SERVICE-SIGNUP | blocked | Manuel | Self-service tenant signup with trial gate and onboarding flow | S-HC-TEN-01-GLOBAL-TENANT-ADMIN, S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION |
 | S-HC-COMM-02-BILLING-ACTIVATION | blocked | Manuel | Tenant billing activation: plan selection, usage tracking, payment integration | S-HC-COMM-01-SELF-SERVICE-SIGNUP |
 | S-HC-INFRA-BASELINE-GATES-RECOVERY | ready_for_integration | Manuel | Baseline gates recovery: Oreshnik alpha.9, identity v2, Prisma, typecheck, build and canonical suite | - |
@@ -96,6 +101,7 @@ tags:
 | S-HC-STRAT-02-CONTENT-CALENDAR-BLUEPRINT | blocked | Manuel | Content calendar blueprint: master publishing calendar from strategy | S-HC-STRAT-01-MASTER-STRATEGY-WORKBENCH |
 | S-HC-SUP-01-ASSISTED-CUSTOMER-CHANNELS | blocked | Manuel | Assisted customer channels: LLM assistant, WhatsApp, email, human escalation | S-HC-COMM-02-BILLING-ACTIVATION |
 | S-HC-TEN-02-CEPEG-ONBOARDING | blocked | Manuel | CEPEG tenant onboarding: brand, assets, network configuration | S-HC-TEN-01-GLOBAL-TENANT-ADMIN, S-HC-OPS-01-CAMPAIGN-REVIEW-DEPLOYMENT, S-HC-COMM-02-BILLING-ACTIVATION, S-HC-ONB-02-GAP-RESOLUTION-WIZARD, S-HC-STRAT-02-CONTENT-CALENDAR-BLUEPRINT, S-HC-ASSET-01-STRATEGY-ASSET-MANIFEST |
+| S-HC-TEN-02A-CANONICAL-ROLE-MODEL-PLATFORMROLE | in_progress | Manuel | Canonical platform and tenant role model repair | S-HC-TEN-01-GLOBAL-TENANT-ADMIN |
 
 ## Ready Ahora
 
@@ -110,8 +116,11 @@ tags:
 |---|---|---|---|
 | S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION | Jean | Transactional email foundation: domain sender, DNS, reputation, provider integration | - |
 
-## Integration Train Outcomes Recientes
+## Reglas Activas
 
-| Sprint | Resultado | Madre | Task | Source | Compatibility | Advance |
-|---|---|---|---|---|---|---|
-| Ninguno | - | - | - | - | - | - |
+- No publicar en redes reales desde HeptaCore sin aprobacion explicita.
+- No pedir ni commitear credenciales reales.
+- No ejecutar scraping real.
+- No gastar en campanas.
+- No cerrar sprint sin actualizar vault, handoff y validaciones.
+- No pisar trabajo del otro operador: usar preflight, zone check y canonical check.

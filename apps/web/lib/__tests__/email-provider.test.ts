@@ -296,8 +296,7 @@ describe("tenant creation and invite links", () => {
     failNext = null;
     fake = buildFakeDb();
     db = fake.db;
-    fake.collections.users.create({ data: { id: "sa1", email: "sa@test.com" } });
-    fake.collections.memberships.create({ data: { tenantId: "global", userId: "sa1", role: "SUPER_ADMIN" } });
+    fake.collections.users.create({ data: { id: "sa1", email: "sa@test.com", platformRole: "SUPER_ADMIN" } });
     restoreEnv = saveEnvAndSet({
       EMAIL_PROVIDER: "disabled",
       HEPTACORE_APP_URL: "https://test.heptacore.vercel.app",
@@ -606,8 +605,7 @@ describe("acceptance client", () => {
     failNext = null;
     fake = buildFakeDb();
     db = fake.db;
-    fake.collections.users.create({ data: { id: "sa1", email: "sa@test.com" } });
-    fake.collections.memberships.create({ data: { tenantId: "global", userId: "sa1", role: "SUPER_ADMIN" } });
+    fake.collections.users.create({ data: { id: "sa1", email: "sa@test.com", platformRole: "SUPER_ADMIN" } });
   });
 
   it("(14) acceptance client navigates with tenantSlug", async () => {
@@ -616,7 +614,7 @@ describe("acceptance client", () => {
     fake.collections.users.create({ data: { id: "u_nav", email: "nav@test.com" } });
     fake.collections.tenants.create({ data: { slug: "navigate-slug", name: "NS", status: "PROVISIONING", id: "t_nav" } });
     fake.collections.invitations.create({
-      data: { id: "inv_nav", tenantId: "t_nav", email: "nav@test.com", role: "OWNER", tokenHash, expiresAt: getInvitationExpiration() },
+      data: { id: "inv_nav", tenantId: "t_nav", email: "nav@test.com", role: "TENANT_ADMIN", tokenHash, expiresAt: getInvitationExpiration() },
     });
     await db.$transaction((tx: any) => acceptRegistrationInvitation({
       token: plainToken, email: "nav@test.com", password: "securePassword123",
@@ -641,7 +639,7 @@ describe("acceptance client", () => {
     fake.collections.users.create({ data: { id: "u_mis", email: "wrong@test.com" } });
     fake.collections.tenants.create({ data: { slug: "email-mismatch", name: "EM", status: "PROVISIONING", id: "t_mis" } });
     fake.collections.invitations.create({
-      data: { id: "inv_mis", tenantId: "t_mis", email: "correct@test.com", role: "OWNER", tokenHash, expiresAt: getInvitationExpiration() },
+      data: { id: "inv_mis", tenantId: "t_mis", email: "correct@test.com", role: "TENANT_ADMIN", tokenHash, expiresAt: getInvitationExpiration() },
     });
     await assert.rejects(
       () => db.$transaction((tx: any) => acceptRegistrationInvitation({
@@ -656,9 +654,9 @@ describe("acceptance client", () => {
     const tokenHash = hashInvitationToken(plainToken);
     fake.collections.users.create({ data: { id: "u17", email: "dup17@test.com" } });
     fake.collections.tenants.create({ data: { slug: "dup-17", name: "D17", status: "PROVISIONING", id: "t_dup17" } });
-    fake.collections.memberships.create({ data: { tenantId: "t_dup17", userId: "u17", role: "OWNER" } });
+    fake.collections.memberships.create({ data: { tenantId: "t_dup17", userId: "u17", role: "TENANT_ADMIN" } });
     fake.collections.invitations.create({
-      data: { id: "inv_dup17", tenantId: "t_dup17", email: "dup17@test.com", role: "OWNER", tokenHash, expiresAt: getInvitationExpiration() },
+      data: { id: "inv_dup17", tenantId: "t_dup17", email: "dup17@test.com", role: "TENANT_ADMIN", tokenHash, expiresAt: getInvitationExpiration() },
     });
     const result = await db.$transaction((tx: any) => acceptRegistrationInvitation({
       token: plainToken, email: "dup17@test.com", password: "securePassword123",
@@ -674,7 +672,7 @@ describe("acceptance client", () => {
     fake.collections.users.create({ data: { id: "u_ba", email: "ba@test.com" } });
     fake.collections.tenants.create({ data: { slug: "bcrypt-acc", name: "BA", status: "PROVISIONING", id: "t_ba" } });
     fake.collections.invitations.create({
-      data: { id: "inv_ba", tenantId: "t_ba", email: "ba@test.com", role: "OWNER", tokenHash, expiresAt: getInvitationExpiration() },
+      data: { id: "inv_ba", tenantId: "t_ba", email: "ba@test.com", role: "TENANT_ADMIN", tokenHash, expiresAt: getInvitationExpiration() },
     });
     const password = "securePassword123";
     await db.$transaction((tx: any) => acceptRegistrationInvitation({
@@ -691,7 +689,7 @@ describe("acceptance client", () => {
     fake.collections.users.create({ data: { id: "u_exp", email: "expired@test.com" } });
     fake.collections.tenants.create({ data: { slug: "exp-acc", name: "EA", status: "PROVISIONING", id: "t_exp_a" } });
     fake.collections.invitations.create({
-      data: { id: "inv_exp_a", tenantId: "t_exp_a", email: "expired@test.com", role: "OWNER", tokenHash, expiresAt: new Date(Date.now() - 1) },
+      data: { id: "inv_exp_a", tenantId: "t_exp_a", email: "expired@test.com", role: "TENANT_ADMIN", tokenHash, expiresAt: new Date(Date.now() - 1) },
     });
     await assert.rejects(
       () => db.$transaction((tx: any) => acceptRegistrationInvitation({
@@ -717,8 +715,7 @@ describe("zero external deps checks", () => {
     const r = saveEnvAndSet({ EMAIL_PROVIDER: "disabled", HEPTACORE_APP_URL: "https://test.heptacore.vercel.app" });
     try {
       const f = buildFakeDb();
-      f.collections.users.create({ data: { id: "sa1", email: "sa@test.com" } });
-      f.collections.memberships.create({ data: { tenantId: "global", userId: "sa1", role: "SUPER_ADMIN" } });
+      f.collections.users.create({ data: { id: "sa1", email: "sa@test.com", platformRole: "SUPER_ADMIN" } });
       const result = await createAdminTenant({
         actorId: "sa1", slug: "no-secrets", name: "NoSecrets", ownerEmail: "ns2@test.com",
       }, f.db);
@@ -732,8 +729,7 @@ describe("zero external deps checks", () => {
     const r = saveEnvAndSet({ EMAIL_PROVIDER: "disabled", HEPTACORE_APP_URL: "https://test.heptacore.vercel.app" });
     try {
       const f = buildFakeDb();
-      f.collections.users.create({ data: { id: "sa1", email: "sa@test.com" } });
-      f.collections.memberships.create({ data: { tenantId: "global", userId: "sa1", role: "SUPER_ADMIN" } });
+      f.collections.users.create({ data: { id: "sa1", email: "sa@test.com", platformRole: "SUPER_ADMIN" } });
       await createAdminTenant({
         actorId: "sa1", slug: "no-prov-call", name: "NPC", ownerEmail: "npc@test.com",
       }, f.db);

@@ -4,6 +4,7 @@ import { auth } from "../../../../../../../../lib/auth";
 import { ASSET_UPLOAD_LIMITS, validateAssetFile } from "../../../../../../../../lib/asset-config";
 import { prisma } from "../../../../../../../../lib/prisma";
 import { AssetServiceError, replaceTenantAssetWithBlob } from "../../../../../../../../lib/asset-service";
+import { hasCanonicalTenantAccess } from "../../../../../../../../lib/role-model";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -53,7 +54,7 @@ export async function POST(request: Request, context: { params: Promise<{ slug: 
           where: { tenantId_userId: { tenantId: tenant.id, userId: session.user.id } },
           select: { role: true },
         });
-        if (!membership || !["OWNER", "ADMIN", "EDITOR", "STRATEGIST", "PUBLISHER", "SUPER_ADMIN", "TENANT_ADMIN"].includes(membership.role)) {
+        if (!hasCanonicalTenantAccess(session.user.platformRole, membership?.role, ["TENANT_ADMIN", "PUBLISHER"])) {
           throw new AssetServiceError("FORBIDDEN", "Forbidden.", 403);
         }
         const asset = await prisma.asset.findFirst({

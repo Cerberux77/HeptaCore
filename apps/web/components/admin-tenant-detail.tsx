@@ -242,7 +242,7 @@ function MembersTab({ slug, tenantStatus }: { slug: string; tenantStatus: string
 
   const [showAdd, setShowAdd] = useState(false);
   const [addEmail, setAddEmail] = useState("");
-  const [addRole, setAddRole] = useState("VIEWER");
+  const [addRole, setAddRole] = useState("TENANT_ADMIN");
   const [addError, setAddError] = useState("");
   const [addLoading, setAddLoading] = useState(false);
 
@@ -280,7 +280,7 @@ function MembersTab({ slug, tenantStatus }: { slug: string; tenantStatus: string
       if (!res.ok) { setAddError(translateError(res.error?.code ?? "", res.error?.message || "Error al agregar miembro")); return; }
       setShowAdd(false);
       setAddEmail("");
-      setAddRole("VIEWER");
+      setAddRole("TENANT_ADMIN");
       fetchMembers();
     } catch { setAddError("Error de conexion"); }
     finally { setAddLoading(false); }
@@ -326,9 +326,6 @@ function MembersTab({ slug, tenantStatus }: { slug: string; tenantStatus: string
   const isProvisioning = tenantStatus === "PROVISIONING";
   const isFrozen = tenantStatus === "SUSPENDED" || tenantStatus === "ARCHIVED";
 
-  const ownerCount = data?.items.filter((m) => m.role === "OWNER").length ?? 0;
-  const isLastOwner = (member: Member) => member.role === "OWNER" && ownerCount <= 1;
-
   return (
     <div>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
@@ -344,7 +341,7 @@ function MembersTab({ slug, tenantStatus }: { slug: string; tenantStatus: string
         {isProvisioning && (
           <span style={{ fontSize: 11, color: "var(--hc-warn)", display: "flex", alignItems: "center", gap: 4 }}>
             <AlertTriangle size={12} />
-            Las cuentas deben incorporarse mediante invitacion OWNER
+            Las cuentas deben incorporarse mediante una invitacion canonica del tenant
           </span>
         )}
         {isFrozen && (
@@ -395,17 +392,11 @@ function MembersTab({ slug, tenantStatus }: { slug: string; tenantStatus: string
               <span></span>
             </div>
             {data.items.map((m) => {
-              const isOwnerRow = isLastOwner(m);
-              const disableActions = isFrozen || isOwnerRow;
+              const disableActions = isFrozen;
               return (
               <div key={m.id} className="tenant-row" style={{ padding: "8px 14px", gridTemplateColumns: "1fr 180px 100px 80px", borderTop: "1px solid var(--hc-line)", alignItems: "center" }}>
                 <span style={{ fontSize: 13, fontWeight: 500, display: "flex", alignItems: "center", gap: 4 }}>
                   {m.name || "(sin nombre)"}
-                  {isOwnerRow && (
-                    <span style={{ fontSize: 9, background: "var(--hc-warn)", color: "#fff", padding: "1px 5px", borderRadius: 3, fontWeight: 600 }} title="Es el unico OWNER del tenant. No se puede cambiar su rol ni eliminarlo.">
-                      UNICO OWNER
-                    </span>
-                  )}
                 </span>
                 <span style={{ fontSize: 12, color: "var(--hc-fog)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{m.email}</span>
                 <span>
@@ -418,11 +409,6 @@ function MembersTab({ slug, tenantStatus }: { slug: string; tenantStatus: string
                   >
                     {ROLE_OPTIONS.map((r) => <option key={r} value={r}>{getCanonicalRoleLabel(r)}</option>)}
                   </select>
-                  {isOwnerRow && (
-                    <div style={{ fontSize: 9, color: "var(--hc-warn)", marginTop: 2 }}>
-                      No puedes cambiar el rol ni eliminar al ultimo OWNER del tenant.
-                    </div>
-                  )}
                 </span>
                 <button
                   onClick={() => setShowRemove(m.id)}
@@ -442,7 +428,7 @@ function MembersTab({ slug, tenantStatus }: { slug: string; tenantStatus: string
       <ConfirmDialog
         open={!!showRemove}
         title="Quitar miembro"
-        message="Vas a quitar a este miembro del tenant. Si es el ultimo OWNER, la operacion sera rechazada."
+        message="Vas a quitar a este miembro del tenant."
         confirmLabel="Quitar"
         danger
         loading={removeLoading}
@@ -462,7 +448,7 @@ function InvitationsTab({ slug, tenantStatus }: { slug: string; tenantStatus: st
 
   const [showCreate, setShowCreate] = useState(false);
   const [invEmail, setInvEmail] = useState("");
-  const [invRole, setInvRole] = useState("VIEWER");
+  const [invRole, setInvRole] = useState("TENANT_ADMIN");
   const [invError, setInvError] = useState("");
   const [invLoading, setInvLoading] = useState(false);
 
@@ -496,7 +482,7 @@ function InvitationsTab({ slug, tenantStatus }: { slug: string; tenantStatus: st
         body: JSON.stringify({ email: invEmail, role: invRole }),
       });
       if (!res.ok) { setInvError(translateError(res.error?.code ?? "", res.error?.message || "Error al crear invitacion")); return; }
-      setShowCreate(false); setInvEmail(""); setInvRole("VIEWER");
+      setShowCreate(false); setInvEmail(""); setInvRole("TENANT_ADMIN");
       if (res.data?.inviteLink) {
         setResendLink(res.data.inviteLink);
         setResendId(res.data.id);
@@ -574,11 +560,11 @@ function InvitationsTab({ slug, tenantStatus }: { slug: string; tenantStatus: st
           <label style={{ display: "flex", flexDirection: "column", gap: 3 }}>
             <span style={{ fontSize: 11, fontWeight: 600 }}>Rol</span>
             <select value={invRole} onChange={(e) => setInvRole(e.target.value)} style={{ padding: "5px 6px", fontSize: 12, border: "1px solid var(--hc-line)", borderRadius: 4, fontFamily: "inherit" }}>
-              {(isProvisioning ? ["OWNER"] : ROLE_OPTIONS).map((r) => <option key={r} value={r}>{getCanonicalRoleLabel(r)}</option>)}
+              {ROLE_OPTIONS.map((r) => <option key={r} value={r}>{getCanonicalRoleLabel(r)}</option>)}
             </select>
           </label>
-          {isProvisioning && invRole !== "OWNER" && (
-            <span style={{ fontSize: 11, color: "var(--hc-warn)", flexBasis: "100%" }}>Tenant en PROVISIONING: solo se permiten invitaciones con rol OWNER.</span>
+          {isProvisioning && (
+            <span style={{ fontSize: 11, color: "var(--hc-warn)", flexBasis: "100%" }}>Tenant en PROVISIONING: las invitaciones siguen siendo tenant-scoped y no usan aliases legacy.</span>
           )}
           <button type="submit" disabled={invLoading} style={{ padding: "5px 14px", fontSize: 12, borderRadius: 4, border: "none", background: "var(--hc-teal)", color: "#fff", cursor: "pointer", fontFamily: "inherit" }}>
             {invLoading ? "..." : "Crear"}

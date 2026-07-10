@@ -33,6 +33,8 @@ npx prisma validate --schema packages/db/prisma/schema.prisma
 
 ## Production Guardrails
 
+##
+
 - Live RRSS publishing is operational (Facebook Page, Instagram) with approval gates and transactional durability.
 - Real Meta adapters (Facebook Page, Instagram) are connected and verified in production.
 - Ambiguous provider outcomes are blocked without automatic retry; manual reconciliation via IN_REVIEW state machine.

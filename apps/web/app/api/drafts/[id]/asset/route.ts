@@ -4,6 +4,7 @@ import { prisma } from "../../../../../lib/prisma";
 import { auditLog } from "../../../../../lib/audit";
 import { normalizeAssetManifest, roleForAssetOrder } from "../../../../../lib/publishing-formats";
 import { resolveAssetUrl } from "../../../../../lib/asset-resolution";
+import { hasCanonicalTenantAccess } from "../../../../../lib/role-model";
 
 export async function PUT(
   req: Request,
@@ -36,7 +37,7 @@ export async function PUT(
   const membership = await prisma.membership.findFirst({
     where: { tenantId: draft.tenantId, userId: session.user.id },
   });
-  if (!membership || !["OWNER", "ADMIN", "EDITOR", "STRATEGIST", "PUBLISHER", "SUPER_ADMIN", "TENANT_ADMIN"].includes(membership.role)) {
+  if (!hasCanonicalTenantAccess(session.user.platformRole, membership?.role, ["TENANT_ADMIN", "PUBLISHER"])) {
     return NextResponse.json({ error: "Forbidden: editor role required" }, { status: 403 });
   }
 

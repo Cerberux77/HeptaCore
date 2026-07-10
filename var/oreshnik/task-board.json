@@ -2385,6 +2385,50 @@
       ]
     },
     {
+      "id": "S-HC-TEN-02A-CANONICAL-ROLE-MODEL-PLATFORMROLE",
+      "title": "Canonical platform and tenant role model repair",
+      "owner": "Manuel",
+      "backupOwner": "Manuel",
+      "status": "integrated",
+      "track": "tenant-platform",
+      "zone": [
+        "packages/db/**",
+        "apps/web/lib/**",
+        "apps/web/app/**",
+        "scripts/**",
+        "docs/**",
+        "var/oreshnik/**"
+      ],
+      "dependsOn": [
+        "S-HC-TEN-01-GLOBAL-TENANT-ADMIN"
+      ],
+      "acceptance": [
+        "SUPER_ADMIN is stored only on User.platformRole",
+        "Membership.role keeps only TENANT_ADMIN and PUBLISHER as functional roles",
+        "First-password and recovery flows are hardened",
+        "Legacy repair is idempotent and aborts on ambiguous roles",
+        "PR #7 and alpha.15 adoption remain untouched"
+      ],
+      "handoff": "docs/oreshnik/S-HC-TEN-02A-CANONICAL-ROLE-MODEL-PLATFORMROLE.md",
+      "attempts": 0,
+      "history": [
+        {
+          "at": "2026-07-09T00:00:00.000Z",
+          "action": "created",
+          "operator": "Architect",
+          "branch": "codex/s-hc-ten-02a-canonical-role-model-platformrole-2026-07-09",
+          "description": "Repair task opened after validating that TEN-02 was already occupied by CEPEG onboarding and TEN-01 closed with the obsolete OWNER/ADMIN/VIEWER model."
+        },
+        {
+          "at": "2026-07-10T17:46:36.000Z",
+          "action": "post_merge_reconciled",
+          "operator": "Manuel",
+          "branch": "Manuel/s-hc-ten-02a-postmerge-reconcile-2026-07-10",
+          "description": "Reconciled to integrated from GitHub evidence: implementation PR #9 merged at 2026-07-10T01:52:37Z and post-merge reconciliation PR #12 merged at 2026-07-10T17:46:36Z. No historical Run or claim was synthesized."
+        }
+      ]
+    },
+    {
       "id": "S-HC-TEN-01-GLOBAL-TENANT-ADMIN",
       "title": "Global tenant administration and provisioning",
       "owner": "Manuel",

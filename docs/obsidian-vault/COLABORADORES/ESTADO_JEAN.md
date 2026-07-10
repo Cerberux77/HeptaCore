@@ -2,14 +2,14 @@
 type: collaborator-status
 project: "HeptaCore"
 operator: "Jean"
-last_updated: "2026-07-01T20:36:14.547Z"
+last_updated: "2026-07-10T17:42:27.958Z"
 generated_by: "Oreshnik canonical-check"
 source: "var/oreshnik/task-board.json"
 ---
 
 # Estado Jean
 
-> Documento derivado. `var/oreshnik/task-board.json` es la proyeccion compatible que debe mantenerse alineada con los artefactos durables de runtime.
+> Documento derivado. La fuente operativa es `var/oreshnik/task-board.json`.
 
 ## Ready
 

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { auth } from "../../../../lib/auth";
 import { prisma } from "../../../../lib/prisma";
+import { isPlatformSuperAdmin } from "../../../../lib/role-model";
 
 export async function GET(req: Request) {
   const session = await auth();
@@ -22,9 +23,8 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: "Tenant not found" }, { status: 404 });
   }
 
-  const isAdmin = session.user.memberships?.some(
-    (m) => m.role === "SUPER_ADMIN" || m.role === "TENANT_ADMIN" || m.role === "OWNER" || m.role === "ADMIN",
-  );
+  const isAdmin = isPlatformSuperAdmin(session.user.platformRole)
+    || session.user.memberships?.some((m) => m.tenantId === tenant.id && m.role === "TENANT_ADMIN");
   if (!isAdmin && !session.user.memberships?.some((m) => m.tenantId === tenant.id)) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
@@ -92,9 +92,8 @@ export async function PUT(req: Request) {
     return NextResponse.json({ error: "Tenant not found" }, { status: 404 });
   }
 
-  const isAdmin = session.user.memberships?.some(
-    (m) => m.role === "SUPER_ADMIN" || m.role === "TENANT_ADMIN" || m.role === "OWNER" || m.role === "ADMIN",
-  );
+  const isAdmin = isPlatformSuperAdmin(session.user.platformRole)
+    || session.user.memberships?.some((m) => m.tenantId === tenant.id && m.role === "TENANT_ADMIN");
   if (!isAdmin) {
     return NextResponse.json({ error: "Forbidden: admin role required" }, { status: 403 });
   }

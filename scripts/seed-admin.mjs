@@ -4,12 +4,7 @@ import { PrismaPg } from "@prisma/adapter-pg";
 import pg from "pg";
 import { pathToFileURL } from "node:url";
 
-// Deterministic Preview admin bootstrap.
-//
-// There are NO hardcoded credentials or emails. Every value comes from the
-// environment. The script is preview-only and idempotent, and it never logs
-// passwords, DATABASE_URL, tokens or connection strings.
-
+// Preview-only, environment-driven and idempotent. Secret values are never logged.
 const REQUIRED_ADMIN_ENV = [
   "HEPTACORE_ADMIN_EMAIL",
   "HEPTACORE_ADMIN_PASSWORD",
@@ -17,10 +12,6 @@ const REQUIRED_ADMIN_ENV = [
   "HEPTACORE_TENANT_SLUG",
 ];
 
-/**
- * Validate and extract the required admin bootstrap configuration from an env
- * bag. Throws an error listing ONLY the missing variable names (never values).
- */
 export function requireAdminBootstrapEnv(env) {
   const missing = REQUIRED_ADMIN_ENV.filter((key) => !env[key] || !String(env[key]).trim());
   if (missing.length > 0) {
@@ -38,7 +29,6 @@ export function requireAdminBootstrapEnv(env) {
   };
 }
 
-/** The Preview admin bootstrap only ever provisions a SUPER_ADMIN. */
 export function assertSuperAdminRole(role) {
   if (role !== "SUPER_ADMIN") {
     const error = new Error(
@@ -49,50 +39,33 @@ export function assertSuperAdminRole(role) {
   }
 }
 
-/**
- * Idempotent upsert of the configured super admin and their tenant membership.
- * `prisma` and `hashPassword` are injected so this is unit-testable without a
- * real database. Existing users keep their unrelated data (only passwordHash is
- * refreshed); memberships are created or promoted to the configured role.
- */
-export async function upsertSuperAdmin({ prisma, hashPassword, email, name, password, role, tenantSlug }) {
-  const tenant = await prisma.tenant.findFirst({ where: { slug: tenantSlug } });
-  if (!tenant) {
-    const error = new Error(
-      `Tenant "${tenantSlug}" not found. Set HEPTACORE_TENANT_SLUG to an existing tenant slug.`,
-    );
-    error.code = "TENANT_NOT_FOUND";
-    throw error;
-  }
-
+export async function upsertSuperAdmin({ prisma, hashPassword, email, name, password, role }) {
+  assertSuperAdminRole(role);
   const passwordHash = await hashPassword(password);
-
   let user = await prisma.user.findUnique({ where: { email } });
-  let userCreated = false;
+  const userCreated = !user;
+
   if (!user) {
-    user = await prisma.user.create({ data: { email, name: name || email, passwordHash } });
-    userCreated = true;
+    user = await prisma.user.create({
+      data: {
+        email,
+        name: name || email,
+        passwordHash,
+        platformRole: "SUPER_ADMIN",
+      },
+    });
   } else {
-    // Preserve unrelated fields (e.g. name); only refresh the credential.
-    await prisma.user.update({ where: { id: user.id }, data: { passwordHash } });
+    user = await prisma.user.update({
+      where: { id: user.id },
+      data: {
+        passwordHash,
+        platformRole: "SUPER_ADMIN",
+        ...(name ? { name } : {}),
+      },
+    });
   }
 
-  const membership = await prisma.membership.findFirst({
-    where: { tenantId: tenant.id, userId: user.id },
-  });
-
-  let membershipAction;
-  if (!membership) {
-    await prisma.membership.create({ data: { tenantId: tenant.id, userId: user.id, role } });
-    membershipAction = "created";
-  } else if (membership.role !== role) {
-    await prisma.membership.update({ where: { id: membership.id }, data: { role } });
-    membershipAction = "updated";
-  } else {
-    membershipAction = "unchanged";
-  }
-
-  return { userId: user.id, tenantId: tenant.id, userCreated, membershipAction, role, tenantSlug };
+  return { userId: user.id, userCreated, platformRole: "SUPER_ADMIN" };
 }
 
 async function main() {
@@ -125,11 +98,9 @@ async function main() {
       name: cfg.name,
       password: cfg.password,
       role: cfg.role,
-      tenantSlug: cfg.tenantSlug,
     });
-    // Log identity + outcome only. Never the password / DATABASE_URL / tokens.
     console.log(
-      `[ADMIN BOOTSTRAP] email=${cfg.email} userCreated=${result.userCreated} membership=${result.membershipAction} role=${result.role} tenant=${result.tenantSlug}`,
+      `[ADMIN BOOTSTRAP] email=${cfg.email} userCreated=${result.userCreated} platformRole=${result.platformRole}`,
     );
     console.log("[ADMIN BOOTSTRAP] Complete.");
   } catch (error) {
@@ -141,8 +112,6 @@ async function main() {
   }
 }
 
-// Only run when invoked directly, so the pure helpers stay importable/testable
-// without opening a database connection.
 const invokedDirectly = process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href;
 if (invokedDirectly) {
   await main();

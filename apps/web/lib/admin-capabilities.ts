@@ -1,10 +1,11 @@
 import { Permission, getPermissionsForRole } from "./permissions";
-import type { UserRole, TenantStatus } from "@prisma/client";
+import type { PlatformRole, UserRole, TenantStatus } from "@prisma/client";
+import { PLATFORM_ROLE_SUPER_ADMIN, isPlatformSuperAdmin } from "./role-model";
 
 const ALL_PERMISSIONS = Object.values(Permission);
 
 export const LIFECYCLE_MUTATION_BLOCKED: Record<string, string | null> = {
-  PROVISIONING: "El tenant esta en PROVISIONING. Solo se permiten invitaciones OWNER y configuracion.",
+  PROVISIONING: "El tenant esta en PROVISIONING. Solo se permiten invitaciones TENANT_ADMIN y configuracion.",
   SUSPENDED: "El tenant esta SUSPENDED. Las mutaciones estan bloqueadas hasta su reactivacion.",
   ARCHIVED: "El tenant esta ARCHIVED. Las mutaciones estan bloqueadas hasta su reactivacion.",
   ACTIVE: null,
@@ -40,7 +41,7 @@ export interface AdminCapabilities {
 
 export interface CapabilityResolverDb {
   user: {
-    findUnique(args: { where: { id: string }; select: { id: true; email: true; name: true } }): Promise<{ id: string; email: string; name: string | null } | null>;
+    findUnique(args: { where: { id: string }; select: { id: true; email: true; name: true; platformRole: true } }): Promise<{ id: string; email: string; name: string | null; platformRole: PlatformRole | null } | null>;
   };
   membership: {
     findMany(args: { where: { userId: string }; select: { tenantId: true; role: true } }): Promise<Array<{ tenantId: string; role: UserRole }>>;
@@ -57,10 +58,13 @@ export async function resolveAdminCapabilities(
 ): Promise<AdminCapabilities> {
   const user = await db.user.findUnique({
     where: { id: userId },
-    select: { id: true, email: true, name: true },
+    select: { id: true, email: true, name: true, platformRole: true },
   });
   if (!user) {
     throw new Error("UNAUTHORIZED");
+  }
+  if (!isPlatformSuperAdmin(user.platformRole)) {
+    throw new Error("FORBIDDEN");
   }
 
   const memberships = await db.membership.findMany({
@@ -68,7 +72,7 @@ export async function resolveAdminCapabilities(
     select: { tenantId: true, role: true },
   });
 
-  const superAdminPermissionSet = getPermissionsForRole("SUPER_ADMIN");
+  const superAdminPermissionSet = getPermissionsForRole(PLATFORM_ROLE_SUPER_ADMIN);
   const effectivePermissions: CapabilityPermission[] = ALL_PERMISSIONS.map((p) => ({
     permission: p as string,
     granted: superAdminPermissionSet.has(p),
@@ -86,7 +90,7 @@ export async function resolveAdminCapabilities(
     }
     const membership = memberships.find((m) => m.tenantId === t.id);
     const role = membership?.role ?? null;
-    const rolePermissions = role ? getPermissionsForRole(role) : new Set<Permission>();
+    const rolePermissions = getPermissionsForRole(PLATFORM_ROLE_SUPER_ADMIN);
     const tenantPerms = ALL_PERMISSIONS.map((p) => ({
       permission: p as string,
       granted: rolePermissions.has(p),
@@ -108,7 +112,7 @@ export async function resolveAdminCapabilities(
       id: user.id,
       email: user.email,
       name: user.name,
-      globalRole: "SUPER_ADMIN",
+      globalRole: user.platformRole,
     },
     effectivePermissions,
     tenant,

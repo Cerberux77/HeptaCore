@@ -2,10 +2,9 @@ import { NextResponse } from "next/server";
 import { auth } from "../../../../lib/auth";
 import { auditLog } from "../../../../lib/audit";
 import { prisma } from "../../../../lib/prisma";
+import { hasCanonicalTenantAccess } from "../../../../lib/role-model";
 
 export const dynamic = "force-dynamic";
-
-const ROLLBACK_ROLES = ["OWNER", "ADMIN", "APPROVER", "PUBLISHER", "SUPER_ADMIN", "TENANT_ADMIN"];
 
 export async function POST(req: Request) {
   const session = await auth();
@@ -37,7 +36,7 @@ export async function POST(req: Request) {
     where: { tenantId: tenant.id, userId: session.user.id },
     select: { role: true },
   });
-  if (!membership || !ROLLBACK_ROLES.includes(membership.role)) {
+  if (!hasCanonicalTenantAccess(session.user.platformRole, membership?.role, ["TENANT_ADMIN", "PUBLISHER"])) {
     return NextResponse.json({ error: "Forbidden: publisher role required." }, { status: 403 });
   }
 

@@ -22,11 +22,8 @@ const { requireAdminBootstrapEnv, assertSuperAdminRole, upsertSuperAdmin } = see
     tenantSlug: string;
   }) => Promise<{
     userId: string;
-    tenantId: string;
     userCreated: boolean;
-    membershipAction: string;
-    role: string;
-    tenantSlug: string;
+    platformRole: "SUPER_ADMIN";
   }>;
 };
 const { resolveAppAccess } = await import("../access-routing.js");
@@ -144,8 +141,8 @@ describe("admin bootstrap: env + role guards", () => {
   });
 });
 
-describe("admin bootstrap: idempotent super admin upsert", () => {
-  it("creates the user and SUPER_ADMIN membership when none exist", async () => {
+describe("admin bootstrap: idempotent platform super admin upsert", () => {
+  it("creates the user with platformRole and no tenant membership", async () => {
     const { prisma, state } = makeFakePrisma([{ slug: "turpial-sound" }]);
     const result = await upsertSuperAdmin({
       prisma,
@@ -157,14 +154,13 @@ describe("admin bootstrap: idempotent super admin upsert", () => {
       tenantSlug: "turpial-sound",
     });
     assert.equal(result.userCreated, true);
-    assert.equal(result.membershipAction, "created");
-    assert.equal(result.role, "SUPER_ADMIN");
+    assert.equal(result.platformRole, "SUPER_ADMIN");
     assert.equal(state.users.length, 1);
-    assert.equal(state.memberships.length, 1);
-    assert.equal(state.memberships[0].role, "SUPER_ADMIN");
+    assert.equal(state.users[0].platformRole, "SUPER_ADMIN");
+    assert.equal(state.memberships.length, 0);
   });
 
-  it("promotes an existing non-super membership to SUPER_ADMIN", async () => {
+  it("promotes an existing user without changing tenant memberships", async () => {
     const { prisma, state } = makeFakePrisma([{ id: "t1", slug: "turpial-sound" }]);
     state.users.push({ id: "user-1", email: "admin@example.test", name: "Existing", passwordHash: "old" });
     state.memberships.push({ id: "mem-1", tenantId: "t1", userId: "user-1", role: "VIEWER" });
@@ -178,8 +174,9 @@ describe("admin bootstrap: idempotent super admin upsert", () => {
       tenantSlug: "turpial-sound",
     });
     assert.equal(result.userCreated, false);
-    assert.equal(result.membershipAction, "updated");
-    assert.equal(state.memberships[0].role, "SUPER_ADMIN");
+    assert.equal(result.platformRole, "SUPER_ADMIN");
+    assert.equal(state.users[0].platformRole, "SUPER_ADMIN");
+    assert.equal(state.memberships[0].role, "VIEWER");
     assert.equal(state.users[0].name, "Existing", "unrelated user data preserved");
     assert.equal(state.users.length, 1);
     assert.equal(state.memberships.length, 1);
@@ -199,44 +196,36 @@ describe("admin bootstrap: idempotent super admin upsert", () => {
     await upsertSuperAdmin(args);
     const second = await upsertSuperAdmin(args);
     assert.equal(second.userCreated, false);
-    assert.equal(second.membershipAction, "unchanged");
+    assert.equal(second.platformRole, "SUPER_ADMIN");
     assert.equal(state.users.length, 1);
-    assert.equal(state.memberships.length, 1);
+    assert.equal(state.memberships.length, 0);
   });
 
-  it("aborts with an actionable error when the tenant does not exist", async () => {
-    const { prisma } = makeFakePrisma([{ slug: "other-tenant" }]);
-    await assert.rejects(
-      () =>
-        upsertSuperAdmin({
-          prisma,
-          hashPassword,
-          email: "admin@example.test",
-          name: null,
-          password: "pw",
-          role: "SUPER_ADMIN",
-          tenantSlug: "missing-tenant",
-        }),
-      (err: any) => {
-        assert.equal(err.code, "TENANT_NOT_FOUND");
-        assert.match(err.message, /HEPTACORE_TENANT_SLUG/);
-        return true;
-      },
-    );
+  it("does not require a tenant row for a platform super admin", async () => {
+    const { prisma, state } = makeFakePrisma([]);
+    await upsertSuperAdmin({
+      prisma,
+      hashPassword,
+      email: "admin@example.test",
+      name: null,
+      password: "pw",
+      role: "SUPER_ADMIN",
+      tenantSlug: "missing-tenant",
+    });
+    assert.equal(state.users[0].platformRole, "SUPER_ADMIN");
+    assert.equal(state.memberships.length, 0);
   });
 });
 
-describe("admin bootstrap: access routing outcome (semantics unchanged)", () => {
+describe("admin bootstrap: canonical access routing outcome", () => {
   it("routes a SUPER_ADMIN to /admin", () => {
-    const resolved = resolveAppAccess([
-      { tenantId: "t1", role: "SUPER_ADMIN", tenant: { slug: "turpial-sound", name: "Turpial" } },
-    ]);
+    const resolved = resolveAppAccess([], "SUPER_ADMIN");
     assert.deepEqual(resolved, { kind: "admin", href: "/admin" });
   });
 
   it("keeps a normal single-tenant user isolated in their tenant", () => {
     const resolved = resolveAppAccess([
-      { tenantId: "t2", role: "OWNER", tenant: { slug: "turpial-sound", name: "Turpial" } },
+      { tenantId: "t2", role: "TENANT_ADMIN", tenant: { slug: "turpial-sound", name: "Turpial" } },
     ]);
     assert.equal(resolved.kind, "tenant");
     if (resolved.kind === "tenant") assert.equal(resolved.href, "/tenant/turpial-sound");

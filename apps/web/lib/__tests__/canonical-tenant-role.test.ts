@@ -7,192 +7,87 @@ import {
   isLegacyTenantRole,
   getCanonicalRoleLabel,
 } from "../../lib/canonical-tenant-role";
+import {
+  AMBIGUOUS_LEGACY_TENANT_ROLES,
+  PLATFORM_ROLE_SUPER_ADMIN,
+  TENANT_FUNCTIONAL_ROLES,
+  convertSafeLegacyTenantRole,
+  getTenantRoleLabel,
+  isAmbiguousLegacyTenantRole,
+  isCanonicalTenantRole,
+  isPlatformSuperAdmin,
+  normalizeFunctionalTenantRole,
+} from "../../lib/role-model";
 
 describe("canonical tenant roles", () => {
-  it("has exactly three canonical roles", () => {
-    assert.equal(CANONICAL_TENANT_ROLES.length, 3);
-    assert.ok(CANONICAL_TENANT_ROLES.includes("OWNER"));
-    assert.ok(CANONICAL_TENANT_ROLES.includes("ADMIN"));
-    assert.ok(CANONICAL_TENANT_ROLES.includes("VIEWER"));
+  it("has exactly the two canonical tenant roles", () => {
+    assert.deepEqual(CANONICAL_TENANT_ROLES, ["TENANT_ADMIN", "PUBLISHER"]);
+    assert.deepEqual(TENANT_FUNCTIONAL_ROLES, ["TENANT_ADMIN", "PUBLISHER"]);
   });
 
-  it("normalizeTenantRole maps OWNER to OWNER", () => {
-    assert.equal(normalizeTenantRole("OWNER"), "OWNER");
+  it("normalizes canonical tenant roles without aliases", () => {
+    assert.equal(normalizeTenantRole("TENANT_ADMIN"), "TENANT_ADMIN");
+    assert.equal(normalizeTenantRole("PUBLISHER"), "PUBLISHER");
   });
 
-  it("normalizeTenantRole maps TENANT_ADMIN to ADMIN", () => {
-    assert.equal(normalizeTenantRole("TENANT_ADMIN"), "ADMIN");
+  it("does not grant runtime access through safe legacy aliases", () => {
+    assert.equal(normalizeFunctionalTenantRole("OWNER"), null);
+    assert.equal(normalizeFunctionalTenantRole("ADMIN"), null);
+    assert.equal(normalizeFunctionalTenantRole("TENANT_ADMIN"), "TENANT_ADMIN");
+    assert.equal(normalizeFunctionalTenantRole("PUBLISHER"), "PUBLISHER");
   });
 
-  it("normalizeTenantRole maps ADMIN to ADMIN", () => {
-    assert.equal(normalizeTenantRole("ADMIN"), "ADMIN");
+  it("maps safe legacy tenant roles only through explicit repair conversion", () => {
+    assert.equal(convertSafeLegacyTenantRole("OWNER"), "TENANT_ADMIN");
+    assert.equal(convertSafeLegacyTenantRole("ADMIN"), "TENANT_ADMIN");
+    assert.equal(convertSafeLegacyTenantRole("TENANT_ADMIN"), "TENANT_ADMIN");
+    assert.equal(convertSafeLegacyTenantRole("PUBLISHER"), "PUBLISHER");
   });
 
-  it("normalizeTenantRole maps STRATEGIST to ADMIN", () => {
-    assert.equal(normalizeTenantRole("STRATEGIST"), "ADMIN");
+  it("does not normalize SUPER_ADMIN as a tenant role", () => {
+    assert.equal(normalizeFunctionalTenantRole("SUPER_ADMIN"), null);
+    assert.equal(normalizeTenantRole("SUPER_ADMIN" as never), null);
   });
 
-  it("normalizeTenantRole maps EDITOR to ADMIN", () => {
-    assert.equal(normalizeTenantRole("EDITOR"), "ADMIN");
-  });
-
-  it("normalizeTenantRole maps APPROVER to ADMIN", () => {
-    assert.equal(normalizeTenantRole("APPROVER"), "ADMIN");
-  });
-
-  it("normalizeTenantRole maps PUBLISHER to ADMIN", () => {
-    assert.equal(normalizeTenantRole("PUBLISHER"), "ADMIN");
-  });
-
-  it("normalizeTenantRole maps ANALYST to VIEWER", () => {
-    assert.equal(normalizeTenantRole("ANALYST"), "VIEWER");
-  });
-
-  it("normalizeTenantRole maps VIEWER to VIEWER", () => {
-    assert.equal(normalizeTenantRole("VIEWER"), "VIEWER");
-  });
-
-  it("normalizeTenantRole returns null for SUPER_ADMIN", () => {
-    assert.equal(normalizeTenantRole("SUPER_ADMIN"), null);
-  });
-
-  it("normalizeTenantRole returns null for unknown role", () => {
-    assert.equal(normalizeTenantRole("UNKNOWN" as any), null);
-  });
-
-  it("TENANT_ADMIN canonical is ADMIN not null", () => {
-    const result = normalizeTenantRole("TENANT_ADMIN");
-    assert.equal(result, "ADMIN");
-    assert.notEqual(result, null);
-  });
-
-  it("EDITOR canonical is ADMIN not null", () => {
-    const result = normalizeTenantRole("EDITOR");
-    assert.equal(result, "ADMIN");
-    assert.notEqual(result, null);
-  });
-
-  it("ANALYST canonical is VIEWER not null", () => {
-    const result = normalizeTenantRole("ANALYST");
-    assert.equal(result, "VIEWER");
-    assert.notEqual(result, null);
-  });
-
-  it("isAssignableTenantRole accepts OWNER", () => {
-    assert.equal(isAssignableTenantRole("OWNER"), true);
-  });
-
-  it("isAssignableTenantRole accepts ADMIN", () => {
-    assert.equal(isAssignableTenantRole("ADMIN"), true);
-  });
-
-  it("isAssignableTenantRole accepts VIEWER", () => {
-    assert.equal(isAssignableTenantRole("VIEWER"), true);
-  });
-
-  it("isAssignableTenantRole rejects SUPER_ADMIN", () => {
-    assert.equal(isAssignableTenantRole("SUPER_ADMIN"), false);
-  });
-
-  it("isAssignableTenantRole rejects EDITOR", () => {
-    assert.equal(isAssignableTenantRole("EDITOR"), false);
-  });
-
-  it("isAssignableTenantRole rejects TENANT_ADMIN", () => {
-    assert.equal(isAssignableTenantRole("TENANT_ADMIN"), false);
-  });
-
-  it("isAssignableTenantRole rejects STRATEGIST", () => {
-    assert.equal(isAssignableTenantRole("STRATEGIST"), false);
-  });
-
-  it("isAssignableTenantRole rejects APPROVER", () => {
-    assert.equal(isAssignableTenantRole("APPROVER"), false);
-  });
-
-  it("isAssignableTenantRole rejects PUBLISHER", () => {
-    assert.equal(isAssignableTenantRole("PUBLISHER"), false);
-  });
-
-  it("isAssignableTenantRole rejects ANALYST", () => {
-    assert.equal(isAssignableTenantRole("ANALYST"), false);
-  });
-
-  it("isLegacyTenantRole identifies TENANT_ADMIN as legacy", () => {
-    assert.equal(isLegacyTenantRole("TENANT_ADMIN"), true);
-  });
-
-  it("isLegacyTenantRole identifies EDITOR as legacy", () => {
-    assert.equal(isLegacyTenantRole("EDITOR"), true);
-  });
-
-  it("isLegacyTenantRole identifies STRATEGIST as legacy", () => {
-    assert.equal(isLegacyTenantRole("STRATEGIST"), true);
-  });
-
-  it("isLegacyTenantRole identifies PUBLISHER as legacy", () => {
-    assert.equal(isLegacyTenantRole("PUBLISHER"), true);
-  });
-
-  it("isLegacyTenantRole identifies APPROVER as legacy", () => {
-    assert.equal(isLegacyTenantRole("APPROVER"), true);
-  });
-
-  it("isLegacyTenantRole identifies ANALYST as legacy", () => {
-    assert.equal(isLegacyTenantRole("ANALYST"), true);
-  });
-
-  it("isLegacyTenantRole returns false for OWNER", () => {
-    assert.equal(isLegacyTenantRole("OWNER"), false);
-  });
-
-  it("isLegacyTenantRole returns false for ADMIN", () => {
-    assert.equal(isLegacyTenantRole("ADMIN"), false);
-  });
-
-  it("isLegacyTenantRole returns false for VIEWER", () => {
-    assert.equal(isLegacyTenantRole("VIEWER"), false);
-  });
-
-  it("isLegacyTenantRole returns false for SUPER_ADMIN", () => {
-    assert.equal(isLegacyTenantRole("SUPER_ADMIN"), false);
-  });
-
-  it("getCanonicalRoleLabel returns Spanish label for OWNER", () => {
-    assert.equal(getCanonicalRoleLabel("OWNER"), "Propietario");
-  });
-
-  it("getCanonicalRoleLabel returns Spanish label for ADMIN", () => {
-    assert.equal(getCanonicalRoleLabel("ADMIN"), "Administrador");
-  });
-
-  it("getCanonicalRoleLabel returns Spanish label for VIEWER", () => {
-    assert.equal(getCanonicalRoleLabel("VIEWER"), "Consulta");
-  });
-
-  it("getCanonicalRoleLabel returns raw string for unknown role", () => {
-    assert.equal(getCanonicalRoleLabel("UNKNOWN"), "UNKNOWN");
-  });
-
-  it("all tenant roles normalize to a canonical value or null", () => {
-    const allTenantRoles = [
-      "OWNER", "TENANT_ADMIN", "ADMIN", "STRATEGIST", "EDITOR",
-      "APPROVER", "PUBLISHER", "ANALYST", "VIEWER",
-    ];
-    for (const role of allTenantRoles) {
-      const canonical = normalizeTenantRole(role as any);
-      assert.ok(canonical !== undefined, `${role} should not be undefined`);
-      if (role === "SUPER_ADMIN") {
-        assert.equal(canonical, null);
-      } else {
-        assert.ok(canonical === "OWNER" || canonical === "ADMIN" || canonical === "VIEWER",
-          `${role} mapped to ${canonical}`);
-      }
+  it("does not auto-convert ambiguous legacy roles", () => {
+    for (const role of AMBIGUOUS_LEGACY_TENANT_ROLES) {
+      assert.equal(normalizeFunctionalTenantRole(role), null, `${role} must require manual migration`);
+      assert.equal(convertSafeLegacyTenantRole(role), null, `${role} must not be safely converted`);
+      assert.equal(isAmbiguousLegacyTenantRole(role), true);
     }
   });
 
-  it("SUPER_ADMIN does not normalize to OWNER", () => {
-    assert.notEqual(normalizeTenantRole("SUPER_ADMIN"), "OWNER");
-    assert.equal(normalizeTenantRole("SUPER_ADMIN"), null);
+  it("recognizes assignable and legacy roles correctly", () => {
+    assert.equal(isAssignableTenantRole("TENANT_ADMIN"), true);
+    assert.equal(isAssignableTenantRole("PUBLISHER"), true);
+    assert.equal(isAssignableTenantRole("OWNER"), false);
+    assert.equal(isAssignableTenantRole("ADMIN"), false);
+    assert.equal(isAssignableTenantRole("SUPER_ADMIN"), false);
+
+    assert.equal(isLegacyTenantRole("OWNER"), true);
+    assert.equal(isLegacyTenantRole("ADMIN"), true);
+    assert.equal(isLegacyTenantRole("VIEWER"), true);
+    assert.equal(isLegacyTenantRole("SUPER_ADMIN"), true);
+    assert.equal(isLegacyTenantRole("TENANT_ADMIN"), false);
+    assert.equal(isLegacyTenantRole("PUBLISHER"), false);
+  });
+
+  it("labels the canonical roles without old aliases", () => {
+    assert.equal(getCanonicalRoleLabel("TENANT_ADMIN"), "Tenant Admin");
+    assert.equal(getCanonicalRoleLabel("PUBLISHER"), "Publisher");
+    assert.equal(getCanonicalRoleLabel(PLATFORM_ROLE_SUPER_ADMIN), "Super Admin");
+    assert.equal(getTenantRoleLabel("TENANT_ADMIN"), "Tenant Admin");
+  });
+
+  it("recognizes global platform super admin only from platformRole", () => {
+    assert.equal(isPlatformSuperAdmin(PLATFORM_ROLE_SUPER_ADMIN), true);
+    assert.equal(isPlatformSuperAdmin(null), false);
+  });
+
+  it("recognizes canonical tenant roles only for the supported pair", () => {
+    assert.equal(isCanonicalTenantRole("TENANT_ADMIN"), true);
+    assert.equal(isCanonicalTenantRole("PUBLISHER"), true);
+    assert.equal(isCanonicalTenantRole("OWNER"), false);
+    assert.equal(isCanonicalTenantRole("ADMIN"), false);
   });
 });

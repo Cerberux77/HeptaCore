@@ -47,8 +47,8 @@ class FakeDb {
     { id: "tenant-b", slug: "tenant-b" },
   ];
   memberships: Row[] = [
-    { tenantId: "tenant-a", userId: "user-a", role: "EDITOR" },
-    { tenantId: "tenant-b", userId: "user-b", role: "EDITOR" },
+    { tenantId: "tenant-a", userId: "user-a", role: "PUBLISHER" },
+    { tenantId: "tenant-b", userId: "user-b", role: "PUBLISHER" },
   ];
   assets: Row[] = [];
   drafts: Row[] = [];

@@ -20,6 +20,7 @@ function buildFakeDb() {
         if (args.select.id) result.id = u.id;
         if (args.select.email) result.email = u.email;
         if (args.select.name) result.name = u.name;
+        if (args.select.platformRole) result.platformRole = u.platformRole ?? null;
         return result as any;
       },
     },
@@ -67,7 +68,7 @@ describe("resolveAdminCapabilities", () => {
   });
 
   it("returns SUPER_ADMIN capabilities with all permissions", async () => {
-    fake.users.push({ id: "sa1", email: "sa@test.com", name: "Super Admin" });
+    fake.users.push({ id: "sa1", email: "sa@test.com", name: "Super Admin", platformRole: "SUPER_ADMIN" });
 
     const result = await resolveAdminCapabilities("sa1", null, fake.db);
 
@@ -84,7 +85,7 @@ describe("resolveAdminCapabilities", () => {
   });
 
   it("returns empty tenant context when no tenant slug", async () => {
-    fake.users.push({ id: "sa1", email: "sa@test.com", name: "SA" });
+    fake.users.push({ id: "sa1", email: "sa@test.com", name: "SA", platformRole: "SUPER_ADMIN" });
 
     const result = await resolveAdminCapabilities("sa1", null, fake.db);
 
@@ -93,7 +94,7 @@ describe("resolveAdminCapabilities", () => {
   });
 
   it("throws NOT_FOUND for non-existent tenant slug", async () => {
-    fake.users.push({ id: "sa1", email: "sa@test.com", name: "SA" });
+    fake.users.push({ id: "sa1", email: "sa@test.com", name: "SA", platformRole: "SUPER_ADMIN" });
 
     await assert.rejects(
       () => resolveAdminCapabilities("sa1", "no-such-tenant", fake.db),
@@ -102,7 +103,7 @@ describe("resolveAdminCapabilities", () => {
   });
 
   it("returns tenant context with lifecycle status for ACTIVE", async () => {
-    fake.users.push({ id: "sa1", email: "sa@test.com", name: "SA" });
+    fake.users.push({ id: "sa1", email: "sa@test.com", name: "SA", platformRole: "SUPER_ADMIN" });
     fake.tenants.push({ id: "t1", slug: "active-tenant", name: "Active Corp", status: "ACTIVE" });
 
     const result = await resolveAdminCapabilities("sa1", "active-tenant", fake.db);
@@ -114,7 +115,7 @@ describe("resolveAdminCapabilities", () => {
   });
 
   it("returns lifecycle block reason for PROVISIONING", async () => {
-    fake.users.push({ id: "sa1", email: "sa@test.com", name: "SA" });
+    fake.users.push({ id: "sa1", email: "sa@test.com", name: "SA", platformRole: "SUPER_ADMIN" });
     fake.tenants.push({ id: "t1", slug: "prov-tenant", name: "Prov Corp", status: "PROVISIONING" });
 
     const result = await resolveAdminCapabilities("sa1", "prov-tenant", fake.db);
@@ -125,7 +126,7 @@ describe("resolveAdminCapabilities", () => {
   });
 
   it("returns lifecycle block reason for SUSPENDED", async () => {
-    fake.users.push({ id: "sa1", email: "sa@test.com", name: "SA" });
+    fake.users.push({ id: "sa1", email: "sa@test.com", name: "SA", platformRole: "SUPER_ADMIN" });
     fake.tenants.push({ id: "t1", slug: "susp-tenant", name: "Susp Corp", status: "SUSPENDED" });
 
     const result = await resolveAdminCapabilities("sa1", "susp-tenant", fake.db);
@@ -135,7 +136,7 @@ describe("resolveAdminCapabilities", () => {
   });
 
   it("returns lifecycle block reason for ARCHIVED", async () => {
-    fake.users.push({ id: "sa1", email: "sa@test.com", name: "SA" });
+    fake.users.push({ id: "sa1", email: "sa@test.com", name: "SA", platformRole: "SUPER_ADMIN" });
     fake.tenants.push({ id: "t1", slug: "arch-tenant", name: "Arch Corp", status: "ARCHIVED" });
 
     const result = await resolveAdminCapabilities("sa1", "arch-tenant", fake.db);
@@ -145,17 +146,17 @@ describe("resolveAdminCapabilities", () => {
   });
 
   it("includes tenant role when user is member", async () => {
-    fake.users.push({ id: "sa1", email: "sa@test.com", name: "SA" });
+    fake.users.push({ id: "sa1", email: "sa@test.com", name: "SA", platformRole: "SUPER_ADMIN" });
     fake.tenants.push({ id: "t1", slug: "my-tenant", name: "My Corp", status: "ACTIVE" });
-    fake.memberships.push({ userId: "sa1", tenantId: "t1", role: "OWNER" });
+    fake.memberships.push({ userId: "sa1", tenantId: "t1", role: "TENANT_ADMIN" });
 
     const result = await resolveAdminCapabilities("sa1", "my-tenant", fake.db);
 
-    assert.equal(result.tenant.tenantRole, "OWNER");
+    assert.equal(result.tenant.tenantRole, "TENANT_ADMIN");
   });
 
   it("response has zero secrets", async () => {
-    fake.users.push({ id: "sa1", email: "sa@test.com", name: "SA" });
+    fake.users.push({ id: "sa1", email: "sa@test.com", name: "SA", platformRole: "SUPER_ADMIN" });
     fake.tenants.push({ id: "t1", slug: "t", name: "T", status: "ACTIVE" });
 
     const result = await resolveAdminCapabilities("sa1", "t", fake.db);
@@ -169,10 +170,8 @@ describe("resolveAdminCapabilities", () => {
   });
 
   it("tenant permissions for SUPER_ADMIN in tenant show full access", async () => {
-    fake.users.push({ id: "sa1", email: "sa@test.com", name: "SA" });
+    fake.users.push({ id: "sa1", email: "sa@test.com", name: "SA", platformRole: "SUPER_ADMIN" });
     fake.tenants.push({ id: "t1", slug: "t", name: "T", status: "ACTIVE" });
-    fake.memberships.push({ userId: "sa1", tenantId: "t1", role: "SUPER_ADMIN" });
-
     const result = await resolveAdminCapabilities("sa1", "t", fake.db);
     const tenantPerms = result.tenant.tenantPermissions!;
     for (const p of tenantPerms) {
@@ -181,7 +180,7 @@ describe("resolveAdminCapabilities", () => {
   });
 
   it("switch tenant slug returns different tenant data", async () => {
-    fake.users.push({ id: "sa1", email: "sa@test.com", name: "SA" });
+    fake.users.push({ id: "sa1", email: "sa@test.com", name: "SA", platformRole: "SUPER_ADMIN" });
     fake.tenants.push({ id: "t1", slug: "tenant-a", name: "Tenant A", status: "ACTIVE" });
     fake.tenants.push({ id: "t2", slug: "tenant-b", name: "Tenant B", status: "SUSPENDED" });
 
@@ -196,7 +195,7 @@ describe("resolveAdminCapabilities", () => {
   });
 
   it("no tenant slug returns full global permissions without tenant context", async () => {
-    fake.users.push({ id: "sa1", email: "sa@test.com", name: "SA" });
+    fake.users.push({ id: "sa1", email: "sa@test.com", name: "SA", platformRole: "SUPER_ADMIN" });
 
     const result = await resolveAdminCapabilities("sa1", null, fake.db);
 
