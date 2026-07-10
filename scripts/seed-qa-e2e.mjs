@@ -44,11 +44,21 @@ async function ensureUser(email, name, role, tenantSlug) {
   const hash = await bcrypt.hash(QA_PASSWORD, 10);
   let user = await prisma.user.findUnique({ where: { email } });
   if (!user) {
-    user = await prisma.user.create({ data: { email, name, passwordHash: hash } });
+    user = await prisma.user.create({ data: { email, name, passwordHash: hash, platformRole: role === "SUPER_ADMIN" ? "SUPER_ADMIN" : null } });
     console.log("[USER] created:", email);
   } else {
-    await prisma.user.update({ where: { id: user.id }, data: { passwordHash: hash, name } });
+    await prisma.user.update({
+      where: { id: user.id },
+      data: {
+        passwordHash: hash,
+        name,
+        platformRole: role === "SUPER_ADMIN" ? "SUPER_ADMIN" : null,
+      },
+    });
     console.log("[USER] updated:", email);
+  }
+  if (role === "SUPER_ADMIN") {
+    return user;
   }
   const tenant = await prisma.tenant.findFirst({ where: { slug: tenantSlug } });
   if (!tenant) throw new Error("Tenant " + tenantSlug + " not found");
@@ -65,35 +75,13 @@ async function ensureUser(email, name, role, tenantSlug) {
   return user;
 }
 
-async function ensureLegacyUser(identifier, name, role, tenantSlug) {
-  const hash = await bcrypt.hash(QA_PASSWORD, 10);
-  let user = await prisma.user.findUnique({ where: { email: identifier } });
-  if (!user) {
-    user = await prisma.user.create({ data: { email: identifier, name, passwordHash: hash } });
-    console.log("[USER] created legacy:", identifier);
-  } else {
-    await prisma.user.update({ where: { id: user.id }, data: { passwordHash: hash, name } });
-    console.log("[USER] updated legacy:", identifier);
-  }
-  const tenant = await prisma.tenant.findFirst({ where: { slug: tenantSlug } });
-  if (!tenant) throw new Error("Tenant " + tenantSlug + " not found");
-  const membership = await prisma.membership.findFirst({ where: { tenantId: tenant.id, userId: user.id } });
-  if (!membership) {
-    await prisma.membership.create({ data: { tenantId: tenant.id, userId: user.id, role } });
-    console.log("[MEMBER] created legacy:", identifier, role, tenantSlug);
-  }
-  return user;
-}
-
 try {
   console.log("[QA SEED] Starting...");
   await ensureTenant(BASE_TENANT_SLUG);
   await ensureTenant(QA_TENANT_SLUG);
   await ensureUser("qa-superadmin@heptacore.test", "QA SuperAdmin", "SUPER_ADMIN", BASE_TENANT_SLUG);
-  await ensureUser("qa-owner@heptacore.test", "QA Owner", "OWNER", QA_TENANT_SLUG);
-  await ensureUser("qa-admin@heptacore.test", "QA Admin", "ADMIN", QA_TENANT_SLUG);
-  await ensureUser("qa-viewer@heptacore.test", "QA Viewer", "VIEWER", QA_TENANT_SLUG);
-  await ensureLegacyUser("qa-legacy", "QA Legacy", "VIEWER", QA_TENANT_SLUG);
+  await ensureUser("qa-tenant-admin@heptacore.test", "QA Tenant Admin", "TENANT_ADMIN", QA_TENANT_SLUG);
+  await ensureUser("qa-publisher@heptacore.test", "QA Publisher", "PUBLISHER", QA_TENANT_SLUG);
   console.log("[QA SEED] Complete.");
 } catch (error) {
   console.error("[QA SEED] Failed:", error instanceof Error ? error.message : error);

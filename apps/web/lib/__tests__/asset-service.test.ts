@@ -51,8 +51,8 @@ class FakeDb {
     { id: "tenant-b", slug: "tenant-b" },
   ];
   memberships: Row[] = [
-    { tenantId: "tenant-a", userId: "user-a", role: "EDITOR" },
-    { tenantId: "tenant-b", userId: "user-b", role: "EDITOR" },
+    { tenantId: "tenant-a", userId: "user-a", role: "PUBLISHER" },
+    { tenantId: "tenant-b", userId: "user-b", role: "PUBLISHER" },
   ];
   assets: Row[] = [
     { id: "asset-a", tenantId: "tenant-a", kind: "IMAGE", filename: "a.jpg", mimeType: "image/jpeg", storageKey: "old/a.jpg", sourcePath: "https://blob.test/old/a.jpg", metadata: { sizeBytes: 100, folder: "" }, rightsStatus: "needs_review" },

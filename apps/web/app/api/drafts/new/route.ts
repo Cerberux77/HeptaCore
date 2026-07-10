@@ -3,6 +3,7 @@ import { auth } from "../../../../lib/auth";
 import { prisma } from "../../../../lib/prisma";
 import { auditLog } from "../../../../lib/audit";
 import { formatNetwork, MULTIFORMAT_VALUES, normalizePublishingFormat } from "../../../../lib/publishing-formats";
+import { hasCanonicalTenantAccess } from "../../../../lib/role-model";
 
 export async function POST(req: Request) {
   const session = await auth();
@@ -50,7 +51,7 @@ export async function POST(req: Request) {
   const membership = await prisma.membership.findFirst({
     where: { tenantId: tenant.id, userId: session.user.id },
   });
-  if (!membership || !["OWNER", "ADMIN", "EDITOR", "STRATEGIST", "PUBLISHER", "SUPER_ADMIN", "TENANT_ADMIN"].includes(membership.role)) {
+  if (!hasCanonicalTenantAccess(session.user.platformRole, membership?.role, ["TENANT_ADMIN", "PUBLISHER"])) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 

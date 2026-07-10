@@ -25,7 +25,7 @@ export default async function AppEntryPage() {
     },
   });
 
-  const access = resolveAppAccess(memberships);
+  const access = resolveAppAccess(memberships, session.user.platformRole);
   if (access.kind === "admin") redirect(access.href);
   if (access.kind === "tenant") redirect(access.href);
   if (access.kind === "access-required") redirect(access.href);

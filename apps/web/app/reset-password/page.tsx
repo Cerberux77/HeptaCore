@@ -9,6 +9,7 @@ function ResetPasswordForm() {
   const searchParams = useSearchParams();
   const token = searchParams.get("token") || "";
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [done, setDone] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -21,7 +22,7 @@ function ResetPasswordForm() {
     const res = await fetch("/api/auth/reset-password", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ token, password }),
+      body: JSON.stringify({ token, password, confirmPassword }),
     });
 
     const data = await res.json();
@@ -65,6 +66,19 @@ function ResetPasswordForm() {
               minLength={8}
               className="login-input"
               placeholder="Minimo 8 caracteres"
+              autoComplete="new-password"
+            />
+          </label>
+          <label className="login-label">
+            Confirmar contrasena
+            <input
+              type="password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              required
+              minLength={8}
+              className="login-input"
+              placeholder="Repite la contrasena"
               autoComplete="new-password"
             />
           </label>

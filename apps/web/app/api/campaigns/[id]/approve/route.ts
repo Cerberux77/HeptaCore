@@ -2,8 +2,7 @@ import { NextResponse } from "next/server";
 import { auth } from "../../../../../lib/auth";
 import { prisma } from "../../../../../lib/prisma";
 import { auditLog } from "../../../../../lib/audit";
-
-const APPROVE_ROLES = ["OWNER", "ADMIN", "SUPER_ADMIN", "TENANT_ADMIN"];
+import { hasCanonicalTenantAccess } from "../../../../../lib/role-model";
 
 export async function POST(
   _req: Request,
@@ -22,8 +21,9 @@ export async function POST(
 
   const membership = await prisma.membership.findFirst({
     where: { tenantId: campaign.tenantId, userId: session.user.id },
+    select: { role: true },
   });
-  if (!membership || !APPROVE_ROLES.includes(membership.role)) {
+  if (!hasCanonicalTenantAccess(session.user.platformRole, membership?.role, ["TENANT_ADMIN", "PUBLISHER"])) {
     return NextResponse.json({ error: "Forbidden: admin role required" }, { status: 403 });
   }
 

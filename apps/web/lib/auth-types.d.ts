@@ -1,4 +1,4 @@
-import type { UserRole } from "@prisma/client";
+import type { PlatformRole, UserRole } from "@prisma/client";
 
 declare module "next-auth" {
   interface User {
@@ -9,6 +9,7 @@ declare module "next-auth" {
       id: string;
       email: string;
       name?: string | null;
+      platformRole: PlatformRole | null;
       tenantId: string | null;
       role: UserRole | null;
       memberships: Array<{ tenantId: string; role: UserRole }>;
@@ -19,6 +20,7 @@ declare module "next-auth" {
 declare module "next-auth/jwt" {
   interface JWT {
     id: string;
+    platformRole: PlatformRole | null;
     tenantId: string | null;
     role: UserRole | null;
     memberships: Array<{ tenantId: string; role: UserRole }>;

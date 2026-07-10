@@ -38,12 +38,16 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       }
 
       if (token.id) {
+        const authUser = await prisma.user.findUnique({
+          where: { id: token.id },
+          select: { platformRole: true },
+        });
         const memberships = await prisma.membership.findMany({
           where: { userId: token.id },
           orderBy: { createdAt: "asc" },
           select: { tenantId: true, role: true },
         });
-        applyMembershipClaims(token, memberships);
+        applyMembershipClaims(token, memberships, authUser?.platformRole ?? null);
       }
       return token;
     },
@@ -60,6 +64,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     async session({ session, token }) {
       if (session.user) {
         session.user.id = token.id as string;
+        session.user.platformRole = (token.platformRole as typeof session.user.platformRole) ?? null;
         session.user.memberships = token.memberships as typeof session.user.memberships;
         session.user.tenantId = token.tenantId as string | null;
         session.user.role = token.role as typeof session.user.role;

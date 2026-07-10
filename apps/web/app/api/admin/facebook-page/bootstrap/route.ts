@@ -2,11 +2,10 @@ import { NextResponse } from "next/server";
 import { auth } from "../../../../../lib/auth";
 import { prisma } from "../../../../../lib/prisma";
 import { decryptJson, encryptJson } from "../../../../../lib/token-vault";
+import { hasCanonicalTenantAccess } from "../../../../../lib/role-model";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
-
-const ADMIN_ROLES = ["SUPER_ADMIN", "TENANT_ADMIN", "OWNER", "ADMIN"];
 
 function formatMetaError(resJson: unknown, status: number): string {
   const err = (resJson as Record<string, unknown>)?.error as Record<string, unknown> | undefined;
@@ -25,13 +24,6 @@ export async function POST(req: Request) {
   const session = await auth();
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
-  const isAdmin = session.user.memberships?.some(
-    (m: { role: string }) => ADMIN_ROLES.includes(m.role)
-  );
-  if (!isAdmin) {
-    return NextResponse.json({ error: "Forbidden: admin role required" }, { status: 403 });
   }
 
   const body = await req.json().catch(() => null);
@@ -68,6 +60,14 @@ export async function POST(req: Request) {
 
   if (!tenant) {
     return NextResponse.json({ error: "Tenant not found", ok: false }, { status: 404 });
+  }
+
+  const membership = await prisma.membership.findFirst({
+    where: { tenantId: tenant.id, userId: session.user.id },
+    select: { role: true },
+  });
+  if (!hasCanonicalTenantAccess(session.user.platformRole, membership?.role, ["TENANT_ADMIN"])) {
+    return NextResponse.json({ error: "Forbidden: admin role required" }, { status: 403 });
   }
 
   const requiredScopes = ["pages_show_list", "pages_read_engagement", "pages_manage_posts"];

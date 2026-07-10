@@ -5,7 +5,7 @@ import { translateError } from "../error-messages";
 describe("error-messages", () => {
   it("translates LAST_OWNER", () => {
     const msg = translateError("LAST_OWNER", "fallback");
-    assert.ok(msg.includes("ultimo OWNER"));
+    assert.ok(msg.includes("ultimo Tenant Admin"));
     assert.ok(msg.includes("cambiar el rol"));
   });
 

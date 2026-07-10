@@ -2,10 +2,9 @@ import { NextResponse } from "next/server";
 import { auth } from "../../../lib/auth";
 import { prisma } from "../../../lib/prisma";
 import { auditLog } from "../../../lib/audit";
+import { hasCanonicalTenantAccess } from "../../../lib/role-model";
 
 export const dynamic = "force-dynamic";
-
-const CAMPAIGN_ROLES = ["OWNER", "ADMIN", "SUPER_ADMIN", "TENANT_ADMIN"];
 
 export async function GET(req: Request) {
   const session = await auth();
@@ -29,7 +28,7 @@ export async function GET(req: Request) {
     where: { tenantId: tenant.id, userId: session.user.id },
     select: { role: true },
   });
-  if (!membership || !CAMPAIGN_ROLES.includes(membership.role)) {
+  if (!hasCanonicalTenantAccess(session.user.platformRole, membership?.role, ["TENANT_ADMIN", "PUBLISHER"])) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
@@ -81,7 +80,7 @@ export async function POST(req: Request) {
     where: { tenantId: tenant.id, userId: session.user.id },
     select: { role: true },
   });
-  if (!membership || ![...CAMPAIGN_ROLES, "STRATEGIST"].includes(membership.role)) {
+  if (!hasCanonicalTenantAccess(session.user.platformRole, membership?.role, ["TENANT_ADMIN", "PUBLISHER"])) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 

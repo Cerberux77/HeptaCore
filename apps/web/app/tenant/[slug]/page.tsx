@@ -13,6 +13,7 @@ import {
   getTenantAssets,
 } from "../../../lib/dashboard";
 import { prisma } from "../../../lib/prisma";
+import { isPlatformSuperAdmin } from "../../../lib/role-model";
 import { getTrialStatus } from "../../../lib/trial";
 
 export const dynamic = "force-dynamic";
@@ -32,14 +33,16 @@ export default async function TenantPage({
   });
   if (!tenant) notFound();
 
+  const isGlobalAdmin = isPlatformSuperAdmin(session.user.platformRole);
+
   const membership = await prisma.membership.findFirst({
     where: {
       userId: session.user.id,
-      OR: [{ tenantId: tenant.id }, { role: "SUPER_ADMIN" }],
+      tenantId: tenant.id,
     },
     select: { role: true },
   });
-  if (!membership) redirect(tenantAccessRequiredHref(slug));
+  if (!membership && !isGlobalAdmin) redirect(tenantAccessRequiredHref(slug));
 
   const [metrics, queue, assets, strategy, calendar, checklist, report, readiness] = await Promise.all([
     getDashboardMetrics(slug),
@@ -53,8 +56,6 @@ export default async function TenantPage({
   ]);
 
   if (!metrics) notFound();
-
-  const isGlobalAdmin = membership.role === "SUPER_ADMIN";
 
   const trial = await getTrialStatus(metrics.tenant.id);
 
