@@ -12,7 +12,8 @@ describe("recover route reset-link guard", () => {
   it("requires explicit HEPTACORE_EXPOSE_RESET_LINKS=1 to expose resetLink", () => {
     const source = readFileSync(routePath, "utf8");
     assert.match(source, /HEPTACORE_EXPOSE_RESET_LINKS === "1"/);
-    assert.match(source, /if \(!user \|\| !canExposeResetLinks\(\)\) \{\s*return NextResponse\.json\(\{ ok: true \}\);/m);
+    assert.match(source, /const debugResetLink = canExposeResetLinks\(\) && result\.token/);
+    assert.match(source, /\.\.\.\(debugResetLink \? \{ debugResetLink \} : \{\}\)/);
   });
 
   it("does not allow preview alone to expose resetLink", () => {
