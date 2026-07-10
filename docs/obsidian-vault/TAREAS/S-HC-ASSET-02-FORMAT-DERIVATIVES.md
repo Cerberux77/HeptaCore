@@ -4,9 +4,9 @@ type: task-runtime
 project: "HeptaCore"
 task_id: "S-HC-ASSET-02-FORMAT-DERIVATIVES"
 sprint: "assets"
-status: "ready_for_integration"
+status: "integrated"
 owner: "Manuel"
-last_updated: "2026-07-01T20:31:05.696Z"
+last_updated: "2026-07-04T05:39:30.129Z"
 source: "var/oreshnik/tasks/S-HC-ASSET-02-FORMAT-DERIVATIVES.json"
 ---
 
@@ -18,7 +18,7 @@ Format derivatives: badge interaction, format preview, intelligent crop, safe zo
 
 ## Runtime
 
-- estado: `ready_for_integration`
+- estado: `integrated`
 - owner: `Manuel`
 - backup: `Manuel`
 - intentos: `1`
@@ -62,17 +62,25 @@ Format derivatives: badge interaction, format preview, intelligent crop, safe zo
 
 | Run | Operator | Mode | Task Status | Claim | Branch |
 |---|---|---|---|---|---|
-| run-manuel-S-HC-ASSET-02-FORMAT-DERIVATIVES-20260701070057-4b417034 | manuel | codex | ready_for_integration | released | dispatch/manuel/manuel-codex2/assets/S-HC-ASSET-02-FORMAT-DERIVATIVES/396dfc38dd |
+| run-manuel-S-HC-ASSET-02-FORMAT-DERIVATIVES-20260701070057-4b417034 | manuel | codex | integrated | released | dispatch/manuel/manuel-codex2/assets/S-HC-ASSET-02-FORMAT-DERIVATIVES/396dfc38dd |
 
 ## Integracion
 
 - run: `run-manuel-S-HC-ASSET-02-FORMAT-DERIVATIVES-20260701070057-4b417034`
-- estado: `queued`
+- estado: `integrated`
 - madre: `MADRE/v54-assets-asset-02-validated-partial-delivery-2026-07-01`
 - source: `dispatch/manuel/manuel-codex2/assets/S-HC-ASSET-02-FORMAT-DERIVATIVES/396dfc38dd`
+- target: `MADRE/v54-assets-asset-02-validated-partial-delivery-2026-07-01`
 
 ## Train Mas Reciente
 
-- Ninguno
+- intento: `train-run-manuel-S-HC-ASSET-02-FORMAT-DERIVATIVES-2026-1782940057654`
+- run: `run-manuel-S-HC-ASSET-02-FORMAT-DERIVATIVES-20260701070057-4b417034`
+- source: `dispatch/manuel/manuel-codex2/assets/S-HC-ASSET-02-FORMAT-DERIVATIVES/396dfc38dd`
+- target: `MADRE/v54-assets-asset-02-validated-partial-delivery-2026-07-01`
+- branch: `integration-train/assets/S-HC-ASSET-02-FORMAT-DER/r-5cdcee7b964f/a-98f25f84692b`
+- estado: `succeeded`
+- advance: `runtime_projection_confirmed`
+- reason: Already contained on MADRE/v54-assets-asset-02-validated-partial-delivery-2026-07-01; runtime reconciled without merge
 
 <!-- ORESHNIK:GENERATED:END -->

@@ -1,0 +1,57 @@
+{
+  "project": "HeptaCore",
+  "sprint": "publishing",
+  "motherBranch": "MADRE/v55-publishing-meta-reels-stories-publishers-2026-07-04",
+  "lockKey": "integration-train/MADRE/v55-publishing-meta-reels-stories-publishers-2026-07-04",
+  "createdAt": "2026-07-04T05:55:21.333Z",
+  "updatedAt": "2026-07-04T05:59:02.611Z",
+  "results": [
+    {
+      "attemptId": "train-run-manuel-S-HC-PUB-06-REELS-STORIES-PUBLISHERS--1783144521333",
+      "taskId": "S-HC-PUB-06-REELS-STORIES-PUBLISHERS",
+      "runId": "run-manuel-S-HC-PUB-06-REELS-STORIES-PUBLISHERS-20260704050056-dbcefd7d",
+      "sourceBranch": "dispatch/manuel/manuel-codex3/publishing/S-HC-PUB-06-REELS-STORIES-PUBLISHERS/57a46a194e",
+      "targetBranch": "MADRE/v55-publishing-meta-reels-stories-publishers-2026-07-04",
+      "integrationBranch": "integration-train/publishing/S-HC-PUB-06-REELS-STORIE/r-e3111e9a8532/a-d7ca244ca84e",
+      "operator": "manuel",
+      "lockKey": "integration-train/MADRE/v55-publishing-meta-reels-stories-publishers-2026-07-04",
+      "startedAt": "2026-07-04T05:55:21.333Z",
+      "status": "succeeded",
+      "completedAt": "2026-07-04T05:59:02.611Z",
+      "reason": "Already contained on MADRE/v55-publishing-meta-reels-stories-publishers-2026-07-04; runtime reconciled without merge",
+      "gateResults": [
+        {
+          "name": "typecheck",
+          "passed": true
+        },
+        {
+          "name": "build",
+          "passed": true
+        },
+        {
+          "name": "worker",
+          "passed": true
+        },
+        {
+          "name": "tests",
+          "passed": true
+        }
+      ],
+      "outcome": {
+        "mergeBase": "033c4ffc6805edcffbf667eab5126c04cf00ed5f",
+        "changedFiles": [],
+        "compatibilityBranchPushed": false,
+        "deliveryDisposition": "already_contained",
+        "projectedMotherBranch": "MADRE/v55-publishing-meta-reels-stories-publishers-2026-07-04",
+        "motherAdvanceState": "runtime_projection_confirmed",
+        "motherFunctionalExpectedCommit": "8a5690c0855d36f0ff0042989227eec5a8bd1eaf",
+        "motherFunctionalRemoteCommit": "8a5690c0855d36f0ff0042989227eec5a8bd1eaf",
+        "motherFunctionalPushVerified": true,
+        "motherFunctionalPushReconciled": false,
+        "projectedTaskStatus": "integrated",
+        "projectedRunStatus": "integrated",
+        "projectedSprintEntryStatus": "integrated"
+      }
+    }
+  ]
+}

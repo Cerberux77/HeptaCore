@@ -4,9 +4,9 @@ type: task-runtime
 project: "HeptaCore"
 task_id: "S-HC-PUB-06-REELS-STORIES-PUBLISHERS"
 sprint: "publishing"
-status: "ready"
+status: "ready_for_integration"
 owner: "Manuel"
-last_updated: "2026-07-01T20:31:05.696Z"
+last_updated: "2026-07-04T05:39:30.129Z"
 source: "var/oreshnik/tasks/S-HC-PUB-06-REELS-STORIES-PUBLISHERS.json"
 ---
 
@@ -18,11 +18,11 @@ Real publishing for Meta Reels and Stories: Instagram + Facebook
 
 ## Runtime
 
-- estado: `ready`
+- estado: `ready_for_integration`
 - owner: `Manuel`
 - backup: `Manuel`
-- intentos: `0`
-- handoff: -
+- intentos: `1`
+- handoff: docs/07_handoffs/S-HC-PUB-06-REELS-STORIES-PUBLISHERS.md
 
 ## Dependencias
 
@@ -62,11 +62,14 @@ Real publishing for Meta Reels and Stories: Instagram + Facebook
 
 | Run | Operator | Mode | Task Status | Claim | Branch |
 |---|---|---|---|---|---|
-| Ninguno | - | - | - | - | - |
+| run-manuel-S-HC-PUB-06-REELS-STORIES-PUBLISHERS-20260704050056-dbcefd7d | manuel | codex | ready_for_integration | released | dispatch/manuel/manuel-codex3/publishing/S-HC-PUB-06-REELS-STORIES-PUBLISHERS/57a46a194e |
 
 ## Integracion
 
-- Ninguna
+- run: `run-manuel-S-HC-PUB-06-REELS-STORIES-PUBLISHERS-20260704050056-dbcefd7d`
+- estado: `queued`
+- madre: `MADRE/v55-publishing-meta-reels-stories-publishers-2026-07-04`
+- source: `dispatch/manuel/manuel-codex3/publishing/S-HC-PUB-06-REELS-STORIES-PUBLISHERS/57a46a194e`
 
 ## Train Mas Reciente
 

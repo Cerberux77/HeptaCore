@@ -2,23 +2,47 @@ import { afterEach, describe, it } from "node:test";
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
 import { existsSync, mkdtempSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
+import { createRequire } from "node:module";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
+const require = createRequire(import.meta.url);
 const REPO_ROOT = join(__dirname, "..", "..", "..");
-const ORESHNIK_CLI = join(REPO_ROOT, "node_modules", "oreshnik-cli", "dist", "cli.js");
+const ORESHNIK_PACKAGE = require.resolve("oreshnik-cli/package.json");
+const ORESHNIK_CLI = join(dirname(ORESHNIK_PACKAGE), "dist", "cli.js");
 const GOAL_RUNNER = join(REPO_ROOT, "scripts", "goal-runner", "run.mjs");
 const GOAL_RUNNER_SCHEMA = readFileSync(join(REPO_ROOT, "scripts", "goal-runner", "schema.json"), "utf8");
 const tempRoots = [];
+
+function sleep(ms) {
+  Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, ms);
+}
+
+function removeTreeWithRetry(path) {
+  const attempts = 8;
+  for (let attempt = 0; attempt < attempts; attempt++) {
+    try {
+      rmSync(path, { recursive: true, force: true });
+      return;
+    } catch (error) {
+      if (!(error instanceof Error) || !("code" in error)) throw error;
+      const code = error.code;
+      if ((code !== "EPERM" && code !== "EBUSY" && code !== "ENOTEMPTY") || attempt === attempts - 1) {
+        throw error;
+      }
+      sleep(150 * (attempt + 1));
+    }
+  }
+}
 
 describe("Oreshnik synthetic end-to-end smoke", () => {
   afterEach(() => {
     while (tempRoots.length > 0) {
       const path = tempRoots.pop();
       if (!path) continue;
-      rmSync(path, { recursive: true, force: true });
+      removeTreeWithRetry(path);
     }
   });
 

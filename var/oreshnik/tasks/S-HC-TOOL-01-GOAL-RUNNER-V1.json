@@ -8,7 +8,7 @@
   "owner": "Manuel",
   "backupOwner": "Manuel",
   "status": "integrated",
-  "taskBoardPath": "D:\\PROYECTOS\\WORKTREES\\HC_ASSET02_STATE_REPAIR\\var\\oreshnik\\task-board.json",
+  "taskBoardPath": "D:\\PROYECTOS\\PROYECTOS VISUAL STUDIO\\HeptaCore\\var\\oreshnik\\task-board.json",
   "zone": [
     "scripts/goal-runner/**",
     "var/goal-runner/**",
@@ -107,7 +107,7 @@
       "description": "Integrated kilo/s-hc-tool-01-goal-runner-v1 into MADRE/v50-s-hc-tool-01-goal-runner-v1-goal-runner-v1-deterministic-state-machine-locks-2026-06-29"
     }
   ],
-  "updatedAt": "2026-07-01T20:31:05.696Z",
+  "updatedAt": "2026-07-04T05:39:30.129Z",
   "runs": [
     {
       "runId": "kilo-S-HC-TOOL-01-GOAL-RUNNER-V1-2026-06-29T02-07-54-626Z-6c79c9a6",

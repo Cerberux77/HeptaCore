@@ -3,12 +3,12 @@
   "taskId": "S-HC-INBOX-01-UNIFIED-ENGAGEMENT",
   "sprint": "engagement",
   "sprintOrderIndex": 13,
-  "taskOrderIndex": 17,
+  "taskOrderIndex": 18,
   "title": "Unified engagement inbox: read and respond to messages and comments",
   "owner": "Manuel",
   "backupOwner": "Manuel",
   "status": "blocked",
-  "taskBoardPath": "D:\\PROYECTOS\\WORKTREES\\HC_ASSET02_STATE_REPAIR\\var\\oreshnik\\task-board.json",
+  "taskBoardPath": "D:\\PROYECTOS\\PROYECTOS VISUAL STUDIO\\HeptaCore\\var\\oreshnik\\task-board.json",
   "zone": [
     "apps/web/components",
     "apps/web/app/api",
@@ -31,6 +31,6 @@
       "description": "Task status reconciled to blocked: dependency S-HC-AN-01-CAMPAIGN-PERFORMANCE still pending (S-HC-AN-01-CAMPAIGN-PERFORMANCE:pending)"
     }
   ],
-  "updatedAt": "2026-07-01T20:31:05.696Z",
+  "updatedAt": "2026-07-04T05:39:30.129Z",
   "runs": []
 }

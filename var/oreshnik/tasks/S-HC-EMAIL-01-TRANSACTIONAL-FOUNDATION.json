@@ -3,12 +3,12 @@
   "taskId": "S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION",
   "sprint": "email-infra",
   "sprintOrderIndex": 12,
-  "taskOrderIndex": 16,
+  "taskOrderIndex": 17,
   "title": "Transactional email foundation: domain sender, DNS, reputation, provider integration",
   "owner": "Jean",
   "backupOwner": "Manuel",
   "status": "pending",
-  "taskBoardPath": "D:\\PROYECTOS\\WORKTREES\\HC_ASSET02_STATE_REPAIR\\var\\oreshnik\\task-board.json",
+  "taskBoardPath": "D:\\PROYECTOS\\PROYECTOS VISUAL STUDIO\\HeptaCore\\var\\oreshnik\\task-board.json",
   "zone": [
     "apps/web/app/api/email",
     "packages/core",
@@ -22,6 +22,6 @@
     "Webhooks de eventos (delivered, bounced, complained) configurados",
     "Enlaces comerciales y de marca consistentes con el dominio final"
   ],
-  "updatedAt": "2026-07-01T20:31:05.696Z",
+  "updatedAt": "2026-07-04T05:39:30.129Z",
   "runs": []
 }

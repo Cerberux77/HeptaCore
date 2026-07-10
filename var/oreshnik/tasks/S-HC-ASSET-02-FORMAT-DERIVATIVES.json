@@ -8,7 +8,7 @@
   "owner": "Manuel",
   "backupOwner": "Manuel",
   "status": "integrated",
-  "taskBoardPath": "D:\\PROYECTOS\\WORKTREES\\HC_ASSET02_STATE_REPAIR\\var\\oreshnik\\task-board.json",
+  "taskBoardPath": "D:\\PROYECTOS\\PROYECTOS VISUAL STUDIO\\HeptaCore\\var\\oreshnik\\task-board.json",
   "zone": [
     "apps/web/components",
     "packages/core",
@@ -267,7 +267,7 @@
       "summary": "S-HC-ASSET-02-FORMAT-DERIVATIVES:worker | exit=0 | timed_ok | signal=none | stdout=> heptacore@0.1.0 worker:validate | stderr=[config] .env.rrss no encontrado. Usando solo variables de entorno del sistema."
     }
   ],
-  "updatedAt": "2026-07-01T21:10:33.990Z",
+  "updatedAt": "2026-07-04T05:39:30.129Z",
   "runs": [
     {
       "runId": "run-manuel-S-HC-ASSET-02-FORMAT-DERIVATIVES-20260701070057-4b417034",

@@ -3,12 +3,12 @@
   "taskId": "S-HC-ONB-02-GAP-RESOLUTION-WIZARD",
   "sprint": "onboarding",
   "sprintOrderIndex": 15,
-  "taskOrderIndex": 20,
+  "taskOrderIndex": 21,
   "title": "Gap resolution wizard: dynamic form to resolve missing or conflicting data",
   "owner": "Manuel",
   "backupOwner": "Manuel",
   "status": "blocked",
-  "taskBoardPath": "D:\\PROYECTOS\\WORKTREES\\HC_ASSET02_STATE_REPAIR\\var\\oreshnik\\task-board.json",
+  "taskBoardPath": "D:\\PROYECTOS\\PROYECTOS VISUAL STUDIO\\HeptaCore\\var\\oreshnik\\task-board.json",
   "zone": [
     "apps/web/components",
     "packages/core"
@@ -30,6 +30,6 @@
       "description": "Task status reconciled to blocked: dependency S-HC-ONB-01-MASTER-BRIEF-INGESTION still pending (S-HC-ONB-01-MASTER-BRIEF-INGESTION:pending)"
     }
   ],
-  "updatedAt": "2026-07-01T20:31:05.696Z",
+  "updatedAt": "2026-07-04T05:39:30.129Z",
   "runs": []
 }

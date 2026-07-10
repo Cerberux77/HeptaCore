@@ -3,12 +3,12 @@
   "taskId": "S-HC-TEN-02-CEPEG-ONBOARDING",
   "sprint": "tenant-onboarding",
   "sprintOrderIndex": 25,
-  "taskOrderIndex": 37,
+  "taskOrderIndex": 38,
   "title": "CEPEG tenant onboarding: brand, assets, network configuration",
   "owner": "Manuel",
   "backupOwner": "Manuel",
   "status": "blocked",
-  "taskBoardPath": "D:\\PROYECTOS\\WORKTREES\\HC_ASSET02_STATE_REPAIR\\var\\oreshnik\\task-board.json",
+  "taskBoardPath": "D:\\PROYECTOS\\PROYECTOS VISUAL STUDIO\\HeptaCore\\var\\oreshnik\\task-board.json",
   "zone": [
     "examples/tenants/cepeg",
     "apps/web",
@@ -36,6 +36,6 @@
       "description": "Task status reconciled to blocked: dependency S-HC-OPS-01-CAMPAIGN-REVIEW-DEPLOYMENT still pending (S-HC-OPS-01-CAMPAIGN-REVIEW-DEPLOYMENT:pending) | dependency S-HC-COMM-02-BILLING-ACTIVATION still pending (S-HC-COMM-02-BILLING-ACTIVATION:pending) | dependency S-HC-ONB-02-GAP-RESOLUTION-WIZARD still pending (S-HC-ONB-02-GAP-RESOLUTION-WIZARD:pending) | dependency S-HC-STRAT-02-CONTENT-CALENDAR-BLUEPRINT still pending (S-HC-STRAT-02-CONTENT-CALENDAR-BLUEPRINT:pending) | dependency S-HC-ASSET-01-STRATEGY-ASSET-MANIFEST still pending (S-HC-ASSET-01-STRATEGY-ASSET-MANIFEST:pending)"
     }
   ],
-  "updatedAt": "2026-07-01T20:31:05.696Z",
+  "updatedAt": "2026-07-04T05:39:30.129Z",
   "runs": []
 }

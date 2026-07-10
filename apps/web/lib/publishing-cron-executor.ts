@@ -416,6 +416,7 @@ async function processJob(
       targetId: credential.targetId,
       accessToken: credential.accessToken,
       caption: ctx.draft?.caption ?? ctx.draft?.title ?? "",
+      format: ctx.draft?.format ?? "",
       mediaUrl,
       mediaType: mediaAsset ? (mediaAsset.kind === "VIDEO" ? "VIDEO" : "IMAGE") : undefined,
     });

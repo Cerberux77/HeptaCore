@@ -6,7 +6,7 @@ task_id: "S-HC-OPS-01-CAMPAIGN-REVIEW-DEPLOYMENT"
 sprint: "operations"
 status: "blocked"
 owner: "Manuel"
-last_updated: "2026-07-01T20:31:05.696Z"
+last_updated: "2026-07-04T05:39:30.129Z"
 source: "var/oreshnik/tasks/S-HC-OPS-01-CAMPAIGN-REVIEW-DEPLOYMENT.json"
 ---
 

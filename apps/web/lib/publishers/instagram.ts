@@ -6,7 +6,7 @@ const capabilities: PublisherCapabilities = {
   image: true,
   video: true,
   carousel: false,
-  story: false,
+  story: true,
   reels: true,
   scheduling: false,
 };
@@ -17,6 +17,7 @@ async function publishViaInstagram(input: PublishInput): Promise<PublishResult> 
     accessToken: input.accessToken,
     mediaUrl: input.mediaUrl!,
     caption: input.caption,
+    format: input.format,
     mediaType: input.mediaType,
   });
 
@@ -31,5 +32,6 @@ export const instagramPublisher: Publisher = {
   capabilities,
   credentialLabel: "instagram_oauth",
   requiredScopes: ["instagram_business_content_publish"],
+  supportedFormats: ["INSTAGRAM_FEED", "INSTAGRAM_STORY", "INSTAGRAM_REEL"],
   publish: publishViaInstagram,
 };

@@ -3,12 +3,12 @@
   "taskId": "S-HC-PROD-02",
   "sprint": "production-infra",
   "sprintOrderIndex": 19,
-  "taskOrderIndex": 24,
+  "taskOrderIndex": 25,
   "title": "Production DB/Auth/env and Turpial seed smoke",
   "owner": "Jean",
   "backupOwner": "Manuel",
   "status": "done",
-  "taskBoardPath": "D:\\PROYECTOS\\WORKTREES\\HC_ASSET02_STATE_REPAIR\\var\\oreshnik\\task-board.json",
+  "taskBoardPath": "D:\\PROYECTOS\\PROYECTOS VISUAL STUDIO\\HeptaCore\\var\\oreshnik\\task-board.json",
   "zone": [
     "docs",
     "scripts",
@@ -54,6 +54,6 @@
       "reason": "User-directed reassignment to maximize parallel closeout."
     }
   ],
-  "updatedAt": "2026-07-01T20:31:05.696Z",
+  "updatedAt": "2026-07-04T05:39:30.129Z",
   "runs": []
 }
