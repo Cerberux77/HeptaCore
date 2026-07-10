@@ -3,12 +3,12 @@
   "taskId": "S-HC-PUB-07-YOUTUBE-PUBLISHING",
   "sprint": "publishing",
   "sprintOrderIndex": 20,
-  "taskOrderIndex": 28,
+  "taskOrderIndex": 29,
   "title": "Real publishing for YouTube: Video 16:9 and YouTube Shorts",
   "owner": "Manuel",
   "backupOwner": "Manuel",
   "status": "ready",
-  "taskBoardPath": "D:\\PROYECTOS\\WORKTREES\\HC_ASSET02_STATE_REPAIR\\var\\oreshnik\\task-board.json",
+  "taskBoardPath": "D:\\PROYECTOS\\WORKTREES\\HeptaCore_ORESHNIK_READY\\var\\oreshnik\\wt\\32305cad03d6321a\\manuel\\manuel-kilo8\\publishing\\S-HC-PUB-07-YOUTUBE-PUBLISHING\\0235fe3455\\var\\oreshnik\\task-board.json",
   "zone": [
     "apps/web/lib/publishers",
     "apps/web/app/api/publishing",
@@ -27,14 +27,403 @@
     "Reutilizacion de transactional finalization y IN_REVIEW state machine",
     "Cero declaracion de soporte hasta validacion real"
   ],
+  "handoff": "docs/07_handoffs/S-HC-PUB-07-YOUTUBE-PUBLISHING.md",
+  "attempts": 1,
   "history": [
     {
       "at": "2026-06-28T18:47:05.091Z",
       "action": "status_reconciled",
       "operator": "manuel",
       "description": "Task status reconciled to ready: dependencies and conflicts are clear for execution"
+    },
+    {
+      "at": "2026-07-06T07:22:42.209Z",
+      "action": "claimed",
+      "operator": "manuel",
+      "branch": "dispatch/manuel/manuel-kilo8/publishing/S-HC-PUB-07-YOUTUBE-PUBLISHING/0235fe3455",
+      "description": "Run run-manuel-S-HC-PUB-07-YOUTUBE-PUBLISHING-20260706072216-381f66dc claimed via kilo"
+    },
+    {
+      "at": "2026-07-08T07:03:12.241Z",
+      "action": "validation_started",
+      "operator": "manuel",
+      "branch": "dispatch/manuel/manuel-kilo8/publishing/S-HC-PUB-07-YOUTUBE-PUBLISHING/0235fe3455",
+      "description": "Gates 4/4 (typecheck/build/worker/tests); Vercel Preview green; YouTube provider+persistence+dry-run+gate; live BLOCKED_EXTERNAL_LIVE"
+    },
+    {
+      "at": "2026-07-08T07:14:19.631Z",
+      "action": "validated",
+      "operator": "manuel",
+      "branch": "dispatch/manuel/manuel-kilo8/publishing/S-HC-PUB-07-YOUTUBE-PUBLISHING/0235fe3455",
+      "description": "PR #6 head 7367b6c; gates 4/4 green; Vercel Preview SUCCESS; manual QA reconciled; live BLOCKED_EXTERNAL_LIVE; typecheck passed; build passed; worker passed; tests passed"
+    },
+    {
+      "at": "2026-07-08T07:14:19.631Z",
+      "action": "ready_for_integration",
+      "operator": "manuel",
+      "branch": "dispatch/manuel/manuel-kilo8/publishing/S-HC-PUB-07-YOUTUBE-PUBLISHING/0235fe3455",
+      "description": "Task delivered with handoff docs/07_handoffs/S-HC-PUB-07-YOUTUBE-PUBLISHING.md"
+    },
+    {
+      "at": "2026-07-08T07:17:14.376Z",
+      "action": "claim_released",
+      "operator": "manuel",
+      "description": "Run run-manuel-S-HC-PUB-07-YOUTUBE-PUBLISHING-20260706072216-381f66dc released"
     }
   ],
-  "updatedAt": "2026-07-01T20:31:05.696Z",
-  "runs": []
+  "validationGateResults": [
+    {
+      "gateId": "typecheck",
+      "command": "npm",
+      "args": [
+        "run",
+        "typecheck"
+      ],
+      "cwd": "D:\\PROYECTOS\\WORKTREES\\HeptaCore_ORESHNIK_READY\\var\\oreshnik\\wt\\32305cad03d6321a\\manuel\\manuel-kilo8\\publishing\\S-HC-PUB-07-YOUTUBE-PUBLISHING\\0235fe3455",
+      "startedAt": "2026-07-08T07:10:28.447Z",
+      "finishedAt": "2026-07-08T07:10:40.775Z",
+      "durationMs": 12328,
+      "exitCode": 0,
+      "signal": null,
+      "timedOut": false,
+      "spawnError": null,
+      "stdout": "\n> heptacore@0.1.0 typecheck\n> npm run typecheck --workspaces --if-present\n\n\n> @heptacore/web@0.1.0 typecheck\n> tsc --noEmit\n\n\n> @heptacore/worker@0.2.0 typecheck\n> tsc --noEmit\n\n\n> @heptacore/agents@0.1.0 typecheck\n> tsc --noEmit\n\n\n> @heptacore/core@0.1.0 typecheck\n> tsc --noEmit\n\n\n> @heptacore/db@0.1.0 typecheck\n> tsc --noEmit\n\n\n> @heptacore/integrations@0.1.0 typecheck\n> tsc --noEmit\n\n\n> @heptacore/ui@0.1.0 typecheck\n> tsc --noEmit\n\n",
+      "stderr": "",
+      "passed": true,
+      "attempt": 1,
+      "commandFingerprint": "c6307c1ddc8309d7ecb2c20c5723aea73c6803246d82759b03392f3298890fad",
+      "resultFingerprint": "6fd4271b4ce4e83eaa07db9db7ca427ae58716c64df1b1095091814316154a0c",
+      "stdoutBytes": 440,
+      "stderrBytes": 0,
+      "stdoutTruncated": false,
+      "stderrTruncated": false
+    },
+    {
+      "gateId": "build",
+      "command": "npm",
+      "args": [
+        "run",
+        "build"
+      ],
+      "cwd": "D:\\PROYECTOS\\WORKTREES\\HeptaCore_ORESHNIK_READY\\var\\oreshnik\\wt\\32305cad03d6321a\\manuel\\manuel-kilo8\\publishing\\S-HC-PUB-07-YOUTUBE-PUBLISHING\\0235fe3455",
+      "startedAt": "2026-07-08T07:10:40.776Z",
+      "finishedAt": "2026-07-08T07:11:38.968Z",
+      "durationMs": 58192,
+      "exitCode": 0,
+      "signal": null,
+      "timedOut": false,
+      "spawnError": null,
+      "stdout": "\n> heptacore@0.1.0 build\n> npm run build --workspaces --if-present\n\n\n> @heptacore/web@0.1.0 build\n> node scripts/copy-tenant-assets.mjs && prisma generate --schema ../../packages/db/prisma/schema.prisma && next build --webpack\n\n[copy-tenant-assets] Turpial assets copied to D:\\PROYECTOS\\WORKTREES\\HeptaCore_ORESHNIK_READY\\var\\oreshnik\\wt\\32305cad03d6321a\\manuel\\manuel-kilo8\\publishing\\S-HC-PUB-07-YOUTUBE-PUBLISHING\\0235fe3455\\apps\\web\\public\\tenant-assets\\turpial\n\n✔ Generated Prisma Client (v7.8.0) to .\\..\\..\\node_modules\\@prisma\\client in 571ms\n\nStart by importing your Prisma Client (See: https://pris.ly/d/importing-client)\n\n\n▲ Next.js 16.2.9 (webpack)\n\n  Creating an optimized production build ...\n✓ Compiled successfully in 7.5s\n  Running TypeScript ...\n  Finished TypeScript in 12.0s ...\n  Collecting page data using 7 workers ...\n  Generating static pages using 7 workers (0/27) ...\n  Generating static pages using 7 workers (6/27) \r\n  Generating static pages using 7 workers (13/27) \r\n  Generating static pages using 7 workers (20/27) \r\n✓ Generating static pages using 7 workers (27/27) in 2.6s\n  Finalizing page optimization ...\n  Collecting build traces ...\n\nRoute (app)\n┌ ƒ /\n├ ○ /_not-found\n├ ƒ /accept-invitation\n├ ƒ /access-required\n├ ƒ /admin\n├ ƒ /admin/tenants\n├ ƒ /admin/tenants/[slug]\n├ ƒ /admin/tenants/new\n├ ƒ /api/admin/capabilities\n├ ƒ /api/admin/facebook-page/bootstrap\n├ ƒ /api/admin/llm-config\n├ ƒ /api/admin/llm-governance\n├ ƒ /api/admin/llm-usage\n├ ƒ /api/admin/tenants\n├ ƒ /api/admin/tenants/[slug]\n├ ƒ /api/admin/tenants/[slug]/invitations\n├ ƒ /api/admin/tenants/[slug]/invitations/[id]\n├ ƒ /api/admin/tenants/[slug]/invitations/[id]/resend\n├ ƒ /api/admin/tenants/[slug]/members\n├ ƒ /api/admin/tenants/[slug]/members/[membershipId]\n├ ƒ /api/admin/tenants/[slug]/status\n├ ƒ /api/assets/[id]\n├ ƒ /api/assets/upload\n├ ƒ /api/assistant\n├ ƒ /api/auth/[...nextauth]\n├ ƒ /api/auth/recover\n├ ƒ /api/auth/register\n├ ƒ /api/auth/reset-password\n├ ƒ /api/campaigns\n├ ƒ /api/campaigns/[id]/approve\n├ ƒ /api/cron/publisher\n├ ƒ /api/drafts/[id]\n├ ƒ /api/drafts/[id]/approve\n├ ƒ /api/drafts/[id]/asset\n├ ƒ /api/drafts/[id]/reject\n├ ƒ /api/drafts/new\n├ ƒ /api/drafts/reorder\n├ ƒ /api/invitations\n├ ƒ /api/invitations/accept\n├ ƒ /api/oauth/facebook/callback\n├ ƒ /api/oauth/facebook/login\n├ ƒ /api/oauth/instagram/callback\n├ ƒ /api/oauth/instagram/login\n├ ƒ /api/publishing/publish\n├ ƒ /api/publishing/rollback\n├ ƒ /api/session/capabilities\n├ ƒ /api/strategy/generate\n├ ƒ /api/strategy/update\n├ ƒ /api/tenant-assets/[[...path]]\n├ ƒ /api/tenant-networks\n├ ƒ /api/tenants/[slug]/assets\n├ ƒ /api/tenants/[slug]/assets/[assetId]\n├ ƒ /api/tenants/[slug]/assets/[assetId]/content\n├ ƒ /api/tenants/[slug]/assets/[assetId]/content/upload\n├ ƒ /api/tenants/[slug]/assets/[assetId]/derivatives\n├ ƒ /api/tenants/[slug]/assets/by-storage-key\n├ ƒ /api/tenants/[slug]/assets/finalize\n├ ƒ /api/tenants/[slug]/assets/upload\n├ ƒ /api/webhooks/resend\n├ ƒ /app\n├ ○ /data-deletion\n├ ○ /icon.svg\n├ ○ /login\n├ ○ /privacy\n├ ○ /recover\n├ ○ /register\n├ ○ /reset-password\n├ ƒ /tenant/[slug]\n└ ○ /terms\n\n\nƒ Proxy (Middleware)\n\n○  (Static)   prerendered as static content\nƒ  (Dynamic)  server-rendered on demand\n\n",
+      "stderr": "Prisma schema loaded from ..\\..\\packages\\db\\prisma\\schema.prisma.\n⚠ Warning: Next.js inferred your workspace root, but it may not be correct.\n We detected multiple lockfiles and selected the directory of D:\\PROYECTOS\\WORKTREES\\HeptaCore_ORESHNIK_READY\\package-lock.json as the root directory.\n To silence this warning, set `outputFileTracingRoot` in your Next.js config, or consider removing one of the lockfiles if it's not needed.\n   See https://nextjs.org/docs/app/api-reference/config/next-config-js/output#caveats for more information.\n Detected additional lockfiles: \n   * D:\\PROYECTOS\\WORKTREES\\HeptaCore_ORESHNIK_READY\\var\\oreshnik\\wt\\32305cad03d6321a\\manuel\\manuel-kilo8\\publishing\\S-HC-PUB-07-YOUTUBE-PUBLISHING\\0235fe3455\\package-lock.json\n\n",
+      "passed": true,
+      "attempt": 1,
+      "commandFingerprint": "75991160a1a54c9eadfb676641cb105e2e8ba48dde8f819038a0ca6fd89a6a3a",
+      "resultFingerprint": "7b94cf4ee5c61240a5cc1a61d690d0c098526377efddabb3a71b2e7cb436e49b",
+      "stdoutBytes": 3426,
+      "stderrBytes": 754,
+      "stdoutTruncated": false,
+      "stderrTruncated": false
+    },
+    {
+      "gateId": "worker",
+      "command": "npm",
+      "args": [
+        "run",
+        "worker:validate"
+      ],
+      "cwd": "D:\\PROYECTOS\\WORKTREES\\HeptaCore_ORESHNIK_READY\\var\\oreshnik\\wt\\32305cad03d6321a\\manuel\\manuel-kilo8\\publishing\\S-HC-PUB-07-YOUTUBE-PUBLISHING\\0235fe3455",
+      "startedAt": "2026-07-08T07:11:38.968Z",
+      "finishedAt": "2026-07-08T07:11:40.488Z",
+      "durationMs": 1520,
+      "exitCode": 0,
+      "signal": null,
+      "timedOut": false,
+      "spawnError": null,
+      "stdout": "\n> heptacore@0.1.0 worker:validate\n> npm run validate -w @heptacore/worker\n\n\n> @heptacore/worker@0.2.0 validate\n> node src/validate.mjs\n\n\n=== Validacion de Assets ===\n\nPresentes: 46/46\n✅ Todos los assets presentes.\n\n\n=== Validacion de Cola de Publicaciones ===\nTotal entries: 29\n\n\n=== Resumen de Validacion ===\nValidos: 29/29\nAssets faltantes: 0\nFechas faltantes: 0\n\n✅ Todos los drafts validos.\n",
+      "stderr": "[config] .env.rrss no encontrado. Usando solo variables de entorno del sistema.\n",
+      "passed": true,
+      "attempt": 1,
+      "commandFingerprint": "104a87f9bca46d5df74805fdc54635c5ccbd06b6a345080ff90c2fd0cc110ac8",
+      "resultFingerprint": "13aa0c9e431eabdb3b2bbad4e6920e2f1a5f8817f1fb9f4e328bf4d1a783ae61",
+      "stdoutBytes": 399,
+      "stderrBytes": 80,
+      "stdoutTruncated": false,
+      "stderrTruncated": false
+    },
+    {
+      "gateId": "tests",
+      "command": "npm",
+      "args": [
+        "run",
+        "test"
+      ],
+      "cwd": "D:\\PROYECTOS\\WORKTREES\\HeptaCore_ORESHNIK_READY\\var\\oreshnik\\wt\\32305cad03d6321a\\manuel\\manuel-kilo8\\publishing\\S-HC-PUB-07-YOUTUBE-PUBLISHING\\0235fe3455",
+      "startedAt": "2026-07-08T07:11:40.488Z",
+      "finishedAt": "2026-07-08T07:14:19.151Z",
+      "durationMs": 158663,
+      "exitCode": 0,
+      "signal": null,
+      "timedOut": false,
+      "spawnError": null,
+      "stdout": "\n> heptacore@0.1.0 test\n> node --test apps/web/lib/calendar-state.test.mjs && npm run test:infra && npm run test --workspaces --if-present\n\n✔ calendar display state prefers operational state over approval status (1.2753ms)\nℹ tests 1\nℹ suites 0\nℹ pass 1\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 227.119\n\n> heptacore@0.1.0 test:infra\n> node --test scripts/goal-runner/__tests__/*.test.mjs scripts/oreshnik/__tests__/*.test.mjs\n\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\n▶ Doctor Command\n  ✔ reports healthy for empty clean worktree (192.0662ms)\n  ✔ detects stale lock when state status is not ACTIVE (277.7934ms)\n  ✔ detects stale lock when state file is missing (296.7029ms)\n  ✔ reports DOCTOR-I002 for valid lock and ACTIVE state (313.7046ms)\n  ✔ detects state validation failure (corrupt state) (286.7483ms)\n  ✔ detects index inconsistency (stale content hash) (228.8265ms)\n  ✔ detects index entry with no goal directory (214.0089ms)\n  ✔ detects resumable goals when no lock exists (176.84ms)\n  ✔ reports missing history directory as warning (158.4731ms)\n  ✔ reports missing schema file as error (102.8442ms)\n  ✔ resolveGateSpawn wraps npm in cmd.exe /c on Windows (0.3255ms)\n  ✔ resolveGateSpawn preserves non-aliased commands unchanged (1.8263ms)\n  ✔ resolveGateSpawn wraps aliased commands via cmd.exe /c on Windows (0.3255ms)\n✔ Doctor Command (2277.9034ms)\n▶ Evidence and Gates\n  ✔ complete fails without evidence (37.9071ms)\n  ✔ complete fails with wrong evidence type (5.0992ms)\n  ✔ evidence-add rejects sensitive paths (3.411ms)\n  ✔ evidence-add rejects absolute paths (2.5372ms)\n  ✔ evidence-add rejects non-existent file (1.6888ms)\n  ✔ evidence-add rejects directory (2.1843ms)\n  ✔ evidence-add rejects path traversal (2.509ms)\n  ✔ evidence-add accepts valid relative path and computes hash (14.7464ms)\n  ✔ validateGateIds rejects unknown gates (3.6753ms)\n  ✔ validateGateIds rejects non-array (0.6577ms)\n  ✔ setGates works for DRAFT and READY statuses (32.9725ms)\n  ✔ setGates rejects after ACTIVE (8.3091ms)\n  ✔ setGates rejects unknown gate IDs (2.9016ms)\n  ✔ setGates deduplicates while preserving order (24.1066ms)\n  ✔ validateEvidencePath rejects absolute paths (0.4053ms)\n✔ Evidence and Gates (172.4923ms)\n▶ ID Generation\n  ✔ generates valid goal IDs (6.2302ms)\n  ✔ generates 5000 IDs with same title without collisions (46.3275ms)\n  ✔ generates 5000 IDs with fixed timestamp without collisions (51.1228ms)\n  ✔ rejects path traversal in IDs (0.3578ms)\n  ✔ rejects Windows reserved characters (0.3766ms)\n  ✔ rejects control characters (0.2921ms)\n  ✔ rejects invalid goal ID format (0.2063ms)\n  ✔ sanitizeSlug handles edge cases (0.2329ms)\n  ✔ generated IDs contain no Windows-problematic chars (13.4075ms)\n  ✔ goal ID has 8 hex chars of entropy suffix (1.7673ms)\n✔ ID Generation (126.0568ms)\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nError: Worktree already locked by active goal: GR-20260708T071146Z-02be1267-first-active-goal\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nError: Cannot complete: No evidence submitted\nfatal: not a git repository (or any of the parent directories): .git\nfile:///D:/PROYECTOS/WORKTREES/HeptaCore_ORESHNIK_READY/var/oreshnik/wt/32305cad03d6321a/manuel/manuel-kilo8/publishing/S-HC-PUB-07-YOUTUBE-PUBLISHING/0235fe3455/scripts/goal-runner/lib.mjs:189\n  if (!check.valid) throw new Error(check.reason);\n                          ^\n\nError: Status COMPLETED is terminal and immutable\n    at applyTransition (file:///D:/PROYECTOS/WORKTREES/HeptaCore_ORESHNIK_READY/var/oreshnik/wt/32305cad03d6321a/manuel/manuel-kilo8/publishing/S-HC-PUB-07-YOUTUBE-PUBLISHING/0235fe3455/scripts/goal-runner/lib.mjs:189:27)\n    at cmdActivate (file:///D:/PROYECTOS/WORKTREES/HeptaCore_ORESHNIK_READY/var/oreshnik/wt/32305cad03d6321a/manuel/manuel-kilo8/publishing/S-HC-PUB-07-YOUTUBE-PUBLISHING/0235fe3455/scripts/goal-runner/run.mjs:183:3)\n    at file:///D:/PROYECTOS/WORKTREES/HeptaCore_ORESHNIK_READY/var/oreshnik/wt/32305cad03d6321a/manuel/manuel-kilo8/publishing/S-HC-PUB-07-YOUTUBE-PUBLISHING/0235fe3455/scripts/goal-runner/run.mjs:559:20\n    at ModuleJob.run (node:internal/modules/esm/module_job:439:25)\n    at async node:internal/modules/esm/loader:633:26\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5)\n\nNode.js v24.16.0\nError: Goal is not ACTIVE (current: COMPLETED)\n▶ Goal Runner CLI Integration\n  ✔ 1. create (681.3636ms)\n  ✔ 2. plan-record (255.7413ms)\n  ✔ 3. gates-set (441.4094ms)\n  ✔ 4. activate (370.0354ms)\n  ✔ 5. step-start and step-complete (390.3015ms)\n  ✔ 6. finding-add (193.2363ms)\n  ✔ 7. evidence-add (128.665ms)\n  ✔ 8. complete (122.501ms)\n  ✔ 9. resume from PAUSED (973.6052ms)\n  ✔ 10. second ACTIVE goal is rejected (1261.2879ms)\n  ✔ 11. stale lock detection (718.6962ms)\n  ✔ 12. complete is rejected without evidence (966.7336ms)\n  ✔ 13. terminal state is immutable after complete (309.5379ms)\n✔ Goal Runner CLI Integration (6837.4359ms)\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\n▶ Lock Exclusivity\n  ✔ readLock returns null when no lock exists (3.337ms)\n  ✔ stale lock on wrong worktreeRoot (2.6355ms)\n  ✔ stale lock on different branch (211.6183ms)\n  ✔ non-existent goal state makes lock stale (173.3184ms)\n  ✔ stale lock has invalid goalId format (1.3958ms)\n  ✔",
+      "stderr": "",
+      "passed": true,
+      "attempt": 1,
+      "commandFingerprint": "92e9b2322596c087538d1b785940bc9c70cb051221a89eeeb2d7a812dc7fbabb",
+      "resultFingerprint": "6e1eab1991503501a6a15f0526462535f0ba4966694dd8170cb91bf35c994fc0",
+      "stdoutBytes": 71155,
+      "stderrBytes": 0,
+      "stdoutTruncated": true,
+      "stderrTruncated": false
+    }
+  ],
+  "evidenceVerifications": [
+    {
+      "itemId": "build_passed",
+      "label": "build passed",
+      "verified": true,
+      "verifiedAt": "2026-07-08T07:11:38.968Z",
+      "runId": "run-manuel-S-HC-PUB-07-YOUTUBE-PUBLISHING-20260706072216-381f66dc",
+      "gateId": "build",
+      "source": "gate",
+      "commandFingerprint": "75991160a1a54c9eadfb676641cb105e2e8ba48dde8f819038a0ca6fd89a6a3a",
+      "resultFingerprint": "7b94cf4ee5c61240a5cc1a61d690d0c098526377efddabb3a71b2e7cb436e49b",
+      "summary": "S-HC-PUB-07-YOUTUBE-PUBLISHING:build | exit=0 | timed_ok | signal=none | stdout=> heptacore@0.1.0 build | stderr=Prisma schema loaded from ..\\..\\packages\\db\\prisma\\schema.prisma."
+    },
+    {
+      "itemId": "changed_files_diff",
+      "label": "changed files diff",
+      "verified": true,
+      "verifiedAt": "2026-07-08T07:14:19.186Z",
+      "runId": "run-manuel-S-HC-PUB-07-YOUTUBE-PUBLISHING-20260706072216-381f66dc",
+      "source": "git",
+      "resultFingerprint": "39413750d86489fc1d0cfe27cc890e0c1cfa69e8d9baea720bf98472dfcffe55",
+      "summary": "diff master..dispatch/manuel/manuel-kilo8/publishing/S-HC-PUB-07-YOUTUBE-PUBLISHING/0235fe3455: apps/web/app/api/publishing/publish/route.ts, apps/web/lib/__tests__/admin-bootstrap.test.ts, apps/web/lib/__tests__/qa-seed-guard.test.ts, apps/web/lib/__tests__/youtube-publisher.test.ts, apps/web/lib/publishers/index.ts, apps/web/lib/publishers/types.ts, apps/web/lib/publishers/youtube.ts, apps/web/lib/publishing-formats.ts, docs/07_handoffs/S-HC-PUB-07-YOUTUBE-PUBLISHING.md, packages/db/prisma/migrations/20260706040000_add_youtube_oauth_provider/migration.sql, packages/db/prisma/schema.prisma, prisma.config.ts, scripts/seed-admin.mjs, scripts/seed-qa-e2e.mjs, var/oreshnik/task-board.json, var/oreshnik/tasks/S-HC-PUB-07-YOUTUBE-PUBLISHING.json, vercel.json"
+    },
+    {
+      "itemId": "tests_passed",
+      "label": "tests passed",
+      "verified": true,
+      "verifiedAt": "2026-07-08T07:14:19.151Z",
+      "runId": "run-manuel-S-HC-PUB-07-YOUTUBE-PUBLISHING-20260706072216-381f66dc",
+      "gateId": "tests",
+      "source": "gate",
+      "commandFingerprint": "92e9b2322596c087538d1b785940bc9c70cb051221a89eeeb2d7a812dc7fbabb",
+      "resultFingerprint": "6e1eab1991503501a6a15f0526462535f0ba4966694dd8170cb91bf35c994fc0",
+      "summary": "S-HC-PUB-07-YOUTUBE-PUBLISHING:tests | exit=0 | timed_ok | signal=none | stdout=> heptacore@0.1.0 test"
+    },
+    {
+      "itemId": "typecheck_passed",
+      "label": "typecheck passed",
+      "verified": true,
+      "verifiedAt": "2026-07-08T07:10:40.775Z",
+      "runId": "run-manuel-S-HC-PUB-07-YOUTUBE-PUBLISHING-20260706072216-381f66dc",
+      "gateId": "typecheck",
+      "source": "gate",
+      "commandFingerprint": "c6307c1ddc8309d7ecb2c20c5723aea73c6803246d82759b03392f3298890fad",
+      "resultFingerprint": "6fd4271b4ce4e83eaa07db9db7ca427ae58716c64df1b1095091814316154a0c",
+      "summary": "S-HC-PUB-07-YOUTUBE-PUBLISHING:typecheck | exit=0 | timed_ok | signal=none | stdout=> heptacore@0.1.0 typecheck"
+    },
+    {
+      "itemId": "worker_validation_passed",
+      "label": "worker validation passed",
+      "verified": true,
+      "verifiedAt": "2026-07-08T07:11:40.488Z",
+      "runId": "run-manuel-S-HC-PUB-07-YOUTUBE-PUBLISHING-20260706072216-381f66dc",
+      "gateId": "worker",
+      "source": "gate",
+      "commandFingerprint": "104a87f9bca46d5df74805fdc54635c5ccbd06b6a345080ff90c2fd0cc110ac8",
+      "resultFingerprint": "13aa0c9e431eabdb3b2bbad4e6920e2f1a5f8817f1fb9f4e328bf4d1a783ae61",
+      "summary": "S-HC-PUB-07-YOUTUBE-PUBLISHING:worker | exit=0 | timed_ok | signal=none | stdout=> heptacore@0.1.0 worker:validate | stderr=[config] .env.rrss no encontrado. Usando solo variables de entorno del sistema."
+    }
+  ],
+  "updatedAt": "2026-07-08T07:17:14.376Z",
+  "runs": [
+    {
+      "runId": "run-manuel-S-HC-PUB-07-YOUTUBE-PUBLISHING-20260706072216-381f66dc",
+      "operator": "manuel",
+      "worker": "manuel-dispatcher",
+      "workerMode": "kilo",
+      "branch": "dispatch/manuel/manuel-kilo8/publishing/S-HC-PUB-07-YOUTUBE-PUBLISHING/0235fe3455",
+      "worktreePath": "D:\\PROYECTOS\\WORKTREES\\HeptaCore_ORESHNIK_READY\\var\\oreshnik\\wt\\32305cad03d6321a\\manuel\\manuel-kilo8\\publishing\\S-HC-PUB-07-YOUTUBE-PUBLISHING\\0235fe3455",
+      "zones": [
+        "apps/web/lib/publishers",
+        "apps/web/app/api/publishing",
+        "packages/integrations"
+      ],
+      "taskStatus": "ready_for_integration",
+      "claimStatus": "released",
+      "claimedAt": "2026-07-06T07:22:42.208Z",
+      "updatedAt": "2026-07-08T07:14:19.653Z",
+      "expiresAt": "2026-07-06T08:22:42.208Z",
+      "releasedAt": "2026-07-08T07:14:19.653Z",
+      "manifestPath": "var/oreshnik/runs/S-HC-PUB-07-YOUTUBE-PUBLISHING/run-manuel-S-HC-PUB-07-YOUTUBE-PUBLISHING-20260706072216-381f66dc.json",
+      "validationGateResults": [
+        {
+          "gateId": "typecheck",
+          "command": "npm",
+          "args": [
+            "run",
+            "typecheck"
+          ],
+          "cwd": "D:\\PROYECTOS\\WORKTREES\\HeptaCore_ORESHNIK_READY\\var\\oreshnik\\wt\\32305cad03d6321a\\manuel\\manuel-kilo8\\publishing\\S-HC-PUB-07-YOUTUBE-PUBLISHING\\0235fe3455",
+          "startedAt": "2026-07-08T07:10:28.447Z",
+          "finishedAt": "2026-07-08T07:10:40.775Z",
+          "durationMs": 12328,
+          "exitCode": 0,
+          "signal": null,
+          "timedOut": false,
+          "spawnError": null,
+          "stdout": "\n> heptacore@0.1.0 typecheck\n> npm run typecheck --workspaces --if-present\n\n\n> @heptacore/web@0.1.0 typecheck\n> tsc --noEmit\n\n\n> @heptacore/worker@0.2.0 typecheck\n> tsc --noEmit\n\n\n> @heptacore/agents@0.1.0 typecheck\n> tsc --noEmit\n\n\n> @heptacore/core@0.1.0 typecheck\n> tsc --noEmit\n\n\n> @heptacore/db@0.1.0 typecheck\n> tsc --noEmit\n\n\n> @heptacore/integrations@0.1.0 typecheck\n> tsc --noEmit\n\n\n> @heptacore/ui@0.1.0 typecheck\n> tsc --noEmit\n\n",
+          "stderr": "",
+          "passed": true,
+          "attempt": 1,
+          "commandFingerprint": "c6307c1ddc8309d7ecb2c20c5723aea73c6803246d82759b03392f3298890fad",
+          "resultFingerprint": "6fd4271b4ce4e83eaa07db9db7ca427ae58716c64df1b1095091814316154a0c",
+          "stdoutBytes": 440,
+          "stderrBytes": 0,
+          "stdoutTruncated": false,
+          "stderrTruncated": false
+        },
+        {
+          "gateId": "build",
+          "command": "npm",
+          "args": [
+            "run",
+            "build"
+          ],
+          "cwd": "D:\\PROYECTOS\\WORKTREES\\HeptaCore_ORESHNIK_READY\\var\\oreshnik\\wt\\32305cad03d6321a\\manuel\\manuel-kilo8\\publishing\\S-HC-PUB-07-YOUTUBE-PUBLISHING\\0235fe3455",
+          "startedAt": "2026-07-08T07:10:40.776Z",
+          "finishedAt": "2026-07-08T07:11:38.968Z",
+          "durationMs": 58192,
+          "exitCode": 0,
+          "signal": null,
+          "timedOut": false,
+          "spawnError": null,
+          "stdout": "\n> heptacore@0.1.0 build\n> npm run build --workspaces --if-present\n\n\n> @heptacore/web@0.1.0 build\n> node scripts/copy-tenant-assets.mjs && prisma generate --schema ../../packages/db/prisma/schema.prisma && next build --webpack\n\n[copy-tenant-assets] Turpial assets copied to D:\\PROYECTOS\\WORKTREES\\HeptaCore_ORESHNIK_READY\\var\\oreshnik\\wt\\32305cad03d6321a\\manuel\\manuel-kilo8\\publishing\\S-HC-PUB-07-YOUTUBE-PUBLISHING\\0235fe3455\\apps\\web\\public\\tenant-assets\\turpial\n\n✔ Generated Prisma Client (v7.8.0) to .\\..\\..\\node_modules\\@prisma\\client in 571ms\n\nStart by importing your Prisma Client (See: https://pris.ly/d/importing-client)\n\n\n▲ Next.js 16.2.9 (webpack)\n\n  Creating an optimized production build ...\n✓ Compiled successfully in 7.5s\n  Running TypeScript ...\n  Finished TypeScript in 12.0s ...\n  Collecting page data using 7 workers ...\n  Generating static pages using 7 workers (0/27) ...\n  Generating static pages using 7 workers (6/27) \r\n  Generating static pages using 7 workers (13/27) \r\n  Generating static pages using 7 workers (20/27) \r\n✓ Generating static pages using 7 workers (27/27) in 2.6s\n  Finalizing page optimization ...\n  Collecting build traces ...\n\nRoute (app)\n┌ ƒ /\n├ ○ /_not-found\n├ ƒ /accept-invitation\n├ ƒ /access-required\n├ ƒ /admin\n├ ƒ /admin/tenants\n├ ƒ /admin/tenants/[slug]\n├ ƒ /admin/tenants/new\n├ ƒ /api/admin/capabilities\n├ ƒ /api/admin/facebook-page/bootstrap\n├ ƒ /api/admin/llm-config\n├ ƒ /api/admin/llm-governance\n├ ƒ /api/admin/llm-usage\n├ ƒ /api/admin/tenants\n├ ƒ /api/admin/tenants/[slug]\n├ ƒ /api/admin/tenants/[slug]/invitations\n├ ƒ /api/admin/tenants/[slug]/invitations/[id]\n├ ƒ /api/admin/tenants/[slug]/invitations/[id]/resend\n├ ƒ /api/admin/tenants/[slug]/members\n├ ƒ /api/admin/tenants/[slug]/members/[membershipId]\n├ ƒ /api/admin/tenants/[slug]/status\n├ ƒ /api/assets/[id]\n├ ƒ /api/assets/upload\n├ ƒ /api/assistant\n├ ƒ /api/auth/[...nextauth]\n├ ƒ /api/auth/recover\n├ ƒ /api/auth/register\n├ ƒ /api/auth/reset-password\n├ ƒ /api/campaigns\n├ ƒ /api/campaigns/[id]/approve\n├ ƒ /api/cron/publisher\n├ ƒ /api/drafts/[id]\n├ ƒ /api/drafts/[id]/approve\n├ ƒ /api/drafts/[id]/asset\n├ ƒ /api/drafts/[id]/reject\n├ ƒ /api/drafts/new\n├ ƒ /api/drafts/reorder\n├ ƒ /api/invitations\n├ ƒ /api/invitations/accept\n├ ƒ /api/oauth/facebook/callback\n├ ƒ /api/oauth/facebook/login\n├ ƒ /api/oauth/instagram/callback\n├ ƒ /api/oauth/instagram/login\n├ ƒ /api/publishing/publish\n├ ƒ /api/publishing/rollback\n├ ƒ /api/session/capabilities\n├ ƒ /api/strategy/generate\n├ ƒ /api/strategy/update\n├ ƒ /api/tenant-assets/[[...path]]\n├ ƒ /api/tenant-networks\n├ ƒ /api/tenants/[slug]/assets\n├ ƒ /api/tenants/[slug]/assets/[assetId]\n├ ƒ /api/tenants/[slug]/assets/[assetId]/content\n├ ƒ /api/tenants/[slug]/assets/[assetId]/content/upload\n├ ƒ /api/tenants/[slug]/assets/[assetId]/derivatives\n├ ƒ /api/tenants/[slug]/assets/by-storage-key\n├ ƒ /api/tenants/[slug]/assets/finalize\n├ ƒ /api/tenants/[slug]/assets/upload\n├ ƒ /api/webhooks/resend\n├ ƒ /app\n├ ○ /data-deletion\n├ ○ /icon.svg\n├ ○ /login\n├ ○ /privacy\n├ ○ /recover\n├ ○ /register\n├ ○ /reset-password\n├ ƒ /tenant/[slug]\n└ ○ /terms\n\n\nƒ Proxy (Middleware)\n\n○  (Static)   prerendered as static content\nƒ  (Dynamic)  server-rendered on demand\n\n",
+          "stderr": "Prisma schema loaded from ..\\..\\packages\\db\\prisma\\schema.prisma.\n⚠ Warning: Next.js inferred your workspace root, but it may not be correct.\n We detected multiple lockfiles and selected the directory of D:\\PROYECTOS\\WORKTREES\\HeptaCore_ORESHNIK_READY\\package-lock.json as the root directory.\n To silence this warning, set `outputFileTracingRoot` in your Next.js config, or consider removing one of the lockfiles if it's not needed.\n   See https://nextjs.org/docs/app/api-reference/config/next-config-js/output#caveats for more information.\n Detected additional lockfiles: \n   * D:\\PROYECTOS\\WORKTREES\\HeptaCore_ORESHNIK_READY\\var\\oreshnik\\wt\\32305cad03d6321a\\manuel\\manuel-kilo8\\publishing\\S-HC-PUB-07-YOUTUBE-PUBLISHING\\0235fe3455\\package-lock.json\n\n",
+          "passed": true,
+          "attempt": 1,
+          "commandFingerprint": "75991160a1a54c9eadfb676641cb105e2e8ba48dde8f819038a0ca6fd89a6a3a",
+          "resultFingerprint": "7b94cf4ee5c61240a5cc1a61d690d0c098526377efddabb3a71b2e7cb436e49b",
+          "stdoutBytes": 3426,
+          "stderrBytes": 754,
+          "stdoutTruncated": false,
+          "stderrTruncated": false
+        },
+        {
+          "gateId": "worker",
+          "command": "npm",
+          "args": [
+            "run",
+            "worker:validate"
+          ],
+          "cwd": "D:\\PROYECTOS\\WORKTREES\\HeptaCore_ORESHNIK_READY\\var\\oreshnik\\wt\\32305cad03d6321a\\manuel\\manuel-kilo8\\publishing\\S-HC-PUB-07-YOUTUBE-PUBLISHING\\0235fe3455",
+          "startedAt": "2026-07-08T07:11:38.968Z",
+          "finishedAt": "2026-07-08T07:11:40.488Z",
+          "durationMs": 1520,
+          "exitCode": 0,
+          "signal": null,
+          "timedOut": false,
+          "spawnError": null,
+          "stdout": "\n> heptacore@0.1.0 worker:validate\n> npm run validate -w @heptacore/worker\n\n\n> @heptacore/worker@0.2.0 validate\n> node src/validate.mjs\n\n\n=== Validacion de Assets ===\n\nPresentes: 46/46\n✅ Todos los assets presentes.\n\n\n=== Validacion de Cola de Publicaciones ===\nTotal entries: 29\n\n\n=== Resumen de Validacion ===\nValidos: 29/29\nAssets faltantes: 0\nFechas faltantes: 0\n\n✅ Todos los drafts validos.\n",
+          "stderr": "[config] .env.rrss no encontrado. Usando solo variables de entorno del sistema.\n",
+          "passed": true,
+          "attempt": 1,
+          "commandFingerprint": "104a87f9bca46d5df74805fdc54635c5ccbd06b6a345080ff90c2fd0cc110ac8",
+          "resultFingerprint": "13aa0c9e431eabdb3b2bbad4e6920e2f1a5f8817f1fb9f4e328bf4d1a783ae61",
+          "stdoutBytes": 399,
+          "stderrBytes": 80,
+          "stdoutTruncated": false,
+          "stderrTruncated": false
+        },
+        {
+          "gateId": "tests",
+          "command": "npm",
+          "args": [
+            "run",
+            "test"
+          ],
+          "cwd": "D:\\PROYECTOS\\WORKTREES\\HeptaCore_ORESHNIK_READY\\var\\oreshnik\\wt\\32305cad03d6321a\\manuel\\manuel-kilo8\\publishing\\S-HC-PUB-07-YOUTUBE-PUBLISHING\\0235fe3455",
+          "startedAt": "2026-07-08T07:11:40.488Z",
+          "finishedAt": "2026-07-08T07:14:19.151Z",
+          "durationMs": 158663,
+          "exitCode": 0,
+          "signal": null,
+          "timedOut": false,
+          "spawnError": null,
+          "stdout": "\n> heptacore@0.1.0 test\n> node --test apps/web/lib/calendar-state.test.mjs && npm run test:infra && npm run test --workspaces --if-present\n\n✔ calendar display state prefers operational state over approval status (1.2753ms)\nℹ tests 1\nℹ suites 0\nℹ pass 1\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 227.119\n\n> heptacore@0.1.0 test:infra\n> node --test scripts/goal-runner/__tests__/*.test.mjs scripts/oreshnik/__tests__/*.test.mjs\n\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\n▶ Doctor Command\n  ✔ reports healthy for empty clean worktree (192.0662ms)\n  ✔ detects stale lock when state status is not ACTIVE (277.7934ms)\n  ✔ detects stale lock when state file is missing (296.7029ms)\n  ✔ reports DOCTOR-I002 for valid lock and ACTIVE state (313.7046ms)\n  ✔ detects state validation failure (corrupt state) (286.7483ms)\n  ✔ detects index inconsistency (stale content hash) (228.8265ms)\n  ✔ detects index entry with no goal directory (214.0089ms)\n  ✔ detects resumable goals when no lock exists (176.84ms)\n  ✔ reports missing history directory as warning (158.4731ms)\n  ✔ reports missing schema file as error (102.8442ms)\n  ✔ resolveGateSpawn wraps npm in cmd.exe /c on Windows (0.3255ms)\n  ✔ resolveGateSpawn preserves non-aliased commands unchanged (1.8263ms)\n  ✔ resolveGateSpawn wraps aliased commands via cmd.exe /c on Windows (0.3255ms)\n✔ Doctor Command (2277.9034ms)\n▶ Evidence and Gates\n  ✔ complete fails without evidence (37.9071ms)\n  ✔ complete fails with wrong evidence type (5.0992ms)\n  ✔ evidence-add rejects sensitive paths (3.411ms)\n  ✔ evidence-add rejects absolute paths (2.5372ms)\n  ✔ evidence-add rejects non-existent file (1.6888ms)\n  ✔ evidence-add rejects directory (2.1843ms)\n  ✔ evidence-add rejects path traversal (2.509ms)\n  ✔ evidence-add accepts valid relative path and computes hash (14.7464ms)\n  ✔ validateGateIds rejects unknown gates (3.6753ms)\n  ✔ validateGateIds rejects non-array (0.6577ms)\n  ✔ setGates works for DRAFT and READY statuses (32.9725ms)\n  ✔ setGates rejects after ACTIVE (8.3091ms)\n  ✔ setGates rejects unknown gate IDs (2.9016ms)\n  ✔ setGates deduplicates while preserving order (24.1066ms)\n  ✔ validateEvidencePath rejects absolute paths (0.4053ms)\n✔ Evidence and Gates (172.4923ms)\n▶ ID Generation\n  ✔ generates valid goal IDs (6.2302ms)\n  ✔ generates 5000 IDs with same title without collisions (46.3275ms)\n  ✔ generates 5000 IDs with fixed timestamp without collisions (51.1228ms)\n  ✔ rejects path traversal in IDs (0.3578ms)\n  ✔ rejects Windows reserved characters (0.3766ms)\n  ✔ rejects control characters (0.2921ms)\n  ✔ rejects invalid goal ID format (0.2063ms)\n  ✔ sanitizeSlug handles edge cases (0.2329ms)\n  ✔ generated IDs contain no Windows-problematic chars (13.4075ms)\n  ✔ goal ID has 8 hex chars of entropy suffix (1.7673ms)\n✔ ID Generation (126.0568ms)\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nError: Worktree already locked by active goal: GR-20260708T071146Z-02be1267-first-active-goal\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nError: Cannot complete: No evidence submitted\nfatal: not a git repository (or any of the parent directories): .git\nfile:///D:/PROYECTOS/WORKTREES/HeptaCore_ORESHNIK_READY/var/oreshnik/wt/32305cad03d6321a/manuel/manuel-kilo8/publishing/S-HC-PUB-07-YOUTUBE-PUBLISHING/0235fe3455/scripts/goal-runner/lib.mjs:189\n  if (!check.valid) throw new Error(check.reason);\n                          ^\n\nError: Status COMPLETED is terminal and immutable\n    at applyTransition (file:///D:/PROYECTOS/WORKTREES/HeptaCore_ORESHNIK_READY/var/oreshnik/wt/32305cad03d6321a/manuel/manuel-kilo8/publishing/S-HC-PUB-07-YOUTUBE-PUBLISHING/0235fe3455/scripts/goal-runner/lib.mjs:189:27)\n    at cmdActivate (file:///D:/PROYECTOS/WORKTREES/HeptaCore_ORESHNIK_READY/var/oreshnik/wt/32305cad03d6321a/manuel/manuel-kilo8/publishing/S-HC-PUB-07-YOUTUBE-PUBLISHING/0235fe3455/scripts/goal-runner/run.mjs:183:3)\n    at file:///D:/PROYECTOS/WORKTREES/HeptaCore_ORESHNIK_READY/var/oreshnik/wt/32305cad03d6321a/manuel/manuel-kilo8/publishing/S-HC-PUB-07-YOUTUBE-PUBLISHING/0235fe3455/scripts/goal-runner/run.mjs:559:20\n    at ModuleJob.run (node:internal/modules/esm/module_job:439:25)\n    at async node:internal/modules/esm/loader:633:26\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5)\n\nNode.js v24.16.0\nError: Goal is not ACTIVE (current: COMPLETED)\n▶ Goal Runner CLI Integration\n  ✔ 1. create (681.3636ms)\n  ✔ 2. plan-record (255.7413ms)\n  ✔ 3. gates-set (441.4094ms)\n  ✔ 4. activate (370.0354ms)\n  ✔ 5. step-start and step-complete (390.3015ms)\n  ✔ 6. finding-add (193.2363ms)\n  ✔ 7. evidence-add (128.665ms)\n  ✔ 8. complete (122.501ms)\n  ✔ 9. resume from PAUSED (973.6052ms)\n  ✔ 10. second ACTIVE goal is rejected (1261.2879ms)\n  ✔ 11. stale lock detection (718.6962ms)\n  ✔ 12. complete is rejected without evidence (966.7336ms)\n  ✔ 13. terminal state is immutable after complete (309.5379ms)\n✔ Goal Runner CLI Integration (6837.4359ms)\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\n▶ Lock Exclusivity\n  ✔ readLock returns null when no lock exists (3.337ms)\n  ✔ stale lock on wrong worktreeRoot (2.6355ms)\n  ✔ stale lock on different branch (211.6183ms)\n  ✔ non-existent goal state makes lock stale (173.3184ms)\n  ✔ stale lock has invalid goalId format (1.3958ms)\n  ✔",
+          "stderr": "",
+          "passed": true,
+          "attempt": 1,
+          "commandFingerprint": "92e9b2322596c087538d1b785940bc9c70cb051221a89eeeb2d7a812dc7fbabb",
+          "resultFingerprint": "6e1eab1991503501a6a15f0526462535f0ba4966694dd8170cb91bf35c994fc0",
+          "stdoutBytes": 71155,
+          "stderrBytes": 0,
+          "stdoutTruncated": true,
+          "stderrTruncated": false
+        }
+      ],
+      "evidenceVerifications": [
+        {
+          "itemId": "build_passed",
+          "label": "build passed",
+          "verified": true,
+          "verifiedAt": "2026-07-08T07:11:38.968Z",
+          "runId": "run-manuel-S-HC-PUB-07-YOUTUBE-PUBLISHING-20260706072216-381f66dc",
+          "gateId": "build",
+          "source": "gate",
+          "commandFingerprint": "75991160a1a54c9eadfb676641cb105e2e8ba48dde8f819038a0ca6fd89a6a3a",
+          "resultFingerprint": "7b94cf4ee5c61240a5cc1a61d690d0c098526377efddabb3a71b2e7cb436e49b",
+          "summary": "S-HC-PUB-07-YOUTUBE-PUBLISHING:build | exit=0 | timed_ok | signal=none | stdout=> heptacore@0.1.0 build | stderr=Prisma schema loaded from ..\\..\\packages\\db\\prisma\\schema.prisma."
+        },
+        {
+          "itemId": "changed_files_diff",
+          "label": "changed files diff",
+          "verified": true,
+          "verifiedAt": "2026-07-08T07:14:19.186Z",
+          "runId": "run-manuel-S-HC-PUB-07-YOUTUBE-PUBLISHING-20260706072216-381f66dc",
+          "source": "git",
+          "resultFingerprint": "39413750d86489fc1d0cfe27cc890e0c1cfa69e8d9baea720bf98472dfcffe55",
+          "summary": "diff master..dispatch/manuel/manuel-kilo8/publishing/S-HC-PUB-07-YOUTUBE-PUBLISHING/0235fe3455: apps/web/app/api/publishing/publish/route.ts, apps/web/lib/__tests__/admin-bootstrap.test.ts, apps/web/lib/__tests__/qa-seed-guard.test.ts, apps/web/lib/__tests__/youtube-publisher.test.ts, apps/web/lib/publishers/index.ts, apps/web/lib/publishers/types.ts, apps/web/lib/publishers/youtube.ts, apps/web/lib/publishing-formats.ts, docs/07_handoffs/S-HC-PUB-07-YOUTUBE-PUBLISHING.md, packages/db/prisma/migrations/20260706040000_add_youtube_oauth_provider/migration.sql, packages/db/prisma/schema.prisma, prisma.config.ts, scripts/seed-admin.mjs, scripts/seed-qa-e2e.mjs, var/oreshnik/task-board.json, var/oreshnik/tasks/S-HC-PUB-07-YOUTUBE-PUBLISHING.json, vercel.json"
+        },
+        {
+          "itemId": "tests_passed",
+          "label": "tests passed",
+          "verified": true,
+          "verifiedAt": "2026-07-08T07:14:19.151Z",
+          "runId": "run-manuel-S-HC-PUB-07-YOUTUBE-PUBLISHING-20260706072216-381f66dc",
+          "gateId": "tests",
+          "source": "gate",
+          "commandFingerprint": "92e9b2322596c087538d1b785940bc9c70cb051221a89eeeb2d7a812dc7fbabb",
+          "resultFingerprint": "6e1eab1991503501a6a15f0526462535f0ba4966694dd8170cb91bf35c994fc0",
+          "summary": "S-HC-PUB-07-YOUTUBE-PUBLISHING:tests | exit=0 | timed_ok | signal=none | stdout=> heptacore@0.1.0 test"
+        },
+        {
+          "itemId": "typecheck_passed",
+          "label": "typecheck passed",
+          "verified": true,
+          "verifiedAt": "2026-07-08T07:10:40.775Z",
+          "runId": "run-manuel-S-HC-PUB-07-YOUTUBE-PUBLISHING-20260706072216-381f66dc",
+          "gateId": "typecheck",
+          "source": "gate",
+          "commandFingerprint": "c6307c1ddc8309d7ecb2c20c5723aea73c6803246d82759b03392f3298890fad",
+          "resultFingerprint": "6fd4271b4ce4e83eaa07db9db7ca427ae58716c64df1b1095091814316154a0c",
+          "summary": "S-HC-PUB-07-YOUTUBE-PUBLISHING:typecheck | exit=0 | timed_ok | signal=none | stdout=> heptacore@0.1.0 typecheck"
+        },
+        {
+          "itemId": "worker_validation_passed",
+          "label": "worker validation passed",
+          "verified": true,
+          "verifiedAt": "2026-07-08T07:11:40.488Z",
+          "runId": "run-manuel-S-HC-PUB-07-YOUTUBE-PUBLISHING-20260706072216-381f66dc",
+          "gateId": "worker",
+          "source": "gate",
+          "commandFingerprint": "104a87f9bca46d5df74805fdc54635c5ccbd06b6a345080ff90c2fd0cc110ac8",
+          "resultFingerprint": "13aa0c9e431eabdb3b2bbad4e6920e2f1a5f8817f1fb9f4e328bf4d1a783ae61",
+          "summary": "S-HC-PUB-07-YOUTUBE-PUBLISHING:worker | exit=0 | timed_ok | signal=none | stdout=> heptacore@0.1.0 worker:validate | stderr=[config] .env.rrss no encontrado. Usando solo variables de entorno del sistema."
+        }
+      ]
+    }
+  ]
 }
