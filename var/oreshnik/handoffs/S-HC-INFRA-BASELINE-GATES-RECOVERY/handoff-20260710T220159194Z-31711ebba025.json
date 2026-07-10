@@ -1,0 +1,129 @@
+{
+  "schema": "oreshnik-handoff/v1",
+  "id": "handoff-20260710T220159194Z-31711ebba025",
+  "createdAt": "2026-07-10T22:01:59.194Z",
+  "integrity": {
+    "algorithm": "sha256",
+    "digest": "b1955e9a89f13764f300ead91f1b7890122994c2e41d0ff8060039c59a81f4be"
+  },
+  "identity": {
+    "project": "HeptaCore",
+    "repository": "https://github.com/Cerberux77/HeptaCore.git",
+    "operator": "Manuel",
+    "taskId": "S-HC-INFRA-BASELINE-GATES-RECOVERY",
+    "runId": "manuel-S-HC-INFRA-BASELINE-GATES-RECOVERY-2026-06-30T22-17-21-382Z-571d1347",
+    "assignmentId": null,
+    "claimStatus": "released",
+    "reason": "external_blocker",
+    "oreshnikVersion": "0.2.0-alpha.16"
+  },
+  "git": {
+    "branch": "Manuel/s-hc-neon-recovery-blocker-2026-07-10",
+    "upstream": "origin/master",
+    "head": "51ef135e7d3be290dfb7f500d07287e360b605b7",
+    "base": "51ef135e7d3be290dfb7f500d07287e360b605b7",
+    "ahead": 0,
+    "behind": 0,
+    "ownCommits": [],
+    "modified": [],
+    "untracked": [],
+    "conflicts": [],
+    "stash": [
+      "stash@{0} On Manuel/s-hc-pub-02-multiformat-preview: canonical-dirty-pre-consolidation-2026-07-02",
+      "stash@{1} On dispatch/manuel/manuel-codex1/assets/S-HC-ASSET-02-FORMAT-DERIVATIVES/8cd14a8134: run-b-asset02-runtime-claim-before-alpha11-base",
+      "stash@{2} On Manuel/s-hc-pub-04-hourly-batch-goal: PUB04 finalize implementation rescued before baseline encoding repair",
+      "stash@{3} On Architect/jean-pendientes-2026-06-14-jean-tiene-11-tareas-ready-para-revision-2026-06-14: stash before checkout master",
+      "stash@{4} WIP on Manuel/s-hc-03-agent-strategy-runner-2026-06-09: c9f4150 feat(oreshnik): mother branch now integrates code + docs (TurpialSound model)"
+    ],
+    "clean": true,
+    "detached": false,
+    "worktreePath": "D:\\PROYECTOS\\WORKTREES\\HeptaCore_NEON_RECOVERY_BLOCKER"
+  },
+  "github": {
+    "available": true,
+    "pr": null,
+    "state": null,
+    "base": null,
+    "head": null,
+    "mergeable": null,
+    "checks": [],
+    "reviews": [],
+    "unresolvedConversations": null,
+    "remoteHead": "51ef135e7d3be290dfb7f500d07287e360b605b7",
+    "source": "github-rest"
+  },
+  "functional": {
+    "objective": "Diagnose Neon/Prisma drift without exposing secrets or mutating production",
+    "implemented": [],
+    "partial": [
+      "Vercel session and encrypted Neon/DB variables confirmed by name only; local environment has no DATABASE_URL; Prisma schema validates locally."
+    ],
+    "decisions": [],
+    "primaryFiles": [],
+    "testsRun": [
+      "vercel whoami: authenticated",
+      "vercel env ls: DATABASE_URL and Neon-related variables exist as encrypted values",
+      "npx prisma validate --schema packages/db/prisma/schema.prisma: PASS"
+    ],
+    "testsPending": [
+      "Read-only prisma migrate status with ephemeral DATABASE_URL/DIRECT_URL"
+    ],
+    "gates": [],
+    "regressions": []
+  },
+  "deployments": [],
+  "blockers": [
+    {
+      "id": "NEON-DRIFT-READONLY-CREDENTIAL-CHANNEL",
+      "category": "CREDENTIAL",
+      "description": "Neon/Prisma drift read-only check requires a secure non-persisted DATABASE_URL or DIRECT_URL. Vercel has encrypted DB/Neon variables by name, but local env has no DB URL and vercel env pull would write secrets to a file.",
+      "evidence": [],
+      "impact": "Cannot prove Neon migration drift status from this session without violating the no-secret-files rule or receiving an ephemeral DB URL. No production mutation is authorized.",
+      "blocking": true,
+      "probableOwner": "Manuel",
+      "recommendedAction": "Provide DATABASE_URL/DIRECT_URL via ephemeral environment input or authorize a secure retrieval path that does not write credentials to repo, logs, artifacts, prompts, or reports.",
+      "nextCommand": "npx prisma migrate status --schema packages/db/prisma/schema.prisma",
+      "unblockCondition": "Read-only prisma migrate status completes with DATABASE_URL supplied ephemerally; any production mutation has explicit human approval."
+    }
+  ],
+  "stability": {
+    "classification": "BLOCKED_EXTERNAL",
+    "reasons": [
+      "Neon/Prisma drift read-only check requires a secure non-persisted DATABASE_URL or DIRECT_URL. Vercel has encrypted DB/Neon variables by name, but local env has no DB URL and vercel env pull would write secrets to a file."
+    ]
+  },
+  "resume": {
+    "exactPoint": "Await secure non-persisted DB URL input or approved secret retrieval path",
+    "firstCommand": "Run read-only prisma migrate status with DATABASE_URL supplied as an ephemeral environment variable",
+    "branch": "Manuel/s-hc-neon-recovery-blocker-2026-07-10",
+    "worktreePath": "D:\\PROYECTOS\\WORKTREES\\HeptaCore_NEON_RECOVERY_BLOCKER",
+    "preconditions": [
+      "Run oreshnik preflight",
+      "Verify assignment and claim authority",
+      "Confirm no handoff supersedes this one"
+    ],
+    "priorityFiles": [],
+    "focusedTests": [
+      "Read-only prisma migrate status with ephemeral DATABASE_URL/DIRECT_URL"
+    ],
+    "completionCriterion": "Neon drift status is known without writing secrets; any production mutation has explicit human approval"
+  },
+  "sources": [
+    {
+      "kind": "discovered",
+      "field": "identity.taskId",
+      "evidence": "canonical task artifact/task-board"
+    },
+    {
+      "kind": "discovered",
+      "field": "git",
+      "evidence": "git commands executed with typed argv"
+    },
+    {
+      "kind": "declared",
+      "field": "functional",
+      "evidence": "operator CLI input"
+    }
+  ],
+  "warnings": []
+}
