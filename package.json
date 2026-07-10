@@ -33,6 +33,7 @@
     "oreshnik:timeline": "oreshnik timeline",
     "oreshnik:checkpoint": "oreshnik checkpoint",
     "oreshnik:integrate": "oreshnik integrate",
+    "oreshnik:command-catalog": "node scripts/oreshnik/generate-command-catalog.mjs",
     "oreshnik:dispatch:init": "oreshnik dispatch init",
     "oreshnik:dispatch:status": "oreshnik dispatch status",
     "oreshnik:goal": "node scripts/oreshnik/goal.mjs",
