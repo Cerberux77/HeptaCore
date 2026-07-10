@@ -1,5 +1,16 @@
 # S-HC-TEN-02A-CANONICAL-ROLE-MODEL-PLATFORMROLE
 
+## Oreshnik rebase evidence
+
+- Rebased branch: `rebase-check/ten-02a-on-master-a1f1560`
+- Rebased HEAD: `96acb6ec0ee186e2ae4a152030f50d8f7a4332fe`
+- Base master validated before rebase: `a1f156005df8f1eda7868f73b752ef70e8446629`
+- Base master includes:
+  - PR #8 `/recover` reset-link guard
+  - PR #7 vendored `oreshnik-cli 0.2.0-alpha.15`
+
+This rebase preserved the TEN-02A recovery architecture while keeping the post-PR8 security policy from `master`.
+
 ## Objective
 
 Repair the current HeptaCore auth model so the platform role and tenant roles match the agreed canonical architecture:
@@ -29,6 +40,21 @@ The repository contained the legacy functional roles `OWNER`, `ADMIN`, `VIEWER`,
 - `SUPER_ADMIN` must not require tenant membership.
 - `TENANT_ADMIN` and `PUBLISHER` must be the only tenant functional roles.
 - `activeTenantId` selects context only; it never grants authorization.
+
+## Recovery guard after rebase
+
+- `/recover` keeps the TEN-02A `password-reset-service` abstraction.
+- Recovery input remains identifier-based; it is not reverted to email-only.
+- Default response remains generic: `{ ok: true }`.
+- `debugResetLink` is emitted only when:
+
+```bash
+HEPTACORE_EXPOSE_RESET_LINKS=1
+```
+
+- `VERCEL_ENV` is not used to expose reset links.
+- Preview does not expose reset links implicitly.
+- The handler must not reveal whether the target user exists.
 
 ## Platform admin identifiers
 
@@ -114,31 +140,26 @@ Main areas changed in the WIP branch:
 
 ## Validation
 
-Local validation reported before the WIP checkpoint:
+Rebase validation against the post-PR7 / post-PR8 `master` base:
 
-- `npm run typecheck`: OK
-- `npm run build`: OK
-- `npm run test -w @heptacore/web -- tenant-admin-service`: OK, 608/608 tests passing
-- `npm run test -w @heptacore/web -- error-messages tenant-admin-service`: OK
-
-Local validation after follow-up remote fixes:
-
+- `npm run oreshnik:ready`: PASS, `ORESHNIK READY FOR KILO + GOAL RUNNER`
 - `npm run typecheck`: PASS
 - `npm run build`: PASS
-- `npm run test:infra`: PASS, 160/160 tests passing
-- `npm run test -w @heptacore/web`: PASS, 609/609 tests passing
+- `npm run test:infra`: PASS, `160/160` tests passing
 - `git diff --check`: PASS
-- `npm run oreshnik:ready`: PASS, `ORESHNIK READY FOR KILO + GOAL RUNNER`
 
-## Vercel status
+Operational Oreshnik checks executed during evidence refresh:
 
-The latest checked remote commit `3926d18ec776bdd9bd27416ed6ad798514fdff36` still reported Vercel failure from GitHub status. The Vercel log was not accessible through this evidence pass. The failure must be inspected and fixed or documented as external/unrelated before this task can be marked ready for integration.
+- `npm run oreshnik:status`
+- `npm run oreshnik:dispatch:status`
+
+`npm run oreshnik:dispatch:status` completed and reported the current remote control-plane inventory and historical duplicate warnings without mutating state.
 
 ## Integration status
 
-- Local gates are green.
-- Remote Vercel is still blocking integration.
-- Do not merge until Vercel is green or the failure is explicitly explained and accepted.
+- TEN-02A is now rebased on the validated `master` that already contains PR #8 and PR #7.
+- Local Oreshnik release-governance gates listed above are green on the rebased worktree.
+- This evidence update does not change auth behavior, Prisma schema contents, or role semantics beyond documenting the already rebased state.
 
 ## Guardrails
 
