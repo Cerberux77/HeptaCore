@@ -3,6 +3,10 @@ import { prisma } from "../../../../lib/prisma";
 import { resolvePublicOrigin } from "../../../../lib/url-origin";
 import crypto from "crypto";
 
+function canExposeResetLinks(): boolean {
+  return process.env.HEPTACORE_EXPOSE_RESET_LINKS === "1";
+}
+
 function createResetToken(userId: string): string {
   const payload = JSON.stringify({ userId, exp: Date.now() + 3600000 });
   const encoded = Buffer.from(payload).toString("base64url");
@@ -20,7 +24,7 @@ export async function POST(req: NextRequest) {
   const email = body.email.toLowerCase().trim();
   const user = await prisma.user.findUnique({ where: { email } });
 
-  if (!user) {
+  if (!user || !canExposeResetLinks()) {
     return NextResponse.json({ ok: true });
   }
 
