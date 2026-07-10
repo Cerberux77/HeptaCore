@@ -1,0 +1,257 @@
+{
+  "schema": "heptacore-oreshnik-command-catalog/v1",
+  "source": "node_modules/oreshnik-cli/dist/cli.js",
+  "version": "0.2.0-alpha.16",
+  "commands": [
+    {
+      "command": "init",
+      "summary": "[options] Initialize Oreshnik in the current git repository"
+    },
+    {
+      "command": "preflight",
+      "summary": "[options] Run 11-step validation before starting work"
+    },
+    {
+      "command": "status",
+      "summary": "Show project state, branch, and checkpoints"
+    },
+    {
+      "command": "portfolio",
+      "summary": "[options] Inspect multi-project portfolio configuration"
+    },
+    {
+      "command": "ingest",
+      "summary": "[options] Ingest meeting notes markdown into classified backlog"
+    },
+    {
+      "command": "inject",
+      "summary": "[options] Inject classified tasks into project task-boards"
+    },
+    {
+      "command": "bootstrap",
+      "summary": "[options] Initialize Oreshnik structure (task-board, zone-map, gates) in portfolio projects"
+    },
+    {
+      "command": "dashboard",
+      "summary": "[options] Multi-project dashboard with task status across all portfolio projects"
+    },
+    {
+      "command": "zone-check",
+      "summary": "[options] Validate zone-map compliance across portfolio projects"
+    },
+    {
+      "command": "audit",
+      "summary": "[options] Cross-project audit: git history, checkpoints, secrets, and pipeline status"
+    },
+    {
+      "command": "lock",
+      "summary": "[options] Acquire/release distributed zone locks via git refs"
+    },
+    {
+      "command": "claim",
+      "summary": "[options] Claim, renew, or release a task run"
+    },
+    {
+      "command": "dispatch",
+      "summary": "Atomic multi-operator remote dispatcher",
+      "subcommands": [
+        {
+          "command": "dispatch init",
+          "summary": "[options]"
+        },
+        {
+          "command": "dispatch next",
+          "summary": "[options]"
+        },
+        {
+          "command": "dispatch peek",
+          "summary": "[options] Preview the next eligible task without mutating remote"
+        },
+        {
+          "command": "dispatch status",
+          "summary": "[options]"
+        },
+        {
+          "command": "dispatch resume",
+          "summary": "[options]"
+        },
+        {
+          "command": "dispatch release",
+          "summary": "[options]"
+        },
+        {
+          "command": "dispatch supersede",
+          "summary": "[options]"
+        },
+        {
+          "command": "dispatch reconcile",
+          "summary": "[options]"
+        },
+        {
+          "command": "dispatch explain",
+          "summary": "[options]"
+        },
+        {
+          "command": "dispatch takeover",
+          "summary": "[options] Take over an existing run after session interruption"
+        },
+        {
+          "command": "dispatch help",
+          "summary": "[command] display help for command"
+        }
+      ]
+    },
+    {
+      "command": "align",
+      "summary": "[options] Diagnose or repair local execution alignment for the current operator instance"
+    },
+    {
+      "command": "goal",
+      "summary": "[options] Resolve execution context, align if needed, and resume or dispatch the next task"
+    },
+    {
+      "command": "operator",
+      "summary": "Manage the project operator registry and local session selection",
+      "subcommands": [
+        {
+          "command": "operator list",
+          "summary": "[options]"
+        },
+        {
+          "command": "operator add",
+          "summary": "[options]"
+        },
+        {
+          "command": "operator deactivate",
+          "summary": "[options] <operatorId>"
+        },
+        {
+          "command": "operator status",
+          "summary": "[options] <operatorId>"
+        },
+        {
+          "command": "operator select",
+          "summary": "[options]"
+        },
+        {
+          "command": "operator current",
+          "summary": ""
+        },
+        {
+          "command": "operator help",
+          "summary": "[command] display help for command"
+        }
+      ]
+    },
+    {
+      "command": "notify",
+      "summary": "Local notification utilities",
+      "subcommands": [
+        {
+          "command": "notify test",
+          "summary": "[options]"
+        },
+        {
+          "command": "notify help",
+          "summary": "[command] display help for command"
+        }
+      ]
+    },
+    {
+      "command": "evidence",
+      "summary": "[options] Validate task evidence and advance task validation lifecycle"
+    },
+    {
+      "command": "handoff",
+      "summary": "Create, inspect, validate, and resume canonical operator handoffs",
+      "subcommands": [
+        {
+          "command": "handoff create",
+          "summary": "[options] Capture a safe, verifiable, resumable operator handoff"
+        },
+        {
+          "command": "handoff show",
+          "summary": "[options] Show a canonical handoff"
+        },
+        {
+          "command": "handoff validate",
+          "summary": "[options] Validate schema and integrity"
+        },
+        {
+          "command": "handoff resume",
+          "summary": "[options] Check whether a handoff can be resumed safely"
+        },
+        {
+          "command": "handoff list",
+          "summary": "[options] List canonical handoffs"
+        },
+        {
+          "command": "handoff help",
+          "summary": "[command] display help for command"
+        }
+      ]
+    },
+    {
+      "command": "reconcile",
+      "summary": "[options] Validate and regenerate canonical docs from task-board"
+    },
+    {
+      "command": "close",
+      "summary": "[options] Close sprint, create MADRE branch, push"
+    },
+    {
+      "command": "checkpoint",
+      "summary": "[options] Create a manual checkpoint"
+    },
+    {
+      "command": "rollback",
+      "summary": "[options] Restore to a previous checkpoint"
+    },
+    {
+      "command": "timeline",
+      "summary": "Show checkpoint and sprint timeline"
+    },
+    {
+      "command": "gate",
+      "summary": "[options] Run validation suite (typecheck, build, tests)"
+    },
+    {
+      "command": "integrate",
+      "summary": "[options] Merge sprint into a target branch with zone checks"
+    },
+    {
+      "command": "rebalance",
+      "summary": "[options] Preview or apply task redistribution across registered operators"
+    },
+    {
+      "command": "task",
+      "summary": "Task-level runtime administration",
+      "subcommands": [
+        {
+          "command": "task reassign",
+          "summary": "[options] <taskId>"
+        },
+        {
+          "command": "task block",
+          "summary": "[options]"
+        },
+        {
+          "command": "task unblock",
+          "summary": "[options]"
+        },
+        {
+          "command": "task resume",
+          "summary": "[options]"
+        },
+        {
+          "command": "task help",
+          "summary": "[command] display help for command"
+        }
+      ]
+    },
+    {
+      "command": "release",
+      "summary": "[options] Merge latest MADRE into master with pre-release checkpoint for instant rollback"
+    }
+  ]
+}

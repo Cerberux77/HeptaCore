@@ -1,0 +1,71 @@
+name: Oreshnik Digital Twin CI
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/oreshnik-digital-twin.yml"
+      - "docs/operations/oreshnik-command-catalog.json"
+      - "package.json"
+      - "package-lock.json"
+      - "scripts/oreshnik/**"
+      - "vendor/oreshnik/**"
+      - "var/oreshnik/**"
+  push:
+    branches:
+      - master
+    paths:
+      - ".github/workflows/oreshnik-digital-twin.yml"
+      - "docs/operations/oreshnik-command-catalog.json"
+      - "package.json"
+      - "package-lock.json"
+      - "scripts/oreshnik/**"
+      - "vendor/oreshnik/**"
+      - "var/oreshnik/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  digital-twin:
+    name: Real CLI catalog and governance smoke
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Verify Oreshnik readiness
+        run: npm run oreshnik:ready
+
+      - name: Generate command catalog from real CLI
+        run: npm run oreshnik:command-catalog
+
+      - name: Verify generated catalog is committed
+        run: git diff --exit-code docs/operations/oreshnik-command-catalog.json
+
+      - name: Smoke real Oreshnik CLI
+        run: |
+          node node_modules/oreshnik-cli/dist/cli.js --version
+          node node_modules/oreshnik-cli/dist/cli.js status
+          node node_modules/oreshnik-cli/dist/cli.js reconcile --check --json
+          node node_modules/oreshnik-cli/dist/cli.js handoff --help
+
+      - name: Run Oreshnik infra tests
+        run: npm run test:infra
+
+      - name: Upload command catalog
+        uses: actions/upload-artifact@v4
+        with:
+          name: oreshnik-command-catalog
+          path: docs/operations/oreshnik-command-catalog.json
