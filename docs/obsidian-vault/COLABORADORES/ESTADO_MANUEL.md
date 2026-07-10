@@ -2,14 +2,14 @@
 type: collaborator-status
 project: "HeptaCore"
 operator: "Manuel"
-last_updated: "2026-07-01T20:36:14.546Z"
+last_updated: "2026-07-10T17:42:27.958Z"
 generated_by: "Oreshnik canonical-check"
 source: "var/oreshnik/task-board.json"
 ---
 
 # Estado Manuel
 
-> Documento derivado. `var/oreshnik/task-board.json` es la proyeccion compatible que debe mantenerse alineada con los artefactos durables de runtime.
+> Documento derivado. La fuente operativa es `var/oreshnik/task-board.json`.
 
 ## Ready
 
@@ -125,7 +125,7 @@ Zonas: `apps/web/components`, `packages/core`
 
 ### S-HC-ASSET-02-FORMAT-DERIVATIVES - Format derivatives: badge interaction, format preview, intelligent crop, safe zones, asset variants
 
-Estado: `ready_for_integration`
+Estado: `integrated`
 
 - Badge de compatibilidad clickeable que abre detalle de formato
 - Preview especifico de formato con crop y safe zones visuales
@@ -328,4 +328,16 @@ Estado: `blocked`
 - Initial strategy draft generated
 
 Zonas: `examples/tenants/cepeg`, `apps/web`, `packages/db`
+
+### S-HC-TEN-02A-CANONICAL-ROLE-MODEL-PLATFORMROLE - Canonical platform and tenant role model repair
+
+Estado: `in_progress`
+
+- SUPER_ADMIN is stored only on User.platformRole
+- Membership.role keeps only TENANT_ADMIN and PUBLISHER as functional roles
+- First-password and recovery flows are hardened
+- Legacy repair is idempotent and aborts on ambiguous roles
+- PR #7 and alpha.15 adoption remain untouched
+
+Zonas: `packages/db/**`, `apps/web/lib/**`, `apps/web/app/**`, `scripts/**`, `docs/**`, `var/oreshnik/**`
 
