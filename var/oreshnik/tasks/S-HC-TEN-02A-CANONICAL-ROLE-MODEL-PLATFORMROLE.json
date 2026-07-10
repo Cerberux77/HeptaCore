@@ -7,7 +7,7 @@
   "title": "Canonical platform and tenant role model repair",
   "owner": "Manuel",
   "backupOwner": "Manuel",
-  "status": "in_progress",
+  "status": "integrated",
   "zone": [
     "packages/db/**",
     "apps/web/lib/**",
@@ -53,8 +53,15 @@
       "operator": "Architect",
       "branch": "codex/s-hc-ten-02a-canonical-role-model-platformrole-2026-07-09",
       "description": "Repair task created because TEN-01 closed with the obsolete OWNER/ADMIN/VIEWER model and SUPER_ADMIN inside Membership.role."
+    },
+    {
+      "at": "2026-07-10T17:46:36.000Z",
+      "action": "post_merge_reconciled",
+      "operator": "Manuel",
+      "branch": "Manuel/s-hc-ten-02a-postmerge-reconcile-2026-07-10",
+      "description": "Reconciled to integrated from GitHub evidence: implementation PR #9 merged at 2026-07-10T01:52:37Z and post-merge reconciliation PR #12 merged at 2026-07-10T17:46:36Z. No historical Run or claim was synthesized."
     }
   ],
-  "updatedAt": "2026-07-09T00:00:00.000Z",
+  "updatedAt": "2026-07-10T17:46:36.000Z",
   "runs": []
 }

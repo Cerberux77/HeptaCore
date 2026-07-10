@@ -2187,7 +2187,7 @@
       "title": "Canonical platform and tenant role model repair",
       "owner": "Manuel",
       "backupOwner": "Manuel",
-      "status": "in_progress",
+      "status": "integrated",
       "track": "tenant-platform",
       "zone": [
         "packages/db/**",
@@ -2216,6 +2216,13 @@
           "operator": "Architect",
           "branch": "codex/s-hc-ten-02a-canonical-role-model-platformrole-2026-07-09",
           "description": "Repair task opened after validating that TEN-02 was already occupied by CEPEG onboarding and TEN-01 closed with the obsolete OWNER/ADMIN/VIEWER model."
+        },
+        {
+          "at": "2026-07-10T17:46:36.000Z",
+          "action": "post_merge_reconciled",
+          "operator": "Manuel",
+          "branch": "Manuel/s-hc-ten-02a-postmerge-reconcile-2026-07-10",
+          "description": "Reconciled to integrated from GitHub evidence: implementation PR #9 merged at 2026-07-10T01:52:37Z and post-merge reconciliation PR #12 merged at 2026-07-10T17:46:36Z. No historical Run or claim was synthesized."
         }
       ]
     },
