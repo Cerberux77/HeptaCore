@@ -27,14 +27,14 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           hasPasswordInput: Boolean(credentials?.password),
         });
 
+        if (!credentials?.email || !credentials?.password) return null;
+
         const email = String(credentials.email).toLowerCase().trim();
         const password = String(credentials.password);
 
         logAuthDiagnostic("normalized", {
           normalizedIdentifier: email,
         });
-
-        if (!credentials?.email || !credentials?.password) return null;
 
         const user = await prisma.user.findUnique({ where: { email } });
         logAuthDiagnostic("user lookup", {
