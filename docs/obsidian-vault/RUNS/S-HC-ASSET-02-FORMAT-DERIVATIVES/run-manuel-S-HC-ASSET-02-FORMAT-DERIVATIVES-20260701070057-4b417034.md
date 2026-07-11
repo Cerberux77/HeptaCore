@@ -5,10 +5,10 @@ project: "HeptaCore"
 task_id: "S-HC-ASSET-02-FORMAT-DERIVATIVES"
 run_id: "run-manuel-S-HC-ASSET-02-FORMAT-DERIVATIVES-20260701070057-4b417034"
 sprint: "assets"
-status: "ready_for_integration"
+status: "integrated"
 claim_status: "released"
 operator: "manuel"
-last_updated: "2026-07-01T08:39:46.620Z"
+last_updated: "2026-07-01T21:10:33.990Z"
 source: "var/oreshnik/runs/S-HC-ASSET-02-FORMAT-DERIVATIVES/run-manuel-S-HC-ASSET-02-FORMAT-DERIVATIVES-20260701070057-4b417034.json"
 ---
 
@@ -25,7 +25,7 @@ source: "var/oreshnik/runs/S-HC-ASSET-02-FORMAT-DERIVATIVES/run-manuel-S-HC-ASSE
 - operator: `manuel`
 - worker: `manuel-dispatcher`
 - mode: `codex`
-- task status: `ready_for_integration`
+- task status: `integrated`
 - claim status: `released`
 - branch: `dispatch/manuel/manuel-codex2/assets/S-HC-ASSET-02-FORMAT-DERIVATIVES/396dfc38dd`
 - worktree: `D:\PROYECTOS\WORKTREES\HeptaCore_ORESHNIK_READY\var\oreshnik\wt\32305cad03d6321a\manuel\manuel-codex2\assets\S-HC-ASSET-02-FORMAT-DERIVATIVES\396dfc38dd`
@@ -40,6 +40,12 @@ source: "var/oreshnik/runs/S-HC-ASSET-02-FORMAT-DERIVATIVES/run-manuel-S-HC-ASSE
 
 ## Integration Train
 
-- Ninguno
+- attempt: `train-run-manuel-S-HC-ASSET-02-FORMAT-DERIVATIVES-2026-1782940057654`
+- source: `dispatch/manuel/manuel-codex2/assets/S-HC-ASSET-02-FORMAT-DERIVATIVES/396dfc38dd`
+- target: `MADRE/v54-assets-asset-02-validated-partial-delivery-2026-07-01`
+- integration branch: `integration-train/assets/S-HC-ASSET-02-FORMAT-DER/r-5cdcee7b964f/a-98f25f84692b`
+- status: `succeeded`
+- advance: `runtime_projection_confirmed`
+- reason: Already contained on MADRE/v54-assets-asset-02-validated-partial-delivery-2026-07-01; runtime reconciled without merge
 
 <!-- ORESHNIK:GENERATED:END -->

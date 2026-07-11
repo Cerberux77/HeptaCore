@@ -3,12 +3,12 @@
   "taskId": "S-HC-STRAT-01-MASTER-STRATEGY-WORKBENCH",
   "sprint": "strategy",
   "sprintOrderIndex": 23,
-  "taskOrderIndex": 34,
+  "taskOrderIndex": 35,
   "title": "Master strategy workbench: LLM-powered strategy generation and conversational refinement",
   "owner": "Manuel",
   "backupOwner": "Manuel",
   "status": "blocked",
-  "taskBoardPath": "D:\\PROYECTOS\\WORKTREES\\HC_ASSET02_STATE_REPAIR\\var\\oreshnik\\task-board.json",
+  "taskBoardPath": "/home/runner/work/HeptaCore/HeptaCore/var/oreshnik/task-board.json",
   "zone": [
     "packages/agents",
     "apps/web/components",
@@ -36,6 +36,6 @@
       "description": "Task status reconciled to blocked: dependency S-HC-ONB-02-GAP-RESOLUTION-WIZARD still pending (S-HC-ONB-02-GAP-RESOLUTION-WIZARD:pending) | dependency S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE still pending (S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE:pending)"
     }
   ],
-  "updatedAt": "2026-07-01T20:31:05.696Z",
+  "updatedAt": "2026-07-11T19:09:07.244Z",
   "runs": []
 }

@@ -3,12 +3,12 @@
   "taskId": "S-HC-INFRA-BASELINE-GATES-RECOVERY",
   "sprint": "S-HC-INFRA-BASELINE-GATES-RECOVERY",
   "sprintOrderIndex": 10,
-  "taskOrderIndex": 14,
+  "taskOrderIndex": 15,
   "title": "Baseline gates recovery: Oreshnik alpha.9, identity v2, Prisma, typecheck, build and canonical suite",
   "owner": "Manuel",
   "backupOwner": "Manuel",
   "status": "ready_for_integration",
-  "taskBoardPath": "D:\\PROYECTOS\\WORKTREES\\HC_ASSET02_STATE_REPAIR\\var\\oreshnik\\task-board.json",
+  "taskBoardPath": "/home/runner/work/HeptaCore/HeptaCore/var/oreshnik/task-board.json",
   "zone": [
     "package.json",
     "package-lock.json",
@@ -272,7 +272,7 @@
       "classification": "BLOCKED_EXTERNAL"
     }
   ],
-  "updatedAt": "2026-07-01T20:31:05.696Z",
+  "updatedAt": "2026-07-11T19:09:07.244Z",
   "runs": [
     {
       "runId": "manuel-S-HC-INFRA-BASELINE-GATES-RECOVERY-2026-06-30T22-17-21-382Z-571d1347",
@@ -469,6 +469,17 @@
           "commandFingerprint": "56026e7abb3b80f9b313eae496086c340a3700402d490994bb04666e139ec6a5",
           "resultFingerprint": "ea39909da30aa49ba9f71b9c8a7aeaa7c589a64be0ad7c55afb0de894595a94d",
           "summary": "S-HC-INFRA-BASELINE-GATES-RECOVERY:worker | exit=0 | timed_ok | signal=none | stdout=> heptacore@0.1.0 worker:validate | stderr=[config] .env.rrss no encontrado. Usando solo variables de entorno del sistema."
+        }
+      ],
+      "handoffs": [
+        {
+          "id": "handoff-20260710T220159194Z-31711ebba025",
+          "schema": "oreshnik-handoff/v1",
+          "createdAt": "2026-07-10T22:01:59.194Z",
+          "jsonPath": "var/oreshnik/handoffs/S-HC-INFRA-BASELINE-GATES-RECOVERY/handoff-20260710T220159194Z-31711ebba025.json",
+          "markdownPath": "docs/oreshnik/handoffs/S-HC-INFRA-BASELINE-GATES-RECOVERY/handoff-20260710T220159194Z-31711ebba025.md",
+          "digest": "b1955e9a89f13764f300ead91f1b7890122994c2e41d0ff8060039c59a81f4be",
+          "classification": "BLOCKED_EXTERNAL"
         }
       ]
     }

@@ -6,7 +6,7 @@ task_id: "S-HC-INBOX-01-UNIFIED-ENGAGEMENT"
 sprint: "engagement"
 status: "blocked"
 owner: "Manuel"
-last_updated: "2026-07-01T20:31:05.696Z"
+last_updated: "2026-07-11T19:09:07.244Z"
 source: "var/oreshnik/tasks/S-HC-INBOX-01-UNIFIED-ENGAGEMENT.json"
 ---
 

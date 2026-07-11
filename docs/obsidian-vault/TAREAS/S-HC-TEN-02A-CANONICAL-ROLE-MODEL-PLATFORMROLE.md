@@ -4,9 +4,9 @@ type: task-runtime
 project: "HeptaCore"
 task_id: "S-HC-TEN-02A-CANONICAL-ROLE-MODEL-PLATFORMROLE"
 sprint: "tenant-platform"
-status: "in_progress"
+status: "integrated"
 owner: "Manuel"
-last_updated: "2026-07-09T00:00:00.000Z"
+last_updated: "2026-07-11T19:09:07.244Z"
 source: "var/oreshnik/tasks/S-HC-TEN-02A-CANONICAL-ROLE-MODEL-PLATFORMROLE.json"
 ---
 
@@ -14,15 +14,15 @@ source: "var/oreshnik/tasks/S-HC-TEN-02A-CANONICAL-ROLE-MODEL-PLATFORMROLE.json"
 
 ## Scope
 
-Repair the platform and tenant role model so `SUPER_ADMIN` lives only on `User.platformRole` and tenant memberships keep only `TENANT_ADMIN` and `PUBLISHER`.
+Canonical platform and tenant role model repair
 
 ## Runtime
 
-- estado: `in_progress`
+- estado: `integrated`
 - owner: `Manuel`
 - backup: `Manuel`
 - intentos: `0`
-- handoff: `docs/oreshnik/S-HC-TEN-02A-CANONICAL-ROLE-MODEL-PLATFORMROLE.md`
+- handoff: docs/oreshnik/S-HC-TEN-02A-CANONICAL-ROLE-MODEL-PLATFORMROLE.md
 
 ## Dependencias
 
@@ -49,11 +49,11 @@ Repair the platform and tenant role model so `SUPER_ADMIN` lives only on `User.p
 
 ## Aceptacion
 
-- `SUPER_ADMIN` se almacena solo en `User.platformRole`
-- `Membership.role` queda restringido a `TENANT_ADMIN` y `PUBLISHER`
-- `activeTenantId` no concede autorizacion
-- primer password y recovery quedan endurecidos
-- la reparacion heredada aborta si encuentra roles ambiguos
+- SUPER_ADMIN is stored only on User.platformRole
+- Membership.role keeps only TENANT_ADMIN and PUBLISHER as functional roles
+- First-password and recovery flows are hardened
+- Legacy repair is idempotent and aborts on ambiguous roles
+- PR #7 and alpha.15 adoption remain untouched
 
 ## Runs
 

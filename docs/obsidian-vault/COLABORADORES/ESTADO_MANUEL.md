@@ -1,15 +1,16 @@
+<!-- ORESHNIK:GENERATED:START -->
 ---
 type: collaborator-status
 project: "HeptaCore"
 operator: "Manuel"
-last_updated: "2026-07-10T17:42:27.958Z"
+last_updated: "2026-07-11T19:09:07.423Z"
 generated_by: "Oreshnik canonical-check"
 source: "var/oreshnik/task-board.json"
 ---
 
 # Estado Manuel
 
-> Documento derivado. La fuente operativa es `var/oreshnik/task-board.json`.
+> Documento derivado. `var/oreshnik/task-board.json` es la proyeccion compatible que debe mantenerse alineada con los artefactos durables de runtime.
 
 ## Ready
 
@@ -17,6 +18,7 @@ source: "var/oreshnik/task-board.json"
 |---|---|---|
 | S-HC-PUB-06-REELS-STORIES-PUBLISHERS | Real publishing for Meta Reels and Stories: Instagram + Facebook | S-HC-PUB-03-MULTITENANT-ASSETS, S-HC-PUB-04-HOURLY-BATCH-CRON |
 | S-HC-PUB-07-YOUTUBE-PUBLISHING | Real publishing for YouTube: Video 16:9 and YouTube Shorts | S-HC-PUB-03-MULTITENANT-ASSETS, S-HC-PUB-04-HOURLY-BATCH-CRON |
+| S-HC-STRAT-03-INTAKE-TO-ACTIVE-STRATEGY | End-to-end intake, generated strategy persistence, approval and calendar materialization | - |
 
 ## Pending
 
@@ -331,7 +333,7 @@ Zonas: `examples/tenants/cepeg`, `apps/web`, `packages/db`
 
 ### S-HC-TEN-02A-CANONICAL-ROLE-MODEL-PLATFORMROLE - Canonical platform and tenant role model repair
 
-Estado: `in_progress`
+Estado: `integrated`
 
 - SUPER_ADMIN is stored only on User.platformRole
 - Membership.role keeps only TENANT_ADMIN and PUBLISHER as functional roles
@@ -341,3 +343,24 @@ Estado: `in_progress`
 
 Zonas: `packages/db/**`, `apps/web/lib/**`, `apps/web/app/**`, `scripts/**`, `docs/**`, `var/oreshnik/**`
 
+### S-HC-STRAT-03-INTAKE-TO-ACTIVE-STRATEGY - End-to-end intake, generated strategy persistence, approval and calendar materialization
+
+Estado: `ready`
+
+- A tenant can enter a structured intake without pasting a completed strategy
+- Generation uses the exact current form values, networks, timezone and start date
+- A strict four-week platform-specific strategy includes exact times, copy, scripts, assets, KPI and hypotheses
+- Draft strategy persists across reload and successive generations create identifiable versions
+- Human review, approval and activation lifecycle exists
+- Activation transactionally materializes pillars, calendar-ready drafts and asset requirements
+- Repeated activation creates no duplicate pillars or drafts
+- Deterministic fallback is visibly distinct from real LLM generation
+- No live social publication or campaign spend occurs
+- Prisma, authentication and authorization remain unchanged unless an Oreshnik double lock is acquired
+- Focused tests, full gates, evidence and canonical handoff pass
+- Terminal state is READY_FOR_MANUAL_QA pending Manuel validation in Preview
+
+Zonas: `apps/web/components/dashboard-console.tsx`, `apps/web/app/api/strategy/**`, `apps/web/lib/**strategy**`, `apps/web/lib/dashboard.ts`, `packages/agents/src/**`, `packages/core/src/**strategy**`, `docs/oreshnik/**`, `docs/07_handoffs/**`, `apps/web/lib/__tests__/**`, `packages/agents/src/**/*.test.*`
+
+
+<!-- ORESHNIK:GENERATED:END -->

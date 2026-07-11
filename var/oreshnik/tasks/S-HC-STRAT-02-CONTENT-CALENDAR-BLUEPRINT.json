@@ -3,12 +3,12 @@
   "taskId": "S-HC-STRAT-02-CONTENT-CALENDAR-BLUEPRINT",
   "sprint": "strategy",
   "sprintOrderIndex": 23,
-  "taskOrderIndex": 35,
+  "taskOrderIndex": 36,
   "title": "Content calendar blueprint: master publishing calendar from strategy",
   "owner": "Manuel",
   "backupOwner": "Manuel",
   "status": "blocked",
-  "taskBoardPath": "D:\\PROYECTOS\\WORKTREES\\HC_ASSET02_STATE_REPAIR\\var\\oreshnik\\task-board.json",
+  "taskBoardPath": "/home/runner/work/HeptaCore/HeptaCore/var/oreshnik/task-board.json",
   "zone": [
     "apps/web/components",
     "apps/web/lib/dashboard.ts",
@@ -32,6 +32,6 @@
       "description": "Task status reconciled to blocked: dependency S-HC-STRAT-01-MASTER-STRATEGY-WORKBENCH still pending (S-HC-STRAT-01-MASTER-STRATEGY-WORKBENCH:pending)"
     }
   ],
-  "updatedAt": "2026-07-01T20:31:05.696Z",
+  "updatedAt": "2026-07-11T19:09:07.244Z",
   "runs": []
 }

@@ -3,12 +3,12 @@
   "taskId": "S-HC-COMM-02-BILLING-ACTIVATION",
   "sprint": "commercial",
   "sprintOrderIndex": 9,
-  "taskOrderIndex": 13,
+  "taskOrderIndex": 14,
   "title": "Tenant billing activation: plan selection, usage tracking, payment integration",
   "owner": "Manuel",
   "backupOwner": "Manuel",
   "status": "blocked",
-  "taskBoardPath": "D:\\PROYECTOS\\WORKTREES\\HC_ASSET02_STATE_REPAIR\\var\\oreshnik\\task-board.json",
+  "taskBoardPath": "/home/runner/work/HeptaCore/HeptaCore/var/oreshnik/task-board.json",
   "zone": [
     "apps/web/app/api/billing",
     "packages/db",
@@ -31,6 +31,6 @@
       "description": "Task status reconciled to blocked: dependency S-HC-COMM-01-SELF-SERVICE-SIGNUP still pending (S-HC-COMM-01-SELF-SERVICE-SIGNUP:pending)"
     }
   ],
-  "updatedAt": "2026-07-01T20:31:05.696Z",
+  "updatedAt": "2026-07-11T19:09:07.244Z",
   "runs": []
 }

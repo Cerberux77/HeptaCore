@@ -3,12 +3,12 @@
   "taskId": "S-HC-AIGEN-01-ASSET-GENERATION-BROKER",
   "sprint": "ai-generation",
   "sprintOrderIndex": 5,
-  "taskOrderIndex": 7,
+  "taskOrderIndex": 8,
   "title": "AI asset generation broker: provider-agnostic, metered and billed",
   "owner": "Manuel",
   "backupOwner": "Manuel",
   "status": "blocked",
-  "taskBoardPath": "D:\\PROYECTOS\\WORKTREES\\HC_ASSET02_STATE_REPAIR\\var\\oreshnik\\task-board.json",
+  "taskBoardPath": "/home/runner/work/HeptaCore/HeptaCore/var/oreshnik/task-board.json",
   "zone": [
     "packages/agents",
     "apps/web/app/api",
@@ -34,6 +34,6 @@
       "description": "Task status reconciled to blocked: dependency S-HC-ASSET-01-STRATEGY-ASSET-MANIFEST still pending (S-HC-ASSET-01-STRATEGY-ASSET-MANIFEST:pending) | dependency S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE still pending (S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE:pending) | dependency S-HC-COMM-02-BILLING-ACTIVATION still pending (S-HC-COMM-02-BILLING-ACTIVATION:pending)"
     }
   ],
-  "updatedAt": "2026-07-01T20:31:05.696Z",
+  "updatedAt": "2026-07-11T19:09:07.244Z",
   "runs": []
 }

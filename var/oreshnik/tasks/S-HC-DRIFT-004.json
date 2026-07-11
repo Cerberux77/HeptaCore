@@ -3,12 +3,12 @@
   "taskId": "S-HC-DRIFT-004",
   "sprint": "ad-hoc",
   "sprintOrderIndex": 4,
-  "taskOrderIndex": 39,
+  "taskOrderIndex": 7,
   "title": "Corregido bug preexistente de colision de goal IDs descubierto por gate global durante ASSET-02",
   "owner": "Manuel",
   "backupOwner": "Manuel",
   "status": "done",
-  "taskBoardPath": "D:\\PROYECTOS\\WORKTREES\\HC_ASSET02_STATE_REPAIR\\var\\oreshnik\\task-board.json",
+  "taskBoardPath": "/home/runner/work/HeptaCore/HeptaCore/var/oreshnik/task-board.json",
   "zone": [
     "apps/web"
   ],
@@ -27,6 +27,6 @@
       "description": "Corregido bug preexistente de colision de goal IDs descubierto por gate global durante ASSET-02"
     }
   ],
-  "updatedAt": "2026-07-01T20:31:05.696Z",
+  "updatedAt": "2026-07-11T19:09:07.244Z",
   "runs": []
 }

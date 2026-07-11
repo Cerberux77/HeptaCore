@@ -3,12 +3,12 @@
   "taskId": "S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE",
   "sprint": "ai-infra",
   "sprintOrderIndex": 6,
-  "taskOrderIndex": 8,
+  "taskOrderIndex": 9,
   "title": "LLM provider selection, cost estimation and governance policy",
   "owner": "Manuel",
   "backupOwner": "Manuel",
   "status": "integrated",
-  "taskBoardPath": "D:\\PROYECTOS\\WORKTREES\\HC_ASSET02_STATE_REPAIR\\var\\oreshnik\\task-board.json",
+  "taskBoardPath": "/home/runner/work/HeptaCore/HeptaCore/var/oreshnik/task-board.json",
   "zone": [
     "packages/agents",
     "packages/core",
@@ -311,7 +311,7 @@
       "summary": "S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE:worker | exit=0 | timed_ok | signal=none | stdout=> heptacore@0.1.0 worker:validate | stderr=[config] .env.rrss no encontrado. Usando solo variables de entorno del sistema."
     }
   ],
-  "updatedAt": "2026-07-01T20:31:05.696Z",
+  "updatedAt": "2026-07-11T19:09:07.244Z",
   "runs": [
     {
       "runId": "codex-S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE-2026-06-29T02-30-49-546Z-c443db0b",

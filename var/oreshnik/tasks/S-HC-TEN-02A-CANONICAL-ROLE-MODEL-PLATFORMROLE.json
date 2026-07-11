@@ -8,6 +8,7 @@
   "owner": "Manuel",
   "backupOwner": "Manuel",
   "status": "integrated",
+  "taskBoardPath": "/home/runner/work/HeptaCore/HeptaCore/var/oreshnik/task-board.json",
   "zone": [
     "packages/db/**",
     "apps/web/lib/**",
@@ -19,40 +20,22 @@
   "dependsOn": [
     "S-HC-TEN-01-GLOBAL-TENANT-ADMIN"
   ],
-  "objective": "Replace the legacy membership-based SUPER_ADMIN/OWNER/ADMIN role model with the canonical split between User.platformRole=SUPER_ADMIN and Membership.role in {TENANT_ADMIN,PUBLISHER}, while hardening first-password and password recovery flows.",
-  "migrationContract": [
-    "Add User.platformRole as the only global SUPER_ADMIN storage",
-    "Keep Membership.role only for TENANT_ADMIN and PUBLISHER after repair",
-    "Convert Membership.SUPER_ADMIN into User.platformRole and remove obsolete SUPER_ADMIN memberships",
-    "Convert OWNER and ADMIN memberships to TENANT_ADMIN",
-    "Abort with safe report if STRATEGIST, EDITOR, ANALYST, APPROVER, or VIEWER are present in target data",
-    "Do not mutate production without explicit human approval"
-  ],
   "acceptance": [
     "SUPER_ADMIN is stored only on User.platformRole",
-    "Membership.role only allows TENANT_ADMIN and PUBLISHER as functional roles",
-    "activeTenantId selects context only and never grants authorization",
-    "mvera and jean bootstrap paths resolve as platform admins without tenant membership",
-    "First-password setup requires password confirmation and minimum length",
-    "Password reset tokens are one-time use, expiring, and do not reveal account existence",
-    "Legacy role repair is idempotent and aborts on ambiguous roles with a safe report"
+    "Membership.role keeps only TENANT_ADMIN and PUBLISHER as functional roles",
+    "First-password and recovery flows are hardened",
+    "Legacy repair is idempotent and aborts on ambiguous roles",
+    "PR #7 and alpha.15 adoption remain untouched"
   ],
-  "rollbackNotes": [
-    "Do not apply the repair script to production without prior backup and human approval",
-    "If ambiguous roles are detected, stop before enum finalization and keep legacy data untouched",
-    "Schema finalization must happen only after the repair report is clean"
-  ],
-  "evidencePath": "docs/oreshnik/S-HC-TEN-02A-CANONICAL-ROLE-MODEL-PLATFORMROLE.md",
-  "noSecrets": true,
-  "noProductionMutationWithoutApproval": true,
   "handoff": "docs/oreshnik/S-HC-TEN-02A-CANONICAL-ROLE-MODEL-PLATFORMROLE.md",
+  "attempts": 0,
   "history": [
     {
       "at": "2026-07-09T00:00:00.000Z",
       "action": "created",
       "operator": "Architect",
       "branch": "codex/s-hc-ten-02a-canonical-role-model-platformrole-2026-07-09",
-      "description": "Repair task created because TEN-01 closed with the obsolete OWNER/ADMIN/VIEWER model and SUPER_ADMIN inside Membership.role."
+      "description": "Repair task opened after validating that TEN-02 was already occupied by CEPEG onboarding and TEN-01 closed with the obsolete OWNER/ADMIN/VIEWER model."
     },
     {
       "at": "2026-07-10T17:46:36.000Z",
@@ -62,6 +45,6 @@
       "description": "Reconciled to integrated from GitHub evidence: implementation PR #9 merged at 2026-07-10T01:52:37Z and post-merge reconciliation PR #12 merged at 2026-07-10T17:46:36Z. No historical Run or claim was synthesized."
     }
   ],
-  "updatedAt": "2026-07-10T17:46:36.000Z",
+  "updatedAt": "2026-07-11T19:09:07.244Z",
   "runs": []
 }

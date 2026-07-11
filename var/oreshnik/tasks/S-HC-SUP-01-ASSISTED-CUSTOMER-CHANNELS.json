@@ -3,12 +3,12 @@
   "taskId": "S-HC-SUP-01-ASSISTED-CUSTOMER-CHANNELS",
   "sprint": "support",
   "sprintOrderIndex": 24,
-  "taskOrderIndex": 36,
+  "taskOrderIndex": 37,
   "title": "Assisted customer channels: LLM assistant, WhatsApp, email, human escalation",
   "owner": "Manuel",
   "backupOwner": "Manuel",
   "status": "blocked",
-  "taskBoardPath": "D:\\PROYECTOS\\WORKTREES\\HC_ASSET02_STATE_REPAIR\\var\\oreshnik\\task-board.json",
+  "taskBoardPath": "/home/runner/work/HeptaCore/HeptaCore/var/oreshnik/task-board.json",
   "zone": [
     "apps/web/components",
     "apps/web/app/api/assistant",
@@ -31,6 +31,6 @@
       "description": "Task status reconciled to blocked: dependency S-HC-COMM-02-BILLING-ACTIVATION still pending (S-HC-COMM-02-BILLING-ACTIVATION:pending)"
     }
   ],
-  "updatedAt": "2026-07-01T20:31:05.696Z",
+  "updatedAt": "2026-07-11T19:09:07.244Z",
   "runs": []
 }
