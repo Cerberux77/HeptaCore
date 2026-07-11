@@ -1,0 +1,70 @@
+{
+  "schema": "heptacore-oreshnik-cloud-request/v1",
+  "requestId": "OCR-S-HC-STRAT-03-20260711",
+  "project": "HeptaCore",
+  "taskId": "S-HC-STRAT-03-INTAKE-TO-ACTIVE-STRATEGY",
+  "title": "End-to-end intake, generated strategy persistence, approval and calendar materialization",
+  "requestedBy": "manuel",
+  "requestedAt": "2026-07-11T17:45:00Z",
+  "state": "READY_FOR_CANONICAL_INJECTION",
+  "priority": "critical",
+  "track": "strategy",
+  "owner": "Manuel",
+  "harness": "codex",
+  "executionProfile": {
+    "preferredModel": "gpt-5.6-sol",
+    "reasoningEffort": "extra_high",
+    "modelSelectionPolicy": "advisory_for_cloud_use_platform_default_if_not_configurable",
+    "why": "Cross-cutting product correction spanning intake UX, API contracts, strict structured generation, persistence, transactional activation, timezone scheduling, tenant isolation and regression tests."
+  },
+  "goalDocument": "docs/oreshnik/S-HC-STRAT-03-INTAKE-TO-ACTIVE-STRATEGY.md",
+  "evidenceRequired": [
+    "code",
+    "integration",
+    "ui"
+  ],
+  "gates": [
+    "npm run oreshnik:ready",
+    "npm run typecheck",
+    "npm run build",
+    "npm run test",
+    "npm run worker:validate",
+    "oreshnik reconcile --check --json"
+  ],
+  "allowedZones": [
+    "apps/web/components/dashboard-console.tsx",
+    "apps/web/app/api/strategy/**",
+    "apps/web/lib/**strategy**",
+    "apps/web/lib/dashboard.ts",
+    "packages/agents/src/**",
+    "packages/core/src/**strategy**",
+    "docs/oreshnik/**",
+    "docs/07_handoffs/**",
+    "apps/web/lib/__tests__/**",
+    "packages/agents/src/**/*.test.*"
+  ],
+  "protectedZones": [
+    "packages/db/prisma/schema.prisma",
+    "apps/web/lib/auth*",
+    "apps/web/app/api/auth/**",
+    ".env*",
+    "vercel.json",
+    "publishing provider adapters"
+  ],
+  "hardStops": [
+    "No live social publication.",
+    "No campaign spend.",
+    "No production deployment.",
+    "No credentials or API keys in Git, logs, fixtures or screenshots.",
+    "No Prisma schema, authentication or authorization model change without an explicit Oreshnik double lock and documented necessity.",
+    "Do not create a Run, claim or assignment by editing runtime JSON manually; use the installed Oreshnik CLI and exact Codex instance context."
+  ],
+  "startupContract": [
+    "Read AGENTS.md and the goal document.",
+    "Run npm run oreshnik:ready.",
+    "Inspect the installed Oreshnik inject/dispatch help and register this request canonically without hand-editing runtime state.",
+    "Invoke oreshnik goal --harness codex --repo . --json so Oreshnik resolves operator, instance, session and exact resumable/new Run.",
+    "Implement only inside the assigned worktree and zones returned by Oreshnik."
+  ],
+  "terminalState": "READY_FOR_MANUAL_QA"
+}
