@@ -1,0 +1,143 @@
+name: Oreshnik STRAT-03 Canonical Registration
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - ".github/workflows/oreshnik-strat03-register.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: read
+
+concurrency:
+  group: oreshnik-strat03-canonical-registration
+  cancel-in-progress: false
+
+jobs:
+  register-and-reconcile:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout full repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Setup Node 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Configure canonical Git identity and origin
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "Oreshnik Control Plane"
+          git config user.email "oreshnik-control@users.noreply.github.com"
+          git remote set-url origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          git fetch --prune origin '+refs/heads/*:refs/remotes/origin/*' '+refs/oreshnik/*:refs/oreshnik/*' || git fetch --prune origin
+          git remote -v
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install locked dependencies
+        run: npm ci
+
+      - name: Capture readiness before registration
+        shell: bash
+        run: |
+          set +e
+          npm run oreshnik:ready 2>&1 | tee /tmp/strat03-readiness-before.log
+          echo "exit_code=${PIPESTATUS[0]}" >> "$GITHUB_OUTPUT"
+          exit 0
+        id: readiness_before
+
+      - name: Register exact canonical Task ID
+        run: node scripts/oreshnik/register-strat03.mjs
+
+      - name: Regenerate canonical Oreshnik projections
+        shell: bash
+        run: |
+          set -euo pipefail
+          node node_modules/oreshnik-cli/dist/cli.js reconcile \
+            --write \
+            --sprint S-HC-STRAT-03-INTAKE-TO-ACTIVE-STRATEGY \
+            --operator manuel \
+            --json | tee /tmp/strat03-reconcile-write.json
+
+      - name: Validate task board and canonical projections
+        shell: bash
+        run: |
+          set -euo pipefail
+          node node_modules/oreshnik-cli/dist/cli.js reconcile \
+            --check \
+            --sprint S-HC-STRAT-03-INTAKE-TO-ACTIVE-STRATEGY \
+            --operator manuel \
+            --json | tee /tmp/strat03-reconcile-check.json
+          git diff --check
+
+      - name: Commit canonical registration
+        shell: bash
+        run: |
+          set -euo pipefail
+          git add var/oreshnik docs scripts/oreshnik/register-strat03.mjs
+          if git diff --cached --quiet; then
+            echo "No versioned registration changes were required."
+          else
+            git commit -m "chore(oreshnik): canonically register STRAT-03"
+            git push origin HEAD:master
+          fi
+
+      - name: Reconcile remote Oreshnik control plane
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch --prune origin '+refs/heads/*:refs/remotes/origin/*' '+refs/oreshnik/*:refs/oreshnik/*' || git fetch --prune origin
+          node node_modules/oreshnik-cli/dist/cli.js dispatch reconcile --repo . --json | tee /tmp/strat03-dispatch-reconcile.json
+          node node_modules/oreshnik-cli/dist/cli.js dispatch status --repo . --json | tee /tmp/strat03-dispatch-status.json
+
+      - name: Final readiness and exact task verification
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm run oreshnik:ready | tee /tmp/strat03-readiness-after.log
+          node - <<'NODE'
+          const fs = require('node:fs');
+          const board = JSON.parse(fs.readFileSync('var/oreshnik/task-board.json', 'utf8'));
+          const id = 'S-HC-STRAT-03-INTAKE-TO-ACTIVE-STRATEGY';
+          const task = board.tasks.find((entry) => entry.id === id);
+          if (!task) throw new Error(`Canonical task ${id} was not registered`);
+          if (!['ready', 'claimed', 'active'].includes(task.status)) {
+            throw new Error(`Canonical task has unexpected status ${task.status}`);
+          }
+          console.log(JSON.stringify({
+            taskId: task.id,
+            status: task.status,
+            owner: task.owner,
+            track: task.track,
+            priority: task.priority,
+            executionRecommendation: task.executionRecommendation,
+            taskExecutionPolicy: task.taskExecutionPolicy
+          }, null, 2));
+          NODE
+
+      - name: Upload Oreshnik registration evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: oreshnik-strat03-registration-evidence
+          path: |
+            /tmp/strat03-readiness-before.log
+            /tmp/strat03-reconcile-write.json
+            /tmp/strat03-reconcile-check.json
+            /tmp/strat03-dispatch-reconcile.json
+            /tmp/strat03-dispatch-status.json
+            /tmp/strat03-readiness-after.log
+          if-no-files-found: ignore
+          retention-days: 14
