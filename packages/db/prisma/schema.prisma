@@ -576,4 +576,5 @@ enum OAuthProvider {
   FACEBOOK
   INSTAGRAM
   WHATSAPP
+  YOUTUBE
 }

@@ -3,10 +3,12 @@ export const MULTIFORMAT_VALUES = [
   "INSTAGRAM_CAROUSEL",
   "INSTAGRAM_STORY",
   "FACEBOOK_FEED",
+  "YOUTUBE_VIDEO",
+  "YOUTUBE_SHORT",
 ] as const;
 
 export type PublishingFormat = (typeof MULTIFORMAT_VALUES)[number];
-export type PublishingPlatform = "INSTAGRAM" | "FACEBOOK";
+export type PublishingPlatform = "INSTAGRAM" | "FACEBOOK" | "YOUTUBE";
 
 export type DraftFormatAsset = {
   id: string;
@@ -79,6 +81,7 @@ export type PublishingFormatConfig = {
 
 const IMAGE_MIMES = ["image/jpeg", "image/png", "image/webp"];
 const VIDEO_MIMES = ["video/mp4", "video/quicktime"];
+const YOUTUBE_VIDEO_MIMES = ["video/mp4", "video/quicktime", "video/webm"];
 
 export const PUBLISHING_FORMAT_CONFIGS: Record<PublishingFormat, PublishingFormatConfig> = {
   INSTAGRAM_FEED: {
@@ -161,6 +164,41 @@ export const PUBLISHING_FORMAT_CONFIGS: Record<PublishingFormat, PublishingForma
     },
     preview: { aspectRatio: "1.91 / 1" },
   },
+  YOUTUBE_VIDEO: {
+    format: "YOUTUBE_VIDEO",
+    platform: "YOUTUBE",
+    label: "YouTube Video 16:9",
+    assetRule: {
+      min: 1,
+      max: 1,
+      acceptedMimeTypes: [...YOUTUBE_VIDEO_MIMES],
+      aspectRatios: [{ label: "16:9", ratio: 16 / 9, tolerance: 0.05 }],
+      minWidth: 1280,
+      minHeight: 720,
+      maxSizeBytes: 100 * 1024 * 1024,
+      maxDurationSeconds: 12 * 60 * 60,
+    },
+    preview: { aspectRatio: "16 / 9" },
+  },
+  YOUTUBE_SHORT: {
+    format: "YOUTUBE_SHORT",
+    platform: "YOUTUBE",
+    label: "YouTube Shorts",
+    assetRule: {
+      min: 1,
+      max: 1,
+      acceptedMimeTypes: [...YOUTUBE_VIDEO_MIMES],
+      aspectRatios: [{ label: "9:16", ratio: 9 / 16, tolerance: 0.05 }],
+      minWidth: 720,
+      minHeight: 1280,
+      maxSizeBytes: 100 * 1024 * 1024,
+      maxDurationSeconds: 180,
+    },
+    preview: {
+      aspectRatio: "9 / 16",
+      safeAreas: { topPercent: 10, bottomPercent: 20, sidePercent: 6 },
+    },
+  },
 };
 
 const EXTENSION_MIMES: Record<string, string> = {
@@ -170,6 +208,7 @@ const EXTENSION_MIMES: Record<string, string> = {
   webp: "image/webp",
   mp4: "video/mp4",
   mov: "video/quicktime",
+  webm: "video/webm",
 };
 
 function numberFrom(value: unknown): number | null {
@@ -194,6 +233,10 @@ export function inferMimeType(asset: Pick<DraftFormatAsset, "mimeType" | "filena
 export function normalizePublishingFormat(network: string, format?: string | null): PublishingFormat {
   const raw = String(format ?? "").trim().toUpperCase();
   if (MULTIFORMAT_VALUES.includes(raw as PublishingFormat)) return raw as PublishingFormat;
+  if (network === "YOUTUBE") {
+    if (raw.includes("SHORT")) return "YOUTUBE_SHORT";
+    return "YOUTUBE_VIDEO";
+  }
   if (network === "FACEBOOK") return "FACEBOOK_FEED";
   if (raw.includes("CAROUSEL") || raw.includes("CARRUSEL")) return "INSTAGRAM_CAROUSEL";
   if (raw.includes("STORY") || raw.includes("HISTORIA")) return "INSTAGRAM_STORY";
@@ -375,4 +418,48 @@ export function buildMultiformatDryRun(format: PublishingFormat, assets: DraftFo
     assets,
     previewData: buildPreviewData(format, assets),
   };
+}
+
+export const YOUTUBE_THUMBNAIL_MIMES = ["image/jpeg", "image/png", "image/webp"];
+
+export type YouTubePublishGateResult = {
+  blocked: boolean;
+  code: "LIVE_BLOCKED_FORMAT_VALIDATION" | null;
+  problems: string[];
+  validation: MultiformatDryRunResult;
+};
+
+/**
+ * Shared decision used by the publish route for YouTube live + scheduled modes.
+ *
+ * It validates the main video asset(s) against the format rule (the thumbnail is
+ * NOT counted as a second video asset) and, for YOUTUBE_VIDEO, requires a valid
+ * public image thumbnail. The same gate protects both `immediate` and
+ * `scheduled`, so a horizontal / over-long / wrong-MIME short or a video without
+ * a valid thumbnail can never bypass dry-run into a real publish or a job.
+ */
+export function evaluateYouTubePublishGate(params: {
+  format: PublishingFormat;
+  videoAssets: DraftFormatAsset[];
+  thumbnail: DraftFormatAsset | null;
+}): YouTubePublishGateResult {
+  const validation = buildMultiformatDryRun(params.format, params.videoAssets);
+  const problems = validation.errors.map((error) => error.code);
+
+  if (params.format === "YOUTUBE_VIDEO") {
+    if (!params.thumbnail) {
+      problems.push("THUMBNAIL_REQUIRED");
+    } else {
+      const mime = inferMimeType(params.thumbnail);
+      if (!mime || !YOUTUBE_THUMBNAIL_MIMES.includes(mime)) {
+        problems.push("THUMBNAIL_MIME");
+      }
+      if (!params.thumbnail.url) {
+        problems.push("THUMBNAIL_NOT_PUBLIC");
+      }
+    }
+  }
+
+  const blocked = !validation.valid || problems.length > 0;
+  return { blocked, code: blocked ? "LIVE_BLOCKED_FORMAT_VALIDATION" : null, problems, validation };
 }
