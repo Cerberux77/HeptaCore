@@ -43,7 +43,7 @@ function LoginForm() {
 
       <form onSubmit={handleSubmit} className="login-form">
         <label className="login-label">
-          Correo electrónico
+          Usuario o correo
           <input
             type="text"
             value={email}

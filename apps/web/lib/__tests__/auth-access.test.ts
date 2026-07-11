@@ -69,7 +69,7 @@ describe("auth access routing", () => {
     const { readFileSync } = await import("node:fs");
     const loginSource = readFileSync(new URL("../../app/login/page.tsx", import.meta.url), "utf8");
     assert.doesNotMatch(loginSource, /type="email"/);
-    assert.match(loginSource, /Correo electrónico/);
+    assert.match(loginSource, /Usuario o correo/);
   });
 
   it("membership added after login refreshes token claims", () => {

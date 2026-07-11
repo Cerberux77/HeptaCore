@@ -1,7 +1,7 @@
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
-import { applyMembershipClaims } from "./auth-token-claims";
+import { hydrateAuthTokenClaims } from "./auth-token-claims";
 import { prisma } from "./prisma";
 
 function authDiagnosticsEnabled(): boolean {
@@ -11,6 +11,11 @@ function authDiagnosticsEnabled(): boolean {
 function logAuthDiagnostic(event: string, payload: Record<string, unknown>) {
   if (!authDiagnosticsEnabled()) return;
   console.info(`[auth.credentials] ${event}`, payload);
+}
+
+function logAuthJwtDiagnostic(event: string, payload: Record<string, unknown>) {
+  if (!authDiagnosticsEnabled()) return;
+  console.info(`[auth.jwt] ${event}`, payload);
 }
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
@@ -68,16 +73,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       }
 
       if (token.id) {
-        const authUser = await prisma.user.findUnique({
-          where: { id: token.id },
-          select: { platformRole: true },
-        });
-        const memberships = await prisma.membership.findMany({
-          where: { userId: token.id },
-          orderBy: { createdAt: "asc" },
-          select: { tenantId: true, role: true },
-        });
-        applyMembershipClaims(token, memberships, authUser?.platformRole ?? null);
+        await hydrateAuthTokenClaims(token, prisma, logAuthJwtDiagnostic);
       }
       return token;
     },

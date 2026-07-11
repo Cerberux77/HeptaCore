@@ -40,6 +40,15 @@ export class PasswordResetError extends Error {
 
 type PasswordResetDb = Prisma.TransactionClient;
 
+function authDiagnosticsEnabled(): boolean {
+  return process.env.HEPTACORE_AUTH_DIAGNOSTICS === "1";
+}
+
+function logPasswordResetDiagnostic(event: string, payload: Record<string, unknown>) {
+  if (!authDiagnosticsEnabled()) return;
+  console.info(`[auth.reset] ${event}`, payload);
+}
+
 function hashPasswordResetToken(token: string): string {
   return createHash("sha256").update(token).digest("hex");
 }
@@ -104,6 +113,24 @@ export async function consumePasswordResetToken(
   await db.user.update({
     where: { id: stored.userId },
     data: { passwordHash },
+  });
+
+  const updatedUser = authDiagnosticsEnabled()
+    ? await db.user.findUnique({
+      where: { id: stored.userId },
+      select: { id: true, email: true, passwordHash: true },
+    })
+    : null;
+
+  const immediateCompareOk = updatedUser?.passwordHash
+    ? await bcrypt.compare(password, updatedUser.passwordHash)
+    : false;
+
+  logPasswordResetDiagnostic("password update verification", {
+    normalizedIdentifier: updatedUser ? normalizeRecoveryIdentifier(updatedUser.email) : null,
+    userId: stored.userId,
+    passwordHashUpdated: Boolean(updatedUser?.passwordHash),
+    immediateCompareOk,
   });
 
   await db.passwordResetToken.update({

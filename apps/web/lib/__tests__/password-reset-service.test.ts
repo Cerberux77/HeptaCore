@@ -11,6 +11,7 @@ import {
 function createFakeDb() {
   const users = [
     { id: "u1", email: "jean@test.com", passwordHash: null },
+    { id: "u2", email: "mvera", passwordHash: null },
   ] as Array<{ id: string; email: string; passwordHash: string | null }>;
   const tokens: Array<{
     id: string;
@@ -127,5 +128,19 @@ describe("password reset service", () => {
     await consumePasswordResetToken({ token, password: "securePass123", confirmPassword: "securePass123" }, db as never);
     assert.ok(db.users[0].passwordHash);
     assert.equal(await bcrypt.compare("securePass123", db.users[0].passwordHash as string), true);
+  });
+
+  it("resets a legacy identifier and the stored hash matches immediately", async () => {
+    const db = createFakeDb();
+    const token = await issuePasswordResetForUser("u2", db as never);
+    const result = await consumePasswordResetToken({
+      token,
+      password: "Mvera2026test",
+      confirmPassword: "Mvera2026test",
+    }, db as never);
+
+    assert.equal(result.ok, true);
+    assert.ok(db.users[1].passwordHash);
+    assert.equal(await bcrypt.compare("Mvera2026test", db.users[1].passwordHash as string), true);
   });
 });
