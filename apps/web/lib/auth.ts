@@ -1,8 +1,22 @@
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
-import { applyMembershipClaims } from "./auth-token-claims";
+import { hydrateAuthTokenClaims } from "./auth-token-claims";
 import { prisma } from "./prisma";
+
+function authDiagnosticsEnabled(): boolean {
+  return process.env.HEPTACORE_AUTH_DIAGNOSTICS === "1";
+}
+
+function logAuthDiagnostic(event: string, payload: Record<string, unknown>) {
+  if (!authDiagnosticsEnabled()) return;
+  console.info(`[auth.credentials] ${event}`, payload);
+}
+
+function logAuthJwtDiagnostic(event: string, payload: Record<string, unknown>) {
+  if (!authDiagnosticsEnabled()) return;
+  console.info(`[auth.jwt] ${event}`, payload);
+}
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   providers: [
@@ -13,15 +27,36 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
+        logAuthDiagnostic("attempt", {
+          rawIdentifierLength: String(credentials?.email ?? "").length,
+          hasPasswordInput: Boolean(credentials?.password),
+        });
+
         if (!credentials?.email || !credentials?.password) return null;
 
         const email = String(credentials.email).toLowerCase().trim();
         const password = String(credentials.password);
 
+        logAuthDiagnostic("normalized", {
+          normalizedIdentifier: email,
+        });
+
         const user = await prisma.user.findUnique({ where: { email } });
+        logAuthDiagnostic("user lookup", {
+          normalizedIdentifier: email,
+          userFound: Boolean(user),
+          hasPasswordHash: Boolean(user?.passwordHash),
+          platformRole: user?.platformRole ?? null,
+        });
+
         if (!user || !user.passwordHash) return null;
 
         const valid = await bcrypt.compare(password, user.passwordHash);
+        logAuthDiagnostic("password compare", {
+          normalizedIdentifier: email,
+          valid,
+        });
+
         if (!valid) return null;
 
         return { id: user.id, email: user.email, name: user.name };
@@ -38,16 +73,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       }
 
       if (token.id) {
-        const authUser = await prisma.user.findUnique({
-          where: { id: token.id },
-          select: { platformRole: true },
-        });
-        const memberships = await prisma.membership.findMany({
-          where: { userId: token.id },
-          orderBy: { createdAt: "asc" },
-          select: { tenantId: true, role: true },
-        });
-        applyMembershipClaims(token, memberships, authUser?.platformRole ?? null);
+        await hydrateAuthTokenClaims(token, prisma, logAuthJwtDiagnostic);
       }
       return token;
     },
