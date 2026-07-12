@@ -6,6 +6,9 @@ on:
       - master
     paths:
       - ".github/workflows/oreshnik-strat03-register.yml"
+  pull_request:
+    branches:
+      - master
   workflow_dispatch:
 
 permissions:
