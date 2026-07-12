@@ -1,4 +1,4 @@
-name: Oreshnik STRAT-03 Canonical Registration
+name: Oreshnik STRAT-03 Operator Dispatch
 
 on:
   push:
@@ -10,21 +10,28 @@ on:
 
 permissions:
   contents: write
+  issues: write
+  pull-requests: write
   actions: read
 
 concurrency:
-  group: oreshnik-strat03-canonical-registration
+  group: oreshnik-strat03-operator-dispatch
   cancel-in-progress: false
 
 jobs:
-  register-and-reconcile:
+  dispatch:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 45
+
+    env:
+      TASK_ID: S-HC-STRAT-03-INTAKE-TO-ACTIVE-STRATEGY
+      ORESHNIK_CLI: node node_modules/oreshnik-cli/dist/cli.js
 
     steps:
-      - name: Checkout full repository
+      - name: Checkout canonical master
         uses: actions/checkout@v4
         with:
+          ref: master
           fetch-depth: 0
           persist-credentials: true
 
@@ -34,110 +41,222 @@ jobs:
           node-version: 24
           cache: npm
 
-      - name: Configure canonical Git identity and origin
+      - name: Configure authenticated origin
         shell: bash
-        run: |
-          set -euo pipefail
-          git config user.name "Oreshnik Control Plane"
-          git config user.email "oreshnik-control@users.noreply.github.com"
-          git remote set-url origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
-          git fetch --prune origin '+refs/heads/*:refs/remotes/origin/*' '+refs/oreshnik/*:refs/oreshnik/*' || git fetch --prune origin
-          git remote -v
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          git config user.name "Manuel Vera via ChatGPT Operator"
+          git config user.email "manuel@heptacore.dev"
+          git remote set-url origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          git fetch --prune origin '+refs/heads/*:refs/remotes/origin/*' '+refs/oreshnik/*:refs/oreshnik/*' || git fetch --prune origin
+          test "$(git rev-parse HEAD)" = "$(git rev-parse origin/master)"
+          echo "origin=https://github.com/${GITHUB_REPOSITORY}.git"
+          echo "master=$(git rev-parse HEAD)"
 
       - name: Install locked dependencies
         run: npm ci
 
-      - name: Capture readiness before registration
-        shell: bash
-        run: |
-          set +e
-          npm run oreshnik:ready 2>&1 | tee /tmp/strat03-readiness-before.log
-          echo "exit_code=${PIPESTATUS[0]}" >> "$GITHUB_OUTPUT"
-          exit 0
-        id: readiness_before
-
-      - name: Register exact canonical Task ID
-        run: node scripts/oreshnik/register-strat03.mjs
-
-      - name: Regenerate canonical Oreshnik projections
+      - name: Verify canonical STRAT-03 registration
         shell: bash
         run: |
           set -euo pipefail
-          node node_modules/oreshnik-cli/dist/cli.js reconcile \
-            --write \
-            --sprint S-HC-STRAT-03-INTAKE-TO-ACTIVE-STRATEGY \
-            --operator manuel \
-            --json | tee /tmp/strat03-reconcile-write.json
+          node - <<'NODE'
+          const fs = require('node:fs');
+          const taskId = process.env.TASK_ID;
+          const board = JSON.parse(fs.readFileSync('var/oreshnik/task-board.json', 'utf8'));
+          const task = board.tasks.find((entry) => entry.id === taskId);
+          if (!task) throw new Error(`Canonical task ${taskId} is absent from task-board`);
+          if (!['ready', 'claimed', 'active'].includes(task.status)) {
+            throw new Error(`Task ${taskId} is not dispatchable; status=${task.status}`);
+          }
+          console.log(JSON.stringify({ taskId: task.id, status: task.status, owner: task.owner, zones: task.zone }, null, 2));
+          NODE
 
-      - name: Validate task board and canonical projections
+      - name: Oreshnik readiness
         shell: bash
         run: |
           set -euo pipefail
-          node node_modules/oreshnik-cli/dist/cli.js reconcile \
-            --check \
-            --sprint S-HC-STRAT-03-INTAKE-TO-ACTIVE-STRATEGY \
-            --operator manuel \
-            --json | tee /tmp/strat03-reconcile-check.json
-          git diff --check
+          npm run oreshnik:ready 2>&1 | tee /tmp/strat03-readiness.log
 
-      - name: Commit canonical registration
+      - name: Register this GitHub Actions runner in Oreshnik
+        id: init
         shell: bash
         run: |
           set -euo pipefail
-          git add var/oreshnik docs scripts/oreshnik/register-strat03.mjs
-          if git diff --cached --quiet; then
-            echo "No versioned registration changes were required."
-          else
-            git commit -m "chore(oreshnik): canonically register STRAT-03"
-            git push origin HEAD:master
-          fi
+          WORKTREE_ROOT="${RUNNER_TEMP}/oreshnik-wt"
+          mkdir -p "$WORKTREE_ROOT"
+          echo "worktree_root=$WORKTREE_ROOT" >> "$GITHUB_OUTPUT"
+          $ORESHNIK_CLI dispatch init \
+            --mother master \
+            --worktree-root "$WORKTREE_ROOT" \
+            --repo . \
+            --json | tee /tmp/strat03-dispatch-init.json
 
       - name: Reconcile remote Oreshnik control plane
         shell: bash
         run: |
           set -euo pipefail
           git fetch --prune origin '+refs/heads/*:refs/remotes/origin/*' '+refs/oreshnik/*:refs/oreshnik/*' || git fetch --prune origin
-          node node_modules/oreshnik-cli/dist/cli.js dispatch reconcile --repo . --json | tee /tmp/strat03-dispatch-reconcile.json
-          node node_modules/oreshnik-cli/dist/cli.js dispatch status --repo . --json | tee /tmp/strat03-dispatch-status.json
+          $ORESHNIK_CLI dispatch reconcile --repo . --json | tee /tmp/strat03-dispatch-reconcile.json
+          $ORESHNIK_CLI dispatch status --repo . --json | tee /tmp/strat03-dispatch-status-before.json
 
-      - name: Final readiness and exact task verification
+      - name: Explain exact target eligibility
         shell: bash
         run: |
           set -euo pipefail
-          npm run oreshnik:ready | tee /tmp/strat03-readiness-after.log
+          $ORESHNIK_CLI dispatch explain \
+            --task "$TASK_ID" \
+            --operator manuel \
+            --repo . \
+            --json | tee /tmp/strat03-dispatch-explain.json
+
+      - name: Enter through Oreshnik goal as Manuel
+        id: goal
+        shell: bash
+        run: |
+          set -euo pipefail
+          $ORESHNIK_CLI goal \
+            --operator manuel \
+            --harness shell \
+            --task "$TASK_ID" \
+            --auto-align \
+            --repo . \
+            --max-retries 3 \
+            --json | tee /tmp/strat03-goal.json
+
           node - <<'NODE'
           const fs = require('node:fs');
-          const board = JSON.parse(fs.readFileSync('var/oreshnik/task-board.json', 'utf8'));
-          const id = 'S-HC-STRAT-03-INTAKE-TO-ACTIVE-STRATEGY';
-          const task = board.tasks.find((entry) => entry.id === id);
-          if (!task) throw new Error(`Canonical task ${id} was not registered`);
-          if (!['ready', 'claimed', 'active'].includes(task.status)) {
-            throw new Error(`Canonical task has unexpected status ${task.status}`);
+          const goal = JSON.parse(fs.readFileSync('/tmp/strat03-goal.json', 'utf8'));
+          if (!['assigned', 'resumed'].includes(goal.result)) {
+            throw new Error(`Oreshnik goal did not assign/resume the task: ${goal.result}`);
           }
+          if (goal.taskId !== process.env.TASK_ID) {
+            throw new Error(`Oreshnik returned wrong task: ${goal.taskId}`);
+          }
+          const required = ['runId', 'assignmentId', 'claimId', 'operator', 'agentInstanceAlias', 'sessionId', 'functionalBranch', 'worktreePath'];
+          for (const key of required) {
+            if (!goal[key]) throw new Error(`Oreshnik goal omitted ${key}`);
+          }
+          const output = process.env.GITHUB_OUTPUT;
+          const lines = [
+            `run_id=${goal.runId}`,
+            `assignment_id=${goal.assignmentId}`,
+            `claim_id=${goal.claimId}`,
+            `operator=${goal.operator}`,
+            `instance=${goal.agentInstanceAlias}`,
+            `session=${goal.sessionId}`,
+            `branch=${goal.functionalBranch}`,
+            `worktree=${goal.worktreePath}`,
+          ];
+          fs.appendFileSync(output, `${lines.join('\n')}\n`);
           console.log(JSON.stringify({
-            taskId: task.id,
-            status: task.status,
-            owner: task.owner,
-            track: task.track,
-            priority: task.priority,
-            executionRecommendation: task.executionRecommendation,
-            taskExecutionPolicy: task.taskExecutionPolicy
+            result: goal.result,
+            taskId: goal.taskId,
+            runId: goal.runId,
+            assignmentId: goal.assignmentId,
+            claimId: goal.claimId,
+            operator: goal.operator,
+            instance: goal.agentInstanceAlias,
+            session: goal.sessionId,
+            branch: goal.functionalBranch,
+            worktree: goal.worktreePath,
+            zones: goal.zones,
           }, null, 2));
           NODE
 
-      - name: Upload Oreshnik registration evidence
+      - name: Persist ChatGPT delegated-operator execution context on assigned branch
+        shell: bash
+        env:
+          RUN_ID: ${{ steps.goal.outputs.run_id }}
+          ASSIGNMENT_ID: ${{ steps.goal.outputs.assignment_id }}
+          CLAIM_ID: ${{ steps.goal.outputs.claim_id }}
+          INSTANCE: ${{ steps.goal.outputs.instance }}
+          SESSION_ID: ${{ steps.goal.outputs.session }}
+          FUNCTIONAL_BRANCH: ${{ steps.goal.outputs.branch }}
+          WORKTREE_PATH: ${{ steps.goal.outputs.worktree }}
+        run: |
+          set -euo pipefail
+          test -d "$WORKTREE_PATH/.git" -o -f "$WORKTREE_PATH/.git"
+          cd "$WORKTREE_PATH"
+          test "$(git branch --show-current)" = "$FUNCTIONAL_BRANCH"
+          mkdir -p docs/oreshnik/executions
+          cat > docs/oreshnik/executions/S-HC-STRAT-03-RUN.md <<EOF
+          # STRAT-03 canonical execution
+
+          - Task: \`$TASK_ID\`
+          - Run: \`$RUN_ID\`
+          - Assignment: \`$ASSIGNMENT_ID\`
+          - Claim: \`$CLAIM_ID\`
+          - Operator: \`manuel\`
+          - Delegated operator interface: ChatGPT
+          - Execution infrastructure: GitHub Actions
+          - Oreshnik harness: \`shell\`
+          - Agent instance: \`$INSTANCE\`
+          - Session: \`$SESSION_ID\`
+          - Functional branch: \`$FUNCTIONAL_BRANCH\`
+          - Worktree: ephemeral GitHub Actions worktree governed by Oreshnik
+          - Source issue: #16
+
+          The prior Issue/PR/bootstrap artifacts were preparatory only. Canonical execution begins with the Oreshnik-generated Run, assignment, claim, branch and worktree recorded above.
+
+          Product implementation must occur only on this functional branch and within the zones returned by Oreshnik. No merge, production deployment, live publication or campaign spend is authorized.
+          EOF
+          git add docs/oreshnik/executions/S-HC-STRAT-03-RUN.md
+          if ! git diff --cached --quiet; then
+            git commit -m "chore(oreshnik): record STRAT-03 canonical run"
+          fi
+          git push --set-upstream origin "$FUNCTIONAL_BRANCH"
+
+      - name: Verify control plane after assignment
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd "$GITHUB_WORKSPACE"
+          git fetch --prune origin '+refs/heads/*:refs/remotes/origin/*' '+refs/oreshnik/*:refs/oreshnik/*' || git fetch --prune origin
+          $ORESHNIK_CLI dispatch status --repo . --json | tee /tmp/strat03-dispatch-status-after.json
+
+      - name: Report canonical Run to Issue 16
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RUN_ID: ${{ steps.goal.outputs.run_id }}
+          ASSIGNMENT_ID: ${{ steps.goal.outputs.assignment_id }}
+          CLAIM_ID: ${{ steps.goal.outputs.claim_id }}
+          INSTANCE: ${{ steps.goal.outputs.instance }}
+          SESSION_ID: ${{ steps.goal.outputs.session }}
+          FUNCTIONAL_BRANCH: ${{ steps.goal.outputs.branch }}
+        run: |
+          set -euo pipefail
+          gh issue comment 16 --repo "$GITHUB_REPOSITORY" --body "## Oreshnik canonical execution created
+
+- Task: \`$TASK_ID\`
+- Run: \`$RUN_ID\`
+- Assignment: \`$ASSIGNMENT_ID\`
+- Claim: \`$CLAIM_ID\`
+- Operator: \`manuel\`
+- Delegated interface: ChatGPT
+- Infrastructure: GitHub Actions
+- Harness: \`shell\`
+- Instance: \`$INSTANCE\`
+- Session: \`$SESSION_ID\`
+- Functional branch: \`$FUNCTIONAL_BRANCH\`
+
+The Task is now governed by a real Oreshnik Run. Product implementation continues only on the assigned branch."
+
+      - name: Upload canonical dispatch evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: oreshnik-strat03-registration-evidence
+          name: oreshnik-strat03-canonical-dispatch
           path: |
-            /tmp/strat03-readiness-before.log
-            /tmp/strat03-reconcile-write.json
-            /tmp/strat03-reconcile-check.json
+            /tmp/strat03-readiness.log
+            /tmp/strat03-dispatch-init.json
             /tmp/strat03-dispatch-reconcile.json
-            /tmp/strat03-dispatch-status.json
-            /tmp/strat03-readiness-after.log
+            /tmp/strat03-dispatch-status-before.json
+            /tmp/strat03-dispatch-explain.json
+            /tmp/strat03-goal.json
+            /tmp/strat03-dispatch-status-after.json
           if-no-files-found: ignore
           retention-days: 14
