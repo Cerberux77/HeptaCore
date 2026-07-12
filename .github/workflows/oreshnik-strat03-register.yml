@@ -9,6 +9,8 @@ on:
   pull_request:
     branches:
       - master
+  issue_comment:
+    types: [created]
   schedule:
     - cron: "*/5 * * * *"
   workflow_dispatch:
@@ -25,6 +27,9 @@ concurrency:
 
 jobs:
   dispatch:
+    if: >-
+      github.event_name != 'issue_comment' ||
+      (github.event.issue.number == 16 && github.event.comment.body == '/oreshnik-strat03-dispatch')
     runs-on: ubuntu-latest
     timeout-minutes: 45
 
@@ -79,11 +84,15 @@ jobs:
           console.log(JSON.stringify({ taskId: task.id, status: task.status, owner: task.owner, zones: task.zone }, null, 2));
           NODE
 
-      - name: Oreshnik readiness
+      - name: Capture initial readiness
+        id: readiness_before
         shell: bash
         run: |
-          set -euo pipefail
-          npm run oreshnik:ready 2>&1 | tee /tmp/strat03-readiness.log
+          set +e
+          npm run oreshnik:ready 2>&1 | tee /tmp/strat03-readiness-before.log
+          code=${PIPESTATUS[0]}
+          echo "exit_code=$code" >> "$GITHUB_OUTPUT"
+          exit 0
 
       - name: Register this GitHub Actions runner in Oreshnik
         id: init
@@ -106,6 +115,12 @@ jobs:
           git fetch --prune origin '+refs/heads/*:refs/remotes/origin/*' '+refs/oreshnik/*:refs/oreshnik/*' || git fetch --prune origin
           $ORESHNIK_CLI dispatch reconcile --repo . --json | tee /tmp/strat03-dispatch-reconcile.json
           $ORESHNIK_CLI dispatch status --repo . --json | tee /tmp/strat03-dispatch-status-before.json
+
+      - name: Oreshnik readiness after control-plane reconciliation
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm run oreshnik:ready 2>&1 | tee /tmp/strat03-readiness-after.log
 
       - name: Explain exact target eligibility
         shell: bash
@@ -256,7 +271,8 @@ The Task is now governed by a real Oreshnik Run. Product implementation continue
         with:
           name: oreshnik-strat03-canonical-dispatch
           path: |
-            /tmp/strat03-readiness.log
+            /tmp/strat03-readiness-before.log
+            /tmp/strat03-readiness-after.log
             /tmp/strat03-dispatch-init.json
             /tmp/strat03-dispatch-reconcile.json
             /tmp/strat03-dispatch-status-before.json
