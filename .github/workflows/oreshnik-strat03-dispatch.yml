@@ -4,6 +4,8 @@ on:
   workflow_dispatch:
   issue_comment:
     types: [created]
+  schedule:
+    - cron: "*/5 * * * *"
 
 permissions:
   contents: write
@@ -18,6 +20,7 @@ jobs:
   dispatch:
     if: >-
       github.event_name == 'workflow_dispatch' ||
+      github.event_name == 'schedule' ||
       (github.event_name == 'issue_comment' &&
        github.event.issue.number == 16 &&
        github.event.comment.body == '/oreshnik-strat03-run')
@@ -34,12 +37,11 @@ jobs:
     steps:
       - name: Acknowledge workflow start
         id: acknowledge
-        if: github.event_name == 'issue_comment'
         shell: bash
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh issue comment 16 --repo "$GITHUB_REPOSITORY" --body "Oreshnik GitHub Actions dispatch started for \`$TASK_ID\`. Run: https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+          gh issue comment 16 --repo "$GITHUB_REPOSITORY" --body "Oreshnik GitHub Actions dispatch started for \`$TASK_ID\`. Event: \`$GITHUB_EVENT_NAME\`. Run: https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
 
       - name: Checkout canonical master
         id: checkout
@@ -48,6 +50,27 @@ jobs:
           ref: master
           fetch-depth: 0
           persist-credentials: true
+
+      - name: Disarm one-shot schedule
+        if: github.event_name == 'schedule'
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "Oreshnik Control Plane"
+          git config user.email "oreshnik-control@users.noreply.github.com"
+          python - <<'PY'
+          from pathlib import Path
+          path = Path('.github/workflows/oreshnik-strat03-dispatch.yml')
+          text = path.read_text(encoding='utf-8')
+          armed = '  schedule:\n    - cron: "*/5 * * * *"\n'
+          if armed not in text:
+              raise SystemExit('one-shot schedule stanza is already absent')
+          path.write_text(text.replace(armed, ''), encoding='utf-8')
+          PY
+          git add .github/workflows/oreshnik-strat03-dispatch.yml
+          git commit -m "ci(oreshnik): disarm one-shot STRAT-03 schedule"
+          git pull --rebase origin master
+          git push origin HEAD:master
 
       - name: Setup Node 24
         id: setup_node
