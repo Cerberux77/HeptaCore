@@ -33,14 +33,16 @@ jobs:
 
     steps:
       - name: Acknowledge workflow start
+        id: acknowledge
         if: github.event_name == 'issue_comment'
         shell: bash
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh issue comment 16 --repo "$GITHUB_REPOSITORY" --body "Oreshnik GitHub Actions dispatch started for \`$TASK_ID\`. The next valid report will contain identifiers read from the remote control plane."
+          gh issue comment 16 --repo "$GITHUB_REPOSITORY" --body "Oreshnik GitHub Actions dispatch started for \`$TASK_ID\`. Run: https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
 
       - name: Checkout canonical master
+        id: checkout
         uses: actions/checkout@v4
         with:
           ref: master
@@ -48,12 +50,14 @@ jobs:
           persist-credentials: true
 
       - name: Setup Node 24
+        id: setup_node
         uses: actions/setup-node@v4
         with:
           node-version: 24
           cache: npm
 
       - name: Install locked dependencies
+        id: install
         run: npm ci
 
       - name: Execute Oreshnik canonical dispatch
@@ -64,6 +68,7 @@ jobs:
         run: bash scripts/oreshnik/dispatch-strat03-ci.sh
 
       - name: Report canonical identifiers to Issue 16
+        id: report_success
         shell: bash
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -96,10 +101,12 @@ jobs:
 - Functional branch: \`$FUNCTIONAL_BRANCH\`
 - Control head: \`$CONTROL_HEAD\`
 - Task-board head: \`$TASK_BOARD_HEAD\`
+- Workflow: https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID
 
 The Task is now governed by a real Oreshnik Run. Product implementation must continue only on the assigned functional branch. No merge or deployment is authorized."
 
       - name: Upload dispatch evidence
+        id: upload
         if: always()
         uses: actions/upload-artifact@v4
         with:
@@ -107,3 +114,26 @@ The Task is now governed by a real Oreshnik Run. Product implementation must con
           path: /tmp/oreshnik-strat03
           if-no-files-found: ignore
           retention-days: 14
+
+      - name: Report dispatch failure to Issue 16
+        if: failure()
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CHECKOUT_OUTCOME: ${{ steps.checkout.outcome }}
+          SETUP_OUTCOME: ${{ steps.setup_node.outcome }}
+          INSTALL_OUTCOME: ${{ steps.install.outcome }}
+          DISPATCH_OUTCOME: ${{ steps.dispatch.outcome }}
+          REPORT_OUTCOME: ${{ steps.report_success.outcome }}
+        run: |
+          gh issue comment 16 --repo "$GITHUB_REPOSITORY" --body "## Oreshnik GitHub Actions dispatch failed
+
+- Task: \`$TASK_ID\`
+- Checkout: \`$CHECKOUT_OUTCOME\`
+- Node setup: \`$SETUP_OUTCOME\`
+- npm ci: \`$INSTALL_OUTCOME\`
+- Oreshnik dispatch: \`$DISPATCH_OUTCOME\`
+- Success report: \`$REPORT_OUTCOME\`
+- Workflow logs: https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID
+
+No Task/Run/claim/assignment is considered created unless it is visible in the remote Oreshnik control plane."
