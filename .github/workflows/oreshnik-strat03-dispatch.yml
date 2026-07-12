@@ -1,0 +1,94 @@
+name: Oreshnik STRAT-03 Canonical Dispatch
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  issues: write
+  actions: read
+
+concurrency:
+  group: oreshnik-strat03-canonical-dispatch
+  cancel-in-progress: false
+
+jobs:
+  dispatch:
+    name: Create canonical Oreshnik Run as Manuel
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    env:
+      TASK_ID: S-HC-STRAT-03-INTAKE-TO-ACTIVE-STRATEGY
+      OPERATOR: manuel
+      HARNESS: shell
+      EVIDENCE_DIR: /tmp/oreshnik-strat03
+
+    steps:
+      - name: Checkout canonical master
+        uses: actions/checkout@v4
+        with:
+          ref: master
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Setup Node 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install locked dependencies
+        run: npm ci
+
+      - name: Execute Oreshnik canonical dispatch
+        id: dispatch
+        shell: bash
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: bash scripts/oreshnik/dispatch-strat03-ci.sh
+
+      - name: Report canonical identifiers to Issue 16
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RUN_ID: ${{ steps.dispatch.outputs.run_id }}
+          ASSIGNMENT_ID: ${{ steps.dispatch.outputs.assignment_id }}
+          CLAIM_ID: ${{ steps.dispatch.outputs.claim_id }}
+          INSTANCE_UID: ${{ steps.dispatch.outputs.instance_uid }}
+          INSTANCE_ALIAS: ${{ steps.dispatch.outputs.instance_alias }}
+          SESSION_ID: ${{ steps.dispatch.outputs.session_id }}
+          MACHINE_ID: ${{ steps.dispatch.outputs.machine_id }}
+          FUNCTIONAL_BRANCH: ${{ steps.dispatch.outputs.branch }}
+          CONTROL_HEAD: ${{ steps.dispatch.outputs.control_head }}
+          TASK_BOARD_HEAD: ${{ steps.dispatch.outputs.task_board_head }}
+        run: |
+          set -euo pipefail
+          gh issue comment 16 --repo "$GITHUB_REPOSITORY" --body "## Canonical Oreshnik Run created by GitHub Actions
+
+- Task: \`$TASK_ID\`
+- Run: \`$RUN_ID\`
+- Assignment: \`$ASSIGNMENT_ID\`
+- Claim: \`$CLAIM_ID\`
+- Operator: \`manuel\`
+- Delegated operator interface: ChatGPT
+- Infrastructure: GitHub Actions
+- Harness: \`shell\`
+- Instance UID: \`$INSTANCE_UID\`
+- Instance alias: \`$INSTANCE_ALIAS\`
+- Session: \`$SESSION_ID\`
+- Machine: \`$MACHINE_ID\`
+- Functional branch: \`$FUNCTIONAL_BRANCH\`
+- Control head: \`$CONTROL_HEAD\`
+- Task-board head: \`$TASK_BOARD_HEAD\`
+
+The Task is now governed by a real Oreshnik Run. Product implementation must continue only on the assigned functional branch. No merge or deployment is authorized."
+
+      - name: Upload dispatch evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: oreshnik-strat03-canonical-dispatch
+          path: /tmp/oreshnik-strat03
+          if-no-files-found: ignore
+          retention-days: 14
