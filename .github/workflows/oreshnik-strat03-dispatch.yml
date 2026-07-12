@@ -4,6 +4,11 @@ on:
   workflow_dispatch:
   issue_comment:
     types: [created]
+  push:
+    branches:
+      - master
+    paths:
+      - ".github/oreshnik-strat03-trigger"
   schedule:
     - cron: "*/5 * * * *"
 
@@ -21,6 +26,7 @@ jobs:
     if: >-
       github.event_name == 'workflow_dispatch' ||
       github.event_name == 'schedule' ||
+      github.event_name == 'push' ||
       (github.event_name == 'issue_comment' &&
        github.event.issue.number == 16 &&
        github.event.comment.body == '/oreshnik-strat03-run')
@@ -51,8 +57,8 @@ jobs:
           fetch-depth: 0
           persist-credentials: true
 
-      - name: Disarm one-shot schedule
-        if: github.event_name == 'schedule'
+      - name: Disarm one-shot automatic triggers
+        if: github.event_name == 'schedule' || github.event_name == 'push'
         shell: bash
         run: |
           set -euo pipefail
@@ -62,13 +68,20 @@ jobs:
           from pathlib import Path
           path = Path('.github/workflows/oreshnik-strat03-dispatch.yml')
           text = path.read_text(encoding='utf-8')
-          armed = '  schedule:\n    - cron: "*/5 * * * *"\n'
+          armed = '''  push:
+    branches:
+      - master
+    paths:
+      - ".github/oreshnik-strat03-trigger"
+  schedule:
+    - cron: "*/5 * * * *"
+'''
           if armed not in text:
-              raise SystemExit('one-shot schedule stanza is already absent')
+              raise SystemExit('one-shot automatic trigger stanza is already absent')
           path.write_text(text.replace(armed, ''), encoding='utf-8')
           PY
           git add .github/workflows/oreshnik-strat03-dispatch.yml
-          git commit -m "ci(oreshnik): disarm one-shot STRAT-03 schedule"
+          git commit -m "ci(oreshnik): disarm one-shot STRAT-03 triggers"
           git pull --rebase origin master
           git push origin HEAD:master
 
