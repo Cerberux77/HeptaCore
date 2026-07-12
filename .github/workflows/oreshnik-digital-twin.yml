@@ -24,7 +24,9 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
+  issues: write
+  actions: read
 
 jobs:
   digital-twin:
@@ -71,3 +73,198 @@ jobs:
         with:
           name: oreshnik-command-catalog
           path: docs/operations/oreshnik-command-catalog.json
+
+  strat03-dispatch:
+    name: Dispatch STRAT-03 as Manuel delegated through ChatGPT
+    if: github.event_name == 'pull_request' && startsWith(github.head_ref, 'oreshnik/chatgpt-strat03-digital-twin-trigger')
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      TASK_ID: S-HC-STRAT-03-INTAKE-TO-ACTIVE-STRATEGY
+
+    steps:
+      - name: Checkout canonical master
+        uses: actions/checkout@v4
+        with:
+          ref: master
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Setup Node 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Configure authenticated canonical origin
+        shell: bash
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          git config user.name "Manuel Vera via ChatGPT Operator"
+          git config user.email "manuel@heptacore.dev"
+          git remote set-url origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          git fetch --prune origin '+refs/heads/*:refs/remotes/origin/*' '+refs/oreshnik/*:refs/oreshnik/*' || git fetch --prune origin
+          test "$(git rev-parse HEAD)" = "$(git rev-parse origin/master)"
+
+      - name: Install locked dependencies
+        run: npm ci
+
+      - name: Verify exact Task registration
+        shell: bash
+        run: |
+          node - <<'NODE'
+          const fs = require('node:fs');
+          const board = JSON.parse(fs.readFileSync('var/oreshnik/task-board.json', 'utf8'));
+          const task = board.tasks.find((entry) => entry.id === process.env.TASK_ID);
+          if (!task) throw new Error(`Missing ${process.env.TASK_ID}`);
+          if (!['ready', 'claimed', 'active'].includes(task.status)) throw new Error(`Not dispatchable: ${task.status}`);
+          console.log(JSON.stringify({ id: task.id, owner: task.owner, status: task.status, zones: task.zone }, null, 2));
+          NODE
+
+      - name: Capture pre-reconcile readiness
+        shell: bash
+        run: |
+          set +e
+          npm run oreshnik:ready 2>&1 | tee /tmp/strat03-readiness-before.log
+          exit 0
+
+      - name: Register ephemeral runner machine
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/oreshnik-wt"
+          node node_modules/oreshnik-cli/dist/cli.js dispatch init \
+            --mother master \
+            --worktree-root "$RUNNER_TEMP/oreshnik-wt" \
+            --repo . \
+            --json | tee /tmp/strat03-dispatch-init.json
+
+      - name: Reconcile catalog into remote control plane
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch --prune origin '+refs/heads/*:refs/remotes/origin/*' '+refs/oreshnik/*:refs/oreshnik/*' || git fetch --prune origin
+          node node_modules/oreshnik-cli/dist/cli.js dispatch reconcile --repo . --json | tee /tmp/strat03-dispatch-reconcile.json
+          npm run oreshnik:ready 2>&1 | tee /tmp/strat03-readiness-after.log
+          node node_modules/oreshnik-cli/dist/cli.js dispatch explain \
+            --task "$TASK_ID" \
+            --operator manuel \
+            --repo . \
+            --json | tee /tmp/strat03-dispatch-explain.json
+
+      - name: Enter through canonical Oreshnik goal
+        id: goal
+        shell: bash
+        run: |
+          set -euo pipefail
+          node node_modules/oreshnik-cli/dist/cli.js goal \
+            --operator manuel \
+            --harness shell \
+            --task "$TASK_ID" \
+            --auto-align \
+            --repo . \
+            --max-retries 3 \
+            --json | tee /tmp/strat03-goal.json
+          node - <<'NODE'
+          const fs = require('node:fs');
+          const goal = JSON.parse(fs.readFileSync('/tmp/strat03-goal.json', 'utf8'));
+          if (!['assigned', 'resumed', 'taken_over'].includes(goal.result)) throw new Error(`Goal result: ${goal.result}`);
+          if (goal.taskId !== process.env.TASK_ID) throw new Error(`Wrong task: ${goal.taskId}`);
+          for (const key of ['runId','assignmentId','operator','agentInstanceAlias','sessionId','functionalBranch','worktreePath']) {
+            if (!goal[key]) throw new Error(`Missing ${key}`);
+          }
+          const claimId = `claim-${goal.assignmentId}`;
+          fs.appendFileSync(process.env.GITHUB_OUTPUT, [
+            `run_id=${goal.runId}`,
+            `assignment_id=${goal.assignmentId}`,
+            `claim_id=${claimId}`,
+            `instance=${goal.agentInstanceAlias}`,
+            `session=${goal.sessionId}`,
+            `branch=${goal.functionalBranch}`,
+            `worktree=${goal.worktreePath}`,
+          ].join('\n') + '\n');
+          console.log(JSON.stringify({ ...goal, claimId }, null, 2));
+          NODE
+
+      - name: Persist execution provenance on assigned branch
+        shell: bash
+        env:
+          RUN_ID: ${{ steps.goal.outputs.run_id }}
+          ASSIGNMENT_ID: ${{ steps.goal.outputs.assignment_id }}
+          CLAIM_ID: ${{ steps.goal.outputs.claim_id }}
+          INSTANCE: ${{ steps.goal.outputs.instance }}
+          SESSION_ID: ${{ steps.goal.outputs.session }}
+          FUNCTIONAL_BRANCH: ${{ steps.goal.outputs.branch }}
+          WORKTREE_PATH: ${{ steps.goal.outputs.worktree }}
+        run: |
+          set -euo pipefail
+          cd "$WORKTREE_PATH"
+          test "$(git branch --show-current)" = "$FUNCTIONAL_BRANCH"
+          mkdir -p docs/oreshnik/executions
+          node - <<'NODE'
+          const fs = require('node:fs');
+          const data = {
+            schema: 'heptacore-oreshnik-delegated-run/v1',
+            taskId: process.env.TASK_ID,
+            runId: process.env.RUN_ID,
+            assignmentId: process.env.ASSIGNMENT_ID,
+            claimId: process.env.CLAIM_ID,
+            operator: 'manuel',
+            delegatedInterface: 'ChatGPT',
+            infrastructure: 'GitHub Actions',
+            harness: 'shell',
+            agentInstanceAlias: process.env.INSTANCE,
+            sessionId: process.env.SESSION_ID,
+            functionalBranch: process.env.FUNCTIONAL_BRANCH,
+            worktreeKind: 'ephemeral-github-actions-oreshnik-governed',
+            sourceIssue: 16,
+            restrictions: ['no-merge','no-deploy','no-live-publish','no-campaign-spend']
+          };
+          fs.writeFileSync('docs/oreshnik/executions/S-HC-STRAT-03-RUN.json', JSON.stringify(data, null, 2) + '\n');
+          NODE
+          git add docs/oreshnik/executions/S-HC-STRAT-03-RUN.json
+          git commit -m "chore(oreshnik): record STRAT-03 canonical run"
+          git push --set-upstream origin "$FUNCTIONAL_BRANCH"
+
+      - name: Report real identifiers to Issue 16
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RUN_ID: ${{ steps.goal.outputs.run_id }}
+          ASSIGNMENT_ID: ${{ steps.goal.outputs.assignment_id }}
+          CLAIM_ID: ${{ steps.goal.outputs.claim_id }}
+          INSTANCE: ${{ steps.goal.outputs.instance }}
+          SESSION_ID: ${{ steps.goal.outputs.session }}
+          FUNCTIONAL_BRANCH: ${{ steps.goal.outputs.branch }}
+        run: |
+          gh issue comment 16 --repo "$GITHUB_REPOSITORY" --body "## Canonical Oreshnik Run created by GitHub Actions
+
+- Task: \`$TASK_ID\`
+- Run: \`$RUN_ID\`
+- Assignment: \`$ASSIGNMENT_ID\`
+- Claim: \`$CLAIM_ID\`
+- Operator: \`manuel\`
+- Delegated interface: ChatGPT
+- Harness: \`shell\`
+- Instance: \`$INSTANCE\`
+- Session: \`$SESSION_ID\`
+- Functional branch: \`$FUNCTIONAL_BRANCH\`
+
+Implementation will proceed only on the Oreshnik-assigned branch."
+
+      - name: Upload STRAT-03 dispatch evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: oreshnik-strat03-dispatch-evidence
+          path: |
+            /tmp/strat03-readiness-before.log
+            /tmp/strat03-readiness-after.log
+            /tmp/strat03-dispatch-init.json
+            /tmp/strat03-dispatch-reconcile.json
+            /tmp/strat03-dispatch-explain.json
+            /tmp/strat03-goal.json
+          if-no-files-found: ignore
+          retention-days: 14
