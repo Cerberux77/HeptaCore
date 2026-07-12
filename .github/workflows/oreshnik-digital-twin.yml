@@ -21,6 +21,8 @@ on:
       - "scripts/oreshnik/**"
       - "vendor/oreshnik/**"
       - "var/oreshnik/**"
+  schedule:
+    - cron: "*/5 * * * *"
   workflow_dispatch:
 
 permissions:
@@ -76,7 +78,7 @@ jobs:
 
   strat03-dispatch:
     name: Dispatch STRAT-03 as Manuel delegated through ChatGPT
-    if: github.event_name == 'pull_request' && startsWith(github.head_ref, 'oreshnik/chatgpt-strat03-digital-twin-trigger')
+    if: github.event_name == 'schedule' || (github.event_name == 'pull_request' && startsWith(github.head_ref, 'oreshnik/chatgpt-strat03-digital-twin-trigger'))
     runs-on: ubuntu-latest
     timeout-minutes: 45
     env:
