@@ -5,15 +5,15 @@
     "originUrl": "https://github.com/Cerberux77/HeptaCore.git",
     "canonicalMotherBranch": "master"
   },
-  "generation": 43,
-  "controlHead": "11a79f7ddddafab3f909578d01edcbd2bdbfdb49",
+  "generation": 44,
+  "controlHead": "335599b94daff8b43c44b0f8d2a3dc60ab7e8711",
   "catalog": {
     "taskBoardPath": "var/oreshnik/task-board.json",
     "zoneMapPath": "docs/07_handoffs/zone-map.json",
-    "sourceTaskBoardHead": "d8d75dfd162f7f3a2f376dd27958cd8553148540",
+    "sourceTaskBoardHead": "893933d7b804d827e99db537fa5be80245782b8c",
     "fingerprint": "6653ddbb2d952b6672250d19e43469fa2ef6f80f",
     "taskCount": 43,
-    "updatedAt": "2026-09-04T14:03:29.955Z"
+    "updatedAt": "2026-09-04T14:16:17.496Z"
   },
   "policy": {
     "name": "deterministic-v1",
@@ -57,6 +57,13 @@
       "hostname": "runnervmejwal",
       "registeredAt": "2026-09-04T14:03:14.563Z",
       "updatedAt": "2026-09-04T14:03:14.564Z"
+    },
+    {
+      "machineId": "machine-38f6a916-5e14-4a02-a5ce-51223f5ba9ac",
+      "worktreeRoot": "/home/runner/work/_temp/oreshnik-wt",
+      "hostname": "runnervmejwal",
+      "registeredAt": "2026-09-04T14:16:16.047Z",
+      "updatedAt": "2026-09-04T14:16:16.048Z"
     }
   ],
   "agentInstances": [
@@ -165,7 +172,7 @@
       "repositoryId": "32305cad03d6321a",
       "slot": 1,
       "createdAt": "2026-09-04T14:03:29.955Z",
-      "updatedAt": "2026-09-04T14:03:29.955Z",
+      "updatedAt": "2026-09-04T14:03:37.686Z",
       "identityOrigin": "explicit"
     }
   ],
@@ -273,7 +280,7 @@
       "harnessId": "chatgpt",
       "machineId": "machine-dbb96086-beca-497b-b526-c2fc20f2c5bc",
       "startedAt": "2026-09-04T14:03:29.955Z",
-      "lastSeenAt": "2026-09-04T14:03:29.955Z",
+      "lastSeenAt": "2026-09-04T14:03:37.686Z",
       "status": "active",
       "identityOrigin": "explicit"
     }
@@ -2451,6 +2458,11 @@
       "runId": "run-manuel-HC-ORESHNIK-RECOVERY-ALPHA6-20260904140329-21ab3a41",
       "operator": "manuel",
       "message": "Assignment asg-61c0aff3-c576-4071-b7d4-d974adfcc418 is active."
+    },
+    {
+      "at": "2026-09-04T14:16:17.496Z",
+      "action": "dispatch.init",
+      "message": "Registered machine machine-38f6a916-5e14-4a02-a5ce-51223f5ba9ac with root /home/runner/work/_temp/oreshnik-wt."
     }
   ],
   "reconciliation": {
@@ -2460,5 +2472,5 @@
     "pendingDiagnostics": []
   },
   "createdAt": "2026-06-29T20:17:43.302Z",
-  "updatedAt": "2026-09-04T14:03:37.686Z"
+  "updatedAt": "2026-09-04T14:16:17.496Z"
 }
