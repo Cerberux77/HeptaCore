@@ -6,7 +6,7 @@ task_id: "S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION"
 sprint: "email-infra"
 status: "pending"
 owner: "Jean"
-last_updated: "2026-09-04T13:49:14.848Z"
+last_updated: "2026-09-04T13:53:56.549Z"
 source: "var/oreshnik/tasks/S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION.json"
 ---
 

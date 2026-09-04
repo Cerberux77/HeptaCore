@@ -1,6 +1,6 @@
 {
   "project": "HeptaCore",
-  "updatedAt": "2026-09-04T13:49:14.848Z",
+  "updatedAt": "2026-09-04T13:53:56.549Z",
   "currentExecutionOrder": [
     "S-HC-PUB-04-HOURLY-BATCH-CRON",
     "S-HC-PUB-05-RECONCILIATION-OPS",
@@ -2119,7 +2119,7 @@
       },
       "history": [
         {
-          "at": "2026-09-04T13:49:14.848Z",
+          "at": "2026-09-04T13:53:56.549Z",
           "action": "canonically_registered",
           "operator": "manuel",
           "description": "Owner-authorized durable bootstrap registration under pinned alpha.16. Alpha.16 predates canonical `task register`; HeptaCore already uses durable per-Task artifacts, so this compatibility bootstrap writes the Task artifact plus Goal and then delegates all projection/control-plane mutation back to Oreshnik reconcile and dispatch."

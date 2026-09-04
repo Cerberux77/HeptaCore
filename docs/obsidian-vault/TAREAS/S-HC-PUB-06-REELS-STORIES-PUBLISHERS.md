@@ -6,7 +6,7 @@ task_id: "S-HC-PUB-06-REELS-STORIES-PUBLISHERS"
 sprint: "publishing"
 status: "ready"
 owner: "Manuel"
-last_updated: "2026-09-04T13:49:14.848Z"
+last_updated: "2026-09-04T13:53:56.549Z"
 source: "var/oreshnik/tasks/S-HC-PUB-06-REELS-STORIES-PUBLISHERS.json"
 ---
 
