@@ -1,0 +1,139 @@
+name: Oreshnik Alpha6 Recovery Bootstrap
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - ".github/oreshnik-alpha6-recovery-trigger"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: read
+  issues: write
+
+concurrency:
+  group: heptacore-oreshnik-alpha6-recovery
+  cancel-in-progress: false
+
+env:
+  TASK_ID: HC-ORESHNIK-RECOVERY-ALPHA6
+  OPERATOR: manuel
+  HARNESS: chatgpt
+  ISSUE_NUMBER: "22"
+
+jobs:
+  bootstrap-and-dispatch:
+    if: github.repository == 'Cerberux77/HeptaCore'
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - name: Checkout canonical master
+        uses: actions/checkout@v4
+        with:
+          ref: master
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Configure governed identity
+        run: |
+          git config user.name "Manuel Vera via ChatGPT Operator"
+          git config user.email "manuel@heptacore.dev"
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install current pinned consumer safely
+        run: npm ci --ignore-scripts
+
+      - name: Verify alpha16 bootstrap baseline
+        run: |
+          test "$(node node_modules/oreshnik-cli/dist/cli.js --version)" = "0.2.0-alpha.16"
+          npm run oreshnik:ready
+
+      - name: Register owner-authorized recovery Task
+        run: |
+          node scripts/oreshnik/register-alpha6-recovery.mjs
+          node node_modules/oreshnik-cli/dist/cli.js reconcile --write --json
+          node node_modules/oreshnik-cli/dist/cli.js reconcile --check --json
+          npm run oreshnik:canonical
+          git diff --check
+
+      - name: Persist canonical bootstrap registration
+        run: |
+          git add var/oreshnik docs/obsidian-vault docs/oreshnik docs/07_handoffs
+          if git diff --cached --quiet; then
+            echo "Recovery Task already registered canonically."
+          else
+            git commit -m "chore(oreshnik): canonically register alpha6 recovery"
+            git pull --rebase origin master
+            git push origin HEAD:master
+          fi
+          git fetch origin master oreshnik/control
+          test "$(git rev-parse HEAD)" = "$(git rev-parse origin/master)"
+
+      - name: Dispatch real Oreshnik Run
+        id: dispatch
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          WORKTREE_ROOT: ${{ runner.temp }}/oreshnik-wt
+          EVIDENCE_DIR: ${{ runner.temp }}/oreshnik-alpha6-recovery
+        run: bash scripts/oreshnik/dispatch-alpha6-recovery-ci.sh
+
+      - name: Upload bootstrap evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: heptacore-oreshnik-alpha6-recovery-bootstrap
+          path: ${{ runner.temp }}/oreshnik-alpha6-recovery/
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Report canonical Run to recovery issue
+        if: success()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUN_ID: ${{ steps.dispatch.outputs.run_id }}
+          ASSIGNMENT_ID: ${{ steps.dispatch.outputs.assignment_id }}
+          CLAIM_ID: ${{ steps.dispatch.outputs.claim_id }}
+          HARNESS_ID: ${{ steps.dispatch.outputs.harness }}
+          INSTANCE: ${{ steps.dispatch.outputs.instance_alias }}
+          BRANCH: ${{ steps.dispatch.outputs.branch }}
+          CONTROL_HEAD: ${{ steps.dispatch.outputs.control_head }}
+        run: |
+          cat > "$RUNNER_TEMP/recovery-run.md" <<EOF
+          ## Canonical recovery Run created
+
+          - Task: \`$TASK_ID\`
+          - Operator: \`$OPERATOR\`
+          - Harness: \`$HARNESS_ID\`
+          - Instance: \`$INSTANCE\`
+          - Run: \`$RUN_ID\`
+          - Assignment: \`$ASSIGNMENT_ID\`
+          - Claim: \`$CLAIM_ID\`
+          - Functional branch: \`$BRANCH\`
+          - Control head: \`$CONTROL_HEAD\`
+          - Target: \`oreshnik-cli@0.3.0-alpha.6\`
+          - Rollback retained: \`0.2.0-alpha.16\`
+
+          Bootstrap is complete. All implementation/adoption mutations must now occur only on the Oreshnik-assigned functional branch and within its authorized zones.
+          EOF
+          gh issue comment "$ISSUE_NUMBER" --repo "$GITHUB_REPOSITORY" --body-file "$RUNNER_TEMP/recovery-run.md"
+
+      - name: Report fail-closed result
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cat > "$RUNNER_TEMP/recovery-failed.md" <<EOF
+          ## Alpha6 recovery bootstrap failed closed
+
+          Workflow run: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID
+
+          No product work, production deployment, live publication, or campaign spend is authorized. Review the workflow evidence before retrying; do not fabricate Run/assignment/claim state.
+          EOF
+          gh issue comment "$ISSUE_NUMBER" --repo "$GITHUB_REPOSITORY" --body-file "$RUNNER_TEMP/recovery-failed.md"
