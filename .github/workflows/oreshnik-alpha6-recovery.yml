@@ -55,17 +55,28 @@ jobs:
           test "$(node node_modules/oreshnik-cli/dist/cli.js --version)" = "0.2.0-alpha.16"
           npm run oreshnik:ready
 
-      - name: Register owner-authorized recovery Task
+      - name: Register owner-authorized durable recovery Task
         run: |
           node scripts/oreshnik/register-alpha6-recovery.mjs
           node node_modules/oreshnik-cli/dist/cli.js reconcile --write --json
           node node_modules/oreshnik-cli/dist/cli.js reconcile --check --json
           npm run oreshnik:canonical
           git diff --check
+          test -f "var/oreshnik/tasks/$TASK_ID.json"
+          test -f "docs/goals/$TASK_ID.md"
+          node - <<'NODE'
+          const fs = require('node:fs');
+          const id = process.env.TASK_ID;
+          const board = JSON.parse(fs.readFileSync('var/oreshnik/task-board.json', 'utf8'));
+          const task = board.tasks.find((entry) => entry.id === id);
+          if (!task) throw new Error(`Oreshnik compatibility projection omitted ${id}`);
+          if (task.status !== 'ready') throw new Error(`Expected ${id} ready, got ${task.status}`);
+          console.log(JSON.stringify({ taskId: id, status: task.status, track: task.track }, null, 2));
+          NODE
 
       - name: Persist canonical bootstrap registration
         run: |
-          git add var/oreshnik docs/obsidian-vault docs/oreshnik docs/07_handoffs
+          git add var/oreshnik docs/obsidian-vault docs/oreshnik docs/goals docs/07_handoffs
           if git diff --cached --quiet; then
             echo "Recovery Task already registered canonically."
           else
