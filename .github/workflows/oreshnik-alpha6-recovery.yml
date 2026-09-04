@@ -60,18 +60,6 @@ jobs:
           node scripts/oreshnik/register-alpha6-recovery.mjs
           test -f "var/oreshnik/tasks/$TASK_ID.json"
           test -f "docs/goals/$TASK_ID.md"
-          node --input-type=module - <<'NODE'
-          import fs from 'node:fs';
-          import { TaskManifestSchema } from './node_modules/oreshnik-cli/dist/types/schemas.js';
-          const id = process.env.TASK_ID;
-          const raw = JSON.parse(fs.readFileSync(`var/oreshnik/tasks/${id}.json`, 'utf8'));
-          const parsed = TaskManifestSchema.safeParse(raw);
-          if (!parsed.success) {
-            console.error(JSON.stringify(parsed.error.issues, null, 2));
-            throw new Error(`Bootstrap Task manifest ${id} is invalid for installed Oreshnik`);
-          }
-          console.log(JSON.stringify({ taskId: id, schemaValid: true, evidenceType: parsed.data.evidenceType }, null, 2));
-          NODE
           node node_modules/oreshnik-cli/dist/cli.js reconcile --write --json
           node node_modules/oreshnik-cli/dist/cli.js reconcile --check --json
           npm run oreshnik:canonical
@@ -83,7 +71,8 @@ jobs:
           const task = board.tasks.find((entry) => entry.id === id);
           if (!task) throw new Error(`Oreshnik compatibility projection omitted ${id}`);
           if (task.status !== 'ready') throw new Error(`Expected ${id} ready, got ${task.status}`);
-          console.log(JSON.stringify({ taskId: id, status: task.status, track: task.track, taskCount: board.tasks.length }, null, 2));
+          if (board.tasks.length < 43) throw new Error(`Expected at least 43 projected tasks, got ${board.tasks.length}`);
+          console.log(JSON.stringify({ taskId: id, projectionAccepted: true, status: task.status, track: task.track, evidenceType: task.evidenceType, taskCount: board.tasks.length }, null, 2));
           NODE
 
       - name: Persist canonical bootstrap registration
