@@ -5,7 +5,7 @@
     "originUrl": "https://github.com/Cerberux77/HeptaCore.git",
     "canonicalMotherBranch": "master"
   },
-  "generation": 39,
+  "generation": 40,
   "controlHead": "d3792b3b75377a91138ea13c227a72dc16f97a28",
   "catalog": {
     "taskBoardPath": "var/oreshnik/task-board.json",
@@ -618,12 +618,13 @@
         "apps/web/app/api/publishing",
         "packages/integrations"
       ],
-      "status": "ready_for_integration",
+      "status": "superseded",
       "sourceTaskBoardHead": "619e2beac49529c31ce1843159b16eb5e81899ae",
       "catalogFingerprint": "598085002c5244d04ba764c6865934cdc726e23c",
       "createdAt": "2026-07-06T07:22:16.473Z",
-      "updatedAt": "2026-07-08T07:17:14.399Z",
+      "updatedAt": "2026-09-04T14:00:36.612Z",
       "activatedAt": "2026-07-06T07:22:48.360Z",
+      "lastError": "HC-ORESHNIK-RECOVERY-ALPHA6: stale ready_for_integration assignment contradicts released claim/run and canonical task=ready; preserve remote branch dispatch/manuel/manuel-kilo8/publishing/S-HC-PUB-07-YOUTUBE-PUBLISHING/0235fe3455 for later governed salvage and supersede only stale ownership.",
       "resumedCount": 0,
       "takeoverCount": 0,
       "ownershipGeneration": 1,
@@ -865,9 +866,9 @@
       "runId": "run-manuel-S-HC-PUB-07-YOUTUBE-PUBLISHING-20260706072216-381f66dc",
       "branch": "dispatch/manuel/manuel-kilo8/publishing/S-HC-PUB-07-YOUTUBE-PUBLISHING/0235fe3455",
       "worktreePath": "D:\\PROYECTOS\\WORKTREES\\HeptaCore_ORESHNIK_READY\\var\\oreshnik\\wt\\32305cad03d6321a\\manuel\\manuel-kilo8\\publishing\\S-HC-PUB-07-YOUTUBE-PUBLISHING\\0235fe3455",
-      "status": "released",
+      "status": "superseded",
       "createdAt": "2026-07-06T07:22:16.473Z",
-      "updatedAt": "2026-07-08T07:17:14.399Z",
+      "updatedAt": "2026-09-04T14:00:36.612Z",
       "ownershipGeneration": 1,
       "harnessId": "kilo",
       "agentInstanceUid": "agent_6db2b4495ddf40f0b72c727dbf505671",
@@ -1111,10 +1112,11 @@
       "machineId": "machine-89814280-0079-4c35-82c8-3d533c515221",
       "branch": "dispatch/manuel/manuel-kilo8/publishing/S-HC-PUB-07-YOUTUBE-PUBLISHING/0235fe3455",
       "worktreePath": "D:\\PROYECTOS\\WORKTREES\\HeptaCore_ORESHNIK_READY\\var\\oreshnik\\wt\\32305cad03d6321a\\manuel\\manuel-kilo8\\publishing\\S-HC-PUB-07-YOUTUBE-PUBLISHING\\0235fe3455",
-      "status": "released",
+      "status": "superseded",
       "createdAt": "2026-07-06T07:22:16.473Z",
-      "updatedAt": "2026-07-08T07:17:14.399Z",
+      "updatedAt": "2026-09-04T14:00:36.612Z",
       "sourceTaskBoardHead": "619e2beac49529c31ce1843159b16eb5e81899ae",
+      "lastError": "HC-ORESHNIK-RECOVERY-ALPHA6: stale ready_for_integration assignment contradicts released claim/run and canonical task=ready; preserve remote branch dispatch/manuel/manuel-kilo8/publishing/S-HC-PUB-07-YOUTUBE-PUBLISHING/0235fe3455 for later governed salvage and supersede only stale ownership.",
       "ownershipGeneration": 1,
       "harnessId": "kilo",
       "agentInstanceUid": "agent_6db2b4495ddf40f0b72c727dbf505671",
@@ -1727,9 +1729,9 @@
       "machineId": "machine-89814280-0079-4c35-82c8-3d533c515221",
       "runId": "run-manuel-S-HC-PUB-07-YOUTUBE-PUBLISHING-20260706072216-381f66dc",
       "branch": "dispatch/manuel/manuel-kilo8/publishing/S-HC-PUB-07-YOUTUBE-PUBLISHING/0235fe3455",
-      "status": "released",
+      "status": "superseded",
       "createdAt": "2026-07-06T07:22:16.473Z",
-      "updatedAt": "2026-07-08T07:17:14.399Z",
+      "updatedAt": "2026-09-04T14:00:36.612Z",
       "harnessId": "kilo",
       "agentInstanceUid": "agent_6db2b4495ddf40f0b72c727dbf505671",
       "agentInstanceAlias": "manuel-kilo8",
@@ -1745,9 +1747,9 @@
       "machineId": "machine-89814280-0079-4c35-82c8-3d533c515221",
       "runId": "run-manuel-S-HC-PUB-07-YOUTUBE-PUBLISHING-20260706072216-381f66dc",
       "branch": "dispatch/manuel/manuel-kilo8/publishing/S-HC-PUB-07-YOUTUBE-PUBLISHING/0235fe3455",
-      "status": "released",
+      "status": "superseded",
       "createdAt": "2026-07-06T07:22:16.473Z",
-      "updatedAt": "2026-07-08T07:17:14.399Z",
+      "updatedAt": "2026-09-04T14:00:36.612Z",
       "harnessId": "kilo",
       "agentInstanceUid": "agent_6db2b4495ddf40f0b72c727dbf505671",
       "agentInstanceAlias": "manuel-kilo8",
@@ -1763,9 +1765,9 @@
       "machineId": "machine-89814280-0079-4c35-82c8-3d533c515221",
       "runId": "run-manuel-S-HC-PUB-07-YOUTUBE-PUBLISHING-20260706072216-381f66dc",
       "branch": "dispatch/manuel/manuel-kilo8/publishing/S-HC-PUB-07-YOUTUBE-PUBLISHING/0235fe3455",
-      "status": "released",
+      "status": "superseded",
       "createdAt": "2026-07-06T07:22:16.473Z",
-      "updatedAt": "2026-07-08T07:17:14.399Z",
+      "updatedAt": "2026-09-04T14:00:36.612Z",
       "harnessId": "kilo",
       "agentInstanceUid": "agent_6db2b4495ddf40f0b72c727dbf505671",
       "agentInstanceAlias": "manuel-kilo8",
@@ -2073,6 +2075,14 @@
       "at": "2026-09-04T14:00:29.837Z",
       "action": "dispatch.init",
       "message": "Registered machine machine-b6b32755-1292-4420-93a1-6e1ac57f534f with root /home/runner/work/_temp/oreshnik-wt."
+    },
+    {
+      "at": "2026-09-04T14:00:36.612Z",
+      "action": "dispatch.superseded",
+      "assignmentId": "asg-1a915513-296e-4755-8490-ef806182449c",
+      "runId": "run-manuel-S-HC-PUB-07-YOUTUBE-PUBLISHING-20260706072216-381f66dc",
+      "operator": "manuel",
+      "message": "HC-ORESHNIK-RECOVERY-ALPHA6: stale ready_for_integration assignment contradicts released claim/run and canonical task=ready; preserve remote branch dispatch/manuel/manuel-kilo8/publishing/S-HC-PUB-07-YOUTUBE-PUBLISHING/0235fe3455 for later governed salvage and supersede only stale ownership."
     }
   ],
   "reconciliation": {
@@ -2082,5 +2092,5 @@
     "pendingDiagnostics": []
   },
   "createdAt": "2026-06-29T20:17:43.302Z",
-  "updatedAt": "2026-09-04T14:00:29.837Z"
+  "updatedAt": "2026-09-04T14:00:36.612Z"
 }
