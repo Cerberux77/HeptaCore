@@ -311,7 +311,7 @@
       "summary": "S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE:worker | exit=0 | timed_ok | signal=none | stdout=> heptacore@0.1.0 worker:validate | stderr=[config] .env.rrss no encontrado. Usando solo variables de entorno del sistema."
     }
   ],
-  "updatedAt": "2026-09-04T14:00:23.610Z",
+  "updatedAt": "2026-09-04T14:03:10.743Z",
   "runs": [
     {
       "runId": "codex-S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE-2026-06-29T02-30-49-546Z-c443db0b",

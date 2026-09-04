@@ -18,6 +18,10 @@ Recover HeptaCore governance before further product development by adopting the 
 - SHA-256: `66E0E6683CDF9587A873B27F20DD8C8538199EB511068E9C40B682CEADB176E8`
 - Rollback: retained vendored `0.2.0-alpha.16`
 
+## Capability contract
+
+HeptaCore's current operator registry does not define capability metadata. This recovery Task therefore does not invent capability labels for `manuel`; eligibility is constrained by exact Task ownership, zones, gates, release identity/digest checks, and hard stops.
+
 ## Hard stops
 
 - No product features.

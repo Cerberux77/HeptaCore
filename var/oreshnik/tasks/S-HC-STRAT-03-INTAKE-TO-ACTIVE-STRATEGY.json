@@ -136,6 +136,6 @@
       "description": "Owner-authorized versioned task-board registration because alpha.16 inject only derives lowercase IDs from note text and cannot preserve the approved canonical Task ID. Registration is followed by Oreshnik reconcile and dispatch control-plane reconciliation."
     }
   ],
-  "updatedAt": "2026-09-04T14:00:23.610Z",
+  "updatedAt": "2026-09-04T14:03:10.743Z",
   "runs": []
 }

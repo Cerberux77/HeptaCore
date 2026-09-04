@@ -45,14 +45,6 @@
     "release commit 3e4345b76238e18da8e4d259f537f0e9c64ce099",
     "release SHA-256 66E0E6683CDF9587A873B27F20DD8C8538199EB511068E9C40B682CEADB176E8"
   ],
-  "capabilities": [
-    "oreshnik-governance",
-    "git",
-    "nodejs",
-    "supply-chain-verification",
-    "control-plane-recovery",
-    "release-adoption"
-  ],
   "gates": [
     "npm run oreshnik:ready",
     "node node_modules/oreshnik-cli/dist/cli.js --version",
@@ -94,12 +86,6 @@
     "riskLevel": "critical",
     "recommendedReasoning": "max",
     "reviewMode": "strict",
-    "requiredCapabilities": [
-      "oreshnik-governance",
-      "git",
-      "supply-chain-verification",
-      "control-plane-recovery"
-    ],
     "independentReviewRequired": false,
     "requiredReviewRoles": [
       "validator"
@@ -126,12 +112,12 @@
   },
   "history": [
     {
-      "at": "2026-09-04T14:00:23.610Z",
+      "at": "2026-09-04T14:03:10.743Z",
       "action": "canonically_registered",
       "operator": "manuel",
-      "description": "Owner-authorized durable bootstrap registration under pinned alpha.16. Alpha.16 predates canonical `task register`; HeptaCore already uses durable per-Task artifacts, so this compatibility bootstrap writes the Task artifact plus Goal and then delegates all projection/control-plane mutation back to Oreshnik reconcile and dispatch."
+      "description": "Owner-authorized durable bootstrap registration under pinned alpha.16. Alpha.16 predates canonical `task register`; HeptaCore already uses durable per-Task artifacts, so this compatibility bootstrap writes the Task artifact plus Goal and then delegates all projection/control-plane mutation back to Oreshnik reconcile and dispatch. Capability labels are intentionally omitted because HeptaCore's operator registry does not define capability metadata; safety is enforced by explicit zones, gates, release digest verification, and hard stops instead of fabricated operator capabilities."
     }
   ],
-  "updatedAt": "2026-09-04T14:00:23.610Z",
+  "updatedAt": "2026-09-04T14:03:10.743Z",
   "runs": []
 }

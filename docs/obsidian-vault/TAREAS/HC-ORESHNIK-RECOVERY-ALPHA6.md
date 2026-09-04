@@ -6,7 +6,7 @@ task_id: "HC-ORESHNIK-RECOVERY-ALPHA6"
 sprint: "recovery"
 status: "ready"
 owner: "Manuel"
-last_updated: "2026-09-04T14:00:23.610Z"
+last_updated: "2026-09-04T14:03:10.743Z"
 source: "var/oreshnik/tasks/HC-ORESHNIK-RECOVERY-ALPHA6.json"
 ---
 
