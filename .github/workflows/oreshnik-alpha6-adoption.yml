@@ -23,6 +23,9 @@ env:
   RUN_ID: run-manuel-HC-ORESHNIK-RECOVERY-ALPHA6-20260904140329-21ab3a41
   FUNCTIONAL_BRANCH: dispatch/manuel/manuel-chatgpt1/recovery/HC-ORESHNIK-RECOVERY-ALPHA6/2954c98970
   ISSUE_NUMBER: "22"
+  ALPHA6_VERSION: 0.3.0-alpha.6
+  ALPHA6_SHA256: 66e0e6683cdf9587a873b27f20dd8c8538199eb511068e9c40b682ceadb176e8
+  ALPHA6_URL: https://github.com/Cerberux77/oreshnik/releases/download/v0.3.0-alpha.6/oreshnik-cli-0.3.0-alpha.6.tgz
 
 jobs:
   adopt-alpha6:
@@ -57,7 +60,31 @@ jobs:
           test "$(node node_modules/oreshnik-cli/dist/cli.js --version)" = "0.2.0-alpha.16"
           npm run oreshnik:ready
 
-      - name: Rehydrate same canonical Run through takeover
+      - name: Prepare digest-verified alpha6 takeover CLI
+        run: |
+          set -euo pipefail
+          ALPHA6_TGZ="$RUNNER_TEMP/oreshnik-cli-$ALPHA6_VERSION.tgz"
+          ALPHA6_PREFIX="$RUNNER_TEMP/oreshnik-alpha6-takeover-cli"
+          curl --fail --location --retry 4 --retry-all-errors --connect-timeout 20 --max-time 180 \
+            "$ALPHA6_URL" --output "$ALPHA6_TGZ"
+          printf '%s  %s\n' "$ALPHA6_SHA256" "$ALPHA6_TGZ" | sha256sum -c -
+          mkdir -p "$ALPHA6_PREFIX"
+          npm install --prefix "$ALPHA6_PREFIX" --ignore-scripts "$ALPHA6_TGZ"
+          ALPHA6_CLI="$ALPHA6_PREFIX/node_modules/oreshnik-cli/dist/cli.js"
+          test -f "$ALPHA6_CLI"
+          test "$(node "$ALPHA6_CLI" --version)" = "$ALPHA6_VERSION"
+          echo "ALPHA6_CLI=$ALPHA6_CLI" >> "$GITHUB_ENV"
+
+      - name: Verify takeover ancestry precondition
+        run: |
+          set -euo pipefail
+          git fetch origin "+refs/heads/$FUNCTIONAL_BRANCH:refs/remotes/origin/$FUNCTIONAL_BRANCH"
+          EXPECTED_SHA="d8d75dfd162f7f3a2f376dd27958cd8553148540"
+          BRANCH_SHA="$(git rev-parse "refs/remotes/origin/$FUNCTIONAL_BRANCH")"
+          git merge-base --is-ancestor "$EXPECTED_SHA" "$BRANCH_SHA"
+          echo "Verified governed branch descendant: expected=$EXPECTED_SHA head=$BRANCH_SHA"
+
+      - name: Rehydrate same canonical Run through alpha6 takeover
         id: takeover
         env:
           WORKTREE_ROOT: ${{ runner.temp }}/oreshnik-wt
@@ -65,7 +92,7 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p "$WORKTREE_ROOT" "$EVIDENCE_DIR"
-          CLI=(node node_modules/oreshnik-cli/dist/cli.js)
+          CLI=(node "$ALPHA6_CLI")
           "${CLI[@]}" dispatch init \
             --mother master \
             --worktree-root "$WORKTREE_ROOT" \
@@ -73,7 +100,7 @@ jobs:
             --json | tee "$EVIDENCE_DIR/dispatch-init.json"
           "${CLI[@]}" dispatch takeover \
             --run "$RUN_ID" \
-            --reason "Ephemeral GitHub Actions session ended after canonical Run creation; rehydrate the same Run for its authorized alpha6 adoption execution." \
+            --reason "Ephemeral GitHub Actions session ended after canonical Run creation; rehydrate the same Run for its authorized alpha6 adoption execution. Alpha6 takeover accepts a branch that safely descends from the recorded source commit." \
             --operator "$OPERATOR" \
             --harness "$HARNESS" \
             --instance new \
@@ -122,7 +149,7 @@ jobs:
           EVIDENCE_DIR: ${{ runner.temp }}/oreshnik-alpha6-adoption
         run: |
           set -euo pipefail
-          CLI=(node node_modules/oreshnik-cli/dist/cli.js)
+          CLI=(node "$ALPHA6_CLI")
           git fetch origin "+refs/heads/$FUNCTIONAL_BRANCH:refs/remotes/origin/$FUNCTIONAL_BRANCH" '+refs/heads/oreshnik/control:refs/remotes/origin/oreshnik/control'
           "${CLI[@]}" dispatch reconcile --repo . --json | tee "$EVIDENCE_DIR/dispatch-reconcile-after-adoption.json"
           git fetch origin '+refs/heads/oreshnik/control:refs/remotes/origin/oreshnik/control'
