@@ -8,10 +8,14 @@ REPO="${REPO:-.}"
 WORKTREE_ROOT="${WORKTREE_ROOT:-${RUNNER_TEMP:-/tmp}/oreshnik-wt}"
 EVIDENCE_DIR="${EVIDENCE_DIR:-${RUNNER_TEMP:-/tmp}/oreshnik-alpha6-recovery}"
 OUTPUT_FILE="${GITHUB_OUTPUT:-$EVIDENCE_DIR/outputs.env}"
+STALE_YOUTUBE_TASK="S-HC-PUB-07-YOUTUBE-PUBLISHING"
+STALE_YOUTUBE_RUN="run-manuel-S-HC-PUB-07-YOUTUBE-PUBLISHING-20260706072216-381f66dc"
+STALE_YOUTUBE_BRANCH="dispatch/manuel/manuel-kilo8/publishing/S-HC-PUB-07-YOUTUBE-PUBLISHING/0235fe3455"
 CLI=(node node_modules/oreshnik-cli/dist/cli.js)
 
 mkdir -p "$WORKTREE_ROOT" "$EVIDENCE_DIR"
 export TASK_ID OPERATOR HARNESS REPO WORKTREE_ROOT EVIDENCE_DIR
+export STALE_YOUTUBE_TASK STALE_YOUTUBE_RUN STALE_YOUTUBE_BRANCH
 
 git config user.name "Manuel Vera via ChatGPT Operator"
 git config user.email "manuel@heptacore.dev"
@@ -65,6 +69,78 @@ npm run oreshnik:ready 2>&1 | tee "$EVIDENCE_DIR/readiness-before.log"
   --json | tee "$EVIDENCE_DIR/dispatch-init.json"
 
 git fetch --prune origin '+refs/heads/*:refs/remotes/origin/*' '+refs/heads/oreshnik/control:refs/remotes/origin/oreshnik/control' || git fetch --prune origin
+
+# Recovery fence for a known stale July delivery lineage. The assignment still says
+# ready_for_integration while its claim and run are released and the canonical Task is ready.
+# We preserve the remote branch and only supersede the stale control-plane ownership.
+git show origin/oreshnik/control:control-plane.json >"$EVIDENCE_DIR/control-plane-before-stale-repair.json"
+git show "origin/master:var/oreshnik/tasks/$STALE_YOUTUBE_TASK.json" >"$EVIDENCE_DIR/youtube-task-master-before-repair.json"
+if ! git show-ref --verify --quiet "refs/remotes/origin/$STALE_YOUTUBE_BRANCH"; then
+  echo "Refusing stale-lineage repair because preserved YouTube branch is missing: $STALE_YOUTUBE_BRANCH" >&2
+  exit 23
+fi
+git rev-list --left-right --count "origin/master...origin/$STALE_YOUTUBE_BRANCH" >"$EVIDENCE_DIR/youtube-branch-divergence.txt"
+git log --oneline --no-decorate "origin/master..origin/$STALE_YOUTUBE_BRANCH" >"$EVIDENCE_DIR/youtube-branch-preserved-commits.txt"
+
+REPAIR_DECISION="$(node - <<'NODE'
+const fs = require('node:fs');
+const path = require('node:path');
+const evidenceDir = process.env.EVIDENCE_DIR;
+const taskId = process.env.STALE_YOUTUBE_TASK;
+const runId = process.env.STALE_YOUTUBE_RUN;
+const branch = process.env.STALE_YOUTUBE_BRANCH;
+const control = JSON.parse(fs.readFileSync(path.join(evidenceDir, 'control-plane-before-stale-repair.json'), 'utf8'));
+const task = JSON.parse(fs.readFileSync(path.join(evidenceDir, 'youtube-task-master-before-repair.json'), 'utf8'));
+const assignment = control.assignments.find((entry) => entry.taskId === taskId && entry.runId === runId);
+const claim = control.claims.find((entry) => entry.taskId === taskId && entry.runId === runId);
+const run = control.runs.find((entry) => entry.taskId === taskId && entry.runId === runId);
+if (!assignment || !claim || !run) throw new Error('Known stale YouTube lineage is incomplete in control plane');
+if (assignment.functionalBranch !== branch) throw new Error(`Stale YouTube branch mismatch: ${assignment.functionalBranch}`);
+if (task.status !== 'ready') throw new Error(`Canonical ${taskId} must be ready before stale-lineage repair; got ${task.status}`);
+if (Array.isArray(task.runs) && task.runs.length !== 0) throw new Error(`Canonical ${taskId} unexpectedly contains durable runs`);
+if (assignment.status === 'superseded') {
+  console.error(JSON.stringify({ decision: 'already_superseded', assignmentStatus: assignment.status, claimStatus: claim.status, runStatus: run.status }, null, 2));
+  process.stdout.write('already_superseded');
+  process.exit(0);
+}
+if (assignment.status !== 'ready_for_integration') {
+  throw new Error(`Expected stale YouTube assignment ready_for_integration, got ${assignment.status}`);
+}
+if (claim.status !== 'released' || run.status !== 'released') {
+  throw new Error(`Expected released stale claim/run, got claim=${claim.status} run=${run.status}`);
+}
+console.error(JSON.stringify({ decision: 'supersede', assignmentStatus: assignment.status, claimStatus: claim.status, runStatus: run.status, preservedBranch: branch }, null, 2));
+process.stdout.write('supersede');
+NODE
+)"
+
+echo "$REPAIR_DECISION" >"$EVIDENCE_DIR/youtube-stale-repair-decision.txt"
+if [[ "$REPAIR_DECISION" == "supersede" ]]; then
+  "${CLI[@]}" dispatch supersede \
+    --run "$STALE_YOUTUBE_RUN" \
+    --reason "HC-ORESHNIK-RECOVERY-ALPHA6: stale ready_for_integration assignment contradicts released claim/run and canonical task=ready; preserve remote branch $STALE_YOUTUBE_BRANCH for later governed salvage and supersede only stale ownership." \
+    --repo "$REPO" \
+    --json | tee "$EVIDENCE_DIR/youtube-stale-supersede.json"
+elif [[ "$REPAIR_DECISION" != "already_superseded" ]]; then
+  echo "Unexpected stale-repair decision: $REPAIR_DECISION" >&2
+  exit 24
+fi
+
+git fetch --prune origin '+refs/heads/oreshnik/control:refs/remotes/origin/oreshnik/control' "+refs/heads/$STALE_YOUTUBE_BRANCH:refs/remotes/origin/$STALE_YOUTUBE_BRANCH"
+git show origin/oreshnik/control:control-plane.json >"$EVIDENCE_DIR/control-plane-after-stale-repair.json"
+if ! git show-ref --verify --quiet "refs/remotes/origin/$STALE_YOUTUBE_BRANCH"; then
+  echo "Stale-lineage repair removed the preserved YouTube branch; refusing to continue." >&2
+  exit 25
+fi
+node - <<'NODE'
+const fs = require('node:fs');
+const path = require('node:path');
+const control = JSON.parse(fs.readFileSync(path.join(process.env.EVIDENCE_DIR, 'control-plane-after-stale-repair.json'), 'utf8'));
+const assignment = control.assignments.find((entry) => entry.taskId === process.env.STALE_YOUTUBE_TASK && entry.runId === process.env.STALE_YOUTUBE_RUN);
+if (!assignment) throw new Error('Stale YouTube assignment disappeared instead of being terminalized');
+if (assignment.status !== 'superseded') throw new Error(`Expected superseded stale YouTube assignment, got ${assignment.status}`);
+console.log(JSON.stringify({ staleRepairVerified: true, assignmentId: assignment.assignmentId, status: assignment.status, preservedBranch: process.env.STALE_YOUTUBE_BRANCH }, null, 2));
+NODE
 
 "${CLI[@]}" dispatch reconcile \
   --repo "$REPO" \
