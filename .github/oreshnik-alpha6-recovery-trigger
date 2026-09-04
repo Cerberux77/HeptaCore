@@ -3,5 +3,6 @@ operator=manuel
 harness=chatgpt
 target=oreshnik-cli@0.3.0-alpha.6
 issued=2026-09-04
-attempt=2
+attempt=3
 bootstrap=durable-task-artifact
+manifest-schema=alpha16-validated
