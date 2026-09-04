@@ -3,7 +3,11 @@ import path from "node:path";
 
 const root = process.cwd();
 const boardPath = path.join(root, "var", "oreshnik", "task-board.json");
+const tasksDir = path.join(root, "var", "oreshnik", "tasks");
 const taskId = "HC-ORESHNIK-RECOVERY-ALPHA6";
+const taskArtifactPath = path.join(tasksDir, `${taskId}.json`);
+const goalDir = path.join(root, "docs", "goals");
+const goalPath = path.join(goalDir, `${taskId}.md`);
 const now = new Date().toISOString();
 
 const board = JSON.parse(fs.readFileSync(boardPath, "utf8").replace(/^\uFEFF/, ""));
@@ -14,7 +18,7 @@ const task = {
   owner: "Manuel",
   backupOwner: "Manuel",
   status: "ready",
-  track: "governance-recovery",
+  track: "recovery",
   zone: [
     "package.json",
     "package-lock.json",
@@ -46,6 +50,7 @@ const task = {
   resources: [
     "GitHub issue #22",
     "docs/oreshnik/ORESHNIK_CONSUMER_ADOPTION.md",
+    "docs/goals/HC-ORESHNIK-RECOVERY-ALPHA6.md",
     "Oreshnik release v0.3.0-alpha.6",
     "release commit 3e4345b76238e18da8e4d259f537f0e9c64ce099",
     "release SHA-256 66E0E6683CDF9587A873B27F20DD8C8538199EB511068E9C40B682CEADB176E8"
@@ -95,22 +100,6 @@ const task = {
   ],
   handoff: "docs/07_handoffs/HC-ORESHNIK-RECOVERY-ALPHA6.md",
   attempts: 0,
-  executionRecommendation: {
-    requiredCapabilities: [
-      "oreshnik-governance",
-      "git",
-      "nodejs",
-      "supply-chain-verification",
-      "control-plane-recovery"
-    ],
-    preferredHarnesses: ["chatgpt"],
-    modelClass: "gpt-5.6-sol",
-    reasoningClass: "maximum",
-    rationale: [
-      "Owner explicitly authorized operator manuel with ChatGPT harness",
-      "Governance recovery must precede every further HeptaCore product task"
-    ]
-  },
   taskExecutionPolicy: {
     riskLevel: "critical",
     recommendedReasoning: "max",
@@ -142,31 +131,74 @@ const task = {
       at: now,
       action: "canonically_registered",
       operator: "manuel",
-      description: "Owner-authorized versioned bootstrap registration under pinned alpha.16. This compatibility exception exists only because alpha.16 predates canonical `task register`; registration must be followed immediately by Oreshnik reconcile and remote dispatch before any implementation mutation."
+      description: "Owner-authorized durable bootstrap registration under pinned alpha.16. Alpha.16 predates canonical `task register`; HeptaCore already uses durable per-Task artifacts, so this compatibility bootstrap writes the Task artifact plus Goal and then delegates all projection/control-plane mutation back to Oreshnik reconcile and dispatch."
     }
   ]
 };
 
-const existingIndex = board.tasks.findIndex((entry) => entry.id === taskId);
-if (existingIndex >= 0) {
-  const existing = board.tasks[existingIndex];
-  if (["claimed", "active", "validating", "ready_for_integration", "integrated", "done"].includes(existing.status)) {
-    console.log(JSON.stringify({ changed: false, reason: `existing task preserved in status ${existing.status}`, taskId }, null, 2));
+const terminalOrOwned = new Set(["claimed", "active", "validating", "ready_for_integration", "integrated", "done"]);
+if (fs.existsSync(taskArtifactPath)) {
+  const existingArtifact = JSON.parse(fs.readFileSync(taskArtifactPath, "utf8").replace(/^\uFEFF/, ""));
+  if (terminalOrOwned.has(existingArtifact.status)) {
+    console.log(JSON.stringify({ changed: false, reason: `existing durable task preserved in status ${existingArtifact.status}`, taskId }, null, 2));
     process.exit(0);
   }
-  board.tasks[existingIndex] = {
-    ...existing,
-    ...task,
-    history: [...(existing.history || []), ...task.history]
-  };
-} else {
-  board.tasks.push(task);
 }
 
-if (!board.currentExecutionOrder.includes(taskId)) {
-  board.currentExecutionOrder.unshift(taskId);
-}
+const sprintOrderIndex = Math.max(0, board.currentExecutionOrder.indexOf(task.track));
+const existingIndex = board.tasks.findIndex((entry) => entry.id === taskId);
+const taskOrderIndex = existingIndex >= 0 ? existingIndex : board.tasks.length;
+
+const artifact = {
+  project: board.project,
+  taskId,
+  sprint: task.track,
+  sprintOrderIndex,
+  taskOrderIndex,
+  title: task.title,
+  owner: task.owner,
+  backupOwner: task.backupOwner,
+  status: task.status,
+  taskBoardPath: "var/oreshnik/task-board.json",
+  zone: task.zone,
+  readZones: task.readZones,
+  writeZones: task.writeZones,
+  resources: task.resources,
+  capabilities: task.capabilities,
+  gates: task.gates,
+  priority: task.priority,
+  validationExpectations: task.validationExpectations,
+  evidenceType: task.evidenceType,
+  dependsOn: task.dependsOn,
+  acceptance: task.acceptance,
+  handoff: task.handoff,
+  attempts: 0,
+  taskExecutionPolicy: task.taskExecutionPolicy,
+  history: task.history,
+  updatedAt: now,
+  runs: []
+};
+
+const goalMarkdown = `# ${taskId}\n\n## Objective\n\nRecover HeptaCore governance before further product development by adopting the exact Oreshnik \`0.3.0-alpha.6\` release, reconciling the remote control plane, preserving alpha16 rollback, and freezing a clean governed baseline.\n\n## Operator and harness\n\n- Operator: \`manuel\`\n- Harness: \`chatgpt\`\n- Mother: \`master\`\n- Control plane: \`oreshnik/control\`\n\n## Release identity\n\n- Version: \`0.3.0-alpha.6\`\n- Commit: \`3e4345b76238e18da8e4d259f537f0e9c64ce099\`\n- SHA-256: \`66E0E6683CDF9587A873B27F20DD8C8538199EB511068E9C40B682CEADB176E8\`\n- Rollback: retained vendored \`0.2.0-alpha.16\`\n\n## Hard stops\n\n- No product features.\n- No production deployment.\n- No live social publication or campaign spend.\n- No credentials, passwords, tokens or env contents in Git/evidence.\n- No floating dependency and no manual edits to remote control-plane JSON.\n\n## Terminal acceptance\n\nThe Run may advance only after exact release verification, alpha6 consumer readiness, control-plane reconciliation, command-catalog regeneration, full HeptaCore gates, rollback evidence, and canonical handoff all pass.\n`;
+
+fs.mkdirSync(tasksDir, { recursive: true });
+fs.mkdirSync(goalDir, { recursive: true });
+fs.writeFileSync(taskArtifactPath, `${JSON.stringify(artifact, null, 2)}\n`, "utf8");
+fs.writeFileSync(goalPath, goalMarkdown, "utf8");
+
+// Keep the compatibility projection coherent before Oreshnik immediately regenerates it from durable artifacts.
+if (existingIndex >= 0) board.tasks[existingIndex] = task;
+else board.tasks.push(task);
+if (!board.currentExecutionOrder.includes(taskId)) board.currentExecutionOrder.push(taskId);
 board.updatedAt = now;
-
 fs.writeFileSync(boardPath, `${JSON.stringify(board, null, 2)}\n`, "utf8");
-console.log(JSON.stringify({ changed: true, taskId, status: "ready", boardPath }, null, 2));
+
+console.log(JSON.stringify({
+  changed: true,
+  taskId,
+  status: "ready",
+  taskArtifactPath,
+  goalPath,
+  boardPath,
+  bootstrapMode: "alpha16-durable-task-compatibility"
+}, null, 2));
