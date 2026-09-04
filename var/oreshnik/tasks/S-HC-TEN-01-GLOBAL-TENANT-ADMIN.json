@@ -3,7 +3,7 @@
   "taskId": "S-HC-TEN-01-GLOBAL-TENANT-ADMIN",
   "sprint": "tenant-platform",
   "sprintOrderIndex": 26,
-  "taskOrderIndex": 40,
+  "taskOrderIndex": 41,
   "title": "Global tenant administration and provisioning",
   "owner": "Manuel",
   "backupOwner": "Manuel",

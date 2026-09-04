@@ -3,7 +3,7 @@
   "taskId": "S-HC-SUP-01-ASSISTED-CUSTOMER-CHANNELS",
   "sprint": "support",
   "sprintOrderIndex": 24,
-  "taskOrderIndex": 37,
+  "taskOrderIndex": 38,
   "title": "Assisted customer channels: LLM assistant, WhatsApp, email, human escalation",
   "owner": "Manuel",
   "backupOwner": "Manuel",

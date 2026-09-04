@@ -3,7 +3,7 @@
   "taskId": "S-HC-STRAT-03-INTAKE-TO-ACTIVE-STRATEGY",
   "sprint": "strategy",
   "sprintOrderIndex": 23,
-  "taskOrderIndex": 41,
+  "taskOrderIndex": 37,
   "title": "End-to-end intake, generated strategy persistence, approval and calendar materialization",
   "owner": "Manuel",
   "backupOwner": "Manuel",

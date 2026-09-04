@@ -1,13 +1,6 @@
 {
   "project": "HeptaCore",
   "updatedAt": "2026-07-11T19:09:07.244Z",
-  "resiliencePolicy": "If an owner is unavailable for more than one working block or blocks the critical path, backupOwner may take over after recording reassignment.",
-  "closurePolicy": "No sprint may be closed until acceptance criteria, base tests, sprint-specific tests, docs/handoff, and Oreshnik zone checks pass.",
-  "baseTestMatrix": [
-    "npm run typecheck",
-    "npm run build",
-    "npm run worker:validate"
-  ],
   "currentExecutionOrder": [
     "S-HC-PUB-04-HOURLY-BATCH-CRON",
     "S-HC-PUB-05-RECONCILIATION-OPS",
@@ -35,23 +28,7 @@
     "strategy",
     "support",
     "tenant-onboarding",
-    "tenant-platform",
-    "observability",
-    "tooling",
-    "Fase completada: S-HC-TEN-01-GLOBAL-TENANT-ADMIN — tres roles canonicos (OWNER/ADMIN/VIEWER), normalizacion heredada, identidad en /admin y /tenant/*, 5/5 E2E en Preview (SHA 4b82628), 569 unit tests.",
-    "Fase completada: S-HC-REC-00A — baseline de publicacion recuperado y estabilizado (SHA 2fd9e249). Facebook e Instagram publican realmente desde la UI con durabilidad transaccional.",
-    "Fase completada: S-HC-REC-00C — integracion canonica en master (SHA 9329fe8). Documentacion y Oreshnik alineados.",
-    "Fase completada: oreshnik-cli@0.2.0-alpha.0 publicado. reconcile --check/--write operacional.",
-    "Fase completada: S-HC-PUB-02-MULTIFORMAT-PREVIEW — preview y dry-run multiformato para Instagram y Facebook.",
-    "Fase completada: S-HC-PUB-03-MULTITENANT-ASSETS — biblioteca multi-tenant, metadata, compatibilidad, colecciones, inspector (SHA 31dd93e).",
-    "Siguiente fase (un sprint por vez): S-HC-PUB-04-HOURLY-BATCH-CRON — batch cron publishing.",
-    "Fase completada: S-HC-TOOL-01-GOAL-RUNNER-V1 - Goal Runner v1 integrado en rama madre y listo para operar con Oreshnik dispatch.",
-    "EMAIL-01 infraestructura de codigo preparada (modelos, templates, provider abstraction, webhook, Link-Only activo). Integracion externa bloqueada hasta dominio final.",
-    "Modo operacional actual: EMAIL_PROVIDER=disabled. Invitaciones se entregan via enlace copiable (inviteLink). Correos reales: 0.",
-    "Reels, Stories y YouTube forman parte obligatoria del alcance final de HeptaCore. Las combinaciones sin publisher real quedan pendientes de implementacion en PUB-06, PUB-07 o PUB-08.",
-    "Jean fuera de ruta critica. Responsabilidades reasignadas a Manuel.",
-    "Fase completada: S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE - broker LLM, gobernanza de costo y evidencia estructurada integrados en ai-infra.",
-    "S-HC-STRAT-03-INTAKE-TO-ACTIVE-STRATEGY"
+    "tenant-platform"
   ],
   "tasks": [
     {
@@ -2119,6 +2096,141 @@
       ]
     },
     {
+      "id": "S-HC-STRAT-03-INTAKE-TO-ACTIVE-STRATEGY",
+      "title": "End-to-end intake, generated strategy persistence, approval and calendar materialization",
+      "owner": "Manuel",
+      "backupOwner": "Manuel",
+      "status": "ready",
+      "track": "strategy",
+      "zone": [
+        "apps/web/components/dashboard-console.tsx",
+        "apps/web/app/api/strategy/**",
+        "apps/web/lib/**strategy**",
+        "apps/web/lib/dashboard.ts",
+        "packages/agents/src/**",
+        "packages/core/src/**strategy**",
+        "docs/oreshnik/**",
+        "docs/07_handoffs/**",
+        "apps/web/lib/__tests__/**",
+        "packages/agents/src/**/*.test.*"
+      ],
+      "readZones": [
+        "packages/db/prisma/schema.prisma",
+        "apps/web/lib/auth*",
+        "apps/web/app/api/auth/**",
+        "publishing provider adapters"
+      ],
+      "writeZones": [
+        "apps/web/components/dashboard-console.tsx",
+        "apps/web/app/api/strategy/**",
+        "apps/web/lib/**strategy**",
+        "apps/web/lib/dashboard.ts",
+        "packages/agents/src/**",
+        "packages/core/src/**strategy**",
+        "docs/oreshnik/**",
+        "docs/07_handoffs/**",
+        "apps/web/lib/__tests__/**",
+        "packages/agents/src/**/*.test.*"
+      ],
+      "resources": [
+        "docs/oreshnik/S-HC-STRAT-03-INTAKE-TO-ACTIVE-STRATEGY.md",
+        "docs/oreshnik/S-HC-STRAT-03-OPERATOR-AUTHORIZATION.md",
+        "var/oreshnik/cloud/requests/S-HC-STRAT-03-INTAKE-TO-ACTIVE-STRATEGY.json",
+        "GitHub issue #16"
+      ],
+      "capabilities": [
+        "codex",
+        "typescript",
+        "nextjs",
+        "multi-tenant",
+        "strategy-generation",
+        "transactional-activation",
+        "timezone-scheduling",
+        "testing"
+      ],
+      "gates": [
+        "npm run oreshnik:ready",
+        "npm run typecheck",
+        "npm run build",
+        "npm run test",
+        "npm run worker:validate",
+        "oreshnik reconcile --check --json",
+        "git diff --check"
+      ],
+      "priority": "critical",
+      "validationExpectations": [
+        "Exact current intake is used by generation",
+        "Generated strategy persists and is versioned",
+        "Approval and activation are explicit, transactional and idempotent",
+        "Local IANA schedules are converted to correct UTC instants",
+        "Provider/model/fallback state is unambiguous",
+        "No live publisher call, campaign spend or production deployment occurs",
+        "Tenant isolation and canonical role checks are preserved",
+        "Focused tests and all repository gates pass"
+      ],
+      "evidenceType": "integration",
+      "dependsOn": [],
+      "acceptance": [
+        "A tenant can enter a structured intake without pasting a completed strategy",
+        "Generation uses the exact current form values, networks, timezone and start date",
+        "A strict four-week platform-specific strategy includes exact times, copy, scripts, assets, KPI and hypotheses",
+        "Draft strategy persists across reload and successive generations create identifiable versions",
+        "Human review, approval and activation lifecycle exists",
+        "Activation transactionally materializes pillars, calendar-ready drafts and asset requirements",
+        "Repeated activation creates no duplicate pillars or drafts",
+        "Deterministic fallback is visibly distinct from real LLM generation",
+        "No live social publication or campaign spend occurs",
+        "Prisma, authentication and authorization remain unchanged unless an Oreshnik double lock is acquired",
+        "Focused tests, full gates, evidence and canonical handoff pass",
+        "Terminal state is READY_FOR_MANUAL_QA pending Manuel validation in Preview"
+      ],
+      "handoff": "docs/07_handoffs/S-HC-STRAT-03-INTAKE-TO-ACTIVE-STRATEGY.md",
+      "attempts": 0,
+      "taskExecutionPolicy": {
+        "riskLevel": "critical",
+        "recommendedReasoning": "max",
+        "reviewMode": "strict",
+        "requiredCapabilities": [
+          "typescript",
+          "nextjs",
+          "multi-tenant",
+          "transactional-workflows",
+          "timezone-scheduling",
+          "test-engineering"
+        ],
+        "independentReviewRequired": false,
+        "requiredReviewRoles": [
+          "validator"
+        ],
+        "humanApprovalRequired": true,
+        "maxCorrectionCycles": 3,
+        "requiredGates": [
+          "oreshnik:ready",
+          "focused-strategy-tests",
+          "typecheck",
+          "build",
+          "test",
+          "worker:validate",
+          "reconcile",
+          "git-diff-check"
+        ],
+        "evidenceRequirements": [
+          "code",
+          "integration",
+          "ui",
+          "canonical-handoff"
+        ]
+      },
+      "history": [
+        {
+          "at": "2026-07-11T19:09:07.244Z",
+          "action": "canonically_registered",
+          "operator": "manuel",
+          "description": "Owner-authorized versioned task-board registration because alpha.16 inject only derives lowercase IDs from note text and cannot preserve the approved canonical Task ID. Registration is followed by Oreshnik reconcile and dispatch control-plane reconciliation."
+        }
+      ]
+    },
+    {
       "id": "S-HC-SUP-01-ASSISTED-CUSTOMER-CHANNELS",
       "title": "Assisted customer channels: LLM assistant, WhatsApp, email, human escalation",
       "owner": "Manuel",
@@ -2264,161 +2376,6 @@
           "description": "Three canonical roles (OWNER/ADMIN/VIEWER), legacy role normalization, identity panel in /admin and /tenant/*, 5/5 E2E pass, 569 unit tests, production intact"
         }
       ]
-    },
-    {
-      "id": "S-HC-STRAT-03-INTAKE-TO-ACTIVE-STRATEGY",
-      "title": "End-to-end intake, generated strategy persistence, approval and calendar materialization",
-      "owner": "Manuel",
-      "backupOwner": "Manuel",
-      "status": "ready",
-      "track": "strategy",
-      "zone": [
-        "apps/web/components/dashboard-console.tsx",
-        "apps/web/app/api/strategy/**",
-        "apps/web/lib/**strategy**",
-        "apps/web/lib/dashboard.ts",
-        "packages/agents/src/**",
-        "packages/core/src/**strategy**",
-        "docs/oreshnik/**",
-        "docs/07_handoffs/**",
-        "apps/web/lib/__tests__/**",
-        "packages/agents/src/**/*.test.*"
-      ],
-      "readZones": [
-        "packages/db/prisma/schema.prisma",
-        "apps/web/lib/auth*",
-        "apps/web/app/api/auth/**",
-        "publishing provider adapters"
-      ],
-      "writeZones": [
-        "apps/web/components/dashboard-console.tsx",
-        "apps/web/app/api/strategy/**",
-        "apps/web/lib/**strategy**",
-        "apps/web/lib/dashboard.ts",
-        "packages/agents/src/**",
-        "packages/core/src/**strategy**",
-        "docs/oreshnik/**",
-        "docs/07_handoffs/**",
-        "apps/web/lib/__tests__/**",
-        "packages/agents/src/**/*.test.*"
-      ],
-      "resources": [
-        "docs/oreshnik/S-HC-STRAT-03-INTAKE-TO-ACTIVE-STRATEGY.md",
-        "docs/oreshnik/S-HC-STRAT-03-OPERATOR-AUTHORIZATION.md",
-        "var/oreshnik/cloud/requests/S-HC-STRAT-03-INTAKE-TO-ACTIVE-STRATEGY.json",
-        "GitHub issue #16"
-      ],
-      "capabilities": [
-        "codex",
-        "typescript",
-        "nextjs",
-        "multi-tenant",
-        "strategy-generation",
-        "transactional-activation",
-        "timezone-scheduling",
-        "testing"
-      ],
-      "gates": [
-        "npm run oreshnik:ready",
-        "npm run typecheck",
-        "npm run build",
-        "npm run test",
-        "npm run worker:validate",
-        "oreshnik reconcile --check --json",
-        "git diff --check"
-      ],
-      "priority": "critical",
-      "validationExpectations": [
-        "Exact current intake is used by generation",
-        "Generated strategy persists and is versioned",
-        "Approval and activation are explicit, transactional and idempotent",
-        "Local IANA schedules are converted to correct UTC instants",
-        "Provider/model/fallback state is unambiguous",
-        "No live publisher call, campaign spend or production deployment occurs",
-        "Tenant isolation and canonical role checks are preserved",
-        "Focused tests and all repository gates pass"
-      ],
-      "evidenceType": "integration",
-      "dependsOn": [],
-      "acceptance": [
-        "A tenant can enter a structured intake without pasting a completed strategy",
-        "Generation uses the exact current form values, networks, timezone and start date",
-        "A strict four-week platform-specific strategy includes exact times, copy, scripts, assets, KPI and hypotheses",
-        "Draft strategy persists across reload and successive generations create identifiable versions",
-        "Human review, approval and activation lifecycle exists",
-        "Activation transactionally materializes pillars, calendar-ready drafts and asset requirements",
-        "Repeated activation creates no duplicate pillars or drafts",
-        "Deterministic fallback is visibly distinct from real LLM generation",
-        "No live social publication or campaign spend occurs",
-        "Prisma, authentication and authorization remain unchanged unless an Oreshnik double lock is acquired",
-        "Focused tests, full gates, evidence and canonical handoff pass",
-        "Terminal state is READY_FOR_MANUAL_QA pending Manuel validation in Preview"
-      ],
-      "handoff": "docs/07_handoffs/S-HC-STRAT-03-INTAKE-TO-ACTIVE-STRATEGY.md",
-      "attempts": 0,
-      "executionRecommendation": {
-        "requiredCapabilities": [
-          "typescript",
-          "nextjs",
-          "multi-tenant",
-          "transactional-workflows",
-          "timezone-scheduling",
-          "test-engineering"
-        ],
-        "preferredHarnesses": [
-          "codex"
-        ],
-        "modelClass": "gpt-5.6-sol",
-        "reasoningClass": "maximum",
-        "rationale": [
-          "Critical cross-cutting correction spanning UX, APIs, structured LLM output, persistence, transactions, scheduling and tenant isolation",
-          "Requires autonomous implementation plus focused and terminal validation",
-          "Human owner authorized official Oreshnik control-plane recovery operations"
-        ]
-      },
-      "taskExecutionPolicy": {
-        "riskLevel": "critical",
-        "recommendedReasoning": "max",
-        "reviewMode": "strict",
-        "requiredCapabilities": [
-          "typescript",
-          "nextjs",
-          "multi-tenant",
-          "transactional-workflows",
-          "timezone-scheduling",
-          "test-engineering"
-        ],
-        "independentReviewRequired": false,
-        "requiredReviewRoles": [
-          "validator"
-        ],
-        "humanApprovalRequired": true,
-        "maxCorrectionCycles": 3,
-        "requiredGates": [
-          "oreshnik:ready",
-          "focused-strategy-tests",
-          "typecheck",
-          "build",
-          "test",
-          "worker:validate",
-          "reconcile",
-          "git-diff-check"
-        ],
-        "evidenceRequirements": [
-          "code",
-          "integration",
-          "ui",
-          "canonical-handoff"
-        ]
-      },
-      "history": [
-        {
-          "at": "2026-07-11T19:09:07.244Z",
-          "action": "canonically_registered",
-          "operator": "manuel",
-          "description": "Owner-authorized versioned task-board registration because alpha.16 inject only derives lowercase IDs from note text and cannot preserve the approved canonical Task ID. Registration is followed by Oreshnik reconcile and dispatch control-plane reconciliation."
-        }
-      ]
     }
   ],
   "reassignments": [
@@ -2442,13 +2399,6 @@
       "from": "Manuel",
       "to": "Jean",
       "reason": "User-directed reassignment to maximize parallel closeout."
-    },
-    {
-      "at": "2026-06-22T19:30:00.000Z",
-      "task": "*",
-      "from": "Jean",
-      "to": "Manuel",
-      "reason": "Jean fuera de ruta critica. Responsabilidades pendientes reasignadas temporalmente a Manuel."
     }
   ]
 }

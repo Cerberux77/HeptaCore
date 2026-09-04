@@ -3,7 +3,7 @@
   "taskId": "S-HC-TEN-02-CEPEG-ONBOARDING",
   "sprint": "tenant-onboarding",
   "sprintOrderIndex": 25,
-  "taskOrderIndex": 38,
+  "taskOrderIndex": 39,
   "title": "CEPEG tenant onboarding: brand, assets, network configuration",
   "owner": "Manuel",
   "backupOwner": "Manuel",
