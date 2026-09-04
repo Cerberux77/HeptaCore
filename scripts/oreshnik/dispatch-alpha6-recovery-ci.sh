@@ -13,12 +13,15 @@ CLI=(node node_modules/oreshnik-cli/dist/cli.js)
 mkdir -p "$WORKTREE_ROOT" "$EVIDENCE_DIR"
 export TASK_ID OPERATOR HARNESS REPO WORKTREE_ROOT EVIDENCE_DIR
 
-if [[ -n "${GITHUB_TOKEN:-}" && -n "${GITHUB_REPOSITORY:-}" ]]; then
-  git remote set-url origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
-fi
-
 git config user.name "Manuel Vera via ChatGPT Operator"
 git config user.email "manuel@heptacore.dev"
+
+ORIGIN_URL="$(git remote get-url origin)"
+if [[ "$ORIGIN_URL" == *"@"* || "$ORIGIN_URL" == *"x-access-token"* || "$ORIGIN_URL" == *"${GITHUB_TOKEN:-__NO_TOKEN__}"* ]]; then
+  echo "Refusing dispatch with credential-bearing origin URL." >&2
+  exit 19
+fi
+
 git fetch --prune origin '+refs/heads/*:refs/remotes/origin/*' '+refs/heads/oreshnik/control:refs/remotes/origin/oreshnik/control' || git fetch --prune origin
 
 MASTER_HEAD="$(git rev-parse origin/master)"
