@@ -10,7 +10,6 @@ TARGET_VERSION="0.3.0-alpha.6"
 TARGET_COMMIT="3e4345b76238e18da8e4d259f537f0e9c64ce099"
 TARGET_SHA256="66e0e6683cdf9587a873b27f20dd8c8538199eb511068e9c40b682ceadb176e8"
 TARGET_ASSET="oreshnik-cli-0.3.0-alpha.6.tgz"
-TARGET_URL="https://github.com/Cerberux77/oreshnik/releases/download/v0.3.0-alpha.6/${TARGET_ASSET}"
 TARGET_VENDOR="vendor/oreshnik/oreshnik-cli-0.3.0-alpha.6-${TARGET_COMMIT}.tgz"
 ROLLBACK_VERSION="0.2.0-alpha.16"
 ROLLBACK_COMMIT="d983c051c79b99c3fcda6c4c200b7c96bda997ff"
@@ -39,8 +38,14 @@ fi
 printf '%s  %s\n' "$ROLLBACK_SHA256" "$ROLLBACK_VENDOR" | sha256sum -c - | tee "$EVIDENCE_DIR/rollback-sha256-before.txt"
 
 asset_tmp="$EVIDENCE_DIR/$TARGET_ASSET"
-curl --fail --location --retry 4 --retry-all-errors --connect-timeout 20 --max-time 180 \
-  "$TARGET_URL" --output "$asset_tmp"
+pack_dir="$EVIDENCE_DIR/registry-pack"
+mkdir -p "$pack_dir"
+pack_name="$(cd "$pack_dir" && npm pack "oreshnik-cli@$TARGET_VERSION" --ignore-scripts --silent | tail -n 1)"
+if [[ -z "$pack_name" || ! -f "$pack_dir/$pack_name" ]]; then
+  echo "Unable to obtain exact npm transport for oreshnik-cli@$TARGET_VERSION" >&2
+  exit 36
+fi
+cp "$pack_dir/$pack_name" "$asset_tmp"
 printf '%s  %s\n' "$TARGET_SHA256" "$asset_tmp" | sha256sum -c - | tee "$EVIDENCE_DIR/alpha6-release-sha256.txt"
 cp "$asset_tmp" "$TARGET_VENDOR"
 printf '%s  %s\n' "$TARGET_SHA256" "$TARGET_VENDOR" | sha256sum -c - | tee "$EVIDENCE_DIR/alpha6-vendor-sha256.txt"
@@ -100,6 +105,7 @@ cat > "$ADOPTION_EVIDENCE" <<EOF
 - Release commit: \`$TARGET_COMMIT\`
 - Release asset: \`$TARGET_ASSET\`
 - Required SHA-256: \`${TARGET_SHA256^^}\`
+- Transport: npm registry tarball accepted only after exact SHA-256 equality with the canonical GitHub Release asset digest.
 - Vendored path: \`$TARGET_VENDOR\`
 - Dependency mode: exact local \`file:\` pin; no floating/latest dependency.
 
@@ -132,7 +138,7 @@ Recover HeptaCore governance on the exact Oreshnik \`0.3.0-alpha.6\` release bef
 
 ## Candidate state
 
-The alpha6 release asset has been digest-verified, vendored under its release commit, pinned through \`package.json\`/\`package-lock.json\`, installed, and used to regenerate the real CLI command catalog. Alpha16 remains present as a digest-verified rollback artifact.
+The alpha6 release tarball has been obtained through the npm transport and accepted only after matching the canonical GitHub Release SHA-256 exactly, vendored under its release commit, pinned through \`package.json\`/\`package-lock.json\`, installed, and used to regenerate the real CLI command catalog. Alpha16 remains present as a digest-verified rollback artifact.
 
 ## Hard stops
 
@@ -148,7 +154,6 @@ git diff --cached --check
 git commit -m "chore(oreshnik): adopt 0.3.0-alpha.6"
 git push origin "HEAD:$EXPECTED_BRANCH"
 
-# Candidate gates run from a clean, remotely persisted commit.
 npm run oreshnik:ready 2>&1 | tee "$EVIDENCE_DIR/oreshnik-ready.log"
 "${CLI[@]}" --version 2>&1 | tee "$EVIDENCE_DIR/oreshnik-version.log"
 "${CLI[@]}" status 2>&1 | tee "$EVIDENCE_DIR/oreshnik-status.log"
@@ -196,8 +201,6 @@ git diff --cached --check
 git commit -m "docs(oreshnik): record alpha6 adoption gate evidence"
 git push origin "HEAD:$EXPECTED_BRANCH"
 
-# Canonical Oreshnik validation lifecycle. Evidence command re-executes the configured
-# HeptaCore validation gates and only releases the local task claim after they pass.
 "${CLI[@]}" evidence \
   --task "$TASK_ID" \
   --operator "$OPERATOR" \
@@ -206,7 +209,6 @@ git push origin "HEAD:$EXPECTED_BRANCH"
   --details "Exact alpha6 release/digest verified; candidate and rollback digests verified; full consumer and HeptaCore gates passed." \
   --start-validation 2>&1 | tee "$EVIDENCE_DIR/evidence-start-validation.log"
 
-# Persist validating state before the terminal evidence gate so interrupted runs are resumable.
 git add var/oreshnik docs/obsidian-vault docs/07_handoffs docs/oreshnik || true
 if ! git diff --cached --quiet; then
   git diff --cached --check
