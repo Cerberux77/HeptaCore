@@ -1,0 +1,190 @@
+name: Oreshnik Alpha6 Governed Adoption
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - ".github/oreshnik-alpha6-adoption-trigger"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: read
+  issues: write
+
+concurrency:
+  group: heptacore-oreshnik-alpha6-governed-adoption
+  cancel-in-progress: false
+
+env:
+  TASK_ID: HC-ORESHNIK-RECOVERY-ALPHA6
+  OPERATOR: manuel
+  HARNESS: chatgpt
+  RUN_ID: run-manuel-HC-ORESHNIK-RECOVERY-ALPHA6-20260904140329-21ab3a41
+  FUNCTIONAL_BRANCH: dispatch/manuel/manuel-chatgpt1/recovery/HC-ORESHNIK-RECOVERY-ALPHA6/2954c98970
+  ISSUE_NUMBER: "22"
+
+jobs:
+  adopt-alpha6:
+    if: github.repository == 'Cerberux77/HeptaCore'
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+
+    steps:
+      - name: Checkout canonical master control scaffold
+        uses: actions/checkout@v4
+        with:
+          ref: master
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Configure governed identity
+        run: |
+          git config user.name "Manuel Vera via ChatGPT Operator"
+          git config user.email "manuel@heptacore.dev"
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install bootstrap Oreshnik without product mutations
+        run: npm ci --ignore-scripts
+
+      - name: Verify bootstrap baseline
+        run: |
+          test "$(node node_modules/oreshnik-cli/dist/cli.js --version)" = "0.2.0-alpha.16"
+          npm run oreshnik:ready
+
+      - name: Rehydrate same canonical Run through takeover
+        id: takeover
+        env:
+          WORKTREE_ROOT: ${{ runner.temp }}/oreshnik-wt
+          EVIDENCE_DIR: ${{ runner.temp }}/oreshnik-alpha6-adoption
+        run: |
+          set -euo pipefail
+          mkdir -p "$WORKTREE_ROOT" "$EVIDENCE_DIR"
+          CLI=(node node_modules/oreshnik-cli/dist/cli.js)
+          "${CLI[@]}" dispatch init \
+            --mother master \
+            --worktree-root "$WORKTREE_ROOT" \
+            --repo . \
+            --json | tee "$EVIDENCE_DIR/dispatch-init.json"
+          "${CLI[@]}" dispatch takeover \
+            --run "$RUN_ID" \
+            --reason "Ephemeral GitHub Actions session ended after canonical Run creation; rehydrate the same Run for its authorized alpha6 adoption execution." \
+            --operator "$OPERATOR" \
+            --harness "$HARNESS" \
+            --instance new \
+            --takeover \
+            --repo . \
+            --json | tee "$EVIDENCE_DIR/takeover.json"
+          node - <<'NODE'
+          const fs = require('node:fs');
+          const t = JSON.parse(fs.readFileSync(process.env.EVIDENCE_DIR + '/takeover.json', 'utf8'));
+          if (t.result !== 'taken_over') throw new Error(`Expected taken_over, got ${t.result}`);
+          if (t.runId !== process.env.RUN_ID) throw new Error(`Run changed during takeover: ${t.runId}`);
+          if (t.taskId !== process.env.TASK_ID) throw new Error(`Task changed during takeover: ${t.taskId}`);
+          if (t.operator !== process.env.OPERATOR) throw new Error(`Operator changed during takeover: ${t.operator}`);
+          if (t.harnessId !== process.env.HARNESS) throw new Error(`Harness changed during takeover: ${t.harnessId}`);
+          if (t.functionalBranch !== process.env.FUNCTIONAL_BRANCH) throw new Error(`Functional branch changed during takeover: ${t.functionalBranch}`);
+          if (!t.worktreePath) throw new Error('Takeover omitted worktreePath');
+          fs.appendFileSync(process.env.GITHUB_OUTPUT, `worktree=${t.worktreePath}\ninstance=${t.agentInstanceAlias}\nsession=${t.sessionId}\n`);
+          NODE
+
+      - name: Fast-forward rehydrated worktree to governed branch head
+        env:
+          RUN_WORKTREE: ${{ steps.takeover.outputs.worktree }}
+        run: |
+          set -euo pipefail
+          test -d "$RUN_WORKTREE"
+          test "$(git -C "$RUN_WORKTREE" branch --show-current)" = "$FUNCTIONAL_BRANCH"
+          git -C "$RUN_WORKTREE" config user.name "Manuel Vera via ChatGPT Operator"
+          git -C "$RUN_WORKTREE" config user.email "manuel@heptacore.dev"
+          git -C "$RUN_WORKTREE" fetch origin "+refs/heads/$FUNCTIONAL_BRANCH:refs/remotes/origin/$FUNCTIONAL_BRANCH"
+          git -C "$RUN_WORKTREE" merge --ff-only "origin/$FUNCTIONAL_BRANCH"
+          test -x "$RUN_WORKTREE/scripts/oreshnik/adopt-alpha6-in-run.sh"
+          test -z "$(git -C "$RUN_WORKTREE" status --porcelain)"
+
+      - name: Execute governed alpha6 adoption and gate matrix
+        env:
+          RUN_WORKTREE: ${{ steps.takeover.outputs.worktree }}
+          EVIDENCE_DIR: ${{ runner.temp }}/oreshnik-alpha6-adoption
+        run: |
+          set -euo pipefail
+          cd "$RUN_WORKTREE"
+          export TASK_ID OPERATOR RUN_ID FUNCTIONAL_BRANCH EVIDENCE_DIR
+          bash scripts/oreshnik/adopt-alpha6-in-run.sh
+
+      - name: Reconcile durable delivery into remote control plane
+        env:
+          EVIDENCE_DIR: ${{ runner.temp }}/oreshnik-alpha6-adoption
+        run: |
+          set -euo pipefail
+          CLI=(node node_modules/oreshnik-cli/dist/cli.js)
+          git fetch origin "+refs/heads/$FUNCTIONAL_BRANCH:refs/remotes/origin/$FUNCTIONAL_BRANCH" '+refs/heads/oreshnik/control:refs/remotes/origin/oreshnik/control'
+          "${CLI[@]}" dispatch reconcile --repo . --json | tee "$EVIDENCE_DIR/dispatch-reconcile-after-adoption.json"
+          git fetch origin '+refs/heads/oreshnik/control:refs/remotes/origin/oreshnik/control'
+          git show origin/oreshnik/control:control-plane.json > "$EVIDENCE_DIR/control-plane-after-adoption.json"
+          node - <<'NODE'
+          const fs = require('node:fs');
+          const control = JSON.parse(fs.readFileSync(process.env.EVIDENCE_DIR + '/control-plane-after-adoption.json', 'utf8'));
+          const a = control.assignments.find(x => x.runId === process.env.RUN_ID && x.taskId === process.env.TASK_ID);
+          const r = control.runs.find(x => x.runId === process.env.RUN_ID && x.taskId === process.env.TASK_ID);
+          const c = control.claims.find(x => x.runId === process.env.RUN_ID && x.taskId === process.env.TASK_ID);
+          if (!a || !r || !c) throw new Error('Canonical Run lineage missing after adoption reconcile');
+          if (a.functionalBranch !== process.env.FUNCTIONAL_BRANCH) throw new Error(`Assignment branch drifted: ${a.functionalBranch}`);
+          if (a.status !== 'ready_for_integration') throw new Error(`Assignment is not ready_for_integration: ${a.status}`);
+          if (r.status !== 'ready_for_integration') throw new Error(`Run is not ready_for_integration: ${r.status}`);
+          if (c.status !== 'released') throw new Error(`Claim is not released after integration-ready evidence: ${c.status}`);
+          console.log(JSON.stringify({assignmentId:a.assignmentId, assignmentStatus:a.status, runStatus:r.status, claimStatus:c.status, controlHead:control.controlHead}, null, 2));
+          NODE
+
+      - name: Upload governed adoption evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: heptacore-oreshnik-alpha6-governed-adoption
+          path: ${{ runner.temp }}/oreshnik-alpha6-adoption/
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Report adoption result to recovery issue
+        if: success()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          INSTANCE: ${{ steps.takeover.outputs.instance }}
+          SESSION: ${{ steps.takeover.outputs.session }}
+        run: |
+          cat > "$RUNNER_TEMP/alpha6-adoption-success.md" <<EOF
+          ## Alpha6 governed adoption succeeded
+
+          - Task: \`$TASK_ID\`
+          - Same Run: \`$RUN_ID\`
+          - Operator/harness: \`$OPERATOR/$HARNESS\`
+          - Takeover instance: \`$INSTANCE\`
+          - Session: \`$SESSION\`
+          - Functional branch: \`$FUNCTIONAL_BRANCH\`
+          - Installed target: \`oreshnik-cli@0.3.0-alpha.6\`
+          - Release SHA-256: \`66E0E6683CDF9587A873B27F20DD8C8538199EB511068E9C40B682CEADB176E8\`
+          - Rollback retained: \`0.2.0-alpha.16\`
+          - Lifecycle: \`ready_for_integration\`
+
+          Full consumer readiness, typecheck, build, tests, worker validation, command-catalog regeneration, reconcile checks, release/rollback digest checks, and governed evidence gates passed. No production deploy or product feature was executed.
+          EOF
+          gh issue comment "$ISSUE_NUMBER" --repo "$GITHUB_REPOSITORY" --body-file "$RUNNER_TEMP/alpha6-adoption-success.md"
+
+      - name: Report fail-closed adoption result
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cat > "$RUNNER_TEMP/alpha6-adoption-failed.md" <<EOF
+          ## Alpha6 governed adoption failed closed
+
+          Workflow: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID
+
+          The same canonical Run remains the only authorized recovery lineage. No production deploy, product feature, live publication, campaign spend, or secret mutation was authorized. Review the uploaded gate evidence before resuming.
+          EOF
+          gh issue comment "$ISSUE_NUMBER" --repo "$GITHUB_REPOSITORY" --body-file "$RUNNER_TEMP/alpha6-adoption-failed.md"
