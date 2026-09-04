@@ -3,7 +3,7 @@
   "taskId": "S-HC-STRAT-03-INTAKE-TO-ACTIVE-STRATEGY",
   "sprint": "strategy",
   "sprintOrderIndex": 23,
-  "taskOrderIndex": 37,
+  "taskOrderIndex": 38,
   "title": "End-to-end intake, generated strategy persistence, approval and calendar materialization",
   "owner": "Manuel",
   "backupOwner": "Manuel",
@@ -136,6 +136,6 @@
       "description": "Owner-authorized versioned task-board registration because alpha.16 inject only derives lowercase IDs from note text and cannot preserve the approved canonical Task ID. Registration is followed by Oreshnik reconcile and dispatch control-plane reconciliation."
     }
   ],
-  "updatedAt": "2026-07-11T19:09:07.244Z",
+  "updatedAt": "2026-09-04T13:49:14.848Z",
   "runs": []
 }

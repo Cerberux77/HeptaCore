@@ -3,7 +3,7 @@
   "taskId": "S-HC-STRAT-02-CONTENT-CALENDAR-BLUEPRINT",
   "sprint": "strategy",
   "sprintOrderIndex": 23,
-  "taskOrderIndex": 36,
+  "taskOrderIndex": 37,
   "title": "Content calendar blueprint: master publishing calendar from strategy",
   "owner": "Manuel",
   "backupOwner": "Manuel",
@@ -32,6 +32,6 @@
       "description": "Task status reconciled to blocked: dependency S-HC-STRAT-01-MASTER-STRATEGY-WORKBENCH still pending (S-HC-STRAT-01-MASTER-STRATEGY-WORKBENCH:pending)"
     }
   ],
-  "updatedAt": "2026-07-11T19:09:07.244Z",
+  "updatedAt": "2026-09-04T13:49:14.848Z",
   "runs": []
 }

@@ -4,7 +4,7 @@ type: master-dashboard
 project: "HeptaCore"
 status: active-production
 phase: "Canonical Oreshnik task board governs current assignments"
-last_updated: "2026-09-04T13:37:26.730Z"
+last_updated: "2026-09-04T13:49:15.049Z"
 mother_branch: "MADRE/v47-s-hc-pub-03-multitenant-assets-multitenant-assets-metadata-compatibility-batch--2026-06-23"
 tags:
   - "#central"
@@ -19,7 +19,7 @@ tags:
 
 | Campo | Valor |
 |---|---|
-| Task board actualizado | 2026-07-11T19:09:07.244Z |
+| Task board actualizado | 2026-09-04T13:49:14.848Z |
 | Rama madre | MADRE/v47-s-hc-pub-03-multitenant-assets-multitenant-assets-metadata-compatibility-batch--2026-06-23 |
 
 
@@ -52,6 +52,7 @@ tags:
 - support
 - tenant-onboarding
 - tenant-platform
+- HC-ORESHNIK-RECOVERY-ALPHA6
 
 ## Tareas Abiertas
 
@@ -78,6 +79,7 @@ tags:
 | S-HC-PUB-06-REELS-STORIES-PUBLISHERS | ready | Manuel | Real publishing for Meta Reels and Stories: Instagram + Facebook | S-HC-PUB-03-MULTITENANT-ASSETS, S-HC-PUB-04-HOURLY-BATCH-CRON |
 | S-HC-PUB-07-YOUTUBE-PUBLISHING | ready | Manuel | Real publishing for YouTube: Video 16:9 and YouTube Shorts | S-HC-PUB-03-MULTITENANT-ASSETS, S-HC-PUB-04-HOURLY-BATCH-CRON |
 | S-HC-PUB-08-PLATFORM-FORMAT-PARITY | blocked | Manuel | Platform-format parity: manifest, preview, dry-run, scheduling and publishing for every supported format | S-HC-PUB-06-REELS-STORIES-PUBLISHERS, S-HC-PUB-07-YOUTUBE-PUBLISHING |
+| HC-ORESHNIK-RECOVERY-ALPHA6 | ready | Manuel | Upgrade HeptaCore governance to Oreshnik 0.3.0-alpha.6 and reconcile control plane | - |
 | S-HC-STRAT-01-MASTER-STRATEGY-WORKBENCH | blocked | Manuel | Master strategy workbench: LLM-powered strategy generation and conversational refinement | S-HC-ONB-02-GAP-RESOLUTION-WIZARD, S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE |
 | S-HC-STRAT-02-CONTENT-CALENDAR-BLUEPRINT | blocked | Manuel | Content calendar blueprint: master publishing calendar from strategy | S-HC-STRAT-01-MASTER-STRATEGY-WORKBENCH |
 | S-HC-STRAT-03-INTAKE-TO-ACTIVE-STRATEGY | ready | Manuel | End-to-end intake, generated strategy persistence, approval and calendar materialization | - |
@@ -91,6 +93,7 @@ tags:
 |---|---|---|
 | S-HC-PUB-06-REELS-STORIES-PUBLISHERS | Manuel | Real publishing for Meta Reels and Stories: Instagram + Facebook |
 | S-HC-PUB-07-YOUTUBE-PUBLISHING | Manuel | Real publishing for YouTube: Video 16:9 and YouTube Shorts |
+| HC-ORESHNIK-RECOVERY-ALPHA6 | Manuel | Upgrade HeptaCore governance to Oreshnik 0.3.0-alpha.6 and reconcile control plane |
 | S-HC-STRAT-03-INTAKE-TO-ACTIVE-STRATEGY | Manuel | End-to-end intake, generated strategy persistence, approval and calendar materialization |
 
 ## Pendientes Bloqueados por Dependencias

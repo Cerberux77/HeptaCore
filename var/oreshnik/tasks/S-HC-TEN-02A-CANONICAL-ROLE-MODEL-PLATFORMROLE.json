@@ -3,7 +3,7 @@
   "taskId": "S-HC-TEN-02A-CANONICAL-ROLE-MODEL-PLATFORMROLE",
   "sprint": "tenant-platform",
   "sprintOrderIndex": 26,
-  "taskOrderIndex": 40,
+  "taskOrderIndex": 41,
   "title": "Canonical platform and tenant role model repair",
   "owner": "Manuel",
   "backupOwner": "Manuel",
@@ -45,6 +45,6 @@
       "description": "Reconciled to integrated from GitHub evidence: implementation PR #9 merged at 2026-07-10T01:52:37Z and post-merge reconciliation PR #12 merged at 2026-07-10T17:46:36Z. No historical Run or claim was synthesized."
     }
   ],
-  "updatedAt": "2026-07-11T19:09:07.244Z",
+  "updatedAt": "2026-09-04T13:49:14.848Z",
   "runs": []
 }

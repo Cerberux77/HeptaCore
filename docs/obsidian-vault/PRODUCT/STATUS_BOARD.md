@@ -2,7 +2,7 @@
 ---
 type: status-board
 project: "HeptaCore"
-last_updated: "2026-09-04T13:37:26.737Z"
+last_updated: "2026-09-04T13:49:15.058Z"
 generated_by: "Oreshnik canonical-check"
 source: "var/oreshnik/task-board.json"
 ---
@@ -40,6 +40,7 @@ source: "var/oreshnik/task-board.json"
 - support
 - tenant-onboarding
 - tenant-platform
+- HC-ORESHNIK-RECOVERY-ALPHA6
 
 ## Tareas Ready/Pending
 
@@ -66,6 +67,7 @@ source: "var/oreshnik/task-board.json"
 | S-HC-PUB-06-REELS-STORIES-PUBLISHERS | ready | Manuel | Real publishing for Meta Reels and Stories: Instagram + Facebook | S-HC-PUB-03-MULTITENANT-ASSETS, S-HC-PUB-04-HOURLY-BATCH-CRON |
 | S-HC-PUB-07-YOUTUBE-PUBLISHING | ready | Manuel | Real publishing for YouTube: Video 16:9 and YouTube Shorts | S-HC-PUB-03-MULTITENANT-ASSETS, S-HC-PUB-04-HOURLY-BATCH-CRON |
 | S-HC-PUB-08-PLATFORM-FORMAT-PARITY | blocked | Manuel | Platform-format parity: manifest, preview, dry-run, scheduling and publishing for every supported format | S-HC-PUB-06-REELS-STORIES-PUBLISHERS, S-HC-PUB-07-YOUTUBE-PUBLISHING |
+| HC-ORESHNIK-RECOVERY-ALPHA6 | ready | Manuel | Upgrade HeptaCore governance to Oreshnik 0.3.0-alpha.6 and reconcile control plane | - |
 | S-HC-STRAT-01-MASTER-STRATEGY-WORKBENCH | blocked | Manuel | Master strategy workbench: LLM-powered strategy generation and conversational refinement | S-HC-ONB-02-GAP-RESOLUTION-WIZARD, S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE |
 | S-HC-STRAT-02-CONTENT-CALENDAR-BLUEPRINT | blocked | Manuel | Content calendar blueprint: master publishing calendar from strategy | S-HC-STRAT-01-MASTER-STRATEGY-WORKBENCH |
 | S-HC-STRAT-03-INTAKE-TO-ACTIVE-STRATEGY | ready | Manuel | End-to-end intake, generated strategy persistence, approval and calendar materialization | - |

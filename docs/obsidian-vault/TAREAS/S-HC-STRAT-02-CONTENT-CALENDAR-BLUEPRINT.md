@@ -6,7 +6,7 @@ task_id: "S-HC-STRAT-02-CONTENT-CALENDAR-BLUEPRINT"
 sprint: "strategy"
 status: "blocked"
 owner: "Manuel"
-last_updated: "2026-07-11T19:09:07.244Z"
+last_updated: "2026-09-04T13:49:14.848Z"
 source: "var/oreshnik/tasks/S-HC-STRAT-02-CONTENT-CALENDAR-BLUEPRINT.json"
 ---
 

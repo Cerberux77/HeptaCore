@@ -6,7 +6,7 @@ task_id: "S-HC-02"
 sprint: "data"
 status: "done"
 owner: "Jean"
-last_updated: "2026-07-11T19:09:07.244Z"
+last_updated: "2026-09-04T13:49:14.848Z"
 source: "var/oreshnik/tasks/S-HC-02.json"
 ---
 
