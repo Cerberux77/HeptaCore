@@ -5,15 +5,15 @@
     "originUrl": "https://github.com/Cerberux77/HeptaCore.git",
     "canonicalMotherBranch": "master"
   },
-  "generation": 40,
-  "controlHead": "d3792b3b75377a91138ea13c227a72dc16f97a28",
+  "generation": 41,
+  "controlHead": "6d8a391aa231a4d42132ce50492cec29110315f9",
   "catalog": {
     "taskBoardPath": "var/oreshnik/task-board.json",
     "zoneMapPath": "docs/07_handoffs/zone-map.json",
-    "sourceTaskBoardHead": "07b06756e175130cd5391b0178838ea25aaac76d",
-    "fingerprint": "8fd466972c94710e7659725b19dbbaf91a156f67",
+    "sourceTaskBoardHead": "d8d75dfd162f7f3a2f376dd27958cd8553148540",
+    "fingerprint": "6653ddbb2d952b6672250d19e43469fa2ef6f80f",
     "taskCount": 43,
-    "updatedAt": "2026-09-04T14:00:29.837Z"
+    "updatedAt": "2026-09-04T14:03:15.504Z"
   },
   "policy": {
     "name": "deterministic-v1",
@@ -50,6 +50,13 @@
       "hostname": "runnervmejwal",
       "registeredAt": "2026-09-04T14:00:28.697Z",
       "updatedAt": "2026-09-04T14:00:28.697Z"
+    },
+    {
+      "machineId": "machine-dbb96086-beca-497b-b526-c2fc20f2c5bc",
+      "worktreeRoot": "/home/runner/work/_temp/oreshnik-wt",
+      "hostname": "runnervmejwal",
+      "registeredAt": "2026-09-04T14:03:14.563Z",
+      "updatedAt": "2026-09-04T14:03:14.564Z"
     }
   ],
   "agentInstances": [
@@ -146,7 +153,7 @@
       "repositoryId": "32305cad03d6321a",
       "slot": 8,
       "createdAt": "2026-07-06T07:22:16.473Z",
-      "updatedAt": "2026-07-08T07:17:14.399Z",
+      "updatedAt": "2026-09-04T14:00:36.612Z",
       "identityOrigin": "explicit"
     }
   ],
@@ -242,8 +249,9 @@
       "harnessId": "kilo",
       "machineId": "machine-89814280-0079-4c35-82c8-3d533c515221",
       "startedAt": "2026-07-06T07:22:16.473Z",
-      "lastSeenAt": "2026-07-08T07:17:14.399Z",
-      "status": "active",
+      "lastSeenAt": "2026-09-04T14:00:36.612Z",
+      "status": "closed",
+      "closedAt": "2026-09-04T14:00:36.612Z",
       "identityOrigin": "explicit"
     }
   ],
@@ -2083,6 +2091,11 @@
       "runId": "run-manuel-S-HC-PUB-07-YOUTUBE-PUBLISHING-20260706072216-381f66dc",
       "operator": "manuel",
       "message": "HC-ORESHNIK-RECOVERY-ALPHA6: stale ready_for_integration assignment contradicts released claim/run and canonical task=ready; preserve remote branch dispatch/manuel/manuel-kilo8/publishing/S-HC-PUB-07-YOUTUBE-PUBLISHING/0235fe3455 for later governed salvage and supersede only stale ownership."
+    },
+    {
+      "at": "2026-09-04T14:03:15.504Z",
+      "action": "dispatch.init",
+      "message": "Registered machine machine-dbb96086-beca-497b-b526-c2fc20f2c5bc with root /home/runner/work/_temp/oreshnik-wt."
     }
   ],
   "reconciliation": {
@@ -2092,5 +2105,5 @@
     "pendingDiagnostics": []
   },
   "createdAt": "2026-06-29T20:17:43.302Z",
-  "updatedAt": "2026-09-04T14:00:36.612Z"
+  "updatedAt": "2026-09-04T14:03:15.504Z"
 }
