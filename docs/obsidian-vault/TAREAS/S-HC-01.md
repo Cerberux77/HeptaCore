@@ -6,7 +6,7 @@ task_id: "S-HC-01"
 sprint: "product-ui"
 status: "done"
 owner: "Jean"
-last_updated: "2026-09-04T13:53:56.549Z"
+last_updated: "2026-09-04T14:00:23.610Z"
 source: "var/oreshnik/tasks/S-HC-01.json"
 ---
 

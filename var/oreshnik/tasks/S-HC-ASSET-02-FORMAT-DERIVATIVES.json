@@ -267,7 +267,7 @@
       "summary": "S-HC-ASSET-02-FORMAT-DERIVATIVES:worker | exit=0 | timed_ok | signal=none | stdout=> heptacore@0.1.0 worker:validate | stderr=[config] .env.rrss no encontrado. Usando solo variables de entorno del sistema."
     }
   ],
-  "updatedAt": "2026-09-04T13:53:56.549Z",
+  "updatedAt": "2026-09-04T14:00:23.610Z",
   "runs": [
     {
       "runId": "run-manuel-S-HC-ASSET-02-FORMAT-DERIVATIVES-20260701070057-4b417034",

@@ -6,7 +6,7 @@ task_id: "S-HC-PROD-02"
 sprint: "production-infra"
 status: "done"
 owner: "Jean"
-last_updated: "2026-09-04T13:53:56.549Z"
+last_updated: "2026-09-04T14:00:23.610Z"
 source: "var/oreshnik/tasks/S-HC-PROD-02.json"
 ---
 

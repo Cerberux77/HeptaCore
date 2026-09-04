@@ -6,7 +6,7 @@ task_id: "S-HC-ONB-02-GAP-RESOLUTION-WIZARD"
 sprint: "onboarding"
 status: "blocked"
 owner: "Manuel"
-last_updated: "2026-09-04T13:53:56.549Z"
+last_updated: "2026-09-04T14:00:23.610Z"
 source: "var/oreshnik/tasks/S-HC-ONB-02-GAP-RESOLUTION-WIZARD.json"
 ---
 
