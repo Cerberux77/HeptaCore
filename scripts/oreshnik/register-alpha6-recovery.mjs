@@ -55,14 +55,6 @@ const task = {
     "release commit 3e4345b76238e18da8e4d259f537f0e9c64ce099",
     "release SHA-256 66E0E6683CDF9587A873B27F20DD8C8538199EB511068E9C40B682CEADB176E8"
   ],
-  capabilities: [
-    "oreshnik-governance",
-    "git",
-    "nodejs",
-    "supply-chain-verification",
-    "control-plane-recovery",
-    "release-adoption"
-  ],
   gates: [
     "npm run oreshnik:ready",
     "node node_modules/oreshnik-cli/dist/cli.js --version",
@@ -104,12 +96,6 @@ const task = {
     riskLevel: "critical",
     recommendedReasoning: "max",
     reviewMode: "strict",
-    requiredCapabilities: [
-      "oreshnik-governance",
-      "git",
-      "supply-chain-verification",
-      "control-plane-recovery"
-    ],
     independentReviewRequired: false,
     requiredReviewRoles: ["validator"],
     humanApprovalRequired: false,
@@ -131,7 +117,7 @@ const task = {
       at: now,
       action: "canonically_registered",
       operator: "manuel",
-      description: "Owner-authorized durable bootstrap registration under pinned alpha.16. Alpha.16 predates canonical `task register`; HeptaCore already uses durable per-Task artifacts, so this compatibility bootstrap writes the Task artifact plus Goal and then delegates all projection/control-plane mutation back to Oreshnik reconcile and dispatch."
+      description: "Owner-authorized durable bootstrap registration under pinned alpha.16. Alpha.16 predates canonical `task register`; HeptaCore already uses durable per-Task artifacts, so this compatibility bootstrap writes the Task artifact plus Goal and then delegates all projection/control-plane mutation back to Oreshnik reconcile and dispatch. Capability labels are intentionally omitted because HeptaCore's operator registry does not define capability metadata; safety is enforced by explicit zones, gates, release digest verification, and hard stops instead of fabricated operator capabilities."
     }
   ]
 };
@@ -164,7 +150,6 @@ const artifact = {
   readZones: task.readZones,
   writeZones: task.writeZones,
   resources: task.resources,
-  capabilities: task.capabilities,
   gates: task.gates,
   priority: task.priority,
   validationExpectations: task.validationExpectations,
@@ -179,7 +164,7 @@ const artifact = {
   runs: []
 };
 
-const goalMarkdown = `# ${taskId}\n\n## Objective\n\nRecover HeptaCore governance before further product development by adopting the exact Oreshnik \`0.3.0-alpha.6\` release, reconciling the remote control plane, preserving alpha16 rollback, and freezing a clean governed baseline.\n\n## Operator and harness\n\n- Operator: \`manuel\`\n- Harness: \`chatgpt\`\n- Mother: \`master\`\n- Control plane: \`oreshnik/control\`\n\n## Release identity\n\n- Version: \`0.3.0-alpha.6\`\n- Commit: \`3e4345b76238e18da8e4d259f537f0e9c64ce099\`\n- SHA-256: \`66E0E6683CDF9587A873B27F20DD8C8538199EB511068E9C40B682CEADB176E8\`\n- Rollback: retained vendored \`0.2.0-alpha.16\`\n\n## Hard stops\n\n- No product features.\n- No production deployment.\n- No live social publication or campaign spend.\n- No credentials, passwords, tokens or env contents in Git/evidence.\n- No floating dependency and no manual edits to remote control-plane JSON.\n\n## Terminal acceptance\n\nThe Run may advance only after exact release verification, alpha6 consumer readiness, control-plane reconciliation, command-catalog regeneration, full HeptaCore gates, rollback evidence, and canonical handoff all pass.\n`;
+const goalMarkdown = `# ${taskId}\n\n## Objective\n\nRecover HeptaCore governance before further product development by adopting the exact Oreshnik \`0.3.0-alpha.6\` release, reconciling the remote control plane, preserving alpha16 rollback, and freezing a clean governed baseline.\n\n## Operator and harness\n\n- Operator: \`manuel\`\n- Harness: \`chatgpt\`\n- Mother: \`master\`\n- Control plane: \`oreshnik/control\`\n\n## Release identity\n\n- Version: \`0.3.0-alpha.6\`\n- Commit: \`3e4345b76238e18da8e4d259f537f0e9c64ce099\`\n- SHA-256: \`66E0E6683CDF9587A873B27F20DD8C8538199EB511068E9C40B682CEADB176E8\`\n- Rollback: retained vendored \`0.2.0-alpha.16\`\n\n## Capability contract\n\nHeptaCore's current operator registry does not define capability metadata. This recovery Task therefore does not invent capability labels for \`manuel\`; eligibility is constrained by exact Task ownership, zones, gates, release identity/digest checks, and hard stops.\n\n## Hard stops\n\n- No product features.\n- No production deployment.\n- No live social publication or campaign spend.\n- No credentials, passwords, tokens or env contents in Git/evidence.\n- No floating dependency and no manual edits to remote control-plane JSON.\n\n## Terminal acceptance\n\nThe Run may advance only after exact release verification, alpha6 consumer readiness, control-plane reconciliation, command-catalog regeneration, full HeptaCore gates, rollback evidence, and canonical handoff all pass.\n`;
 
 fs.mkdirSync(tasksDir, { recursive: true });
 fs.mkdirSync(goalDir, { recursive: true });
