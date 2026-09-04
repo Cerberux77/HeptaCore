@@ -84,7 +84,7 @@ const task = {
     "Command catalog is regenerated from the exact installed alpha6 CLI",
     "No product feature, production deployment, live publication, spend, credential or env mutation occurs"
   ],
-  evidenceType: "governance-recovery",
+  evidenceType: "integration",
   dependsOn: [],
   acceptance: [
     "Vendored alpha6 release asset matches SHA-256 66E0E6683CDF9587A873B27F20DD8C8538199EB511068E9C40B682CEADB176E8",
@@ -186,7 +186,6 @@ fs.mkdirSync(goalDir, { recursive: true });
 fs.writeFileSync(taskArtifactPath, `${JSON.stringify(artifact, null, 2)}\n`, "utf8");
 fs.writeFileSync(goalPath, goalMarkdown, "utf8");
 
-// Keep the compatibility projection coherent before Oreshnik immediately regenerates it from durable artifacts.
 if (existingIndex >= 0) board.tasks[existingIndex] = task;
 else board.tasks.push(task);
 if (!board.currentExecutionOrder.includes(taskId)) board.currentExecutionOrder.push(taskId);
