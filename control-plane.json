@@ -5,15 +5,15 @@
     "originUrl": "https://github.com/Cerberux77/HeptaCore.git",
     "canonicalMotherBranch": "master"
   },
-  "generation": 61,
-  "controlHead": "101eef106f413edf7a3f84ad73dc24b64eb0e95a",
+  "generation": 62,
+  "controlHead": "9e4c9806dc157c79603d6abcbe3bb98752fd8c02",
   "catalog": {
     "taskBoardPath": "var/oreshnik/task-board.json",
     "zoneMapPath": "docs/07_handoffs/zone-map.json",
-    "sourceTaskBoardHead": "34831fee1a6d89d7677fc39b2fd59edcd1608a43",
-    "fingerprint": "6653ddbb2d952b6672250d19e43469fa2ef6f80f",
+    "sourceTaskBoardHead": "fc2a021d31aa26cd0081c7b51af0c58344f9cb25",
+    "fingerprint": "8952e2c85ed7be859c65d0b1acf5ca717ac63fa6",
     "taskCount": 43,
-    "updatedAt": "2026-09-05T16:21:18.951Z"
+    "updatedAt": "2026-09-05T16:24:57.177Z"
   },
   "policy": {
     "name": "deterministic-v1",
@@ -134,6 +134,13 @@
       "hostname": "runnervmejwal",
       "registeredAt": "2026-09-05T16:17:38.383Z",
       "updatedAt": "2026-09-05T16:17:38.383Z"
+    },
+    {
+      "machineId": "machine-b07aa803-a233-4d81-a856-d8801442e372",
+      "worktreeRoot": "/home/runner/work/_temp/oreshnik-wt",
+      "hostname": "runnervmejwal",
+      "registeredAt": "2026-09-05T16:24:56.055Z",
+      "updatedAt": "2026-09-05T16:24:56.055Z"
     }
   ],
   "agentInstances": [
@@ -2862,6 +2869,11 @@
       "agentInstanceUid": "agent_b3b9741f431941c7ba8982457ed6899b",
       "sessionId": "session_1f3e442d2d144761a613b550bde6d6ad",
       "message": "Takeover by manuel/manuel-chatgpt1 from manuel/manuel-chatgpt1. Reason: Continue the same alpha6 recovery Run after deterministic CI bootstrap diagnosis.. Generation: 7 → 8."
+    },
+    {
+      "at": "2026-09-05T16:24:57.177Z",
+      "action": "dispatch.init",
+      "message": "Registered machine machine-b07aa803-a233-4d81-a856-d8801442e372 with root /home/runner/work/_temp/oreshnik-wt."
     }
   ],
   "reconciliation": {
@@ -2871,5 +2883,5 @@
     "pendingDiagnostics": []
   },
   "createdAt": "2026-06-29T20:17:43.302Z",
-  "updatedAt": "2026-09-05T16:21:10.787Z"
+  "updatedAt": "2026-09-05T16:24:57.177Z"
 }
