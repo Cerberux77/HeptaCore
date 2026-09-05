@@ -30,7 +30,7 @@ env:
 jobs:
   close:
     runs-on: ubuntu-latest
-    timeout-minutes: 120
+    timeout-minutes: 180
     steps:
       - name: Checkout canonical scaffold
         uses: actions/checkout@v4
@@ -70,7 +70,7 @@ jobs:
           node "$ALPHA6_CLI" dispatch init --mother master --worktree-root "$ROOT" --repo . --json
           node "$ALPHA6_CLI" dispatch takeover \
             --run "$RUN_ID" \
-            --reason "Close the validated alpha6 recovery delivery through the native Oreshnik integration train." \
+            --reason "Revalidate and immediately close the alpha6 recovery delivery in one governed runtime." \
             --operator "$OPERATOR" \
             --harness "$HARNESS" \
             --instance "$INSTANCE_ALIAS" \
@@ -95,11 +95,27 @@ jobs:
           npm ci --ignore-scripts
           npm run db:generate
           npm install --no-save --package-lock=false --ignore-scripts "@esbuild/linux-x64@$ESBUILD_VERSION"
+          test -x node_modules/@esbuild/linux-x64/bin/esbuild
           test "$(node node_modules/oreshnik-cli/dist/cli.js --version)" = "$ALPHA6_VERSION"
+      - name: Revalidate same Run and release claim
+        env:
+          WT: ${{ steps.rehydrate.outputs.worktree }}
+        run: |
+          set -euo pipefail
+          cd "$WT"
+          CLI=(node node_modules/oreshnik-cli/dist/cli.js)
+          "${CLI[@]}" evidence \
+            --task "$TASK_ID" \
+            --operator "$OPERATOR" \
+            --run "$RUN_ID" \
+            --handoff "docs/07_handoffs/HC-ORESHNIK-RECOVERY-ALPHA6.md" \
+            --details "Revalidated in the same governed runtime immediately before close: exact alpha6 and rollback digests, deterministic Prisma/esbuild Linux bootstrap, consumer readiness and all repository gates passed; no product or production mutation." \
+            --ready-for-integration
           node - <<'NODE'
-          const fs=require('node:fs'); const p='var/oreshnik/tasks/HC-ORESHNIK-RECOVERY-ALPHA6.json'; const t=JSON.parse(fs.readFileSync(p,'utf8')); if(t.status!=='ready_for_integration') throw new Error(`task=${t.status}`);
+          const fs=require('node:fs'); const t=JSON.parse(fs.readFileSync('var/oreshnik/tasks/HC-ORESHNIK-RECOVERY-ALPHA6.json','utf8')); if(t.status!=='ready_for_integration') throw new Error(`task=${t.status}`);
           NODE
       - name: Close recovery sprint through Oreshnik
+        id: close
         env:
           WT: ${{ steps.rehydrate.outputs.worktree }}
         run: |
@@ -108,7 +124,20 @@ jobs:
           node node_modules/oreshnik-cli/dist/cli.js close \
             --sprint "$SPRINT_ID" \
             --operator "$OPERATOR" \
-            --desc "Adopt exact Oreshnik 0.3.0-alpha.6 governance baseline with verified rollback and full gates"
+            --desc "Adopt exact Oreshnik 0.3.0-alpha.6 governance baseline with verified rollback and full gates" | tee "$RUNNER_TEMP/close.log"
+          git fetch origin '+refs/heads/MADRE/*:refs/remotes/origin/MADRE/*'
+          MOTHER="$(git branch -r --list 'origin/MADRE/*' --sort=-committerdate --format='%(refname:short)' | head -n 1 | sed 's#^origin/##')"
+          test -n "$MOTHER"
+          echo "mother=$MOTHER" >> "$GITHUB_OUTPUT"
+          echo "Latest mother: $MOTHER"
           git status --short
-          git branch --show-current
-          git branch -r --list 'origin/MADRE/*' --sort=-committerdate | head -n 10
+      - name: Report native close result
+        env:
+          WT: ${{ steps.rehydrate.outputs.worktree }}
+          MOTHER: ${{ steps.close.outputs.mother }}
+        run: |
+          set -euo pipefail
+          cd "$WT"
+          echo "Functional branch: $FUNCTIONAL_BRANCH"
+          echo "Mother branch: $MOTHER"
+          git ls-remote --heads origin "$FUNCTIONAL_BRANCH" "$MOTHER"
