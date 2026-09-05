@@ -1,0 +1,114 @@
+name: Oreshnik Alpha6 Governed Close
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - ".github/oreshnik-alpha6-close-trigger"
+
+permissions:
+  contents: write
+  actions: read
+
+concurrency:
+  group: heptacore-oreshnik-alpha6-governed-close
+  cancel-in-progress: false
+
+env:
+  TASK_ID: HC-ORESHNIK-RECOVERY-ALPHA6
+  SPRINT_ID: recovery
+  OPERATOR: manuel
+  HARNESS: chatgpt
+  INSTANCE_ALIAS: manuel-chatgpt1
+  SESSION_ID: session_1f3e442d2d144761a613b550bde6d6ad
+  RUN_ID: run-manuel-HC-ORESHNIK-RECOVERY-ALPHA6-20260904140329-21ab3a41
+  FUNCTIONAL_BRANCH: dispatch/manuel/manuel-chatgpt1/recovery/HC-ORESHNIK-RECOVERY-ALPHA6/2954c98970
+  ALPHA6_VERSION: 0.3.0-alpha.6
+  ALPHA6_SHA256: 66e0e6683cdf9587a873b27f20dd8c8538199eb511068e9c40b682ceadb176e8
+  ESBUILD_VERSION: 0.28.0
+
+jobs:
+  close:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - name: Checkout canonical scaffold
+        uses: actions/checkout@v4
+        with:
+          ref: master
+          fetch-depth: 0
+          persist-credentials: true
+      - name: Configure identity
+        run: |
+          git config user.name "Manuel Vera via ChatGPT Operator"
+          git config user.email "manuel@heptacore.dev"
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - name: Install bootstrap
+        run: npm ci --ignore-scripts
+      - name: Prepare exact alpha6 CLI
+        run: |
+          set -euo pipefail
+          PACK_DIR="$RUNNER_TEMP/oreshnik-alpha6-pack"
+          PREFIX="$RUNNER_TEMP/oreshnik-alpha6-cli"
+          mkdir -p "$PACK_DIR" "$PREFIX"
+          NAME="$(cd "$PACK_DIR" && npm pack "oreshnik-cli@$ALPHA6_VERSION" --ignore-scripts --silent | tail -n 1)"
+          printf '%s  %s\n' "$ALPHA6_SHA256" "$PACK_DIR/$NAME" | sha256sum -c -
+          npm install --prefix "$PREFIX" --ignore-scripts "$PACK_DIR/$NAME"
+          CLI="$PREFIX/node_modules/oreshnik-cli/dist/cli.js"
+          test "$(node "$CLI" --version)" = "$ALPHA6_VERSION"
+          echo "ALPHA6_CLI=$CLI" >> "$GITHUB_ENV"
+      - name: Rehydrate same governed Run
+        id: rehydrate
+        run: |
+          set -euo pipefail
+          ROOT="$RUNNER_TEMP/oreshnik-wt"
+          mkdir -p "$ROOT"
+          node "$ALPHA6_CLI" dispatch init --mother master --worktree-root "$ROOT" --repo . --json
+          node "$ALPHA6_CLI" dispatch takeover \
+            --run "$RUN_ID" \
+            --reason "Close the validated alpha6 recovery delivery through the native Oreshnik integration train." \
+            --operator "$OPERATOR" \
+            --harness "$HARNESS" \
+            --instance "$INSTANCE_ALIAS" \
+            --session "$SESSION_ID" \
+            --repo . --json > "$RUNNER_TEMP/takeover.json"
+          cat "$RUNNER_TEMP/takeover.json"
+          node - <<'NODE'
+          const fs=require('node:fs'); const r=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/takeover.json','utf8'));
+          if (r.runId!==process.env.RUN_ID || r.taskId!==process.env.TASK_ID || r.functionalBranch!==process.env.FUNCTIONAL_BRANCH) throw new Error('governed lineage drift');
+          fs.appendFileSync(process.env.GITHUB_OUTPUT,`worktree=${r.worktreePath}\n`);
+          NODE
+      - name: Prepare governed worktree
+        env:
+          WT: ${{ steps.rehydrate.outputs.worktree }}
+        run: |
+          set -euo pipefail
+          git -C "$WT" config user.name "Manuel Vera via ChatGPT Operator"
+          git -C "$WT" config user.email "manuel@heptacore.dev"
+          git -C "$WT" fetch origin "+refs/heads/$FUNCTIONAL_BRANCH:refs/remotes/origin/$FUNCTIONAL_BRANCH"
+          git -C "$WT" merge --ff-only "origin/$FUNCTIONAL_BRANCH"
+          cd "$WT"
+          npm ci --ignore-scripts
+          npm run db:generate
+          npm install --no-save --package-lock=false --ignore-scripts "@esbuild/linux-x64@$ESBUILD_VERSION"
+          test "$(node node_modules/oreshnik-cli/dist/cli.js --version)" = "$ALPHA6_VERSION"
+          node - <<'NODE'
+          const fs=require('node:fs'); const p='var/oreshnik/tasks/HC-ORESHNIK-RECOVERY-ALPHA6.json'; const t=JSON.parse(fs.readFileSync(p,'utf8')); if(t.status!=='ready_for_integration') throw new Error(`task=${t.status}`);
+          NODE
+      - name: Close recovery sprint through Oreshnik
+        env:
+          WT: ${{ steps.rehydrate.outputs.worktree }}
+        run: |
+          set -euo pipefail
+          cd "$WT"
+          node node_modules/oreshnik-cli/dist/cli.js close \
+            --sprint "$SPRINT_ID" \
+            --operator "$OPERATOR" \
+            --desc "Adopt exact Oreshnik 0.3.0-alpha.6 governance baseline with verified rollback and full gates"
+          git status --short
+          git branch --show-current
+          git branch -r --list 'origin/MADRE/*' --sort=-committerdate | head -n 10
