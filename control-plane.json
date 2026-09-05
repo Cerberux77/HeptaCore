@@ -5,15 +5,15 @@
     "originUrl": "https://github.com/Cerberux77/HeptaCore.git",
     "canonicalMotherBranch": "master"
   },
-  "generation": 59,
-  "controlHead": "61d423d76636b44f92b4582eec657e6692f654ca",
+  "generation": 60,
+  "controlHead": "101eef106f413edf7a3f84ad73dc24b64eb0e95a",
   "catalog": {
     "taskBoardPath": "var/oreshnik/task-board.json",
     "zoneMapPath": "docs/07_handoffs/zone-map.json",
-    "sourceTaskBoardHead": "503fd94630e265152a38a570509439b8a570f2ae",
+    "sourceTaskBoardHead": "155ee796fe13d1b2736f57a90008da6ef8493295",
     "fingerprint": "6653ddbb2d952b6672250d19e43469fa2ef6f80f",
     "taskCount": 43,
-    "updatedAt": "2026-09-05T16:11:03.942Z"
+    "updatedAt": "2026-09-05T16:17:40.061Z"
   },
   "policy": {
     "name": "deterministic-v1",
@@ -127,6 +127,13 @@
       "hostname": "runnervmejwal",
       "registeredAt": "2026-09-05T16:11:02.932Z",
       "updatedAt": "2026-09-05T16:11:02.932Z"
+    },
+    {
+      "machineId": "machine-406c6f97-1229-46ec-953d-f77571e027cc",
+      "worktreeRoot": "/home/runner/work/_temp/oreshnik-wt",
+      "hostname": "runnervmejwal",
+      "registeredAt": "2026-09-05T16:17:38.383Z",
+      "updatedAt": "2026-09-05T16:17:38.383Z"
     }
   ],
   "agentInstances": [
@@ -243,11 +250,11 @@
       "displayAlias": "manuel-chatgpt1",
       "operatorId": "manuel",
       "harnessId": "chatgpt",
-      "machineId": "machine-7f401fb4-1314-4627-afc9-cc402aacf5d4",
+      "machineId": "machine-db39dedc-0977-4300-ad82-62e1ba6355f7",
       "repositoryId": "32305cad03d6321a",
       "slot": 1,
       "createdAt": "2026-09-04T14:03:29.955Z",
-      "updatedAt": "2026-09-05T16:06:38.291Z",
+      "updatedAt": "2026-09-05T16:11:09.042Z",
       "identityOrigin": "explicit"
     }
   ],
@@ -364,9 +371,9 @@
       "agentInstanceUid": "agent_b3b9741f431941c7ba8982457ed6899b",
       "operatorId": "manuel",
       "harnessId": "chatgpt",
-      "machineId": "machine-7f401fb4-1314-4627-afc9-cc402aacf5d4",
+      "machineId": "machine-db39dedc-0977-4300-ad82-62e1ba6355f7",
       "startedAt": "2026-09-04T14:03:29.955Z",
-      "lastSeenAt": "2026-09-05T16:06:38.291Z",
+      "lastSeenAt": "2026-09-05T16:11:09.042Z",
       "status": "active",
       "identityOrigin": "explicit"
     }
@@ -2840,6 +2847,11 @@
       "agentInstanceUid": "agent_b3b9741f431941c7ba8982457ed6899b",
       "sessionId": "session_1f3e442d2d144761a613b550bde6d6ad",
       "message": "Takeover by manuel/manuel-chatgpt1 from manuel/manuel-chatgpt1. Reason: Continue the same alpha6 recovery Run after deterministic Prisma-generation diagnosis.. Generation: 6 → 7."
+    },
+    {
+      "at": "2026-09-05T16:17:40.061Z",
+      "action": "dispatch.init",
+      "message": "Registered machine machine-406c6f97-1229-46ec-953d-f77571e027cc with root /home/runner/work/_temp/oreshnik-wt."
     }
   ],
   "reconciliation": {
@@ -2849,5 +2861,5 @@
     "pendingDiagnostics": []
   },
   "createdAt": "2026-06-29T20:17:43.302Z",
-  "updatedAt": "2026-09-05T16:11:09.042Z"
+  "updatedAt": "2026-09-05T16:17:40.061Z"
 }
