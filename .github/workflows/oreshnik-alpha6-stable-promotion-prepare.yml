@@ -1,0 +1,156 @@
+name: Oreshnik Alpha6 Stable Promotion Prepare
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - ".github/oreshnik-alpha6-stable-promotion-trigger"
+
+permissions:
+  contents: write
+  actions: read
+
+concurrency:
+  group: heptacore-oreshnik-alpha6-stable-promotion-prepare
+  cancel-in-progress: false
+
+env:
+  MOTHER_BRANCH: MADRE/v56-recovery-alpha6-governance-baseline-bounded-legacy-eviden-2026-09-05
+  MOTHER_EXPECTED_HEAD: bc2dab9bf5c1d79bcc08685192437e1eb61804cc
+  PROMOTION_BRANCH: promotion/oreshnik-alpha6-v56
+  ALPHA6_VERSION: 0.3.0-alpha.6
+  ALPHA6_SHA256: 66e0e6683cdf9587a873b27f20dd8c8538199eb511068e9c40b682ceadb176e8
+  ESBUILD_VERSION: 0.28.0
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - name: Checkout current master
+        uses: actions/checkout@v4
+        with:
+          ref: master
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Configure identity
+        run: |
+          git config user.name "Manuel Vera via ChatGPT Operator"
+          git config user.email "manuel@heptacore.dev"
+
+      - name: Verify exact integrated mother
+        run: |
+          set -euo pipefail
+          git fetch origin "+refs/heads/$MOTHER_BRANCH:refs/remotes/origin/$MOTHER_BRANCH"
+          test "$(git rev-parse origin/$MOTHER_BRANCH)" = "$MOTHER_EXPECTED_HEAD"
+          node - <<'NODE'
+          const { execFileSync } = require('node:child_process');
+          const ref = `origin/${process.env.MOTHER_BRANCH}`;
+          const read = p => JSON.parse(execFileSync('git',['show',`${ref}:${p}`],{encoding:'utf8'}));
+          const task = read('var/oreshnik/tasks/HC-ORESHNIK-RECOVERY-ALPHA6.json');
+          const run = read('var/oreshnik/runs/HC-ORESHNIK-RECOVERY-ALPHA6/run-manuel-HC-ORESHNIK-RECOVERY-ALPHA6-20260904140329-21ab3a41.json');
+          const queue = read('var/oreshnik/integration/recovery.json');
+          const train = read('var/oreshnik/integration-trains/recovery.json');
+          const entry = queue.queue.find(x => x.taskId === 'HC-ORESHNIK-RECOVERY-ALPHA6');
+          const result = train.results.find(x => x.taskId === 'HC-ORESHNIK-RECOVERY-ALPHA6');
+          if (task.status !== 'integrated') throw new Error(`mother task=${task.status}`);
+          if (run.taskStatus !== 'integrated' || run.claimStatus !== 'released') throw new Error(`mother run=${run.taskStatus}/${run.claimStatus}`);
+          if (!entry || entry.status !== 'integrated') throw new Error(`mother queue=${entry?.status}`);
+          if (!result || result.status !== 'succeeded') throw new Error(`mother train=${result?.status}`);
+          NODE
+
+      - name: Merge mother onto current master with bounded conflict policy
+        id: merge
+        run: |
+          set -euo pipefail
+          git checkout -B "$PROMOTION_BRANCH" master
+          set +e
+          git merge --no-commit --no-ff "origin/$MOTHER_BRANCH"
+          MERGE_RC=$?
+          set -e
+
+          if [ "$MERGE_RC" -ne 0 ]; then
+            mapfile -t CONFLICTS < <(git diff --name-only --diff-filter=U)
+            printf 'Conflicts detected:\n'
+            printf ' - %s\n' "${CONFLICTS[@]}"
+            test "${#CONFLICTS[@]}" -gt 0
+
+            for f in "${CONFLICTS[@]}"; do
+              case "$f" in
+                package.json|package-lock.json|scripts/oreshnik/ready.mjs|docs/07_handoffs/*|docs/oreshnik/*|docs/operations/oreshnik-command-catalog.json|docs/obsidian-vault/*|var/oreshnik/*)
+                  git checkout --theirs -- "$f"
+                  git add -- "$f"
+                  ;;
+                .github/*)
+                  git checkout --ours -- "$f"
+                  git add -- "$f"
+                  ;;
+                *)
+                  echo "UNBOUNDED_CONFLICT=$f"
+                  git merge --abort || true
+                  exit 41
+                  ;;
+              esac
+            done
+
+            if git diff --name-only --diff-filter=U | grep -q .; then
+              echo "Unresolved conflicts remain"
+              git diff --name-only --diff-filter=U
+              exit 42
+            fi
+          fi
+
+          git commit -m "chore(oreshnik): reconcile integrated alpha6 v56 onto current master"
+          echo "promotion_head=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Prepare deterministic alpha6 runtime
+        run: |
+          set -euo pipefail
+          TGZ="vendor/oreshnik/oreshnik-cli-0.3.0-alpha.6-3e4345b76238e18da8e4d259f537f0e9c64ce099.tgz"
+          test -f "$TGZ"
+          printf '%s  %s\n' "$ALPHA6_SHA256" "$TGZ" | sha256sum -c -
+          npm ci --ignore-scripts
+          npm run db:generate
+          npm install --no-save --package-lock=false --ignore-scripts "@esbuild/linux-x64@$ESBUILD_VERSION"
+          test -x node_modules/@esbuild/linux-x64/bin/esbuild
+          test "$(node node_modules/oreshnik-cli/dist/cli.js --version)" = "$ALPHA6_VERSION"
+
+      - name: Validate promotion candidate
+        run: |
+          set -euo pipefail
+          npm run oreshnik:ready
+          npm run typecheck
+          npm run build
+          npm run worker:validate
+          npm run test
+          node node_modules/oreshnik-cli/dist/cli.js reconcile --check --json
+          git diff --check
+
+      - name: Restore known generated build surfaces and assert clean candidate
+        run: |
+          set -euo pipefail
+          if ! git diff --quiet -- apps/web/next-env.d.ts; then
+            git checkout -- apps/web/next-env.d.ts
+          fi
+          STATUS="$(git status --porcelain)"
+          if [ -n "$STATUS" ]; then
+            echo "Unexpected dirty files after gates:"
+            printf '%s\n' "$STATUS"
+            exit 43
+          fi
+
+      - name: Push conflict-resolved promotion branch
+        run: |
+          set -euo pipefail
+          EXPECTED="$(git rev-parse HEAD)"
+          git push --force-with-lease origin "HEAD:refs/heads/$PROMOTION_BRANCH"
+          git fetch origin "+refs/heads/$PROMOTION_BRANCH:refs/remotes/origin/$PROMOTION_BRANCH"
+          test "$(git rev-parse origin/$PROMOTION_BRANCH)" = "$EXPECTED"
+          echo "PROMOTION_HEAD=$EXPECTED"
