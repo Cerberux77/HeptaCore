@@ -1,0 +1,80 @@
+name: Validate Email Foundation Candidate
+
+on:
+  push:
+    branches:
+      - validation/email-foundation-f9a14fcc
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      SOURCE_SHA: f9a14fccaddedfaf323365d895487ea49faf6fd8
+      ESBUILD_VERSION: 0.28.0
+    steps:
+      - name: Checkout validation branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Verify validation branch contains exact candidate plus runner only
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD^)" = "$SOURCE_SHA"
+          mapfile -t files < <(git diff --name-only "$SOURCE_SHA" HEAD)
+          test "${#files[@]}" -eq 1
+          test "${files[0]}" = ".github/workflows/validate-email-foundation.yml"
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Prepare deterministic runtime
+        run: |
+          set -euo pipefail
+          npm ci --ignore-scripts
+          npm run db:generate
+          npm install --no-save --package-lock=false --ignore-scripts "@esbuild/linux-x64@$ESBUILD_VERSION"
+          test -x node_modules/@esbuild/linux-x64/bin/esbuild
+          test "$(node node_modules/oreshnik-cli/dist/cli.js --version)" = "0.3.0-alpha.6"
+
+      - name: Focused email readiness tests
+        run: npx tsx --test packages/core/src/__tests__/email-readiness.test.ts
+
+      - name: Oreshnik readiness
+        run: npm run oreshnik:ready
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Build
+        run: npm run build
+
+      - name: Worker validation
+        run: npm run worker:validate
+
+      - name: Full tests
+        run: npm run test
+
+      - name: Oreshnik reconcile check
+        run: node node_modules/oreshnik-cli/dist/cli.js reconcile --check --json
+
+      - name: Diff check and candidate cleanliness
+        run: |
+          set -euo pipefail
+          git diff --check "$SOURCE_SHA"
+          if ! git diff --quiet -- apps/web/next-env.d.ts; then
+            git checkout -- apps/web/next-env.d.ts
+          fi
+          STATUS="$(git status --porcelain)"
+          if [ -n "$STATUS" ]; then
+            echo "Unexpected dirty files after gates:"
+            printf '%s\n' "$STATUS"
+            exit 43
+          fi
