@@ -22,3 +22,7 @@ No product feature, deployment, live publication, spend, secret, credential, or 
 ## Continuation
 
 Run the complete alpha6 consumer and HeptaCore gate matrix, persist canonical validation evidence, advance the same Run to `ready_for_integration`, then integrate through Oreshnik only if all checks remain green.
+
+## Gate result
+
+All required consumer and HeptaCore gates passed on the alpha6 candidate. The next governed action is Oreshnik validation lifecycle transition on this same Run; integration remains prohibited until `ready_for_integration` is persisted.

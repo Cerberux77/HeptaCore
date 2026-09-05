@@ -29,3 +29,22 @@
 ## Validation contract
 
 The candidate is not integration-ready until consumer readiness on the clean committed candidate, exact CLI version, generated command catalog, reconcile check, typecheck, build, tests, worker validation, git diff check, and Oreshnik governed evidence gates all pass. The active Run worktree intentionally retains its governed runtime projection until lifecycle evidence releases it. No product feature, production deploy, live publication, campaign spend, credential, token, or environment mutation is part of this Run.
+
+## Candidate gate result
+
+All of the following passed on the committed alpha6 candidate / governed Run as applicable:
+
+- clean committed-candidate `npm run oreshnik:ready`
+- installed CLI version exactly `0.3.0-alpha.6`
+- real CLI `status` in the governed active Run
+- `oreshnik reconcile --check --json`
+- `oreshnik handoff --help`
+- `npm run typecheck`
+- `npm run build`
+- `npm run test`
+- `npm run worker:validate`
+- `git diff --check`
+- alpha6 vendored digest re-check
+- alpha16 rollback digest re-check
+
+Gate logs are retained as the GitHub Actions evidence artifact for the recovery execution.
