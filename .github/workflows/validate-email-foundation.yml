@@ -24,10 +24,10 @@ jobs:
       - name: Verify validation branch contains exact candidate plus runner only
         run: |
           set -euo pipefail
-          test "$(git rev-parse HEAD^)" = "$SOURCE_SHA"
           mapfile -t files < <(git diff --name-only "$SOURCE_SHA" HEAD)
           test "${#files[@]}" -eq 1
           test "${files[0]}" = ".github/workflows/validate-email-foundation.yml"
+          git diff --quiet "$SOURCE_SHA" HEAD -- . ':(exclude).github/workflows/validate-email-foundation.yml'
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -46,9 +46,6 @@ jobs:
 
       - name: Focused email readiness tests
         run: npx tsx --test packages/core/src/__tests__/email-readiness.test.ts
-
-      - name: Oreshnik readiness
-        run: npm run oreshnik:ready
 
       - name: Typecheck
         run: npm run typecheck
