@@ -5,15 +5,15 @@
     "originUrl": "https://github.com/Cerberux77/HeptaCore.git",
     "canonicalMotherBranch": "master"
   },
-  "generation": 63,
-  "controlHead": "9e4c9806dc157c79603d6abcbe3bb98752fd8c02",
+  "generation": 64,
+  "controlHead": "dca0dd7ee8116ff924864b484755ed2cd9e87842",
   "catalog": {
     "taskBoardPath": "var/oreshnik/task-board.json",
     "zoneMapPath": "docs/07_handoffs/zone-map.json",
-    "sourceTaskBoardHead": "fc2a021d31aa26cd0081c7b51af0c58344f9cb25",
+    "sourceTaskBoardHead": "4d032dda106cefd6869d518ef11c19b019049863",
     "fingerprint": "8952e2c85ed7be859c65d0b1acf5ca717ac63fa6",
     "taskCount": 43,
-    "updatedAt": "2026-09-05T16:24:57.177Z"
+    "updatedAt": "2026-09-05T16:27:41.519Z"
   },
   "policy": {
     "name": "deterministic-v1",
@@ -141,6 +141,13 @@
       "hostname": "runnervmejwal",
       "registeredAt": "2026-09-05T16:24:56.055Z",
       "updatedAt": "2026-09-05T16:24:56.055Z"
+    },
+    {
+      "machineId": "machine-787ea06b-45cf-44e4-a4a0-f657a4f6fccf",
+      "worktreeRoot": "/home/runner/work/_temp/oreshnik-wt",
+      "hostname": "runnervmejwal",
+      "registeredAt": "2026-09-05T16:27:40.513Z",
+      "updatedAt": "2026-09-05T16:27:40.513Z"
     }
   ],
   "agentInstances": [
@@ -257,11 +264,11 @@
       "displayAlias": "manuel-chatgpt1",
       "operatorId": "manuel",
       "harnessId": "chatgpt",
-      "machineId": "machine-406c6f97-1229-46ec-953d-f77571e027cc",
+      "machineId": "machine-b07aa803-a233-4d81-a856-d8801442e372",
       "repositoryId": "32305cad03d6321a",
       "slot": 1,
       "createdAt": "2026-09-04T14:03:29.955Z",
-      "updatedAt": "2026-09-05T16:17:47.399Z",
+      "updatedAt": "2026-09-05T16:25:03.031Z",
       "identityOrigin": "explicit"
     }
   ],
@@ -378,9 +385,9 @@
       "agentInstanceUid": "agent_b3b9741f431941c7ba8982457ed6899b",
       "operatorId": "manuel",
       "harnessId": "chatgpt",
-      "machineId": "machine-406c6f97-1229-46ec-953d-f77571e027cc",
+      "machineId": "machine-b07aa803-a233-4d81-a856-d8801442e372",
       "startedAt": "2026-09-04T14:03:29.955Z",
-      "lastSeenAt": "2026-09-05T16:17:47.399Z",
+      "lastSeenAt": "2026-09-05T16:25:03.031Z",
       "status": "active",
       "identityOrigin": "explicit"
     }
@@ -2884,6 +2891,11 @@
       "agentInstanceUid": "agent_b3b9741f431941c7ba8982457ed6899b",
       "sessionId": "session_1f3e442d2d144761a613b550bde6d6ad",
       "message": "Takeover by manuel/manuel-chatgpt1 from manuel/manuel-chatgpt1. Reason: Close the validated alpha6 recovery delivery through the native Oreshnik integration train.. Generation: 8 → 9."
+    },
+    {
+      "at": "2026-09-05T16:27:41.519Z",
+      "action": "dispatch.init",
+      "message": "Registered machine machine-787ea06b-45cf-44e4-a4a0-f657a4f6fccf with root /home/runner/work/_temp/oreshnik-wt."
     }
   ],
   "reconciliation": {
@@ -2893,5 +2905,5 @@
     "pendingDiagnostics": []
   },
   "createdAt": "2026-06-29T20:17:43.302Z",
-  "updatedAt": "2026-09-05T16:25:03.031Z"
+  "updatedAt": "2026-09-05T16:27:41.519Z"
 }
