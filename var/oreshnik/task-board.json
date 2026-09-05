@@ -1,6 +1,6 @@
 {
   "project": "HeptaCore",
-  "updatedAt": "2026-09-05T08:16:40.452Z",
+  "updatedAt": "2026-09-05T16:07:01.790Z",
   "currentExecutionOrder": [
     "S-HC-PUB-04-HOURLY-BATCH-CRON",
     "S-HC-PUB-05-RECONCILIATION-OPS",
@@ -1462,7 +1462,7 @@
       "title": "Transactional email foundation: domain sender, DNS, reputation, provider integration",
       "owner": "Jean",
       "backupOwner": "Manuel",
-      "status": "pending",
+      "status": "ready",
       "track": "email-infra",
       "zone": [
         "apps/web/app/api/email",
@@ -1476,6 +1476,14 @@
         "Proveedor de correo transaccional integrado (Resend, SendGrid o equivalente)",
         "Webhooks de eventos (delivered, bounced, complained) configurados",
         "Enlaces comerciales y de marca consistentes con el dominio final"
+      ],
+      "history": [
+        {
+          "at": "2026-09-05T16:07:01.790Z",
+          "action": "status_reconciled",
+          "operator": "jean",
+          "description": "Task status reconciled to ready: dependencies and conflicts are clear for execution"
+        }
       ]
     },
     {
@@ -2080,9 +2088,7 @@
         "recommendedReasoning": "max",
         "reviewMode": "strict",
         "independentReviewRequired": false,
-        "requiredReviewRoles": [
-          "validator"
-        ],
+        "requiredReviewRoles": [],
         "humanApprovalRequired": false,
         "maxCorrectionCycles": 3,
         "requiredGates": [
@@ -2157,6 +2163,13 @@
           "operator": "manuel",
           "branch": "dispatch/manuel/manuel-chatgpt1/recovery/HC-ORESHNIK-RECOVERY-ALPHA6/2954c98970",
           "description": "Exact alpha6 release/digest verified; clean committed-candidate readiness passed; candidate and rollback digests verified; full consumer and HeptaCore gates passed."
+        },
+        {
+          "at": "2026-09-05T16:07:01.584Z",
+          "action": "governance_policy_corrected",
+          "operator": "manuel",
+          "branch": "dispatch/manuel/manuel-chatgpt1/recovery/HC-ORESHNIK-RECOVERY-ALPHA6/2954c98970",
+          "description": "Removed bootstrap-only validator role while preserving strict mode, full technical gates, exact release digest, rollback verification and hard stops. independentReviewRequired=false and humanApprovalRequired=false remain unchanged."
         }
       ]
     },

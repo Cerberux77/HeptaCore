@@ -3,7 +3,7 @@
 type: collaborator-status
 project: "HeptaCore"
 operator: "Manuel"
-last_updated: "2026-09-04T14:03:11.027Z"
+last_updated: "2026-09-05T16:07:02.027Z"
 generated_by: "Oreshnik canonical-check"
 source: "var/oreshnik/task-board.json"
 ---
@@ -18,8 +18,6 @@ source: "var/oreshnik/task-board.json"
 |---|---|---|
 | S-HC-PUB-06-REELS-STORIES-PUBLISHERS | Real publishing for Meta Reels and Stories: Instagram + Facebook | S-HC-PUB-03-MULTITENANT-ASSETS, S-HC-PUB-04-HOURLY-BATCH-CRON |
 | S-HC-PUB-07-YOUTUBE-PUBLISHING | Real publishing for YouTube: Video 16:9 and YouTube Shorts | S-HC-PUB-03-MULTITENANT-ASSETS, S-HC-PUB-04-HOURLY-BATCH-CRON |
-| HC-ORESHNIK-RECOVERY-ALPHA6 | Upgrade HeptaCore governance to Oreshnik 0.3.0-alpha.6 and reconcile control plane | - |
-| S-HC-STRAT-03-INTAKE-TO-ACTIVE-STRATEGY | End-to-end intake, generated strategy persistence, approval and calendar materialization | - |
 
 ## Pending
 
@@ -285,7 +283,7 @@ Zonas: `apps/web/lib/publishers`, `apps/web/lib/publishing-formats.ts`, `apps/we
 
 ### HC-ORESHNIK-RECOVERY-ALPHA6 - Upgrade HeptaCore governance to Oreshnik 0.3.0-alpha.6 and reconcile control plane
 
-Estado: `ready`
+Estado: `validating`
 
 - Vendored alpha6 release asset matches SHA-256 66E0E6683CDF9587A873B27F20DD8C8538199EB511068E9C40B682CEADB176E8
 - package.json and package-lock.json resolve the exact vendored alpha6 package
@@ -329,7 +327,7 @@ Zonas: `apps/web/components`, `apps/web/lib/dashboard.ts`, `packages/core`
 
 ### S-HC-STRAT-03-INTAKE-TO-ACTIVE-STRATEGY - End-to-end intake, generated strategy persistence, approval and calendar materialization
 
-Estado: `ready`
+Estado: `blocked`
 
 - A tenant can enter a structured intake without pasting a completed strategy
 - Generation uses the exact current form values, networks, timezone and start date

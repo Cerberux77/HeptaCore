@@ -7,8 +7,8 @@
   "title": "Transactional email foundation: domain sender, DNS, reputation, provider integration",
   "owner": "Jean",
   "backupOwner": "Manuel",
-  "status": "pending",
-  "taskBoardPath": "/home/runner/work/HeptaCore/HeptaCore/var/oreshnik/task-board.json",
+  "status": "ready",
+  "taskBoardPath": "/home/runner/work/_temp/oreshnik-wt/32305cad03d6321a/manuel/manuel-chatgpt1/recovery/HC-ORESHNIK-RECOVERY-ALPHA6/adfcc418/var/oreshnik/task-board.json",
   "zone": [
     "apps/web/app/api/email",
     "packages/core",
@@ -22,6 +22,14 @@
     "Webhooks de eventos (delivered, bounced, complained) configurados",
     "Enlaces comerciales y de marca consistentes con el dominio final"
   ],
-  "updatedAt": "2026-09-04T14:03:10.743Z",
+  "history": [
+    {
+      "at": "2026-09-05T16:07:01.790Z",
+      "action": "status_reconciled",
+      "operator": "jean",
+      "description": "Task status reconciled to ready: dependencies and conflicts are clear for execution"
+    }
+  ],
+  "updatedAt": "2026-09-05T16:07:01.790Z",
   "runs": []
 }

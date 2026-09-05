@@ -4,9 +4,9 @@ type: task-runtime
 project: "HeptaCore"
 task_id: "HC-ORESHNIK-RECOVERY-ALPHA6"
 sprint: "recovery"
-status: "ready"
+status: "validating"
 owner: "Manuel"
-last_updated: "2026-09-04T14:03:10.743Z"
+last_updated: "2026-09-05T08:16:40.452Z"
 source: "var/oreshnik/tasks/HC-ORESHNIK-RECOVERY-ALPHA6.json"
 ---
 
@@ -18,10 +18,10 @@ Upgrade HeptaCore governance to Oreshnik 0.3.0-alpha.6 and reconcile control pla
 
 ## Runtime
 
-- estado: `ready`
+- estado: `validating`
 - owner: `Manuel`
 - backup: `Manuel`
-- intentos: `0`
+- intentos: `1`
 - handoff: docs/07_handoffs/HC-ORESHNIK-RECOVERY-ALPHA6.md
 
 ## Dependencias
@@ -78,7 +78,7 @@ Upgrade HeptaCore governance to Oreshnik 0.3.0-alpha.6 and reconcile control pla
 
 | Run | Operator | Mode | Task Status | Claim | Branch |
 |---|---|---|---|---|---|
-| Ninguno | - | - | - | - | - |
+| run-manuel-HC-ORESHNIK-RECOVERY-ALPHA6-20260904140329-21ab3a41 | manuel | shell | validating | claimed | dispatch/manuel/manuel-chatgpt1/recovery/HC-ORESHNIK-RECOVERY-ALPHA6/2954c98970 |
 
 ## Integracion
 

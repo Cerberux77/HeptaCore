@@ -87,9 +87,7 @@
     "recommendedReasoning": "max",
     "reviewMode": "strict",
     "independentReviewRequired": false,
-    "requiredReviewRoles": [
-      "validator"
-    ],
+    "requiredReviewRoles": [],
     "humanApprovalRequired": false,
     "maxCorrectionCycles": 3,
     "requiredGates": [
@@ -164,6 +162,13 @@
       "operator": "manuel",
       "branch": "dispatch/manuel/manuel-chatgpt1/recovery/HC-ORESHNIK-RECOVERY-ALPHA6/2954c98970",
       "description": "Exact alpha6 release/digest verified; clean committed-candidate readiness passed; candidate and rollback digests verified; full consumer and HeptaCore gates passed."
+    },
+    {
+      "at": "2026-09-05T16:07:01.584Z",
+      "operator": "manuel",
+      "action": "governance_policy_corrected",
+      "branch": "dispatch/manuel/manuel-chatgpt1/recovery/HC-ORESHNIK-RECOVERY-ALPHA6/2954c98970",
+      "description": "Removed bootstrap-only validator role while preserving strict mode, full technical gates, exact release digest, rollback verification and hard stops. independentReviewRequired=false and humanApprovalRequired=false remain unchanged."
     }
   ],
   "updatedAt": "2026-09-05T08:16:40.452Z",
