@@ -21,6 +21,7 @@ env:
   OPERATOR: manuel
   HARNESS: chatgpt
   INSTANCE_ALIAS: manuel-chatgpt1
+  SESSION_ID: session_1f3e442d2d144761a613b550bde6d6ad
   RUN_ID: run-manuel-HC-ORESHNIK-RECOVERY-ALPHA6-20260904140329-21ab3a41
   FUNCTIONAL_BRANCH: dispatch/manuel/manuel-chatgpt1/recovery/HC-ORESHNIK-RECOVERY-ALPHA6/2954c98970
   ISSUE_NUMBER: "22"
@@ -87,7 +88,7 @@ jobs:
           git merge-base --is-ancestor "$EXPECTED_SHA" "$BRANCH_SHA"
           echo "Verified governed branch descendant: expected=$EXPECTED_SHA head=$BRANCH_SHA"
 
-      - name: Rehydrate same governed instance cross-machine through alpha6 takeover
+      - name: Rehydrate same governed instance and session cross-machine through alpha6 takeover
         id: rehydrate
         env:
           WORKTREE_ROOT: ${{ runner.temp }}/oreshnik-wt
@@ -103,11 +104,11 @@ jobs:
             --json | tee "$EVIDENCE_DIR/dispatch-init.json"
           "${CLI[@]}" dispatch takeover \
             --run "$RUN_ID" \
-            --reason "GitHub Actions runner is ephemeral; rehydrate the same governed instance and same canonical Run on the current machine without creating a new instance or ownership lineage." \
+            --reason "GitHub Actions runner is ephemeral; rehydrate the same governed instance, preserved session, and canonical Run on the current machine without creating a new ownership lineage." \
             --operator "$OPERATOR" \
             --harness "$HARNESS" \
             --instance "$INSTANCE_ALIAS" \
-            --session "$GITHUB_RUN_ID" \
+            --session "$SESSION_ID" \
             --repo . \
             --json | tee "$EVIDENCE_DIR/rehydrate.json"
           node - <<'NODE'
@@ -119,6 +120,7 @@ jobs:
           if (r.operator !== process.env.OPERATOR) throw new Error(`Operator changed during rehydration: ${r.operator}`);
           if (r.harnessId !== process.env.HARNESS) throw new Error(`Harness changed during rehydration: ${r.harnessId}`);
           if (r.agentInstanceAlias !== process.env.INSTANCE_ALIAS) throw new Error(`Instance changed during rehydration: ${r.agentInstanceAlias}`);
+          if (r.sessionId !== process.env.SESSION_ID) throw new Error(`Session changed during rehydration: ${r.sessionId}`);
           if (r.functionalBranch !== process.env.FUNCTIONAL_BRANCH) throw new Error(`Functional branch changed during rehydration: ${r.functionalBranch}`);
           if (!r.worktreePath) throw new Error('Rehydration omitted worktreePath');
           fs.appendFileSync(process.env.GITHUB_OUTPUT, `worktree=${r.worktreePath}\ninstance=${r.agentInstanceAlias}\nsession=${r.sessionId}\n`);
@@ -195,10 +197,10 @@ jobs:
           - Same Run: \`$RUN_ID\`
           - Operator/harness: \`$OPERATOR/$HARNESS\`
           - Same governed instance: \`$INSTANCE\`
-          - Session: \`$SESSION\`
+          - Preserved session: \`$SESSION\`
           - Functional branch: \`$FUNCTIONAL_BRANCH\`
           - Installed target: \`oreshnik-cli@0.3.0-alpha.6\`
-          - Release SHA-256: \`66E0E6683CDF9587A873B27F20DD8C8538199EB511068e9c40b682ceadb176e8\`
+          - Release SHA-256: \`66E0E6683CDF9587A873B27F20DD8C8538199EB511068E9C40B682CEADB176E8\`
           - Rollback retained: \`0.2.0-alpha.16\`
           - Lifecycle: \`ready_for_integration\`
 
