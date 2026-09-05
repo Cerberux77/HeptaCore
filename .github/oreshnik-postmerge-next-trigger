@@ -1,0 +1,6 @@
+HC-ORESHNIK-RECOVERY-ALPHA6
+stable_master=74cc4becdcd56369fce5d47cf0324b9ae22c1b1f
+operator=resolved-by-oreshnik
+harness=chatgpt
+action=reconcile-then-goal
+issued=2026-09-05
