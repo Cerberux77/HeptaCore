@@ -1,0 +1,15 @@
+{
+  "claimId": "claim-asg-61c0aff3-c576-4071-b7d4-d974adfcc418",
+  "taskId": "HC-ORESHNIK-RECOVERY-ALPHA6",
+  "runId": "run-manuel-HC-ORESHNIK-RECOVERY-ALPHA6-20260904140329-21ab3a41",
+  "operator": "manuel",
+  "workerMode": "chatgpt",
+  "harnessId": "chatgpt",
+  "agentInstanceUid": "agent_b3b9741f431941c7ba8982457ed6899b",
+  "agentInstanceAlias": "manuel-chatgpt1",
+  "sessionId": "session_1f3e442d2d144761a613b550bde6d6ad",
+  "ownershipGeneration": 12,
+  "worker": "manuel",
+  "status": "released",
+  "updatedAt": "2026-09-05T18:01:26.000Z"
+}

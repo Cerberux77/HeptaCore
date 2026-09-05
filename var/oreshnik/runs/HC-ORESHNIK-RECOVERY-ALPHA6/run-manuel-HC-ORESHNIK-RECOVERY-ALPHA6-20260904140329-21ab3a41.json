@@ -4,8 +4,8 @@
   "sprint": "recovery",
   "owner": "Manuel",
   "operator": "manuel",
-  "worker": "manuel-dispatcher",
-  "workerMode": "shell",
+  "worker": "manuel",
+  "workerMode": "chatgpt",
   "runId": "run-manuel-HC-ORESHNIK-RECOVERY-ALPHA6-20260904140329-21ab3a41",
   "branch": "dispatch/manuel/manuel-chatgpt1/recovery/HC-ORESHNIK-RECOVERY-ALPHA6/2954c98970",
   "worktreePath": "/home/runner/work/_temp/oreshnik-wt/32305cad03d6321a/manuel/manuel-chatgpt1/recovery/HC-ORESHNIK-RECOVERY-ALPHA6/adfcc418",
@@ -29,7 +29,7 @@
   "taskStatus": "integrated",
   "claimStatus": "released",
   "claimedAt": "2026-09-05T16:58:51.819Z",
-  "updatedAt": "2026-09-05T17:08:48.577Z",
+  "updatedAt": "2026-09-05T18:01:26.000Z",
   "expiresAt": "2026-09-05T17:58:51.819Z",
   "releasedAt": "2026-09-05T17:01:26.714Z",
   "validationGateResults": [
@@ -301,5 +301,23 @@
       "resultFingerprint": "2a60bcc2f07de223563c93d3e77b40d607ae41d9793d9a72227806796f2642ff",
       "summary": "HC-ORESHNIK-RECOVERY-ALPHA6:worker | exit=0 | timed_ok | signal=none | stdout=> heptacore@0.1.0 worker:validate | stderr=[config] .env.rrss no encontrado. Usando solo variables de entorno del sistema."
     }
-  ]
+  ],
+  "harnessId": "chatgpt",
+  "agentInstanceUid": "agent_b3b9741f431941c7ba8982457ed6899b",
+  "agentInstanceAlias": "manuel-chatgpt1",
+  "sessionId": "session_1f3e442d2d144761a613b550bde6d6ad",
+  "ownershipGeneration": 12,
+  "integration": {
+    "pullRequest": 26,
+    "mergeCommit": "74cc4becdcd56369fce5d47cf0324b9ae22c1b1f",
+    "integratedAt": "2026-09-05T18:01:26.000Z",
+    "correlationId": "term-ebbd4756-966d-40d2-9bfd-7a6090e542ba",
+    "evidence": [
+      "stable-merge:74cc4becdcd56369fce5d47cf0324b9ae22c1b1f",
+      "promotion-head:d0d8b18e0f71cf5befaa101cf4863c946e4fb7d5",
+      "alpha6-sha256:66e0e6683cdf9587a873b27f20dd8c8538199eb511068e9c40b682ceadb176e8",
+      "issue-22:completed",
+      "promotion-pr:26"
+    ]
+  }
 }

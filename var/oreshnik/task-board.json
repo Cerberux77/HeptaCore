@@ -1,6 +1,6 @@
 {
   "project": "HeptaCore",
-  "updatedAt": "2026-09-05T17:08:48.577Z",
+  "updatedAt": "2026-09-05T18:01:26.000Z",
   "currentExecutionOrder": [
     "S-HC-PUB-04-HOURLY-BATCH-CRON",
     "S-HC-PUB-05-RECONCILIATION-OPS",
@@ -2082,7 +2082,7 @@
         "No product feature or production mutation is mixed into this Run"
       ],
       "handoff": "docs/07_handoffs/HC-ORESHNIK-RECOVERY-ALPHA6.md",
-      "attempts": 2,
+      "attempts": 3,
       "taskExecutionPolicy": {
         "riskLevel": "critical",
         "recommendedReasoning": "max",
@@ -2192,6 +2192,13 @@
           "operator": "manuel",
           "branch": "dispatch/manuel/manuel-chatgpt1/recovery/HC-ORESHNIK-RECOVERY-ALPHA6/2954c98970",
           "description": "Integrated dispatch/manuel/manuel-chatgpt1/recovery/HC-ORESHNIK-RECOVERY-ALPHA6/2954c98970 into MADRE/v56-recovery-alpha6-governance-baseline-bounded-legacy-eviden-2026-09-05"
+        },
+        {
+          "at": "2026-09-05T18:01:26.000Z",
+          "action": "integrated",
+          "operator": "manuel",
+          "branch": "dispatch/manuel/manuel-chatgpt1/recovery/HC-ORESHNIK-RECOVERY-ALPHA6/2954c98970",
+          "description": "PR #26 integrated Run run-manuel-HC-ORESHNIK-RECOVERY-ALPHA6-20260904140329-21ab3a41 at 74cc4becdcd56369fce5d47cf0324b9ae22c1b1f (terminalization term-ebbd4756-966d-40d2-9bfd-7a6090e542ba)."
         }
       ],
       "validationGateResults": [
