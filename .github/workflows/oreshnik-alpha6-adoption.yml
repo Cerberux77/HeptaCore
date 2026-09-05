@@ -20,6 +20,7 @@ env:
   TASK_ID: HC-ORESHNIK-RECOVERY-ALPHA6
   OPERATOR: manuel
   HARNESS: chatgpt
+  INSTANCE_ALIAS: manuel-chatgpt1
   RUN_ID: run-manuel-HC-ORESHNIK-RECOVERY-ALPHA6-20260904140329-21ab3a41
   FUNCTIONAL_BRANCH: dispatch/manuel/manuel-chatgpt1/recovery/HC-ORESHNIK-RECOVERY-ALPHA6/2954c98970
   ISSUE_NUMBER: "22"
@@ -59,11 +60,11 @@ jobs:
           test "$(node node_modules/oreshnik-cli/dist/cli.js --version)" = "0.2.0-alpha.16"
           npm run oreshnik:ready
 
-      - name: Prepare digest-verified alpha6 takeover CLI
+      - name: Prepare digest-verified alpha6 resume CLI
         run: |
           set -euo pipefail
           ALPHA6_TGZ="$RUNNER_TEMP/oreshnik-cli-$ALPHA6_VERSION.tgz"
-          ALPHA6_PREFIX="$RUNNER_TEMP/oreshnik-alpha6-takeover-cli"
+          ALPHA6_PREFIX="$RUNNER_TEMP/oreshnik-alpha6-resume-cli"
           PACK_DIR="$RUNNER_TEMP/oreshnik-alpha6-registry-pack"
           mkdir -p "$PACK_DIR" "$ALPHA6_PREFIX"
           PACK_NAME="$(cd "$PACK_DIR" && npm pack "oreshnik-cli@$ALPHA6_VERSION" --ignore-scripts --silent | tail -n 1)"
@@ -77,7 +78,7 @@ jobs:
           test "$(node "$ALPHA6_CLI" --version)" = "$ALPHA6_VERSION"
           echo "ALPHA6_CLI=$ALPHA6_CLI" >> "$GITHUB_ENV"
 
-      - name: Verify takeover ancestry precondition
+      - name: Verify resume ancestry precondition
         run: |
           set -euo pipefail
           git fetch origin "+refs/heads/$FUNCTIONAL_BRANCH:refs/remotes/origin/$FUNCTIONAL_BRANCH"
@@ -86,8 +87,8 @@ jobs:
           git merge-base --is-ancestor "$EXPECTED_SHA" "$BRANCH_SHA"
           echo "Verified governed branch descendant: expected=$EXPECTED_SHA head=$BRANCH_SHA"
 
-      - name: Rehydrate same canonical Run through alpha6 takeover
-        id: takeover
+      - name: Resume same governed instance and canonical Run through alpha6
+        id: resume
         env:
           WORKTREE_ROOT: ${{ runner.temp }}/oreshnik-wt
           EVIDENCE_DIR: ${{ runner.temp }}/oreshnik-alpha6-adoption
@@ -100,31 +101,30 @@ jobs:
             --worktree-root "$WORKTREE_ROOT" \
             --repo . \
             --json | tee "$EVIDENCE_DIR/dispatch-init.json"
-          "${CLI[@]}" dispatch takeover \
-            --run "$RUN_ID" \
-            --reason "Ephemeral GitHub Actions session ended after canonical Run creation; rehydrate the same Run for its authorized alpha6 adoption execution. Alpha6 takeover accepts a branch that safely descends from the recorded source commit." \
+          "${CLI[@]}" dispatch resume \
             --operator "$OPERATOR" \
             --harness "$HARNESS" \
-            --instance new \
-            --takeover \
+            --instance "$INSTANCE_ALIAS" \
+            --session "$GITHUB_RUN_ID" \
             --repo . \
-            --json | tee "$EVIDENCE_DIR/takeover.json"
+            --json | tee "$EVIDENCE_DIR/resume.json"
           node - <<'NODE'
           const fs = require('node:fs');
-          const t = JSON.parse(fs.readFileSync(process.env.EVIDENCE_DIR + '/takeover.json', 'utf8'));
-          if (t.result !== 'taken_over') throw new Error(`Expected taken_over, got ${t.result}`);
-          if (t.runId !== process.env.RUN_ID) throw new Error(`Run changed during takeover: ${t.runId}`);
-          if (t.taskId !== process.env.TASK_ID) throw new Error(`Task changed during takeover: ${t.taskId}`);
-          if (t.operator !== process.env.OPERATOR) throw new Error(`Operator changed during takeover: ${t.operator}`);
-          if (t.harnessId !== process.env.HARNESS) throw new Error(`Harness changed during takeover: ${t.harnessId}`);
-          if (t.functionalBranch !== process.env.FUNCTIONAL_BRANCH) throw new Error(`Functional branch changed during takeover: ${t.functionalBranch}`);
-          if (!t.worktreePath) throw new Error('Takeover omitted worktreePath');
-          fs.appendFileSync(process.env.GITHUB_OUTPUT, `worktree=${t.worktreePath}\ninstance=${t.agentInstanceAlias}\nsession=${t.sessionId}\n`);
+          const r = JSON.parse(fs.readFileSync(process.env.EVIDENCE_DIR + '/resume.json', 'utf8'));
+          if (r.result !== 'resumed') throw new Error(`Expected resumed, got ${r.result}`);
+          if (r.runId !== process.env.RUN_ID) throw new Error(`Run changed during resume: ${r.runId}`);
+          if (r.taskId !== process.env.TASK_ID) throw new Error(`Task changed during resume: ${r.taskId}`);
+          if (r.operator !== process.env.OPERATOR) throw new Error(`Operator changed during resume: ${r.operator}`);
+          if (r.harnessId !== process.env.HARNESS) throw new Error(`Harness changed during resume: ${r.harnessId}`);
+          if (r.agentInstanceAlias !== process.env.INSTANCE_ALIAS) throw new Error(`Instance changed during resume: ${r.agentInstanceAlias}`);
+          if (r.functionalBranch !== process.env.FUNCTIONAL_BRANCH) throw new Error(`Functional branch changed during resume: ${r.functionalBranch}`);
+          if (!r.worktreePath) throw new Error('Resume omitted worktreePath');
+          fs.appendFileSync(process.env.GITHUB_OUTPUT, `worktree=${r.worktreePath}\ninstance=${r.agentInstanceAlias}\nsession=${r.sessionId}\n`);
           NODE
 
       - name: Fast-forward rehydrated worktree to governed branch head
         env:
-          RUN_WORKTREE: ${{ steps.takeover.outputs.worktree }}
+          RUN_WORKTREE: ${{ steps.resume.outputs.worktree }}
         run: |
           set -euo pipefail
           test -d "$RUN_WORKTREE"
@@ -138,7 +138,7 @@ jobs:
 
       - name: Execute governed alpha6 adoption and gate matrix
         env:
-          RUN_WORKTREE: ${{ steps.takeover.outputs.worktree }}
+          RUN_WORKTREE: ${{ steps.resume.outputs.worktree }}
           EVIDENCE_DIR: ${{ runner.temp }}/oreshnik-alpha6-adoption
         run: |
           set -euo pipefail
@@ -183,8 +183,8 @@ jobs:
         if: success()
         env:
           GH_TOKEN: ${{ github.token }}
-          INSTANCE: ${{ steps.takeover.outputs.instance }}
-          SESSION: ${{ steps.takeover.outputs.session }}
+          INSTANCE: ${{ steps.resume.outputs.instance }}
+          SESSION: ${{ steps.resume.outputs.session }}
         run: |
           cat > "$RUNNER_TEMP/alpha6-adoption-success.md" <<EOF
           ## Alpha6 governed adoption succeeded
@@ -192,7 +192,7 @@ jobs:
           - Task: \`$TASK_ID\`
           - Same Run: \`$RUN_ID\`
           - Operator/harness: \`$OPERATOR/$HARNESS\`
-          - Takeover instance: \`$INSTANCE\`
+          - Resumed instance: \`$INSTANCE\`
           - Session: \`$SESSION\`
           - Functional branch: \`$FUNCTIONAL_BRANCH\`
           - Installed target: \`oreshnik-cli@0.3.0-alpha.6\`
