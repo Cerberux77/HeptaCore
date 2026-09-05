@@ -4,9 +4,9 @@ type: task-runtime
 project: "HeptaCore"
 task_id: "S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION"
 sprint: "email-infra"
-status: "pending"
+status: "ready"
 owner: "Jean"
-last_updated: "2026-09-04T14:03:10.743Z"
+last_updated: "2026-09-05T16:07:01.790Z"
 source: "var/oreshnik/tasks/S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION.json"
 ---
 
@@ -18,7 +18,7 @@ Transactional email foundation: domain sender, DNS, reputation, provider integra
 
 ## Runtime
 
-- estado: `pending`
+- estado: `ready`
 - owner: `Jean`
 - backup: `Manuel`
 - intentos: `0`

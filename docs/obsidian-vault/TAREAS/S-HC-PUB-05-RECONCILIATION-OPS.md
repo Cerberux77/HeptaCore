@@ -6,7 +6,7 @@ task_id: "S-HC-PUB-05-RECONCILIATION-OPS"
 sprint: "S-HC-PUB-05-RECONCILIATION-OPS"
 status: "integrated"
 owner: "Manuel"
-last_updated: "2026-09-04T14:03:10.743Z"
+last_updated: "2026-09-05T16:21:03.695Z"
 source: "var/oreshnik/tasks/S-HC-PUB-05-RECONCILIATION-OPS.json"
 ---
 
@@ -55,8 +55,8 @@ Operational reconciliation automation for ambiguous provider outcomes
 
 | Run | Operator | Mode | Task Status | Claim | Branch |
 |---|---|---|---|---|---|
+| manuel-S-HC-PUB-05-RECONCILIATION-OPS-2026-06-29T00-22-46-240Z-52eb7757 | manuel | codex | integrated | released | task/S-HC-PUB-05-RECONCILIATION-OPS/S-HC-PUB-05-RECONCILIATION-OPS/manuel/manuel-S-HC-PUB-05-RECONCILIATION-OPS-2026-06-29T00-22-46-240Z-52eb7757 |
 | manuel-S-HC-PUB-05-RECONCILIATION-OPS-2026-06-29T00-37-03-464Z-4e3d4eae | manuel | codex | integrated | released | task/S-HC-PUB-05-RECONCILIATION-OPS/S-HC-PUB-05-RECONCILIATION-OPS/manuel/manuel-S-HC-PUB-05-RECONCILIATION-OPS-2026-06-29T00-37-03-464Z-4e3d4eae |
-| manuel-S-HC-PUB-05-RECONCILIATION-OPS-2026-06-29T00-22-46-240Z-52eb7757 | manuel | codex | ready_for_integration | released | task/S-HC-PUB-05-RECONCILIATION-OPS/S-HC-PUB-05-RECONCILIATION-OPS/manuel/manuel-S-HC-PUB-05-RECONCILIATION-OPS-2026-06-29T00-22-46-240Z-52eb7757 |
 
 ## Integracion
 

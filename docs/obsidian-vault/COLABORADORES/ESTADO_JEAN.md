@@ -1,9 +1,8 @@
-<!-- ORESHNIK:GENERATED:START -->
 ---
 type: collaborator-status
 project: "HeptaCore"
 operator: "Jean"
-last_updated: "2026-09-04T14:03:11.028Z"
+last_updated: "2026-09-05T17:01:28.592Z"
 generated_by: "Oreshnik canonical-check"
 source: "var/oreshnik/task-board.json"
 ---
@@ -16,19 +15,19 @@ source: "var/oreshnik/task-board.json"
 
 | Sprint | Scope | Depende de |
 |---|---|---|
-| Ninguno | - | - |
+| S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION | Transactional email foundation: domain sender, DNS, reputation, provider integration | - |
 
 ## Pending
 
 | Sprint | Scope | Depende de |
 |---|---|---|
-| S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION | Transactional email foundation: domain sender, DNS, reputation, provider integration | - |
+| Ninguno | - | - |
 
 ## Detalle de Aceptacion
 
 ### S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION - Transactional email foundation: domain sender, DNS, reputation, provider integration
 
-Estado: `pending`
+Estado: `ready`
 
 - Dominio final de HeptaCore configurado como remitente autorizado
 - DNS (SPF, DKIM, DMARC) verificado
@@ -38,5 +37,3 @@ Estado: `pending`
 
 Zonas: `apps/web/app/api/email`, `packages/core`, `docs`
 
-
-<!-- ORESHNIK:GENERATED:END -->
