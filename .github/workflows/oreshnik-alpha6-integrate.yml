@@ -1,0 +1,89 @@
+name: Oreshnik Alpha6 Governed Integrate
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - ".github/oreshnik-alpha6-integrate-trigger"
+
+permissions:
+  contents: write
+  actions: read
+
+concurrency:
+  group: heptacore-oreshnik-alpha6-governed-integrate
+  cancel-in-progress: false
+
+env:
+  OPERATOR: manuel
+  FUNCTIONAL_BRANCH: dispatch/manuel/manuel-chatgpt1/recovery/HC-ORESHNIK-RECOVERY-ALPHA6/2954c98970
+  MOTHER_BRANCH: MADRE/v56-recovery-alpha6-governance-baseline-bounded-legacy-eviden-2026-09-05
+  EXPECTED_CLOSE_HEAD: b2937e866d96cef1b708eea5657c5e5e6a6d92cf
+  ALPHA6_VERSION: 0.3.0-alpha.6
+  ESBUILD_VERSION: 0.28.0
+
+jobs:
+  integrate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - name: Checkout exact recovery mother
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ env.MOTHER_BRANCH }}
+          fetch-depth: 0
+          persist-credentials: true
+      - name: Configure identity
+        run: |
+          git config user.name "Manuel Vera via ChatGPT Operator"
+          git config user.email "manuel@heptacore.dev"
+      - name: Verify exact train binding
+        run: |
+          set -euo pipefail
+          git fetch origin "+refs/heads/$FUNCTIONAL_BRANCH:refs/remotes/origin/$FUNCTIONAL_BRANCH" "+refs/heads/$MOTHER_BRANCH:refs/remotes/origin/$MOTHER_BRANCH"
+          test "$(git rev-parse HEAD)" = "$EXPECTED_CLOSE_HEAD"
+          test "$(git rev-parse origin/$MOTHER_BRANCH)" = "$EXPECTED_CLOSE_HEAD"
+          test "$(git rev-parse origin/$FUNCTIONAL_BRANCH)" = "$EXPECTED_CLOSE_HEAD"
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const m=JSON.parse(fs.readFileSync('var/oreshnik/integration/recovery.json','utf8'));
+          const q=m.queue.filter(x=>x.taskId==='HC-ORESHNIK-RECOVERY-ALPHA6');
+          if(m.motherBranch!==process.env.MOTHER_BRANCH || q.length!==1 || q[0].status!=='queued' || q[0].sourceBranch!==process.env.FUNCTIONAL_BRANCH) throw new Error('integration train binding drift');
+          NODE
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - name: Prepare deterministic runtime
+        run: |
+          set -euo pipefail
+          npm ci --ignore-scripts
+          npm run db:generate
+          npm install --no-save --package-lock=false --ignore-scripts "@esbuild/linux-x64@$ESBUILD_VERSION"
+          test -x node_modules/@esbuild/linux-x64/bin/esbuild
+          test "$(node node_modules/oreshnik-cli/dist/cli.js --version)" = "$ALPHA6_VERSION"
+      - name: Integrate queued recovery delivery
+        run: |
+          set -euo pipefail
+          node node_modules/oreshnik-cli/dist/cli.js integrate \
+            --from "$FUNCTIONAL_BRANCH" \
+            --to "$MOTHER_BRANCH" \
+            --operator "$OPERATOR"
+      - name: Verify integrated runtime is remote
+        run: |
+          set -euo pipefail
+          git fetch origin "+refs/heads/$MOTHER_BRANCH:refs/remotes/origin/$MOTHER_BRANCH"
+          git reset --hard "origin/$MOTHER_BRANCH"
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const t=JSON.parse(fs.readFileSync('var/oreshnik/tasks/HC-ORESHNIK-RECOVERY-ALPHA6.json','utf8'));
+          const m=JSON.parse(fs.readFileSync('var/oreshnik/integration/recovery.json','utf8'));
+          const q=m.queue.find(x=>x.taskId==='HC-ORESHNIK-RECOVERY-ALPHA6');
+          if(t.status!=='integrated') throw new Error(`task=${t.status}`);
+          if(!q || q.status!=='integrated') throw new Error(`queue=${q?.status}`);
+          const run=t.runs.find(r=>r.runId==='run-manuel-HC-ORESHNIK-RECOVERY-ALPHA6-20260904140329-21ab3a41');
+          if(!run || run.taskStatus!=='integrated') throw new Error(`run=${run?.taskStatus}`);
+          console.log(`Integrated mother head: ${process.env.GITHUB_SHA || ''}`);
+          NODE
+          git rev-parse HEAD
