@@ -1,3 +1,4 @@
 HC-ORESHNIK-RECOVERY-ALPHA6
-action=continue-after-prisma-diagnosis
+action=continue-after-platform-bootstrap-diagnosis
 issued=2026-09-05
+attempt=2
