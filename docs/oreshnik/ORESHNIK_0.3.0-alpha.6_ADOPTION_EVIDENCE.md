@@ -28,4 +28,4 @@
 
 ## Validation contract
 
-The candidate is not integration-ready until consumer readiness, exact CLI version, generated command catalog, reconcile check, typecheck, build, tests, worker validation, git diff check, and Oreshnik governed evidence gates all pass. No product feature, production deploy, live publication, campaign spend, credential, token, or environment mutation is part of this Run.
+The candidate is not integration-ready until consumer readiness on the clean committed candidate, exact CLI version, generated command catalog, reconcile check, typecheck, build, tests, worker validation, git diff check, and Oreshnik governed evidence gates all pass. The active Run worktree intentionally retains its governed runtime projection until lifecycle evidence releases it. No product feature, production deploy, live publication, campaign spend, credential, token, or environment mutation is part of this Run.
