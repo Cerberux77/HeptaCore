@@ -126,9 +126,10 @@ jobs:
           fs.appendFileSync(process.env.GITHUB_OUTPUT, `worktree=${r.worktreePath}\ninstance=${r.agentInstanceAlias}\nsession=${r.sessionId}\n`);
           NODE
 
-      - name: Fast-forward rehydrated worktree to governed branch head
+      - name: Fast-forward and validate governed runtime projection
         env:
           RUN_WORKTREE: ${{ steps.rehydrate.outputs.worktree }}
+          EVIDENCE_DIR: ${{ runner.temp }}/oreshnik-alpha6-adoption
         run: |
           set -euo pipefail
           test -d "$RUN_WORKTREE"
@@ -138,7 +139,28 @@ jobs:
           git -C "$RUN_WORKTREE" fetch origin "+refs/heads/$FUNCTIONAL_BRANCH:refs/remotes/origin/$FUNCTIONAL_BRANCH"
           git -C "$RUN_WORKTREE" merge --ff-only "origin/$FUNCTIONAL_BRANCH"
           test -f "$RUN_WORKTREE/scripts/oreshnik/adopt-alpha6-in-run.sh"
-          test -z "$(git -C "$RUN_WORKTREE" status --porcelain)"
+
+          mkdir -p "$EVIDENCE_DIR"
+          git -C "$RUN_WORKTREE" status --short | tee "$EVIDENCE_DIR/status-after-rehydration.txt"
+          mapfile -t dirty_paths < <(
+            {
+              git -C "$RUN_WORKTREE" diff --name-only
+              git -C "$RUN_WORKTREE" diff --cached --name-only
+              git -C "$RUN_WORKTREE" ls-files --others --exclude-standard
+            } | sed '/^$/d' | sort -u
+          )
+          unexpected_dirty=()
+          for dirty_path in "${dirty_paths[@]}"; do
+            if [[ "$dirty_path" != var/oreshnik/* ]]; then
+              unexpected_dirty+=("$dirty_path")
+            fi
+          done
+          if (( ${#unexpected_dirty[@]} > 0 )); then
+            echo "Unexpected dirty paths outside var/oreshnik/** after governed cross-machine rehydration:" >&2
+            printf '  %s\n' "${unexpected_dirty[@]}" >&2
+            exit 1
+          fi
+          printf '%s\n' "${dirty_paths[@]}" | sed '/^$/d' | tee "$EVIDENCE_DIR/allowed-runtime-projection-paths.txt"
 
       - name: Execute governed alpha6 adoption and gate matrix
         env:
