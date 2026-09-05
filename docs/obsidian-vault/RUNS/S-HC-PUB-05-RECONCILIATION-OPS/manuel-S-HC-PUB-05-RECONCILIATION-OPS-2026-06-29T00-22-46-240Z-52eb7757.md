@@ -5,10 +5,10 @@ project: "HeptaCore"
 task_id: "S-HC-PUB-05-RECONCILIATION-OPS"
 run_id: "manuel-S-HC-PUB-05-RECONCILIATION-OPS-2026-06-29T00-22-46-240Z-52eb7757"
 sprint: "S-HC-PUB-05-RECONCILIATION-OPS"
-status: "ready_for_integration"
+status: "integrated"
 claim_status: "released"
 operator: "manuel"
-last_updated: "2026-06-29T00:36:40.003Z"
+last_updated: "2026-09-05T16:07:02.072Z"
 source: "var/oreshnik/runs/S-HC-PUB-05-RECONCILIATION-OPS/manuel-S-HC-PUB-05-RECONCILIATION-OPS-2026-06-29T00-22-46-240Z-52eb7757.json"
 ---
 
@@ -25,7 +25,7 @@ source: "var/oreshnik/runs/S-HC-PUB-05-RECONCILIATION-OPS/manuel-S-HC-PUB-05-REC
 - operator: `manuel`
 - worker: `manuel`
 - mode: `codex`
-- task status: `ready_for_integration`
+- task status: `integrated`
 - claim status: `released`
 - branch: `task/S-HC-PUB-05-RECONCILIATION-OPS/S-HC-PUB-05-RECONCILIATION-OPS/manuel/manuel-S-HC-PUB-05-RECONCILIATION-OPS-2026-06-29T00-22-46-240Z-52eb7757`
 - worktree: `var/oreshnik/wt/S-HC-PUB-05-RECONCILIATION-OPS/S-HC-PUB-05-RECONCILIATION-OPS/r-d9c500bb15d4`

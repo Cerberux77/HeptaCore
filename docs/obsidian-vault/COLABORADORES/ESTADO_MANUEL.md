@@ -3,7 +3,7 @@
 type: collaborator-status
 project: "HeptaCore"
 operator: "Manuel"
-last_updated: "2026-09-05T16:07:02.027Z"
+last_updated: "2026-09-05T16:21:04.133Z"
 generated_by: "Oreshnik canonical-check"
 source: "var/oreshnik/task-board.json"
 ---
@@ -283,7 +283,7 @@ Zonas: `apps/web/lib/publishers`, `apps/web/lib/publishing-formats.ts`, `apps/we
 
 ### HC-ORESHNIK-RECOVERY-ALPHA6 - Upgrade HeptaCore governance to Oreshnik 0.3.0-alpha.6 and reconcile control plane
 
-Estado: `validating`
+Estado: `ready_for_integration`
 
 - Vendored alpha6 release asset matches SHA-256 66E0E6683CDF9587A873B27F20DD8C8538199EB511068E9C40B682CEADB176E8
 - package.json and package-lock.json resolve the exact vendored alpha6 package

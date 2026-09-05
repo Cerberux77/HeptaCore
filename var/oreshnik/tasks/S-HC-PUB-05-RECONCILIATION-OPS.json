@@ -8,7 +8,7 @@
   "owner": "Manuel",
   "backupOwner": "Manuel",
   "status": "integrated",
-  "taskBoardPath": "/home/runner/work/HeptaCore/HeptaCore/var/oreshnik/task-board.json",
+  "taskBoardPath": "/home/runner/work/_temp/oreshnik-wt/32305cad03d6321a/manuel/manuel-chatgpt1/recovery/HC-ORESHNIK-RECOVERY-ALPHA6/adfcc418/var/oreshnik/task-board.json",
   "zone": [
     "apps/web/lib/publishing-finalization.ts",
     "apps/web/lib/draft-operational-state.ts",
@@ -87,8 +87,28 @@
       "description": "Integrated Manuel/s-hc-pub-05-reconciliation-ops-sprint-2026-06-29 into MADRE/v49-s-hc-pub-05-reconciliation-ops-implementa-automatizacion-operacional-de-reconci-2026-06-29"
     }
   ],
-  "updatedAt": "2026-09-04T14:03:10.743Z",
+  "updatedAt": "2026-09-05T16:21:03.695Z",
   "runs": [
+    {
+      "runId": "manuel-S-HC-PUB-05-RECONCILIATION-OPS-2026-06-29T00-22-46-240Z-52eb7757",
+      "operator": "manuel",
+      "worker": "manuel",
+      "workerMode": "codex",
+      "branch": "task/S-HC-PUB-05-RECONCILIATION-OPS/S-HC-PUB-05-RECONCILIATION-OPS/manuel/manuel-S-HC-PUB-05-RECONCILIATION-OPS-2026-06-29T00-22-46-240Z-52eb7757",
+      "worktreePath": "var/oreshnik/wt/S-HC-PUB-05-RECONCILIATION-OPS/S-HC-PUB-05-RECONCILIATION-OPS/r-d9c500bb15d4",
+      "zones": [
+        "apps/web/lib/publishing-finalization.ts",
+        "apps/web/lib/draft-operational-state.ts",
+        "packages/core"
+      ],
+      "taskStatus": "integrated",
+      "claimStatus": "released",
+      "claimedAt": "2026-06-29T00:22:46.240Z",
+      "updatedAt": "2026-09-05T16:07:02.072Z",
+      "expiresAt": "2026-06-29T01:22:46.240Z",
+      "releasedAt": "2026-06-29T00:36:40.003Z",
+      "manifestPath": "var/oreshnik/runs/S-HC-PUB-05-RECONCILIATION-OPS/manuel-S-HC-PUB-05-RECONCILIATION-OPS-2026-06-29T00-22-46-240Z-52eb7757.json"
+    },
     {
       "runId": "manuel-S-HC-PUB-05-RECONCILIATION-OPS-2026-06-29T00-37-03-464Z-4e3d4eae",
       "operator": "manuel",
@@ -108,26 +128,6 @@
       "expiresAt": "2026-06-29T01:37:03.464Z",
       "releasedAt": "2026-06-29T00:37:30.052Z",
       "manifestPath": "var/oreshnik/runs/S-HC-PUB-05-RECONCILIATION-OPS/manuel-S-HC-PUB-05-RECONCILIATION-OPS-2026-06-29T00-37-03-464Z-4e3d4eae.json"
-    },
-    {
-      "runId": "manuel-S-HC-PUB-05-RECONCILIATION-OPS-2026-06-29T00-22-46-240Z-52eb7757",
-      "operator": "manuel",
-      "worker": "manuel",
-      "workerMode": "codex",
-      "branch": "task/S-HC-PUB-05-RECONCILIATION-OPS/S-HC-PUB-05-RECONCILIATION-OPS/manuel/manuel-S-HC-PUB-05-RECONCILIATION-OPS-2026-06-29T00-22-46-240Z-52eb7757",
-      "worktreePath": "var/oreshnik/wt/S-HC-PUB-05-RECONCILIATION-OPS/S-HC-PUB-05-RECONCILIATION-OPS/r-d9c500bb15d4",
-      "zones": [
-        "apps/web/lib/publishing-finalization.ts",
-        "apps/web/lib/draft-operational-state.ts",
-        "packages/core"
-      ],
-      "taskStatus": "ready_for_integration",
-      "claimStatus": "released",
-      "claimedAt": "2026-06-29T00:22:46.240Z",
-      "updatedAt": "2026-06-29T00:36:40.003Z",
-      "expiresAt": "2026-06-29T01:22:46.240Z",
-      "releasedAt": "2026-06-29T00:36:40.003Z",
-      "manifestPath": "var/oreshnik/runs/S-HC-PUB-05-RECONCILIATION-OPS/manuel-S-HC-PUB-05-RECONCILIATION-OPS-2026-06-29T00-22-46-240Z-52eb7757.json"
     }
   ],
   "integration": {
