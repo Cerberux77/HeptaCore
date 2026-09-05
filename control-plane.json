@@ -5,15 +5,15 @@
     "originUrl": "https://github.com/Cerberux77/HeptaCore.git",
     "canonicalMotherBranch": "master"
   },
-  "generation": 47,
-  "controlHead": "6f3ad9d430d4e51529e3eee879de9774ed5203cb",
+  "generation": 48,
+  "controlHead": "a121885298e1eb1bbf23fb850478750a4e9c8782",
   "catalog": {
     "taskBoardPath": "var/oreshnik/task-board.json",
     "zoneMapPath": "docs/07_handoffs/zone-map.json",
-    "sourceTaskBoardHead": "1f7cebc16564f79a063dd976ab7f9e7640165446",
+    "sourceTaskBoardHead": "191c6a3ad7f84198eb1da3ebcb4dcbb49779d917",
     "fingerprint": "6653ddbb2d952b6672250d19e43469fa2ef6f80f",
     "taskCount": 43,
-    "updatedAt": "2026-09-05T07:57:30.851Z"
+    "updatedAt": "2026-09-05T08:00:33.532Z"
   },
   "policy": {
     "name": "deterministic-v1",
@@ -78,6 +78,13 @@
       "hostname": "runnervmejwal",
       "registeredAt": "2026-09-05T07:57:29.602Z",
       "updatedAt": "2026-09-05T07:57:29.603Z"
+    },
+    {
+      "machineId": "machine-0cdeb4c6-fd31-48bb-b9d2-702148ce0b49",
+      "worktreeRoot": "/home/runner/work/_temp/oreshnik-wt",
+      "hostname": "runnervmejwal",
+      "registeredAt": "2026-09-05T08:00:32.157Z",
+      "updatedAt": "2026-09-05T08:00:32.157Z"
     }
   ],
   "agentInstances": [
@@ -2706,6 +2713,11 @@
       "at": "2026-09-05T07:57:30.851Z",
       "action": "dispatch.init",
       "message": "Registered machine machine-98f44b47-144a-4c75-bcd2-044ba63c535c with root /home/runner/work/_temp/oreshnik-wt."
+    },
+    {
+      "at": "2026-09-05T08:00:33.532Z",
+      "action": "dispatch.init",
+      "message": "Registered machine machine-0cdeb4c6-fd31-48bb-b9d2-702148ce0b49 with root /home/runner/work/_temp/oreshnik-wt."
     }
   ],
   "reconciliation": {
@@ -2715,5 +2727,5 @@
     "pendingDiagnostics": []
   },
   "createdAt": "2026-06-29T20:17:43.302Z",
-  "updatedAt": "2026-09-05T07:57:30.851Z"
+  "updatedAt": "2026-09-05T08:00:33.532Z"
 }
