@@ -45,6 +45,16 @@ jobs:
           npm ci --ignore-scripts
           test "$(node node_modules/oreshnik-cli/dist/cli.js --version)" = "0.3.0-alpha.6"
 
+      - name: Register ephemeral dispatcher machine
+        run: |
+          set -euo pipefail
+          CLI="$GITHUB_WORKSPACE/node_modules/oreshnik-cli/dist/cli.js"
+          node "$CLI" dispatch init \
+            --mother master \
+            --worktree-root "$RUNNER_TEMP/oreshnik-wt-email" \
+            --repo "$GITHUB_WORKSPACE" \
+            --json | tee /tmp/dispatch-init.json
+
       - name: Rehydrate exact governed email Run
         id: takeover
         run: |
@@ -63,7 +73,7 @@ jobs:
           test -n "$WT"
           echo "worktree=$WT" >> "$GITHUB_OUTPUT"
           git -C "$WT" fetch origin --prune
-          test "$(git -C "$WT" merge-base --is-ancestor "$CANDIDATE_SHA" HEAD; echo $?)" = "0"
+          git -C "$WT" merge-base --is-ancestor "$CANDIDATE_SHA" HEAD
           test "$(git -C "$WT" branch --show-current)" = "dispatch/manuel/manuel-chatgpt1/email-infra/S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION/3294b78874"
 
       - name: Create canonical BLOCKED_EXTERNAL handoff
