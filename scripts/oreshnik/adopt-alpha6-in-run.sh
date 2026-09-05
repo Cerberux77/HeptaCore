@@ -26,11 +26,35 @@ if [[ "$current_branch" != "$EXPECTED_BRANCH" ]]; then
   echo "Refusing adoption outside Oreshnik branch: expected=$EXPECTED_BRANCH actual=$current_branch" >&2
   exit 31
 fi
-if [[ -n "$(git status --porcelain)" ]]; then
-  echo "Refusing adoption from dirty Run worktree." >&2
+
+# A governed cross-machine takeover intentionally reconstructs the local Run
+# projection under var/oreshnik/** (task-board, Claim, task artifact, Run
+# manifest). That projection is required by subsequent evidence commands and is
+# therefore allowed to be dirty here. Any mutation outside var/oreshnik/** is
+# still a hard stop so product/code drift cannot enter this adoption Run.
+mapfile -t dirty_paths < <(
+  {
+    git diff --name-only
+    git diff --cached --name-only
+    git ls-files --others --exclude-standard
+  } | sed '/^$/d' | sort -u
+)
+unexpected_dirty=()
+for dirty_path in "${dirty_paths[@]}"; do
+  if [[ "$dirty_path" != var/oreshnik/* ]]; then
+    unexpected_dirty+=("$dirty_path")
+  fi
+done
+if (( ${#unexpected_dirty[@]} > 0 )); then
+  echo "Refusing adoption: unexpected dirty paths exist outside the governed runtime projection." >&2
+  printf '  %s\n' "${unexpected_dirty[@]}" >&2
   git status --short >&2
   exit 32
 fi
+if (( ${#dirty_paths[@]} > 0 )); then
+  printf '%s\n' "${dirty_paths[@]}" | tee "$EVIDENCE_DIR/rehydrated-runtime-dirty-paths.txt"
+fi
+
 if [[ ! -f "$ROLLBACK_VENDOR" ]]; then
   echo "Rollback TGZ is missing: $ROLLBACK_VENDOR" >&2
   exit 33
