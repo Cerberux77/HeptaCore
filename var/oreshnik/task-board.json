@@ -1,6 +1,6 @@
 {
   "project": "HeptaCore",
-  "updatedAt": "2026-09-04T14:03:10.743Z",
+  "updatedAt": "2026-09-05T16:21:11.207Z",
   "currentExecutionOrder": [
     "S-HC-PUB-04-HOURLY-BATCH-CRON",
     "S-HC-PUB-05-RECONCILIATION-OPS",
@@ -1462,7 +1462,7 @@
       "title": "Transactional email foundation: domain sender, DNS, reputation, provider integration",
       "owner": "Jean",
       "backupOwner": "Manuel",
-      "status": "pending",
+      "status": "ready",
       "track": "email-infra",
       "zone": [
         "apps/web/app/api/email",
@@ -1476,6 +1476,14 @@
         "Proveedor de correo transaccional integrado (Resend, SendGrid o equivalente)",
         "Webhooks de eventos (delivered, bounced, complained) configurados",
         "Enlaces comerciales y de marca consistentes con el dominio final"
+      ],
+      "history": [
+        {
+          "at": "2026-09-05T16:21:11.206Z",
+          "action": "dependency_readiness_reprojected",
+          "operator": "system",
+          "description": "Auto-promoted to ready by reconcile: all dependencies satisfied and no residual blockers"
+        }
       ]
     },
     {
