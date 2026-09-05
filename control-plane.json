@@ -5,7 +5,7 @@
     "originUrl": "https://github.com/Cerberux77/HeptaCore.git",
     "canonicalMotherBranch": "master"
   },
-  "generation": 83,
+  "generation": 84,
   "controlHead": "18504ba6d88dce133182e0a849af88a7a17447be",
   "catalog": {
     "taskBoardPath": "var/oreshnik/task-board.json",
@@ -970,7 +970,7 @@
       "sprintId": "email-infra",
       "title": "Transactional email foundation: domain sender, DNS, reputation, provider integration",
       "operator": "manuel",
-      "machineId": "machine-573c4678-df23-4b03-a6e3-d4c540b79931",
+      "machineId": "machine-7efea005-7c22-4e01-b9a1-6503cd31d7e2",
       "functionalBranch": "dispatch/manuel/manuel-chatgpt1/email-infra/S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION/3294b78874",
       "motherBranch": "master",
       "worktreePath": "/home/runner/work/_temp/oreshnik-wt-email/32305cad03d6321a/manuel/manuel-chatgpt1/email-infra/S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION/3ae02502",
@@ -997,15 +997,15 @@
       "sourceTaskBoardHead": "2cc4d938cf3cab72dec25c948ce45affe6cdcd34",
       "catalogFingerprint": "7426b59d1dbd367366f838d00bb41c945e6868af",
       "createdAt": "2026-09-05T18:01:53.697Z",
-      "updatedAt": "2026-09-05T20:49:36.991Z",
+      "updatedAt": "2026-09-05T20:54:06.894Z",
       "activatedAt": "2026-09-05T18:02:01.942Z",
-      "resumedCount": 4,
+      "resumedCount": 5,
       "takeoverCount": 0,
-      "ownershipGeneration": 5,
+      "ownershipGeneration": 6,
       "previousAgentInstanceUid": "agent_a7665c7284074daa989cd1e0e83847e0",
       "previousSessionId": "session_1d4bac9cf36943759bf3bc4272dd5105",
       "takeoverReason": "Finish owner-deferred production-domain block using the already validated handoff",
-      "takenOverAt": "2026-09-05T20:49:36.991Z",
+      "takenOverAt": "2026-09-05T20:54:06.894Z",
       "harnessId": "chatgpt",
       "agentInstanceUid": "agent_a7665c7284074daa989cd1e0e83847e0",
       "agentInstanceAlias": "manuel-chatgpt1",
@@ -1345,13 +1345,13 @@
       "taskId": "S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION",
       "sprintId": "email-infra",
       "operator": "manuel",
-      "machineId": "machine-573c4678-df23-4b03-a6e3-d4c540b79931",
+      "machineId": "machine-7efea005-7c22-4e01-b9a1-6503cd31d7e2",
       "runId": "run-manuel-S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION-20260905180153-1e9c8316",
       "branch": "dispatch/manuel/manuel-chatgpt1/email-infra/S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION/3294b78874",
       "worktreePath": "/home/runner/work/_temp/oreshnik-wt-email/32305cad03d6321a/manuel/manuel-chatgpt1/email-infra/S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION/3ae02502",
       "status": "active",
       "createdAt": "2026-09-05T18:01:53.697Z",
-      "updatedAt": "2026-09-05T20:49:36.991Z",
+      "updatedAt": "2026-09-05T20:54:06.894Z",
       "zones": [
         "apps/web/app/api/email",
         "packages/core",
@@ -1369,7 +1369,7 @@
         "packages/core",
         "docs"
       ],
-      "ownershipGeneration": 5,
+      "ownershipGeneration": 6,
       "harnessId": "chatgpt",
       "agentInstanceUid": "agent_a7665c7284074daa989cd1e0e83847e0",
       "agentInstanceAlias": "manuel-chatgpt1",
@@ -1715,12 +1715,12 @@
       "taskId": "S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION",
       "sprintId": "email-infra",
       "operator": "manuel",
-      "machineId": "machine-573c4678-df23-4b03-a6e3-d4c540b79931",
+      "machineId": "machine-7efea005-7c22-4e01-b9a1-6503cd31d7e2",
       "branch": "dispatch/manuel/manuel-chatgpt1/email-infra/S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION/3294b78874",
       "worktreePath": "/home/runner/work/_temp/oreshnik-wt-email/32305cad03d6321a/manuel/manuel-chatgpt1/email-infra/S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION/3ae02502",
       "status": "active",
       "createdAt": "2026-09-05T18:01:53.697Z",
-      "updatedAt": "2026-09-05T20:49:36.991Z",
+      "updatedAt": "2026-09-05T20:54:06.894Z",
       "sourceTaskBoardHead": "2cc4d938cf3cab72dec25c948ce45affe6cdcd34",
       "zones": [
         "apps/web/app/api/email",
@@ -1739,7 +1739,7 @@
         "packages/core",
         "docs"
       ],
-      "ownershipGeneration": 5,
+      "ownershipGeneration": 6,
       "harnessId": "chatgpt",
       "agentInstanceUid": "agent_a7665c7284074daa989cd1e0e83847e0",
       "agentInstanceAlias": "manuel-chatgpt1",
@@ -3298,6 +3298,16 @@
       "at": "2026-09-05T20:54:00.707Z",
       "action": "dispatch.init",
       "message": "Registered machine machine-7efea005-7c22-4e01-b9a1-6503cd31d7e2 with root /home/runner/work/_temp/oreshnik-wt-email."
+    },
+    {
+      "at": "2026-09-05T20:54:06.894Z",
+      "action": "dispatch.takeover",
+      "assignmentId": "asg-1d61b39d-d0e2-4d9a-b319-8bc93ae02502",
+      "runId": "run-manuel-S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION-20260905180153-1e9c8316",
+      "operator": "manuel",
+      "agentInstanceUid": "agent_a7665c7284074daa989cd1e0e83847e0",
+      "sessionId": "session_1d4bac9cf36943759bf3bc4272dd5105",
+      "message": "Takeover by manuel/manuel-chatgpt1 from manuel/manuel-chatgpt1. Reason: Finish owner-deferred production-domain block using the already validated handoff. Generation: 5 → 6."
     }
   ],
   "reconciliation": {
@@ -3307,5 +3317,5 @@
     "pendingDiagnostics": []
   },
   "createdAt": "2026-06-29T20:17:43.302Z",
-  "updatedAt": "2026-09-05T20:54:00.707Z"
+  "updatedAt": "2026-09-05T20:54:06.894Z"
 }
