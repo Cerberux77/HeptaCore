@@ -1,0 +1,139 @@
+name: Oreshnik Post-Merge Reconcile and Next
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - ".github/oreshnik-postmerge-next-trigger"
+
+permissions:
+  contents: write
+  actions: read
+
+concurrency:
+  group: heptacore-oreshnik-postmerge-next
+  cancel-in-progress: false
+
+jobs:
+  reconcile-and-next:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Checkout canonical master
+        uses: actions/checkout@v4
+        with:
+          ref: master
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Configure identity
+        run: |
+          git config user.name "Manuel Vera via ChatGPT Operator"
+          git config user.email "manuel@heptacore.dev"
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install exact consumer runtime
+        run: npm ci --ignore-scripts
+
+      - name: Verify alpha6 readiness and stable baseline
+        run: |
+          set -euo pipefail
+          npm run oreshnik:ready
+          test "$(node node_modules/oreshnik-cli/dist/cli.js --version)" = "0.3.0-alpha.6"
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const t=JSON.parse(fs.readFileSync('var/oreshnik/tasks/HC-ORESHNIK-RECOVERY-ALPHA6.json','utf8'));
+          if(t.status!=='integrated') throw new Error(`recovery task=${t.status}`);
+          NODE
+
+      - name: Reconcile stale control-plane ownership through Oreshnik
+        run: |
+          set -euo pipefail
+          ROOT="$RUNNER_TEMP/oreshnik-wt"
+          mkdir -p "$ROOT"
+          CLI=(node node_modules/oreshnik-cli/dist/cli.js)
+          "${CLI[@]}" dispatch init --mother master --worktree-root "$ROOT" --repo . --json | tee "$RUNNER_TEMP/dispatch-init.json"
+          "${CLI[@]}" dispatch reconcile --repo . --json | tee "$RUNNER_TEMP/dispatch-reconcile.json"
+          git fetch origin '+refs/heads/oreshnik/control:refs/remotes/origin/oreshnik/control'
+          git show origin/oreshnik/control:control-plane.json > "$RUNNER_TEMP/control.json"
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const c=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/control.json','utf8'));
+          const runId='run-manuel-HC-ORESHNIK-RECOVERY-ALPHA6-20260904140329-21ab3a41';
+          const a=(c.assignments||[]).find(x=>x.runId===runId);
+          const r=(c.runs||[]).find(x=>x.runId===runId);
+          const cl=(c.claims||[]).find(x=>x.runId===runId);
+          const forbidden=new Set(['active','assigned','claimed','validating','ready_for_integration','reserved']);
+          if(a && forbidden.has(a.status)) throw new Error(`stale recovery assignment=${a.status}`);
+          if(r && forbidden.has(r.status)) throw new Error(`stale recovery run=${r.status}`);
+          if(cl && forbidden.has(cl.status)) throw new Error(`stale recovery claim=${cl.status}`);
+          console.log(JSON.stringify({controlHead:c.controlHead,recovery:{assignment:a?.status??null,run:r?.status??null,claim:cl?.status??null}},null,2));
+          NODE
+
+      - name: Ask native alpha6 goal contract for the next work
+        id: goal
+        run: |
+          set -euo pipefail
+          node node_modules/oreshnik-cli/dist/cli.js goal \
+            --harness chatgpt \
+            --auto-align \
+            --repo . \
+            --max-retries 3 \
+            --json | tee "$RUNNER_TEMP/goal.json"
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const p=process.env.RUNNER_TEMP+'/goal.json';
+          const g=JSON.parse(fs.readFileSync(p,'utf8'));
+          const allowed=new Set(['assigned','resumed','no_task','needs_alignment','target_missing','target_ineligible','active_assignment_mismatch']);
+          if(!allowed.has(g.result)) throw new Error(`unexpected goal result=${g.result}`);
+          const out=process.env.GITHUB_OUTPUT;
+          fs.appendFileSync(out,`result=${g.result}\n`);
+          if(g.taskId) fs.appendFileSync(out,`task_id=${g.taskId}\n`);
+          if(g.runId) fs.appendFileSync(out,`run_id=${g.runId}\n`);
+          if(g.functionalBranch) fs.appendFileSync(out,`functional_branch=${g.functionalBranch}\n`);
+          if(g.worktreePath) fs.appendFileSync(out,`worktree_path=${g.worktreePath}\n`);
+          console.log(JSON.stringify({result:g.result,taskId:g.taskId??null,runId:g.runId??null,functionalBranch:g.functionalBranch??null,operator:g.operator??null,harnessId:g.harnessId??null,worktreePath:g.worktreePath??null,alignmentIssues:g.alignmentIssues??null,targetEligibility:g.targetEligibility??null},null,2));
+          if(['needs_alignment','target_missing','target_ineligible','active_assignment_mismatch'].includes(g.result)) process.exitCode=23;
+          NODE
+
+      - name: Verify new remote lineage when assigned or resumed
+        if: steps.goal.outputs.result == 'assigned' || steps.goal.outputs.result == 'resumed'
+        env:
+          TASK_ID: ${{ steps.goal.outputs.task_id }}
+          RUN_ID: ${{ steps.goal.outputs.run_id }}
+          FUNCTIONAL_BRANCH: ${{ steps.goal.outputs.functional_branch }}
+        run: |
+          set -euo pipefail
+          test -n "$TASK_ID"
+          test -n "$RUN_ID"
+          test -n "$FUNCTIONAL_BRANCH"
+          git fetch origin "+refs/heads/$FUNCTIONAL_BRANCH:refs/remotes/origin/$FUNCTIONAL_BRANCH" '+refs/heads/oreshnik/control:refs/remotes/origin/oreshnik/control'
+          git show origin/oreshnik/control:control-plane.json > "$RUNNER_TEMP/control-after-goal.json"
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const c=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/control-after-goal.json','utf8'));
+          const a=(c.assignments||[]).find(x=>x.runId===process.env.RUN_ID);
+          const r=(c.runs||[]).find(x=>x.runId===process.env.RUN_ID);
+          const cl=(c.claims||[]).find(x=>x.runId===process.env.RUN_ID);
+          if(!a||!r||!cl) throw new Error('new Run lineage missing');
+          if(a.taskId!==process.env.TASK_ID || r.taskId!==process.env.TASK_ID || cl.taskId!==process.env.TASK_ID) throw new Error('new Run task lineage drift');
+          console.log(JSON.stringify({taskId:process.env.TASK_ID,runId:process.env.RUN_ID,assignment:a.status,run:r.status,claim:cl.status,functionalBranch:process.env.FUNCTIONAL_BRANCH,controlHead:c.controlHead},null,2));
+          NODE
+
+      - name: Upload dispatch evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: oreshnik-postmerge-next
+          path: |
+            ${{ runner.temp }}/dispatch-init.json
+            ${{ runner.temp }}/dispatch-reconcile.json
+            ${{ runner.temp }}/goal.json
+            ${{ runner.temp }}/control.json
+            ${{ runner.temp }}/control-after-goal.json
+          if-no-files-found: ignore
