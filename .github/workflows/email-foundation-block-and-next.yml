@@ -23,7 +23,7 @@ jobs:
       SESSION: session_1d4bac9cf36943759bf3bc4272dd5105
       HANDOFF_PATH: var/oreshnik/handoffs/S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION/handoff-20260905T203611929Z-9fe1de71d50a.json
       HANDOFF_DIGEST: c0e8dfdf01cfff3803c646dd25e76f4d5e639f1862094c25bded19610fab2dde
-      ORESHNIK_LOCAL_STATE_DIR: ${{ runner.temp }}/oreshnik-local-state
+      ORESHNIK_LOCAL_STATE_DIR: /tmp/oreshnik-local-state
     steps:
       - name: Checkout operations scaffold
         uses: actions/checkout@v4
