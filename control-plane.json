@@ -5,15 +5,15 @@
     "originUrl": "https://github.com/Cerberux77/HeptaCore.git",
     "canonicalMotherBranch": "master"
   },
-  "generation": 51,
-  "controlHead": "04ae6f9fc7609da4a5bd67604a76d9f7651e1196",
+  "generation": 52,
+  "controlHead": "89bfc3f13db530888bc3e3e53e16c76234df5ed3",
   "catalog": {
     "taskBoardPath": "var/oreshnik/task-board.json",
     "zoneMapPath": "docs/07_handoffs/zone-map.json",
-    "sourceTaskBoardHead": "b3d16d355eeb867b8ab674e00e7a17f74e100cf6",
+    "sourceTaskBoardHead": "dcf4d54899bd0e9e311d3cb16ef2d81e00419597",
     "fingerprint": "6653ddbb2d952b6672250d19e43469fa2ef6f80f",
     "taskCount": 43,
-    "updatedAt": "2026-09-05T08:05:13.447Z"
+    "updatedAt": "2026-09-05T08:10:20.826Z"
   },
   "policy": {
     "name": "deterministic-v1",
@@ -99,6 +99,13 @@
       "hostname": "runnervmejwal",
       "registeredAt": "2026-09-05T08:05:12.289Z",
       "updatedAt": "2026-09-05T08:05:12.289Z"
+    },
+    {
+      "machineId": "machine-ddd081fb-4745-4a8e-bb89-a9d2a84db7bc",
+      "worktreeRoot": "/home/runner/work/_temp/oreshnik-wt",
+      "hostname": "runnervmejwal",
+      "registeredAt": "2026-09-05T08:10:19.671Z",
+      "updatedAt": "2026-09-05T08:10:19.671Z"
     }
   ],
   "agentInstances": [
@@ -215,11 +222,11 @@
       "displayAlias": "manuel-chatgpt1",
       "operatorId": "manuel",
       "harnessId": "chatgpt",
-      "machineId": "machine-4a2a6ed8-9f17-4982-bc4a-20b7f0b0dd31",
+      "machineId": "machine-fc2c67ae-2ed6-4d27-8670-ee0ca2be4ba8",
       "repositoryId": "32305cad03d6321a",
       "slot": 1,
       "createdAt": "2026-09-04T14:03:29.955Z",
-      "updatedAt": "2026-09-04T20:05:02.340Z",
+      "updatedAt": "2026-09-05T08:05:19.253Z",
       "identityOrigin": "explicit"
     }
   ],
@@ -336,9 +343,9 @@
       "agentInstanceUid": "agent_b3b9741f431941c7ba8982457ed6899b",
       "operatorId": "manuel",
       "harnessId": "chatgpt",
-      "machineId": "machine-4a2a6ed8-9f17-4982-bc4a-20b7f0b0dd31",
+      "machineId": "machine-fc2c67ae-2ed6-4d27-8670-ee0ca2be4ba8",
       "startedAt": "2026-09-04T14:03:29.955Z",
-      "lastSeenAt": "2026-09-04T20:05:02.340Z",
+      "lastSeenAt": "2026-09-05T08:05:19.253Z",
       "status": "active",
       "identityOrigin": "explicit"
     }
@@ -2752,6 +2759,11 @@
       "agentInstanceUid": "agent_b3b9741f431941c7ba8982457ed6899b",
       "sessionId": "session_1f3e442d2d144761a613b550bde6d6ad",
       "message": "Takeover by manuel/manuel-chatgpt1 from manuel/manuel-chatgpt1. Reason: GitHub Actions runner is ephemeral; rehydrate the same governed instance, preserved session, and canonical Run on the current machine without creating a new ownership lineage.. Generation: 2 → 3."
+    },
+    {
+      "at": "2026-09-05T08:10:20.826Z",
+      "action": "dispatch.init",
+      "message": "Registered machine machine-ddd081fb-4745-4a8e-bb89-a9d2a84db7bc with root /home/runner/work/_temp/oreshnik-wt."
     }
   ],
   "reconciliation": {
@@ -2761,5 +2773,5 @@
     "pendingDiagnostics": []
   },
   "createdAt": "2026-06-29T20:17:43.302Z",
-  "updatedAt": "2026-09-05T08:05:19.253Z"
+  "updatedAt": "2026-09-05T08:10:20.826Z"
 }
