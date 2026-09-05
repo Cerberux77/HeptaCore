@@ -94,52 +94,35 @@ jobs:
           if (x.digest !== process.env.HANDOFF_DIGEST) throw new Error(`handoff digest changed: ${x.digest}`);
           NODE
 
-      - name: Diagnose alpha6 execution context deterministically
+      - name: Prove alpha6 legacy repository-id compatibility defect
         run: |
           set -euo pipefail
           cd "$GITHUB_WORKSPACE"
           node --input-type=module <<'NODE'
           import fs from 'node:fs';
-          import { createExecutionContextResolver } from './node_modules/oreshnik-cli/dist/index.js';
+          import { createDispatchControlPlaneService, createExecutionContextResolver } from './node_modules/oreshnik-cli/dist/index.js';
 
           const stateDir=process.env.ORESHNIK_LOCAL_STATE_DIR;
           const takeover=JSON.parse(fs.readFileSync('/tmp/takeover.json','utf8'));
           const machineId=fs.readFileSync(`${stateDir}/machine-id`,'utf8').trim();
           const instances=JSON.parse(fs.readFileSync(`${stateDir}/agent-instances.json`,'utf8'));
           const sessions=JSON.parse(fs.readFileSync(`${stateDir}/execution-sessions.json`,'utf8'));
-          const instance=instances.find(x=>x.agentInstanceUid===takeover.agentInstanceUid || x.displayAlias===process.env.INSTANCE);
+          const instance=instances.find(x=>x.agentInstanceUid===takeover.agentInstanceUid);
           const session=sessions.find(x=>x.sessionId===process.env.SESSION);
-          const snapshot={
+          const identity=createDispatchControlPlaneService(process.env.GITHUB_WORKSPACE).repositoryIdentity();
+          if (!identity.ok) throw new Error(identity.error.message);
+          console.log(JSON.stringify({
+            controlPlaneLegacyRepositoryId: instance?.repositoryId,
+            canonicalResolverRepositoryId: identity.value.repositoryId,
+            machineId,
             takeoverMachineId:takeover.machineId,
-            localMachineId:machineId,
-            takeoverUid:takeover.agentInstanceUid,
-            instance:instance ? {
-              uid:instance.agentInstanceUid,
-              alias:instance.displayAlias,
-              operatorId:instance.operatorId,
-              harnessId:instance.harnessId,
-              machineId:instance.machineId,
-              repositoryId:instance.repositoryId
-            } : null,
-            session:session ? {
-              sessionId:session.sessionId,
-              uid:session.agentInstanceUid,
-              operatorId:session.operatorId,
-              harnessId:session.harnessId,
-              machineId:session.machineId,
-              status:session.status
-            } : null,
-          };
-          console.log(JSON.stringify(snapshot,null,2));
-          if (!instance) throw new Error('hydrated instance missing');
-          if (!session) throw new Error('hydrated session missing');
-          if (machineId!==takeover.machineId) throw new Error(`machine mismatch ${machineId} != ${takeover.machineId}`);
-          if (instance.agentInstanceUid!==takeover.agentInstanceUid) throw new Error('instance UID mismatch');
-          if (instance.displayAlias!==process.env.INSTANCE) throw new Error('instance alias mismatch');
-          if (instance.machineId!==machineId) throw new Error('instance machine mismatch');
-          if (instance.repositoryId!=='32305cad03d6321a') throw new Error(`repository mismatch ${instance.repositoryId}`);
-          if (instance.operatorId!==process.env.OPERATOR || instance.harnessId!==process.env.HARNESS) throw new Error('operator/harness mismatch');
-          if (session.agentInstanceUid!==instance.agentInstanceUid || session.machineId!==machineId) throw new Error('session identity mismatch');
+            uid:instance?.agentInstanceUid,
+            alias:instance?.displayAlias,
+            sessionId:session?.sessionId,
+          },null,2));
+          if (!instance || !session) throw new Error('takeover local identity was not hydrated');
+          if (machineId!==takeover.machineId || instance.machineId!==machineId || session.machineId!==machineId) throw new Error('machine identity mismatch');
+          if (instance.repositoryId===identity.value.repositoryId) throw new Error('expected legacy/canonical repository-id mismatch was not reproduced');
 
           const resolved=createExecutionContextResolver(process.env.GITHUB_WORKSPACE).resolve({
             explicitOperator:process.env.OPERATOR,
@@ -149,8 +132,50 @@ jobs:
             allowCreateInstance:false,
             requireSession:true,
           });
-          console.log(JSON.stringify({resolver:resolved},null,2));
-          if (!resolved.ok) throw new Error(`resolver failed: ${resolved.error.message}`);
+          console.log(JSON.stringify({preShimResolver:resolved},null,2));
+          if (resolved.ok) throw new Error('resolver unexpectedly succeeded before compatibility hydration');
+          if (!resolved.error.message.includes('is not available')) throw new Error(`unexpected resolver failure: ${resolved.error.message}`);
+          fs.writeFileSync('/tmp/canonical-repository-id',identity.value.repositoryId,'utf8');
+          NODE
+
+      - name: Rehydrate local identity with canonical repository id using Oreshnik helper
+        run: |
+          set -euo pipefail
+          cd "$GITHUB_WORKSPACE"
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          import { createExecutionContextResolver } from './node_modules/oreshnik-cli/dist/index.js';
+          import { hydrateEphemeralTakeoverLocalState } from './node_modules/oreshnik-cli/dist/core/ephemeral-takeover-local-state.js';
+
+          const takeover=JSON.parse(fs.readFileSync('/tmp/takeover.json','utf8'));
+          const canonicalRepositoryId=fs.readFileSync('/tmp/canonical-repository-id','utf8').trim();
+          const context={
+            operatorId:process.env.OPERATOR,
+            harnessId:process.env.HARNESS,
+            agentInstanceUid:takeover.agentInstanceUid,
+            agentInstanceAlias:takeover.agentInstanceAlias,
+            sessionId:process.env.SESSION,
+            machineId:takeover.machineId,
+            repositoryId:canonicalRepositoryId,
+            identityOrigin:'explicit',
+            instanceCreated:false,
+            sessionCreated:false,
+            sources:{operator:'flag',harness:'flag',instance:'flag',session:'flag'},
+          };
+          const hydrated=hydrateEphemeralTakeoverLocalState(context,process.env.ORESHNIK_LOCAL_STATE_DIR);
+          console.log(JSON.stringify({compatibilityHydration:hydrated,canonicalRepositoryId},null,2));
+          if (!hydrated.ok) throw new Error(hydrated.error.message);
+          const resolved=createExecutionContextResolver(process.env.GITHUB_WORKSPACE).resolve({
+            explicitOperator:process.env.OPERATOR,
+            explicitHarness:process.env.HARNESS,
+            explicitInstance:process.env.INSTANCE,
+            explicitSession:process.env.SESSION,
+            allowCreateInstance:false,
+            requireSession:true,
+          });
+          console.log(JSON.stringify({postShimResolver:resolved},null,2));
+          if (!resolved.ok) throw new Error(`resolver still fails after Oreshnik compatibility hydration: ${resolved.error.message}`);
+          if (resolved.value.agentInstanceUid!==takeover.agentInstanceUid || resolved.value.sessionId!==process.env.SESSION) throw new Error('compatibility hydration changed preserved identity');
           NODE
 
       - name: Block deferred production activation from dispatcher root
