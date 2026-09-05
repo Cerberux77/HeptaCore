@@ -1,4 +1,4 @@
 HC-ORESHNIK-RECOVERY-ALPHA6
-action=start-validation-ready-close-native-train
+action=bounded-legacy-exception-close-native-train
 issued=2026-09-05
-attempt=3
+attempt=4
