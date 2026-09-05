@@ -5,15 +5,15 @@
     "originUrl": "https://github.com/Cerberux77/HeptaCore.git",
     "canonicalMotherBranch": "master"
   },
-  "generation": 71,
-  "controlHead": "d93d443b46c60f53fd18fd2ccf51b3fc48f48433",
+  "generation": 72,
+  "controlHead": "4e32bb45459b27a254bff4a28c25e202c41e3129",
   "catalog": {
     "taskBoardPath": "var/oreshnik/task-board.json",
     "zoneMapPath": "docs/07_handoffs/zone-map.json",
     "sourceTaskBoardHead": "2cc4d938cf3cab72dec25c948ce45affe6cdcd34",
     "fingerprint": "7426b59d1dbd367366f838d00bb41c945e6868af",
     "taskCount": 43,
-    "updatedAt": "2026-09-05T18:01:31.991Z"
+    "updatedAt": "2026-09-05T18:01:37.167Z"
   },
   "policy": {
     "name": "deterministic-v1",
@@ -169,6 +169,13 @@
       "hostname": "runnervmejwal",
       "registeredAt": "2026-09-05T17:56:02.784Z",
       "updatedAt": "2026-09-05T17:56:02.784Z"
+    },
+    {
+      "machineId": "machine-676e6903-c3e4-4a2d-9d08-2838c93f8598",
+      "worktreeRoot": "/home/runner/work/_temp/oreshnik-wt-next",
+      "hostname": "runnervmejwal",
+      "registeredAt": "2026-09-05T18:01:36.229Z",
+      "updatedAt": "2026-09-05T18:01:36.229Z"
     }
   ],
   "agentInstances": [
@@ -289,7 +296,7 @@
       "repositoryId": "32305cad03d6321a",
       "slot": 1,
       "createdAt": "2026-09-04T14:03:29.955Z",
-      "updatedAt": "2026-09-05T16:58:50.990Z",
+      "updatedAt": "2026-09-05T18:01:31.991Z",
       "identityOrigin": "explicit"
     }
   ],
@@ -2971,6 +2978,11 @@
       "runId": "run-manuel-HC-ORESHNIK-RECOVERY-ALPHA6-20260904140329-21ab3a41",
       "operator": "manuel",
       "message": "Terminalization term-ebbd4756-966d-40d2-9bfd-7a6090e542ba confirmed PR #26 for HC-ORESHNIK-RECOVERY-ALPHA6 on master at 2cc4d938cf3cab72dec25c948ce45affe6cdcd34; run integrated, assignment and claim released."
+    },
+    {
+      "at": "2026-09-05T18:01:37.167Z",
+      "action": "dispatch.init",
+      "message": "Registered machine machine-676e6903-c3e4-4a2d-9d08-2838c93f8598 with root /home/runner/work/_temp/oreshnik-wt-next."
     }
   ],
   "reconciliation": {
@@ -2980,5 +2992,5 @@
     "pendingDiagnostics": []
   },
   "createdAt": "2026-06-29T20:17:43.302Z",
-  "updatedAt": "2026-09-05T18:01:31.991Z"
+  "updatedAt": "2026-09-05T18:01:37.167Z"
 }
