@@ -5,15 +5,15 @@
     "originUrl": "https://github.com/Cerberux77/HeptaCore.git",
     "canonicalMotherBranch": "master"
   },
-  "generation": 82,
-  "controlHead": "c987638eb9559d0cfa97aa36b5c7356b3c225840",
+  "generation": 83,
+  "controlHead": "18504ba6d88dce133182e0a849af88a7a17447be",
   "catalog": {
     "taskBoardPath": "var/oreshnik/task-board.json",
     "zoneMapPath": "docs/07_handoffs/zone-map.json",
     "sourceTaskBoardHead": "2cc4d938cf3cab72dec25c948ce45affe6cdcd34",
     "fingerprint": "7426b59d1dbd367366f838d00bb41c945e6868af",
     "taskCount": 43,
-    "updatedAt": "2026-09-05T20:49:29.338Z"
+    "updatedAt": "2026-09-05T20:54:00.707Z"
   },
   "policy": {
     "name": "deterministic-v1",
@@ -204,6 +204,13 @@
       "hostname": "runnervmejwal",
       "registeredAt": "2026-09-05T20:49:27.724Z",
       "updatedAt": "2026-09-05T20:49:27.724Z"
+    },
+    {
+      "machineId": "machine-7efea005-7c22-4e01-b9a1-6503cd31d7e2",
+      "worktreeRoot": "/home/runner/work/_temp/oreshnik-wt-email",
+      "hostname": "runnervmejwal",
+      "registeredAt": "2026-09-05T20:53:59.470Z",
+      "updatedAt": "2026-09-05T20:53:59.470Z"
     }
   ],
   "agentInstances": [
@@ -332,11 +339,11 @@
       "displayAlias": "manuel-chatgpt1",
       "operatorId": "manuel",
       "harnessId": "chatgpt",
-      "machineId": "machine-c9f621ed-16f3-4372-9e71-b4ae8a7017f2",
+      "machineId": "machine-573c4678-df23-4b03-a6e3-d4c540b79931",
       "repositoryId": "32305cad03d6321a",
       "slot": 1,
       "createdAt": "2026-09-05T18:01:53.697Z",
-      "updatedAt": "2026-09-05T20:45:33.985Z",
+      "updatedAt": "2026-09-05T20:49:36.991Z",
       "identityOrigin": "explicit"
     }
   ],
@@ -465,9 +472,9 @@
       "agentInstanceUid": "agent_a7665c7284074daa989cd1e0e83847e0",
       "operatorId": "manuel",
       "harnessId": "chatgpt",
-      "machineId": "machine-c9f621ed-16f3-4372-9e71-b4ae8a7017f2",
+      "machineId": "machine-573c4678-df23-4b03-a6e3-d4c540b79931",
       "startedAt": "2026-09-05T18:01:53.697Z",
-      "lastSeenAt": "2026-09-05T20:45:33.985Z",
+      "lastSeenAt": "2026-09-05T20:49:36.991Z",
       "status": "active",
       "identityOrigin": "explicit"
     }
@@ -3286,6 +3293,11 @@
       "agentInstanceUid": "agent_a7665c7284074daa989cd1e0e83847e0",
       "sessionId": "session_1d4bac9cf36943759bf3bc4272dd5105",
       "message": "Takeover by manuel/manuel-chatgpt1 from manuel/manuel-chatgpt1. Reason: Finish owner-deferred production-domain block using the already validated handoff. Generation: 4 → 5."
+    },
+    {
+      "at": "2026-09-05T20:54:00.707Z",
+      "action": "dispatch.init",
+      "message": "Registered machine machine-7efea005-7c22-4e01-b9a1-6503cd31d7e2 with root /home/runner/work/_temp/oreshnik-wt-email."
     }
   ],
   "reconciliation": {
@@ -3295,5 +3307,5 @@
     "pendingDiagnostics": []
   },
   "createdAt": "2026-06-29T20:17:43.302Z",
-  "updatedAt": "2026-09-05T20:49:36.991Z"
+  "updatedAt": "2026-09-05T20:54:00.707Z"
 }
