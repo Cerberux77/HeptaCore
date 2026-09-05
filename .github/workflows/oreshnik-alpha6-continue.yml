@@ -25,6 +25,7 @@ env:
   FUNCTIONAL_BRANCH: dispatch/manuel/manuel-chatgpt1/recovery/HC-ORESHNIK-RECOVERY-ALPHA6/2954c98970
   ALPHA6_VERSION: 0.3.0-alpha.6
   ALPHA6_SHA256: 66e0e6683cdf9587a873b27f20dd8c8538199eb511068e9c40b682ceadb176e8
+  ESBUILD_VERSION: 0.28.0
 
 jobs:
   continue:
@@ -70,7 +71,7 @@ jobs:
           node "$ALPHA6_CLI" dispatch init --mother master --worktree-root "$ROOT" --repo . --json
           node "$ALPHA6_CLI" dispatch takeover \
             --run "$RUN_ID" \
-            --reason "Continue the same alpha6 recovery Run after deterministic Prisma-generation diagnosis." \
+            --reason "Continue the same alpha6 recovery Run after deterministic CI bootstrap diagnosis." \
             --operator "$OPERATOR" \
             --harness "$HARNESS" \
             --instance "$INSTANCE_ALIAS" \
@@ -96,8 +97,11 @@ jobs:
           cd "$WT"
           npm ci --ignore-scripts
           npm run db:generate
+          npm install --no-save --package-lock=false --ignore-scripts "@esbuild/linux-x64@$ESBUILD_VERSION"
+          test -x node_modules/@esbuild/linux-x64/bin/esbuild
           test "$(node node_modules/oreshnik-cli/dist/cli.js --version)" = "$ALPHA6_VERSION"
           npm run typecheck
+          npm run test
       - name: Advance same Run to ready for integration
         env:
           WT: ${{ steps.rehydrate.outputs.worktree }}
@@ -110,7 +114,7 @@ jobs:
             --operator "$OPERATOR" \
             --run "$RUN_ID" \
             --handoff "docs/07_handoffs/HC-ORESHNIK-RECOVERY-ALPHA6.md" \
-            --details "Exact alpha6 adoption and rollback digest verified; Prisma client generated deterministically; consumer readiness, typecheck, build, tests, worker validation, reconcile and diff gates passed; no product or production mutation." \
+            --details "Exact alpha6 adoption and rollback digest verified; Prisma client and exact platform esbuild binary prepared deterministically for Linux CI; consumer readiness, typecheck, build, tests, worker validation, reconcile and diff gates passed; no product or production mutation." \
             --ready-for-integration
           "${CLI[@]}" reconcile --write --json
           git add var/oreshnik docs/obsidian-vault docs/07_handoffs docs/oreshnik || true
