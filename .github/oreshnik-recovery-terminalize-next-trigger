@@ -1,0 +1,9 @@
+task=HC-ORESHNIK-RECOVERY-ALPHA6
+run=run-manuel-HC-ORESHNIK-RECOVERY-ALPHA6-20260904140329-21ab3a41
+assignment=asg-61c0aff3-c576-4071-b7d4-d974adfcc418
+stable_merge=74cc4becdcd56369fce5d47cf0324b9ae22c1b1f
+pr=26
+operator=manuel
+harness=chatgpt
+action=terminalize-then-goal
+issued=2026-09-05
