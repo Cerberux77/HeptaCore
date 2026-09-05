@@ -1,0 +1,249 @@
+name: Oreshnik Recovery Terminalize and Next
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - ".github/oreshnik-recovery-terminalize-next-trigger"
+
+permissions:
+  contents: write
+  actions: read
+
+concurrency:
+  group: heptacore-oreshnik-recovery-terminalize-next
+  cancel-in-progress: false
+
+env:
+  TASK_ID: HC-ORESHNIK-RECOVERY-ALPHA6
+  RUN_ID: run-manuel-HC-ORESHNIK-RECOVERY-ALPHA6-20260904140329-21ab3a41
+  ASSIGNMENT_ID: asg-61c0aff3-c576-4071-b7d4-d974adfcc418
+  OPERATOR: manuel
+  MERGE_COMMIT: 74cc4becdcd56369fce5d47cf0324b9ae22c1b1f
+  PROMOTION_HEAD: d0d8b18e0f71cf5befaa101cf4863c946e4fb7d5
+  PULL_REQUEST: "26"
+  ALPHA6_VERSION: 0.3.0-alpha.6
+  ALPHA6_SHA256: 66e0e6683cdf9587a873b27f20dd8c8538199eb511068e9c40b682ceadb176e8
+
+jobs:
+  terminalize-and-next:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - name: Checkout canonical master
+        uses: actions/checkout@v4
+        with:
+          ref: master
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Configure identity
+        run: |
+          git config user.name "Manuel Vera via ChatGPT Operator"
+          git config user.email "manuel@heptacore.dev"
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install exact alpha6 consumer
+        run: npm ci --ignore-scripts
+
+      - name: Freeze fresh CAS heads and validate participants
+        id: cas
+        run: |
+          set -euo pipefail
+          npm run oreshnik:ready
+          test "$(node node_modules/oreshnik-cli/dist/cli.js --version)" = "$ALPHA6_VERSION"
+          git fetch origin '+refs/heads/master:refs/remotes/origin/master' '+refs/heads/oreshnik/control:refs/remotes/origin/oreshnik/control'
+          EXPECTED_HEAD="$(git rev-parse origin/master)"
+          EXPECTED_CONTROL_HEAD="$(git rev-parse origin/oreshnik/control)"
+          test "$(git rev-parse HEAD)" = "$EXPECTED_HEAD"
+          git merge-base --is-ancestor "$MERGE_COMMIT" "$EXPECTED_HEAD"
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const {execFileSync}=require('node:child_process');
+          const task=JSON.parse(execFileSync('git',['show',`origin/master:var/oreshnik/tasks/${process.env.TASK_ID}.json`],{encoding:'utf8'}));
+          const control=JSON.parse(execFileSync('git',['show','origin/oreshnik/control:control-plane.json'],{encoding:'utf8'}));
+          const a=(control.assignments||[]).find(x=>x.assignmentId===process.env.ASSIGNMENT_ID);
+          const r=(control.runs||[]).find(x=>x.runId===process.env.RUN_ID);
+          const c=(control.claims||[]).find(x=>x.runId===process.env.RUN_ID);
+          if(task.status!=='integrated') throw new Error(`durable task=${task.status}`);
+          if(!a||a.taskId!==process.env.TASK_ID||a.runId!==process.env.RUN_ID||a.operator!==process.env.OPERATOR) throw new Error('assignment participant drift');
+          if(!r||r.taskId!==process.env.TASK_ID||r.assignmentId!==process.env.ASSIGNMENT_ID||r.operator!==process.env.OPERATOR) throw new Error('run participant drift');
+          if(!c||c.taskId!==process.env.TASK_ID||c.assignmentId!==process.env.ASSIGNMENT_ID||c.operator!==process.env.OPERATOR) throw new Error('claim participant drift');
+          if(a.status==='superseded'||r.status==='superseded') throw new Error('recovery lifecycle was superseded');
+          console.log(JSON.stringify({task:task.status,assignment:a.status,run:r.status,claim:c.status},null,2));
+          NODE
+          echo "expected_head=$EXPECTED_HEAD" >> "$GITHUB_OUTPUT"
+          echo "expected_control_head=$EXPECTED_CONTROL_HEAD" >> "$GITHUB_OUTPUT"
+
+      - name: Prepare canonical terminal handoff content
+        run: |
+          cat > "$RUNNER_TEMP/HC-ORESHNIK-RECOVERY-ALPHA6-HANDOFF.md" <<'EOF'
+          # HC-ORESHNIK-RECOVERY-ALPHA6 — terminal handoff
+
+          ## Outcome
+
+          HeptaCore governance recovery is complete on exact Oreshnik `0.3.0-alpha.6`.
+
+          ## Canonical lineage
+
+          - Task: `HC-ORESHNIK-RECOVERY-ALPHA6`
+          - Run: `run-manuel-HC-ORESHNIK-RECOVERY-ALPHA6-20260904140329-21ab3a41`
+          - Assignment: `asg-61c0aff3-c576-4071-b7d4-d974adfcc418`
+          - Operator: `manuel`
+          - Harness: `chatgpt`
+          - Stable promotion PR: `#26`
+          - Stable merge: `74cc4becdcd56369fce5d47cf0324b9ae22c1b1f`
+
+          ## Release identity
+
+          - Oreshnik: `0.3.0-alpha.6`
+          - Release commit: `3e4345b76238e18da8e4d259f537f0e9c64ce099`
+          - TGZ SHA-256: `66e0e6683cdf9587a873b27f20dd8c8538199eb511068e9c40b682ceadb176e8`
+          - alpha16 vendored rollback retained.
+
+          ## Validation
+
+          Consumer readiness, exact release digest, typecheck, build, worker validation, test suite, command-catalog smoke and reconcile checks passed before stable promotion. The governed integration train succeeded and the stable candidate was merged to `master` only after explicit owner authorization.
+
+          ## Safety
+
+          The recovery Run contained no product feature implementation, production deployment, live social publication, campaign spend, secret mutation, or floating Oreshnik dependency.
+
+          ## Next action
+
+          After terminal projection is verified, continue only through the native alpha6 `/goal` contract. Do not restore legacy ownership manually.
+          EOF
+
+      - name: Run canonical alpha6 terminalization saga
+        id: terminalize
+        env:
+          EXPECTED_HEAD: ${{ steps.cas.outputs.expected_head }}
+          EXPECTED_CONTROL_HEAD: ${{ steps.cas.outputs.expected_control_head }}
+        run: |
+          set -euo pipefail
+          AT="$(date -u +'%Y-%m-%dT%H:%M:%S.000Z')"
+          node node_modules/oreshnik-cli/dist/cli.js task terminalize \
+            --task "$TASK_ID" \
+            --run "$RUN_ID" \
+            --assignment "$ASSIGNMENT_ID" \
+            --operator "$OPERATOR" \
+            --expected-head "$EXPECTED_HEAD" \
+            --expected-control-head "$EXPECTED_CONTROL_HEAD" \
+            --merge-commit "$MERGE_COMMIT" \
+            --pull-request "$PULL_REQUEST" \
+            --at "$AT" \
+            --handoff "$RUNNER_TEMP/HC-ORESHNIK-RECOVERY-ALPHA6-HANDOFF.md" \
+            --evidence "stable-merge:$MERGE_COMMIT" "promotion-head:$PROMOTION_HEAD" "alpha6-sha256:$ALPHA6_SHA256" "issue-22:completed" "promotion-pr:$PULL_REQUEST" \
+            --mother master \
+            --repo . \
+            --json | tee "$RUNNER_TEMP/terminalization.json"
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const r=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/terminalization.json','utf8'));
+          const phases=['terminalization_prepared','canonical_projection_persisted','integration_confirmed','control_projection_confirmed','resources_released','terminalization_verified'];
+          if(r.status!=='terminalization_verified') throw new Error(`terminalization=${r.status}: ${(r.contradictions||[]).join('; ')}`);
+          for(const p of phases) if(!(r.completedPhases||[]).includes(p)) throw new Error(`missing terminal phase ${p}`);
+          if(r.taskId!==process.env.TASK_ID||r.runId!==process.env.RUN_ID||r.assignmentId!==process.env.ASSIGNMENT_ID) throw new Error('terminal report participant drift');
+          fs.appendFileSync(process.env.GITHUB_OUTPUT,`terminal_master=${r.masterHead}\nterminal_control=${r.controlHead}\n`);
+          console.log(JSON.stringify(r,null,2));
+          NODE
+
+      - name: Re-read remote terminal state
+        env:
+          TERMINAL_MASTER: ${{ steps.terminalize.outputs.terminal_master }}
+          TERMINAL_CONTROL: ${{ steps.terminalize.outputs.terminal_control }}
+        run: |
+          set -euo pipefail
+          git fetch origin '+refs/heads/master:refs/remotes/origin/master' '+refs/heads/oreshnik/control:refs/remotes/origin/oreshnik/control'
+          test "$(git rev-parse origin/master)" = "$TERMINAL_MASTER"
+          test "$(git rev-parse origin/oreshnik/control)" = "$TERMINAL_CONTROL"
+          node - <<'NODE'
+          const {execFileSync}=require('node:child_process');
+          const read=(ref,p)=>JSON.parse(execFileSync('git',['show',`${ref}:${p}`],{encoding:'utf8'}));
+          const task=read('origin/master',`var/oreshnik/tasks/${process.env.TASK_ID}.json`);
+          const run=read('origin/master',`var/oreshnik/runs/${process.env.TASK_ID}/${process.env.RUN_ID}.json`);
+          const claim=read('origin/master',`var/oreshnik/claims/${process.env.TASK_ID}.json`);
+          const control=read('origin/oreshnik/control','control-plane.json');
+          const a=(control.assignments||[]).find(x=>x.assignmentId===process.env.ASSIGNMENT_ID);
+          const r=(control.runs||[]).find(x=>x.runId===process.env.RUN_ID);
+          const c=(control.claims||[]).find(x=>x.assignmentId===process.env.ASSIGNMENT_ID);
+          const zones=(control.zones||[]).filter(x=>x.assignmentId===process.env.ASSIGNMENT_ID&&x.status==='reserved');
+          if(task.status!=='integrated'||run.taskStatus!=='integrated'||run.claimStatus!=='released'||claim.status!=='released') throw new Error('durable terminal projection incomplete');
+          if(a?.status!=='released'||r?.status!=='integrated'||c?.status!=='released'||zones.length) throw new Error(`control terminal projection incomplete: ${a?.status}/${r?.status}/${c?.status}/zones=${zones.length}`);
+          console.log(JSON.stringify({task:task.status,run:run.taskStatus,claim:claim.status,assignment:a.status,controlRun:r.status,controlClaim:c.status,reservedZones:zones.length,controlHead:control.controlHead},null,2));
+          NODE
+          git cat-file -e "origin/master:docs/07_handoffs/$TASK_ID-HANDOFF.md"
+
+      - name: Reset runner to terminal master and reconcile
+        run: |
+          set -euo pipefail
+          git reset --hard origin/master
+          ROOT="$RUNNER_TEMP/oreshnik-wt-next"
+          mkdir -p "$ROOT"
+          CLI=(node node_modules/oreshnik-cli/dist/cli.js)
+          "${CLI[@]}" dispatch init --mother master --worktree-root "$ROOT" --repo . --json | tee "$RUNNER_TEMP/dispatch-init-after-terminal.json"
+          "${CLI[@]}" dispatch reconcile --repo . --json | tee "$RUNNER_TEMP/reconcile-after-terminal.json"
+          git fetch origin '+refs/heads/oreshnik/control:refs/remotes/origin/oreshnik/control'
+
+      - name: Ask native alpha6 goal contract for next work
+        id: goal
+        run: |
+          set -euo pipefail
+          node node_modules/oreshnik-cli/dist/cli.js goal \
+            --harness chatgpt \
+            --auto-align \
+            --repo . \
+            --max-retries 3 \
+            --json | tee "$RUNNER_TEMP/goal.json"
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const g=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/goal.json','utf8'));
+          const allowed=new Set(['assigned','resumed','no_task','needs_alignment','target_missing','target_ineligible','active_assignment_mismatch']);
+          if(!allowed.has(g.result)) throw new Error(`unexpected goal result=${g.result}`);
+          console.log(JSON.stringify({result:g.result,taskId:g.taskId??null,runId:g.runId??null,assignmentId:g.assignmentId??null,operator:g.operator??null,harnessId:g.harnessId??null,functionalBranch:g.functionalBranch??null,worktreePath:g.worktreePath??null,alignmentIssues:g.alignmentIssues??null},null,2));
+          for(const [k,v] of Object.entries({result:g.result,task_id:g.taskId,run_id:g.runId,assignment_id:g.assignmentId,functional_branch:g.functionalBranch,worktree_path:g.worktreePath})) if(v) fs.appendFileSync(process.env.GITHUB_OUTPUT,`${k}=${v}\n`);
+          if(['needs_alignment','target_missing','target_ineligible','active_assignment_mismatch'].includes(g.result)) process.exitCode=23;
+          NODE
+
+      - name: Verify next Run lineage
+        if: steps.goal.outputs.result == 'assigned' || steps.goal.outputs.result == 'resumed'
+        env:
+          NEXT_TASK: ${{ steps.goal.outputs.task_id }}
+          NEXT_RUN: ${{ steps.goal.outputs.run_id }}
+          NEXT_ASSIGNMENT: ${{ steps.goal.outputs.assignment_id }}
+          NEXT_BRANCH: ${{ steps.goal.outputs.functional_branch }}
+        run: |
+          set -euo pipefail
+          test -n "$NEXT_TASK" && test -n "$NEXT_RUN" && test -n "$NEXT_BRANCH"
+          git fetch origin "+refs/heads/$NEXT_BRANCH:refs/remotes/origin/$NEXT_BRANCH" '+refs/heads/oreshnik/control:refs/remotes/origin/oreshnik/control'
+          git show origin/oreshnik/control:control-plane.json > "$RUNNER_TEMP/control-next.json"
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const c=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/control-next.json','utf8'));
+          const a=(c.assignments||[]).find(x=>x.runId===process.env.NEXT_RUN);
+          const r=(c.runs||[]).find(x=>x.runId===process.env.NEXT_RUN);
+          const cl=(c.claims||[]).find(x=>x.runId===process.env.NEXT_RUN);
+          if(!a||!r||!cl) throw new Error('next Run lineage missing');
+          if(a.taskId!==process.env.NEXT_TASK||r.taskId!==process.env.NEXT_TASK||cl.taskId!==process.env.NEXT_TASK) throw new Error('next Run task drift');
+          if(a.operator!=='manuel'||r.operator!=='manuel'||cl.operator!=='manuel') throw new Error('next Run operator drift');
+          if(a.harnessId!=='chatgpt'||r.harnessId!=='chatgpt'||cl.harnessId!=='chatgpt') throw new Error('next Run harness drift');
+          console.log(JSON.stringify({taskId:process.env.NEXT_TASK,runId:process.env.NEXT_RUN,assignmentId:a.assignmentId,assignment:a.status,run:r.status,claim:cl.status,operator:a.operator,harness:a.harnessId,functionalBranch:process.env.NEXT_BRANCH,controlHead:c.controlHead},null,2));
+          NODE
+
+      - name: Upload terminalization and dispatch evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: oreshnik-recovery-terminalize-next
+          path: |
+            ${{ runner.temp }}/terminalization.json
+            ${{ runner.temp }}/dispatch-init-after-terminal.json
+            ${{ runner.temp }}/reconcile-after-terminal.json
+            ${{ runner.temp }}/goal.json
+            ${{ runner.temp }}/control-next.json
+          if-no-files-found: ignore
