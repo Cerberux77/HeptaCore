@@ -55,6 +55,27 @@ if (( ${#dirty_paths[@]} > 0 )); then
   printf '%s\n' "${dirty_paths[@]}" | tee "$EVIDENCE_DIR/rehydrated-runtime-dirty-paths.txt"
 fi
 
+run_consumer_readiness() {
+  local readiness_worktree="${RUNNER_TEMP:-/tmp}/oreshnik-alpha6-readiness-${GITHUB_RUN_ID:-$$}"
+  git worktree remove --force "$readiness_worktree" >/dev/null 2>&1 || true
+  rm -rf "$readiness_worktree"
+  git worktree add --detach "$readiness_worktree" HEAD >/dev/null
+  set +e
+  (
+    set -euo pipefail
+    cd "$readiness_worktree"
+    npm ci --ignore-scripts
+    npm run oreshnik:ready
+  ) 2>&1 | tee "$EVIDENCE_DIR/oreshnik-ready.log"
+  local readiness_rc=${PIPESTATUS[0]}
+  set -e
+  git worktree remove --force "$readiness_worktree" >/dev/null 2>&1 || true
+  if (( readiness_rc != 0 )); then
+    echo "Clean committed-candidate consumer readiness failed." >&2
+    return "$readiness_rc"
+  fi
+}
+
 if [[ ! -f "$ROLLBACK_VENDOR" ]]; then
   echo "Rollback TGZ is missing: $ROLLBACK_VENDOR" >&2
   exit 33
@@ -143,7 +164,7 @@ cat > "$ADOPTION_EVIDENCE" <<EOF
 
 ## Validation contract
 
-The candidate is not integration-ready until consumer readiness, exact CLI version, generated command catalog, reconcile check, typecheck, build, tests, worker validation, git diff check, and Oreshnik governed evidence gates all pass. No product feature, production deploy, live publication, campaign spend, credential, token, or environment mutation is part of this Run.
+The candidate is not integration-ready until consumer readiness on the clean committed candidate, exact CLI version, generated command catalog, reconcile check, typecheck, build, tests, worker validation, git diff check, and Oreshnik governed evidence gates all pass. The active Run worktree intentionally retains its governed runtime projection until lifecycle evidence releases it. No product feature, production deploy, live publication, campaign spend, credential, token, or environment mutation is part of this Run.
 EOF
 
 cat > "$HANDOFF" <<EOF
@@ -175,10 +196,16 @@ EOF
 
 git add package.json package-lock.json "$TARGET_VENDOR" scripts/oreshnik/ready.mjs docs/operations/oreshnik-command-catalog.json "$ADOPTION_EVIDENCE" "$HANDOFF"
 git diff --cached --check
-git commit -m "chore(oreshnik): adopt 0.3.0-alpha.6"
+if ! git diff --cached --quiet; then
+  git commit -m "chore(oreshnik): adopt 0.3.0-alpha.6"
+fi
 git push origin "HEAD:$EXPECTED_BRANCH"
 
-npm run oreshnik:ready 2>&1 | tee "$EVIDENCE_DIR/oreshnik-ready.log"
+# Consumer readiness requires a clean repository with no local active Claim.
+# Validate the exact committed candidate in a detached clean worktree while the
+# governed execution worktree retains the active Run projection needed by
+# status/evidence lifecycle commands.
+run_consumer_readiness
 "${CLI[@]}" --version 2>&1 | tee "$EVIDENCE_DIR/oreshnik-version.log"
 "${CLI[@]}" status 2>&1 | tee "$EVIDENCE_DIR/oreshnik-status.log"
 "${CLI[@]}" reconcile --check --json 2>&1 | tee "$EVIDENCE_DIR/oreshnik-reconcile-check.json"
@@ -195,11 +222,11 @@ cat >> "$ADOPTION_EVIDENCE" <<EOF
 
 ## Candidate gate result
 
-All of the following passed on the committed functional-branch candidate:
+All of the following passed on the committed alpha6 candidate / governed Run as applicable:
 
-- \`npm run oreshnik:ready\`
+- clean committed-candidate \`npm run oreshnik:ready\`
 - installed CLI version exactly \`$TARGET_VERSION\`
-- real CLI \`status\`
+- real CLI \`status\` in the governed active Run
 - \`oreshnik reconcile --check --json\`
 - \`oreshnik handoff --help\`
 - \`npm run typecheck\`
@@ -222,15 +249,17 @@ EOF
 
 git add "$ADOPTION_EVIDENCE" "$HANDOFF"
 git diff --cached --check
-git commit -m "docs(oreshnik): record alpha6 adoption gate evidence"
-git push origin "HEAD:$EXPECTED_BRANCH"
+if ! git diff --cached --quiet; then
+  git commit -m "docs(oreshnik): record alpha6 adoption gate evidence"
+  git push origin "HEAD:$EXPECTED_BRANCH"
+fi
 
 "${CLI[@]}" evidence \
   --task "$TASK_ID" \
   --operator "$OPERATOR" \
   --run "$RUN_ID" \
   --handoff "$HANDOFF" \
-  --details "Exact alpha6 release/digest verified; candidate and rollback digests verified; full consumer and HeptaCore gates passed." \
+  --details "Exact alpha6 release/digest verified; clean committed-candidate readiness passed; candidate and rollback digests verified; full consumer and HeptaCore gates passed." \
   --start-validation 2>&1 | tee "$EVIDENCE_DIR/evidence-start-validation.log"
 
 git add var/oreshnik docs/obsidian-vault docs/07_handoffs docs/oreshnik || true
