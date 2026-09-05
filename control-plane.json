@@ -5,15 +5,15 @@
     "originUrl": "https://github.com/Cerberux77/HeptaCore.git",
     "canonicalMotherBranch": "master"
   },
-  "generation": 72,
-  "controlHead": "4e32bb45459b27a254bff4a28c25e202c41e3129",
+  "generation": 73,
+  "controlHead": "a48e72d67dfe106faa24ba1f3e715bd754cdf5cd",
   "catalog": {
     "taskBoardPath": "var/oreshnik/task-board.json",
     "zoneMapPath": "docs/07_handoffs/zone-map.json",
     "sourceTaskBoardHead": "2cc4d938cf3cab72dec25c948ce45affe6cdcd34",
     "fingerprint": "7426b59d1dbd367366f838d00bb41c945e6868af",
     "taskCount": 43,
-    "updatedAt": "2026-09-05T18:01:37.167Z"
+    "updatedAt": "2026-09-05T18:01:53.697Z"
   },
   "policy": {
     "name": "deterministic-v1",
@@ -905,6 +905,49 @@
       "agentInstanceAlias": "manuel-chatgpt1",
       "sessionId": "session_1f3e442d2d144761a613b550bde6d6ad",
       "identityOrigin": "explicit"
+    },
+    {
+      "assignmentId": "asg-1d61b39d-d0e2-4d9a-b319-8bc93ae02502",
+      "taskId": "S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION",
+      "sprintId": "email-infra",
+      "title": "Transactional email foundation: domain sender, DNS, reputation, provider integration",
+      "operator": "manuel",
+      "machineId": "machine-676e6903-c3e4-4a2d-9d08-2838c93f8598",
+      "functionalBranch": "dispatch/manuel/manuel-chatgpt1/email-infra/S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION/3294b78874",
+      "motherBranch": "master",
+      "worktreePath": "/home/runner/work/_temp/oreshnik-wt-next/32305cad03d6321a/manuel/manuel-chatgpt1/email-infra/S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION/3294b78874",
+      "runId": "run-manuel-S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION-20260905180153-1e9c8316",
+      "claimId": "claim-asg-1d61b39d-d0e2-4d9a-b319-8bc93ae02502",
+      "zones": [
+        "apps/web/app/api/email",
+        "packages/core",
+        "docs"
+      ],
+      "readZones": [],
+      "writeZones": [
+        "apps/web/app/api/email",
+        "packages/core",
+        "docs"
+      ],
+      "resources": [],
+      "locks": [
+        "apps/web/app/api/email",
+        "packages/core",
+        "docs"
+      ],
+      "status": "provisioning",
+      "sourceTaskBoardHead": "2cc4d938cf3cab72dec25c948ce45affe6cdcd34",
+      "catalogFingerprint": "7426b59d1dbd367366f838d00bb41c945e6868af",
+      "createdAt": "2026-09-05T18:01:53.697Z",
+      "updatedAt": "2026-09-05T18:01:53.697Z",
+      "resumedCount": 0,
+      "takeoverCount": 0,
+      "ownershipGeneration": 1,
+      "harnessId": "chatgpt",
+      "agentInstanceUid": "agent_a7665c7284074daa989cd1e0e83847e0",
+      "agentInstanceAlias": "manuel-chatgpt1",
+      "sessionId": "session_1d4bac9cf36943759bf3bc4272dd5105",
+      "identityOrigin": "explicit"
     }
   ],
   "claims": [
@@ -1231,6 +1274,43 @@
       "agentInstanceUid": "agent_b3b9741f431941c7ba8982457ed6899b",
       "agentInstanceAlias": "manuel-chatgpt1",
       "sessionId": "session_1f3e442d2d144761a613b550bde6d6ad",
+      "identityOrigin": "explicit"
+    },
+    {
+      "claimId": "claim-asg-1d61b39d-d0e2-4d9a-b319-8bc93ae02502",
+      "assignmentId": "asg-1d61b39d-d0e2-4d9a-b319-8bc93ae02502",
+      "taskId": "S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION",
+      "sprintId": "email-infra",
+      "operator": "manuel",
+      "machineId": "machine-676e6903-c3e4-4a2d-9d08-2838c93f8598",
+      "runId": "run-manuel-S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION-20260905180153-1e9c8316",
+      "branch": "dispatch/manuel/manuel-chatgpt1/email-infra/S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION/3294b78874",
+      "worktreePath": "/home/runner/work/_temp/oreshnik-wt-next/32305cad03d6321a/manuel/manuel-chatgpt1/email-infra/S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION/3294b78874",
+      "status": "active",
+      "createdAt": "2026-09-05T18:01:53.697Z",
+      "updatedAt": "2026-09-05T18:01:53.697Z",
+      "zones": [
+        "apps/web/app/api/email",
+        "packages/core",
+        "docs"
+      ],
+      "readZones": [],
+      "writeZones": [
+        "apps/web/app/api/email",
+        "packages/core",
+        "docs"
+      ],
+      "resources": [],
+      "locks": [
+        "apps/web/app/api/email",
+        "packages/core",
+        "docs"
+      ],
+      "ownershipGeneration": 1,
+      "harnessId": "chatgpt",
+      "agentInstanceUid": "agent_a7665c7284074daa989cd1e0e83847e0",
+      "agentInstanceAlias": "manuel-chatgpt1",
+      "sessionId": "session_1d4bac9cf36943759bf3bc4272dd5105",
       "identityOrigin": "explicit"
     }
   ],
@@ -1564,6 +1644,43 @@
       "agentInstanceUid": "agent_b3b9741f431941c7ba8982457ed6899b",
       "agentInstanceAlias": "manuel-chatgpt1",
       "sessionId": "session_1f3e442d2d144761a613b550bde6d6ad",
+      "identityOrigin": "explicit"
+    },
+    {
+      "runId": "run-manuel-S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION-20260905180153-1e9c8316",
+      "assignmentId": "asg-1d61b39d-d0e2-4d9a-b319-8bc93ae02502",
+      "taskId": "S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION",
+      "sprintId": "email-infra",
+      "operator": "manuel",
+      "machineId": "machine-676e6903-c3e4-4a2d-9d08-2838c93f8598",
+      "branch": "dispatch/manuel/manuel-chatgpt1/email-infra/S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION/3294b78874",
+      "worktreePath": "/home/runner/work/_temp/oreshnik-wt-next/32305cad03d6321a/manuel/manuel-chatgpt1/email-infra/S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION/3294b78874",
+      "status": "provisioning",
+      "createdAt": "2026-09-05T18:01:53.697Z",
+      "updatedAt": "2026-09-05T18:01:53.697Z",
+      "sourceTaskBoardHead": "2cc4d938cf3cab72dec25c948ce45affe6cdcd34",
+      "zones": [
+        "apps/web/app/api/email",
+        "packages/core",
+        "docs"
+      ],
+      "readZones": [],
+      "writeZones": [
+        "apps/web/app/api/email",
+        "packages/core",
+        "docs"
+      ],
+      "resources": [],
+      "locks": [
+        "apps/web/app/api/email",
+        "packages/core",
+        "docs"
+      ],
+      "ownershipGeneration": 1,
+      "harnessId": "chatgpt",
+      "agentInstanceUid": "agent_a7665c7284074daa989cd1e0e83847e0",
+      "agentInstanceAlias": "manuel-chatgpt1",
+      "sessionId": "session_1d4bac9cf36943759bf3bc4272dd5105",
       "identityOrigin": "explicit"
     }
   ],
@@ -2449,6 +2566,60 @@
       "agentInstanceAlias": "manuel-chatgpt1",
       "sessionId": "session_018d8de421844f5197d5b4b9e3ba7443",
       "identityOrigin": "explicit"
+    },
+    {
+      "zone": "apps/web/app/api/email",
+      "assignmentId": "asg-1d61b39d-d0e2-4d9a-b319-8bc93ae02502",
+      "taskId": "S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION",
+      "sprintId": "email-infra",
+      "operator": "manuel",
+      "machineId": "machine-676e6903-c3e4-4a2d-9d08-2838c93f8598",
+      "runId": "run-manuel-S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION-20260905180153-1e9c8316",
+      "branch": "dispatch/manuel/manuel-chatgpt1/email-infra/S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION/3294b78874",
+      "status": "reserved",
+      "createdAt": "2026-09-05T18:01:53.697Z",
+      "updatedAt": "2026-09-05T18:01:53.697Z",
+      "harnessId": "chatgpt",
+      "agentInstanceUid": "agent_a7665c7284074daa989cd1e0e83847e0",
+      "agentInstanceAlias": "manuel-chatgpt1",
+      "sessionId": "session_1d4bac9cf36943759bf3bc4272dd5105",
+      "identityOrigin": "explicit"
+    },
+    {
+      "zone": "packages/core",
+      "assignmentId": "asg-1d61b39d-d0e2-4d9a-b319-8bc93ae02502",
+      "taskId": "S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION",
+      "sprintId": "email-infra",
+      "operator": "manuel",
+      "machineId": "machine-676e6903-c3e4-4a2d-9d08-2838c93f8598",
+      "runId": "run-manuel-S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION-20260905180153-1e9c8316",
+      "branch": "dispatch/manuel/manuel-chatgpt1/email-infra/S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION/3294b78874",
+      "status": "reserved",
+      "createdAt": "2026-09-05T18:01:53.697Z",
+      "updatedAt": "2026-09-05T18:01:53.697Z",
+      "harnessId": "chatgpt",
+      "agentInstanceUid": "agent_a7665c7284074daa989cd1e0e83847e0",
+      "agentInstanceAlias": "manuel-chatgpt1",
+      "sessionId": "session_1d4bac9cf36943759bf3bc4272dd5105",
+      "identityOrigin": "explicit"
+    },
+    {
+      "zone": "docs",
+      "assignmentId": "asg-1d61b39d-d0e2-4d9a-b319-8bc93ae02502",
+      "taskId": "S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION",
+      "sprintId": "email-infra",
+      "operator": "manuel",
+      "machineId": "machine-676e6903-c3e4-4a2d-9d08-2838c93f8598",
+      "runId": "run-manuel-S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION-20260905180153-1e9c8316",
+      "branch": "dispatch/manuel/manuel-chatgpt1/email-infra/S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION/3294b78874",
+      "status": "reserved",
+      "createdAt": "2026-09-05T18:01:53.697Z",
+      "updatedAt": "2026-09-05T18:01:53.697Z",
+      "harnessId": "chatgpt",
+      "agentInstanceUid": "agent_a7665c7284074daa989cd1e0e83847e0",
+      "agentInstanceAlias": "manuel-chatgpt1",
+      "sessionId": "session_1d4bac9cf36943759bf3bc4272dd5105",
+      "identityOrigin": "explicit"
     }
   ],
   "audit": [
@@ -2983,14 +3154,22 @@
       "at": "2026-09-05T18:01:37.167Z",
       "action": "dispatch.init",
       "message": "Registered machine machine-676e6903-c3e4-4a2d-9d08-2838c93f8598 with root /home/runner/work/_temp/oreshnik-wt-next."
+    },
+    {
+      "at": "2026-09-05T18:01:53.697Z",
+      "action": "dispatch.next.reserved",
+      "assignmentId": "asg-1d61b39d-d0e2-4d9a-b319-8bc93ae02502",
+      "runId": "run-manuel-S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION-20260905180153-1e9c8316",
+      "operator": "manuel",
+      "message": "Reserved S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION for manuel."
     }
   ],
   "reconciliation": {
-    "lastAttemptAt": "2026-09-05T16:21:10.787Z",
+    "lastAttemptAt": "2026-09-05T18:01:53.692Z",
     "lastAppliedAt": "2026-07-01T07:00:56.759Z",
     "lastResult": "clean",
     "pendingDiagnostics": []
   },
   "createdAt": "2026-06-29T20:17:43.302Z",
-  "updatedAt": "2026-09-05T18:01:37.167Z"
+  "updatedAt": "2026-09-05T18:01:53.697Z"
 }
