@@ -21,7 +21,8 @@ jobs:
       HARNESS: chatgpt
       INSTANCE: manuel-chatgpt1
       SESSION: session_1d4bac9cf36943759bf3bc4272dd5105
-      CANDIDATE_SHA: f9a14fccaddedfaf323365d895487ea49faf6fd8
+      HANDOFF_PATH: var/oreshnik/handoffs/S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION/handoff-20260905T203611929Z-9fe1de71d50a.json
+      HANDOFF_DIGEST: c0e8dfdf01cfff3803c646dd25e76f4d5e639f1862094c25bded19610fab2dde
     steps:
       - name: Checkout operations scaffold
         uses: actions/checkout@v4
@@ -62,7 +63,7 @@ jobs:
           CLI="$GITHUB_WORKSPACE/node_modules/oreshnik-cli/dist/cli.js"
           node "$CLI" dispatch takeover \
             --run "$RUN_ID" \
-            --reason "Persist validated development email foundation and block only on owner-deferred production domain/DNS" \
+            --reason "Finish owner-deferred production-domain block using the already validated handoff" \
             --operator "$OPERATOR" \
             --harness "$HARNESS" \
             --instance "$INSTANCE" \
@@ -73,77 +74,28 @@ jobs:
           test -n "$WT"
           echo "worktree=$WT" >> "$GITHUB_OUTPUT"
           git -C "$WT" fetch origin --prune
-          git -C "$WT" merge-base --is-ancestor "$CANDIDATE_SHA" HEAD
           test "$(git -C "$WT" branch --show-current)" = "dispatch/manuel/manuel-chatgpt1/email-infra/S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION/3294b78874"
 
-      - name: Create canonical BLOCKED_EXTERNAL handoff
-        run: |
-          set -euo pipefail
-          WT='${{ steps.takeover.outputs.worktree }}'
-          CLI="$GITHUB_WORKSPACE/node_modules/oreshnik-cli/dist/cli.js"
-          cat > /tmp/email-blockers.json <<'JSON'
-          [
-            {
-              "id": "EMAIL-PROD-DOMAIN-DNS",
-              "category": "PROVIDER",
-              "description": "Production email activation requires an owned HeptaCore sender domain. The owner explicitly chose the free Vercel hostname for web development until development is complete; Vercel shared hostnames are not used as email sender domains.",
-              "evidence": [
-                "Validated development contract uses HeptaCore <onboarding@resend.dev> for provider test sending.",
-                "Vercel *.vercel.app remains the temporary HEPTACORE_APP_URL web origin only.",
-                "All focused and full software gates passed on candidate f9a14fccaddedfaf323365d895487ea49faf6fd8."
-              ],
-              "impact": "Development can continue. Production transactional sending and final brand-link acceptance remain blocked until the official domain is purchased and DNS is verified.",
-              "blocking": true,
-              "probableOwner": "manuel",
-              "recommendedAction": "After development is complete, purchase/select the official HeptaCore domain, configure it in Resend, publish SPF/DKIM/DMARC, set branded EMAIL_FROM/EMAIL_REPLY_TO/HEPTACORE_BRAND_DOMAIN, then explicitly resume this preserved Run.",
-              "nextCommand": "npx oreshnik task resume --task S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION --operator manuel --authorized-external --note <domain-and-dns-evidence>",
-              "unblockCondition": "Owned sender domain exists and Resend + DNS evidence confirms SPF, DKIM and DMARC verification."
-            }
-          ]
-          JSON
-          cd "$WT"
-          node "$CLI" handoff create \
-            --task "$TASK_ID" \
-            --run "$RUN_ID" \
-            --operator "$OPERATOR" \
-            --reason "owner-deferred-production-domain" \
-            --objective "Complete transactional email foundation while keeping development on the free Vercel web domain." \
-            --implemented "Resend provider integration preserved" "Deterministic development/production email readiness contract" "SUPER_ADMIN email readiness endpoint" "Vercel web-origin versus sender-domain separation" \
-            --decision "Use *.vercel.app only as temporary web origin" "Use onboarding@resend.dev only for development/test transactional email" "Require owned domain plus SPF/DKIM/DMARC before production-ready" \
-            --test-run "11 focused email readiness tests PASS" "npm run typecheck PASS" "npm run build PASS" "npm run worker:validate PASS" "npm run test PASS" "oreshnik reconcile --check --json PASS" "git diff/check candidate cleanliness PASS" \
-            --test-pending "External owned-domain and DNS verification intentionally deferred by owner" \
-            --gate "software candidate f9a14fcc validated green in Actions run 33983403671" \
-            --blocker-file /tmp/email-blockers.json \
-            --exact-point "Software foundation is complete and validated; resume only for official-domain production activation." \
-            --first-command "npx oreshnik task resume --task S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION --operator manuel --authorized-external --note <domain-and-dns-evidence>" \
-            --completion-criterion "Owned HeptaCore sender domain is verified in Resend with SPF, DKIM and DMARC and branded URLs are configured." \
-            --json | tee /tmp/handoff.json
-          node "$CLI" handoff validate --path "$(node -e 'const fs=require("fs");const x=JSON.parse(fs.readFileSync("/tmp/handoff.json","utf8"));process.stdout.write(x.jsonPath)')" --json
-
-      - name: Persist handoff on governed functional branch
-        run: |
-          set -euo pipefail
-          WT='${{ steps.takeover.outputs.worktree }}'
-          cd "$WT"
-          mapfile -t dirty < <(git status --porcelain | sed 's/^...//')
-          for p in "${dirty[@]}"; do
-            case "$p" in
-              var/oreshnik/*|docs/oreshnik/handoffs/*) ;;
-              *) echo "Unexpected dirty path before handoff persistence: $p"; exit 41;;
-            esac
-          done
-          git add var/oreshnik docs/oreshnik/handoffs
-          if ! git diff --cached --quiet; then
-            git commit -m "docs(email): persist blocked-external domain handoff"
-            git push origin HEAD
-          fi
-
-      - name: Block only the deferred production activation and release Run
+      - name: Verify the already persisted BLOCKED_EXTERNAL handoff
         run: |
           set -euo pipefail
           WT='${{ steps.takeover.outputs.worktree }}'
           CLI="$GITHUB_WORKSPACE/node_modules/oreshnik-cli/dist/cli.js"
           cd "$WT"
+          test -f "$HANDOFF_PATH"
+          node "$CLI" handoff validate --path "$HANDOFF_PATH" --json | tee /tmp/handoff-validated.json
+          node - <<'NODE'
+          const fs=require('fs');
+          const x=JSON.parse(fs.readFileSync('/tmp/handoff-validated.json','utf8'));
+          if (!x.valid) throw new Error('handoff is not valid');
+          if (x.digest !== process.env.HANDOFF_DIGEST) throw new Error(`handoff digest changed: ${x.digest}`);
+          NODE
+
+      - name: Block deferred production activation from dispatcher root
+        run: |
+          set -euo pipefail
+          CLI="$GITHUB_WORKSPACE/node_modules/oreshnik-cli/dist/cli.js"
+          cd "$GITHUB_WORKSPACE"
           node "$CLI" task block \
             --task "$TASK_ID" \
             --run "$RUN_ID" \
@@ -154,29 +106,48 @@ jobs:
             --kind awaiting_external_validation \
             --reason "Owner deferred official HeptaCore sender domain until development is complete; software foundation is validated and Vercel remains the temporary web origin." \
             --external-action "Select/purchase official HeptaCore domain and verify Resend SPF, DKIM and DMARC before production email activation." \
-            --resume-policy explicit_authorization_required
+            --resume-policy explicit_authorization_required \
+            --repo "$GITHUB_WORKSPACE"
 
-      - name: Persist blocked runtime projection and verify remote release
+      - name: Persist functional runtime projection
         run: |
           set -euo pipefail
           WT='${{ steps.takeover.outputs.worktree }}'
-          CLI="$GITHUB_WORKSPACE/node_modules/oreshnik-cli/dist/cli.js"
           cd "$WT"
-          git add var/oreshnik || true
+          mapfile -t dirty < <(git status --porcelain | sed 's/^...//')
+          for p in "${dirty[@]}"; do
+            case "$p" in
+              var/oreshnik/*|docs/oreshnik/handoffs/*) ;;
+              *) echo "Unexpected dirty path after task block: $p"; exit 41;;
+            esac
+          done
+          git add var/oreshnik docs/oreshnik/handoffs || true
           if ! git diff --cached --quiet; then
             git commit -m "chore(email): persist deferred production-domain block"
             git push origin HEAD
           fi
+
+      - name: Verify canonical blocked/released state
+        run: |
+          set -euo pipefail
+          CLI="$GITHUB_WORKSPACE/node_modules/oreshnik-cli/dist/cli.js"
           cd "$GITHUB_WORKSPACE"
           git fetch origin master oreshnik/control --prune
           node "$CLI" dispatch status --repo "$GITHUB_WORKSPACE" --json | tee /tmp/status-after.json
           node "$CLI" dispatch reconcile --repo "$GITHUB_WORKSPACE" --json | tee /tmp/reconcile-after.json
+          git fetch origin master oreshnik/control --prune
+          git show "origin/master:var/oreshnik/tasks/$TASK_ID.json" > /tmp/email-task.json
           node - <<'NODE'
           const fs=require('fs');
-          const s=JSON.parse(fs.readFileSync('/tmp/status-after.json','utf8'));
-          const run='run-manuel-S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION-20260905180153-1e9c8316';
-          const a=(s.assignments||[]).find(x=>x.runId===run);
-          const r=(s.runs||[]).find(x=>x.runId===run);
-          if (!a || a.status !== 'released') throw new Error(`assignment not released: ${a?.status}`);
-          if (!r || r.status !== 'released') throw new Error(`run not released: ${r?.status}`);
+          const run=process.env.RUN_ID;
+          const status=JSON.parse(fs.readFileSync('/tmp/status-after.json','utf8'));
+          const assignment=(status.assignments||[]).find(x=>x.runId===run);
+          const runState=(status.runs||[]).find(x=>x.runId===run);
+          if (!assignment || assignment.status !== 'released') throw new Error(`assignment not released: ${assignment?.status}`);
+          if (!runState || runState.status !== 'released') throw new Error(`run not released: ${runState?.status}`);
+          const task=JSON.parse(fs.readFileSync('/tmp/email-task.json','utf8'));
+          if (task.status !== 'blocked') throw new Error(`task not blocked: ${task.status}`);
+          if (task.blockState?.preservedRunId !== run) throw new Error(`preserved run mismatch: ${task.blockState?.preservedRunId}`);
+          if (task.blockState?.kind !== 'awaiting_external_validation') throw new Error(`block kind mismatch: ${task.blockState?.kind}`);
+          console.log(JSON.stringify({task:task.status,block:task.blockState.kind,assignment:assignment.status,run:runState.status},null,2));
           NODE
