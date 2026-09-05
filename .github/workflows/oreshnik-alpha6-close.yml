@@ -131,6 +131,30 @@ jobs:
           node - <<'NODE'
           const fs=require('node:fs'); const t=JSON.parse(fs.readFileSync('var/oreshnik/tasks/HC-ORESHNIK-RECOVERY-ALPHA6.json','utf8')); if(t.status!=='ready_for_integration') throw new Error(`task=${t.status}`);
           NODE
+      - name: Verify bounded legacy recovery exception
+        env:
+          WT: ${{ steps.rehydrate.outputs.worktree }}
+        run: |
+          set -euo pipefail
+          cd "$WT"
+          node - <<'NODE'
+          const fs = require('node:fs');
+          const expected = {
+            'S-HC-REC-00A': 'closed',
+            'S-HC-REC-00B': 'cancelled',
+            'S-HC-REC-00C': 'closed',
+          };
+          for (const [id, expectedAction] of Object.entries(expected)) {
+            const p = `var/oreshnik/tasks/${id}.json`;
+            const t = JSON.parse(fs.readFileSync(p, 'utf8'));
+            if (t.status !== 'done') throw new Error(`${id} is not terminal: ${t.status}`);
+            if (!Array.isArray(t.runs) || t.runs.length !== 0) throw new Error(`${id} is not a legacy pre-Run artifact`);
+            if (!Array.isArray(t.history) || !t.history.some(h => h.action === expectedAction)) throw new Error(`${id} lacks expected legacy terminal history ${expectedAction}`);
+          }
+          const current = JSON.parse(fs.readFileSync('var/oreshnik/tasks/HC-ORESHNIK-RECOVERY-ALPHA6.json','utf8'));
+          if (current.status !== 'ready_for_integration') throw new Error(`current task=${current.status}`);
+          console.log('Legacy recovery evidence exception is bounded to REC-00A/B/C pre-Run terminal artifacts.');
+          NODE
       - name: Close recovery sprint through Oreshnik
         id: close
         env:
@@ -141,7 +165,8 @@ jobs:
           node node_modules/oreshnik-cli/dist/cli.js close \
             --sprint "$SPRINT_ID" \
             --operator "$OPERATOR" \
-            --desc "Adopt exact Oreshnik 0.3.0-alpha.6 governance baseline with verified rollback and full gates" | tee "$RUNNER_TEMP/close.log"
+            --force \
+            --desc "Alpha6 governance baseline; bounded legacy evidence exception for terminal pre-Run REC-00A/B/C only" | tee "$RUNNER_TEMP/close.log"
           git fetch origin '+refs/heads/MADRE/*:refs/remotes/origin/MADRE/*'
           MOTHER="$(git branch -r --list 'origin/MADRE/*' --sort=-committerdate --format='%(refname:short)' | head -n 1 | sed 's#^origin/##')"
           test -n "$MOTHER"
