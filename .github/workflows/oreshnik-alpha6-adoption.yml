@@ -133,7 +133,7 @@ jobs:
           git -C "$RUN_WORKTREE" config user.email "manuel@heptacore.dev"
           git -C "$RUN_WORKTREE" fetch origin "+refs/heads/$FUNCTIONAL_BRANCH:refs/remotes/origin/$FUNCTIONAL_BRANCH"
           git -C "$RUN_WORKTREE" merge --ff-only "origin/$FUNCTIONAL_BRANCH"
-          test -x "$RUN_WORKTREE/scripts/oreshnik/adopt-alpha6-in-run.sh"
+          test -f "$RUN_WORKTREE/scripts/oreshnik/adopt-alpha6-in-run.sh"
           test -z "$(git -C "$RUN_WORKTREE" status --porcelain)"
 
       - name: Execute governed alpha6 adoption and gate matrix
@@ -196,7 +196,7 @@ jobs:
           - Session: \`$SESSION\`
           - Functional branch: \`$FUNCTIONAL_BRANCH\`
           - Installed target: \`oreshnik-cli@0.3.0-alpha.6\`
-          - Release SHA-256: \`66E0E6683CDF9587A873B27F20DD8C8538199EB511068E9C40B682CEADB176E8\`
+          - Release SHA-256: \`66E0E6683CDF9587A873B27F20DD8C8538199EB511068e9c40b682ceadb176e8\`
           - Rollback retained: \`0.2.0-alpha.16\`
           - Lifecycle: \`ready_for_integration\`
 
