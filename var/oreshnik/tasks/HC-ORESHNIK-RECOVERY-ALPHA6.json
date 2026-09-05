@@ -7,8 +7,8 @@
   "title": "Upgrade HeptaCore governance to Oreshnik 0.3.0-alpha.6 and reconcile control plane",
   "owner": "Manuel",
   "backupOwner": "Manuel",
-  "status": "ready",
-  "taskBoardPath": "/home/runner/work/HeptaCore/HeptaCore/var/oreshnik/task-board.json",
+  "status": "validating",
+  "taskBoardPath": "/home/runner/work/_temp/oreshnik-wt/32305cad03d6321a/manuel/manuel-chatgpt1/recovery/HC-ORESHNIK-RECOVERY-ALPHA6/adfcc418/var/oreshnik/task-board.json",
   "zone": [
     "package.json",
     "package-lock.json",
@@ -81,7 +81,7 @@
     "No product feature or production mutation is mixed into this Run"
   ],
   "handoff": "docs/07_handoffs/HC-ORESHNIK-RECOVERY-ALPHA6.md",
-  "attempts": 0,
+  "attempts": 1,
   "taskExecutionPolicy": {
     "riskLevel": "critical",
     "recommendedReasoning": "max",
@@ -110,14 +110,93 @@
       "canonical-handoff"
     ]
   },
+  "activeRun": {
+    "runId": "run-manuel-HC-ORESHNIK-RECOVERY-ALPHA6-20260904140329-21ab3a41",
+    "operator": "manuel",
+    "worker": "manuel-dispatcher",
+    "workerMode": "shell",
+    "claimedAt": "2026-09-05T08:14:13.570Z",
+    "updatedAt": "2026-09-05T08:14:13.570Z",
+    "expiresAt": "2026-09-05T09:14:13.570Z",
+    "branch": "dispatch/manuel/manuel-chatgpt1/recovery/HC-ORESHNIK-RECOVERY-ALPHA6/2954c98970",
+    "worktreePath": "/home/runner/work/_temp/oreshnik-wt/32305cad03d6321a/manuel/manuel-chatgpt1/recovery/HC-ORESHNIK-RECOVERY-ALPHA6/adfcc418",
+    "zones": [
+      "package.json",
+      "package-lock.json",
+      "vendor/oreshnik/**",
+      "scripts/oreshnik/**",
+      ".kilo/commands/**",
+      ".kilo/command/**",
+      "docs/oreshnik/**",
+      "docs/operations/oreshnik-command-catalog.json",
+      "docs/07_handoffs/**",
+      ".oreshnik.json",
+      "var/oreshnik/**",
+      "docs/07_handoffs/zone-map.json",
+      ".github/workflows/oreshnik-digital-twin.yml"
+    ],
+    "resources": []
+  },
   "history": [
     {
       "at": "2026-09-04T14:03:10.743Z",
       "action": "canonically_registered",
       "operator": "manuel",
       "description": "Owner-authorized durable bootstrap registration under pinned alpha.16. Alpha.16 predates canonical `task register`; HeptaCore already uses durable per-Task artifacts, so this compatibility bootstrap writes the Task artifact plus Goal and then delegates all projection/control-plane mutation back to Oreshnik reconcile and dispatch. Capability labels are intentionally omitted because HeptaCore's operator registry does not define capability metadata; safety is enforced by explicit zones, gates, release digest verification, and hard stops instead of fabricated operator capabilities."
+    },
+    {
+      "at": "2026-09-05T08:14:13.571Z",
+      "action": "claimed",
+      "operator": "manuel",
+      "branch": "dispatch/manuel/manuel-chatgpt1/recovery/HC-ORESHNIK-RECOVERY-ALPHA6/2954c98970",
+      "description": "Run run-manuel-HC-ORESHNIK-RECOVERY-ALPHA6-20260904140329-21ab3a41 claimed via shell"
+    },
+    {
+      "at": "2026-09-05T08:15:12.123Z",
+      "action": "status_reconciled",
+      "operator": "Manuel",
+      "branch": "dispatch/manuel/manuel-chatgpt1/recovery/HC-ORESHNIK-RECOVERY-ALPHA6/2954c98970",
+      "description": "Task status reconciled to active: claimed run is now the active operator workload"
+    },
+    {
+      "at": "2026-09-05T08:16:40.452Z",
+      "action": "validation_started",
+      "operator": "manuel",
+      "branch": "dispatch/manuel/manuel-chatgpt1/recovery/HC-ORESHNIK-RECOVERY-ALPHA6/2954c98970",
+      "description": "Exact alpha6 release/digest verified; clean committed-candidate readiness passed; candidate and rollback digests verified; full consumer and HeptaCore gates passed."
     }
   ],
-  "updatedAt": "2026-09-04T14:03:10.743Z",
-  "runs": []
+  "updatedAt": "2026-09-05T08:16:40.452Z",
+  "runs": [
+    {
+      "runId": "run-manuel-HC-ORESHNIK-RECOVERY-ALPHA6-20260904140329-21ab3a41",
+      "operator": "manuel",
+      "worker": "manuel-dispatcher",
+      "workerMode": "shell",
+      "branch": "dispatch/manuel/manuel-chatgpt1/recovery/HC-ORESHNIK-RECOVERY-ALPHA6/2954c98970",
+      "worktreePath": "/home/runner/work/_temp/oreshnik-wt/32305cad03d6321a/manuel/manuel-chatgpt1/recovery/HC-ORESHNIK-RECOVERY-ALPHA6/adfcc418",
+      "zones": [
+        "package.json",
+        "package-lock.json",
+        "vendor/oreshnik/**",
+        "scripts/oreshnik/**",
+        ".kilo/commands/**",
+        ".kilo/command/**",
+        "docs/oreshnik/**",
+        "docs/operations/oreshnik-command-catalog.json",
+        "docs/07_handoffs/**",
+        ".oreshnik.json",
+        "var/oreshnik/**",
+        "docs/07_handoffs/zone-map.json",
+        ".github/workflows/oreshnik-digital-twin.yml"
+      ],
+      "resources": [],
+      "taskStatus": "validating",
+      "claimStatus": "claimed",
+      "claimedAt": "2026-09-05T08:14:13.570Z",
+      "updatedAt": "2026-09-05T08:16:40.458Z",
+      "expiresAt": "2026-09-05T09:14:13.570Z",
+      "manifestPath": "var/oreshnik/runs/HC-ORESHNIK-RECOVERY-ALPHA6/run-manuel-HC-ORESHNIK-RECOVERY-ALPHA6-20260904140329-21ab3a41.json"
+    }
+  ]
 }

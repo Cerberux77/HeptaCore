@@ -7,8 +7,8 @@
   "title": "End-to-end intake, generated strategy persistence, approval and calendar materialization",
   "owner": "Manuel",
   "backupOwner": "Manuel",
-  "status": "ready",
-  "taskBoardPath": "/home/runner/work/HeptaCore/HeptaCore/var/oreshnik/task-board.json",
+  "status": "blocked",
+  "taskBoardPath": "/home/runner/work/_temp/oreshnik-wt/32305cad03d6321a/manuel/manuel-chatgpt1/recovery/HC-ORESHNIK-RECOVERY-ALPHA6/adfcc418/var/oreshnik/task-board.json",
   "zone": [
     "apps/web/components/dashboard-console.tsx",
     "apps/web/app/api/strategy/**",
@@ -134,8 +134,14 @@
       "action": "canonically_registered",
       "operator": "manuel",
       "description": "Owner-authorized versioned task-board registration because alpha.16 inject only derives lowercase IDs from note text and cannot preserve the approved canonical Task ID. Registration is followed by Oreshnik reconcile and dispatch control-plane reconciliation."
+    },
+    {
+      "at": "2026-09-05T08:15:12.123Z",
+      "action": "status_reconciled",
+      "operator": "Manuel",
+      "description": "Task status reconciled to blocked: missing capabilities: codex, typescript, nextjs, multi-tenant, strategy-generation, transactional-activation, timezone-scheduling, testing"
     }
   ],
-  "updatedAt": "2026-09-04T14:03:10.743Z",
+  "updatedAt": "2026-09-05T08:15:12.123Z",
   "runs": []
 }
