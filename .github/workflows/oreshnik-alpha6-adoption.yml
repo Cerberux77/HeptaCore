@@ -60,11 +60,11 @@ jobs:
           test "$(node node_modules/oreshnik-cli/dist/cli.js --version)" = "0.2.0-alpha.16"
           npm run oreshnik:ready
 
-      - name: Prepare digest-verified alpha6 resume CLI
+      - name: Prepare digest-verified alpha6 cross-machine CLI
         run: |
           set -euo pipefail
           ALPHA6_TGZ="$RUNNER_TEMP/oreshnik-cli-$ALPHA6_VERSION.tgz"
-          ALPHA6_PREFIX="$RUNNER_TEMP/oreshnik-alpha6-resume-cli"
+          ALPHA6_PREFIX="$RUNNER_TEMP/oreshnik-alpha6-cross-machine-cli"
           PACK_DIR="$RUNNER_TEMP/oreshnik-alpha6-registry-pack"
           mkdir -p "$PACK_DIR" "$ALPHA6_PREFIX"
           PACK_NAME="$(cd "$PACK_DIR" && npm pack "oreshnik-cli@$ALPHA6_VERSION" --ignore-scripts --silent | tail -n 1)"
@@ -78,7 +78,7 @@ jobs:
           test "$(node "$ALPHA6_CLI" --version)" = "$ALPHA6_VERSION"
           echo "ALPHA6_CLI=$ALPHA6_CLI" >> "$GITHUB_ENV"
 
-      - name: Verify resume ancestry precondition
+      - name: Verify cross-machine ancestry precondition
         run: |
           set -euo pipefail
           git fetch origin "+refs/heads/$FUNCTIONAL_BRANCH:refs/remotes/origin/$FUNCTIONAL_BRANCH"
@@ -87,8 +87,8 @@ jobs:
           git merge-base --is-ancestor "$EXPECTED_SHA" "$BRANCH_SHA"
           echo "Verified governed branch descendant: expected=$EXPECTED_SHA head=$BRANCH_SHA"
 
-      - name: Resume same governed instance and canonical Run through alpha6
-        id: resume
+      - name: Rehydrate same governed instance cross-machine through alpha6 takeover
+        id: rehydrate
         env:
           WORKTREE_ROOT: ${{ runner.temp }}/oreshnik-wt
           EVIDENCE_DIR: ${{ runner.temp }}/oreshnik-alpha6-adoption
@@ -101,30 +101,32 @@ jobs:
             --worktree-root "$WORKTREE_ROOT" \
             --repo . \
             --json | tee "$EVIDENCE_DIR/dispatch-init.json"
-          "${CLI[@]}" dispatch resume \
+          "${CLI[@]}" dispatch takeover \
+            --run "$RUN_ID" \
+            --reason "GitHub Actions runner is ephemeral; rehydrate the same governed instance and same canonical Run on the current machine without creating a new instance or ownership lineage." \
             --operator "$OPERATOR" \
             --harness "$HARNESS" \
             --instance "$INSTANCE_ALIAS" \
             --session "$GITHUB_RUN_ID" \
             --repo . \
-            --json | tee "$EVIDENCE_DIR/resume.json"
+            --json | tee "$EVIDENCE_DIR/rehydrate.json"
           node - <<'NODE'
           const fs = require('node:fs');
-          const r = JSON.parse(fs.readFileSync(process.env.EVIDENCE_DIR + '/resume.json', 'utf8'));
-          if (r.result !== 'resumed') throw new Error(`Expected resumed, got ${r.result}`);
-          if (r.runId !== process.env.RUN_ID) throw new Error(`Run changed during resume: ${r.runId}`);
-          if (r.taskId !== process.env.TASK_ID) throw new Error(`Task changed during resume: ${r.taskId}`);
-          if (r.operator !== process.env.OPERATOR) throw new Error(`Operator changed during resume: ${r.operator}`);
-          if (r.harnessId !== process.env.HARNESS) throw new Error(`Harness changed during resume: ${r.harnessId}`);
-          if (r.agentInstanceAlias !== process.env.INSTANCE_ALIAS) throw new Error(`Instance changed during resume: ${r.agentInstanceAlias}`);
-          if (r.functionalBranch !== process.env.FUNCTIONAL_BRANCH) throw new Error(`Functional branch changed during resume: ${r.functionalBranch}`);
-          if (!r.worktreePath) throw new Error('Resume omitted worktreePath');
+          const r = JSON.parse(fs.readFileSync(process.env.EVIDENCE_DIR + '/rehydrate.json', 'utf8'));
+          if (r.result !== 'taken_over') throw new Error(`Expected taken_over, got ${r.result}`);
+          if (r.runId !== process.env.RUN_ID) throw new Error(`Run changed during rehydration: ${r.runId}`);
+          if (r.taskId !== process.env.TASK_ID) throw new Error(`Task changed during rehydration: ${r.taskId}`);
+          if (r.operator !== process.env.OPERATOR) throw new Error(`Operator changed during rehydration: ${r.operator}`);
+          if (r.harnessId !== process.env.HARNESS) throw new Error(`Harness changed during rehydration: ${r.harnessId}`);
+          if (r.agentInstanceAlias !== process.env.INSTANCE_ALIAS) throw new Error(`Instance changed during rehydration: ${r.agentInstanceAlias}`);
+          if (r.functionalBranch !== process.env.FUNCTIONAL_BRANCH) throw new Error(`Functional branch changed during rehydration: ${r.functionalBranch}`);
+          if (!r.worktreePath) throw new Error('Rehydration omitted worktreePath');
           fs.appendFileSync(process.env.GITHUB_OUTPUT, `worktree=${r.worktreePath}\ninstance=${r.agentInstanceAlias}\nsession=${r.sessionId}\n`);
           NODE
 
       - name: Fast-forward rehydrated worktree to governed branch head
         env:
-          RUN_WORKTREE: ${{ steps.resume.outputs.worktree }}
+          RUN_WORKTREE: ${{ steps.rehydrate.outputs.worktree }}
         run: |
           set -euo pipefail
           test -d "$RUN_WORKTREE"
@@ -138,7 +140,7 @@ jobs:
 
       - name: Execute governed alpha6 adoption and gate matrix
         env:
-          RUN_WORKTREE: ${{ steps.resume.outputs.worktree }}
+          RUN_WORKTREE: ${{ steps.rehydrate.outputs.worktree }}
           EVIDENCE_DIR: ${{ runner.temp }}/oreshnik-alpha6-adoption
         run: |
           set -euo pipefail
@@ -183,8 +185,8 @@ jobs:
         if: success()
         env:
           GH_TOKEN: ${{ github.token }}
-          INSTANCE: ${{ steps.resume.outputs.instance }}
-          SESSION: ${{ steps.resume.outputs.session }}
+          INSTANCE: ${{ steps.rehydrate.outputs.instance }}
+          SESSION: ${{ steps.rehydrate.outputs.session }}
         run: |
           cat > "$RUNNER_TEMP/alpha6-adoption-success.md" <<EOF
           ## Alpha6 governed adoption succeeded
@@ -192,7 +194,7 @@ jobs:
           - Task: \`$TASK_ID\`
           - Same Run: \`$RUN_ID\`
           - Operator/harness: \`$OPERATOR/$HARNESS\`
-          - Resumed instance: \`$INSTANCE\`
+          - Same governed instance: \`$INSTANCE\`
           - Session: \`$SESSION\`
           - Functional branch: \`$FUNCTIONAL_BRANCH\`
           - Installed target: \`oreshnik-cli@0.3.0-alpha.6\`
