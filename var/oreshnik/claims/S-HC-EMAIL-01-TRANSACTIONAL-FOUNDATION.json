@@ -1,0 +1,27 @@
+{
+  "taskId": "S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION",
+  "sprint": "email-infra",
+  "owner": "Jean",
+  "operator": "manuel",
+  "harnessId": "chatgpt",
+  "agentInstanceUid": "agent_a7665c7284074daa989cd1e0e83847e0",
+  "agentInstanceAlias": "manuel-chatgpt1",
+  "sessionId": "session_1d4bac9cf36943759bf3bc4272dd5105",
+  "identityOrigin": "explicit",
+  "worker": "manuel-dispatcher",
+  "workerMode": "shell",
+  "runId": "run-manuel-S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION-20260905180153-1e9c8316",
+  "branch": "dispatch/manuel/manuel-chatgpt1/email-infra/S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION/3294b78874",
+  "worktreePath": "/home/runner/work/_temp/oreshnik-wt-email/32305cad03d6321a/manuel/manuel-chatgpt1/email-infra/S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION/3ae02502",
+  "zones": [
+    "apps/web/app/api/email",
+    "packages/core",
+    "docs"
+  ],
+  "resources": [],
+  "claimedAt": "2026-09-05T20:36:07.338Z",
+  "updatedAt": "2026-09-05T20:36:07.338Z",
+  "expiresAt": "2026-09-05T21:36:07.338Z",
+  "ttlSeconds": 3600,
+  "status": "claimed"
+}

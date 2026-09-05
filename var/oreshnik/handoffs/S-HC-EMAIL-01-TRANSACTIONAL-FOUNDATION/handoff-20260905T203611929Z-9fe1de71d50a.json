@@ -1,0 +1,162 @@
+{
+  "schema": "oreshnik-handoff/v1",
+  "id": "handoff-20260905T203611929Z-9fe1de71d50a",
+  "createdAt": "2026-09-05T20:36:11.929Z",
+  "integrity": {
+    "algorithm": "sha256",
+    "digest": "c0e8dfdf01cfff3803c646dd25e76f4d5e639f1862094c25bded19610fab2dde"
+  },
+  "identity": {
+    "project": "HeptaCore",
+    "repository": "https://github.com/Cerberux77/HeptaCore",
+    "operator": "manuel",
+    "taskId": "S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION",
+    "runId": "run-manuel-S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION-20260905180153-1e9c8316",
+    "assignmentId": null,
+    "claimStatus": "claimed",
+    "reason": "owner-deferred-production-domain",
+    "oreshnikVersion": "0.3.0-alpha.6"
+  },
+  "git": {
+    "branch": "dispatch/manuel/manuel-chatgpt1/email-infra/S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION/3294b78874",
+    "upstream": "origin/dispatch/manuel/manuel-chatgpt1/email-infra/S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION/3294b78874",
+    "head": "f9a14fccaddedfaf323365d895487ea49faf6fd8",
+    "base": "2cc4d938cf3cab72dec25c948ce45affe6cdcd34",
+    "ahead": 5,
+    "behind": 0,
+    "ownCommits": [
+      "f9a14fccaddedfaf323365d895487ea49faf6fd8 docs(email): define development and production readiness gates",
+      "eb86b2ff981d0155693846c87a0ff0316a6d226b feat(email): expose secure transactional readiness diagnostics",
+      "195468e031f73335004454a92b48b80d23a2e0bc test(email): cover development and production readiness gates",
+      "3fbeb8b8143730ec5aa54fe88da0c3874d9b95ed feat(email): export transactional readiness contract",
+      "40175ee1808ae81b37d93be66e7620216a34eb2b feat(email): add deterministic transactional readiness contract"
+    ],
+    "modified": [
+      "var/oreshnik/task-board.json",
+      "var/oreshnik/tasks/S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION.json"
+    ],
+    "untracked": [
+      "var/oreshnik/claims/S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION.json",
+      "var/oreshnik/runs/S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION/run-manuel-S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION-20260905180153-1e9c8316.json"
+    ],
+    "conflicts": [],
+    "stash": [],
+    "clean": false,
+    "detached": false,
+    "worktreePath": "/home/runner/work/_temp/oreshnik-wt-email/32305cad03d6321a/manuel/manuel-chatgpt1/email-infra/S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION/3ae02502"
+  },
+  "github": {
+    "available": true,
+    "pr": null,
+    "state": null,
+    "base": null,
+    "head": null,
+    "mergeable": null,
+    "checks": [],
+    "reviews": [],
+    "unresolvedConversations": null,
+    "remoteHead": "f9a14fccaddedfaf323365d895487ea49faf6fd8",
+    "source": "github-rest"
+  },
+  "functional": {
+    "objective": "Complete transactional email foundation while keeping development on the free Vercel web domain.",
+    "implemented": [
+      "Resend provider integration preserved",
+      "Deterministic development/production email readiness contract",
+      "SUPER_ADMIN email readiness endpoint",
+      "Vercel web-origin versus sender-domain separation"
+    ],
+    "partial": [],
+    "decisions": [
+      "Use *.vercel.app only as temporary web origin",
+      "Use onboarding@resend.dev only for development/test transactional email",
+      "Require owned domain plus SPF/DKIM/DMARC before production-ready"
+    ],
+    "primaryFiles": [
+      "var/oreshnik/claims/S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION.json",
+      "var/oreshnik/runs/S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION/run-manuel-S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION-20260905180153-1e9c8316.json",
+      "var/oreshnik/task-board.json",
+      "var/oreshnik/tasks/S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION.json"
+    ],
+    "testsRun": [
+      "11 focused email readiness tests PASS",
+      "npm run typecheck PASS",
+      "npm run build PASS",
+      "npm run worker:validate PASS",
+      "npm run test PASS",
+      "oreshnik reconcile --check --json PASS",
+      "git diff/check candidate cleanliness PASS"
+    ],
+    "testsPending": [
+      "External owned-domain and DNS verification intentionally deferred by owner"
+    ],
+    "gates": [
+      "software candidate f9a14fcc validated green in Actions run 33983403671"
+    ],
+    "regressions": []
+  },
+  "deployments": [],
+  "blockers": [
+    {
+      "id": "EMAIL-PROD-DOMAIN-DNS",
+      "category": "PROVIDER",
+      "description": "Production email activation requires an owned HeptaCore sender domain. The owner explicitly chose the free Vercel hostname for web development until development is complete; Vercel shared hostnames are not used as email sender domains.",
+      "evidence": [
+        "Validated development contract uses HeptaCore <onboarding@resend.dev> for provider test sending.",
+        "Vercel *.vercel.app remains the temporary HEPTACORE_APP_URL web origin only.",
+        "All focused and full software gates passed on candidate f9a14fccaddedfaf323365d895487ea49faf6fd8."
+      ],
+      "impact": "Development can continue. Production transactional sending and final brand-link acceptance remain blocked until the official domain is purchased and DNS is verified.",
+      "blocking": true,
+      "probableOwner": "manuel",
+      "recommendedAction": "After development is complete, purchase/select the official HeptaCore domain, configure it in Resend, publish SPF/DKIM/DMARC, set branded EMAIL_FROM/EMAIL_REPLY_TO/HEPTACORE_BRAND_DOMAIN, then explicitly resume this preserved Run.",
+      "nextCommand": "npx oreshnik task resume --task S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION --operator manuel --authorized-external --note <domain-and-dns-evidence>",
+      "unblockCondition": "Owned sender domain exists and Resend + DNS evidence confirms SPF, DKIM and DMARC verification."
+    }
+  ],
+  "stability": {
+    "classification": "BLOCKED_EXTERNAL",
+    "reasons": [
+      "Production email activation requires an owned HeptaCore sender domain. The owner explicitly chose the free Vercel hostname for web development until development is complete; Vercel shared hostnames are not used as email sender domains."
+    ]
+  },
+  "resume": {
+    "exactPoint": "Software foundation is complete and validated; resume only for official-domain production activation.",
+    "firstCommand": "npx oreshnik task resume --task S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION --operator manuel --authorized-external --note <domain-and-dns-evidence>",
+    "branch": "dispatch/manuel/manuel-chatgpt1/email-infra/S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION/3294b78874",
+    "worktreePath": "/home/runner/work/_temp/oreshnik-wt-email/32305cad03d6321a/manuel/manuel-chatgpt1/email-infra/S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION/3ae02502",
+    "preconditions": [
+      "Run oreshnik preflight",
+      "Verify assignment and claim authority",
+      "Confirm no handoff supersedes this one"
+    ],
+    "priorityFiles": [
+      "var/oreshnik/claims/S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION.json",
+      "var/oreshnik/runs/S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION/run-manuel-S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION-20260905180153-1e9c8316.json",
+      "var/oreshnik/task-board.json",
+      "var/oreshnik/tasks/S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION.json"
+    ],
+    "focusedTests": [
+      "External owned-domain and DNS verification intentionally deferred by owner"
+    ],
+    "completionCriterion": "Owned HeptaCore sender domain is verified in Resend with SPF, DKIM and DMARC and branded URLs are configured."
+  },
+  "sources": [
+    {
+      "kind": "discovered",
+      "field": "identity.taskId",
+      "evidence": "canonical task artifact/task-board"
+    },
+    {
+      "kind": "discovered",
+      "field": "git",
+      "evidence": "git commands executed with typed argv"
+    },
+    {
+      "kind": "declared",
+      "field": "functional",
+      "evidence": "operator CLI input"
+    }
+  ],
+  "warnings": []
+}

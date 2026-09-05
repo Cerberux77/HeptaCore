@@ -1,6 +1,6 @@
 {
   "project": "HeptaCore",
-  "updatedAt": "2026-09-05T18:01:26.000Z",
+  "updatedAt": "2026-09-05T20:36:07.339Z",
   "currentExecutionOrder": [
     "S-HC-PUB-04-HOURLY-BATCH-CRON",
     "S-HC-PUB-05-RECONCILIATION-OPS",
@@ -1462,7 +1462,7 @@
       "title": "Transactional email foundation: domain sender, DNS, reputation, provider integration",
       "owner": "Jean",
       "backupOwner": "Manuel",
-      "status": "ready",
+      "status": "claimed",
       "track": "email-infra",
       "zone": [
         "apps/web/app/api/email",
@@ -1477,12 +1477,37 @@
         "Webhooks de eventos (delivered, bounced, complained) configurados",
         "Enlaces comerciales y de marca consistentes con el dominio final"
       ],
+      "attempts": 1,
+      "activeRun": {
+        "runId": "run-manuel-S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION-20260905180153-1e9c8316",
+        "operator": "manuel",
+        "worker": "manuel-dispatcher",
+        "workerMode": "shell",
+        "claimedAt": "2026-09-05T20:36:07.338Z",
+        "updatedAt": "2026-09-05T20:36:07.338Z",
+        "expiresAt": "2026-09-05T21:36:07.338Z",
+        "branch": "dispatch/manuel/manuel-chatgpt1/email-infra/S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION/3294b78874",
+        "worktreePath": "/home/runner/work/_temp/oreshnik-wt-email/32305cad03d6321a/manuel/manuel-chatgpt1/email-infra/S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION/3ae02502",
+        "zones": [
+          "apps/web/app/api/email",
+          "packages/core",
+          "docs"
+        ],
+        "resources": []
+      },
       "history": [
         {
           "at": "2026-09-05T16:07:01.790Z",
           "action": "status_reconciled",
           "operator": "jean",
           "description": "Task status reconciled to ready: dependencies and conflicts are clear for execution"
+        },
+        {
+          "at": "2026-09-05T20:36:07.339Z",
+          "action": "claimed",
+          "operator": "manuel",
+          "branch": "dispatch/manuel/manuel-chatgpt1/email-infra/S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION/3294b78874",
+          "description": "Run run-manuel-S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION-20260905180153-1e9c8316 claimed via shell"
         }
       ]
     },
