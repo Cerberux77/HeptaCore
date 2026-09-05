@@ -8,7 +8,7 @@
   "owner": "Manuel",
   "backupOwner": "Manuel",
   "status": "integrated",
-  "taskBoardPath": "/home/runner/work/HeptaCore/HeptaCore/var/oreshnik/task-board.json",
+  "taskBoardPath": "/home/runner/work/_temp/oreshnik-wt/32305cad03d6321a/manuel/manuel-chatgpt1/recovery/HC-ORESHNIK-RECOVERY-ALPHA6/adfcc418/var/oreshnik/task-board.json",
   "zone": [
     "scripts/goal-runner/**",
     "var/goal-runner/**",
@@ -107,8 +107,58 @@
       "description": "Integrated kilo/s-hc-tool-01-goal-runner-v1 into MADRE/v50-s-hc-tool-01-goal-runner-v1-goal-runner-v1-deterministic-state-machine-locks-2026-06-29"
     }
   ],
-  "updatedAt": "2026-09-04T14:03:10.743Z",
+  "updatedAt": "2026-09-05T16:21:03.695Z",
   "runs": [
+    {
+      "runId": "kilo-S-HC-TOOL-01-GOAL-RUNNER-V1-2026-06-29T02-20-46-794Z-ed5534ef",
+      "operator": "kilo",
+      "worker": "kilo",
+      "workerMode": "codex",
+      "branch": "task/S-HC-TOOL-01-GOAL-RUNNER-V1/S-HC-TOOL-01-GOAL-RUNNER-V1/kilo/kilo-S-HC-TOOL-01-GOAL-RUNNER-V1-2026-06-29T02-20-46-794Z-ed5534ef",
+      "worktreePath": "var/oreshnik/wt/S-HC-TOOL-01-GOAL-RUNNER-V1/S-HC-TOOL-01-GOAL-RUNNER-V1/r-7fa3b13c04df",
+      "zones": [
+        "scripts/goal-runner/**",
+        "var/goal-runner/**",
+        ".kilo/command/goal.md",
+        ".kilo/command/preflight.md",
+        "AGENTS.md",
+        "package.json",
+        "docs/07_handoffs/**",
+        "docs/obsidian-vault/**"
+      ],
+      "taskStatus": "integrated",
+      "claimStatus": "released",
+      "claimedAt": "2026-06-29T02:20:46.793Z",
+      "updatedAt": "2026-09-05T16:07:02.073Z",
+      "expiresAt": "2026-06-29T03:20:46.793Z",
+      "releasedAt": "2026-06-29T02:25:48.610Z",
+      "manifestPath": "var/oreshnik/runs/S-HC-TOOL-01-GOAL-RUNNER-V1/kilo-S-HC-TOOL-01-GOAL-RUNNER-V1-2026-06-29T02-20-46-794Z-ed5534ef.json"
+    },
+    {
+      "runId": "kilo-S-HC-TOOL-01-GOAL-RUNNER-V1-2026-06-29T02-19-43-008Z-33b124f7",
+      "operator": "kilo",
+      "worker": "kilo",
+      "workerMode": "codex",
+      "branch": "task/S-HC-TOOL-01-GOAL-RUNNER-V1/S-HC-TOOL-01-GOAL-RUNNER-V1/kilo/kilo-S-HC-TOOL-01-GOAL-RUNNER-V1-2026-06-29T02-19-43-008Z-33b124f7",
+      "worktreePath": "var/oreshnik/wt/S-HC-TOOL-01-GOAL-RUNNER-V1/S-HC-TOOL-01-GOAL-RUNNER-V1/r-ba423d0513f6",
+      "zones": [
+        "scripts/goal-runner/**",
+        "var/goal-runner/**",
+        ".kilo/command/goal.md",
+        ".kilo/command/preflight.md",
+        "AGENTS.md",
+        "package.json",
+        "docs/07_handoffs/**",
+        "docs/obsidian-vault/**"
+      ],
+      "taskStatus": "integrated",
+      "claimStatus": "released",
+      "claimedAt": "2026-06-29T02:19:43.008Z",
+      "updatedAt": "2026-09-05T16:07:02.073Z",
+      "expiresAt": "2026-06-29T03:19:43.008Z",
+      "releasedAt": "2026-06-29T02:20:29.163Z",
+      "manifestPath": "var/oreshnik/runs/S-HC-TOOL-01-GOAL-RUNNER-V1/kilo-S-HC-TOOL-01-GOAL-RUNNER-V1-2026-06-29T02-19-43-008Z-33b124f7.json"
+    },
     {
       "runId": "kilo-S-HC-TOOL-01-GOAL-RUNNER-V1-2026-06-29T02-07-54-626Z-6c79c9a6",
       "operator": "kilo",
@@ -133,56 +183,6 @@
       "expiresAt": "2026-06-29T03:07:54.626Z",
       "releasedAt": "2026-06-29T02:19:25.752Z",
       "manifestPath": "var/oreshnik/runs/S-HC-TOOL-01-GOAL-RUNNER-V1/kilo-S-HC-TOOL-01-GOAL-RUNNER-V1-2026-06-29T02-07-54-626Z-6c79c9a6.json"
-    },
-    {
-      "runId": "kilo-S-HC-TOOL-01-GOAL-RUNNER-V1-2026-06-29T02-20-46-794Z-ed5534ef",
-      "operator": "kilo",
-      "worker": "kilo",
-      "workerMode": "codex",
-      "branch": "task/S-HC-TOOL-01-GOAL-RUNNER-V1/S-HC-TOOL-01-GOAL-RUNNER-V1/kilo/kilo-S-HC-TOOL-01-GOAL-RUNNER-V1-2026-06-29T02-20-46-794Z-ed5534ef",
-      "worktreePath": "var/oreshnik/wt/S-HC-TOOL-01-GOAL-RUNNER-V1/S-HC-TOOL-01-GOAL-RUNNER-V1/r-7fa3b13c04df",
-      "zones": [
-        "scripts/goal-runner/**",
-        "var/goal-runner/**",
-        ".kilo/command/goal.md",
-        ".kilo/command/preflight.md",
-        "AGENTS.md",
-        "package.json",
-        "docs/07_handoffs/**",
-        "docs/obsidian-vault/**"
-      ],
-      "taskStatus": "cancelled",
-      "claimStatus": "released",
-      "claimedAt": "2026-06-29T02:20:46.793Z",
-      "updatedAt": "2026-06-29T02:25:48.610Z",
-      "expiresAt": "2026-06-29T03:20:46.793Z",
-      "releasedAt": "2026-06-29T02:25:48.610Z",
-      "manifestPath": "var/oreshnik/runs/S-HC-TOOL-01-GOAL-RUNNER-V1/kilo-S-HC-TOOL-01-GOAL-RUNNER-V1-2026-06-29T02-20-46-794Z-ed5534ef.json"
-    },
-    {
-      "runId": "kilo-S-HC-TOOL-01-GOAL-RUNNER-V1-2026-06-29T02-19-43-008Z-33b124f7",
-      "operator": "kilo",
-      "worker": "kilo",
-      "workerMode": "codex",
-      "branch": "task/S-HC-TOOL-01-GOAL-RUNNER-V1/S-HC-TOOL-01-GOAL-RUNNER-V1/kilo/kilo-S-HC-TOOL-01-GOAL-RUNNER-V1-2026-06-29T02-19-43-008Z-33b124f7",
-      "worktreePath": "var/oreshnik/wt/S-HC-TOOL-01-GOAL-RUNNER-V1/S-HC-TOOL-01-GOAL-RUNNER-V1/r-ba423d0513f6",
-      "zones": [
-        "scripts/goal-runner/**",
-        "var/goal-runner/**",
-        ".kilo/command/goal.md",
-        ".kilo/command/preflight.md",
-        "AGENTS.md",
-        "package.json",
-        "docs/07_handoffs/**",
-        "docs/obsidian-vault/**"
-      ],
-      "taskStatus": "cancelled",
-      "claimStatus": "released",
-      "claimedAt": "2026-06-29T02:19:43.008Z",
-      "updatedAt": "2026-06-29T02:20:29.163Z",
-      "expiresAt": "2026-06-29T03:19:43.008Z",
-      "releasedAt": "2026-06-29T02:20:29.163Z",
-      "manifestPath": "var/oreshnik/runs/S-HC-TOOL-01-GOAL-RUNNER-V1/kilo-S-HC-TOOL-01-GOAL-RUNNER-V1-2026-06-29T02-19-43-008Z-33b124f7.json"
     }
   ],
   "integration": {

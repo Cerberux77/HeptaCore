@@ -1,7 +1,7 @@
 {
   "schema": "heptacore-oreshnik-command-catalog/v1",
   "source": "node_modules/oreshnik-cli/dist/cli.js",
-  "version": "0.2.0-alpha.16",
+  "version": "0.3.0-alpha.6",
   "commands": [
     {
       "command": "init",
@@ -10,6 +10,14 @@
     {
       "command": "preflight",
       "summary": "[options] Run 11-step validation before starting work"
+    },
+    {
+      "command": "migrate",
+      "summary": "[options] Explicitly inspect or migrate an Oreshnik control-state file"
+    },
+    {
+      "command": "repository-enrollment",
+      "summary": "[options] Governed ChatGPT repository enrollment lifecycle administration"
     },
     {
       "command": "status",
@@ -138,6 +146,22 @@
           "summary": ""
         },
         {
+          "command": "operator tasks",
+          "summary": "[options] Show the complete canonical and staged Goal worklist for an operator"
+        },
+        {
+          "command": "operator work-request",
+          "summary": "[options] Resolve a natural-language operator work request into worklist, onboarding, or rebalance"
+        },
+        {
+          "command": "operator onboard",
+          "summary": "[options] Create a non-canonical onboarding draft for an unknown operator"
+        },
+        {
+          "command": "operator rebalance",
+          "summary": "[options] Generate or apply a digest-bound governed workload rebalance"
+        },
+        {
           "command": "operator help",
           "summary": "[command] display help for command"
         }
@@ -148,11 +172,49 @@
       "summary": "Local notification utilities",
       "subcommands": [
         {
+          "command": "notify explain",
+          "summary": "[options]"
+        },
+        {
           "command": "notify test",
           "summary": "[options]"
         },
         {
+          "command": "notify status",
+          "summary": "[options]"
+        },
+        {
+          "command": "notify migrate-config",
+          "summary": "[options] Add the platform default notifications block to .oreshnik.json when absent"
+        },
+        {
           "command": "notify help",
+          "summary": "[command] display help for command"
+        }
+      ]
+    },
+    {
+      "command": "update",
+      "summary": "Oreshnik update manager",
+      "subcommands": [
+        {
+          "command": "update check",
+          "summary": "[options]"
+        },
+        {
+          "command": "update status",
+          "summary": "[options]"
+        },
+        {
+          "command": "update apply",
+          "summary": "[options]"
+        },
+        {
+          "command": "update rollback",
+          "summary": "[options]"
+        },
+        {
+          "command": "update help",
           "summary": "[command] display help for command"
         }
       ]
@@ -228,6 +290,22 @@
       "summary": "Task-level runtime administration",
       "subcommands": [
         {
+          "command": "task register",
+          "summary": "[options] Atomically register one explicit canonical Task, Goal and Task artifact"
+        },
+        {
+          "command": "task finalize",
+          "summary": "[options] Finalize one merged canonical Task and its existing released lifecycle"
+        },
+        {
+          "command": "task terminalize",
+          "summary": "[options] Run the durable idempotent terminalization saga for a governed Run"
+        },
+        {
+          "command": "task materialize-approved",
+          "summary": "[options] Idempotently materialize every active projection in an approved plan"
+        },
+        {
           "command": "task reassign",
           "summary": "[options] <taskId>"
         },
@@ -250,8 +328,16 @@
       ]
     },
     {
+      "command": "execution-worker",
+      "summary": "[options] Execute one immutable ExecutionRequest as an execution-only provider worker"
+    },
+    {
       "command": "release",
       "summary": "[options] Merge latest MADRE into master with pre-release checkpoint for instant rollback"
+    },
+    {
+      "command": "telemetry",
+      "summary": "[options] Record, report or advise from provider-neutral AI/LLM telemetry"
     }
   ]
 }

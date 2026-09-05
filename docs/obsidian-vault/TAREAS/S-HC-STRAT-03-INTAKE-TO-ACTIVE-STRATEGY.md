@@ -4,9 +4,9 @@ type: task-runtime
 project: "HeptaCore"
 task_id: "S-HC-STRAT-03-INTAKE-TO-ACTIVE-STRATEGY"
 sprint: "strategy"
-status: "ready"
+status: "blocked"
 owner: "Manuel"
-last_updated: "2026-09-04T14:03:10.743Z"
+last_updated: "2026-09-05T08:15:12.123Z"
 source: "var/oreshnik/tasks/S-HC-STRAT-03-INTAKE-TO-ACTIVE-STRATEGY.json"
 ---
 
@@ -18,7 +18,7 @@ End-to-end intake, generated strategy persistence, approval and calendar materia
 
 ## Runtime
 
-- estado: `ready`
+- estado: `blocked`
 - owner: `Manuel`
 - backup: `Manuel`
 - intentos: `0`

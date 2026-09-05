@@ -1,0 +1,57 @@
+{
+  "project": "HeptaCore",
+  "sprint": "recovery",
+  "motherBranch": "MADRE/v56-recovery-alpha6-governance-baseline-bounded-legacy-eviden-2026-09-05",
+  "lockKey": "integration-train/MADRE/v56-recovery-alpha6-governance-baseline-bounded-legacy-eviden-2026-09-05",
+  "createdAt": "2026-09-05T17:07:23.459Z",
+  "updatedAt": "2026-09-05T17:08:48.596Z",
+  "results": [
+    {
+      "attemptId": "train-run-manuel-HC-ORESHNIK-RECOVERY-ALPHA6-202609041-1788628043459",
+      "taskId": "HC-ORESHNIK-RECOVERY-ALPHA6",
+      "runId": "run-manuel-HC-ORESHNIK-RECOVERY-ALPHA6-20260904140329-21ab3a41",
+      "sourceBranch": "dispatch/manuel/manuel-chatgpt1/recovery/HC-ORESHNIK-RECOVERY-ALPHA6/2954c98970",
+      "targetBranch": "MADRE/v56-recovery-alpha6-governance-baseline-bounded-legacy-eviden-2026-09-05",
+      "integrationBranch": "integration-train/recovery/HC-ORESHNIK-RECOVERY-ALP/r-0c7c255b3ad9/a-9bf9cbba778c",
+      "operator": "manuel",
+      "lockKey": "integration-train/MADRE/v56-recovery-alpha6-governance-baseline-bounded-legacy-eviden-2026-09-05",
+      "startedAt": "2026-09-05T17:07:23.459Z",
+      "status": "succeeded",
+      "completedAt": "2026-09-05T17:08:48.596Z",
+      "reason": "Already contained on MADRE/v56-recovery-alpha6-governance-baseline-bounded-legacy-eviden-2026-09-05; runtime reconciled without merge",
+      "gateResults": [
+        {
+          "name": "typecheck",
+          "passed": true
+        },
+        {
+          "name": "build",
+          "passed": true
+        },
+        {
+          "name": "worker",
+          "passed": true
+        },
+        {
+          "name": "tests",
+          "passed": true
+        }
+      ],
+      "outcome": {
+        "mergeBase": "b2937e866d96cef1b708eea5657c5e5e6a6d92cf",
+        "changedFiles": [],
+        "compatibilityBranchPushed": false,
+        "deliveryDisposition": "already_contained",
+        "projectedMotherBranch": "MADRE/v56-recovery-alpha6-governance-baseline-bounded-legacy-eviden-2026-09-05",
+        "motherAdvanceState": "runtime_projection_confirmed",
+        "motherFunctionalExpectedCommit": "b2937e866d96cef1b708eea5657c5e5e6a6d92cf",
+        "motherFunctionalRemoteCommit": "b2937e866d96cef1b708eea5657c5e5e6a6d92cf",
+        "motherFunctionalPushVerified": true,
+        "motherFunctionalPushReconciled": false,
+        "projectedTaskStatus": "integrated",
+        "projectedRunStatus": "integrated",
+        "projectedSprintEntryStatus": "integrated"
+      }
+    }
+  ]
+}
