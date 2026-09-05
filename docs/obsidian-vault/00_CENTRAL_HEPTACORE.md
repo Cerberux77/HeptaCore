@@ -1,10 +1,9 @@
-<!-- ORESHNIK:GENERATED:START -->
 ---
 type: master-dashboard
 project: "HeptaCore"
 status: active-production
 phase: "Canonical Oreshnik task board governs current assignments"
-last_updated: "2026-09-05T16:21:04.132Z"
+last_updated: "2026-09-05T17:01:28.591Z"
 mother_branch: "MADRE/v47-s-hc-pub-03-multitenant-assets-multitenant-assets-metadata-compatibility-batch--2026-06-23"
 tags:
   - "#central"
@@ -19,7 +18,7 @@ tags:
 
 | Campo | Valor |
 |---|---|
-| Task board actualizado | 2026-09-05T16:21:03.695Z |
+| Task board actualizado | 2026-09-05T17:01:26.706Z |
 | Rama madre | MADRE/v47-s-hc-pub-03-multitenant-assets-multitenant-assets-metadata-compatibility-batch--2026-06-23 |
 
 
@@ -106,5 +105,3 @@ tags:
 | Sprint | Resultado | Madre | Task | Source | Compatibility | Advance |
 |---|---|---|---|---|---|---|
 | Ninguno | - | - | - | - | - | - |
-
-<!-- ORESHNIK:GENERATED:END -->

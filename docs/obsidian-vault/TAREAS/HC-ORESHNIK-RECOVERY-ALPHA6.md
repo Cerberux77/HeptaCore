@@ -6,7 +6,7 @@ task_id: "HC-ORESHNIK-RECOVERY-ALPHA6"
 sprint: "recovery"
 status: "ready_for_integration"
 owner: "Manuel"
-last_updated: "2026-09-05T16:21:03.695Z"
+last_updated: "2026-09-05T17:01:26.706Z"
 source: "var/oreshnik/tasks/HC-ORESHNIK-RECOVERY-ALPHA6.json"
 ---
 
@@ -21,7 +21,7 @@ Upgrade HeptaCore governance to Oreshnik 0.3.0-alpha.6 and reconcile control pla
 - estado: `ready_for_integration`
 - owner: `Manuel`
 - backup: `Manuel`
-- intentos: `1`
+- intentos: `2`
 - handoff: docs/07_handoffs/HC-ORESHNIK-RECOVERY-ALPHA6.md
 
 ## Dependencias
@@ -82,7 +82,10 @@ Upgrade HeptaCore governance to Oreshnik 0.3.0-alpha.6 and reconcile control pla
 
 ## Integracion
 
-- Ninguna
+- run: `run-manuel-HC-ORESHNIK-RECOVERY-ALPHA6-20260904140329-21ab3a41`
+- estado: `queued`
+- madre: `MADRE/v56-recovery-alpha6-governance-baseline-bounded-legacy-eviden-2026-09-05`
+- source: `dispatch/manuel/manuel-chatgpt1/recovery/HC-ORESHNIK-RECOVERY-ALPHA6/2954c98970`
 
 ## Train Mas Reciente
 

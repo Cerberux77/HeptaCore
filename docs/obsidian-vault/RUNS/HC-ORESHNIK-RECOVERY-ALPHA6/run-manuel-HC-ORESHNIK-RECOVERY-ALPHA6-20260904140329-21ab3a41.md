@@ -8,7 +8,7 @@ sprint: "recovery"
 status: "ready_for_integration"
 claim_status: "released"
 operator: "manuel"
-last_updated: "2026-09-05T16:21:03.701Z"
+last_updated: "2026-09-05T17:01:26.714Z"
 source: "var/oreshnik/runs/HC-ORESHNIK-RECOVERY-ALPHA6/run-manuel-HC-ORESHNIK-RECOVERY-ALPHA6-20260904140329-21ab3a41.json"
 ---
 
@@ -29,9 +29,9 @@ source: "var/oreshnik/runs/HC-ORESHNIK-RECOVERY-ALPHA6/run-manuel-HC-ORESHNIK-RE
 - claim status: `released`
 - branch: `dispatch/manuel/manuel-chatgpt1/recovery/HC-ORESHNIK-RECOVERY-ALPHA6/2954c98970`
 - worktree: `/home/runner/work/_temp/oreshnik-wt/32305cad03d6321a/manuel/manuel-chatgpt1/recovery/HC-ORESHNIK-RECOVERY-ALPHA6/adfcc418`
-- claimed at: `2026-09-05T08:14:13.570Z`
-- expires at: `2026-09-05T09:14:13.570Z`
-- released at: `2026-09-05T16:21:03.701Z`
+- claimed at: `2026-09-05T16:58:51.819Z`
+- expires at: `2026-09-05T17:58:51.819Z`
+- released at: `2026-09-05T17:01:26.714Z`
 
 ## Boundaries
 

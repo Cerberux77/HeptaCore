@@ -1,9 +1,8 @@
-<!-- ORESHNIK:GENERATED:START -->
 ---
 type: collaborator-status
 project: "HeptaCore"
 operator: "Manuel"
-last_updated: "2026-09-05T16:21:04.133Z"
+last_updated: "2026-09-05T17:01:28.591Z"
 generated_by: "Oreshnik canonical-check"
 source: "var/oreshnik/task-board.json"
 ---
@@ -378,5 +377,3 @@ Estado: `integrated`
 
 Zonas: `packages/db/**`, `apps/web/lib/**`, `apps/web/app/**`, `scripts/**`, `docs/**`, `var/oreshnik/**`
 
-
-<!-- ORESHNIK:GENERATED:END -->

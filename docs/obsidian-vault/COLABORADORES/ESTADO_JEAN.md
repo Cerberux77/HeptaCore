@@ -1,9 +1,8 @@
-<!-- ORESHNIK:GENERATED:START -->
 ---
 type: collaborator-status
 project: "HeptaCore"
 operator: "Jean"
-last_updated: "2026-09-05T16:07:02.028Z"
+last_updated: "2026-09-05T17:01:28.592Z"
 generated_by: "Oreshnik canonical-check"
 source: "var/oreshnik/task-board.json"
 ---
@@ -38,5 +37,3 @@ Estado: `ready`
 
 Zonas: `apps/web/app/api/email`, `packages/core`, `docs`
 
-
-<!-- ORESHNIK:GENERATED:END -->
