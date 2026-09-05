@@ -1,6 +1,6 @@
 {
   "project": "HeptaCore",
-  "updatedAt": "2026-09-05T17:01:26.706Z",
+  "updatedAt": "2026-09-05T17:08:48.577Z",
   "currentExecutionOrder": [
     "S-HC-PUB-04-HOURLY-BATCH-CRON",
     "S-HC-PUB-05-RECONCILIATION-OPS",
@@ -2008,7 +2008,7 @@
       "title": "Upgrade HeptaCore governance to Oreshnik 0.3.0-alpha.6 and reconcile control plane",
       "owner": "Manuel",
       "backupOwner": "Manuel",
-      "status": "ready_for_integration",
+      "status": "integrated",
       "track": "recovery",
       "zone": [
         "package.json",
@@ -2185,6 +2185,13 @@
           "operator": "manuel",
           "branch": "dispatch/manuel/manuel-chatgpt1/recovery/HC-ORESHNIK-RECOVERY-ALPHA6/2954c98970",
           "description": "Task delivered with handoff docs/07_handoffs/HC-ORESHNIK-RECOVERY-ALPHA6.md"
+        },
+        {
+          "at": "2026-09-05T17:08:48.577Z",
+          "action": "integrated",
+          "operator": "manuel",
+          "branch": "dispatch/manuel/manuel-chatgpt1/recovery/HC-ORESHNIK-RECOVERY-ALPHA6/2954c98970",
+          "description": "Integrated dispatch/manuel/manuel-chatgpt1/recovery/HC-ORESHNIK-RECOVERY-ALPHA6/2954c98970 into MADRE/v56-recovery-alpha6-governance-baseline-bounded-legacy-eviden-2026-09-05"
         }
       ],
       "validationGateResults": [

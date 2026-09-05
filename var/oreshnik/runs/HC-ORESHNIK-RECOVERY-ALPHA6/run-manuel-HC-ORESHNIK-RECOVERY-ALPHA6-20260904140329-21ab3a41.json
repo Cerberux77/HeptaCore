@@ -26,10 +26,10 @@
   ],
   "resources": [],
   "taskBoardPath": "/home/runner/work/_temp/oreshnik-wt/32305cad03d6321a/manuel/manuel-chatgpt1/recovery/HC-ORESHNIK-RECOVERY-ALPHA6/adfcc418/var/oreshnik/task-board.json",
-  "taskStatus": "ready_for_integration",
+  "taskStatus": "integrated",
   "claimStatus": "released",
   "claimedAt": "2026-09-05T16:58:51.819Z",
-  "updatedAt": "2026-09-05T17:01:26.714Z",
+  "updatedAt": "2026-09-05T17:08:48.577Z",
   "expiresAt": "2026-09-05T17:58:51.819Z",
   "releasedAt": "2026-09-05T17:01:26.714Z",
   "validationGateResults": [

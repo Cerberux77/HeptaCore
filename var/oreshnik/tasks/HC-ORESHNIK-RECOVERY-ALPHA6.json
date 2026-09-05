@@ -7,8 +7,8 @@
   "title": "Upgrade HeptaCore governance to Oreshnik 0.3.0-alpha.6 and reconcile control plane",
   "owner": "Manuel",
   "backupOwner": "Manuel",
-  "status": "ready_for_integration",
-  "taskBoardPath": "/home/runner/work/_temp/oreshnik-wt/32305cad03d6321a/manuel/manuel-chatgpt1/recovery/HC-ORESHNIK-RECOVERY-ALPHA6/adfcc418/var/oreshnik/task-board.json",
+  "status": "integrated",
+  "taskBoardPath": "/home/runner/work/HeptaCore/HeptaCore/var/oreshnik/task-board.json",
   "zone": [
     "package.json",
     "package-lock.json",
@@ -184,6 +184,13 @@
       "operator": "manuel",
       "branch": "dispatch/manuel/manuel-chatgpt1/recovery/HC-ORESHNIK-RECOVERY-ALPHA6/2954c98970",
       "description": "Task delivered with handoff docs/07_handoffs/HC-ORESHNIK-RECOVERY-ALPHA6.md"
+    },
+    {
+      "at": "2026-09-05T17:08:48.577Z",
+      "action": "integrated",
+      "operator": "manuel",
+      "branch": "dispatch/manuel/manuel-chatgpt1/recovery/HC-ORESHNIK-RECOVERY-ALPHA6/2954c98970",
+      "description": "Integrated dispatch/manuel/manuel-chatgpt1/recovery/HC-ORESHNIK-RECOVERY-ALPHA6/2954c98970 into MADRE/v56-recovery-alpha6-governance-baseline-bounded-legacy-eviden-2026-09-05"
     }
   ],
   "validationGateResults": [
@@ -456,7 +463,7 @@
       "summary": "HC-ORESHNIK-RECOVERY-ALPHA6:worker | exit=0 | timed_ok | signal=none | stdout=> heptacore@0.1.0 worker:validate | stderr=[config] .env.rrss no encontrado. Usando solo variables de entorno del sistema."
     }
   ],
-  "updatedAt": "2026-09-05T17:01:26.706Z",
+  "updatedAt": "2026-09-05T17:08:48.577Z",
   "runs": [
     {
       "runId": "run-manuel-HC-ORESHNIK-RECOVERY-ALPHA6-20260904140329-21ab3a41",
@@ -481,10 +488,10 @@
         ".github/workflows/oreshnik-digital-twin.yml"
       ],
       "resources": [],
-      "taskStatus": "ready_for_integration",
+      "taskStatus": "integrated",
       "claimStatus": "released",
       "claimedAt": "2026-09-05T16:58:51.819Z",
-      "updatedAt": "2026-09-05T17:01:26.714Z",
+      "updatedAt": "2026-09-05T17:08:48.577Z",
       "expiresAt": "2026-09-05T17:58:51.819Z",
       "releasedAt": "2026-09-05T17:01:26.714Z",
       "manifestPath": "var/oreshnik/runs/HC-ORESHNIK-RECOVERY-ALPHA6/run-manuel-HC-ORESHNIK-RECOVERY-ALPHA6-20260904140329-21ab3a41.json",
@@ -763,9 +770,58 @@
   "integration": {
     "runId": "run-manuel-HC-ORESHNIK-RECOVERY-ALPHA6-20260904140329-21ab3a41",
     "sourceBranch": "dispatch/manuel/manuel-chatgpt1/recovery/HC-ORESHNIK-RECOVERY-ALPHA6/2954c98970",
-    "status": "queued",
+    "status": "integrated",
     "motherBranch": "MADRE/v56-recovery-alpha6-governance-baseline-bounded-legacy-eviden-2026-09-05",
     "queuedAt": "2026-09-05T17:01:28.564Z",
-    "updatedAt": "2026-09-05T17:01:28.564Z"
+    "updatedAt": "2026-09-05T17:08:48.577Z",
+    "targetBranch": "MADRE/v56-recovery-alpha6-governance-baseline-bounded-legacy-eviden-2026-09-05",
+    "integratedAt": "2026-09-05T17:08:48.577Z"
+  },
+  "latestTrain": {
+    "attemptId": "train-run-manuel-HC-ORESHNIK-RECOVERY-ALPHA6-202609041-1788628043459",
+    "runId": "run-manuel-HC-ORESHNIK-RECOVERY-ALPHA6-20260904140329-21ab3a41",
+    "sourceBranch": "dispatch/manuel/manuel-chatgpt1/recovery/HC-ORESHNIK-RECOVERY-ALPHA6/2954c98970",
+    "targetBranch": "MADRE/v56-recovery-alpha6-governance-baseline-bounded-legacy-eviden-2026-09-05",
+    "integrationBranch": "integration-train/recovery/HC-ORESHNIK-RECOVERY-ALP/r-0c7c255b3ad9/a-9bf9cbba778c",
+    "operator": "manuel",
+    "lockKey": "integration-train/MADRE/v56-recovery-alpha6-governance-baseline-bounded-legacy-eviden-2026-09-05",
+    "status": "succeeded",
+    "startedAt": "2026-09-05T17:07:23.459Z",
+    "completedAt": "2026-09-05T17:08:48.596Z",
+    "reason": "Already contained on MADRE/v56-recovery-alpha6-governance-baseline-bounded-legacy-eviden-2026-09-05; runtime reconciled without merge",
+    "motherAdvanceState": "runtime_projection_confirmed",
+    "gateResults": [
+      {
+        "name": "typecheck",
+        "passed": true
+      },
+      {
+        "name": "build",
+        "passed": true
+      },
+      {
+        "name": "worker",
+        "passed": true
+      },
+      {
+        "name": "tests",
+        "passed": true
+      }
+    ],
+    "outcome": {
+      "mergeBase": "b2937e866d96cef1b708eea5657c5e5e6a6d92cf",
+      "changedFiles": [],
+      "compatibilityBranchPushed": false,
+      "deliveryDisposition": "already_contained",
+      "projectedMotherBranch": "MADRE/v56-recovery-alpha6-governance-baseline-bounded-legacy-eviden-2026-09-05",
+      "motherAdvanceState": "runtime_projection_confirmed",
+      "motherFunctionalExpectedCommit": "b2937e866d96cef1b708eea5657c5e5e6a6d92cf",
+      "motherFunctionalRemoteCommit": "b2937e866d96cef1b708eea5657c5e5e6a6d92cf",
+      "motherFunctionalPushVerified": true,
+      "motherFunctionalPushReconciled": false,
+      "projectedTaskStatus": "integrated",
+      "projectedRunStatus": "integrated",
+      "projectedSprintEntryStatus": "integrated"
+    }
   }
 }

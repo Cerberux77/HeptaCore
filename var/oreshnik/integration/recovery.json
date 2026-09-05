@@ -3,7 +3,7 @@
   "sprint": "recovery",
   "motherBranch": "MADRE/v56-recovery-alpha6-governance-baseline-bounded-legacy-eviden-2026-09-05",
   "createdAt": "2026-09-05T17:01:28.564Z",
-  "updatedAt": "2026-09-05T17:01:28.564Z",
+  "updatedAt": "2026-09-05T17:08:48.577Z",
   "queue": [
     {
       "taskId": "HC-ORESHNIK-RECOVERY-ALPHA6",
@@ -13,8 +13,10 @@
       "operator": "manuel",
       "handoff": "docs/07_handoffs/HC-ORESHNIK-RECOVERY-ALPHA6.md",
       "queuedAt": "2026-09-05T17:01:28.564Z",
-      "updatedAt": "2026-09-05T17:01:28.564Z",
-      "status": "queued"
+      "updatedAt": "2026-09-05T17:08:48.577Z",
+      "status": "integrated",
+      "integratedAt": "2026-09-05T17:08:48.577Z",
+      "targetBranch": "MADRE/v56-recovery-alpha6-governance-baseline-bounded-legacy-eviden-2026-09-05"
     }
   ]
 }
