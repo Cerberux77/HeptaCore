@@ -97,6 +97,23 @@ jobs:
           npm install --no-save --package-lock=false --ignore-scripts "@esbuild/linux-x64@$ESBUILD_VERSION"
           test -x node_modules/@esbuild/linux-x64/bin/esbuild
           test "$(node node_modules/oreshnik-cli/dist/cli.js --version)" = "$ALPHA6_VERSION"
+      - name: Start validation lifecycle
+        env:
+          WT: ${{ steps.rehydrate.outputs.worktree }}
+        run: |
+          set -euo pipefail
+          cd "$WT"
+          CLI=(node node_modules/oreshnik-cli/dist/cli.js)
+          "${CLI[@]}" evidence \
+            --task "$TASK_ID" \
+            --operator "$OPERATOR" \
+            --run "$RUN_ID" \
+            --handoff "docs/07_handoffs/HC-ORESHNIK-RECOVERY-ALPHA6.md" \
+            --details "Validation lifecycle restarted after governed cross-machine takeover; candidate source and Run lineage preserved." \
+            --start-validation
+          node - <<'NODE'
+          const fs=require('node:fs'); const t=JSON.parse(fs.readFileSync('var/oreshnik/tasks/HC-ORESHNIK-RECOVERY-ALPHA6.json','utf8')); if(t.status!=='validating') throw new Error(`task=${t.status}`);
+          NODE
       - name: Revalidate same Run and release claim
         env:
           WT: ${{ steps.rehydrate.outputs.worktree }}
