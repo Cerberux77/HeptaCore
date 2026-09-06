@@ -1,0 +1,96 @@
+name: Oreshnik PUB-06 Candidate Validation v2
+
+on:
+  push:
+    branches:
+      - dispatch/manuel/manuel-chatgpt2/publishing/S-HC-PUB-06-REELS-STORIES-PUBLISHERS/6b8d9d8384
+    paths:
+      - ".github/workflows/oreshnik-pub06-validate-v2.yml"
+
+permissions:
+  contents: write
+  actions: read
+
+env:
+  FUNCTIONAL_BRANCH: dispatch/manuel/manuel-chatgpt2/publishing/S-HC-PUB-06-REELS-STORIES-PUBLISHERS/6b8d9d8384
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.FUNCTIONAL_BRANCH }}
+          fetch-depth: 0
+          persist-credentials: true
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Remove ephemeral validator from final branch diff
+        run: |
+          set -euo pipefail
+          git config user.name "Manuel Vera via ChatGPT Operator"
+          git config user.email "manuel@heptacore.dev"
+          git rm .github/workflows/oreshnik-pub06-validate-v2.yml
+          git commit -m "chore(ci): remove PUB-06 v2 validator bootstrap"
+          git push origin "HEAD:$FUNCTIONAL_BRANCH"
+          OUTSIDE="$(git diff --name-only origin/master...HEAD | grep -Ev '^(apps/web/lib/publishers/|apps/web/app/api/publishing/|packages/integrations/)' || true)"
+          test -z "$OUTSIDE" || { echo "Outside-zone diff: $OUTSIDE"; exit 1; }
+
+      - name: Install clean candidate and runner-only Linux binary
+        run: |
+          set -euo pipefail
+          npm ci --ignore-scripts
+          npm install --no-save --package-lock=false @esbuild/linux-x64@0.28.0
+          npm run db:generate
+          git status --porcelain
+          test -z "$(git status --porcelain)"
+
+      - name: Canonical readiness diagnostic
+        run: |
+          set -euo pipefail
+          set +e
+          npm run oreshnik:ready 2>&1 | tee "$RUNNER_TEMP/readiness.log"
+          RC=${PIPESTATUS[0]}
+          set -e
+          if [ "$RC" -ne 0 ]; then
+            node - <<'NODE'
+          const fs=require('node:fs');
+          const claim=JSON.parse(fs.readFileSync('var/oreshnik/claims/HC-ORESHNIK-RECOVERY-ALPHA6.json','utf8'));
+          const log=fs.readFileSync(process.env.RUNNER_TEMP+'/readiness.log','utf8');
+          if (claim.status !== 'released') throw new Error(`unexpected alpha6 claim status ${claim.status}`);
+          const failures=log.split(/\r?\n/).filter(x=>x.includes('[FAIL]'));
+          if (failures.length !== 1 || !failures[0].includes('orphan claim files present: HC-ORESHNIK-RECOVERY-ALPHA6.json')) {
+            throw new Error(`unexpected readiness failures: ${failures.join(' | ')}`);
+          }
+          console.log('Bounded readiness blocker confirmed: canonical released alpha6 orphan claim only.');
+          NODE
+          fi
+          test "$(node node_modules/oreshnik-cli/dist/cli.js --version)" = "0.3.0-alpha.6"
+
+      - name: Provider-specific PUB-06 tests
+        run: npm run test -w @heptacore/integrations
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Build
+        run: npm run build
+
+      - name: Full tests
+        run: npm run test
+
+      - name: Worker validation
+        run: npm run worker:validate
+
+      - name: Reconcile and diff gates
+        run: |
+          set -euo pipefail
+          node node_modules/oreshnik-cli/dist/cli.js reconcile --check --json
+          git diff --check origin/master...HEAD
+          test -z "$(git diff --name-only origin/master...HEAD | grep -Ev '^(apps/web/lib/publishers/|apps/web/app/api/publishing/|packages/integrations/)' || true)"
+          test -z "$(git status --porcelain)"
