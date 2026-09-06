@@ -5,7 +5,7 @@
     "originUrl": "https://github.com/Cerberux77/HeptaCore.git",
     "canonicalMotherBranch": "master"
   },
-  "generation": 91,
+  "generation": 92,
   "controlHead": "d31fda2333228a8b47e18a900b9dd871e766bab3",
   "catalog": {
     "taskBoardPath": "var/oreshnik/task-board.json",
@@ -1064,10 +1064,10 @@
       "sprintId": "publishing",
       "title": "Real publishing for Meta Reels and Stories: Instagram + Facebook",
       "operator": "manuel",
-      "machineId": "machine-e15d5758-aa5a-4cda-85ad-73d3cfaf3ce4",
+      "machineId": "machine-0bfd2372-b9bb-4496-bfde-af61a0f6b442",
       "functionalBranch": "dispatch/manuel/manuel-chatgpt2/publishing/S-HC-PUB-06-REELS-STORIES-PUBLISHERS/6b8d9d8384",
       "motherBranch": "master",
-      "worktreePath": "/home/runner/work/_temp/oreshnik-wt-autonomous/32305cad03d6321a/manuel/manuel-chatgpt2/publishing/S-HC-PUB-06-REELS-STORIES-PUBLISHERS/6b8d9d8384",
+      "worktreePath": "/home/runner/work/_temp/oreshnik-wt-pub06-lifecycle/32305cad03d6321a/manuel/manuel-chatgpt2/publishing/S-HC-PUB-06-REELS-STORIES-PUBLISHERS/622deb28",
       "runId": "run-manuel-S-HC-PUB-06-REELS-STORIES-PUBLISHERS-20260906155441-d36bde04",
       "claimId": "claim-asg-c810d3df-2238-40ee-80ec-0a26622deb28",
       "zones": [
@@ -1091,11 +1091,15 @@
       "sourceTaskBoardHead": "5ed685b6884b96fa1c650224bff60a90d0a0badc",
       "catalogFingerprint": "9528bb8410fff66eabd4db8c4e2c1a6b3c69b057",
       "createdAt": "2026-09-06T15:54:41.029Z",
-      "updatedAt": "2026-09-06T15:54:51.983Z",
+      "updatedAt": "2026-09-06T22:00:07.253Z",
       "activatedAt": "2026-09-06T15:54:51.983Z",
-      "resumedCount": 0,
+      "resumedCount": 1,
       "takeoverCount": 0,
-      "ownershipGeneration": 1,
+      "ownershipGeneration": 2,
+      "previousAgentInstanceUid": "agent_6ebdd7f7d7c541a3b4d4aa9bd90ee134",
+      "previousSessionId": "session_93473a46b2904930916a9715222bf6d5",
+      "takeoverReason": "Resume governed PUB-06 lifecycle after complete green validation in Actions run 34062221297",
+      "takenOverAt": "2026-09-06T22:00:07.253Z",
       "harnessId": "chatgpt",
       "agentInstanceUid": "agent_6ebdd7f7d7c541a3b4d4aa9bd90ee134",
       "agentInstanceAlias": "manuel-chatgpt2",
@@ -1472,13 +1476,13 @@
       "taskId": "S-HC-PUB-06-REELS-STORIES-PUBLISHERS",
       "sprintId": "publishing",
       "operator": "manuel",
-      "machineId": "machine-e15d5758-aa5a-4cda-85ad-73d3cfaf3ce4",
+      "machineId": "machine-0bfd2372-b9bb-4496-bfde-af61a0f6b442",
       "runId": "run-manuel-S-HC-PUB-06-REELS-STORIES-PUBLISHERS-20260906155441-d36bde04",
       "branch": "dispatch/manuel/manuel-chatgpt2/publishing/S-HC-PUB-06-REELS-STORIES-PUBLISHERS/6b8d9d8384",
-      "worktreePath": "/home/runner/work/_temp/oreshnik-wt-autonomous/32305cad03d6321a/manuel/manuel-chatgpt2/publishing/S-HC-PUB-06-REELS-STORIES-PUBLISHERS/6b8d9d8384",
+      "worktreePath": "/home/runner/work/_temp/oreshnik-wt-pub06-lifecycle/32305cad03d6321a/manuel/manuel-chatgpt2/publishing/S-HC-PUB-06-REELS-STORIES-PUBLISHERS/622deb28",
       "status": "active",
       "createdAt": "2026-09-06T15:54:41.029Z",
-      "updatedAt": "2026-09-06T15:54:51.983Z",
+      "updatedAt": "2026-09-06T22:00:07.253Z",
       "zones": [
         "apps/web/lib/publishers",
         "apps/web/app/api/publishing",
@@ -1496,7 +1500,7 @@
         "apps/web/app/api/publishing",
         "packages/integrations"
       ],
-      "ownershipGeneration": 1,
+      "ownershipGeneration": 2,
       "harnessId": "chatgpt",
       "agentInstanceUid": "agent_6ebdd7f7d7c541a3b4d4aa9bd90ee134",
       "agentInstanceAlias": "manuel-chatgpt2",
@@ -1880,12 +1884,12 @@
       "taskId": "S-HC-PUB-06-REELS-STORIES-PUBLISHERS",
       "sprintId": "publishing",
       "operator": "manuel",
-      "machineId": "machine-e15d5758-aa5a-4cda-85ad-73d3cfaf3ce4",
+      "machineId": "machine-0bfd2372-b9bb-4496-bfde-af61a0f6b442",
       "branch": "dispatch/manuel/manuel-chatgpt2/publishing/S-HC-PUB-06-REELS-STORIES-PUBLISHERS/6b8d9d8384",
-      "worktreePath": "/home/runner/work/_temp/oreshnik-wt-autonomous/32305cad03d6321a/manuel/manuel-chatgpt2/publishing/S-HC-PUB-06-REELS-STORIES-PUBLISHERS/6b8d9d8384",
+      "worktreePath": "/home/runner/work/_temp/oreshnik-wt-pub06-lifecycle/32305cad03d6321a/manuel/manuel-chatgpt2/publishing/S-HC-PUB-06-REELS-STORIES-PUBLISHERS/622deb28",
       "status": "active",
       "createdAt": "2026-09-06T15:54:41.029Z",
-      "updatedAt": "2026-09-06T15:54:51.983Z",
+      "updatedAt": "2026-09-06T22:00:07.253Z",
       "sourceTaskBoardHead": "5ed685b6884b96fa1c650224bff60a90d0a0badc",
       "zones": [
         "apps/web/lib/publishers",
@@ -1904,7 +1908,7 @@
         "apps/web/app/api/publishing",
         "packages/integrations"
       ],
-      "ownershipGeneration": 1,
+      "ownershipGeneration": 2,
       "harnessId": "chatgpt",
       "agentInstanceUid": "agent_6ebdd7f7d7c541a3b4d4aa9bd90ee134",
       "agentInstanceAlias": "manuel-chatgpt2",
@@ -3576,6 +3580,16 @@
       "at": "2026-09-06T22:00:00.375Z",
       "action": "dispatch.init",
       "message": "Registered machine machine-0bfd2372-b9bb-4496-bfde-af61a0f6b442 with root /home/runner/work/_temp/oreshnik-wt-pub06-lifecycle."
+    },
+    {
+      "at": "2026-09-06T22:00:07.253Z",
+      "action": "dispatch.takeover",
+      "assignmentId": "asg-c810d3df-2238-40ee-80ec-0a26622deb28",
+      "runId": "run-manuel-S-HC-PUB-06-REELS-STORIES-PUBLISHERS-20260906155441-d36bde04",
+      "operator": "manuel",
+      "agentInstanceUid": "agent_6ebdd7f7d7c541a3b4d4aa9bd90ee134",
+      "sessionId": "session_93473a46b2904930916a9715222bf6d5",
+      "message": "Takeover by manuel/manuel-chatgpt2 from manuel/manuel-chatgpt2. Reason: Resume governed PUB-06 lifecycle after complete green validation in Actions run 34062221297. Generation: 1 → 2."
     }
   ],
   "reconciliation": {
@@ -3585,5 +3599,5 @@
     "pendingDiagnostics": []
   },
   "createdAt": "2026-06-29T20:17:43.302Z",
-  "updatedAt": "2026-09-06T22:00:00.375Z"
+  "updatedAt": "2026-09-06T22:00:07.253Z"
 }
