@@ -5,8 +5,8 @@
     "originUrl": "https://github.com/Cerberux77/HeptaCore.git",
     "canonicalMotherBranch": "master"
   },
-  "generation": 89,
-  "controlHead": "74c0773c047f0f947420ae4fee7aec39deff55bf",
+  "generation": 90,
+  "controlHead": "b822c12cc8953b211b8fbfd1481cbf1ed07da350",
   "catalog": {
     "taskBoardPath": "var/oreshnik/task-board.json",
     "zoneMapPath": "docs/07_handoffs/zone-map.json",
@@ -359,6 +359,18 @@
       "createdAt": "2026-09-05T18:01:53.697Z",
       "updatedAt": "2026-09-06T15:49:05.339Z",
       "identityOrigin": "explicit"
+    },
+    {
+      "agentInstanceUid": "agent_6ebdd7f7d7c541a3b4d4aa9bd90ee134",
+      "displayAlias": "manuel-chatgpt2",
+      "operatorId": "manuel",
+      "harnessId": "chatgpt",
+      "machineId": "machine-e15d5758-aa5a-4cda-85ad-73d3cfaf3ce4",
+      "repositoryId": "32305cad03d6321a",
+      "slot": 2,
+      "createdAt": "2026-09-06T15:54:41.029Z",
+      "updatedAt": "2026-09-06T15:54:41.029Z",
+      "identityOrigin": "explicit"
     }
   ],
   "sessions": [
@@ -491,6 +503,17 @@
       "lastSeenAt": "2026-09-06T15:49:05.339Z",
       "status": "closed",
       "closedAt": "2026-09-06T15:49:05.339Z",
+      "identityOrigin": "explicit"
+    },
+    {
+      "sessionId": "session_93473a46b2904930916a9715222bf6d5",
+      "agentInstanceUid": "agent_6ebdd7f7d7c541a3b4d4aa9bd90ee134",
+      "operatorId": "manuel",
+      "harnessId": "chatgpt",
+      "machineId": "machine-e15d5758-aa5a-4cda-85ad-73d3cfaf3ce4",
+      "startedAt": "2026-09-06T15:54:41.029Z",
+      "lastSeenAt": "2026-09-06T15:54:41.029Z",
+      "status": "active",
       "identityOrigin": "explicit"
     }
   ],
@@ -1057,11 +1080,12 @@
         "apps/web/app/api/publishing",
         "packages/integrations"
       ],
-      "status": "provisioning",
+      "status": "active",
       "sourceTaskBoardHead": "5ed685b6884b96fa1c650224bff60a90d0a0badc",
       "catalogFingerprint": "9528bb8410fff66eabd4db8c4e2c1a6b3c69b057",
       "createdAt": "2026-09-06T15:54:41.029Z",
-      "updatedAt": "2026-09-06T15:54:41.029Z",
+      "updatedAt": "2026-09-06T15:54:51.983Z",
+      "activatedAt": "2026-09-06T15:54:51.983Z",
       "resumedCount": 0,
       "takeoverCount": 0,
       "ownershipGeneration": 1,
@@ -1447,7 +1471,7 @@
       "worktreePath": "/home/runner/work/_temp/oreshnik-wt-autonomous/32305cad03d6321a/manuel/manuel-chatgpt2/publishing/S-HC-PUB-06-REELS-STORIES-PUBLISHERS/6b8d9d8384",
       "status": "active",
       "createdAt": "2026-09-06T15:54:41.029Z",
-      "updatedAt": "2026-09-06T15:54:41.029Z",
+      "updatedAt": "2026-09-06T15:54:51.983Z",
       "zones": [
         "apps/web/lib/publishers",
         "apps/web/app/api/publishing",
@@ -1852,9 +1876,9 @@
       "machineId": "machine-e15d5758-aa5a-4cda-85ad-73d3cfaf3ce4",
       "branch": "dispatch/manuel/manuel-chatgpt2/publishing/S-HC-PUB-06-REELS-STORIES-PUBLISHERS/6b8d9d8384",
       "worktreePath": "/home/runner/work/_temp/oreshnik-wt-autonomous/32305cad03d6321a/manuel/manuel-chatgpt2/publishing/S-HC-PUB-06-REELS-STORIES-PUBLISHERS/6b8d9d8384",
-      "status": "provisioning",
+      "status": "active",
       "createdAt": "2026-09-06T15:54:41.029Z",
-      "updatedAt": "2026-09-06T15:54:41.029Z",
+      "updatedAt": "2026-09-06T15:54:51.983Z",
       "sourceTaskBoardHead": "5ed685b6884b96fa1c650224bff60a90d0a0badc",
       "zones": [
         "apps/web/lib/publishers",
@@ -2829,7 +2853,7 @@
       "branch": "dispatch/manuel/manuel-chatgpt2/publishing/S-HC-PUB-06-REELS-STORIES-PUBLISHERS/6b8d9d8384",
       "status": "reserved",
       "createdAt": "2026-09-06T15:54:41.029Z",
-      "updatedAt": "2026-09-06T15:54:41.029Z",
+      "updatedAt": "2026-09-06T15:54:51.983Z",
       "harnessId": "chatgpt",
       "agentInstanceUid": "agent_6ebdd7f7d7c541a3b4d4aa9bd90ee134",
       "agentInstanceAlias": "manuel-chatgpt2",
@@ -2847,7 +2871,7 @@
       "branch": "dispatch/manuel/manuel-chatgpt2/publishing/S-HC-PUB-06-REELS-STORIES-PUBLISHERS/6b8d9d8384",
       "status": "reserved",
       "createdAt": "2026-09-06T15:54:41.029Z",
-      "updatedAt": "2026-09-06T15:54:41.029Z",
+      "updatedAt": "2026-09-06T15:54:51.983Z",
       "harnessId": "chatgpt",
       "agentInstanceUid": "agent_6ebdd7f7d7c541a3b4d4aa9bd90ee134",
       "agentInstanceAlias": "manuel-chatgpt2",
@@ -2865,7 +2889,7 @@
       "branch": "dispatch/manuel/manuel-chatgpt2/publishing/S-HC-PUB-06-REELS-STORIES-PUBLISHERS/6b8d9d8384",
       "status": "reserved",
       "createdAt": "2026-09-06T15:54:41.029Z",
-      "updatedAt": "2026-09-06T15:54:41.029Z",
+      "updatedAt": "2026-09-06T15:54:51.983Z",
       "harnessId": "chatgpt",
       "agentInstanceUid": "agent_6ebdd7f7d7c541a3b4d4aa9bd90ee134",
       "agentInstanceAlias": "manuel-chatgpt2",
@@ -3532,6 +3556,14 @@
       "runId": "run-manuel-S-HC-PUB-06-REELS-STORIES-PUBLISHERS-20260906155441-d36bde04",
       "operator": "manuel",
       "message": "Reserved S-HC-PUB-06-REELS-STORIES-PUBLISHERS for manuel."
+    },
+    {
+      "at": "2026-09-06T15:54:51.983Z",
+      "action": "dispatch.next.active",
+      "assignmentId": "asg-c810d3df-2238-40ee-80ec-0a26622deb28",
+      "runId": "run-manuel-S-HC-PUB-06-REELS-STORIES-PUBLISHERS-20260906155441-d36bde04",
+      "operator": "manuel",
+      "message": "Assignment asg-c810d3df-2238-40ee-80ec-0a26622deb28 is active."
     }
   ],
   "reconciliation": {
@@ -3541,5 +3573,5 @@
     "pendingDiagnostics": []
   },
   "createdAt": "2026-06-29T20:17:43.302Z",
-  "updatedAt": "2026-09-06T15:54:41.029Z"
+  "updatedAt": "2026-09-06T15:54:51.983Z"
 }
