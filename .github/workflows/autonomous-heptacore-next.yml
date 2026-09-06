@@ -1,0 +1,111 @@
+name: Autonomous HeptaCore Next
+
+on:
+  push:
+    branches:
+      - ops/autonomous-heptacore-continuation-20260906
+    paths:
+      - .github/workflows/autonomous-heptacore-next.yml
+
+permissions:
+  contents: write
+
+concurrency:
+  group: autonomous-heptacore-next-20260906
+  cancel-in-progress: false
+
+jobs:
+  dispatch-next:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      OPERATOR: manuel
+      HARNESS: chatgpt
+      INSTANCE: manuel-chatgpt2
+      ORESHNIK_LOCAL_STATE_DIR: /tmp/oreshnik-autonomous-state
+    steps:
+      - name: Checkout operations branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configure git identity
+        run: |
+          git config --global user.name "Oreshnik ChatGPT Operator"
+          git config --global user.email "oreshnik-bot@users.noreply.github.com"
+
+      - name: Setup Node 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install exact governed CLI
+        run: |
+          set -euo pipefail
+          npm ci --ignore-scripts
+          test "$(node node_modules/oreshnik-cli/dist/cli.js --version)" = "0.3.0-alpha.6"
+
+      - name: Register ephemeral dispatcher machine
+        run: |
+          set -euo pipefail
+          CLI="$GITHUB_WORKSPACE/node_modules/oreshnik-cli/dist/cli.js"
+          node "$CLI" dispatch init \
+            --mother master \
+            --worktree-root "$RUNNER_TEMP/oreshnik-wt-autonomous" \
+            --repo "$GITHUB_WORKSPACE" \
+            --json | tee /tmp/dispatch-init.json
+
+      - name: Capture pre-dispatch control state
+        run: |
+          set -euo pipefail
+          CLI="$GITHUB_WORKSPACE/node_modules/oreshnik-cli/dist/cli.js"
+          node "$CLI" dispatch status --repo "$GITHUB_WORKSPACE" --json | tee /tmp/status-before.json
+
+      - name: Dispatch next eligible Task canonically
+        id: dispatch
+        run: |
+          set -euo pipefail
+          CLI="$GITHUB_WORKSPACE/node_modules/oreshnik-cli/dist/cli.js"
+          node "$CLI" dispatch next \
+            --operator "$OPERATOR" \
+            --harness "$HARNESS" \
+            --instance "$INSTANCE" \
+            --session new \
+            --repo "$GITHUB_WORKSPACE" \
+            --json | tee /tmp/dispatch-next.json
+          node - <<'NODE'
+          const fs=require('fs');
+          const x=JSON.parse(fs.readFileSync('/tmp/dispatch-next.json','utf8'));
+          if (x.result !== 'assigned' && x.result !== 'no_task') throw new Error(`unexpected dispatch result: ${x.result}`);
+          if (x.result === 'assigned') {
+            if (x.taskId === 'S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION') throw new Error('blocked EMAIL-01 was incorrectly redispatched');
+            for (const key of ['taskId','runId','assignmentId','functionalBranch','worktreePath','sessionId','agentInstanceUid']) {
+              if (!x[key]) throw new Error(`missing ${key} in assigned contract`);
+            }
+            console.log(`ORESHNIK_ASSIGNED_TASK=${x.taskId}`);
+            console.log(`ORESHNIK_RUN_ID=${x.runId}`);
+            console.log(`ORESHNIK_BRANCH=${x.functionalBranch}`);
+          }
+          NODE
+
+      - name: Verify post-dispatch control state
+        run: |
+          set -euo pipefail
+          CLI="$GITHUB_WORKSPACE/node_modules/oreshnik-cli/dist/cli.js"
+          node "$CLI" dispatch status --repo "$GITHUB_WORKSPACE" --json | tee /tmp/status-after.json
+          node - <<'NODE'
+          const fs=require('fs');
+          const d=JSON.parse(fs.readFileSync('/tmp/dispatch-next.json','utf8'));
+          const s=JSON.parse(fs.readFileSync('/tmp/status-after.json','utf8'));
+          if (d.result === 'assigned') {
+            const a=(s.assignments||[]).find(x=>x.assignmentId===d.assignmentId);
+            const r=(s.runs||[]).find(x=>x.runId===d.runId);
+            if (!a || a.status!=='active') throw new Error(`assignment not active: ${a?.status}`);
+            if (!r || r.status!=='active') throw new Error(`run not active: ${r?.status}`);
+            if (a.taskId!==d.taskId || a.agentInstanceUid!==d.agentInstanceUid || a.sessionId!==d.sessionId) throw new Error('governed identity mismatch after dispatch');
+            console.log(JSON.stringify({task:d.taskId,run:d.runId,assignment:d.assignmentId,branch:d.functionalBranch,worktree:d.worktreePath,session:d.sessionId,instance:d.agentInstanceUid},null,2));
+          } else {
+            console.log(JSON.stringify({result:'no_task',warnings:d.warnings||[]},null,2));
+          }
+          NODE
