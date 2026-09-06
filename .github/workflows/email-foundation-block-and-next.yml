@@ -133,38 +133,37 @@ jobs:
             requireSession:true,
           });
           console.log(JSON.stringify({preShimResolver:resolved},null,2));
-          if (resolved.ok) throw new Error('resolver unexpectedly succeeded before compatibility hydration');
+          if (resolved.ok) throw new Error('resolver unexpectedly succeeded before compatibility shim');
           if (!resolved.error.message.includes('is not available')) throw new Error(`unexpected resolver failure: ${resolved.error.message}`);
           fs.writeFileSync('/tmp/canonical-repository-id',identity.value.repositoryId,'utf8');
           NODE
 
-      - name: Rehydrate local identity with canonical repository id using Oreshnik helper
+      - name: Apply bounded local repository-id compatibility shim
         run: |
           set -euo pipefail
           cd "$GITHUB_WORKSPACE"
           node --input-type=module <<'NODE'
           import fs from 'node:fs';
           import { createExecutionContextResolver } from './node_modules/oreshnik-cli/dist/index.js';
-          import { hydrateEphemeralTakeoverLocalState } from './node_modules/oreshnik-cli/dist/core/ephemeral-takeover-local-state.js';
 
+          const stateDir=process.env.ORESHNIK_LOCAL_STATE_DIR;
+          const file=`${stateDir}/agent-instances.json`;
           const takeover=JSON.parse(fs.readFileSync('/tmp/takeover.json','utf8'));
           const canonicalRepositoryId=fs.readFileSync('/tmp/canonical-repository-id','utf8').trim();
-          const context={
-            operatorId:process.env.OPERATOR,
-            harnessId:process.env.HARNESS,
-            agentInstanceUid:takeover.agentInstanceUid,
-            agentInstanceAlias:takeover.agentInstanceAlias,
-            sessionId:process.env.SESSION,
-            machineId:takeover.machineId,
-            repositoryId:canonicalRepositoryId,
-            identityOrigin:'explicit',
-            instanceCreated:false,
-            sessionCreated:false,
-            sources:{operator:'flag',harness:'flag',instance:'flag',session:'flag'},
-          };
-          const hydrated=hydrateEphemeralTakeoverLocalState(context,process.env.ORESHNIK_LOCAL_STATE_DIR);
-          console.log(JSON.stringify({compatibilityHydration:hydrated,canonicalRepositoryId},null,2));
-          if (!hydrated.ok) throw new Error(hydrated.error.message);
+          const instances=JSON.parse(fs.readFileSync(file,'utf8'));
+          const index=instances.findIndex(x=>x.agentInstanceUid===takeover.agentInstanceUid);
+          if (index < 0) throw new Error('preserved takeover instance not found');
+          const current=instances[index];
+          if (current.displayAlias!==process.env.INSTANCE || current.operatorId!==process.env.OPERATOR || current.harnessId!==process.env.HARNESS || current.machineId!==takeover.machineId) {
+            throw new Error('refusing compatibility shim because preserved identity fields differ');
+          }
+          if (current.repositoryId===canonicalRepositoryId) throw new Error('compatibility shim is no longer necessary');
+          const legacyRepositoryId=current.repositoryId;
+          instances[index]={...current,repositoryId:canonicalRepositoryId,updatedAt:new Date().toISOString()};
+          const temp=`${file}.${process.pid}.tmp`;
+          fs.writeFileSync(temp,`${JSON.stringify(instances,null,2)}\n`,'utf8');
+          fs.renameSync(temp,file);
+
           const resolved=createExecutionContextResolver(process.env.GITHUB_WORKSPACE).resolve({
             explicitOperator:process.env.OPERATOR,
             explicitHarness:process.env.HARNESS,
@@ -173,9 +172,11 @@ jobs:
             allowCreateInstance:false,
             requireSession:true,
           });
-          console.log(JSON.stringify({postShimResolver:resolved},null,2));
-          if (!resolved.ok) throw new Error(`resolver still fails after Oreshnik compatibility hydration: ${resolved.error.message}`);
-          if (resolved.value.agentInstanceUid!==takeover.agentInstanceUid || resolved.value.sessionId!==process.env.SESSION) throw new Error('compatibility hydration changed preserved identity');
+          console.log(JSON.stringify({legacyRepositoryId,canonicalRepositoryId,postShimResolver:resolved},null,2));
+          if (!resolved.ok) throw new Error(`resolver still fails after local compatibility shim: ${resolved.error.message}`);
+          if (resolved.value.agentInstanceUid!==takeover.agentInstanceUid || resolved.value.sessionId!==process.env.SESSION || resolved.value.machineId!==takeover.machineId) {
+            throw new Error('compatibility shim changed preserved governed identity');
+          }
           NODE
 
       - name: Block deferred production activation from dispatcher root
