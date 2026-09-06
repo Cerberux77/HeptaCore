@@ -7,7 +7,26 @@
   "title": "Transactional email foundation: domain sender, DNS, reputation, provider integration",
   "owner": "Jean",
   "backupOwner": "Manuel",
-  "status": "claimed",
+  "status": "blocked",
+  "blockState": {
+    "kind": "awaiting_external_validation",
+    "reason": "Owner deferred official HeptaCore sender domain until development is complete; software foundation is validated and Vercel remains the temporary web origin.",
+    "blockedAt": "2026-09-06T15:49:03.360Z",
+    "blockedBy": "manuel",
+    "externalActionRequired": "Select/purchase official HeptaCore domain and verify Resend SPF, DKIM and DMARC before production email activation.",
+    "resumePolicy": "explicit_authorization_required",
+    "previousStatus": "claimed",
+    "preservedRunId": "run-manuel-S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION-20260905180153-1e9c8316",
+    "history": [
+      {
+        "at": "2026-09-06T15:49:03.360Z",
+        "action": "blocked",
+        "operator": "manuel",
+        "reason": "Owner deferred official HeptaCore sender domain until development is complete; software foundation is validated and Vercel remains the temporary web origin.",
+        "externalActionRequired": "Select/purchase official HeptaCore domain and verify Resend SPF, DKIM and DMARC before production email activation."
+      }
+    ]
+  },
   "taskBoardPath": "/home/runner/work/_temp/oreshnik-wt-email/32305cad03d6321a/manuel/manuel-chatgpt1/email-infra/S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION/3ae02502/var/oreshnik/task-board.json",
   "zone": [
     "apps/web/app/api/email",
@@ -23,23 +42,6 @@
     "Enlaces comerciales y de marca consistentes con el dominio final"
   ],
   "attempts": 1,
-  "activeRun": {
-    "runId": "run-manuel-S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION-20260905180153-1e9c8316",
-    "operator": "manuel",
-    "worker": "manuel-dispatcher",
-    "workerMode": "shell",
-    "claimedAt": "2026-09-05T20:36:07.338Z",
-    "updatedAt": "2026-09-05T20:36:07.338Z",
-    "expiresAt": "2026-09-05T21:36:07.338Z",
-    "branch": "dispatch/manuel/manuel-chatgpt1/email-infra/S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION/3294b78874",
-    "worktreePath": "/home/runner/work/_temp/oreshnik-wt-email/32305cad03d6321a/manuel/manuel-chatgpt1/email-infra/S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION/3ae02502",
-    "zones": [
-      "apps/web/app/api/email",
-      "packages/core",
-      "docs"
-    ],
-    "resources": []
-  },
   "history": [
     {
       "at": "2026-09-05T16:07:01.790Z",
@@ -53,6 +55,14 @@
       "operator": "manuel",
       "branch": "dispatch/manuel/manuel-chatgpt1/email-infra/S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION/3294b78874",
       "description": "Run run-manuel-S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION-20260905180153-1e9c8316 claimed via shell"
+    },
+    {
+      "at": "2026-09-06T15:49:03.360Z",
+      "action": "task_blocked",
+      "operator": "manuel",
+      "reason": "Owner deferred official HeptaCore sender domain until development is complete; software foundation is validated and Vercel remains the temporary web origin.",
+      "branch": "dispatch/manuel/manuel-chatgpt1/email-infra/S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION/3294b78874",
+      "description": "awaiting_external_validation: Owner deferred official HeptaCore sender domain until development is complete; software foundation is validated and Vercel remains the temporary web origin."
     }
   ],
   "handoffs": [
@@ -66,7 +76,7 @@
       "classification": "BLOCKED_EXTERNAL"
     }
   ],
-  "updatedAt": "2026-09-05T20:36:07.339Z",
+  "updatedAt": "2026-09-06T15:49:03.360Z",
   "runs": [
     {
       "runId": "run-manuel-S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION-20260905180153-1e9c8316",
@@ -81,11 +91,12 @@
         "docs"
       ],
       "resources": [],
-      "taskStatus": "claimed",
-      "claimStatus": "claimed",
+      "taskStatus": "blocked",
+      "claimStatus": "released",
       "claimedAt": "2026-09-05T20:36:07.338Z",
-      "updatedAt": "2026-09-05T20:36:07.343Z",
+      "updatedAt": "2026-09-06T15:49:03.367Z",
       "expiresAt": "2026-09-05T21:36:07.338Z",
+      "releasedAt": "2026-09-06T15:49:03.367Z",
       "manifestPath": "var/oreshnik/runs/S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION/run-manuel-S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION-20260905180153-1e9c8316.json"
     }
   ]
