@@ -5,15 +5,15 @@
     "originUrl": "https://github.com/Cerberux77/HeptaCore.git",
     "canonicalMotherBranch": "master"
   },
-  "generation": 87,
-  "controlHead": "72ad5d0ff1b46e6875367e9c242305845c3fc889",
+  "generation": 88,
+  "controlHead": "0be61a5268627835e263b88eebf563f96b8c5d57",
   "catalog": {
     "taskBoardPath": "var/oreshnik/task-board.json",
     "zoneMapPath": "docs/07_handoffs/zone-map.json",
     "sourceTaskBoardHead": "5ed685b6884b96fa1c650224bff60a90d0a0badc",
     "fingerprint": "9528bb8410fff66eabd4db8c4e2c1a6b3c69b057",
     "taskCount": 43,
-    "updatedAt": "2026-09-06T15:49:05.339Z"
+    "updatedAt": "2026-09-06T15:54:21.485Z"
   },
   "policy": {
     "name": "deterministic-v1",
@@ -218,6 +218,13 @@
       "hostname": "runnervmejwal",
       "registeredAt": "2026-09-06T15:48:48.232Z",
       "updatedAt": "2026-09-06T15:48:48.232Z"
+    },
+    {
+      "machineId": "machine-e15d5758-aa5a-4cda-85ad-73d3cfaf3ce4",
+      "worktreeRoot": "/home/runner/work/_temp/oreshnik-wt-autonomous",
+      "hostname": "runnervmejwal",
+      "registeredAt": "2026-09-06T15:54:19.838Z",
+      "updatedAt": "2026-09-06T15:54:19.838Z"
     }
   ],
   "agentInstances": [
@@ -350,7 +357,7 @@
       "repositoryId": "32305cad03d6321a",
       "slot": 1,
       "createdAt": "2026-09-05T18:01:53.697Z",
-      "updatedAt": "2026-09-06T15:48:54.276Z",
+      "updatedAt": "2026-09-06T15:49:05.339Z",
       "identityOrigin": "explicit"
     }
   ],
@@ -481,8 +488,9 @@
       "harnessId": "chatgpt",
       "machineId": "machine-dd16d3de-6807-4762-a608-5050369ab3a8",
       "startedAt": "2026-09-05T18:01:53.697Z",
-      "lastSeenAt": "2026-09-06T15:48:54.276Z",
-      "status": "active",
+      "lastSeenAt": "2026-09-06T15:49:05.339Z",
+      "status": "closed",
+      "closedAt": "2026-09-06T15:49:05.339Z",
       "identityOrigin": "explicit"
     }
   ],
@@ -3340,6 +3348,11 @@
       "runId": "run-manuel-S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION-20260905180153-1e9c8316",
       "operator": "manuel",
       "message": "awaiting_external_validation: Owner deferred official HeptaCore sender domain until development is complete; software foundation is validated and Vercel remains the temporary web origin."
+    },
+    {
+      "at": "2026-09-06T15:54:21.485Z",
+      "action": "dispatch.init",
+      "message": "Registered machine machine-e15d5758-aa5a-4cda-85ad-73d3cfaf3ce4 with root /home/runner/work/_temp/oreshnik-wt-autonomous."
     }
   ],
   "reconciliation": {
@@ -3349,5 +3362,5 @@
     "pendingDiagnostics": []
   },
   "createdAt": "2026-06-29T20:17:43.302Z",
-  "updatedAt": "2026-09-06T15:49:05.339Z"
+  "updatedAt": "2026-09-06T15:54:21.485Z"
 }
