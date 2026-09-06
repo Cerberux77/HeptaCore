@@ -5,15 +5,15 @@
     "originUrl": "https://github.com/Cerberux77/HeptaCore.git",
     "canonicalMotherBranch": "master"
   },
-  "generation": 88,
-  "controlHead": "0be61a5268627835e263b88eebf563f96b8c5d57",
+  "generation": 89,
+  "controlHead": "74c0773c047f0f947420ae4fee7aec39deff55bf",
   "catalog": {
     "taskBoardPath": "var/oreshnik/task-board.json",
     "zoneMapPath": "docs/07_handoffs/zone-map.json",
     "sourceTaskBoardHead": "5ed685b6884b96fa1c650224bff60a90d0a0badc",
     "fingerprint": "9528bb8410fff66eabd4db8c4e2c1a6b3c69b057",
     "taskCount": 43,
-    "updatedAt": "2026-09-06T15:54:21.485Z"
+    "updatedAt": "2026-09-06T15:54:41.029Z"
   },
   "policy": {
     "name": "deterministic-v1",
@@ -1027,6 +1027,49 @@
       "agentInstanceAlias": "manuel-chatgpt1",
       "sessionId": "session_1d4bac9cf36943759bf3bc4272dd5105",
       "identityOrigin": "explicit"
+    },
+    {
+      "assignmentId": "asg-c810d3df-2238-40ee-80ec-0a26622deb28",
+      "taskId": "S-HC-PUB-06-REELS-STORIES-PUBLISHERS",
+      "sprintId": "publishing",
+      "title": "Real publishing for Meta Reels and Stories: Instagram + Facebook",
+      "operator": "manuel",
+      "machineId": "machine-e15d5758-aa5a-4cda-85ad-73d3cfaf3ce4",
+      "functionalBranch": "dispatch/manuel/manuel-chatgpt2/publishing/S-HC-PUB-06-REELS-STORIES-PUBLISHERS/6b8d9d8384",
+      "motherBranch": "master",
+      "worktreePath": "/home/runner/work/_temp/oreshnik-wt-autonomous/32305cad03d6321a/manuel/manuel-chatgpt2/publishing/S-HC-PUB-06-REELS-STORIES-PUBLISHERS/6b8d9d8384",
+      "runId": "run-manuel-S-HC-PUB-06-REELS-STORIES-PUBLISHERS-20260906155441-d36bde04",
+      "claimId": "claim-asg-c810d3df-2238-40ee-80ec-0a26622deb28",
+      "zones": [
+        "apps/web/lib/publishers",
+        "apps/web/app/api/publishing",
+        "packages/integrations"
+      ],
+      "readZones": [],
+      "writeZones": [
+        "apps/web/lib/publishers",
+        "apps/web/app/api/publishing",
+        "packages/integrations"
+      ],
+      "resources": [],
+      "locks": [
+        "apps/web/lib/publishers",
+        "apps/web/app/api/publishing",
+        "packages/integrations"
+      ],
+      "status": "provisioning",
+      "sourceTaskBoardHead": "5ed685b6884b96fa1c650224bff60a90d0a0badc",
+      "catalogFingerprint": "9528bb8410fff66eabd4db8c4e2c1a6b3c69b057",
+      "createdAt": "2026-09-06T15:54:41.029Z",
+      "updatedAt": "2026-09-06T15:54:41.029Z",
+      "resumedCount": 0,
+      "takeoverCount": 0,
+      "ownershipGeneration": 1,
+      "harnessId": "chatgpt",
+      "agentInstanceUid": "agent_6ebdd7f7d7c541a3b4d4aa9bd90ee134",
+      "agentInstanceAlias": "manuel-chatgpt2",
+      "sessionId": "session_93473a46b2904930916a9715222bf6d5",
+      "identityOrigin": "explicit"
     }
   ],
   "claims": [
@@ -1390,6 +1433,43 @@
       "agentInstanceUid": "agent_a7665c7284074daa989cd1e0e83847e0",
       "agentInstanceAlias": "manuel-chatgpt1",
       "sessionId": "session_1d4bac9cf36943759bf3bc4272dd5105",
+      "identityOrigin": "explicit"
+    },
+    {
+      "claimId": "claim-asg-c810d3df-2238-40ee-80ec-0a26622deb28",
+      "assignmentId": "asg-c810d3df-2238-40ee-80ec-0a26622deb28",
+      "taskId": "S-HC-PUB-06-REELS-STORIES-PUBLISHERS",
+      "sprintId": "publishing",
+      "operator": "manuel",
+      "machineId": "machine-e15d5758-aa5a-4cda-85ad-73d3cfaf3ce4",
+      "runId": "run-manuel-S-HC-PUB-06-REELS-STORIES-PUBLISHERS-20260906155441-d36bde04",
+      "branch": "dispatch/manuel/manuel-chatgpt2/publishing/S-HC-PUB-06-REELS-STORIES-PUBLISHERS/6b8d9d8384",
+      "worktreePath": "/home/runner/work/_temp/oreshnik-wt-autonomous/32305cad03d6321a/manuel/manuel-chatgpt2/publishing/S-HC-PUB-06-REELS-STORIES-PUBLISHERS/6b8d9d8384",
+      "status": "active",
+      "createdAt": "2026-09-06T15:54:41.029Z",
+      "updatedAt": "2026-09-06T15:54:41.029Z",
+      "zones": [
+        "apps/web/lib/publishers",
+        "apps/web/app/api/publishing",
+        "packages/integrations"
+      ],
+      "readZones": [],
+      "writeZones": [
+        "apps/web/lib/publishers",
+        "apps/web/app/api/publishing",
+        "packages/integrations"
+      ],
+      "resources": [],
+      "locks": [
+        "apps/web/lib/publishers",
+        "apps/web/app/api/publishing",
+        "packages/integrations"
+      ],
+      "ownershipGeneration": 1,
+      "harnessId": "chatgpt",
+      "agentInstanceUid": "agent_6ebdd7f7d7c541a3b4d4aa9bd90ee134",
+      "agentInstanceAlias": "manuel-chatgpt2",
+      "sessionId": "session_93473a46b2904930916a9715222bf6d5",
       "identityOrigin": "explicit"
     }
   ],
@@ -1761,6 +1841,43 @@
       "agentInstanceUid": "agent_a7665c7284074daa989cd1e0e83847e0",
       "agentInstanceAlias": "manuel-chatgpt1",
       "sessionId": "session_1d4bac9cf36943759bf3bc4272dd5105",
+      "identityOrigin": "explicit"
+    },
+    {
+      "runId": "run-manuel-S-HC-PUB-06-REELS-STORIES-PUBLISHERS-20260906155441-d36bde04",
+      "assignmentId": "asg-c810d3df-2238-40ee-80ec-0a26622deb28",
+      "taskId": "S-HC-PUB-06-REELS-STORIES-PUBLISHERS",
+      "sprintId": "publishing",
+      "operator": "manuel",
+      "machineId": "machine-e15d5758-aa5a-4cda-85ad-73d3cfaf3ce4",
+      "branch": "dispatch/manuel/manuel-chatgpt2/publishing/S-HC-PUB-06-REELS-STORIES-PUBLISHERS/6b8d9d8384",
+      "worktreePath": "/home/runner/work/_temp/oreshnik-wt-autonomous/32305cad03d6321a/manuel/manuel-chatgpt2/publishing/S-HC-PUB-06-REELS-STORIES-PUBLISHERS/6b8d9d8384",
+      "status": "provisioning",
+      "createdAt": "2026-09-06T15:54:41.029Z",
+      "updatedAt": "2026-09-06T15:54:41.029Z",
+      "sourceTaskBoardHead": "5ed685b6884b96fa1c650224bff60a90d0a0badc",
+      "zones": [
+        "apps/web/lib/publishers",
+        "apps/web/app/api/publishing",
+        "packages/integrations"
+      ],
+      "readZones": [],
+      "writeZones": [
+        "apps/web/lib/publishers",
+        "apps/web/app/api/publishing",
+        "packages/integrations"
+      ],
+      "resources": [],
+      "locks": [
+        "apps/web/lib/publishers",
+        "apps/web/app/api/publishing",
+        "packages/integrations"
+      ],
+      "ownershipGeneration": 1,
+      "harnessId": "chatgpt",
+      "agentInstanceUid": "agent_6ebdd7f7d7c541a3b4d4aa9bd90ee134",
+      "agentInstanceAlias": "manuel-chatgpt2",
+      "sessionId": "session_93473a46b2904930916a9715222bf6d5",
       "identityOrigin": "explicit"
     }
   ],
@@ -2700,6 +2817,60 @@
       "agentInstanceAlias": "manuel-chatgpt1",
       "sessionId": "session_1d4bac9cf36943759bf3bc4272dd5105",
       "identityOrigin": "explicit"
+    },
+    {
+      "zone": "apps/web/lib/publishers",
+      "assignmentId": "asg-c810d3df-2238-40ee-80ec-0a26622deb28",
+      "taskId": "S-HC-PUB-06-REELS-STORIES-PUBLISHERS",
+      "sprintId": "publishing",
+      "operator": "manuel",
+      "machineId": "machine-e15d5758-aa5a-4cda-85ad-73d3cfaf3ce4",
+      "runId": "run-manuel-S-HC-PUB-06-REELS-STORIES-PUBLISHERS-20260906155441-d36bde04",
+      "branch": "dispatch/manuel/manuel-chatgpt2/publishing/S-HC-PUB-06-REELS-STORIES-PUBLISHERS/6b8d9d8384",
+      "status": "reserved",
+      "createdAt": "2026-09-06T15:54:41.029Z",
+      "updatedAt": "2026-09-06T15:54:41.029Z",
+      "harnessId": "chatgpt",
+      "agentInstanceUid": "agent_6ebdd7f7d7c541a3b4d4aa9bd90ee134",
+      "agentInstanceAlias": "manuel-chatgpt2",
+      "sessionId": "session_93473a46b2904930916a9715222bf6d5",
+      "identityOrigin": "explicit"
+    },
+    {
+      "zone": "apps/web/app/api/publishing",
+      "assignmentId": "asg-c810d3df-2238-40ee-80ec-0a26622deb28",
+      "taskId": "S-HC-PUB-06-REELS-STORIES-PUBLISHERS",
+      "sprintId": "publishing",
+      "operator": "manuel",
+      "machineId": "machine-e15d5758-aa5a-4cda-85ad-73d3cfaf3ce4",
+      "runId": "run-manuel-S-HC-PUB-06-REELS-STORIES-PUBLISHERS-20260906155441-d36bde04",
+      "branch": "dispatch/manuel/manuel-chatgpt2/publishing/S-HC-PUB-06-REELS-STORIES-PUBLISHERS/6b8d9d8384",
+      "status": "reserved",
+      "createdAt": "2026-09-06T15:54:41.029Z",
+      "updatedAt": "2026-09-06T15:54:41.029Z",
+      "harnessId": "chatgpt",
+      "agentInstanceUid": "agent_6ebdd7f7d7c541a3b4d4aa9bd90ee134",
+      "agentInstanceAlias": "manuel-chatgpt2",
+      "sessionId": "session_93473a46b2904930916a9715222bf6d5",
+      "identityOrigin": "explicit"
+    },
+    {
+      "zone": "packages/integrations",
+      "assignmentId": "asg-c810d3df-2238-40ee-80ec-0a26622deb28",
+      "taskId": "S-HC-PUB-06-REELS-STORIES-PUBLISHERS",
+      "sprintId": "publishing",
+      "operator": "manuel",
+      "machineId": "machine-e15d5758-aa5a-4cda-85ad-73d3cfaf3ce4",
+      "runId": "run-manuel-S-HC-PUB-06-REELS-STORIES-PUBLISHERS-20260906155441-d36bde04",
+      "branch": "dispatch/manuel/manuel-chatgpt2/publishing/S-HC-PUB-06-REELS-STORIES-PUBLISHERS/6b8d9d8384",
+      "status": "reserved",
+      "createdAt": "2026-09-06T15:54:41.029Z",
+      "updatedAt": "2026-09-06T15:54:41.029Z",
+      "harnessId": "chatgpt",
+      "agentInstanceUid": "agent_6ebdd7f7d7c541a3b4d4aa9bd90ee134",
+      "agentInstanceAlias": "manuel-chatgpt2",
+      "sessionId": "session_93473a46b2904930916a9715222bf6d5",
+      "identityOrigin": "explicit"
     }
   ],
   "audit": [
@@ -3353,14 +3524,22 @@
       "at": "2026-09-06T15:54:21.485Z",
       "action": "dispatch.init",
       "message": "Registered machine machine-e15d5758-aa5a-4cda-85ad-73d3cfaf3ce4 with root /home/runner/work/_temp/oreshnik-wt-autonomous."
+    },
+    {
+      "at": "2026-09-06T15:54:41.029Z",
+      "action": "dispatch.next.reserved",
+      "assignmentId": "asg-c810d3df-2238-40ee-80ec-0a26622deb28",
+      "runId": "run-manuel-S-HC-PUB-06-REELS-STORIES-PUBLISHERS-20260906155441-d36bde04",
+      "operator": "manuel",
+      "message": "Reserved S-HC-PUB-06-REELS-STORIES-PUBLISHERS for manuel."
     }
   ],
   "reconciliation": {
-    "lastAttemptAt": "2026-09-05T18:01:53.692Z",
+    "lastAttemptAt": "2026-09-06T15:54:41.024Z",
     "lastAppliedAt": "2026-07-01T07:00:56.759Z",
     "lastResult": "clean",
     "pendingDiagnostics": []
   },
   "createdAt": "2026-06-29T20:17:43.302Z",
-  "updatedAt": "2026-09-06T15:54:21.485Z"
+  "updatedAt": "2026-09-06T15:54:41.029Z"
 }
