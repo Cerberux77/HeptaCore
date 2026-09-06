@@ -1,0 +1,27 @@
+{
+  "taskId": "S-HC-PUB-06-REELS-STORIES-PUBLISHERS",
+  "sprint": "publishing",
+  "owner": "Manuel",
+  "operator": "manuel",
+  "harnessId": "chatgpt",
+  "agentInstanceUid": "agent_6ebdd7f7d7c541a3b4d4aa9bd90ee134",
+  "agentInstanceAlias": "manuel-chatgpt2",
+  "sessionId": "session_93473a46b2904930916a9715222bf6d5",
+  "identityOrigin": "explicit",
+  "worker": "manuel-dispatcher",
+  "workerMode": "shell",
+  "runId": "run-manuel-S-HC-PUB-06-REELS-STORIES-PUBLISHERS-20260906155441-d36bde04",
+  "branch": "dispatch/manuel/manuel-chatgpt2/publishing/S-HC-PUB-06-REELS-STORIES-PUBLISHERS/6b8d9d8384",
+  "worktreePath": "/home/runner/work/_temp/oreshnik-wt-pub06-lifecycle/32305cad03d6321a/manuel/manuel-chatgpt2/publishing/S-HC-PUB-06-REELS-STORIES-PUBLISHERS/622deb28",
+  "zones": [
+    "apps/web/lib/publishers",
+    "apps/web/app/api/publishing",
+    "packages/integrations"
+  ],
+  "resources": [],
+  "claimedAt": "2026-09-06T22:00:08.034Z",
+  "updatedAt": "2026-09-06T22:00:08.034Z",
+  "expiresAt": "2026-09-06T23:00:08.034Z",
+  "ttlSeconds": 3600,
+  "status": "claimed"
+}

@@ -1,6 +1,6 @@
 {
   "project": "HeptaCore",
-  "updatedAt": "2026-09-06T15:49:03.360Z",
+  "updatedAt": "2026-09-06T22:00:34.616Z",
   "currentExecutionOrder": [
     "S-HC-PUB-04-HOURLY-BATCH-CRON",
     "S-HC-PUB-05-RECONCILIATION-OPS",
@@ -1462,26 +1462,7 @@
       "title": "Transactional email foundation: domain sender, DNS, reputation, provider integration",
       "owner": "Jean",
       "backupOwner": "Manuel",
-      "status": "blocked",
-      "blockState": {
-        "kind": "awaiting_external_validation",
-        "reason": "Owner deferred official HeptaCore sender domain until development is complete; software foundation is validated and Vercel remains the temporary web origin.",
-        "blockedAt": "2026-09-06T15:49:03.360Z",
-        "blockedBy": "manuel",
-        "externalActionRequired": "Select/purchase official HeptaCore domain and verify Resend SPF, DKIM and DMARC before production email activation.",
-        "resumePolicy": "explicit_authorization_required",
-        "previousStatus": "claimed",
-        "preservedRunId": "run-manuel-S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION-20260905180153-1e9c8316",
-        "history": [
-          {
-            "at": "2026-09-06T15:49:03.360Z",
-            "action": "blocked",
-            "operator": "manuel",
-            "reason": "Owner deferred official HeptaCore sender domain until development is complete; software foundation is validated and Vercel remains the temporary web origin.",
-            "externalActionRequired": "Select/purchase official HeptaCore domain and verify Resend SPF, DKIM and DMARC before production email activation."
-          }
-        ]
-      },
+      "status": "ready",
       "track": "email-infra",
       "zone": [
         "apps/web/app/api/email",
@@ -1496,28 +1477,12 @@
         "Webhooks de eventos (delivered, bounced, complained) configurados",
         "Enlaces comerciales y de marca consistentes con el dominio final"
       ],
-      "attempts": 1,
       "history": [
         {
           "at": "2026-09-05T16:07:01.790Z",
           "action": "status_reconciled",
           "operator": "jean",
           "description": "Task status reconciled to ready: dependencies and conflicts are clear for execution"
-        },
-        {
-          "at": "2026-09-05T20:36:07.339Z",
-          "action": "claimed",
-          "operator": "manuel",
-          "branch": "dispatch/manuel/manuel-chatgpt1/email-infra/S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION/3294b78874",
-          "description": "Run run-manuel-S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION-20260905180153-1e9c8316 claimed via shell"
-        },
-        {
-          "at": "2026-09-06T15:49:03.360Z",
-          "action": "task_blocked",
-          "operator": "manuel",
-          "reason": "Owner deferred official HeptaCore sender domain until development is complete; software foundation is validated and Vercel remains the temporary web origin.",
-          "branch": "dispatch/manuel/manuel-chatgpt1/email-infra/S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION/3294b78874",
-          "description": "awaiting_external_validation: Owner deferred official HeptaCore sender domain until development is complete; software foundation is validated and Vercel remains the temporary web origin."
         }
       ]
     },
@@ -1859,7 +1824,7 @@
       "title": "Real publishing for Meta Reels and Stories: Instagram + Facebook",
       "owner": "Manuel",
       "backupOwner": "Manuel",
-      "status": "ready",
+      "status": "validating",
       "track": "publishing",
       "zone": [
         "apps/web/lib/publishers",
@@ -1882,12 +1847,44 @@
         "Reutilizacion de transactional finalization y IN_REVIEW state machine",
         "Cero declaracion de soporte hasta que la combinacion concreta haya sido validada"
       ],
+      "attempts": 1,
+      "activeRun": {
+        "runId": "run-manuel-S-HC-PUB-06-REELS-STORIES-PUBLISHERS-20260906155441-d36bde04",
+        "operator": "manuel",
+        "worker": "manuel-dispatcher",
+        "workerMode": "shell",
+        "claimedAt": "2026-09-06T22:00:08.034Z",
+        "updatedAt": "2026-09-06T22:00:08.034Z",
+        "expiresAt": "2026-09-06T23:00:08.034Z",
+        "branch": "dispatch/manuel/manuel-chatgpt2/publishing/S-HC-PUB-06-REELS-STORIES-PUBLISHERS/6b8d9d8384",
+        "worktreePath": "/home/runner/work/_temp/oreshnik-wt-pub06-lifecycle/32305cad03d6321a/manuel/manuel-chatgpt2/publishing/S-HC-PUB-06-REELS-STORIES-PUBLISHERS/622deb28",
+        "zones": [
+          "apps/web/lib/publishers",
+          "apps/web/app/api/publishing",
+          "packages/integrations"
+        ],
+        "resources": []
+      },
       "history": [
         {
           "at": "2026-06-28T18:47:05.091Z",
           "action": "status_reconciled",
           "operator": "manuel",
           "description": "Task status reconciled to ready: dependencies and conflicts are clear for execution"
+        },
+        {
+          "at": "2026-09-06T22:00:08.035Z",
+          "action": "claimed",
+          "operator": "manuel",
+          "branch": "dispatch/manuel/manuel-chatgpt2/publishing/S-HC-PUB-06-REELS-STORIES-PUBLISHERS/6b8d9d8384",
+          "description": "Run run-manuel-S-HC-PUB-06-REELS-STORIES-PUBLISHERS-20260906155441-d36bde04 claimed via shell"
+        },
+        {
+          "at": "2026-09-06T22:00:34.616Z",
+          "action": "validation_started",
+          "operator": "manuel",
+          "branch": "dispatch/manuel/manuel-chatgpt2/publishing/S-HC-PUB-06-REELS-STORIES-PUBLISHERS/6b8d9d8384",
+          "description": "PUB-06 implementation complete; provider-specific 8/8 tests and full typecheck/build/tests/worker/reconcile/diff gates passed in GitHub Actions run 34062221297."
         }
       ]
     },
