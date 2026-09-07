@@ -5,7 +5,7 @@
     "originUrl": "https://github.com/Cerberux77/HeptaCore.git",
     "canonicalMotherBranch": "master"
   },
-  "generation": 99,
+  "generation": 100,
   "controlHead": "6bd02bfb653c48c3d4aff2843e9a1df458f99a09",
   "catalog": {
     "taskBoardPath": "var/oreshnik/task-board.json",
@@ -1092,10 +1092,10 @@
       "sprintId": "publishing",
       "title": "Real publishing for Meta Reels and Stories: Instagram + Facebook",
       "operator": "manuel",
-      "machineId": "machine-b2c47e15-5b30-4b12-9673-07e124cff525",
+      "machineId": "machine-e9f3902a-e3c8-4d54-baa8-2a3db40256b7",
       "functionalBranch": "dispatch/manuel/manuel-chatgpt2/publishing/S-HC-PUB-06-REELS-STORIES-PUBLISHERS/6b8d9d8384",
       "motherBranch": "master",
-      "worktreePath": "/home/runner/work/_temp/oreshnik-wt-pub06-finalize-v3/32305cad03d6321a/manuel/manuel-chatgpt2/publishing/S-HC-PUB-06-REELS-STORIES-PUBLISHERS/622deb28",
+      "worktreePath": "/home/runner/work/_temp/oreshnik-wt-pub06-finalize-v4/32305cad03d6321a/manuel/manuel-chatgpt2/publishing/S-HC-PUB-06-REELS-STORIES-PUBLISHERS/622deb28",
       "runId": "run-manuel-S-HC-PUB-06-REELS-STORIES-PUBLISHERS-20260906155441-d36bde04",
       "claimId": "claim-asg-c810d3df-2238-40ee-80ec-0a26622deb28",
       "zones": [
@@ -1119,15 +1119,15 @@
       "sourceTaskBoardHead": "5ed685b6884b96fa1c650224bff60a90d0a0badc",
       "catalogFingerprint": "9528bb8410fff66eabd4db8c4e2c1a6b3c69b057",
       "createdAt": "2026-09-06T15:54:41.029Z",
-      "updatedAt": "2026-09-07T06:40:19.754Z",
+      "updatedAt": "2026-09-07T06:44:53.337Z",
       "activatedAt": "2026-09-06T15:54:51.983Z",
-      "resumedCount": 4,
+      "resumedCount": 5,
       "takeoverCount": 0,
-      "ownershipGeneration": 5,
+      "ownershipGeneration": 6,
       "previousAgentInstanceUid": "agent_6ebdd7f7d7c541a3b4d4aa9bd90ee134",
       "previousSessionId": "session_93473a46b2904930916a9715222bf6d5",
-      "takeoverReason": "Resume exact PUB-06 Run after clean-handoff lifecycle correction",
-      "takenOverAt": "2026-09-07T06:40:19.754Z",
+      "takeoverReason": "Persist successful PUB-06 ready-for-integration transition",
+      "takenOverAt": "2026-09-07T06:44:53.337Z",
       "harnessId": "chatgpt",
       "agentInstanceUid": "agent_6ebdd7f7d7c541a3b4d4aa9bd90ee134",
       "agentInstanceAlias": "manuel-chatgpt2",
@@ -1504,13 +1504,13 @@
       "taskId": "S-HC-PUB-06-REELS-STORIES-PUBLISHERS",
       "sprintId": "publishing",
       "operator": "manuel",
-      "machineId": "machine-b2c47e15-5b30-4b12-9673-07e124cff525",
+      "machineId": "machine-e9f3902a-e3c8-4d54-baa8-2a3db40256b7",
       "runId": "run-manuel-S-HC-PUB-06-REELS-STORIES-PUBLISHERS-20260906155441-d36bde04",
       "branch": "dispatch/manuel/manuel-chatgpt2/publishing/S-HC-PUB-06-REELS-STORIES-PUBLISHERS/6b8d9d8384",
-      "worktreePath": "/home/runner/work/_temp/oreshnik-wt-pub06-finalize-v3/32305cad03d6321a/manuel/manuel-chatgpt2/publishing/S-HC-PUB-06-REELS-STORIES-PUBLISHERS/622deb28",
+      "worktreePath": "/home/runner/work/_temp/oreshnik-wt-pub06-finalize-v4/32305cad03d6321a/manuel/manuel-chatgpt2/publishing/S-HC-PUB-06-REELS-STORIES-PUBLISHERS/622deb28",
       "status": "active",
       "createdAt": "2026-09-06T15:54:41.029Z",
-      "updatedAt": "2026-09-07T06:40:19.754Z",
+      "updatedAt": "2026-09-07T06:44:53.337Z",
       "zones": [
         "apps/web/lib/publishers",
         "apps/web/app/api/publishing",
@@ -1528,7 +1528,7 @@
         "apps/web/app/api/publishing",
         "packages/integrations"
       ],
-      "ownershipGeneration": 5,
+      "ownershipGeneration": 6,
       "harnessId": "chatgpt",
       "agentInstanceUid": "agent_6ebdd7f7d7c541a3b4d4aa9bd90ee134",
       "agentInstanceAlias": "manuel-chatgpt2",
@@ -1912,12 +1912,12 @@
       "taskId": "S-HC-PUB-06-REELS-STORIES-PUBLISHERS",
       "sprintId": "publishing",
       "operator": "manuel",
-      "machineId": "machine-b2c47e15-5b30-4b12-9673-07e124cff525",
+      "machineId": "machine-e9f3902a-e3c8-4d54-baa8-2a3db40256b7",
       "branch": "dispatch/manuel/manuel-chatgpt2/publishing/S-HC-PUB-06-REELS-STORIES-PUBLISHERS/6b8d9d8384",
-      "worktreePath": "/home/runner/work/_temp/oreshnik-wt-pub06-finalize-v3/32305cad03d6321a/manuel/manuel-chatgpt2/publishing/S-HC-PUB-06-REELS-STORIES-PUBLISHERS/622deb28",
+      "worktreePath": "/home/runner/work/_temp/oreshnik-wt-pub06-finalize-v4/32305cad03d6321a/manuel/manuel-chatgpt2/publishing/S-HC-PUB-06-REELS-STORIES-PUBLISHERS/622deb28",
       "status": "active",
       "createdAt": "2026-09-06T15:54:41.029Z",
-      "updatedAt": "2026-09-07T06:40:19.754Z",
+      "updatedAt": "2026-09-07T06:44:53.337Z",
       "sourceTaskBoardHead": "5ed685b6884b96fa1c650224bff60a90d0a0badc",
       "zones": [
         "apps/web/lib/publishers",
@@ -1936,7 +1936,7 @@
         "apps/web/app/api/publishing",
         "packages/integrations"
       ],
-      "ownershipGeneration": 5,
+      "ownershipGeneration": 6,
       "harnessId": "chatgpt",
       "agentInstanceUid": "agent_6ebdd7f7d7c541a3b4d4aa9bd90ee134",
       "agentInstanceAlias": "manuel-chatgpt2",
@@ -3668,6 +3668,16 @@
       "at": "2026-09-07T06:44:46.903Z",
       "action": "dispatch.init",
       "message": "Registered machine machine-e9f3902a-e3c8-4d54-baa8-2a3db40256b7 with root /home/runner/work/_temp/oreshnik-wt-pub06-finalize-v4."
+    },
+    {
+      "at": "2026-09-07T06:44:53.337Z",
+      "action": "dispatch.takeover",
+      "assignmentId": "asg-c810d3df-2238-40ee-80ec-0a26622deb28",
+      "runId": "run-manuel-S-HC-PUB-06-REELS-STORIES-PUBLISHERS-20260906155441-d36bde04",
+      "operator": "manuel",
+      "agentInstanceUid": "agent_6ebdd7f7d7c541a3b4d4aa9bd90ee134",
+      "sessionId": "session_93473a46b2904930916a9715222bf6d5",
+      "message": "Takeover by manuel/manuel-chatgpt2 from manuel/manuel-chatgpt2. Reason: Persist successful PUB-06 ready-for-integration transition. Generation: 5 → 6."
     }
   ],
   "reconciliation": {
@@ -3677,5 +3687,5 @@
     "pendingDiagnostics": []
   },
   "createdAt": "2026-06-29T20:17:43.302Z",
-  "updatedAt": "2026-09-07T06:44:46.903Z"
+  "updatedAt": "2026-09-07T06:44:53.337Z"
 }
