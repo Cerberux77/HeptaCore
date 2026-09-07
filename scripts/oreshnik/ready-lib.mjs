@@ -117,9 +117,21 @@ export function collectRuntimeIssues(root) {
   const issues = [];
   const claimsDir = join(root, "var", "oreshnik", "claims");
   if (existsSync(claimsDir)) {
-    const claimFiles = readdirSync(claimsDir).filter((entry) => !entry.startsWith("."));
-    if (claimFiles.length > 0) {
-      issues.push(`orphan claim files present: ${claimFiles.join(", ")}`);
+    const orphanClaimFiles = [];
+    const claimFiles = readdirSync(claimsDir)
+      .filter((entry) => !entry.startsWith(".") && entry.endsWith(".json"))
+      .sort();
+    for (const entry of claimFiles) {
+      try {
+        const claim = readJson(join(claimsDir, entry));
+        if (String(claim?.status || "").toLowerCase() === "released") continue;
+      } catch {
+        // Malformed claim artifacts are never safe to ignore.
+      }
+      orphanClaimFiles.push(entry);
+    }
+    if (orphanClaimFiles.length > 0) {
+      issues.push(`orphan claim files present: ${orphanClaimFiles.join(", ")}`);
     }
   }
 
