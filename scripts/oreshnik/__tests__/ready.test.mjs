@@ -74,6 +74,24 @@ describe("oreshnik readiness helpers", () => {
     assert.deepStrictEqual(issues, ["task T-01 has multiple active runs: run-a, run-b"]);
   });
 
+  it("accepts released terminal claim evidence but rejects non-terminal claim files", () => {
+    const isolatedRoot = mkdtempSync(join(tmpdir(), "heptacore-ready-claims-"));
+    try {
+      const claimsDir = join(isolatedRoot, "var", "oreshnik", "claims");
+      mkdirSync(claimsDir, { recursive: true });
+      writeFileSync(join(claimsDir, "terminal.json"), JSON.stringify({ taskId: "T-DONE", runId: "run-done", status: "released" }));
+      assert.deepStrictEqual(collectRuntimeIssues(isolatedRoot), []);
+
+      writeFileSync(join(claimsDir, "active.json"), JSON.stringify({ taskId: "T-ACTIVE", runId: "run-active", status: "claimed" }));
+      assert.deepStrictEqual(collectRuntimeIssues(isolatedRoot), ["orphan claim files present: active.json"]);
+
+      writeFileSync(join(claimsDir, "malformed.json"), "{not-json");
+      assert.deepStrictEqual(collectRuntimeIssues(isolatedRoot), ["orphan claim files present: active.json, malformed.json"]);
+    } finally {
+      rmSync(isolatedRoot, { recursive: true, force: true });
+    }
+  });
+
   it("skips readiness detector source files when scanning forbidden tokens", () => {
     const scriptsDir = join(root, "scripts", "oreshnik");
     mkdirSync(join(scriptsDir, "__tests__"), { recursive: true });
