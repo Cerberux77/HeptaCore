@@ -1,0 +1,148 @@
+name: Oreshnik PUB-06 Finalize v4
+on:
+  push:
+    branches:
+      - dispatch/manuel/manuel-chatgpt2/publishing/S-HC-PUB-06-REELS-STORIES-PUBLISHERS/6b8d9d8384
+permissions:
+  contents: write
+  actions: read
+concurrency:
+  group: heptacore-pub06-finalize
+  cancel-in-progress: false
+jobs:
+  finalize:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    env:
+      TASK: S-HC-PUB-06-REELS-STORIES-PUBLISHERS
+      RUN_ID: run-manuel-S-HC-PUB-06-REELS-STORIES-PUBLISHERS-20260906155441-d36bde04
+      INSTANCE: manuel-chatgpt2
+      SESSION: session_93473a46b2904930916a9715222bf6d5
+      BRANCH: dispatch/manuel/manuel-chatgpt2/publishing/S-HC-PUB-06-REELS-STORIES-PUBLISHERS/6b8d9d8384
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: dispatch/manuel/manuel-chatgpt2/publishing/S-HC-PUB-06-REELS-STORIES-PUBLISHERS/6b8d9d8384
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - name: Remove bootstrap and prepare controller
+        run: |
+          set -euo pipefail
+          git config user.name "Manuel Vera via ChatGPT Operator"
+          git config user.email "manuel@heptacore.dev"
+          git rm .github/workflows/oreshnik-pub06-finalize-v4.yml
+          git commit -m "chore(ci): remove PUB-06 finalize v4 bootstrap"
+          git push origin "HEAD:$BRANCH"
+          npm ci --ignore-scripts
+          npm run db:generate
+      - name: Rehydrate exact Run
+        id: takeover
+        run: |
+          set -euo pipefail
+          WTROOT="$RUNNER_TEMP/oreshnik-wt-pub06-finalize-v4"
+          node node_modules/oreshnik-cli/dist/cli.js dispatch init --mother master --worktree-root "$WTROOT" --repo "$GITHUB_WORKSPACE" --json > "$RUNNER_TEMP/init.json"
+          node node_modules/oreshnik-cli/dist/cli.js dispatch takeover \
+            --run "$RUN_ID" --reason "Persist successful PUB-06 ready-for-integration transition" \
+            --operator manuel --harness chatgpt --instance "$INSTANCE" --session "$SESSION" --takeover \
+            --repo "$GITHUB_WORKSPACE" --json | tee "$RUNNER_TEMP/takeover.json"
+          WT="$(node -e 'const x=require(process.env.RUNNER_TEMP+"/takeover.json"); process.stdout.write(x.worktreePath)')"
+          test -n "$WT" && test -d "$WT"
+          echo "worktree=$WT" >> "$GITHUB_OUTPUT"
+      - name: Prepare worktree and checkpoint takeover runtime
+        run: |
+          set -euo pipefail
+          WT='${{ steps.takeover.outputs.worktree }}'
+          cd "$WT"
+          npm ci --ignore-scripts
+          TMP="$(mktemp -d)"; cd "$TMP"
+          TGZ="$(npm pack @esbuild/linux-x64@0.28.0 --silent)"
+          tar -xzf "$TGZ"
+          mkdir -p "$WT/node_modules/@esbuild/linux-x64"
+          cp -R package/. "$WT/node_modules/@esbuild/linux-x64/"
+          cd "$WT"
+          npm run db:generate
+          git config user.name "Manuel Vera via ChatGPT Operator"
+          git config user.email "manuel@heptacore.dev"
+          mapfile -t CHANGED < <(git status --porcelain=v1 | sed 's/^...//')
+          for p in "${CHANGED[@]}"; do
+            case "$p" in
+              var/oreshnik/task-board.json|var/oreshnik/tasks/$TASK.json|var/oreshnik/runs/$TASK/*|var/oreshnik/claims/$TASK.json) ;;
+              *) echo "Unexpected takeover path: $p" >&2; exit 1 ;;
+            esac
+          done
+          if ((${#CHANGED[@]})); then
+            git add -- "${CHANGED[@]}"
+            git commit -m "chore(oreshnik): checkpoint PUB-06 resumed runtime"
+            git push origin "HEAD:$BRANCH"
+          fi
+          test -z "$(git status --porcelain)"
+      - name: Create clean stable handoff
+        id: handoff
+        run: |
+          set -euo pipefail
+          WT='${{ steps.takeover.outputs.worktree }}'
+          cd "$WT"
+          node node_modules/oreshnik-cli/dist/cli.js handoff create \
+            --task "$TASK" --run "$RUN_ID" --operator manuel --reason validation \
+            --objective "Complete real Meta Reels and Stories publishing for Instagram and Facebook with fail-closed format validation and durable transactional finalization." \
+            --implemented "Instagram Reel real publisher flow" "Instagram Story image and video publisher flows" "Facebook Story image and video publisher flows" "Facebook Reel publisher flow" "PUB-06 format dry-run validation and supportedFormats fail-closed contract" \
+            --decision "Scheduled parity remains outside PUB-06 and stays blocked until separately validated" \
+            --test-run "Provider-specific PUB-06 suite: 8/8 PASS" "Full typecheck/build/tests/worker/reconcile/diff validation: PASS in Actions run 34062221297" "Ready-for-integration core gates PASS in Actions run 34091821804" \
+            --gate "typecheck PASS" "build PASS" "tests PASS" "worker validation PASS" "reconcile PASS" "dry-run PASS" \
+            --exact-point "PUB-06 is technically complete and ready for canonical integration." \
+            --first-command "Open governed integration PR" \
+            --completion-criterion "Task reaches ready_for_integration durably with no active Run or claim file." \
+            --json | tee "$RUNNER_TEMP/handoff.json"
+          MD="$(node -e 'const x=require(process.env.RUNNER_TEMP+"/handoff.json"); process.stdout.write(x.markdownPath || "")')"
+          JSONP="$(node -e 'const x=require(process.env.RUNNER_TEMP+"/handoff.json"); process.stdout.write(x.jsonPath || "")')"
+          CLASS="$(node -e 'const x=require(process.env.RUNNER_TEMP+"/handoff.json"); process.stdout.write(x.document?.stability?.classification || "")')"
+          test "$CLASS" = "STABLE_COMPLETE"
+          node node_modules/oreshnik-cli/dist/cli.js handoff validate --path "$JSONP" --json
+          echo "markdown=$MD" >> "$GITHUB_OUTPUT"
+      - name: Advance and immediately persist ready_for_integration
+        run: |
+          set -euo pipefail
+          WT='${{ steps.takeover.outputs.worktree }}'
+          MD='${{ steps.handoff.outputs.markdown }}'
+          cd "$WT"
+          node node_modules/oreshnik-cli/dist/cli.js evidence \
+            --task "$TASK" --run "$RUN_ID" --operator manuel --handoff "$MD" \
+            --details "PUB-06 accepted: provider 8/8, dry-run, typecheck, build, worker, full tests, reconcile and diff gates PASS." \
+            --ready-for-integration
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const b=JSON.parse(fs.readFileSync('var/oreshnik/task-board.json','utf8'));
+          const t=b.tasks.find(x=>x.id===process.env.TASK);
+          if(!t || t.status!=='ready_for_integration' || t.activeRun) throw new Error(`delivery state=${t?.status} activeRun=${!!t?.activeRun}`);
+          const claim=`var/oreshnik/claims/${process.env.TASK}.json`;
+          if(fs.existsSync(claim)) {
+            const c=JSON.parse(fs.readFileSync(claim,'utf8'));
+            if(c.status!=='released') throw new Error(`claim=${c.status}`);
+          }
+          console.log(JSON.stringify({status:t.status,activeRun:null,claimFilePresent:fs.existsSync(claim)},null,2));
+          NODE
+          git add var/oreshnik docs/oreshnik docs/07_handoffs docs/obsidian-vault 2>/dev/null || true
+          if ! git diff --cached --quiet; then git commit -m "chore(oreshnik): deliver PUB-06 ready for integration"; fi
+          git push origin "HEAD:$BRANCH"
+          test -z "$(git status --porcelain)"
+      - name: Reconcile and verify remote delivery
+        run: |
+          set -euo pipefail
+          node node_modules/oreshnik-cli/dist/cli.js dispatch release \
+            --operator manuel --harness chatgpt --instance "$INSTANCE" --session "$SESSION" \
+            --run "$RUN_ID" --repo "$GITHUB_WORKSPACE" --json | tee "$RUNNER_TEMP/release.json" || true
+          node node_modules/oreshnik-cli/dist/cli.js dispatch reconcile --repo "$GITHUB_WORKSPACE" --json | tee "$RUNNER_TEMP/reconcile.json"
+          git fetch origin "+refs/heads/$BRANCH:refs/remotes/origin/$BRANCH"
+          node - <<'NODE'
+          const {execFileSync}=require('node:child_process');
+          const task=JSON.parse(execFileSync('git',['show',`origin/${process.env.BRANCH}:var/oreshnik/tasks/${process.env.TASK}.json`],{encoding:'utf8'}));
+          if(task.status!=='ready_for_integration' || task.activeRun) throw new Error(`remote state=${task.status} activeRun=${!!task.activeRun}`);
+          let claimPresent=true;
+          try { execFileSync('git',['cat-file','-e',`origin/${process.env.BRANCH}:var/oreshnik/claims/${process.env.TASK}.json`]); } catch { claimPresent=false; }
+          if(claimPresent) throw new Error('claim file still present on delivery branch');
+          console.log(JSON.stringify({status:task.status,claimFilePresent:false},null,2));
+          NODE
