@@ -5,15 +5,15 @@
     "originUrl": "https://github.com/Cerberux77/HeptaCore.git",
     "canonicalMotherBranch": "master"
   },
-  "generation": 96,
-  "controlHead": "c3357c8eeb4056d548ade2175c8522e6c514bdce",
+  "generation": 97,
+  "controlHead": "b5de5f3c0345e1a08c85e9ce94a76f45f9279de9",
   "catalog": {
     "taskBoardPath": "var/oreshnik/task-board.json",
     "zoneMapPath": "docs/07_handoffs/zone-map.json",
     "sourceTaskBoardHead": "5ed685b6884b96fa1c650224bff60a90d0a0badc",
     "fingerprint": "9528bb8410fff66eabd4db8c4e2c1a6b3c69b057",
     "taskCount": 43,
-    "updatedAt": "2026-09-06T22:12:49.019Z"
+    "updatedAt": "2026-09-07T06:40:13.371Z"
   },
   "policy": {
     "name": "deterministic-v1",
@@ -246,6 +246,13 @@
       "hostname": "runnervmejwal",
       "registeredAt": "2026-09-06T22:12:48.052Z",
       "updatedAt": "2026-09-06T22:12:48.053Z"
+    },
+    {
+      "machineId": "machine-b2c47e15-5b30-4b12-9673-07e124cff525",
+      "worktreeRoot": "/home/runner/work/_temp/oreshnik-wt-pub06-finalize-v3",
+      "hostname": "runnervmejwal",
+      "registeredAt": "2026-09-07T06:40:11.989Z",
+      "updatedAt": "2026-09-07T06:40:11.989Z"
     }
   ],
   "agentInstances": [
@@ -386,11 +393,11 @@
       "displayAlias": "manuel-chatgpt2",
       "operatorId": "manuel",
       "harnessId": "chatgpt",
-      "machineId": "machine-a91064be-1664-48b7-8f96-08197d4c1885",
+      "machineId": "machine-0f27ed58-ab38-4f39-9bc1-2492fc087383",
       "repositoryId": "32305cad03d6321a",
       "slot": 2,
       "createdAt": "2026-09-06T15:54:41.029Z",
-      "updatedAt": "2026-09-06T22:08:50.863Z",
+      "updatedAt": "2026-09-06T22:12:54.127Z",
       "identityOrigin": "explicit"
     }
   ],
@@ -531,9 +538,9 @@
       "agentInstanceUid": "agent_6ebdd7f7d7c541a3b4d4aa9bd90ee134",
       "operatorId": "manuel",
       "harnessId": "chatgpt",
-      "machineId": "machine-a91064be-1664-48b7-8f96-08197d4c1885",
+      "machineId": "machine-0f27ed58-ab38-4f39-9bc1-2492fc087383",
       "startedAt": "2026-09-06T15:54:41.029Z",
-      "lastSeenAt": "2026-09-06T22:08:50.863Z",
+      "lastSeenAt": "2026-09-06T22:12:54.127Z",
       "status": "active",
       "identityOrigin": "explicit"
     }
@@ -3634,6 +3641,11 @@
       "agentInstanceUid": "agent_6ebdd7f7d7c541a3b4d4aa9bd90ee134",
       "sessionId": "session_93473a46b2904930916a9715222bf6d5",
       "message": "Takeover by manuel/manuel-chatgpt2 from manuel/manuel-chatgpt2. Reason: Resume exact PUB-06 Run to persist native dry-run gate, governed handoff, and ready-for-integration transition. Generation: 3 → 4."
+    },
+    {
+      "at": "2026-09-07T06:40:13.371Z",
+      "action": "dispatch.init",
+      "message": "Registered machine machine-b2c47e15-5b30-4b12-9673-07e124cff525 with root /home/runner/work/_temp/oreshnik-wt-pub06-finalize-v3."
     }
   ],
   "reconciliation": {
@@ -3643,5 +3655,5 @@
     "pendingDiagnostics": []
   },
   "createdAt": "2026-06-29T20:17:43.302Z",
-  "updatedAt": "2026-09-06T22:12:54.127Z"
+  "updatedAt": "2026-09-07T06:40:13.371Z"
 }
