@@ -8,7 +8,7 @@
   "owner": "Manuel",
   "backupOwner": "Manuel",
   "status": "validating",
-  "taskBoardPath": "/home/runner/work/_temp/oreshnik-wt-pub06-lifecycle/32305cad03d6321a/manuel/manuel-chatgpt2/publishing/S-HC-PUB-06-REELS-STORIES-PUBLISHERS/622deb28/var/oreshnik/task-board.json",
+  "taskBoardPath": "/home/runner/work/_temp/oreshnik-wt-pub06-finalize-v3/32305cad03d6321a/manuel/manuel-chatgpt2/publishing/S-HC-PUB-06-REELS-STORIES-PUBLISHERS/622deb28/var/oreshnik/task-board.json",
   "zone": [
     "apps/web/lib/publishers",
     "apps/web/app/api/publishing",
@@ -70,6 +70,48 @@
       "description": "PUB-06 implementation complete; provider-specific 8/8 tests and full typecheck/build/tests/worker/reconcile/diff gates passed in GitHub Actions run 34062221297."
     }
   ],
+  "validationGateResults": [
+    {
+      "gateId": "dry-run",
+      "command": "npm",
+      "args": [
+        "run",
+        "test",
+        "-w",
+        "@heptacore/integrations"
+      ],
+      "cwd": "/home/runner/work/_temp/oreshnik-wt-pub06-finalize-v3/32305cad03d6321a/manuel/manuel-chatgpt2/publishing/S-HC-PUB-06-REELS-STORIES-PUBLISHERS/622deb28",
+      "startedAt": "2026-09-07T06:40:44.350Z",
+      "finishedAt": "2026-09-07T06:40:44.892Z",
+      "durationMs": 541,
+      "exitCode": 0,
+      "signal": null,
+      "timedOut": false,
+      "spawnError": null,
+      "stdout": "\n> @heptacore/integrations@0.1.0 test\n> tsx --test src/*.test.ts\n\n▶ PUB-06 format contract\n  ✔ normalizes and advertises only validated Meta formats (1.427578ms)\n  ✔ rejects an image masquerading as a Facebook Reel during dry-run (0.444729ms)\n✔ PUB-06 format contract (2.967115ms)\n▶ Instagram Stories and Reels\n  ✔ publishes an Instagram image Story with STORIES media_type (0.925162ms)\n  ✔ publishes an Instagram video Story with STORIES media_type (0.473192ms)\n  ✔ keeps Instagram Reel publication on the durable REELS container flow (0.883369ms)\n✔ Instagram Stories and Reels (2.584119ms)\n▶ Facebook Stories and Reels\n  ✔ publishes a Facebook image Story through photos then photo_stories (0.752572ms)\n  ✔ publishes a Facebook video Story with hosted file_url upload (17.725404ms)\n  ✔ publishes a Facebook Reel with start, hosted upload, and PUBLISHED finish (0.528756ms)\n✔ Facebook Stories and Reels (19.353144ms)\nℹ tests 8\nℹ suites 3\nℹ pass 8\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 261.964271\n",
+      "stderr": "",
+      "passed": true,
+      "attempt": 1,
+      "commandFingerprint": "6eef807e667a90d057db8bf5bfa05f1b77d079bb424c6a15e7588bb887cc5640",
+      "resultFingerprint": "efc7266df01925ca24b5d987fdd4b2befa063637eae0ff63854691ee3aab9e50",
+      "stdoutBytes": 1061,
+      "stderrBytes": 0,
+      "stdoutTruncated": false,
+      "stderrTruncated": false
+    }
+  ],
+  "evidenceVerifications": [
+    {
+      "itemId": "changed_files_diff",
+      "label": "changed files diff",
+      "verified": true,
+      "verifiedAt": "2026-09-07T06:40:44.920Z",
+      "runId": "run-manuel-S-HC-PUB-06-REELS-STORIES-PUBLISHERS-20260906155441-d36bde04",
+      "source": "git",
+      "resultFingerprint": "210159a09726a40d3bad3156c8dce8dfc7e4a9eef815b1d06818631476efecd0",
+      "summary": "diff origin/master..dispatch/manuel/manuel-chatgpt2/publishing/S-HC-PUB-06-REELS-STORIES-PUBLISHERS/6b8d9d8384: apps/web/app/api/publishing/pub06-formats.ts, apps/web/app/api/publishing/publish/route.ts, apps/web/lib/publishers/facebook-page.ts, apps/web/lib/publishers/instagram.ts, apps/web/lib/publishers/registry.ts, apps/web/lib/publishers/types.ts, packages/integrations/package.json, packages/integrations/src/meta-publishers.test.ts, packages/integrations/tsconfig.json, var/oreshnik/claims/S-HC-PUB-06-REELS-STORIES-PUBLISHERS.json, var/oreshnik/runs/S-HC-PUB-06-REELS-STORIES-PUBLISHERS/run-manuel-S-HC-PUB-06-REELS-STORIES-PUBLISHERS-20260906155441-d36bde04.json, var/oreshnik/task-board.json, var/oreshnik/tasks/S-HC-PUB-06-REELS-STORIES-PUBLISHERS.json"
+    }
+  ],
   "updatedAt": "2026-09-06T22:00:34.616Z",
   "runs": [
     {
@@ -88,9 +130,51 @@
       "taskStatus": "validating",
       "claimStatus": "claimed",
       "claimedAt": "2026-09-06T22:00:08.034Z",
-      "updatedAt": "2026-09-06T22:00:34.624Z",
+      "updatedAt": "2026-09-07T06:40:44.920Z",
       "expiresAt": "2026-09-06T23:00:08.034Z",
-      "manifestPath": "var/oreshnik/runs/S-HC-PUB-06-REELS-STORIES-PUBLISHERS/run-manuel-S-HC-PUB-06-REELS-STORIES-PUBLISHERS-20260906155441-d36bde04.json"
+      "manifestPath": "var/oreshnik/runs/S-HC-PUB-06-REELS-STORIES-PUBLISHERS/run-manuel-S-HC-PUB-06-REELS-STORIES-PUBLISHERS-20260906155441-d36bde04.json",
+      "validationGateResults": [
+        {
+          "gateId": "dry-run",
+          "command": "npm",
+          "args": [
+            "run",
+            "test",
+            "-w",
+            "@heptacore/integrations"
+          ],
+          "cwd": "/home/runner/work/_temp/oreshnik-wt-pub06-finalize-v3/32305cad03d6321a/manuel/manuel-chatgpt2/publishing/S-HC-PUB-06-REELS-STORIES-PUBLISHERS/622deb28",
+          "startedAt": "2026-09-07T06:40:44.350Z",
+          "finishedAt": "2026-09-07T06:40:44.892Z",
+          "durationMs": 541,
+          "exitCode": 0,
+          "signal": null,
+          "timedOut": false,
+          "spawnError": null,
+          "stdout": "\n> @heptacore/integrations@0.1.0 test\n> tsx --test src/*.test.ts\n\n▶ PUB-06 format contract\n  ✔ normalizes and advertises only validated Meta formats (1.427578ms)\n  ✔ rejects an image masquerading as a Facebook Reel during dry-run (0.444729ms)\n✔ PUB-06 format contract (2.967115ms)\n▶ Instagram Stories and Reels\n  ✔ publishes an Instagram image Story with STORIES media_type (0.925162ms)\n  ✔ publishes an Instagram video Story with STORIES media_type (0.473192ms)\n  ✔ keeps Instagram Reel publication on the durable REELS container flow (0.883369ms)\n✔ Instagram Stories and Reels (2.584119ms)\n▶ Facebook Stories and Reels\n  ✔ publishes a Facebook image Story through photos then photo_stories (0.752572ms)\n  ✔ publishes a Facebook video Story with hosted file_url upload (17.725404ms)\n  ✔ publishes a Facebook Reel with start, hosted upload, and PUBLISHED finish (0.528756ms)\n✔ Facebook Stories and Reels (19.353144ms)\nℹ tests 8\nℹ suites 3\nℹ pass 8\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 261.964271\n",
+          "stderr": "",
+          "passed": true,
+          "attempt": 1,
+          "commandFingerprint": "6eef807e667a90d057db8bf5bfa05f1b77d079bb424c6a15e7588bb887cc5640",
+          "resultFingerprint": "efc7266df01925ca24b5d987fdd4b2befa063637eae0ff63854691ee3aab9e50",
+          "stdoutBytes": 1061,
+          "stderrBytes": 0,
+          "stdoutTruncated": false,
+          "stderrTruncated": false
+        }
+      ],
+      "evidenceVerifications": [
+        {
+          "itemId": "changed_files_diff",
+          "label": "changed files diff",
+          "verified": true,
+          "verifiedAt": "2026-09-07T06:40:44.920Z",
+          "runId": "run-manuel-S-HC-PUB-06-REELS-STORIES-PUBLISHERS-20260906155441-d36bde04",
+          "source": "git",
+          "resultFingerprint": "210159a09726a40d3bad3156c8dce8dfc7e4a9eef815b1d06818631476efecd0",
+          "summary": "diff origin/master..dispatch/manuel/manuel-chatgpt2/publishing/S-HC-PUB-06-REELS-STORIES-PUBLISHERS/6b8d9d8384: apps/web/app/api/publishing/pub06-formats.ts, apps/web/app/api/publishing/publish/route.ts, apps/web/lib/publishers/facebook-page.ts, apps/web/lib/publishers/instagram.ts, apps/web/lib/publishers/registry.ts, apps/web/lib/publishers/types.ts, packages/integrations/package.json, packages/integrations/src/meta-publishers.test.ts, packages/integrations/tsconfig.json, var/oreshnik/claims/S-HC-PUB-06-REELS-STORIES-PUBLISHERS.json, var/oreshnik/runs/S-HC-PUB-06-REELS-STORIES-PUBLISHERS/run-manuel-S-HC-PUB-06-REELS-STORIES-PUBLISHERS-20260906155441-d36bde04.json, var/oreshnik/task-board.json, var/oreshnik/tasks/S-HC-PUB-06-REELS-STORIES-PUBLISHERS.json"
+        }
+      ]
     }
   ]
 }
