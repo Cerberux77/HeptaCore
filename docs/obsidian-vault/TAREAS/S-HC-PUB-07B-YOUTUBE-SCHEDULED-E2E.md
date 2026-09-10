@@ -6,7 +6,7 @@ task_id: "S-HC-PUB-07B-YOUTUBE-SCHEDULED-E2E"
 sprint: "publishing"
 status: "ready_for_integration"
 owner: "Manuel"
-last_updated: "2026-09-10T22:07:19.509Z"
+last_updated: "2026-09-10T22:12:48.621Z"
 source: "var/oreshnik/tasks/S-HC-PUB-07B-YOUTUBE-SCHEDULED-E2E.json"
 ---
 
@@ -21,8 +21,8 @@ YouTube scheduled E2E integration: Video, Shorts, cron metadata and credentials
 - estado: `ready_for_integration`
 - owner: `Manuel`
 - backup: `Manuel`
-- intentos: `1`
-- handoff: docs/oreshnik/handoffs/S-HC-PUB-07B-YOUTUBE-SCHEDULED-E2E/handoff-20260910T220605373Z-8f654be7c7de.md
+- intentos: `2`
+- handoff: docs/oreshnik/handoffs/S-HC-PUB-07B-YOUTUBE-SCHEDULED-E2E/handoff-20260910T221119888Z-3622de053b4a.md
 
 ## Dependencias
 

@@ -8,7 +8,7 @@ sprint: "publishing"
 status: "ready_for_integration"
 claim_status: "released"
 operator: "manuel"
-last_updated: "2026-09-10T22:07:19.515Z"
+last_updated: "2026-09-10T22:12:48.629Z"
 source: "var/oreshnik/runs/S-HC-PUB-07B-YOUTUBE-SCHEDULED-E2E/run-manuel-S-HC-PUB-07B-YOUTUBE-SCHEDULED-E2E-20260910173721-206fad0f.json"
 ---
 
@@ -29,9 +29,9 @@ source: "var/oreshnik/runs/S-HC-PUB-07B-YOUTUBE-SCHEDULED-E2E/run-manuel-S-HC-PU
 - claim status: `released`
 - branch: `dispatch/manuel/manuel-chatgpt1/publishing/S-HC-PUB-07B-YOUTUBE-SCHEDULED-E2E/da546a5360`
 - worktree: `/home/runner/work/_temp/oreshnik-wt-pub07b-recover-v2/32305cad03d6321a/manuel/manuel-chatgpt1/publishing/S-HC-PUB-07B-YOUTUBE-SCHEDULED-E2E/e9e0f149`
-- claimed at: `2026-09-10T22:05:07.643Z`
-- expires at: `2026-09-10T23:05:07.643Z`
-- released at: `2026-09-10T22:07:19.515Z`
+- claimed at: `2026-09-10T22:10:51.717Z`
+- expires at: `2026-09-10T23:10:51.717Z`
+- released at: `2026-09-10T22:12:48.629Z`
 
 ## Boundaries
 

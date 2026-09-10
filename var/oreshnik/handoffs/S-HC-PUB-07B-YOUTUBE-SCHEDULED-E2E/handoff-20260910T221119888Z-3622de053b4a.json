@@ -1,0 +1,133 @@
+{
+  "schema": "oreshnik-handoff/v1",
+  "id": "handoff-20260910T221119888Z-3622de053b4a",
+  "createdAt": "2026-09-10T22:11:19.888Z",
+  "integrity": {
+    "algorithm": "sha256",
+    "digest": "039dbbc36b8b689c4597816bc4f74871606673648365cd63371124b2e436df5a"
+  },
+  "identity": {
+    "project": "HeptaCore",
+    "repository": "https://github.com/Cerberux77/HeptaCore",
+    "operator": "manuel",
+    "taskId": "S-HC-PUB-07B-YOUTUBE-SCHEDULED-E2E",
+    "runId": "run-manuel-S-HC-PUB-07B-YOUTUBE-SCHEDULED-E2E-20260910173721-206fad0f",
+    "assignmentId": null,
+    "claimStatus": "claimed",
+    "reason": "validation_checkpoint",
+    "oreshnikVersion": "0.3.0-alpha.6"
+  },
+  "git": {
+    "branch": "dispatch/manuel/manuel-chatgpt1/publishing/S-HC-PUB-07B-YOUTUBE-SCHEDULED-E2E/da546a5360",
+    "upstream": "origin/dispatch/manuel/manuel-chatgpt1/publishing/S-HC-PUB-07B-YOUTUBE-SCHEDULED-E2E/da546a5360",
+    "head": "e5c65dcf5bb6b4a9c7ff48cd46d9d74c156cfc9d",
+    "base": "7236235515cdcbc0a154f59b98f0f9fa55a5f7b8",
+    "ahead": 3,
+    "behind": 0,
+    "ownCommits": [
+      "e5c65dcf5bb6b4a9c7ff48cd46d9d74c156cfc9d chore(oreshnik): persist PUB-07B verified E2E evidence",
+      "7b03717de5cb37a0fedf7deda5ff0a71a7bdb296 feat(publishing): complete scheduled YouTube E2E execution",
+      "fc9f891697fae00d30c4898624536e40f06afb61 feat(publishing): implement YouTube video and Shorts provider"
+    ],
+    "modified": [
+      "var/oreshnik/runs/S-HC-PUB-07B-YOUTUBE-SCHEDULED-E2E/run-manuel-S-HC-PUB-07B-YOUTUBE-SCHEDULED-E2E-20260910173721-206fad0f.json",
+      "var/oreshnik/task-board.json",
+      "var/oreshnik/tasks/S-HC-PUB-07B-YOUTUBE-SCHEDULED-E2E.json"
+    ],
+    "untracked": [
+      "var/oreshnik/claims/S-HC-PUB-07B-YOUTUBE-SCHEDULED-E2E.json"
+    ],
+    "conflicts": [],
+    "stash": [],
+    "clean": false,
+    "detached": false,
+    "worktreePath": "/home/runner/work/_temp/oreshnik-wt-pub07b-recover-v2/32305cad03d6321a/manuel/manuel-chatgpt1/publishing/S-HC-PUB-07B-YOUTUBE-SCHEDULED-E2E/e9e0f149"
+  },
+  "github": {
+    "available": true,
+    "pr": null,
+    "state": null,
+    "base": null,
+    "head": null,
+    "mergeable": null,
+    "checks": [],
+    "reviews": [],
+    "unresolvedConversations": null,
+    "remoteHead": "e5c65dcf5bb6b4a9c7ff48cd46d9d74c156cfc9d",
+    "source": "github-rest"
+  },
+  "functional": {
+    "objective": "Deliver deterministic YouTube Video/Shorts immediate and scheduled E2E software path.",
+    "implemented": [
+      "YouTube resumable Video/Shorts provider plus scheduled metadata/thumbnail transport.",
+      "Dynamic provider credentialLabel with fail-closed missing-label behavior."
+    ],
+    "partial": [],
+    "decisions": [
+      "Live YouTube channel smoke remains an external parent acceptance gate."
+    ],
+    "primaryFiles": [
+      "var/oreshnik/claims/S-HC-PUB-07B-YOUTUBE-SCHEDULED-E2E.json",
+      "var/oreshnik/runs/S-HC-PUB-07B-YOUTUBE-SCHEDULED-E2E/run-manuel-S-HC-PUB-07B-YOUTUBE-SCHEDULED-E2E-20260910173721-206fad0f.json",
+      "var/oreshnik/task-board.json",
+      "var/oreshnik/tasks/S-HC-PUB-07B-YOUTUBE-SCHEDULED-E2E.json"
+    ],
+    "testsRun": [
+      "Structured dry-run PASS with zero credential/provider calls.",
+      "Focused 10/10 plus typecheck/build/worker/full tests passed in the validated product run."
+    ],
+    "testsPending": [],
+    "gates": [
+      "Oreshnik dry_run_summary verified from real command/output fingerprints."
+    ],
+    "regressions": []
+  },
+  "deployments": [],
+  "blockers": [],
+  "stability": {
+    "classification": "STABLE_PARTIAL",
+    "reasons": [
+      "Worktree has uncommitted changes."
+    ]
+  },
+  "resume": {
+    "exactPoint": "Deterministic child E2E complete and evidence-verifiable.",
+    "firstCommand": "npx oreshnik evidence --task S-HC-PUB-07B-YOUTUBE-SCHEDULED-E2E --run run-manuel-S-HC-PUB-07B-YOUTUBE-SCHEDULED-E2E-20260910173721-206fad0f --operator manuel --ready-for-integration",
+    "branch": "dispatch/manuel/manuel-chatgpt1/publishing/S-HC-PUB-07B-YOUTUBE-SCHEDULED-E2E/da546a5360",
+    "worktreePath": "/home/runner/work/_temp/oreshnik-wt-pub07b-recover-v2/32305cad03d6321a/manuel/manuel-chatgpt1/publishing/S-HC-PUB-07B-YOUTUBE-SCHEDULED-E2E/e9e0f149",
+    "preconditions": [
+      "Run oreshnik preflight",
+      "Verify assignment and claim authority",
+      "Confirm no handoff supersedes this one"
+    ],
+    "priorityFiles": [
+      "var/oreshnik/claims/S-HC-PUB-07B-YOUTUBE-SCHEDULED-E2E.json",
+      "var/oreshnik/runs/S-HC-PUB-07B-YOUTUBE-SCHEDULED-E2E/run-manuel-S-HC-PUB-07B-YOUTUBE-SCHEDULED-E2E-20260910173721-206fad0f.json",
+      "var/oreshnik/task-board.json",
+      "var/oreshnik/tasks/S-HC-PUB-07B-YOUTUBE-SCHEDULED-E2E.json"
+    ],
+    "focusedTests": [
+      "Structured dry-run PASS with zero credential/provider calls.",
+      "Focused 10/10 plus typecheck/build/worker/full tests passed in the validated product run."
+    ],
+    "completionCriterion": "Merged and terminalized on master."
+  },
+  "sources": [
+    {
+      "kind": "discovered",
+      "field": "identity.taskId",
+      "evidence": "canonical task artifact/task-board"
+    },
+    {
+      "kind": "discovered",
+      "field": "git",
+      "evidence": "git commands executed with typed argv"
+    },
+    {
+      "kind": "declared",
+      "field": "functional",
+      "evidence": "operator CLI input"
+    }
+  ],
+  "warnings": []
+}
