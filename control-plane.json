@@ -5,15 +5,15 @@
     "originUrl": "https://github.com/Cerberux77/HeptaCore.git",
     "canonicalMotherBranch": "master"
   },
-  "generation": 113,
-  "controlHead": "2e9046eeccd797c764774d97423c2a3569e03fa2",
+  "generation": 114,
+  "controlHead": "b034d5a9831aa302d86db955ad8d1bebcae0c706",
   "catalog": {
     "taskBoardPath": "var/oreshnik/task-board.json",
     "zoneMapPath": "docs/07_handoffs/zone-map.json",
-    "sourceTaskBoardHead": "20b4033a1b3790bb926a7f58f2f5047382d86578",
+    "sourceTaskBoardHead": "f53a8177602ef441e9427ab22c14f7e579dc232e",
     "fingerprint": "bea95716241d9f6cd5d476ed5a13e204250b63d3",
     "taskCount": 43,
-    "updatedAt": "2026-09-10T16:00:48.373Z"
+    "updatedAt": "2026-09-10T16:19:43.582Z"
   },
   "policy": {
     "name": "deterministic-v1",
@@ -295,6 +295,13 @@
       "hostname": "runnervmlun5p",
       "registeredAt": "2026-09-10T16:00:19.268Z",
       "updatedAt": "2026-09-10T16:00:19.268Z"
+    },
+    {
+      "machineId": "machine-4ae383f2-5fb9-4cb2-a9d2-9660c5a1a5ce",
+      "worktreeRoot": "/home/runner/work/_temp/oreshnik-wt-next",
+      "hostname": "runnervmlun5p",
+      "registeredAt": "2026-09-10T16:19:42.648Z",
+      "updatedAt": "2026-09-10T16:19:42.648Z"
     }
   ],
   "agentInstances": [
@@ -451,7 +458,7 @@
       "repositoryId": "32305cad03d6321a",
       "slot": 1,
       "createdAt": "2026-09-10T14:46:12.866Z",
-      "updatedAt": "2026-09-10T16:00:30.502Z",
+      "updatedAt": "2026-09-10T16:00:48.373Z",
       "identityOrigin": "explicit"
     }
   ],
@@ -606,8 +613,9 @@
       "harnessId": "chatgpt",
       "machineId": "machine-886f4c1e-ed9a-4884-8cf8-ac9ed318b25d",
       "startedAt": "2026-09-10T14:46:12.866Z",
-      "lastSeenAt": "2026-09-10T16:00:30.502Z",
-      "status": "active",
+      "lastSeenAt": "2026-09-10T16:00:48.373Z",
+      "status": "closed",
+      "closedAt": "2026-09-10T16:00:48.373Z",
       "identityOrigin": "explicit"
     }
   ],
@@ -4012,6 +4020,11 @@
       "runId": "run-manuel-S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION-20260910144612-ccbed006",
       "operator": "manuel",
       "message": "awaiting_external_validation: Final owned HeptaCore sender domain remains intentionally deferred; software foundation is complete and validated while Vercel remains the temporary web origin."
+    },
+    {
+      "at": "2026-09-10T16:19:43.582Z",
+      "action": "dispatch.init",
+      "message": "Registered machine machine-4ae383f2-5fb9-4cb2-a9d2-9660c5a1a5ce with root /home/runner/work/_temp/oreshnik-wt-next."
     }
   ],
   "reconciliation": {
@@ -4021,5 +4034,5 @@
     "pendingDiagnostics": []
   },
   "createdAt": "2026-06-29T20:17:43.302Z",
-  "updatedAt": "2026-09-10T16:00:48.373Z"
+  "updatedAt": "2026-09-10T16:19:43.582Z"
 }
