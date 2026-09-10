@@ -13,6 +13,7 @@ export interface PublishInput {
   accessToken: string;
   mediaUrl?: string | null;
   caption: string;
+  format?: string | null;
   mediaType?: "IMAGE" | "VIDEO" | "CAROUSEL";
 }
 
@@ -46,5 +47,6 @@ export interface Publisher {
   readonly capabilities: PublisherCapabilities;
   readonly credentialLabel: string;
   readonly requiredScopes: string[];
+  readonly supportedFormats: readonly string[];
   publish(input: PublishInput): Promise<PublishResult>;
 }

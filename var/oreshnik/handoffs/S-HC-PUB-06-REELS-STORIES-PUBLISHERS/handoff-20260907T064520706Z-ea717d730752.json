@@ -1,0 +1,146 @@
+{
+  "schema": "oreshnik-handoff/v1",
+  "id": "handoff-20260907T064520706Z-ea717d730752",
+  "createdAt": "2026-09-07T06:45:20.706Z",
+  "integrity": {
+    "algorithm": "sha256",
+    "digest": "caaba4033174bc40b8cd90e6637d8036e932b1097613cc641a00b0ba6b7905cc"
+  },
+  "identity": {
+    "project": "HeptaCore",
+    "repository": "https://github.com/Cerberux77/HeptaCore",
+    "operator": "manuel",
+    "taskId": "S-HC-PUB-06-REELS-STORIES-PUBLISHERS",
+    "runId": "run-manuel-S-HC-PUB-06-REELS-STORIES-PUBLISHERS-20260906155441-d36bde04",
+    "assignmentId": null,
+    "claimStatus": "claimed",
+    "reason": "validation",
+    "oreshnikVersion": "0.3.0-alpha.6"
+  },
+  "git": {
+    "branch": "dispatch/manuel/manuel-chatgpt2/publishing/S-HC-PUB-06-REELS-STORIES-PUBLISHERS/6b8d9d8384",
+    "upstream": "origin/dispatch/manuel/manuel-chatgpt2/publishing/S-HC-PUB-06-REELS-STORIES-PUBLISHERS/6b8d9d8384",
+    "head": "c5c07635e7660b777f35e409bba9c5c1f00d5211",
+    "base": "5ed685b6884b96fa1c650224bff60a90d0a0badc",
+    "ahead": 22,
+    "behind": 0,
+    "ownCommits": [
+      "c5c07635e7660b777f35e409bba9c5c1f00d5211 chore(ci): remove PUB-06 finalize v4 bootstrap",
+      "c62acdea4ac42a09665baeace594b07f641ae2b4 chore(ci): persist successful PUB-06 delivery",
+      "ad0f949d9b28782eace364dc9714153aace5f3bb chore(oreshnik): persist PUB-06 validation runtime",
+      "d5559c4e72ba7cb3a27704974ea69965afb7c1f8 chore(ci): remove PUB-06 finalize v3 bootstrap",
+      "ebf073c94ac5b8503f0915f40daa5a067837c2ed chore(ci): retry governed PUB-06 finalization cleanly",
+      "8d5b92e41f672de583c4ebebded28675e82c166e chore(ci): remove PUB-06 finalize v2 bootstrap",
+      "659e48c78100d7d0c6e5b26222ecef4b2c6d2e51 chore(ci): finalize PUB-06 evidence lifecycle v2",
+      "a6b19000ee0544ca10cc806343585d49f025b3f7 chore(ci): remove PUB-06 evidence bootstrap",
+      "7e2d10bb29cc8f17a4cabf70df28fe77b98ca195 chore(ci): complete PUB-06 structured evidence and handoff",
+      "46618672add313668a6956c4486f8219d68d76d3 chore(oreshnik): start PUB-06 validation",
+      "f13a1692bb045d49669b5d0db04caccf1786c553 chore(ci): remove PUB-06 lifecycle bootstrap",
+      "ec964275d3f056562cfb899d6a954a5fe1b97f7f chore(ci): finalize governed PUB-06 lifecycle",
+      "e6168566bbd2a49ced48e4c4ba7a6842707f3d02 chore(ci): remove PUB-06 v3 validator bootstrap",
+      "56ee4a5702eb597f2233814e2546f6d7ac321115 chore(ci): run complete PUB-06 validation v3",
+      "5f582ab41003468bcd32ea620b0615d20e91958e fix(integrations): include Node types for PUB-06 validation",
+      "707c1227e6873e41a2d3139c4c3c1715ab1c9c67 chore(ci): remove PUB-06 v2 validator bootstrap",
+      "00f3506a07d7c94d970f24ae449ff99817790479 chore(ci): rerun PUB-06 gates with Linux esbuild bootstrap",
+      "801fe5731060c1de6ea0350cce674d5d8559a868 chore(ci): remove PUB-06 validator bootstrap",
+      "49bdada3e9305ee9587d7b038c7d75521895a6a1 chore(ci): validate governed PUB-06 candidate",
+      "0282c9e788c381b2525cd7de67b1542f51c2a59a chore(ci): remove PUB-06 ephemeral delivery workflow",
+      "f7d5e13011b0584833f3f700626c90dbda424929 feat(publishing): complete Meta Stories and Reels publishers",
+      "2e81cbf6da9e3b887010058be4997bef06cbfe66 chore(ci): bootstrap governed PUB-06 autonomous delivery"
+    ],
+    "modified": [],
+    "untracked": [],
+    "conflicts": [],
+    "stash": [],
+    "clean": true,
+    "detached": false,
+    "worktreePath": "/home/runner/work/_temp/oreshnik-wt-pub06-finalize-v4/32305cad03d6321a/manuel/manuel-chatgpt2/publishing/S-HC-PUB-06-REELS-STORIES-PUBLISHERS/622deb28"
+  },
+  "github": {
+    "available": true,
+    "pr": null,
+    "state": null,
+    "base": null,
+    "head": null,
+    "mergeable": null,
+    "checks": [],
+    "reviews": [],
+    "unresolvedConversations": null,
+    "remoteHead": "c5c07635e7660b777f35e409bba9c5c1f00d5211",
+    "source": "github-rest"
+  },
+  "functional": {
+    "objective": "Complete real Meta Reels and Stories publishing for Instagram and Facebook with fail-closed format validation and durable transactional finalization.",
+    "implemented": [
+      "Instagram Reel real publisher flow",
+      "Instagram Story image and video publisher flows",
+      "Facebook Story image and video publisher flows",
+      "Facebook Reel publisher flow",
+      "PUB-06 format dry-run validation and supportedFormats fail-closed contract"
+    ],
+    "partial": [],
+    "decisions": [
+      "Scheduled parity remains outside PUB-06 and stays blocked until separately validated"
+    ],
+    "primaryFiles": [],
+    "testsRun": [
+      "Provider-specific PUB-06 suite: 8/8 PASS",
+      "Full typecheck/build/tests/worker/reconcile/diff validation: PASS in Actions run 34062221297",
+      "Ready-for-integration core gates PASS in Actions run 34091821804"
+    ],
+    "testsPending": [],
+    "gates": [
+      "typecheck PASS",
+      "build PASS",
+      "tests PASS",
+      "worker validation PASS",
+      "reconcile PASS",
+      "dry-run PASS"
+    ],
+    "regressions": []
+  },
+  "deployments": [],
+  "blockers": [],
+  "stability": {
+    "classification": "STABLE_COMPLETE",
+    "reasons": [
+      "Repository state is clean and no blocking or partial work was declared."
+    ]
+  },
+  "resume": {
+    "exactPoint": "PUB-06 is technically complete and ready for canonical integration.",
+    "firstCommand": "Open governed integration PR",
+    "branch": "dispatch/manuel/manuel-chatgpt2/publishing/S-HC-PUB-06-REELS-STORIES-PUBLISHERS/6b8d9d8384",
+    "worktreePath": "/home/runner/work/_temp/oreshnik-wt-pub06-finalize-v4/32305cad03d6321a/manuel/manuel-chatgpt2/publishing/S-HC-PUB-06-REELS-STORIES-PUBLISHERS/622deb28",
+    "preconditions": [
+      "Run oreshnik preflight",
+      "Verify assignment and claim authority",
+      "Confirm no handoff supersedes this one"
+    ],
+    "priorityFiles": [],
+    "focusedTests": [
+      "Provider-specific PUB-06 suite: 8/8 PASS",
+      "Full typecheck/build/tests/worker/reconcile/diff validation: PASS in Actions run 34062221297",
+      "Ready-for-integration core gates PASS in Actions run 34091821804"
+    ],
+    "completionCriterion": "Task reaches ready_for_integration durably with no active Run or claim file."
+  },
+  "sources": [
+    {
+      "kind": "discovered",
+      "field": "identity.taskId",
+      "evidence": "canonical task artifact/task-board"
+    },
+    {
+      "kind": "discovered",
+      "field": "git",
+      "evidence": "git commands executed with typed argv"
+    },
+    {
+      "kind": "declared",
+      "field": "functional",
+      "evidence": "operator CLI input"
+    }
+  ],
+  "warnings": []
+}

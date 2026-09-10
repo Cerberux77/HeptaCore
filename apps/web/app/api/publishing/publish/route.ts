@@ -8,7 +8,8 @@ import { getPublisher, PublishInput } from "../../../../lib/publishers";
 import { buildImmediateJobId, checkExistingJobForRetry, getAllPossibleJobIds, buildDeterministicScheduledJobId } from "../../../../lib/publishing-execution";
 import { commitConfirmedPublication, recordUnconfirmedProviderFailure } from "../../../../lib/publishing-finalization";
 import { ProviderError } from "../../../../lib/publishers/types";
-import { buildMultiformatDryRun, normalizeAssetManifest, normalizePublishingFormat } from "../../../../lib/publishing-formats";
+import { normalizeAssetManifest } from "../../../../lib/publishing-formats";
+import { buildPub06DryRun, normalizePub06PublishingFormat } from "../pub06-formats";
 import { resolveAssetUrl } from "../../../../lib/asset-resolution";
 import { resolveTenantAccessWithLifecycle } from "../../../../lib/tenant-access";
 import { Permission } from "../../../../lib/permissions";
@@ -116,7 +117,7 @@ export async function POST(req: Request) {
   }
 
   const network = draft.network;
-  const format = normalizePublishingFormat(network, draft.format);
+  const format = normalizePub06PublishingFormat(network, draft.format);
   const orderedAssets = normalizeAssetManifest(draft.assets, (asset) => {
     if (!asset) return null;
     return buildPublicAssetUrl(tenantSlug, asset);
@@ -126,7 +127,7 @@ export async function POST(req: Request) {
   const approvalRequired = tenant.automationMode === "APPROVAL_REQUIRED";
 
   if (requestMode === "dry_run") {
-    const dryRun = buildMultiformatDryRun(format, orderedAssets);
+    const dryRun = buildPub06DryRun(format, orderedAssets);
 
     await auditLog({
       tenantId: tenant.id,
@@ -162,11 +163,19 @@ export async function POST(req: Request) {
     });
   }
 
-  if (format === "INSTAGRAM_CAROUSEL" || format === "INSTAGRAM_STORY") {
+  if (format === "INSTAGRAM_CAROUSEL") {
     return NextResponse.json({
       code: "LIVE_BLOCKED_FORMAT_PREVIEW_ONLY",
       error: `${format} is available for preview and dry-run only in this sprint.`,
-      action: "Use dry-run for Carousel or Story. Real publishing remains disabled for this format.",
+      action: "Use dry-run for Carousel. Real publishing remains disabled for this format.",
+    }, { status: 409 });
+  }
+
+  if (requestMode === "scheduled" && ["INSTAGRAM_STORY", "INSTAGRAM_REEL", "FACEBOOK_STORY", "FACEBOOK_REEL"].includes(format)) {
+    return NextResponse.json({
+      code: "LIVE_BLOCKED_FORMAT_SCHEDULING_NOT_VALIDATED",
+      error: `${format} real publishing is validated for immediate mode only in PUB-06.`,
+      action: "Use immediate mode after dry-run. Scheduled parity is handled separately from this publisher task.",
     }, { status: 409 });
   }
 
@@ -320,6 +329,25 @@ export async function POST(req: Request) {
       code: "LIVE_PROVIDER_NOT_IMPLEMENTED",
       error: `Live publishing for ${network} is not yet implemented.`,
     }, { status: 501 });
+  }
+
+  if (!publisher.supportedFormats.includes(format)) {
+    return NextResponse.json({
+      code: "LIVE_BLOCKED_UNVALIDATED_FORMAT",
+      error: `${network} publisher has not validated live support for ${format}.`,
+      action: "Use dry-run or a validated format.",
+    }, { status: 409 });
+  }
+
+  const liveValidation = buildPub06DryRun(format, orderedAssets);
+  if (!liveValidation.valid) {
+    return NextResponse.json({
+      code: "LIVE_BLOCKED_FORMAT_VALIDATION",
+      error: `Assets do not satisfy ${format} provider requirements.`,
+      errors: liveValidation.errors,
+      warnings: liveValidation.warnings,
+      previewData: liveValidation.previewData,
+    }, { status: 409 });
   }
 
   // Asset gate (skip for text-only capable publishers with no assets)
@@ -505,6 +533,7 @@ export async function POST(req: Request) {
     accessToken,
     mediaUrl,
     caption: draft.caption || draft.title,
+    format,
     mediaType,
   };
 

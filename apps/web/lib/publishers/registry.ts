@@ -28,6 +28,7 @@ const unimplementedPublisher = (network: string): Publisher => ({
   },
   credentialLabel: "",
   requiredScopes: [],
+  supportedFormats: [],
   publish: async () => {
     throw new Error(`Publishing to ${network} is not implemented.`);
   },
