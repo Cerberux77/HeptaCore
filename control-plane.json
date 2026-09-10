@@ -5,15 +5,15 @@
     "originUrl": "https://github.com/Cerberux77/HeptaCore.git",
     "canonicalMotherBranch": "master"
   },
-  "generation": 112,
+  "generation": 113,
   "controlHead": "2e9046eeccd797c764774d97423c2a3569e03fa2",
   "catalog": {
     "taskBoardPath": "var/oreshnik/task-board.json",
     "zoneMapPath": "docs/07_handoffs/zone-map.json",
-    "sourceTaskBoardHead": "11091531bddfa4ff0621aadf1d98b082c9a8b782",
-    "fingerprint": "fdf736eb32542e2efbd48b369858d40f03455010",
+    "sourceTaskBoardHead": "20b4033a1b3790bb926a7f58f2f5047382d86578",
+    "fingerprint": "bea95716241d9f6cd5d476ed5a13e204250b63d3",
     "taskCount": 43,
-    "updatedAt": "2026-09-10T16:00:21.034Z"
+    "updatedAt": "2026-09-10T16:00:48.373Z"
   },
   "policy": {
     "name": "deterministic-v1",
@@ -447,11 +447,11 @@
       "displayAlias": "manuel-chatgpt1",
       "operatorId": "manuel",
       "harnessId": "chatgpt",
-      "machineId": "machine-0f2dc4b9-a6ef-4261-a420-7d37164433bb",
+      "machineId": "machine-886f4c1e-ed9a-4884-8cf8-ac9ed318b25d",
       "repositoryId": "32305cad03d6321a",
       "slot": 1,
       "createdAt": "2026-09-10T14:46:12.866Z",
-      "updatedAt": "2026-09-10T15:53:51.876Z",
+      "updatedAt": "2026-09-10T16:00:30.502Z",
       "identityOrigin": "explicit"
     }
   ],
@@ -604,9 +604,9 @@
       "agentInstanceUid": "agent_e8dd52d1d5de4f40a9a4d9923ffda155",
       "operatorId": "manuel",
       "harnessId": "chatgpt",
-      "machineId": "machine-0f2dc4b9-a6ef-4261-a420-7d37164433bb",
+      "machineId": "machine-886f4c1e-ed9a-4884-8cf8-ac9ed318b25d",
       "startedAt": "2026-09-10T14:46:12.866Z",
-      "lastSeenAt": "2026-09-10T15:53:51.876Z",
+      "lastSeenAt": "2026-09-10T16:00:30.502Z",
       "status": "active",
       "identityOrigin": "explicit"
     }
@@ -1222,12 +1222,13 @@
         "packages/core",
         "docs"
       ],
-      "status": "active",
+      "status": "released",
       "sourceTaskBoardHead": "a7383709108c26611d16158ba2a8a2a4c4cabf35",
       "catalogFingerprint": "fdf736eb32542e2efbd48b369858d40f03455010",
       "createdAt": "2026-09-10T14:46:12.866Z",
-      "updatedAt": "2026-09-10T16:00:30.502Z",
+      "updatedAt": "2026-09-10T16:00:48.373Z",
       "activatedAt": "2026-09-10T14:46:28.833Z",
+      "lastError": "awaiting_external_validation: Final owned HeptaCore sender domain remains intentionally deferred; software foundation is complete and validated while Vercel remains the temporary web origin.",
       "resumedCount": 4,
       "takeoverCount": 0,
       "ownershipGeneration": 5,
@@ -1652,9 +1653,9 @@
       "runId": "run-manuel-S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION-20260910144612-ccbed006",
       "branch": "dispatch/manuel/manuel-chatgpt1/email-infra/S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION/ceaa8b659d",
       "worktreePath": "/home/runner/work/_temp/oreshnik-wt-email01-retry/32305cad03d6321a/manuel/manuel-chatgpt1/email-infra/S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION/3f2228d9",
-      "status": "active",
+      "status": "released",
       "createdAt": "2026-09-10T14:46:12.866Z",
-      "updatedAt": "2026-09-10T16:00:30.502Z",
+      "updatedAt": "2026-09-10T16:00:48.373Z",
       "zones": [
         "apps/web/app/api/email",
         "packages/core",
@@ -2096,10 +2097,11 @@
       "machineId": "machine-886f4c1e-ed9a-4884-8cf8-ac9ed318b25d",
       "branch": "dispatch/manuel/manuel-chatgpt1/email-infra/S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION/ceaa8b659d",
       "worktreePath": "/home/runner/work/_temp/oreshnik-wt-email01-retry/32305cad03d6321a/manuel/manuel-chatgpt1/email-infra/S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION/3f2228d9",
-      "status": "active",
+      "status": "released",
       "createdAt": "2026-09-10T14:46:12.866Z",
-      "updatedAt": "2026-09-10T16:00:30.502Z",
+      "updatedAt": "2026-09-10T16:00:48.373Z",
       "sourceTaskBoardHead": "a7383709108c26611d16158ba2a8a2a4c4cabf35",
+      "lastError": "awaiting_external_validation: Final owned HeptaCore sender domain remains intentionally deferred; software foundation is complete and validated while Vercel remains the temporary web origin.",
       "zones": [
         "apps/web/app/api/email",
         "packages/core",
@@ -3125,9 +3127,9 @@
       "machineId": "machine-e6dbba5f-6998-496c-a01f-27480ecacdc5",
       "runId": "run-manuel-S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION-20260910144612-ccbed006",
       "branch": "dispatch/manuel/manuel-chatgpt1/email-infra/S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION/ceaa8b659d",
-      "status": "reserved",
+      "status": "released",
       "createdAt": "2026-09-10T14:46:12.866Z",
-      "updatedAt": "2026-09-10T14:46:28.833Z",
+      "updatedAt": "2026-09-10T16:00:48.373Z",
       "harnessId": "chatgpt",
       "agentInstanceUid": "agent_e8dd52d1d5de4f40a9a4d9923ffda155",
       "agentInstanceAlias": "manuel-chatgpt1",
@@ -3143,9 +3145,9 @@
       "machineId": "machine-e6dbba5f-6998-496c-a01f-27480ecacdc5",
       "runId": "run-manuel-S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION-20260910144612-ccbed006",
       "branch": "dispatch/manuel/manuel-chatgpt1/email-infra/S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION/ceaa8b659d",
-      "status": "reserved",
+      "status": "released",
       "createdAt": "2026-09-10T14:46:12.866Z",
-      "updatedAt": "2026-09-10T14:46:28.833Z",
+      "updatedAt": "2026-09-10T16:00:48.373Z",
       "harnessId": "chatgpt",
       "agentInstanceUid": "agent_e8dd52d1d5de4f40a9a4d9923ffda155",
       "agentInstanceAlias": "manuel-chatgpt1",
@@ -3161,9 +3163,9 @@
       "machineId": "machine-e6dbba5f-6998-496c-a01f-27480ecacdc5",
       "runId": "run-manuel-S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION-20260910144612-ccbed006",
       "branch": "dispatch/manuel/manuel-chatgpt1/email-infra/S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION/ceaa8b659d",
-      "status": "reserved",
+      "status": "released",
       "createdAt": "2026-09-10T14:46:12.866Z",
-      "updatedAt": "2026-09-10T14:46:28.833Z",
+      "updatedAt": "2026-09-10T16:00:48.373Z",
       "harnessId": "chatgpt",
       "agentInstanceUid": "agent_e8dd52d1d5de4f40a9a4d9923ffda155",
       "agentInstanceAlias": "manuel-chatgpt1",
@@ -4002,6 +4004,14 @@
       "agentInstanceUid": "agent_e8dd52d1d5de4f40a9a4d9923ffda155",
       "sessionId": "session_5bb21c8aa01e49bcb03886ae23d26864",
       "message": "Takeover by manuel/manuel-chatgpt1 from manuel/manuel-chatgpt1. Reason: Retry EMAIL-01 external block after all software gates passed. Generation: 4 → 5."
+    },
+    {
+      "at": "2026-09-10T16:00:48.373Z",
+      "action": "dispatch.released",
+      "assignmentId": "asg-913a8dde-5aef-4f8b-8731-1af33f2228d9",
+      "runId": "run-manuel-S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION-20260910144612-ccbed006",
+      "operator": "manuel",
+      "message": "awaiting_external_validation: Final owned HeptaCore sender domain remains intentionally deferred; software foundation is complete and validated while Vercel remains the temporary web origin."
     }
   ],
   "reconciliation": {
@@ -4011,5 +4021,5 @@
     "pendingDiagnostics": []
   },
   "createdAt": "2026-06-29T20:17:43.302Z",
-  "updatedAt": "2026-09-10T16:00:30.502Z"
+  "updatedAt": "2026-09-10T16:00:48.373Z"
 }
