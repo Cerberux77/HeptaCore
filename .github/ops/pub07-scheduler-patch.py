@@ -18,10 +18,10 @@ replace_once(contract,
 '''export interface Pub04Asset {\n  kind: "IMAGE" | "VIDEO";\n  publicUrl: string | null;\n  role?: string | null;\n}''')
 replace_once(contract,
 '''export interface Pub04Publisher {\n  textOnly: boolean;\n  supportedFormats: readonly string[];\n  requiredScopes: readonly string[];\n  publish(input: {\n    targetId: string;\n    accessToken: string;\n    caption: string;\n    mediaUrl?: string;\n    mediaType?: "IMAGE" | "VIDEO";\n  }): Promise<''',
-'''export interface Pub04Publisher {\n  textOnly: boolean;\n  credentialLabel: string;\n  supportedFormats: readonly string[];\n  requiredScopes: readonly string[];\n  publish(input: {\n    targetId: string;\n    accessToken: string;\n    caption: string;\n    mediaUrl?: string;\n    mediaType?: "IMAGE" | "VIDEO";\n    format?: string | null;\n    title?: string | null;\n    description?: string | null;\n    thumbnailUrl?: string | null;\n  }): Promise<''')
+'''export interface Pub04Publisher {\n  textOnly: boolean;\n  credentialLabel?: string;\n  supportedFormats: readonly string[];\n  requiredScopes: readonly string[];\n  publish(input: {\n    targetId: string;\n    accessToken: string;\n    caption: string;\n    mediaUrl?: string;\n    mediaType?: "IMAGE" | "VIDEO";\n    format?: string | null;\n    title?: string | null;\n    description?: string | null;\n    thumbnailUrl?: string | null;\n  }): Promise<''')
 replace_once(contract,
 '''  resolveCredential(input: {\n    tenantId: string;\n    provider: string;\n    socialAccountId: string;\n  }): Promise<''',
-'''  resolveCredential(input: {\n    tenantId: string;\n    provider: string;\n    socialAccountId: string;\n    credentialLabel: string;\n  }): Promise<''')
+'''  resolveCredential(input: {\n    tenantId: string;\n    provider: string;\n    socialAccountId: string;\n    credentialLabel?: string;\n  }): Promise<''')
 
 executor = root / "apps/web/lib/publishing-cron-executor.ts"
 replace_once(executor,
@@ -43,7 +43,7 @@ replace_once(route,
 '''            assets: draft.assets.map((da) => ({\n              kind: da.asset.kind as "IMAGE" | "VIDEO",\n              publicUrl: buildPublicAssetUrl(tenantSlug, da.asset),\n              role: da.role,\n            })),''')
 replace_once(route,
 '''    async resolveCredential({ tenantId, provider, socialAccountId }) {\n      const result = await resolveAndDecryptOAuthCredential({\n        tenantId,\n        provider,\n        socialAccountId,\n        credentialLabel: "facebook_page_oauth",\n      });''',
-'''    async resolveCredential({ tenantId, provider, socialAccountId, credentialLabel }) {\n      const result = await resolveAndDecryptOAuthCredential({\n        tenantId,\n        provider,\n        socialAccountId,\n        credentialLabel,\n      });''')
+'''    async resolveCredential({ tenantId, provider, socialAccountId, credentialLabel }) {\n      if (!credentialLabel) return { ok: false, code: "CREDENTIAL_LABEL_MISSING" };\n      const result = await resolveAndDecryptOAuthCredential({\n        tenantId,\n        provider,\n        socialAccountId,\n        credentialLabel,\n      });''')
 
 test_target = root / "apps/web/lib/__tests__/pub07-scheduled.test.ts"
 test_target.parent.mkdir(parents=True, exist_ok=True)
