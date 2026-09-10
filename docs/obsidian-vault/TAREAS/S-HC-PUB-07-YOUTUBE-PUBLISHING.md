@@ -4,9 +4,9 @@ type: task-runtime
 project: "HeptaCore"
 task_id: "S-HC-PUB-07-YOUTUBE-PUBLISHING"
 sprint: "publishing"
-status: "ready"
+status: "validating"
 owner: "Manuel"
-last_updated: "2026-09-04T14:03:10.743Z"
+last_updated: "2026-09-10T16:42:00.719Z"
 source: "var/oreshnik/tasks/S-HC-PUB-07-YOUTUBE-PUBLISHING.json"
 ---
 
@@ -18,10 +18,10 @@ Real publishing for YouTube: Video 16:9 and YouTube Shorts
 
 ## Runtime
 
-- estado: `ready`
+- estado: `validating`
 - owner: `Manuel`
 - backup: `Manuel`
-- intentos: `0`
+- intentos: `1`
 - handoff: -
 
 ## Dependencias
@@ -59,7 +59,7 @@ Real publishing for YouTube: Video 16:9 and YouTube Shorts
 
 | Run | Operator | Mode | Task Status | Claim | Branch |
 |---|---|---|---|---|---|
-| Ninguno | - | - | - | - | - |
+| run-manuel-S-HC-PUB-07-YOUTUBE-PUBLISHING-20260910162001-40482454 | manuel | shell | validating | claimed | dispatch/manuel/manuel-chatgpt1/publishing/S-HC-PUB-07-YOUTUBE-PUBLISHING/71b46093fd |
 
 ## Integracion
 

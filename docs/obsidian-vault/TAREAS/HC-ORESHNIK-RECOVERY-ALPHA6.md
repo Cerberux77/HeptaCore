@@ -4,9 +4,9 @@ type: task-runtime
 project: "HeptaCore"
 task_id: "HC-ORESHNIK-RECOVERY-ALPHA6"
 sprint: "recovery"
-status: "ready_for_integration"
+status: "integrated"
 owner: "Manuel"
-last_updated: "2026-09-05T17:01:26.706Z"
+last_updated: "2026-09-10T16:42:00.903Z"
 source: "var/oreshnik/tasks/HC-ORESHNIK-RECOVERY-ALPHA6.json"
 ---
 
@@ -18,10 +18,10 @@ Upgrade HeptaCore governance to Oreshnik 0.3.0-alpha.6 and reconcile control pla
 
 ## Runtime
 
-- estado: `ready_for_integration`
+- estado: `integrated`
 - owner: `Manuel`
 - backup: `Manuel`
-- intentos: `2`
+- intentos: `3`
 - handoff: docs/07_handoffs/HC-ORESHNIK-RECOVERY-ALPHA6.md
 
 ## Dependencias
@@ -78,17 +78,25 @@ Upgrade HeptaCore governance to Oreshnik 0.3.0-alpha.6 and reconcile control pla
 
 | Run | Operator | Mode | Task Status | Claim | Branch |
 |---|---|---|---|---|---|
-| run-manuel-HC-ORESHNIK-RECOVERY-ALPHA6-20260904140329-21ab3a41 | manuel | shell | ready_for_integration | released | dispatch/manuel/manuel-chatgpt1/recovery/HC-ORESHNIK-RECOVERY-ALPHA6/2954c98970 |
+| Ninguno | - | - | - | - | - |
 
 ## Integracion
 
 - run: `run-manuel-HC-ORESHNIK-RECOVERY-ALPHA6-20260904140329-21ab3a41`
-- estado: `queued`
+- estado: `integrated`
 - madre: `MADRE/v56-recovery-alpha6-governance-baseline-bounded-legacy-eviden-2026-09-05`
 - source: `dispatch/manuel/manuel-chatgpt1/recovery/HC-ORESHNIK-RECOVERY-ALPHA6/2954c98970`
+- target: `MADRE/v56-recovery-alpha6-governance-baseline-bounded-legacy-eviden-2026-09-05`
 
 ## Train Mas Reciente
 
-- Ninguno
+- intento: `train-run-manuel-HC-ORESHNIK-RECOVERY-ALPHA6-202609041-1788628043459`
+- run: `run-manuel-HC-ORESHNIK-RECOVERY-ALPHA6-20260904140329-21ab3a41`
+- source: `dispatch/manuel/manuel-chatgpt1/recovery/HC-ORESHNIK-RECOVERY-ALPHA6/2954c98970`
+- target: `MADRE/v56-recovery-alpha6-governance-baseline-bounded-legacy-eviden-2026-09-05`
+- branch: `integration-train/recovery/HC-ORESHNIK-RECOVERY-ALP/r-0c7c255b3ad9/a-9bf9cbba778c`
+- estado: `succeeded`
+- advance: `runtime_projection_confirmed`
+- reason: Already contained on MADRE/v56-recovery-alpha6-governance-baseline-bounded-legacy-eviden-2026-09-05; runtime reconciled without merge
 
 <!-- ORESHNIK:GENERATED:END -->

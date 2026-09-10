@@ -7,8 +7,8 @@
   "title": "Real publishing for YouTube: Video 16:9 and YouTube Shorts",
   "owner": "Manuel",
   "backupOwner": "Manuel",
-  "status": "ready",
-  "taskBoardPath": "/home/runner/work/HeptaCore/HeptaCore/var/oreshnik/task-board.json",
+  "status": "validating",
+  "taskBoardPath": "/home/runner/work/_temp/oreshnik-wt/32305cad03d6321a/manuel/manuel-chatgpt1/publishing/S-HC-PUB-07-YOUTUBE-PUBLISHING/7912e8fa/var/oreshnik/task-board.json",
   "zone": [
     "apps/web/lib/publishers",
     "apps/web/app/api/publishing",
@@ -27,14 +27,67 @@
     "Reutilizacion de transactional finalization y IN_REVIEW state machine",
     "Cero declaracion de soporte hasta validacion real"
   ],
+  "attempts": 1,
+  "activeRun": {
+    "runId": "run-manuel-S-HC-PUB-07-YOUTUBE-PUBLISHING-20260910162001-40482454",
+    "operator": "manuel",
+    "worker": "manuel-dispatcher",
+    "workerMode": "shell",
+    "claimedAt": "2026-09-10T16:39:48.375Z",
+    "updatedAt": "2026-09-10T16:39:48.375Z",
+    "expiresAt": "2026-09-10T17:39:48.375Z",
+    "branch": "dispatch/manuel/manuel-chatgpt1/publishing/S-HC-PUB-07-YOUTUBE-PUBLISHING/71b46093fd",
+    "worktreePath": "/home/runner/work/_temp/oreshnik-wt/32305cad03d6321a/manuel/manuel-chatgpt1/publishing/S-HC-PUB-07-YOUTUBE-PUBLISHING/7912e8fa",
+    "zones": [
+      "apps/web/lib/publishers",
+      "apps/web/app/api/publishing",
+      "packages/integrations"
+    ],
+    "resources": []
+  },
   "history": [
     {
       "at": "2026-06-28T18:47:05.091Z",
       "action": "status_reconciled",
       "operator": "manuel",
       "description": "Task status reconciled to ready: dependencies and conflicts are clear for execution"
+    },
+    {
+      "at": "2026-09-10T16:39:48.375Z",
+      "action": "claimed",
+      "operator": "manuel",
+      "branch": "dispatch/manuel/manuel-chatgpt1/publishing/S-HC-PUB-07-YOUTUBE-PUBLISHING/71b46093fd",
+      "description": "Run run-manuel-S-HC-PUB-07-YOUTUBE-PUBLISHING-20260910162001-40482454 claimed via shell"
+    },
+    {
+      "at": "2026-09-10T16:42:00.719Z",
+      "action": "validation_started",
+      "operator": "manuel",
+      "branch": "dispatch/manuel/manuel-chatgpt1/publishing/S-HC-PUB-07-YOUTUBE-PUBLISHING/71b46093fd",
+      "description": "YouTube Video and Shorts immediate publishing, provider-specific dry-run and resumable provider contracts are green. Full project gates pass. Scheduled cron execution remains outside the current canonical zones and will be resolved by governed zone amendment before final acceptance."
     }
   ],
-  "updatedAt": "2026-09-04T14:03:10.743Z",
-  "runs": []
+  "updatedAt": "2026-09-10T16:42:00.719Z",
+  "runs": [
+    {
+      "runId": "run-manuel-S-HC-PUB-07-YOUTUBE-PUBLISHING-20260910162001-40482454",
+      "operator": "manuel",
+      "worker": "manuel-dispatcher",
+      "workerMode": "shell",
+      "branch": "dispatch/manuel/manuel-chatgpt1/publishing/S-HC-PUB-07-YOUTUBE-PUBLISHING/71b46093fd",
+      "worktreePath": "/home/runner/work/_temp/oreshnik-wt/32305cad03d6321a/manuel/manuel-chatgpt1/publishing/S-HC-PUB-07-YOUTUBE-PUBLISHING/7912e8fa",
+      "zones": [
+        "apps/web/lib/publishers",
+        "apps/web/app/api/publishing",
+        "packages/integrations"
+      ],
+      "resources": [],
+      "taskStatus": "validating",
+      "claimStatus": "claimed",
+      "claimedAt": "2026-09-10T16:39:48.375Z",
+      "updatedAt": "2026-09-10T16:42:00.726Z",
+      "expiresAt": "2026-09-10T17:39:48.375Z",
+      "manifestPath": "var/oreshnik/runs/S-HC-PUB-07-YOUTUBE-PUBLISHING/run-manuel-S-HC-PUB-07-YOUTUBE-PUBLISHING-20260910162001-40482454.json"
+    }
+  ]
 }

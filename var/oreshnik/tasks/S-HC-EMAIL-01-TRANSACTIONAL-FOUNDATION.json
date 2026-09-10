@@ -7,12 +7,20 @@
   "title": "Transactional email foundation: domain sender, DNS, reputation, provider integration",
   "owner": "Jean",
   "backupOwner": "Manuel",
-  "status": "blocked",
-  "taskBoardPath": "/home/runner/work/_temp/oreshnik-wt/32305cad03d6321a/manuel/manuel-chatgpt1/recovery/HC-ORESHNIK-RECOVERY-ALPHA6/adfcc418/var/oreshnik/task-board.json",
+  "status": "ready",
+  "taskBoardPath": "/home/runner/work/_temp/oreshnik-wt/32305cad03d6321a/manuel/manuel-chatgpt1/publishing/S-HC-PUB-07-YOUTUBE-PUBLISHING/7912e8fa/var/oreshnik/task-board.json",
   "zone": [
     "apps/web/app/api/email",
     "packages/core",
     "docs"
+  ],
+  "readZones": [],
+  "writeZones": [],
+  "resources": [],
+  "capabilities": [],
+  "gates": [],
+  "validationExpectations": [
+    "Production email activation remains fail-closed until an owned HeptaCore sender domain is verified in Resend with SPF, DKIM and DMARC evidence."
   ],
   "dependsOn": [],
   "acceptance": [
@@ -49,25 +57,14 @@
       "action": "canonical_task_amended",
       "operator": "manuel",
       "description": "Repair alpha.6 standalone Task projection after native external block and preserve the production-domain validation contract.; fields=validationExpectations; priorDigest=c307c316d181db183d7cfdf27461d66e483762dca93044d7b4b2e57a4c24f336"
+    },
+    {
+      "at": "2026-09-10T16:42:00.903Z",
+      "action": "status_reconciled",
+      "operator": "jean",
+      "description": "Task status reconciled to ready: dependencies and conflicts are clear for execution"
     }
   ],
-  "updatedAt": "2026-09-10T16:11:30.680Z",
-  "runs": [],
-  "readZones": [],
-  "writeZones": [],
-  "resources": [],
-  "capabilities": [],
-  "gates": [],
-  "validationExpectations": [
-    "Production email activation remains fail-closed until an owned HeptaCore sender domain is verified in Resend with SPF, DKIM and DMARC evidence."
-  ],
-  "amendment": {
-    "amendedBy": "manuel",
-    "amendedAt": "2026-09-10T16:11:30.680Z",
-    "reason": "Repair alpha.6 standalone Task projection after native external block and preserve the production-domain validation contract.",
-    "priorTaskDigest": "c307c316d181db183d7cfdf27461d66e483762dca93044d7b4b2e57a4c24f336",
-    "changedFields": [
-      "validationExpectations"
-    ]
-  }
+  "updatedAt": "2026-09-10T16:42:00.903Z",
+  "runs": []
 }

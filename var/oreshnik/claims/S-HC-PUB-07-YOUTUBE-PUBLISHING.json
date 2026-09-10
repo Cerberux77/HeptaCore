@@ -1,0 +1,27 @@
+{
+  "taskId": "S-HC-PUB-07-YOUTUBE-PUBLISHING",
+  "sprint": "publishing",
+  "owner": "Manuel",
+  "operator": "manuel",
+  "harnessId": "chatgpt",
+  "agentInstanceUid": "agent_5930d607f3e043f2a8fee58342a57e07",
+  "agentInstanceAlias": "manuel-chatgpt1",
+  "sessionId": "session_dcdf09f15279492f91b148a3e9c751e6",
+  "identityOrigin": "explicit",
+  "worker": "manuel-dispatcher",
+  "workerMode": "shell",
+  "runId": "run-manuel-S-HC-PUB-07-YOUTUBE-PUBLISHING-20260910162001-40482454",
+  "branch": "dispatch/manuel/manuel-chatgpt1/publishing/S-HC-PUB-07-YOUTUBE-PUBLISHING/71b46093fd",
+  "worktreePath": "/home/runner/work/_temp/oreshnik-wt/32305cad03d6321a/manuel/manuel-chatgpt1/publishing/S-HC-PUB-07-YOUTUBE-PUBLISHING/7912e8fa",
+  "zones": [
+    "apps/web/lib/publishers",
+    "apps/web/app/api/publishing",
+    "packages/integrations"
+  ],
+  "resources": [],
+  "claimedAt": "2026-09-10T16:39:48.375Z",
+  "updatedAt": "2026-09-10T16:39:48.375Z",
+  "expiresAt": "2026-09-10T17:39:48.375Z",
+  "ttlSeconds": 3600,
+  "status": "claimed"
+}
