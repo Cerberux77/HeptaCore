@@ -5,15 +5,15 @@
     "originUrl": "https://github.com/Cerberux77/HeptaCore.git",
     "canonicalMotherBranch": "master"
   },
-  "generation": 129,
-  "controlHead": "8066de4e75113c89906e642ae582ea78af697620",
+  "generation": 130,
+  "controlHead": "605eca619454a0dbbc329a1af5f3ebe0b76ba5f8",
   "catalog": {
     "taskBoardPath": "var/oreshnik/task-board.json",
     "zoneMapPath": "docs/07_handoffs/zone-map.json",
-    "sourceTaskBoardHead": "f53a8177602ef441e9427ab22c14f7e579dc232e",
-    "fingerprint": "bea95716241d9f6cd5d476ed5a13e204250b63d3",
-    "taskCount": 43,
-    "updatedAt": "2026-09-10T17:09:49.321Z"
+    "sourceTaskBoardHead": "7236235515cdcbc0a154f59b98f0f9fa55a5f7b8",
+    "fingerprint": "41dc14cac7bf243442e13cae8007d2bfcd704650",
+    "taskCount": 44,
+    "updatedAt": "2026-09-10T17:37:01.661Z"
   },
   "policy": {
     "name": "deterministic-v1",
@@ -344,6 +344,13 @@
       "hostname": "runnervmlun5p",
       "registeredAt": "2026-09-10T17:09:48.390Z",
       "updatedAt": "2026-09-10T17:09:48.390Z"
+    },
+    {
+      "machineId": "machine-48788fbd-d2ea-43db-8f5d-f8bd5f725a19",
+      "worktreeRoot": "/home/runner/work/_temp/oreshnik-wt-pub07b",
+      "hostname": "runnervmlun5p",
+      "registeredAt": "2026-09-10T17:37:00.482Z",
+      "updatedAt": "2026-09-10T17:37:00.482Z"
     }
   ],
   "agentInstances": [
@@ -512,7 +519,7 @@
       "repositoryId": "32305cad03d6321a",
       "slot": 1,
       "createdAt": "2026-09-10T16:20:01.353Z",
-      "updatedAt": "2026-09-10T17:09:54.625Z",
+      "updatedAt": "2026-09-10T17:31:40.578Z",
       "identityOrigin": "explicit"
     }
   ],
@@ -679,8 +686,9 @@
       "harnessId": "chatgpt",
       "machineId": "machine-8f867bf0-640c-438a-914a-6fb8f297e61c",
       "startedAt": "2026-09-10T16:20:01.353Z",
-      "lastSeenAt": "2026-09-10T17:09:54.625Z",
-      "status": "active",
+      "lastSeenAt": "2026-09-10T17:31:40.578Z",
+      "status": "closed",
+      "closedAt": "2026-09-10T17:31:40.578Z",
       "identityOrigin": "explicit"
     }
   ],
@@ -4382,6 +4390,11 @@
       "runId": "run-manuel-S-HC-PUB-07-YOUTUBE-PUBLISHING-20260910162001-40482454",
       "operator": "manuel",
       "message": "Replan PUB-07 because the original canonical Task omitted the scheduled-publishing cron/executor/contract zones. Product commit 4a67b755dce1e8e7d91eff6c4c582e6d69dad64d is preserved on dispatch/manuel/manuel-chatgpt1/publishing/S-HC-PUB-07-YOUTUBE-PUBLISHING/71b46093fd."
+    },
+    {
+      "at": "2026-09-10T17:37:01.661Z",
+      "action": "dispatch.init",
+      "message": "Registered machine machine-48788fbd-d2ea-43db-8f5d-f8bd5f725a19 with root /home/runner/work/_temp/oreshnik-wt-pub07b."
     }
   ],
   "reconciliation": {
@@ -4391,5 +4404,5 @@
     "pendingDiagnostics": []
   },
   "createdAt": "2026-06-29T20:17:43.302Z",
-  "updatedAt": "2026-09-10T17:31:40.578Z"
+  "updatedAt": "2026-09-10T17:37:01.661Z"
 }
