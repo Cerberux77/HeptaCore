@@ -5,7 +5,7 @@
     "originUrl": "https://github.com/Cerberux77/HeptaCore.git",
     "canonicalMotherBranch": "master"
   },
-  "generation": 119,
+  "generation": 120,
   "controlHead": "ba924fe2e10ab6fe61738862159b5997138ac00b",
   "catalog": {
     "taskBoardPath": "var/oreshnik/task-board.json",
@@ -1293,7 +1293,7 @@
       "sprintId": "publishing",
       "title": "Real publishing for YouTube: Video 16:9 and YouTube Shorts",
       "operator": "manuel",
-      "machineId": "machine-80fe480f-7001-4b29-bc7c-30cad904c624",
+      "machineId": "machine-0249465c-e1b8-40fe-8aad-0f605b8f202c",
       "functionalBranch": "dispatch/manuel/manuel-chatgpt1/publishing/S-HC-PUB-07-YOUTUBE-PUBLISHING/71b46093fd",
       "motherBranch": "master",
       "worktreePath": "/home/runner/work/_temp/oreshnik-wt/32305cad03d6321a/manuel/manuel-chatgpt1/publishing/S-HC-PUB-07-YOUTUBE-PUBLISHING/7912e8fa",
@@ -1320,15 +1320,15 @@
       "sourceTaskBoardHead": "f53a8177602ef441e9427ab22c14f7e579dc232e",
       "catalogFingerprint": "bea95716241d9f6cd5d476ed5a13e204250b63d3",
       "createdAt": "2026-09-10T16:20:01.353Z",
-      "updatedAt": "2026-09-10T16:32:49.758Z",
+      "updatedAt": "2026-09-10T16:37:24.298Z",
       "activatedAt": "2026-09-10T16:20:10.286Z",
-      "resumedCount": 1,
+      "resumedCount": 2,
       "takeoverCount": 0,
-      "ownershipGeneration": 2,
+      "ownershipGeneration": 3,
       "previousAgentInstanceUid": "agent_5930d607f3e043f2a8fee58342a57e07",
       "previousSessionId": "session_dcdf09f15279492f91b148a3e9c751e6",
-      "takeoverReason": "Continue PUB-07 on an ephemeral Actions runner while preserving the exact governed Run.",
-      "takenOverAt": "2026-09-10T16:32:49.758Z",
+      "takeoverReason": "Retry PUB-07 product implementation after correcting the local zone guard; preserve the same governed Run.",
+      "takenOverAt": "2026-09-10T16:37:24.298Z",
       "harnessId": "chatgpt",
       "agentInstanceUid": "agent_5930d607f3e043f2a8fee58342a57e07",
       "agentInstanceAlias": "manuel-chatgpt1",
@@ -1779,13 +1779,13 @@
       "taskId": "S-HC-PUB-07-YOUTUBE-PUBLISHING",
       "sprintId": "publishing",
       "operator": "manuel",
-      "machineId": "machine-80fe480f-7001-4b29-bc7c-30cad904c624",
+      "machineId": "machine-0249465c-e1b8-40fe-8aad-0f605b8f202c",
       "runId": "run-manuel-S-HC-PUB-07-YOUTUBE-PUBLISHING-20260910162001-40482454",
       "branch": "dispatch/manuel/manuel-chatgpt1/publishing/S-HC-PUB-07-YOUTUBE-PUBLISHING/71b46093fd",
       "worktreePath": "/home/runner/work/_temp/oreshnik-wt/32305cad03d6321a/manuel/manuel-chatgpt1/publishing/S-HC-PUB-07-YOUTUBE-PUBLISHING/7912e8fa",
       "status": "active",
       "createdAt": "2026-09-10T16:20:01.353Z",
-      "updatedAt": "2026-09-10T16:32:49.758Z",
+      "updatedAt": "2026-09-10T16:37:24.298Z",
       "zones": [
         "apps/web/lib/publishers",
         "apps/web/app/api/publishing",
@@ -1803,7 +1803,7 @@
         "apps/web/app/api/publishing",
         "packages/integrations"
       ],
-      "ownershipGeneration": 2,
+      "ownershipGeneration": 3,
       "harnessId": "chatgpt",
       "agentInstanceUid": "agent_5930d607f3e043f2a8fee58342a57e07",
       "agentInstanceAlias": "manuel-chatgpt1",
@@ -2262,12 +2262,12 @@
       "taskId": "S-HC-PUB-07-YOUTUBE-PUBLISHING",
       "sprintId": "publishing",
       "operator": "manuel",
-      "machineId": "machine-80fe480f-7001-4b29-bc7c-30cad904c624",
+      "machineId": "machine-0249465c-e1b8-40fe-8aad-0f605b8f202c",
       "branch": "dispatch/manuel/manuel-chatgpt1/publishing/S-HC-PUB-07-YOUTUBE-PUBLISHING/71b46093fd",
       "worktreePath": "/home/runner/work/_temp/oreshnik-wt/32305cad03d6321a/manuel/manuel-chatgpt1/publishing/S-HC-PUB-07-YOUTUBE-PUBLISHING/7912e8fa",
       "status": "active",
       "createdAt": "2026-09-10T16:20:01.353Z",
-      "updatedAt": "2026-09-10T16:32:49.758Z",
+      "updatedAt": "2026-09-10T16:37:24.298Z",
       "sourceTaskBoardHead": "f53a8177602ef441e9427ab22c14f7e579dc232e",
       "zones": [
         "apps/web/lib/publishers",
@@ -2286,7 +2286,7 @@
         "apps/web/app/api/publishing",
         "packages/integrations"
       ],
-      "ownershipGeneration": 2,
+      "ownershipGeneration": 3,
       "harnessId": "chatgpt",
       "agentInstanceUid": "agent_5930d607f3e043f2a8fee58342a57e07",
       "agentInstanceAlias": "manuel-chatgpt1",
@@ -4274,6 +4274,16 @@
       "at": "2026-09-10T16:37:17.648Z",
       "action": "dispatch.init",
       "message": "Registered machine machine-0249465c-e1b8-40fe-8aad-0f605b8f202c with root /home/runner/work/_temp/oreshnik-wt."
+    },
+    {
+      "at": "2026-09-10T16:37:24.298Z",
+      "action": "dispatch.takeover",
+      "assignmentId": "asg-797270cc-485b-40c5-b0d6-43977912e8fa",
+      "runId": "run-manuel-S-HC-PUB-07-YOUTUBE-PUBLISHING-20260910162001-40482454",
+      "operator": "manuel",
+      "agentInstanceUid": "agent_5930d607f3e043f2a8fee58342a57e07",
+      "sessionId": "session_dcdf09f15279492f91b148a3e9c751e6",
+      "message": "Takeover by manuel/manuel-chatgpt1 from manuel/manuel-chatgpt1. Reason: Retry PUB-07 product implementation after correcting the local zone guard; preserve the same governed Run.. Generation: 2 → 3."
     }
   ],
   "reconciliation": {
@@ -4283,5 +4293,5 @@
     "pendingDiagnostics": []
   },
   "createdAt": "2026-06-29T20:17:43.302Z",
-  "updatedAt": "2026-09-10T16:37:17.648Z"
+  "updatedAt": "2026-09-10T16:37:24.298Z"
 }
