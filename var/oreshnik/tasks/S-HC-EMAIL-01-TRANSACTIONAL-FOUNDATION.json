@@ -7,8 +7,8 @@
   "title": "Transactional email foundation: domain sender, DNS, reputation, provider integration",
   "owner": "Jean",
   "backupOwner": "Manuel",
-  "status": "ready",
-  "taskBoardPath": "/home/runner/work/_temp/oreshnik-wt/32305cad03d6321a/manuel/manuel-chatgpt1/recovery/HC-ORESHNIK-RECOVERY-ALPHA6/adfcc418/var/oreshnik/task-board.json",
+  "status": "claimed",
+  "taskBoardPath": "/home/runner/work/_temp/oreshnik-wt-email01/32305cad03d6321a/manuel/manuel-chatgpt1/email-infra/S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION/3f2228d9/var/oreshnik/task-board.json",
   "zone": [
     "apps/web/app/api/email",
     "packages/core",
@@ -22,14 +22,71 @@
     "Webhooks de eventos (delivered, bounced, complained) configurados",
     "Enlaces comerciales y de marca consistentes con el dominio final"
   ],
+  "attempts": 1,
+  "activeRun": {
+    "runId": "run-manuel-S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION-20260910144612-ccbed006",
+    "operator": "manuel",
+    "worker": "manuel-dispatcher",
+    "workerMode": "shell",
+    "claimedAt": "2026-09-10T14:57:52.455Z",
+    "updatedAt": "2026-09-10T14:57:52.455Z",
+    "expiresAt": "2026-09-10T15:57:52.455Z",
+    "branch": "dispatch/manuel/manuel-chatgpt1/email-infra/S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION/ceaa8b659d",
+    "worktreePath": "/home/runner/work/_temp/oreshnik-wt-email01/32305cad03d6321a/manuel/manuel-chatgpt1/email-infra/S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION/3f2228d9",
+    "zones": [
+      "apps/web/app/api/email",
+      "packages/core",
+      "docs"
+    ],
+    "resources": []
+  },
   "history": [
     {
       "at": "2026-09-05T16:07:01.790Z",
       "action": "status_reconciled",
       "operator": "jean",
       "description": "Task status reconciled to ready: dependencies and conflicts are clear for execution"
+    },
+    {
+      "at": "2026-09-10T14:57:52.455Z",
+      "action": "claimed",
+      "operator": "manuel",
+      "branch": "dispatch/manuel/manuel-chatgpt1/email-infra/S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION/ceaa8b659d",
+      "description": "Run run-manuel-S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION-20260910144612-ccbed006 claimed via shell"
     }
   ],
-  "updatedAt": "2026-09-05T16:07:01.790Z",
-  "runs": []
+  "handoffs": [
+    {
+      "id": "handoff-20260910T145957651Z-6bebd8293c47",
+      "schema": "oreshnik-handoff/v1",
+      "createdAt": "2026-09-10T14:59:57.651Z",
+      "jsonPath": "var/oreshnik/handoffs/S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION/handoff-20260910T145957651Z-6bebd8293c47.json",
+      "markdownPath": "docs/oreshnik/handoffs/S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION/handoff-20260910T145957651Z-6bebd8293c47.md",
+      "digest": "071980ea256b786a2333b8c2e497c9d987b111486f544822513db9a167d64f97",
+      "classification": "BLOCKED_EXTERNAL"
+    }
+  ],
+  "updatedAt": "2026-09-10T14:57:52.455Z",
+  "runs": [
+    {
+      "runId": "run-manuel-S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION-20260910144612-ccbed006",
+      "operator": "manuel",
+      "worker": "manuel-dispatcher",
+      "workerMode": "shell",
+      "branch": "dispatch/manuel/manuel-chatgpt1/email-infra/S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION/ceaa8b659d",
+      "worktreePath": "/home/runner/work/_temp/oreshnik-wt-email01/32305cad03d6321a/manuel/manuel-chatgpt1/email-infra/S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION/3f2228d9",
+      "zones": [
+        "apps/web/app/api/email",
+        "packages/core",
+        "docs"
+      ],
+      "resources": [],
+      "taskStatus": "claimed",
+      "claimStatus": "claimed",
+      "claimedAt": "2026-09-10T14:57:52.455Z",
+      "updatedAt": "2026-09-10T14:57:52.460Z",
+      "expiresAt": "2026-09-10T15:57:52.455Z",
+      "manifestPath": "var/oreshnik/runs/S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION/run-manuel-S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION-20260910144612-ccbed006.json"
+    }
+  ]
 }
