@@ -5,15 +5,15 @@
     "originUrl": "https://github.com/Cerberux77/HeptaCore.git",
     "canonicalMotherBranch": "master"
   },
-  "generation": 132,
-  "controlHead": "b3f1cbc70ea8e56fe374374a3227be8775767746",
+  "generation": 133,
+  "controlHead": "168bd7f4e45249bc8abd2e0eac0a94ac88f703f2",
   "catalog": {
     "taskBoardPath": "var/oreshnik/task-board.json",
     "zoneMapPath": "docs/07_handoffs/zone-map.json",
     "sourceTaskBoardHead": "7236235515cdcbc0a154f59b98f0f9fa55a5f7b8",
     "fingerprint": "41dc14cac7bf243442e13cae8007d2bfcd704650",
     "taskCount": 44,
-    "updatedAt": "2026-09-10T17:37:21.480Z"
+    "updatedAt": "2026-09-10T17:47:35.217Z"
   },
   "policy": {
     "name": "deterministic-v1",
@@ -351,6 +351,13 @@
       "hostname": "runnervmlun5p",
       "registeredAt": "2026-09-10T17:37:00.482Z",
       "updatedAt": "2026-09-10T17:37:00.482Z"
+    },
+    {
+      "machineId": "machine-d5933367-342f-47ac-9da8-7ed6bb10fc99",
+      "worktreeRoot": "/home/runner/work/_temp/oreshnik-wt-pub07b-recover",
+      "hostname": "runnervmlun5p",
+      "registeredAt": "2026-09-10T17:47:34.127Z",
+      "updatedAt": "2026-09-10T17:47:34.127Z"
     }
   ],
   "agentInstances": [
@@ -531,7 +538,7 @@
       "repositoryId": "32305cad03d6321a",
       "slot": 1,
       "createdAt": "2026-09-10T17:37:21.480Z",
-      "updatedAt": "2026-09-10T17:37:21.480Z",
+      "updatedAt": "2026-09-10T17:37:32.065Z",
       "identityOrigin": "explicit"
     }
   ],
@@ -710,7 +717,7 @@
       "harnessId": "chatgpt",
       "machineId": "machine-48788fbd-d2ea-43db-8f5d-f8bd5f725a19",
       "startedAt": "2026-09-10T17:37:21.480Z",
-      "lastSeenAt": "2026-09-10T17:37:21.480Z",
+      "lastSeenAt": "2026-09-10T17:37:32.065Z",
       "status": "active",
       "identityOrigin": "explicit"
     }
@@ -4714,6 +4721,11 @@
       "runId": "run-manuel-S-HC-PUB-07B-YOUTUBE-SCHEDULED-E2E-20260910173721-206fad0f",
       "operator": "manuel",
       "message": "Assignment asg-6ae5ad07-bb79-49f6-b81a-ff6be9e0f149 is active."
+    },
+    {
+      "at": "2026-09-10T17:47:35.217Z",
+      "action": "dispatch.init",
+      "message": "Registered machine machine-d5933367-342f-47ac-9da8-7ed6bb10fc99 with root /home/runner/work/_temp/oreshnik-wt-pub07b-recover."
     }
   ],
   "reconciliation": {
@@ -4723,5 +4735,5 @@
     "pendingDiagnostics": []
   },
   "createdAt": "2026-06-29T20:17:43.302Z",
-  "updatedAt": "2026-09-10T17:37:32.065Z"
+  "updatedAt": "2026-09-10T17:47:35.217Z"
 }
