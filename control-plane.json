@@ -5,15 +5,15 @@
     "originUrl": "https://github.com/Cerberux77/HeptaCore.git",
     "canonicalMotherBranch": "master"
   },
-  "generation": 143,
-  "controlHead": "08910c589dbf266b3acb09bb2ab8d3ca4e7c2837",
+  "generation": 144,
+  "controlHead": "78b29f083ac5cf84e5254262becd1e57ab43edf9",
   "catalog": {
     "taskBoardPath": "var/oreshnik/task-board.json",
     "zoneMapPath": "docs/07_handoffs/zone-map.json",
     "sourceTaskBoardHead": "6b5d53aa1393c753368c58ab72277a72618e8c10",
-    "fingerprint": "41dc14cac7bf243442e13cae8007d2bfcd704650",
+    "fingerprint": "dd7222f247cc7c42889f344af967ca60fab06d97",
     "taskCount": 44,
-    "updatedAt": "2026-09-10T23:40:52.453Z"
+    "updatedAt": "2026-09-10T23:48:19.967Z"
   },
   "policy": {
     "name": "deterministic-v1",
@@ -386,6 +386,13 @@
       "hostname": "runnervmlun5p",
       "registeredAt": "2026-09-10T22:10:43.553Z",
       "updatedAt": "2026-09-10T22:10:43.553Z"
+    },
+    {
+      "machineId": "machine-6b34a148-a1c0-4886-ad96-be5e474af54a",
+      "worktreeRoot": "/home/runner/work/_temp/oreshnik-wt-pub07-external",
+      "hostname": "runnervmlun5p",
+      "registeredAt": "2026-09-10T23:48:19.008Z",
+      "updatedAt": "2026-09-10T23:48:19.008Z"
     }
   ],
   "agentInstances": [
@@ -566,7 +573,7 @@
       "repositoryId": "32305cad03d6321a",
       "slot": 1,
       "createdAt": "2026-09-10T17:37:21.480Z",
-      "updatedAt": "2026-09-10T22:10:50.920Z",
+      "updatedAt": "2026-09-10T23:40:52.453Z",
       "identityOrigin": "explicit"
     }
   ],
@@ -4837,6 +4844,11 @@
       "runId": "run-manuel-S-HC-PUB-07B-YOUTUBE-SCHEDULED-E2E-20260910173721-206fad0f",
       "operator": "manuel",
       "message": "Terminalization term-c7bda00e-5a5f-42c6-b596-48f574b790d4 confirmed PR #29 for S-HC-PUB-07B-YOUTUBE-SCHEDULED-E2E on master at 6b5d53aa1393c753368c58ab72277a72618e8c10; run integrated, assignment and claim released."
+    },
+    {
+      "at": "2026-09-10T23:48:19.967Z",
+      "action": "dispatch.init",
+      "message": "Registered machine machine-6b34a148-a1c0-4886-ad96-be5e474af54a with root /home/runner/work/_temp/oreshnik-wt-pub07-external."
     }
   ],
   "reconciliation": {
@@ -4846,5 +4858,5 @@
     "pendingDiagnostics": []
   },
   "createdAt": "2026-06-29T20:17:43.302Z",
-  "updatedAt": "2026-09-10T23:40:52.453Z"
+  "updatedAt": "2026-09-10T23:48:19.967Z"
 }
