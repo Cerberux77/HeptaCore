@@ -5,15 +5,15 @@
     "originUrl": "https://github.com/Cerberux77/HeptaCore.git",
     "canonicalMotherBranch": "master"
   },
-  "generation": 101,
-  "controlHead": "6bd02bfb653c48c3d4aff2843e9a1df458f99a09",
+  "generation": 102,
+  "controlHead": "e6e76ad7b125e147ce8b63e7b51d12404a98fe8d",
   "catalog": {
     "taskBoardPath": "var/oreshnik/task-board.json",
     "zoneMapPath": "docs/07_handoffs/zone-map.json",
-    "sourceTaskBoardHead": "56d20350d45062ef9d028e36587e788f30e6708a",
-    "fingerprint": "9528bb8410fff66eabd4db8c4e2c1a6b3c69b057",
+    "sourceTaskBoardHead": "a7383709108c26611d16158ba2a8a2a4c4cabf35",
+    "fingerprint": "fdf736eb32542e2efbd48b369858d40f03455010",
     "taskCount": 43,
-    "updatedAt": "2026-09-10T14:45:34.462Z"
+    "updatedAt": "2026-09-10T14:45:45.657Z"
   },
   "policy": {
     "name": "deterministic-v1",
@@ -260,6 +260,13 @@
       "hostname": "runnervmejwal",
       "registeredAt": "2026-09-07T06:44:45.634Z",
       "updatedAt": "2026-09-07T06:44:45.634Z"
+    },
+    {
+      "machineId": "machine-e6dbba5f-6998-496c-a01f-27480ecacdc5",
+      "worktreeRoot": "/home/runner/work/_temp/oreshnik-wt-next",
+      "hostname": "runnervmlun5p",
+      "registeredAt": "2026-09-10T14:45:44.255Z",
+      "updatedAt": "2026-09-10T14:45:44.255Z"
     }
   ],
   "agentInstances": [
@@ -404,7 +411,7 @@
       "repositoryId": "32305cad03d6321a",
       "slot": 2,
       "createdAt": "2026-09-06T15:54:41.029Z",
-      "updatedAt": "2026-09-07T06:44:53.337Z",
+      "updatedAt": "2026-09-10T14:45:34.462Z",
       "identityOrigin": "explicit"
     }
   ],
@@ -3687,6 +3694,11 @@
       "runId": "run-manuel-S-HC-PUB-06-REELS-STORIES-PUBLISHERS-20260906155441-d36bde04",
       "operator": "manuel",
       "message": "Terminalization term-979fc775-6434-4ee8-92bb-902b2e844ea2 confirmed PR #27 for S-HC-PUB-06-REELS-STORIES-PUBLISHERS on master at 56d20350d45062ef9d028e36587e788f30e6708a; run integrated, assignment and claim released."
+    },
+    {
+      "at": "2026-09-10T14:45:45.657Z",
+      "action": "dispatch.init",
+      "message": "Registered machine machine-e6dbba5f-6998-496c-a01f-27480ecacdc5 with root /home/runner/work/_temp/oreshnik-wt-next."
     }
   ],
   "reconciliation": {
@@ -3696,5 +3708,5 @@
     "pendingDiagnostics": []
   },
   "createdAt": "2026-06-29T20:17:43.302Z",
-  "updatedAt": "2026-09-10T14:45:34.462Z"
+  "updatedAt": "2026-09-10T14:45:45.657Z"
 }
