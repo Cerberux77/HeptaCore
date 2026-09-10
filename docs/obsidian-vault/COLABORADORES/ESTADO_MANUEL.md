@@ -1,8 +1,9 @@
+<!-- ORESHNIK:GENERATED:START -->
 ---
 type: collaborator-status
 project: "HeptaCore"
 operator: "Manuel"
-last_updated: "2026-09-05T17:01:28.591Z"
+last_updated: "2026-09-10T22:07:19.966Z"
 generated_by: "Oreshnik canonical-check"
 source: "var/oreshnik/task-board.json"
 ---
@@ -15,7 +16,6 @@ source: "var/oreshnik/task-board.json"
 
 | Sprint | Scope | Depende de |
 |---|---|---|
-| S-HC-PUB-06-REELS-STORIES-PUBLISHERS | Real publishing for Meta Reels and Stories: Instagram + Facebook | S-HC-PUB-03-MULTITENANT-ASSETS, S-HC-PUB-04-HOURLY-BATCH-CRON |
 | S-HC-PUB-07-YOUTUBE-PUBLISHING | Real publishing for YouTube: Video 16:9 and YouTube Shorts | S-HC-PUB-03-MULTITENANT-ASSETS, S-HC-PUB-04-HOURLY-BATCH-CRON |
 
 ## Pending
@@ -238,7 +238,7 @@ Zonas: `packages/agents`, `apps/web/components`, `packages/core`
 
 ### S-HC-PUB-06-REELS-STORIES-PUBLISHERS - Real publishing for Meta Reels and Stories: Instagram + Facebook
 
-Estado: `ready`
+Estado: `integrated`
 
 - Instagram Reel publishing real con durabilidad transaccional
 - Instagram Story imagen publishing real
@@ -280,9 +280,23 @@ Estado: `blocked`
 
 Zonas: `apps/web/lib/publishers`, `apps/web/lib/publishing-formats.ts`, `apps/web/components`, `packages/integrations`
 
-### HC-ORESHNIK-RECOVERY-ALPHA6 - Upgrade HeptaCore governance to Oreshnik 0.3.0-alpha.6 and reconcile control plane
+### S-HC-PUB-07B-YOUTUBE-SCHEDULED-E2E - YouTube scheduled E2E integration: Video, Shorts, cron metadata and credentials
 
 Estado: `ready_for_integration`
+
+- Validated YouTube Video 16:9 and Shorts publisher is present in the governed delivery.
+- Scheduled cron transports YouTube format, title, description, primary video and thumbnail to the provider adapter.
+- Scheduled credential resolution uses the publisher credentialLabel dynamically and never hardcodes facebook_page_oauth.
+- Missing credentialLabel fails closed before credential decryption.
+- Scheduled dry-run recognizes YouTube formats without resolving credentials or invoking the provider.
+- Provider-specific immediate and scheduled tests pass together.
+- typecheck, build, worker validation and full repository tests pass.
+
+Zonas: `apps/web/lib/publishers`, `apps/web/app/api/publishing`, `packages/integrations`, `apps/web/app/api/cron/publisher`, `apps/web/lib/publishing-cron-executor.ts`, `apps/web/lib/__tests__`, `contracts/S-HC-PUB-04`
+
+### HC-ORESHNIK-RECOVERY-ALPHA6 - Upgrade HeptaCore governance to Oreshnik 0.3.0-alpha.6 and reconcile control plane
+
+Estado: `integrated`
 
 - Vendored alpha6 release asset matches SHA-256 66E0E6683CDF9587A873B27F20DD8C8538199EB511068E9C40B682CEADB176E8
 - package.json and package-lock.json resolve the exact vendored alpha6 package
@@ -377,3 +391,5 @@ Estado: `integrated`
 
 Zonas: `packages/db/**`, `apps/web/lib/**`, `apps/web/app/**`, `scripts/**`, `docs/**`, `var/oreshnik/**`
 
+
+<!-- ORESHNIK:GENERATED:END -->

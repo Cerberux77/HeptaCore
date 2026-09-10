@@ -1,7 +1,8 @@
+<!-- ORESHNIK:GENERATED:START -->
 ---
 type: status-board
 project: "HeptaCore"
-last_updated: "2026-09-05T17:01:28.595Z"
+last_updated: "2026-09-10T22:07:19.970Z"
 generated_by: "Oreshnik canonical-check"
 source: "var/oreshnik/task-board.json"
 ---
@@ -40,6 +41,7 @@ source: "var/oreshnik/task-board.json"
 - tenant-onboarding
 - tenant-platform
 - HC-ORESHNIK-RECOVERY-ALPHA6
+- S-HC-PUB-07B-YOUTUBE-SCHEDULED-E2E
 
 ## Tareas Ready/Pending
 
@@ -63,10 +65,11 @@ source: "var/oreshnik/task-board.json"
 | S-HC-ONB-02-GAP-RESOLUTION-WIZARD | blocked | Manuel | Gap resolution wizard: dynamic form to resolve missing or conflicting data | S-HC-ONB-01-MASTER-BRIEF-INGESTION |
 | S-HC-OPS-01-CAMPAIGN-REVIEW-DEPLOYMENT | blocked | Manuel | Campaign review and deployment: batch approval, schedule, publish | S-HC-STRAT-02-CONTENT-CALENDAR-BLUEPRINT, S-HC-ASSET-01-STRATEGY-ASSET-MANIFEST, S-HC-PUB-04-HOURLY-BATCH-CRON |
 | S-HC-OPT-01-SENTIMENT-STRATEGY-ITERATION | blocked | Manuel | Sentiment-driven strategy iteration: results → improved strategy | S-HC-AN-01-CAMPAIGN-PERFORMANCE, S-HC-INBOX-01-UNIFIED-ENGAGEMENT |
-| S-HC-PUB-06-REELS-STORIES-PUBLISHERS | ready | Manuel | Real publishing for Meta Reels and Stories: Instagram + Facebook | S-HC-PUB-03-MULTITENANT-ASSETS, S-HC-PUB-04-HOURLY-BATCH-CRON |
+| S-HC-PUB-06-REELS-STORIES-PUBLISHERS | integrated | Manuel | Real publishing for Meta Reels and Stories: Instagram + Facebook | S-HC-PUB-03-MULTITENANT-ASSETS, S-HC-PUB-04-HOURLY-BATCH-CRON |
 | S-HC-PUB-07-YOUTUBE-PUBLISHING | ready | Manuel | Real publishing for YouTube: Video 16:9 and YouTube Shorts | S-HC-PUB-03-MULTITENANT-ASSETS, S-HC-PUB-04-HOURLY-BATCH-CRON |
 | S-HC-PUB-08-PLATFORM-FORMAT-PARITY | blocked | Manuel | Platform-format parity: manifest, preview, dry-run, scheduling and publishing for every supported format | S-HC-PUB-06-REELS-STORIES-PUBLISHERS, S-HC-PUB-07-YOUTUBE-PUBLISHING |
-| HC-ORESHNIK-RECOVERY-ALPHA6 | ready_for_integration | Manuel | Upgrade HeptaCore governance to Oreshnik 0.3.0-alpha.6 and reconcile control plane | - |
+| S-HC-PUB-07B-YOUTUBE-SCHEDULED-E2E | ready_for_integration | Manuel | YouTube scheduled E2E integration: Video, Shorts, cron metadata and credentials | S-HC-PUB-03-MULTITENANT-ASSETS, S-HC-PUB-04-HOURLY-BATCH-CRON |
+| HC-ORESHNIK-RECOVERY-ALPHA6 | integrated | Manuel | Upgrade HeptaCore governance to Oreshnik 0.3.0-alpha.6 and reconcile control plane | - |
 | S-HC-STRAT-01-MASTER-STRATEGY-WORKBENCH | blocked | Manuel | Master strategy workbench: LLM-powered strategy generation and conversational refinement | S-HC-ONB-02-GAP-RESOLUTION-WIZARD, S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE |
 | S-HC-STRAT-02-CONTENT-CALENDAR-BLUEPRINT | blocked | Manuel | Content calendar blueprint: master publishing calendar from strategy | S-HC-STRAT-01-MASTER-STRATEGY-WORKBENCH |
 | S-HC-STRAT-03-INTAKE-TO-ACTIVE-STRATEGY | blocked | Manuel | End-to-end intake, generated strategy persistence, approval and calendar materialization | - |
@@ -103,8 +106,10 @@ source: "var/oreshnik/task-board.json"
 
 | Sprint | Resultado | Madre | Task | Source | Compatibility | Advance |
 |---|---|---|---|---|---|---|
+| recovery | succeeded | MADRE/v56-recovery-alpha6-governance-baseline-bounded-legacy-eviden-2026-09-05 | HC-ORESHNIK-RECOVERY-ALPHA6 | dispatch/manuel/manuel-chatgpt1/recovery/HC-ORESHNIK-RECOVERY-ALPHA6/2954c98970 | integration-train/recovery/HC-ORESHNIK-RECOVERY-ALP/r-0c7c255b3ad9/a-9bf9cbba778c | runtime_projection_confirmed |
 | assets | succeeded | MADRE/v54-assets-asset-02-validated-partial-delivery-2026-07-01 | S-HC-ASSET-02-FORMAT-DERIVATIVES | dispatch/manuel/manuel-codex2/assets/S-HC-ASSET-02-FORMAT-DERIVATIVES/396dfc38dd | integration-train/assets/S-HC-ASSET-02-FORMAT-DER/r-5cdcee7b964f/a-98f25f84692b | runtime_projection_confirmed |
 | ai-infra | succeeded | MADRE/v50-ai-infra-llm-provider-selection-cost-governance-2026-06-29 | S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE | task/ai-infra/S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE/codex/codex-S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE-2026-06-29T02-30-49-546Z-c443db0b | integration-train/ai-infra/S-HC-AI-01-LLM-SELECTION/r-c20ec67edeb3/a-3acf93d1c862 | runtime_projection_confirmed |
 | S-HC-TOOL-01-GOAL-RUNNER-V1 | succeeded | MADRE/v50-s-hc-tool-01-goal-runner-v1-goal-runner-v1-deterministic-state-machine-locks-2026-06-29 | S-HC-TOOL-01-GOAL-RUNNER-V1 | kilo/s-hc-tool-01-goal-runner-v1 | integration-train/S-HC-TOOL-01-GOAL-RUNNER/S-HC-TOOL-01-GOAL-RUNNER/r-2ff68e9be13b/a-2cfa35e28f38 | runtime_projection_confirmed |
 | S-HC-PUB-05-RECONCILIATION-OPS | succeeded | MADRE/v49-s-hc-pub-05-reconciliation-ops-implementa-automatizacion-operacional-de-reconci-2026-06-29 | S-HC-PUB-05-RECONCILIATION-OPS | Manuel/s-hc-pub-05-reconciliation-ops-sprint-2026-06-29 | integration-train/S-HC-PUB-05-RECONCILIATI/S-HC-PUB-05-RECONCILIATI/r-3030ee064340/a-4b83c9744f29 | runtime_projection_confirmed |
-| S-HC-PUB-04-HOURLY-BATCH-CRON | succeeded | MADRE/v48-s-hc-pub-04-hourly-batch-cron-hourly-batch-publishing-cron-and-pub-04-producti-2026-06-28 | S-HC-PUB-04-HOURLY-BATCH-CRON | Manuel/s-hc-pub-04-hourly-batch-goal | integration-train/S-HC-PUB-04-HOURLY-BATCH/S-HC-PUB-04-HOURLY-BATCH/r-c08e3c5d3afc/a-f62c2c114d4d | runtime_projection_confirmed |
+
+<!-- ORESHNIK:GENERATED:END -->

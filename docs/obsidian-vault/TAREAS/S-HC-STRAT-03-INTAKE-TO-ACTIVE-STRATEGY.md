@@ -6,7 +6,7 @@ task_id: "S-HC-STRAT-03-INTAKE-TO-ACTIVE-STRATEGY"
 sprint: "strategy"
 status: "blocked"
 owner: "Manuel"
-last_updated: "2026-09-05T08:15:12.123Z"
+last_updated: "2026-09-10T22:07:19.702Z"
 source: "var/oreshnik/tasks/S-HC-STRAT-03-INTAKE-TO-ACTIVE-STRATEGY.json"
 ---
 

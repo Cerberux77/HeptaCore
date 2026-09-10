@@ -4,9 +4,9 @@ type: task-runtime
 project: "HeptaCore"
 task_id: "S-HC-PUB-06-REELS-STORIES-PUBLISHERS"
 sprint: "publishing"
-status: "ready"
+status: "integrated"
 owner: "Manuel"
-last_updated: "2026-09-04T14:03:10.743Z"
+last_updated: "2026-09-10T22:07:19.702Z"
 source: "var/oreshnik/tasks/S-HC-PUB-06-REELS-STORIES-PUBLISHERS.json"
 ---
 
@@ -18,11 +18,11 @@ Real publishing for Meta Reels and Stories: Instagram + Facebook
 
 ## Runtime
 
-- estado: `ready`
+- estado: `integrated`
 - owner: `Manuel`
 - backup: `Manuel`
-- intentos: `0`
-- handoff: -
+- intentos: `2`
+- handoff: docs/oreshnik/handoffs/S-HC-PUB-06-REELS-STORIES-PUBLISHERS/handoff-20260907T064520706Z-ea717d730752.md
 
 ## Dependencias
 

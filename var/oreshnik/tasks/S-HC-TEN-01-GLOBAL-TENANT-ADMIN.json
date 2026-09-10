@@ -3,12 +3,12 @@
   "taskId": "S-HC-TEN-01-GLOBAL-TENANT-ADMIN",
   "sprint": "tenant-platform",
   "sprintOrderIndex": 26,
-  "taskOrderIndex": 42,
+  "taskOrderIndex": 43,
   "title": "Global tenant administration and provisioning",
   "owner": "Manuel",
   "backupOwner": "Manuel",
   "status": "done",
-  "taskBoardPath": "/home/runner/work/HeptaCore/HeptaCore/var/oreshnik/task-board.json",
+  "taskBoardPath": "/home/runner/work/_temp/oreshnik-wt-pub07b-recover-v2/32305cad03d6321a/manuel/manuel-chatgpt1/publishing/S-HC-PUB-07B-YOUTUBE-SCHEDULED-E2E/e9e0f149/var/oreshnik/task-board.json",
   "zone": [
     "packages/db/**",
     "apps/web/lib/tenant-admin-service.ts",
@@ -39,6 +39,6 @@
       "description": "Three canonical roles (OWNER/ADMIN/VIEWER), legacy role normalization, identity panel in /admin and /tenant/*, 5/5 E2E pass, 569 unit tests, production intact"
     }
   ],
-  "updatedAt": "2026-09-04T14:03:10.743Z",
+  "updatedAt": "2026-09-10T22:07:19.702Z",
   "runs": []
 }

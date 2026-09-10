@@ -3,12 +3,12 @@
   "taskId": "S-HC-TEN-02A-CANONICAL-ROLE-MODEL-PLATFORMROLE",
   "sprint": "tenant-platform",
   "sprintOrderIndex": 26,
-  "taskOrderIndex": 41,
+  "taskOrderIndex": 42,
   "title": "Canonical platform and tenant role model repair",
   "owner": "Manuel",
   "backupOwner": "Manuel",
   "status": "integrated",
-  "taskBoardPath": "/home/runner/work/HeptaCore/HeptaCore/var/oreshnik/task-board.json",
+  "taskBoardPath": "/home/runner/work/_temp/oreshnik-wt-pub07b-recover-v2/32305cad03d6321a/manuel/manuel-chatgpt1/publishing/S-HC-PUB-07B-YOUTUBE-SCHEDULED-E2E/e9e0f149/var/oreshnik/task-board.json",
   "zone": [
     "packages/db/**",
     "apps/web/lib/**",
@@ -45,6 +45,6 @@
       "description": "Reconciled to integrated from GitHub evidence: implementation PR #9 merged at 2026-07-10T01:52:37Z and post-merge reconciliation PR #12 merged at 2026-07-10T17:46:36Z. No historical Run or claim was synthesized."
     }
   ],
-  "updatedAt": "2026-09-04T14:03:10.743Z",
+  "updatedAt": "2026-09-10T22:07:19.702Z",
   "runs": []
 }
