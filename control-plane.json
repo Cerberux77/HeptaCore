@@ -5,7 +5,7 @@
     "originUrl": "https://github.com/Cerberux77/HeptaCore.git",
     "canonicalMotherBranch": "master"
   },
-  "generation": 139,
+  "generation": 140,
   "controlHead": "0511c42156fcc8ed488943c0531c0ee24c354c27",
   "catalog": {
     "taskBoardPath": "var/oreshnik/task-board.json",
@@ -1429,7 +1429,7 @@
       "sprintId": "publishing",
       "title": "YouTube scheduled E2E integration: Video, Shorts, cron metadata and credentials",
       "operator": "manuel",
-      "machineId": "machine-26dfce54-2286-4a6d-93c2-2fbe75731346",
+      "machineId": "machine-14a14015-e299-404f-8bee-237cb8bba6c3",
       "functionalBranch": "dispatch/manuel/manuel-chatgpt1/publishing/S-HC-PUB-07B-YOUTUBE-SCHEDULED-E2E/da546a5360",
       "motherBranch": "master",
       "worktreePath": "/home/runner/work/_temp/oreshnik-wt-pub07b-recover-v2/32305cad03d6321a/manuel/manuel-chatgpt1/publishing/S-HC-PUB-07B-YOUTUBE-SCHEDULED-E2E/e9e0f149",
@@ -1468,15 +1468,15 @@
       "sourceTaskBoardHead": "7236235515cdcbc0a154f59b98f0f9fa55a5f7b8",
       "catalogFingerprint": "41dc14cac7bf243442e13cae8007d2bfcd704650",
       "createdAt": "2026-09-10T17:37:21.480Z",
-      "updatedAt": "2026-09-10T22:05:06.737Z",
+      "updatedAt": "2026-09-10T22:09:24.994Z",
       "activatedAt": "2026-09-10T17:37:32.065Z",
-      "resumedCount": 3,
+      "resumedCount": 4,
       "takeoverCount": 0,
-      "ownershipGeneration": 4,
+      "ownershipGeneration": 5,
       "previousAgentInstanceUid": "agent_1b0d08cb2fe44fdb96c1f071337796fd",
       "previousSessionId": "session_f41fead26d4548cd84d66159a64bad09",
       "takeoverReason": "Recover verified PUB-07B delivery after CI optional esbuild binary interrupted evidence persistence.",
-      "takenOverAt": "2026-09-10T22:05:06.737Z",
+      "takenOverAt": "2026-09-10T22:09:24.994Z",
       "harnessId": "chatgpt",
       "agentInstanceUid": "agent_1b0d08cb2fe44fdb96c1f071337796fd",
       "agentInstanceAlias": "manuel-chatgpt1",
@@ -1964,13 +1964,13 @@
       "taskId": "S-HC-PUB-07B-YOUTUBE-SCHEDULED-E2E",
       "sprintId": "publishing",
       "operator": "manuel",
-      "machineId": "machine-26dfce54-2286-4a6d-93c2-2fbe75731346",
+      "machineId": "machine-14a14015-e299-404f-8bee-237cb8bba6c3",
       "runId": "run-manuel-S-HC-PUB-07B-YOUTUBE-SCHEDULED-E2E-20260910173721-206fad0f",
       "branch": "dispatch/manuel/manuel-chatgpt1/publishing/S-HC-PUB-07B-YOUTUBE-SCHEDULED-E2E/da546a5360",
       "worktreePath": "/home/runner/work/_temp/oreshnik-wt-pub07b-recover-v2/32305cad03d6321a/manuel/manuel-chatgpt1/publishing/S-HC-PUB-07B-YOUTUBE-SCHEDULED-E2E/e9e0f149",
       "status": "active",
       "createdAt": "2026-09-10T17:37:21.480Z",
-      "updatedAt": "2026-09-10T22:05:06.737Z",
+      "updatedAt": "2026-09-10T22:09:24.994Z",
       "zones": [
         "apps/web/lib/publishers",
         "apps/web/app/api/publishing",
@@ -2000,7 +2000,7 @@
         "apps/web/lib/__tests__",
         "contracts/S-HC-PUB-04"
       ],
-      "ownershipGeneration": 4,
+      "ownershipGeneration": 5,
       "harnessId": "chatgpt",
       "agentInstanceUid": "agent_1b0d08cb2fe44fdb96c1f071337796fd",
       "agentInstanceAlias": "manuel-chatgpt1",
@@ -2497,12 +2497,12 @@
       "taskId": "S-HC-PUB-07B-YOUTUBE-SCHEDULED-E2E",
       "sprintId": "publishing",
       "operator": "manuel",
-      "machineId": "machine-26dfce54-2286-4a6d-93c2-2fbe75731346",
+      "machineId": "machine-14a14015-e299-404f-8bee-237cb8bba6c3",
       "branch": "dispatch/manuel/manuel-chatgpt1/publishing/S-HC-PUB-07B-YOUTUBE-SCHEDULED-E2E/da546a5360",
       "worktreePath": "/home/runner/work/_temp/oreshnik-wt-pub07b-recover-v2/32305cad03d6321a/manuel/manuel-chatgpt1/publishing/S-HC-PUB-07B-YOUTUBE-SCHEDULED-E2E/e9e0f149",
       "status": "active",
       "createdAt": "2026-09-10T17:37:21.480Z",
-      "updatedAt": "2026-09-10T22:05:06.737Z",
+      "updatedAt": "2026-09-10T22:09:24.994Z",
       "sourceTaskBoardHead": "7236235515cdcbc0a154f59b98f0f9fa55a5f7b8",
       "zones": [
         "apps/web/lib/publishers",
@@ -2533,7 +2533,7 @@
         "apps/web/lib/__tests__",
         "contracts/S-HC-PUB-04"
       ],
-      "ownershipGeneration": 4,
+      "ownershipGeneration": 5,
       "harnessId": "chatgpt",
       "agentInstanceUid": "agent_1b0d08cb2fe44fdb96c1f071337796fd",
       "agentInstanceAlias": "manuel-chatgpt1",
@@ -4796,6 +4796,16 @@
       "at": "2026-09-10T22:09:19.280Z",
       "action": "dispatch.init",
       "message": "Registered machine machine-14a14015-e299-404f-8bee-237cb8bba6c3 with root /home/runner/work/_temp/oreshnik-wt-pub07b-recover-v2."
+    },
+    {
+      "at": "2026-09-10T22:09:24.994Z",
+      "action": "dispatch.takeover",
+      "assignmentId": "asg-6ae5ad07-bb79-49f6-b81a-ff6be9e0f149",
+      "runId": "run-manuel-S-HC-PUB-07B-YOUTUBE-SCHEDULED-E2E-20260910173721-206fad0f",
+      "operator": "manuel",
+      "agentInstanceUid": "agent_1b0d08cb2fe44fdb96c1f071337796fd",
+      "sessionId": "session_f41fead26d4548cd84d66159a64bad09",
+      "message": "Takeover by manuel/manuel-chatgpt1 from manuel/manuel-chatgpt1. Reason: Recover verified PUB-07B delivery after CI optional esbuild binary interrupted evidence persistence.. Generation: 4 → 5."
     }
   ],
   "reconciliation": {
@@ -4805,5 +4815,5 @@
     "pendingDiagnostics": []
   },
   "createdAt": "2026-06-29T20:17:43.302Z",
-  "updatedAt": "2026-09-10T22:09:19.280Z"
+  "updatedAt": "2026-09-10T22:09:24.994Z"
 }
