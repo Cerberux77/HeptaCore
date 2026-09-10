@@ -1,0 +1,335 @@
+name: Ops PUB07 Parent External Boundary
+
+on:
+  push:
+    branches:
+      - ops/pub07-current-run-implementation-20260910
+    paths:
+      - .github/pub07-parent-external-trigger
+
+permissions:
+  contents: write
+  actions: read
+  pull-requests: read
+
+concurrency:
+  group: heptacore-pub07-parent-external
+  cancel-in-progress: false
+
+env:
+  PARENT_TASK: S-HC-PUB-07-YOUTUBE-PUBLISHING
+  CHILD_TASK: S-HC-PUB-07B-YOUTUBE-SCHEDULED-E2E
+  SMOKE_TASK: S-HC-PUB-07C-YOUTUBE-AUTH-CHANNEL-SMOKE
+  OPERATOR: manuel
+  HARNESS: chatgpt
+  ORESHNIK_VERSION: 0.3.0-alpha.6
+
+jobs:
+  govern-external-boundary:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - name: Checkout current canonical master
+        uses: actions/checkout@v4
+        with:
+          ref: master
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Configure identity and Node
+        run: |
+          git config user.name "Manuel Vera via ChatGPT Operator"
+          git config user.email "manuel@heptacore.dev"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Verify alpha6 and terminal child precondition
+        run: |
+          set -euo pipefail
+          npm ci --ignore-scripts
+          test "$(node node_modules/oreshnik-cli/dist/cli.js --version)" = "$ORESHNIK_VERSION"
+          npm run oreshnik:ready
+          git fetch origin '+refs/heads/master:refs/remotes/origin/master' '+refs/heads/oreshnik/control:refs/remotes/origin/oreshnik/control'
+          test "$(git rev-parse HEAD)" = "$(git rev-parse origin/master)"
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const child=JSON.parse(fs.readFileSync(`var/oreshnik/tasks/${process.env.CHILD_TASK}.json`,'utf8'));
+          if(child.status!=='integrated') throw new Error(`PUB-07B must be integrated, found ${child.status}`);
+          const parent=JSON.parse(fs.readFileSync(`var/oreshnik/tasks/${process.env.PARENT_TASK}.json`,'utf8'));
+          if(!['ready','blocked'].includes(parent.status)) throw new Error(`Unexpected PUB-07 artifact status ${parent.status}`);
+          NODE
+
+      - name: Initialize runner control context
+        run: |
+          set -euo pipefail
+          node node_modules/oreshnik-cli/dist/cli.js dispatch init \
+            --mother master \
+            --worktree-root "$RUNNER_TEMP/oreshnik-wt-pub07-external" \
+            --repo . \
+            --json
+
+      - name: Register dedicated non-publishing YouTube smoke Task
+        id: register
+        run: |
+          set -euo pipefail
+          git fetch origin '+refs/heads/master:refs/remotes/origin/master'
+          EXPECTED_HEAD="$(git rev-parse origin/master)"
+          AT="$(date -u +'%Y-%m-%dT%H:%M:%S.000Z')"
+          node - "$RUNNER_TEMP/pub07c-spec.json" "$AT" <<'NODE'
+          const fs=require('node:fs');
+          const [path,at]=process.argv.slice(2);
+          const id=process.env.SMOKE_TASK;
+          const spec={
+            schemaVersion:1,
+            taskId:id,
+            task:{
+              id,
+              title:'Authorized YouTube OAuth and channel identity smoke (no publishing)',
+              owner:'Manuel',
+              backupOwner:'Manuel',
+              status:'ready',
+              track:'publishing',
+              readZones:[
+                'apps/web/lib/publishers/youtube.ts',
+                'apps/web/lib/credential-resolver.ts',
+                'apps/web/app/api/publishing/publish/route.ts'
+              ],
+              writeZones:[],
+              resources:['youtube-authorized-oauth-channel'],
+              capabilities:['external-validation','youtube-oauth'],
+              parallelism:'non_parallel',
+              approvalMode:'manual',
+              gates:['youtube-oauth-channel-smoke'],
+              priority:'critical',
+              validationExpectations:[
+                'No token, refresh token, client secret or credential plaintext is logged or versioned.',
+                'The application resolver follows OAuthConnection.tokenRef to credentialLabel youtube_oauth in an authorized runtime.',
+                'The resolved credential carries the required youtube.upload scope and is not expired.',
+                'A read-only YouTube Data API channels.list request with mine=true returns the authorized channel identity.',
+                'No videos.insert, resumable upload, thumbnail upload, scheduling or production deployment is executed.'
+              ],
+              evidenceType:'prod',
+              dependsOn:[process.env.CHILD_TASK],
+              acceptance:[
+                'Authorized runtime has a connected YOUTUBE SocialAccount for the intended tenant/channel.',
+                'OAuthConnection.tokenRef resolves and decrypts the youtube_oauth vault item without exposing secret material.',
+                'Required scope https://www.googleapis.com/auth/youtube.upload is confirmed.',
+                'Read-only channels.list(part=id,snippet,mine=true) succeeds and records only non-secret channel identity plus HTTP/evidence fingerprints.',
+                'No YouTube content is created, uploaded, scheduled, modified or published by this smoke.',
+                'Parent S-HC-PUB-07-YOUTUBE-PUBLISHING may resume only after this smoke has real authorized PASS evidence.'
+              ],
+              taskExecutionPolicy:{
+                riskLevel:'high',
+                recommendedReasoning:'high',
+                reviewMode:'strict',
+                humanApprovalRequired:true,
+                requiredGates:['youtube-oauth-channel-smoke'],
+                evidenceRequirements:['authorized runtime','real OAuth tokenRef resolution','read-only channel identity response','zero secret disclosure','zero publication']
+              }
+            },
+            goalMarkdown:`# ${id}\n\n## Objective\nValidate the real authorized YouTube OAuth/channel boundary required by parent S-HC-PUB-07-YOUTUBE-PUBLISHING without publishing or modifying YouTube content.\n\n## Safety boundary\n- Never invent, hardcode, print, persist or version OAuth credentials, refresh tokens, access tokens, client secrets or channel credentials.\n- Use only an explicitly authorized runtime and the application's normal credential resolver.\n- Provider interaction is read-only: channels.list(part=id,snippet,mine=true) or an equivalently non-mutating identity check.\n- Do not call videos.insert, resumable upload endpoints, thumbnails.set, scheduling, production deployment, or any content mutation.\n\n## Completion\nStore only non-secret evidence sufficient to prove the OAuth tokenRef resolved, required scope exists, and the authenticated YouTube channel identity is real. Then the parent may be explicitly authorized for resume.\n`,
+            registeredBy:process.env.OPERATOR,
+            registeredAt:at
+          };
+          fs.writeFileSync(path,JSON.stringify(spec,null,2)+'\n');
+          NODE
+          node node_modules/oreshnik-cli/dist/cli.js task register \
+            --spec "$RUNNER_TEMP/pub07c-spec.json" \
+            --expected-head "$EXPECTED_HEAD" \
+            --mother master \
+            --repo . \
+            --json | tee "$RUNNER_TEMP/pub07c-register.json"
+          node node_modules/oreshnik-cli/dist/cli.js dispatch reconcile --repo . --json | tee "$RUNNER_TEMP/reconcile-after-register.json"
+
+      - name: Dispatch current parent with fresh governed Run
+        id: parent_dispatch
+        run: |
+          set -euo pipefail
+          SESSION="pub07-parent-external-$(date -u +%Y%m%d%H%M%S)"
+          node node_modules/oreshnik-cli/dist/cli.js dispatch next \
+            --operator "$OPERATOR" --harness "$HARNESS" --instance new --session "$SESSION" \
+            --task "$PARENT_TASK" --max-retries 3 --repo . --json | tee "$RUNNER_TEMP/parent-dispatch.json"
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const p=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/parent-dispatch.json','utf8'));
+          if(!['assigned','resumed'].includes(p.result)||p.taskId!==process.env.PARENT_TASK) throw new Error(`Parent dispatch failed: ${JSON.stringify(p)}`);
+          for(const [k,v] of Object.entries({run:p.runId,assignment:p.assignmentId,instance:p.agentInstanceAlias||p.agentInstanceUid,session:p.sessionId,worktree:p.worktreePath,branch:p.functionalBranch})) fs.appendFileSync(process.env.GITHUB_OUTPUT,`${k}=${v}\n`);
+          NODE
+
+      - name: Persist BLOCKED_EXTERNAL handoff on parent Run
+        env:
+          RUN_ID: ${{ steps.parent_dispatch.outputs.run }}
+          WORKTREE: ${{ steps.parent_dispatch.outputs.worktree }}
+        run: |
+          set -euo pipefail
+          cat > "$RUNNER_TEMP/parent-blockers.json" <<'JSON'
+          [
+            {
+              "id": "YOUTUBE_AUTHORIZED_OAUTH_CHANNEL_REQUIRED",
+              "category": "CREDENTIAL",
+              "description": "Real authorized YouTube OAuth/channel runtime is not available to this execution. The deterministic software delivery is integrated, but no external channel identity smoke may be claimed without real credentials.",
+              "evidence": [
+                "PUB-07B deterministic software Task is integrated and terminalized.",
+                "Current operation intentionally received no application OAuth/token-vault material and performed no YouTube provider mutation.",
+                "Dedicated Task S-HC-PUB-07C-YOUTUBE-AUTH-CHANNEL-SMOKE owns the safe read-only external validation."
+              ],
+              "impact": "Parent PUB-07 cannot honestly satisfy real provider/channel acceptance or declare external support.",
+              "blocking": true,
+              "probableOwner": "Manuel / authorized YouTube channel owner",
+              "recommendedAction": "Provide or connect an authorized YouTube OAuth/channel runtime, then execute S-HC-PUB-07C-YOUTUBE-AUTH-CHANNEL-SMOKE without publishing content.",
+              "nextCommand": "oreshnik task resume --task S-HC-PUB-07-YOUTUBE-PUBLISHING --operator manuel --authorized-external",
+              "unblockCondition": "S-HC-PUB-07C-YOUTUBE-AUTH-CHANNEL-SMOKE has real authorized PASS evidence for tokenRef resolution, required scope, and read-only channel identity."
+            }
+          ]
+          JSON
+          cd "$WORKTREE"
+          node "$GITHUB_WORKSPACE/node_modules/oreshnik-cli/dist/cli.js" handoff create \
+            --task "$PARENT_TASK" --run "$RUN_ID" --operator "$OPERATOR" \
+            --reason "external YouTube OAuth/channel validation boundary" \
+            --objective "Preserve deterministic PUB-07 software while isolating the real external YouTube smoke." \
+            --implemented "PUB-07B deterministic Video/Shorts immediate+scheduled path integrated" \
+            --partial "Real YouTube OAuth/channel identity smoke remains external" \
+            --test-run "PUB-07B dry-run,typecheck,build,worker,tests PASS" \
+            --test-pending "Authorized read-only YouTube channel identity smoke" \
+            --gate "PUB-07B terminalization verified" \
+            --blocker-file "$RUNNER_TEMP/parent-blockers.json" \
+            --exact-point "Waiting only for authorized YouTube OAuth/channel external validation." \
+            --first-command "Execute S-HC-PUB-07C-YOUTUBE-AUTH-CHANNEL-SMOKE in an authorized runtime; do not publish content." \
+            --completion-criterion "Read-only authorized channel smoke passes with non-secret evidence, then explicitly authorize parent resume." \
+            --json | tee "$RUNNER_TEMP/parent-handoff.json"
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const h=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/parent-handoff.json','utf8'));
+          if(h.document?.stability?.classification!=='BLOCKED_EXTERNAL') throw new Error(`Expected BLOCKED_EXTERNAL handoff, found ${h.document?.stability?.classification}`);
+          NODE
+          git add var/oreshnik docs/oreshnik
+          if ! git diff --cached --quiet; then
+            git commit -m "chore(oreshnik): persist PUB-07 external blocker handoff"
+            git push origin "HEAD:${{ steps.parent_dispatch.outputs.branch }}"
+          fi
+
+      - name: Block parent canonically and release resources
+        env:
+          RUN_ID: ${{ steps.parent_dispatch.outputs.run }}
+          INSTANCE: ${{ steps.parent_dispatch.outputs.instance }}
+          SESSION: ${{ steps.parent_dispatch.outputs.session }}
+        run: |
+          set -euo pipefail
+          node node_modules/oreshnik-cli/dist/cli.js task block \
+            --task "$PARENT_TASK" --run "$RUN_ID" --operator "$OPERATOR" --harness "$HARNESS" \
+            --instance "$INSTANCE" --session "$SESSION" \
+            --kind awaiting_external_validation \
+            --reason "Only real authorized YouTube OAuth/channel identity smoke remains; no credential is available to this execution and no provider support will be claimed without it." \
+            --external-action "Complete $SMOKE_TASK in an explicitly authorized runtime using real OAuth/tokenRef and a read-only channel identity call; never invent/version credentials and do not publish content." \
+            --resume-policy explicit_authorization_required \
+            --repo .
+
+      - name: Dispatch dedicated smoke Task and preserve its external block
+        id: smoke_dispatch
+        run: |
+          set -euo pipefail
+          SESSION="pub07c-external-$(date -u +%Y%m%d%H%M%S)"
+          node node_modules/oreshnik-cli/dist/cli.js dispatch next \
+            --operator "$OPERATOR" --harness "$HARNESS" --instance new --session "$SESSION" \
+            --task "$SMOKE_TASK" --max-retries 3 --repo . --json | tee "$RUNNER_TEMP/smoke-dispatch.json"
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const p=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/smoke-dispatch.json','utf8'));
+          if(!['assigned','resumed'].includes(p.result)||p.taskId!==process.env.SMOKE_TASK) throw new Error(`Smoke dispatch failed: ${JSON.stringify(p)}`);
+          for(const [k,v] of Object.entries({run:p.runId,assignment:p.assignmentId,instance:p.agentInstanceAlias||p.agentInstanceUid,session:p.sessionId,worktree:p.worktreePath,branch:p.functionalBranch})) fs.appendFileSync(process.env.GITHUB_OUTPUT,`${k}=${v}\n`);
+          NODE
+
+      - name: Persist smoke BLOCKED_EXTERNAL handoff and block/release
+        env:
+          RUN_ID: ${{ steps.smoke_dispatch.outputs.run }}
+          WORKTREE: ${{ steps.smoke_dispatch.outputs.worktree }}
+          INSTANCE: ${{ steps.smoke_dispatch.outputs.instance }}
+          SESSION: ${{ steps.smoke_dispatch.outputs.session }}
+        run: |
+          set -euo pipefail
+          cat > "$RUNNER_TEMP/smoke-blockers.json" <<'JSON'
+          [
+            {
+              "id": "AUTHORIZED_YOUTUBE_RUNTIME_REQUIRED",
+              "category": "CREDENTIAL",
+              "description": "This smoke requires a real authorized YouTube OAuth/tokenRef and channel; none is exposed to the current governed runner.",
+              "evidence": ["No secret material was requested, printed, invented or versioned.", "The smoke is intentionally read-only and creates no YouTube content."],
+              "impact": "External provider/channel validation cannot execute truthfully in this environment.",
+              "blocking": true,
+              "probableOwner": "Manuel / authorized YouTube channel owner",
+              "recommendedAction": "Connect an authorized runtime with the real tenant SocialAccount, OAuthConnection and vault credential, then explicitly resume this same Run.",
+              "nextCommand": "oreshnik task resume --task S-HC-PUB-07C-YOUTUBE-AUTH-CHANNEL-SMOKE --operator manuel --authorized-external",
+              "unblockCondition": "Authorized OAuth/tokenRef and channel are available for a non-mutating channels.list identity check."
+            }
+          ]
+          JSON
+          cd "$WORKTREE"
+          node "$GITHUB_WORKSPACE/node_modules/oreshnik-cli/dist/cli.js" handoff create \
+            --task "$SMOKE_TASK" --run "$RUN_ID" --operator "$OPERATOR" \
+            --reason "authorized external YouTube runtime unavailable" \
+            --objective "Prove real OAuth/tokenRef and authenticated channel identity without publishing." \
+            --test-pending "Read-only channels.list(part=id,snippet,mine=true) using the authorized credential" \
+            --blocker-file "$RUNNER_TEMP/smoke-blockers.json" \
+            --exact-point "No provider call attempted because authorized OAuth/channel material is external." \
+            --first-command "Resume this same Run only after authorized external access is explicitly available." \
+            --completion-criterion "Real read-only OAuth/channel smoke passes and evidence contains no secrets or content mutation." \
+            --json | tee "$RUNNER_TEMP/smoke-handoff.json"
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const h=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/smoke-handoff.json','utf8'));
+          if(h.document?.stability?.classification!=='BLOCKED_EXTERNAL') throw new Error(`Expected BLOCKED_EXTERNAL smoke handoff, found ${h.document?.stability?.classification}`);
+          NODE
+          git add var/oreshnik docs/oreshnik
+          if ! git diff --cached --quiet; then
+            git commit -m "chore(oreshnik): persist PUB-07C external blocker handoff"
+            git push origin "HEAD:${{ steps.smoke_dispatch.outputs.branch }}"
+          fi
+          cd "$GITHUB_WORKSPACE"
+          node node_modules/oreshnik-cli/dist/cli.js task block \
+            --task "$SMOKE_TASK" --run "$RUN_ID" --operator "$OPERATOR" --harness "$HARNESS" \
+            --instance "$INSTANCE" --session "$SESSION" \
+            --kind awaiting_external_validation \
+            --reason "Real authorized YouTube OAuth/tokenRef and channel are not available to this execution; read-only external smoke cannot be fabricated." \
+            --external-action "Connect authorized YouTube OAuth/channel runtime and execute read-only channels.list identity validation with zero secret disclosure and zero publication." \
+            --resume-policy explicit_authorization_required \
+            --repo .
+
+      - name: Verify parent and smoke resources released; discover next executable Task
+        run: |
+          set -euo pipefail
+          git fetch origin '+refs/heads/master:refs/remotes/origin/master' '+refs/heads/oreshnik/control:refs/remotes/origin/oreshnik/control'
+          node - <<'NODE'
+          const {execFileSync}=require('node:child_process');
+          const board=JSON.parse(execFileSync('git',['show','origin/master:var/oreshnik/task-board.json'],{encoding:'utf8'}));
+          const control=JSON.parse(execFileSync('git',['show','origin/oreshnik/control:control-plane.json'],{encoding:'utf8'}));
+          for(const id of [process.env.PARENT_TASK,process.env.SMOKE_TASK]) {
+            const t=board.tasks.find(x=>x.id===id);
+            if(!t||t.status!=='blocked'||t.blockState?.kind!=='awaiting_external_validation'||t.blockState?.resumePolicy!=='explicit_authorization_required') throw new Error(`${id} external block projection invalid`);
+            const run=t.blockState.preservedRunId;
+            const a=control.assignments.find(x=>x.runId===run);
+            const c=control.claims.find(x=>x.runId===run);
+            const zones=control.zones.filter(x=>x.runId===run&&x.status==='reserved');
+            if(!a||a.status!=='released'||!c||c.status!=='released'||zones.length) throw new Error(`${id} resources not released`);
+          }
+          console.log(JSON.stringify({master:execFileSync('git',['rev-parse','origin/master'],{encoding:'utf8'}).trim(),control:execFileSync('git',['rev-parse','origin/oreshnik/control'],{encoding:'utf8'}).trim(),parent:board.tasks.find(x=>x.id===process.env.PARENT_TASK),smoke:board.tasks.find(x=>x.id===process.env.SMOKE_TASK)},null,2));
+          NODE
+          node node_modules/oreshnik-cli/dist/cli.js dispatch next \
+            --operator "$OPERATOR" --harness "$HARNESS" --instance new --session continuation-peek \
+            --max-retries 3 --dry-run --repo . --json | tee "$RUNNER_TEMP/next-executable.json"
+
+      - name: Upload governance evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pub07-parent-external-boundary
+          path: |
+            ${{ runner.temp }}/pub07c-register.json
+            ${{ runner.temp }}/reconcile-after-register.json
+            ${{ runner.temp }}/parent-dispatch.json
+            ${{ runner.temp }}/parent-handoff.json
+            ${{ runner.temp }}/smoke-dispatch.json
+            ${{ runner.temp }}/smoke-handoff.json
+            ${{ runner.temp }}/next-executable.json
+          if-no-files-found: ignore
