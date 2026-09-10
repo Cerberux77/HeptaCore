@@ -1,0 +1,95 @@
+name: Ops PUB07 Post-Block Continuation Probe
+
+on:
+  push:
+    branches:
+      - ops/pub07-current-run-implementation-20260910
+    paths:
+      - .github/pub07-continuation-trigger
+
+permissions:
+  contents: write
+  actions: read
+
+concurrency:
+  group: heptacore-pub07-continuation-probe
+  cancel-in-progress: false
+
+env:
+  PARENT_TASK: S-HC-PUB-07-YOUTUBE-PUBLISHING
+  SMOKE_TASK: S-HC-PUB-07C-YOUTUBE-AUTH-CHANNEL-SMOKE
+  OPERATOR: manuel
+  HARNESS: chatgpt
+  ORESHNIK_VERSION: 0.3.0-alpha.6
+
+jobs:
+  probe:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: master
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - name: Verify canonical post-block state and exact alpha6
+        run: |
+          set -euo pipefail
+          npm ci --ignore-scripts
+          test "$(node node_modules/oreshnik-cli/dist/cli.js --version)" = "$ORESHNIK_VERSION"
+          npm run oreshnik:ready
+          git fetch origin '+refs/heads/master:refs/remotes/origin/master' '+refs/heads/oreshnik/control:refs/remotes/origin/oreshnik/control'
+          test "$(git rev-parse HEAD)" = "$(git rev-parse origin/master)"
+          node - <<'NODE'
+          const {execFileSync}=require('node:child_process');
+          const board=JSON.parse(execFileSync('git',['show','origin/master:var/oreshnik/task-board.json'],{encoding:'utf8'}));
+          const control=JSON.parse(execFileSync('git',['show','origin/oreshnik/control:control-plane.json'],{encoding:'utf8'}));
+          const p=board.tasks.find(x=>x.id===process.env.PARENT_TASK);
+          const s=board.tasks.find(x=>x.id===process.env.SMOKE_TASK);
+          if(!p||p.status!=='blocked'||p.blockState?.kind!=='awaiting_external_validation'||p.blockState?.resumePolicy!=='explicit_authorization_required') throw new Error(`Parent external block invalid: ${JSON.stringify(p)}`);
+          if(!s||s.status!=='ready') throw new Error(`Smoke task registration invalid: ${JSON.stringify(s)}`);
+          const run=p.blockState.preservedRunId;
+          const a=control.assignments.find(x=>x.runId===run);
+          const c=control.claims.find(x=>x.runId===run);
+          const z=control.zones.filter(x=>x.runId===run&&x.status==='reserved');
+          if(a?.status!=='released'||c?.status!=='released'||z.length) throw new Error(`Parent resources not released: assignment=${a?.status}, claim=${c?.status}, zones=${z.length}`);
+          console.log(JSON.stringify({master:execFileSync('git',['rev-parse','origin/master'],{encoding:'utf8'}).trim(),control:execFileSync('git',['rev-parse','origin/oreshnik/control'],{encoding:'utf8'}).trim(),parent:{status:p.status,blockState:p.blockState},smoke:{status:s.status,capabilities:s.capabilities},parentResources:{assignment:a?.status,claim:c?.status,reservedZones:z.length}},null,2));
+          NODE
+      - name: Initialize ephemeral dispatcher context
+        run: |
+          set -euo pipefail
+          node node_modules/oreshnik-cli/dist/cli.js dispatch init --mother master --worktree-root "$RUNNER_TEMP/oreshnik-wt-continuation" --repo . --json
+      - name: Confirm PUB07C is externally ineligible, not internally broken
+        run: |
+          set -euo pipefail
+          node node_modules/oreshnik-cli/dist/cli.js dispatch next \
+            --operator "$OPERATOR" --harness "$HARNESS" --instance new --session pub07c-capability-probe \
+            --task "$SMOKE_TASK" --max-retries 3 --dry-run --repo . --json | tee "$RUNNER_TEMP/pub07c-eligibility.json"
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const p=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/pub07c-eligibility.json','utf8'));
+          if(p.result!=='target_ineligible'||p.targetTaskId!==process.env.SMOKE_TASK) throw new Error(`Unexpected PUB07C eligibility: ${JSON.stringify(p)}`);
+          const reasons=p.targetEligibility?.reasons||[];
+          if(!reasons.includes('missing_capability')) throw new Error(`Expected missing_capability, got ${JSON.stringify(reasons)}`);
+          console.log(JSON.stringify(p,null,2));
+          NODE
+      - name: Discover next actually executable task
+        run: |
+          set -euo pipefail
+          node node_modules/oreshnik-cli/dist/cli.js dispatch next \
+            --operator "$OPERATOR" --harness "$HARNESS" --instance new --session post-pub07-continuation \
+            --max-retries 3 --dry-run --repo . --json | tee "$RUNNER_TEMP/next-executable.json"
+          cat "$RUNNER_TEMP/next-executable.json"
+      - name: Upload probe evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pub07-continuation-probe
+          path: |
+            ${{ runner.temp }}/pub07c-eligibility.json
+            ${{ runner.temp }}/next-executable.json
+          if-no-files-found: ignore
