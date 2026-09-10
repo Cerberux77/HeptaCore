@@ -1,0 +1,58 @@
+{
+  "project": "HeptaCore",
+  "taskId": "S-HC-PUB-07B-YOUTUBE-SCHEDULED-E2E",
+  "sprint": "publishing",
+  "title": "YouTube scheduled E2E integration: Video, Shorts, cron metadata and credentials",
+  "owner": "Manuel",
+  "backupOwner": "Manuel",
+  "status": "ready",
+  "taskBoardPath": "var/oreshnik/task-board.json",
+  "zone": [
+    "apps/web/lib/publishers",
+    "apps/web/app/api/publishing",
+    "packages/integrations",
+    "apps/web/app/api/cron/publisher",
+    "apps/web/lib/publishing-cron-executor.ts",
+    "apps/web/lib/__tests__",
+    "contracts/S-HC-PUB-04"
+  ],
+  "readZones": [],
+  "writeZones": [
+    "apps/web/lib/publishers",
+    "apps/web/app/api/publishing",
+    "packages/integrations",
+    "apps/web/app/api/cron/publisher",
+    "apps/web/lib/publishing-cron-executor.ts",
+    "apps/web/lib/__tests__",
+    "contracts/S-HC-PUB-04"
+  ],
+  "resources": [],
+  "capabilities": [],
+  "gates": [],
+  "priority": "high",
+  "validationExpectations": [],
+  "dependsOn": [
+    "S-HC-PUB-03-MULTITENANT-ASSETS",
+    "S-HC-PUB-04-HOURLY-BATCH-CRON"
+  ],
+  "acceptance": [
+    "Validated YouTube Video 16:9 and Shorts publisher is present in the governed delivery.",
+    "Scheduled cron transports YouTube format, title, description, primary video and thumbnail to the provider adapter.",
+    "Scheduled credential resolution uses the publisher credentialLabel dynamically and never hardcodes facebook_page_oauth.",
+    "Missing credentialLabel fails closed before credential decryption.",
+    "Scheduled dry-run recognizes YouTube formats without resolving credentials or invoking the provider.",
+    "Provider-specific immediate and scheduled tests pass together.",
+    "typecheck, build, worker validation and full repository tests pass."
+  ],
+  "attempts": 0,
+  "history": [
+    {
+      "at": "2026-09-10T17:40:00.000Z",
+      "action": "canonical_task_registered",
+      "operator": "manuel",
+      "description": "Governed child Goal created because Oreshnik 0.3.0-alpha.6 freezes Run zones and does not yet expose canonical Task amendment."
+    }
+  ],
+  "updatedAt": "2026-09-10T17:40:00.000Z",
+  "runs": []
+}

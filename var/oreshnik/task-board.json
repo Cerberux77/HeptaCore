@@ -1,6 +1,6 @@
 {
   "project": "HeptaCore",
-  "updatedAt": "2026-09-10T16:11:30.680Z",
+  "updatedAt": "2026-09-10T17:40:00.000Z",
   "currentExecutionOrder": [
     "S-HC-PUB-04-HOURLY-BATCH-CRON",
     "S-HC-PUB-05-RECONCILIATION-OPS",
@@ -29,7 +29,8 @@
     "support",
     "tenant-onboarding",
     "tenant-platform",
-    "HC-ORESHNIK-RECOVERY-ALPHA6"
+    "HC-ORESHNIK-RECOVERY-ALPHA6",
+    "S-HC-PUB-07B-YOUTUBE-SCHEDULED-E2E"
   ],
   "tasks": [
     {
@@ -3133,6 +3134,56 @@
           "operator": "Manuel",
           "branch": "Manuel/s-hc-ten-01-global-tenant-admin",
           "description": "Three canonical roles (OWNER/ADMIN/VIEWER), legacy role normalization, identity panel in /admin and /tenant/*, 5/5 E2E pass, 569 unit tests, production intact"
+        }
+      ]
+    },
+    {
+      "id": "S-HC-PUB-07B-YOUTUBE-SCHEDULED-E2E",
+      "title": "YouTube scheduled E2E integration: Video, Shorts, cron metadata and credentials",
+      "owner": "Manuel",
+      "backupOwner": "Manuel",
+      "status": "ready",
+      "track": "publishing",
+      "zone": [
+        "apps/web/lib/publishers",
+        "apps/web/app/api/publishing",
+        "packages/integrations",
+        "apps/web/app/api/cron/publisher",
+        "apps/web/lib/publishing-cron-executor.ts",
+        "apps/web/lib/__tests__",
+        "contracts/S-HC-PUB-04"
+      ],
+      "readZones": [],
+      "writeZones": [
+        "apps/web/lib/publishers",
+        "apps/web/app/api/publishing",
+        "packages/integrations",
+        "apps/web/app/api/cron/publisher",
+        "apps/web/lib/publishing-cron-executor.ts",
+        "apps/web/lib/__tests__",
+        "contracts/S-HC-PUB-04"
+      ],
+      "priority": "high",
+      "dependsOn": [
+        "S-HC-PUB-03-MULTITENANT-ASSETS",
+        "S-HC-PUB-04-HOURLY-BATCH-CRON"
+      ],
+      "acceptance": [
+        "Validated YouTube Video 16:9 and Shorts publisher is present in the governed delivery.",
+        "Scheduled cron transports YouTube format, title, description, primary video and thumbnail to the provider adapter.",
+        "Scheduled credential resolution uses the publisher credentialLabel dynamically and never hardcodes facebook_page_oauth.",
+        "Missing credentialLabel fails closed before credential decryption.",
+        "Scheduled dry-run recognizes YouTube formats without resolving credentials or invoking the provider.",
+        "Provider-specific immediate and scheduled tests pass together.",
+        "typecheck, build, worker validation and full repository tests pass."
+      ],
+      "attempts": 0,
+      "history": [
+        {
+          "at": "2026-09-10T17:40:00.000Z",
+          "action": "canonical_task_registered",
+          "operator": "manuel",
+          "description": "Governed child Goal created because Oreshnik 0.3.0-alpha.6 freezes Run zones and does not yet expose canonical Task amendment."
         }
       ]
     }
