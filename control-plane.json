@@ -5,15 +5,15 @@
     "originUrl": "https://github.com/Cerberux77/HeptaCore.git",
     "canonicalMotherBranch": "master"
   },
-  "generation": 146,
+  "generation": 147,
   "controlHead": "0e21126e20373bc3763c36b98203871c113ea678",
   "catalog": {
     "taskBoardPath": "var/oreshnik/task-board.json",
     "zoneMapPath": "docs/07_handoffs/zone-map.json",
-    "sourceTaskBoardHead": "741f3e3f66c4fa1fe14d6db9042df4fd1861bf97",
-    "fingerprint": "d824cfee4ddf2d55c3ccca9d368c40bfc8323238",
+    "sourceTaskBoardHead": "0a2e10fd46f3bcc3a0be5d766673d8693571a784",
+    "fingerprint": "c0d17207ca928e4fcc3f55b3564aeb8f5f71bf16",
     "taskCount": 45,
-    "updatedAt": "2026-09-10T23:48:39.047Z"
+    "updatedAt": "2026-09-10T23:48:58.452Z"
   },
   "policy": {
     "name": "deterministic-v1",
@@ -585,7 +585,7 @@
       "repositoryId": "32305cad03d6321a",
       "slot": 1,
       "createdAt": "2026-09-10T23:48:39.047Z",
-      "updatedAt": "2026-09-10T23:48:39.047Z",
+      "updatedAt": "2026-09-10T23:48:47.191Z",
       "identityOrigin": "explicit"
     }
   ],
@@ -776,7 +776,7 @@
       "harnessId": "chatgpt",
       "machineId": "machine-6b34a148-a1c0-4886-ad96-be5e474af54a",
       "startedAt": "2026-09-10T23:48:39.047Z",
-      "lastSeenAt": "2026-09-10T23:48:39.047Z",
+      "lastSeenAt": "2026-09-10T23:48:47.191Z",
       "status": "active",
       "identityOrigin": "explicit"
     }
@@ -1550,12 +1550,13 @@
         "apps/web/app/api/publishing",
         "packages/integrations"
       ],
-      "status": "active",
+      "status": "released",
       "sourceTaskBoardHead": "741f3e3f66c4fa1fe14d6db9042df4fd1861bf97",
       "catalogFingerprint": "d824cfee4ddf2d55c3ccca9d368c40bfc8323238",
       "createdAt": "2026-09-10T23:48:39.047Z",
-      "updatedAt": "2026-09-10T23:48:47.191Z",
+      "updatedAt": "2026-09-10T23:48:58.452Z",
       "activatedAt": "2026-09-10T23:48:47.191Z",
+      "lastError": "awaiting_external_validation: Only real authorized YouTube OAuth/channel identity smoke remains; no credential is available to this execution and no provider support will be claimed without it.",
       "resumedCount": 0,
       "takeoverCount": 0,
       "ownershipGeneration": 1,
@@ -2099,9 +2100,9 @@
       "runId": "run-manuel-S-HC-PUB-07-YOUTUBE-PUBLISHING-20260910234839-191d864a",
       "branch": "dispatch/manuel/manuel-chatgpt1/publishing/S-HC-PUB-07-YOUTUBE-PUBLISHING/5dc36253e7",
       "worktreePath": "/home/runner/work/_temp/oreshnik-wt-pub07-external/32305cad03d6321a/manuel/manuel-chatgpt1/publishing/S-HC-PUB-07-YOUTUBE-PUBLISHING/5dc36253e7",
-      "status": "active",
+      "status": "released",
       "createdAt": "2026-09-10T23:48:39.047Z",
-      "updatedAt": "2026-09-10T23:48:47.191Z",
+      "updatedAt": "2026-09-10T23:48:58.452Z",
       "zones": [
         "apps/web/lib/publishers",
         "apps/web/app/api/publishing",
@@ -2668,10 +2669,11 @@
       "machineId": "machine-6b34a148-a1c0-4886-ad96-be5e474af54a",
       "branch": "dispatch/manuel/manuel-chatgpt1/publishing/S-HC-PUB-07-YOUTUBE-PUBLISHING/5dc36253e7",
       "worktreePath": "/home/runner/work/_temp/oreshnik-wt-pub07-external/32305cad03d6321a/manuel/manuel-chatgpt1/publishing/S-HC-PUB-07-YOUTUBE-PUBLISHING/5dc36253e7",
-      "status": "active",
+      "status": "released",
       "createdAt": "2026-09-10T23:48:39.047Z",
-      "updatedAt": "2026-09-10T23:48:47.191Z",
+      "updatedAt": "2026-09-10T23:48:58.452Z",
       "sourceTaskBoardHead": "741f3e3f66c4fa1fe14d6db9042df4fd1861bf97",
+      "lastError": "awaiting_external_validation: Only real authorized YouTube OAuth/channel identity smoke remains; no credential is available to this execution and no provider support will be claimed without it.",
       "zones": [
         "apps/web/lib/publishers",
         "apps/web/app/api/publishing",
@@ -3931,9 +3933,9 @@
       "machineId": "machine-6b34a148-a1c0-4886-ad96-be5e474af54a",
       "runId": "run-manuel-S-HC-PUB-07-YOUTUBE-PUBLISHING-20260910234839-191d864a",
       "branch": "dispatch/manuel/manuel-chatgpt1/publishing/S-HC-PUB-07-YOUTUBE-PUBLISHING/5dc36253e7",
-      "status": "reserved",
+      "status": "released",
       "createdAt": "2026-09-10T23:48:39.047Z",
-      "updatedAt": "2026-09-10T23:48:47.191Z",
+      "updatedAt": "2026-09-10T23:48:58.452Z",
       "harnessId": "chatgpt",
       "agentInstanceUid": "agent_590d14e71ce04d2aa89dc33d1d81d75d",
       "agentInstanceAlias": "manuel-chatgpt1",
@@ -3949,9 +3951,9 @@
       "machineId": "machine-6b34a148-a1c0-4886-ad96-be5e474af54a",
       "runId": "run-manuel-S-HC-PUB-07-YOUTUBE-PUBLISHING-20260910234839-191d864a",
       "branch": "dispatch/manuel/manuel-chatgpt1/publishing/S-HC-PUB-07-YOUTUBE-PUBLISHING/5dc36253e7",
-      "status": "reserved",
+      "status": "released",
       "createdAt": "2026-09-10T23:48:39.047Z",
-      "updatedAt": "2026-09-10T23:48:47.191Z",
+      "updatedAt": "2026-09-10T23:48:58.452Z",
       "harnessId": "chatgpt",
       "agentInstanceUid": "agent_590d14e71ce04d2aa89dc33d1d81d75d",
       "agentInstanceAlias": "manuel-chatgpt1",
@@ -3967,9 +3969,9 @@
       "machineId": "machine-6b34a148-a1c0-4886-ad96-be5e474af54a",
       "runId": "run-manuel-S-HC-PUB-07-YOUTUBE-PUBLISHING-20260910234839-191d864a",
       "branch": "dispatch/manuel/manuel-chatgpt1/publishing/S-HC-PUB-07-YOUTUBE-PUBLISHING/5dc36253e7",
-      "status": "reserved",
+      "status": "released",
       "createdAt": "2026-09-10T23:48:39.047Z",
-      "updatedAt": "2026-09-10T23:48:47.191Z",
+      "updatedAt": "2026-09-10T23:48:58.452Z",
       "harnessId": "chatgpt",
       "agentInstanceUid": "agent_590d14e71ce04d2aa89dc33d1d81d75d",
       "agentInstanceAlias": "manuel-chatgpt1",
@@ -5060,6 +5062,14 @@
       "runId": "run-manuel-S-HC-PUB-07-YOUTUBE-PUBLISHING-20260910234839-191d864a",
       "operator": "manuel",
       "message": "Assignment asg-63241aa6-6f8f-498f-aba5-554099086a52 is active."
+    },
+    {
+      "at": "2026-09-10T23:48:58.452Z",
+      "action": "dispatch.released",
+      "assignmentId": "asg-63241aa6-6f8f-498f-aba5-554099086a52",
+      "runId": "run-manuel-S-HC-PUB-07-YOUTUBE-PUBLISHING-20260910234839-191d864a",
+      "operator": "manuel",
+      "message": "awaiting_external_validation: Only real authorized YouTube OAuth/channel identity smoke remains; no credential is available to this execution and no provider support will be claimed without it."
     }
   ],
   "reconciliation": {
@@ -5069,5 +5079,5 @@
     "pendingDiagnostics": []
   },
   "createdAt": "2026-06-29T20:17:43.302Z",
-  "updatedAt": "2026-09-10T23:48:47.191Z"
+  "updatedAt": "2026-09-10T23:48:58.452Z"
 }
