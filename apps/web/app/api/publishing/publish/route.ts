@@ -122,6 +122,8 @@ export async function POST(req: Request) {
     if (!asset) return null;
     return buildPublicAssetUrl(tenantSlug, asset);
   });
+  const isYouTube = network === "YOUTUBE";
+  const youtubeThumbnail = isYouTube ? orderedAssets.find((asset) => asset.role === "thumbnail") ?? null : null;
 
   const draftOnly = tenant.automationMode === "DRAFT_ONLY";
   const approvalRequired = tenant.automationMode === "APPROVAL_REQUIRED";
@@ -427,7 +429,8 @@ export async function POST(req: Request) {
   // Asset URL gate (only if asset is needed)
   let mediaUrl: string | undefined | null;
   let mediaType: "IMAGE" | "VIDEO" | undefined;
-  const primaryAsset = needsAsset ? (draft.assets.find((a) => a.role === "primary") ?? draft.assets[0]) : null;
+  const uploadAssets = isYouTube ? draft.assets.filter((a) => a.role !== "thumbnail") : draft.assets;
+  const primaryAsset = needsAsset ? (uploadAssets.find((a) => a.role === "primary") ?? uploadAssets[0] ?? null) : null;
 
   if (primaryAsset) {
     mediaUrl = buildPublicAssetUrl(tenantSlug, primaryAsset.asset);
@@ -537,6 +540,12 @@ export async function POST(req: Request) {
     mediaType,
   };
 
+  if (isYouTube) {
+    publishInput.title = draft.title;
+    publishInput.description = draft.caption ?? draft.title;
+    publishInput.thumbnailUrl = youtubeThumbnail?.url ?? null;
+  }
+
   let publishResult: { externalPostId: string; providerResponse: unknown };
   try {
     publishResult = await publisher.publish(publishInput);
@@ -561,8 +570,8 @@ export async function POST(req: Request) {
         code: "LIVE_RECONCILIATION_REQUIRED",
         status: "RECONCILIATION_REQUIRED",
         draftId: draft.id,
-        error: "Meta devolvio un resultado ambiguo. Verifique la pagina antes de reintentar.",
-        action: "No vuelva a publicar hasta verificar Facebook. El job permanece IN_REVIEW.",
+        error: `${network} devolvio un resultado ambiguo. Verifique la publicacion antes de reintentar.`,
+        action: `No vuelva a publicar hasta verificar ${network}. El job permanece IN_REVIEW.`,
       }, { status: 202 });
     }
 
