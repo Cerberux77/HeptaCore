@@ -1,0 +1,291 @@
+name: Ops EMAIL01A Deterministic Rescue
+
+on:
+  push:
+    branches:
+      - ops/email01a-deterministic-rescue-20260910
+    paths:
+      - .github/email01a-rescue-trigger
+
+permissions:
+  contents: write
+  actions: read
+
+concurrency:
+  group: heptacore-email01a-deterministic-rescue
+  cancel-in-progress: false
+
+env:
+  TASK_ID: S-HC-EMAIL-01A-TRANSACTIONAL-SOFTWARE-FOUNDATION
+  PARENT_TASK: S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION
+  OPERATOR: manuel
+  HARNESS: chatgpt
+  ORESHNIK_VERSION: 0.3.0-alpha.6
+  SOURCE_BRANCH: dispatch/manuel/manuel-chatgpt1/email-infra/S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION/ceaa8b659d
+
+jobs:
+  rescue:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    steps:
+      - name: Checkout current canonical master
+        uses: actions/checkout@v4
+        with:
+          ref: master
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Configure identity
+        run: |
+          git config user.name "Manuel Vera via ChatGPT Operator"
+          git config user.email "manuel@heptacore.dev"
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Verify exact alpha6 and source lineage
+        run: |
+          set -euo pipefail
+          npm ci --ignore-scripts
+          test "$(node node_modules/oreshnik-cli/dist/cli.js --version)" = "$ORESHNIK_VERSION"
+          npm run oreshnik:ready
+          git fetch origin '+refs/heads/master:refs/remotes/origin/master' "+refs/heads/$SOURCE_BRANCH:refs/remotes/origin/$SOURCE_BRANCH" '+refs/heads/oreshnik/control:refs/remotes/origin/oreshnik/control'
+          test "$(git rev-parse HEAD)" = "$(git rev-parse origin/master)"
+          test "$(git merge-base origin/master origin/$SOURCE_BRANCH)" = "a7383709108c26611d16158ba2a8a2a4c4cabf35"
+          for sha in \
+            2ccf8b0b2b83497143cd9fbe5b503343841ae65f \
+            e0dcd54904f24a4e5f1f1e4860373ffe90f6212b \
+            6a328bba6d875caf3bb50276bd1d677ac617b53f \
+            e90bfef3f4a39fa54cae5408c87da65e4dffd52c \
+            f3876454e3d246178432351c8deaabfca7b4e3c7; do
+            git merge-base --is-ancestor "$sha" "origin/$SOURCE_BRANCH"
+          done
+          test ! -e packages/core/src/email-readiness.ts
+          test ! -e packages/core/src/__tests__/email-readiness.test.ts
+          test ! -e apps/web/app/api/email/readiness/route.ts
+
+      - name: Register deterministic child Task with CAS
+        id: register
+        run: |
+          set -euo pipefail
+          git fetch origin '+refs/heads/master:refs/remotes/origin/master'
+          EXPECTED_HEAD="$(git rev-parse origin/master)"
+          AT="$(date -u +'%Y-%m-%dT%H:%M:%S.000Z')"
+          node - "$RUNNER_TEMP/email01a-spec.json" "$AT" <<'NODE'
+          const fs=require('node:fs');
+          const [path,at]=process.argv.slice(2);
+          const id=process.env.TASK_ID;
+          const spec={
+            schemaVersion:1,
+            taskId:id,
+            task:{
+              id,
+              title:'Transactional email deterministic readiness software foundation',
+              owner:'Manuel',
+              backupOwner:'Manuel',
+              status:'ready',
+              track:'email-infra',
+              zone:[
+                'packages/core/src/email-readiness.ts',
+                'packages/core/src/__tests__/email-readiness.test.ts',
+                'packages/core/src/index.ts',
+                'apps/web/app/api/email/readiness/route.ts',
+                'docs/operations/EMAIL_TRANSACTIONAL_READINESS.md'
+              ],
+              readZones:[
+                'apps/web/app/api/webhooks/resend',
+                'apps/web/lib/email',
+                '.env.example'
+              ],
+              writeZones:[
+                'packages/core/src/email-readiness.ts',
+                'packages/core/src/__tests__/email-readiness.test.ts',
+                'packages/core/src/index.ts',
+                'apps/web/app/api/email/readiness/route.ts',
+                'docs/operations/EMAIL_TRANSACTIONAL_READINESS.md'
+              ],
+              resources:[],
+              capabilities:[],
+              gates:[],
+              priority:'high',
+              validationExpectations:[
+                'typecheck, build, worker validation and full tests pass on the rescued implementation against current master.',
+                'Readiness logic remains fail-closed for production until a custom owned domain and verified SPF/DKIM/DMARC are present.',
+                'Readiness endpoint exposes configuration booleans and non-secret provider state only; it never returns API keys or webhook secrets.'
+              ],
+              evidenceType:'ci',
+              dependsOn:[],
+              acceptance:[
+                'Deterministic email readiness contract is present in @heptacore/core and exported.',
+                'SUPER_ADMIN-only /api/email/readiness endpoint evaluates Resend domain and DMARC state without exposing secret material.',
+                'Automated tests cover development test-sender mode, invalid Vercel sender identity, custom-domain verification and production fail-closed behavior.',
+                'Operational documentation distinguishes deterministic software readiness from external production-domain activation.',
+                'No domain, DNS record, Resend credential or production activation is invented or claimed by this child Task.',
+                'typecheck, build, worker validation and full repository tests pass.'
+              ]
+            },
+            goalMarkdown:`# ${id}\n\n## Objective\nRecover the already implemented deterministic transactional-email readiness software from the released ${process.env.PARENT_TASK} branch and integrate it independently of the external sender-domain/DNS activation.\n\n## Scope\nOnly the readiness contract, tests, SUPER_ADMIN readiness endpoint, export and operational documentation are writable.\n\n## External boundary\nThis child never claims an owned HeptaCore domain, SPF/DKIM/DMARC verification, Resend production authorization or production email activation. Those remain on parent ${process.env.PARENT_TASK}.\n`,
+            registeredBy:process.env.OPERATOR,
+            registeredAt:at
+          };
+          fs.writeFileSync(path,JSON.stringify(spec,null,2)+'\n');
+          NODE
+          if git cat-file -e "origin/master:var/oreshnik/tasks/$TASK_ID.json" 2>/dev/null; then
+            echo "Task already registered; preserving current canonical Task."
+          else
+            node node_modules/oreshnik-cli/dist/cli.js task register \
+              --spec "$RUNNER_TEMP/email01a-spec.json" \
+              --expected-head "$EXPECTED_HEAD" \
+              --mother master \
+              --repo . \
+              --json | tee "$RUNNER_TEMP/email01a-register.json"
+          fi
+          git fetch origin '+refs/heads/master:refs/remotes/origin/master'
+          git reset --hard origin/master
+          echo "master=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+
+      - name: Initialize dispatcher and claim exact child
+        id: dispatch
+        run: |
+          set -euo pipefail
+          node node_modules/oreshnik-cli/dist/cli.js dispatch init \
+            --mother master \
+            --worktree-root "$RUNNER_TEMP/oreshnik-wt-email01a" \
+            --repo . --json
+          SESSION="email01a-rescue-$(date -u +%Y%m%d%H%M%S)"
+          node node_modules/oreshnik-cli/dist/cli.js dispatch next \
+            --operator "$OPERATOR" --harness "$HARNESS" --instance new --session "$SESSION" \
+            --task "$TASK_ID" --max-retries 3 --repo . --json | tee "$RUNNER_TEMP/email01a-dispatch.json"
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const p=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/email01a-dispatch.json','utf8'));
+          if(!['assigned','resumed'].includes(p.result)||p.taskId!==process.env.TASK_ID) throw new Error(`Child dispatch failed: ${JSON.stringify(p)}`);
+          for(const [k,v] of Object.entries({run:p.runId,assignment:p.assignmentId,branch:p.functionalBranch,worktree:p.worktreePath,session:p.sessionId,instance:p.agentInstanceAlias||p.agentInstanceUid})) fs.appendFileSync(process.env.GITHUB_OUTPUT,`${k}=${v}\n`);
+          NODE
+
+      - name: Rescue only deterministic implementation commits
+        env:
+          WT: ${{ steps.dispatch.outputs.worktree }}
+          BRANCH: ${{ steps.dispatch.outputs.branch }}
+        run: |
+          set -euo pipefail
+          git -C "$WT" config user.name "Manuel Vera via ChatGPT Operator"
+          git -C "$WT" config user.email "manuel@heptacore.dev"
+          git -C "$WT" fetch origin "+refs/heads/$SOURCE_BRANCH:refs/remotes/origin/$SOURCE_BRANCH"
+          cd "$WT"
+          git cherry-pick \
+            2ccf8b0b2b83497143cd9fbe5b503343841ae65f \
+            e0dcd54904f24a4e5f1f1e4860373ffe90f6212b \
+            6a328bba6d875caf3bb50276bd1d677ac617b53f \
+            e90bfef3f4a39fa54cae5408c87da65e4dffd52c \
+            f3876454e3d246178432351c8deaabfca7b4e3c7
+          changed="$(git diff --name-only ${{ steps.register.outputs.master }}..HEAD)"
+          printf '%s\n' "$changed"
+          while IFS= read -r p; do
+            test -z "$p" && continue
+            case "$p" in
+              packages/core/src/email-readiness.ts|packages/core/src/__tests__/email-readiness.test.ts|packages/core/src/index.ts|apps/web/app/api/email/readiness/route.ts|docs/operations/EMAIL_TRANSACTIONAL_READINESS.md) ;;
+              *) echo "Unexpected rescued path: $p"; exit 41;;
+            esac
+          done <<< "$changed"
+          npm ci --ignore-scripts
+          test "$(node node_modules/oreshnik-cli/dist/cli.js --version)" = "$ORESHNIK_VERSION"
+          git push origin "HEAD:$BRANCH"
+
+      - name: Persist stable handoff and start validation
+        id: handoff
+        env:
+          WT: ${{ steps.dispatch.outputs.worktree }}
+          RUN_ID: ${{ steps.dispatch.outputs.run }}
+          BRANCH: ${{ steps.dispatch.outputs.branch }}
+        run: |
+          set -euo pipefail
+          cd "$WT"
+          node node_modules/oreshnik-cli/dist/cli.js handoff create \
+            --task "$TASK_ID" --run "$RUN_ID" --operator "$OPERATOR" \
+            --reason "Integrate deterministic email readiness software independently from external domain activation." \
+            --objective "Recover validated readiness contract, tests, SUPER_ADMIN probe and operations guide onto current master." \
+            --implemented "Email readiness core contract; focused tests; SUPER_ADMIN readiness API; core export; operations guide" \
+            --test-pending "Oreshnik governed typecheck, build, worker and full tests on current master" \
+            --gate "External sender-domain/DNS activation explicitly out of child scope" \
+            --exact-point "Implementation rescued onto the fresh governed child branch; full alpha6 gates are next." \
+            --first-command "Run Oreshnik evidence --ready-for-integration for this same Run." \
+            --completion-criterion "All deterministic gates pass, PR merges, and this child terminalizes; parent EMAIL-01 remains external until real domain/DNS/provider evidence exists." \
+            --json | tee "$RUNNER_TEMP/email01a-handoff.json"
+          HANDOFF="$(find docs/oreshnik/handoffs/$TASK_ID -type f -name '*.md' | sort | tail -n 1)"
+          test -n "$HANDOFF" -a -f "$HANDOFF"
+          echo "path=$HANDOFF" >> "$GITHUB_OUTPUT"
+          git add var/oreshnik docs/oreshnik/handoffs
+          git diff --cached --check
+          if ! git diff --cached --quiet; then git commit -m "chore(oreshnik): persist EMAIL-01A handoff"; fi
+          git push origin "HEAD:$BRANCH"
+          node node_modules/oreshnik-cli/dist/cli.js evidence \
+            --task "$TASK_ID" --run "$RUN_ID" --operator "$OPERATOR" \
+            --handoff "$HANDOFF" \
+            --details "Fresh child Run owns only deterministic email readiness software recovered from released parent work." \
+            --start-validation
+          node node_modules/oreshnik-cli/dist/cli.js reconcile --write --json
+          git add var/oreshnik docs/obsidian-vault docs/oreshnik docs/07_handoffs || true
+          git diff --cached --check
+          if ! git diff --cached --quiet; then git commit -m "chore(oreshnik): start EMAIL-01A validation"; fi
+          git push origin "HEAD:$BRANCH"
+
+      - name: Execute governed alpha6 gates and mark ready for integration
+        env:
+          WT: ${{ steps.dispatch.outputs.worktree }}
+          RUN_ID: ${{ steps.dispatch.outputs.run }}
+          BRANCH: ${{ steps.dispatch.outputs.branch }}
+          HANDOFF: ${{ steps.handoff.outputs.path }}
+        run: |
+          set -euo pipefail
+          cd "$WT"
+          node node_modules/oreshnik-cli/dist/cli.js evidence \
+            --task "$TASK_ID" --run "$RUN_ID" --operator "$OPERATOR" \
+            --handoff "$HANDOFF" \
+            --details "Deterministic readiness software rescued onto current master; governed typecheck, build, worker and full tests executed by alpha6." \
+            --ready-for-integration
+          node node_modules/oreshnik-cli/dist/cli.js reconcile --write --json
+          git add var/oreshnik docs/obsidian-vault docs/oreshnik docs/07_handoffs || true
+          git diff --cached --check
+          if ! git diff --cached --quiet; then git commit -m "chore(oreshnik): persist EMAIL-01A integration readiness"; fi
+          git push origin "HEAD:$BRANCH"
+
+      - name: Reconcile and verify remote child lifecycle
+        env:
+          RUN_ID: ${{ steps.dispatch.outputs.run }}
+          ASSIGNMENT_ID: ${{ steps.dispatch.outputs.assignment }}
+          BRANCH: ${{ steps.dispatch.outputs.branch }}
+        run: |
+          set -euo pipefail
+          git fetch origin "+refs/heads/$BRANCH:refs/remotes/origin/$BRANCH" '+refs/heads/oreshnik/control:refs/remotes/origin/oreshnik/control'
+          node node_modules/oreshnik-cli/dist/cli.js dispatch reconcile --repo . --json
+          git fetch origin '+refs/heads/oreshnik/control:refs/remotes/origin/oreshnik/control'
+          git show "origin/$BRANCH:var/oreshnik/tasks/$TASK_ID.json" > "$RUNNER_TEMP/email01a-task.json"
+          git show "origin/$BRANCH:var/oreshnik/runs/$TASK_ID/$RUN_ID.json" > "$RUNNER_TEMP/email01a-run.json"
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const t=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/email01a-task.json','utf8'));
+          const r=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/email01a-run.json','utf8'));
+          const required=['typecheck','build','worker','tests'];
+          if(t.status!=='ready_for_integration'||r.taskStatus!=='ready_for_integration') throw new Error(`Lifecycle not ready: ${t.status}/${r.taskStatus}`);
+          for(const id of required){const g=(r.validationGateResults||[]).find(x=>x.gateId===id);if(!g?.passed) throw new Error(`Gate ${id} missing/pass=false`);}
+          console.log(JSON.stringify({task:t.status,run:r.taskStatus,branch:process.env.BRANCH,sourceHead:r.sourceHead||null,gates:(r.validationGateResults||[]).map(g=>({id:g.gateId,passed:g.passed}))},null,2));
+          NODE
+          git rev-parse "origin/$BRANCH" | tee "$RUNNER_TEMP/email01a-head.txt"
+
+      - name: Upload rescue evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: email01a-deterministic-rescue
+          path: |
+            ${{ runner.temp }}/email01a-register.json
+            ${{ runner.temp }}/email01a-dispatch.json
+            ${{ runner.temp }}/email01a-handoff.json
+            ${{ runner.temp }}/email01a-task.json
+            ${{ runner.temp }}/email01a-run.json
+            ${{ runner.temp }}/email01a-head.txt
+          if-no-files-found: ignore
