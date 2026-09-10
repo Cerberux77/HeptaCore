@@ -5,7 +5,7 @@
     "originUrl": "https://github.com/Cerberux77/HeptaCore.git",
     "canonicalMotherBranch": "master"
   },
-  "generation": 109,
+  "generation": 110,
   "controlHead": "3468713be29c04d1c7a451bae3e7c53d9bfa92f1",
   "catalog": {
     "taskBoardPath": "var/oreshnik/task-board.json",
@@ -1192,7 +1192,7 @@
       "sprintId": "email-infra",
       "title": "Transactional email foundation: domain sender, DNS, reputation, provider integration",
       "operator": "manuel",
-      "machineId": "machine-27590b22-7a28-44e1-ad63-8b64699ee928",
+      "machineId": "machine-0f2dc4b9-a6ef-4261-a420-7d37164433bb",
       "functionalBranch": "dispatch/manuel/manuel-chatgpt1/email-infra/S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION/ceaa8b659d",
       "motherBranch": "master",
       "worktreePath": "/home/runner/work/_temp/oreshnik-wt-email01-retry/32305cad03d6321a/manuel/manuel-chatgpt1/email-infra/S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION/3f2228d9",
@@ -1219,15 +1219,15 @@
       "sourceTaskBoardHead": "a7383709108c26611d16158ba2a8a2a4c4cabf35",
       "catalogFingerprint": "fdf736eb32542e2efbd48b369858d40f03455010",
       "createdAt": "2026-09-10T14:46:12.866Z",
-      "updatedAt": "2026-09-10T15:51:08.074Z",
+      "updatedAt": "2026-09-10T15:53:51.876Z",
       "activatedAt": "2026-09-10T14:46:28.833Z",
-      "resumedCount": 2,
+      "resumedCount": 3,
       "takeoverCount": 0,
-      "ownershipGeneration": 3,
+      "ownershipGeneration": 4,
       "previousAgentInstanceUid": "agent_e8dd52d1d5de4f40a9a4d9923ffda155",
       "previousSessionId": "session_5bb21c8aa01e49bcb03886ae23d26864",
-      "takeoverReason": "Retry EMAIL-01 external block with shared execution identity after all software gates passed",
-      "takenOverAt": "2026-09-10T15:51:08.074Z",
+      "takeoverReason": "Retry EMAIL-01 external block through stable controller repository context after all software gates passed",
+      "takenOverAt": "2026-09-10T15:53:51.876Z",
       "harnessId": "chatgpt",
       "agentInstanceUid": "agent_e8dd52d1d5de4f40a9a4d9923ffda155",
       "agentInstanceAlias": "manuel-chatgpt1",
@@ -1641,13 +1641,13 @@
       "taskId": "S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION",
       "sprintId": "email-infra",
       "operator": "manuel",
-      "machineId": "machine-27590b22-7a28-44e1-ad63-8b64699ee928",
+      "machineId": "machine-0f2dc4b9-a6ef-4261-a420-7d37164433bb",
       "runId": "run-manuel-S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION-20260910144612-ccbed006",
       "branch": "dispatch/manuel/manuel-chatgpt1/email-infra/S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION/ceaa8b659d",
       "worktreePath": "/home/runner/work/_temp/oreshnik-wt-email01-retry/32305cad03d6321a/manuel/manuel-chatgpt1/email-infra/S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION/3f2228d9",
       "status": "active",
       "createdAt": "2026-09-10T14:46:12.866Z",
-      "updatedAt": "2026-09-10T15:51:08.074Z",
+      "updatedAt": "2026-09-10T15:53:51.876Z",
       "zones": [
         "apps/web/app/api/email",
         "packages/core",
@@ -1665,7 +1665,7 @@
         "packages/core",
         "docs"
       ],
-      "ownershipGeneration": 3,
+      "ownershipGeneration": 4,
       "harnessId": "chatgpt",
       "agentInstanceUid": "agent_e8dd52d1d5de4f40a9a4d9923ffda155",
       "agentInstanceAlias": "manuel-chatgpt1",
@@ -2086,12 +2086,12 @@
       "taskId": "S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION",
       "sprintId": "email-infra",
       "operator": "manuel",
-      "machineId": "machine-27590b22-7a28-44e1-ad63-8b64699ee928",
+      "machineId": "machine-0f2dc4b9-a6ef-4261-a420-7d37164433bb",
       "branch": "dispatch/manuel/manuel-chatgpt1/email-infra/S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION/ceaa8b659d",
       "worktreePath": "/home/runner/work/_temp/oreshnik-wt-email01-retry/32305cad03d6321a/manuel/manuel-chatgpt1/email-infra/S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION/3f2228d9",
       "status": "active",
       "createdAt": "2026-09-10T14:46:12.866Z",
-      "updatedAt": "2026-09-10T15:51:08.074Z",
+      "updatedAt": "2026-09-10T15:53:51.876Z",
       "sourceTaskBoardHead": "a7383709108c26611d16158ba2a8a2a4c4cabf35",
       "zones": [
         "apps/web/app/api/email",
@@ -2110,7 +2110,7 @@
         "packages/core",
         "docs"
       ],
-      "ownershipGeneration": 3,
+      "ownershipGeneration": 4,
       "harnessId": "chatgpt",
       "agentInstanceUid": "agent_e8dd52d1d5de4f40a9a4d9923ffda155",
       "agentInstanceAlias": "manuel-chatgpt1",
@@ -3970,6 +3970,16 @@
       "at": "2026-09-10T15:53:43.165Z",
       "action": "dispatch.init",
       "message": "Registered machine machine-0f2dc4b9-a6ef-4261-a420-7d37164433bb with root /home/runner/work/_temp/oreshnik-wt-email01-retry."
+    },
+    {
+      "at": "2026-09-10T15:53:51.876Z",
+      "action": "dispatch.takeover",
+      "assignmentId": "asg-913a8dde-5aef-4f8b-8731-1af33f2228d9",
+      "runId": "run-manuel-S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION-20260910144612-ccbed006",
+      "operator": "manuel",
+      "agentInstanceUid": "agent_e8dd52d1d5de4f40a9a4d9923ffda155",
+      "sessionId": "session_5bb21c8aa01e49bcb03886ae23d26864",
+      "message": "Takeover by manuel/manuel-chatgpt1 from manuel/manuel-chatgpt1. Reason: Retry EMAIL-01 external block through stable controller repository context after all software gates passed. Generation: 3 → 4."
     }
   ],
   "reconciliation": {
@@ -3979,5 +3989,5 @@
     "pendingDiagnostics": []
   },
   "createdAt": "2026-06-29T20:17:43.302Z",
-  "updatedAt": "2026-09-10T15:53:43.165Z"
+  "updatedAt": "2026-09-10T15:53:51.876Z"
 }
