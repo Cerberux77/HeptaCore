@@ -1,0 +1,174 @@
+name: Ops PUB07B Governed Terminalize
+
+on:
+  push:
+    branches:
+      - ops/pub07-current-run-implementation-20260910
+    paths:
+      - .github/pub07b-terminalize-trigger
+
+permissions:
+  contents: write
+  actions: read
+
+concurrency:
+  group: heptacore-pub07b-terminalize
+  cancel-in-progress: false
+
+env:
+  TASK_ID: S-HC-PUB-07B-YOUTUBE-SCHEDULED-E2E
+  RUN_ID: run-manuel-S-HC-PUB-07B-YOUTUBE-SCHEDULED-E2E-20260910173721-206fad0f
+  ASSIGNMENT_ID: asg-6ae5ad07-bb79-49f6-b81a-ff6be9e0f149
+  OPERATOR: manuel
+  MERGE_COMMIT: 6b1dbe32ddb37192ad728fb427e305db9505c779
+  PR_NUMBER: "29"
+  VALIDATED_HEAD: a527de0c27fcc1260c79580f402e97e5a9c8fbca
+  EVIDENCE_RUN: "34536051727"
+  ORESHNIK_VERSION: 0.3.0-alpha.6
+
+jobs:
+  terminalize:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - name: Checkout canonical master
+        uses: actions/checkout@v4
+        with:
+          ref: master
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Configure identity
+        run: |
+          git config user.name "Manuel Vera via ChatGPT Operator"
+          git config user.email "manuel@heptacore.dev"
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Verify exact Oreshnik alpha6 and freeze CAS heads
+        id: cas
+        run: |
+          set -euo pipefail
+          npm ci --ignore-scripts
+          test "$(node node_modules/oreshnik-cli/dist/cli.js --version)" = "$ORESHNIK_VERSION"
+          npm run oreshnik:ready
+          git fetch origin '+refs/heads/master:refs/remotes/origin/master' '+refs/heads/oreshnik/control:refs/remotes/origin/oreshnik/control'
+          EXPECTED_HEAD="$(git rev-parse origin/master)"
+          EXPECTED_CONTROL_HEAD="$(git rev-parse origin/oreshnik/control)"
+          test "$(git rev-parse HEAD)" = "$EXPECTED_HEAD"
+          git merge-base --is-ancestor "$MERGE_COMMIT" "$EXPECTED_HEAD"
+          node - <<'NODE'
+          const {execFileSync}=require('node:child_process');
+          const task=JSON.parse(execFileSync('git',['show',`origin/master:var/oreshnik/tasks/${process.env.TASK_ID}.json`],{encoding:'utf8'}));
+          const control=JSON.parse(execFileSync('git',['show','origin/oreshnik/control:control-plane.json'],{encoding:'utf8'}));
+          const a=(control.assignments||[]).find(x=>x.assignmentId===process.env.ASSIGNMENT_ID);
+          const r=(control.runs||[]).find(x=>x.runId===process.env.RUN_ID);
+          const c=(control.claims||[]).find(x=>x.runId===process.env.RUN_ID);
+          if(task.status!=='ready_for_integration' && task.status!=='integrated') throw new Error(`Unexpected durable task status=${task.status}`);
+          if(!a||a.taskId!==process.env.TASK_ID||a.runId!==process.env.RUN_ID||a.operator!==process.env.OPERATOR) throw new Error('assignment participant drift');
+          if(!r||r.taskId!==process.env.TASK_ID||r.assignmentId!==process.env.ASSIGNMENT_ID||r.operator!==process.env.OPERATOR) throw new Error('run participant drift');
+          if(!c||c.taskId!==process.env.TASK_ID||c.assignmentId!==process.env.ASSIGNMENT_ID||c.operator!==process.env.OPERATOR) throw new Error('claim participant drift');
+          if(a.status==='superseded'||r.status==='superseded') throw new Error('PUB-07B lifecycle was superseded');
+          console.log(JSON.stringify({task:task.status,assignment:a.status,run:r.status,claim:c.status,master:process.env.GITHUB_SHA},null,2));
+          NODE
+          echo "expected_head=$EXPECTED_HEAD" >> "$GITHUB_OUTPUT"
+          echo "expected_control_head=$EXPECTED_CONTROL_HEAD" >> "$GITHUB_OUTPUT"
+
+      - name: Prepare terminal handoff
+        run: |
+          cat > "$RUNNER_TEMP/PUB07B-HANDOFF.md" <<'EOF'
+          # S-HC-PUB-07B-YOUTUBE-SCHEDULED-E2E — terminal handoff
+
+          ## Outcome
+          The deterministic YouTube Video/Shorts immediate and scheduled software path is integrated under Oreshnik 0.3.0-alpha.6.
+
+          ## Canonical lineage
+          - Task: `S-HC-PUB-07B-YOUTUBE-SCHEDULED-E2E`
+          - Run: `run-manuel-S-HC-PUB-07B-YOUTUBE-SCHEDULED-E2E-20260910173721-206fad0f`
+          - Assignment: `asg-6ae5ad07-bb79-49f6-b81a-ff6be9e0f149`
+          - Operator: `manuel`
+          - Harness: `chatgpt`
+          - PR: `#29`
+          - Validated source head: `a527de0c27fcc1260c79580f402e97e5a9c8fbca`
+          - Merge commit: `6b1dbe32ddb37192ad728fb427e305db9505c779`
+
+          ## Validation
+          Real validationGateResults passed for dry-run, typecheck, build, worker and tests. Evidence workflow: GitHub Actions run `34536051727`. The alpha.6 EvidenceGateService natively derived `dry_run_summary` from the real `dry-run` validation result; `evidenceVerifications` and lifecycle state were not edited manually.
+
+          ## External boundary
+          This child Task does not claim a real YouTube provider smoke. OAuth, refresh tokens, channel identity and external publication remain parent `S-HC-PUB-07-YOUTUBE-PUBLISHING` acceptance and must only be validated in an authorized environment with real credentials.
+          EOF
+
+      - name: Run alpha6 task terminalize with CAS
+        id: terminalize
+        env:
+          EXPECTED_HEAD: ${{ steps.cas.outputs.expected_head }}
+          EXPECTED_CONTROL_HEAD: ${{ steps.cas.outputs.expected_control_head }}
+        run: |
+          set -euo pipefail
+          AT="$(date -u +'%Y-%m-%dT%H:%M:%S.000Z')"
+          node node_modules/oreshnik-cli/dist/cli.js task terminalize \
+            --task "$TASK_ID" \
+            --run "$RUN_ID" \
+            --assignment "$ASSIGNMENT_ID" \
+            --operator "$OPERATOR" \
+            --expected-head "$EXPECTED_HEAD" \
+            --expected-control-head "$EXPECTED_CONTROL_HEAD" \
+            --merge-commit "$MERGE_COMMIT" \
+            --pull-request "$PR_NUMBER" \
+            --at "$AT" \
+            --handoff "$RUNNER_TEMP/PUB07B-HANDOFF.md" \
+            --evidence "validated-head:$VALIDATED_HEAD" "evidence-run:$EVIDENCE_RUN" "gate:dry-run=pass" "gate:typecheck=pass" "gate:build=pass" "gate:worker=pass" "gate:tests=pass" "youtube-real-smoke:not-claimed" \
+            --mother master \
+            --repo . \
+            --json | tee "$RUNNER_TEMP/pub07b-terminalization.json"
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const r=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/pub07b-terminalization.json','utf8'));
+          const phases=['terminalization_prepared','canonical_projection_persisted','integration_confirmed','control_projection_confirmed','resources_released','terminalization_verified'];
+          if(r.status!=='terminalization_verified') throw new Error(`terminalization=${r.status}: ${(r.contradictions||[]).join('; ')}`);
+          for(const p of phases) if(!(r.completedPhases||[]).includes(p)) throw new Error(`missing terminal phase ${p}`);
+          if(r.taskId!==process.env.TASK_ID||r.runId!==process.env.RUN_ID||r.assignmentId!==process.env.ASSIGNMENT_ID) throw new Error('terminal report participant drift');
+          fs.appendFileSync(process.env.GITHUB_OUTPUT,`terminal_master=${r.masterHead}\nterminal_control=${r.controlHead}\n`);
+          console.log(JSON.stringify(r,null,2));
+          NODE
+
+      - name: Re-read remote terminal state
+        env:
+          TERMINAL_MASTER: ${{ steps.terminalize.outputs.terminal_master }}
+          TERMINAL_CONTROL: ${{ steps.terminalize.outputs.terminal_control }}
+        run: |
+          set -euo pipefail
+          git fetch origin '+refs/heads/master:refs/remotes/origin/master' '+refs/heads/oreshnik/control:refs/remotes/origin/oreshnik/control'
+          test "$(git rev-parse origin/master)" = "$TERMINAL_MASTER"
+          test "$(git rev-parse origin/oreshnik/control)" = "$TERMINAL_CONTROL"
+          node - <<'NODE'
+          const {execFileSync}=require('node:child_process');
+          const read=(ref,p)=>JSON.parse(execFileSync('git',['show',`${ref}:${p}`],{encoding:'utf8'}));
+          const task=read('origin/master',`var/oreshnik/tasks/${process.env.TASK_ID}.json`);
+          const run=read('origin/master',`var/oreshnik/runs/${process.env.TASK_ID}/${process.env.RUN_ID}.json`);
+          const claim=read('origin/master',`var/oreshnik/claims/${process.env.TASK_ID}.json`);
+          const control=read('origin/oreshnik/control','control-plane.json');
+          const a=(control.assignments||[]).find(x=>x.assignmentId===process.env.ASSIGNMENT_ID);
+          const r=(control.runs||[]).find(x=>x.runId===process.env.RUN_ID);
+          const c=(control.claims||[]).find(x=>x.assignmentId===process.env.ASSIGNMENT_ID);
+          const zones=(control.zones||[]).filter(x=>x.assignmentId===process.env.ASSIGNMENT_ID&&x.status==='reserved');
+          if(task.status!=='integrated'||run.taskStatus!=='integrated'||run.claimStatus!=='released'||claim.status!=='released') throw new Error('durable terminal projection incomplete');
+          if(a?.status!=='released'||r?.status!=='integrated'||c?.status!=='released'||zones.length) throw new Error(`control terminal projection incomplete: ${a?.status}/${r?.status}/${c?.status}/zones=${zones.length}`);
+          console.log(JSON.stringify({task:task.status,run:run.taskStatus,claim:claim.status,assignment:a.status,controlRun:r.status,controlClaim:c.status,reservedZones:zones.length,masterHead:process.env.TERMINAL_MASTER,controlHead:process.env.TERMINAL_CONTROL},null,2));
+          NODE
+          git cat-file -e "origin/master:docs/07_handoffs/$TASK_ID-HANDOFF.md"
+
+      - name: Upload terminalization evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pub07b-terminalization
+          path: |
+            ${{ runner.temp }}/pub07b-terminalization.json
+            ${{ runner.temp }}/PUB07B-HANDOFF.md
+          if-no-files-found: ignore
