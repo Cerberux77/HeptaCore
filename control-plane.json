@@ -5,7 +5,7 @@
     "originUrl": "https://github.com/Cerberux77/HeptaCore.git",
     "canonicalMotherBranch": "master"
   },
-  "generation": 133,
+  "generation": 134,
   "controlHead": "168bd7f4e45249bc8abd2e0eac0a94ac88f703f2",
   "catalog": {
     "taskBoardPath": "var/oreshnik/task-board.json",
@@ -1408,10 +1408,10 @@
       "sprintId": "publishing",
       "title": "YouTube scheduled E2E integration: Video, Shorts, cron metadata and credentials",
       "operator": "manuel",
-      "machineId": "machine-48788fbd-d2ea-43db-8f5d-f8bd5f725a19",
+      "machineId": "machine-d5933367-342f-47ac-9da8-7ed6bb10fc99",
       "functionalBranch": "dispatch/manuel/manuel-chatgpt1/publishing/S-HC-PUB-07B-YOUTUBE-SCHEDULED-E2E/da546a5360",
       "motherBranch": "master",
-      "worktreePath": "/home/runner/work/_temp/oreshnik-wt-pub07b/32305cad03d6321a/manuel/manuel-chatgpt1/publishing/S-HC-PUB-07B-YOUTUBE-SCHEDULED-E2E/da546a5360",
+      "worktreePath": "/home/runner/work/_temp/oreshnik-wt-pub07b-recover/32305cad03d6321a/manuel/manuel-chatgpt1/publishing/S-HC-PUB-07B-YOUTUBE-SCHEDULED-E2E/e9e0f149",
       "runId": "run-manuel-S-HC-PUB-07B-YOUTUBE-SCHEDULED-E2E-20260910173721-206fad0f",
       "claimId": "claim-asg-6ae5ad07-bb79-49f6-b81a-ff6be9e0f149",
       "zones": [
@@ -1447,11 +1447,15 @@
       "sourceTaskBoardHead": "7236235515cdcbc0a154f59b98f0f9fa55a5f7b8",
       "catalogFingerprint": "41dc14cac7bf243442e13cae8007d2bfcd704650",
       "createdAt": "2026-09-10T17:37:21.480Z",
-      "updatedAt": "2026-09-10T17:37:32.065Z",
+      "updatedAt": "2026-09-10T17:47:41.273Z",
       "activatedAt": "2026-09-10T17:37:32.065Z",
-      "resumedCount": 0,
+      "resumedCount": 1,
       "takeoverCount": 0,
-      "ownershipGeneration": 1,
+      "ownershipGeneration": 2,
+      "previousAgentInstanceUid": "agent_1b0d08cb2fe44fdb96c1f071337796fd",
+      "previousSessionId": "session_f41fead26d4548cd84d66159a64bad09",
+      "takeoverReason": "Recover PUB-07B after all deterministic gates passed but structured dry-run evidence was not yet recorded.",
+      "takenOverAt": "2026-09-10T17:47:41.273Z",
       "harnessId": "chatgpt",
       "agentInstanceUid": "agent_1b0d08cb2fe44fdb96c1f071337796fd",
       "agentInstanceAlias": "manuel-chatgpt1",
@@ -1939,13 +1943,13 @@
       "taskId": "S-HC-PUB-07B-YOUTUBE-SCHEDULED-E2E",
       "sprintId": "publishing",
       "operator": "manuel",
-      "machineId": "machine-48788fbd-d2ea-43db-8f5d-f8bd5f725a19",
+      "machineId": "machine-d5933367-342f-47ac-9da8-7ed6bb10fc99",
       "runId": "run-manuel-S-HC-PUB-07B-YOUTUBE-SCHEDULED-E2E-20260910173721-206fad0f",
       "branch": "dispatch/manuel/manuel-chatgpt1/publishing/S-HC-PUB-07B-YOUTUBE-SCHEDULED-E2E/da546a5360",
-      "worktreePath": "/home/runner/work/_temp/oreshnik-wt-pub07b/32305cad03d6321a/manuel/manuel-chatgpt1/publishing/S-HC-PUB-07B-YOUTUBE-SCHEDULED-E2E/da546a5360",
+      "worktreePath": "/home/runner/work/_temp/oreshnik-wt-pub07b-recover/32305cad03d6321a/manuel/manuel-chatgpt1/publishing/S-HC-PUB-07B-YOUTUBE-SCHEDULED-E2E/e9e0f149",
       "status": "active",
       "createdAt": "2026-09-10T17:37:21.480Z",
-      "updatedAt": "2026-09-10T17:37:32.065Z",
+      "updatedAt": "2026-09-10T17:47:41.273Z",
       "zones": [
         "apps/web/lib/publishers",
         "apps/web/app/api/publishing",
@@ -1975,7 +1979,7 @@
         "apps/web/lib/__tests__",
         "contracts/S-HC-PUB-04"
       ],
-      "ownershipGeneration": 1,
+      "ownershipGeneration": 2,
       "harnessId": "chatgpt",
       "agentInstanceUid": "agent_1b0d08cb2fe44fdb96c1f071337796fd",
       "agentInstanceAlias": "manuel-chatgpt1",
@@ -2472,12 +2476,12 @@
       "taskId": "S-HC-PUB-07B-YOUTUBE-SCHEDULED-E2E",
       "sprintId": "publishing",
       "operator": "manuel",
-      "machineId": "machine-48788fbd-d2ea-43db-8f5d-f8bd5f725a19",
+      "machineId": "machine-d5933367-342f-47ac-9da8-7ed6bb10fc99",
       "branch": "dispatch/manuel/manuel-chatgpt1/publishing/S-HC-PUB-07B-YOUTUBE-SCHEDULED-E2E/da546a5360",
-      "worktreePath": "/home/runner/work/_temp/oreshnik-wt-pub07b/32305cad03d6321a/manuel/manuel-chatgpt1/publishing/S-HC-PUB-07B-YOUTUBE-SCHEDULED-E2E/da546a5360",
+      "worktreePath": "/home/runner/work/_temp/oreshnik-wt-pub07b-recover/32305cad03d6321a/manuel/manuel-chatgpt1/publishing/S-HC-PUB-07B-YOUTUBE-SCHEDULED-E2E/e9e0f149",
       "status": "active",
       "createdAt": "2026-09-10T17:37:21.480Z",
-      "updatedAt": "2026-09-10T17:37:32.065Z",
+      "updatedAt": "2026-09-10T17:47:41.273Z",
       "sourceTaskBoardHead": "7236235515cdcbc0a154f59b98f0f9fa55a5f7b8",
       "zones": [
         "apps/web/lib/publishers",
@@ -2508,7 +2512,7 @@
         "apps/web/lib/__tests__",
         "contracts/S-HC-PUB-04"
       ],
-      "ownershipGeneration": 1,
+      "ownershipGeneration": 2,
       "harnessId": "chatgpt",
       "agentInstanceUid": "agent_1b0d08cb2fe44fdb96c1f071337796fd",
       "agentInstanceAlias": "manuel-chatgpt1",
@@ -4726,6 +4730,16 @@
       "at": "2026-09-10T17:47:35.217Z",
       "action": "dispatch.init",
       "message": "Registered machine machine-d5933367-342f-47ac-9da8-7ed6bb10fc99 with root /home/runner/work/_temp/oreshnik-wt-pub07b-recover."
+    },
+    {
+      "at": "2026-09-10T17:47:41.273Z",
+      "action": "dispatch.takeover",
+      "assignmentId": "asg-6ae5ad07-bb79-49f6-b81a-ff6be9e0f149",
+      "runId": "run-manuel-S-HC-PUB-07B-YOUTUBE-SCHEDULED-E2E-20260910173721-206fad0f",
+      "operator": "manuel",
+      "agentInstanceUid": "agent_1b0d08cb2fe44fdb96c1f071337796fd",
+      "sessionId": "session_f41fead26d4548cd84d66159a64bad09",
+      "message": "Takeover by manuel/manuel-chatgpt1 from manuel/manuel-chatgpt1. Reason: Recover PUB-07B after all deterministic gates passed but structured dry-run evidence was not yet recorded.. Generation: 1 → 2."
     }
   ],
   "reconciliation": {
@@ -4735,5 +4749,5 @@
     "pendingDiagnostics": []
   },
   "createdAt": "2026-06-29T20:17:43.302Z",
-  "updatedAt": "2026-09-10T17:47:35.217Z"
+  "updatedAt": "2026-09-10T17:47:41.273Z"
 }
