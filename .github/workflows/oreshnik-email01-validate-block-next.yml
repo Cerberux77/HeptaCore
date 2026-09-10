@@ -66,7 +66,7 @@ jobs:
           node node_modules/oreshnik-cli/dist/cli.js dispatch init --mother master --worktree-root "$ROOT" --repo . --json > "$RUNNER_TEMP/init.json"
           node node_modules/oreshnik-cli/dist/cli.js dispatch takeover \
             --run "$RUN_ID" \
-            --reason "Retry EMAIL-01 external block through stable controller repository context after all software gates passed" \
+            --reason "Retry EMAIL-01 external block after all software gates passed" \
             --operator "$OPERATOR" --harness "$HARNESS" --instance "$INSTANCE" --session "$SESSION" \
             --takeover --repo . --json | tee "$RUNNER_TEMP/takeover.json"
           WT="$(node -e 'const x=require(process.env.RUNNER_TEMP+"/takeover.json");process.stdout.write(x.worktreePath||"")')"
@@ -81,7 +81,6 @@ jobs:
           git -C "$WT" merge-base --is-ancestor "$VALIDATED_HEAD" HEAD
           echo "WT=$WT" >> "$GITHUB_ENV"
           echo "ORESHNIK_MACHINE_ID_OVERRIDE=$MACHINE" >> "$GITHUB_ENV"
-          echo "worktree=$WT" >> "$GITHUB_OUTPUT"
 
       - name: Verify preserved green evidence and execution identity
         run: |
@@ -96,7 +95,7 @@ jobs:
           const s=sessions.find(x=>x.sessionId===process.env.SESSION);
           if(!i||i.machineId!==process.env.ORESHNIK_MACHINE_ID_OVERRIDE||i.operatorId!==process.env.OPERATOR||i.harnessId!==process.env.HARNESS||i.repositoryId!==process.env.EXPECTED_REPOSITORY_ID) throw new Error('hydrated instance identity mismatch');
           if(!s||s.agentInstanceUid!==i.agentInstanceUid||s.status!=='active') throw new Error('hydrated session identity mismatch');
-          console.log('EMAIL01_EXECUTION_IDENTITY_PASS '+JSON.stringify({repositoryId:i.repositoryId,machineId:i.machineId,agent:i.agentInstanceUid}));
+          console.log('EMAIL01_EXECUTION_IDENTITY_PASS');
           NODE
           cd "$WT"
           HJSON="$(find var/oreshnik/handoffs/$TASK_ID -type f -name '*.json' | sort | tail -1)"
@@ -112,7 +111,45 @@ jobs:
           console.log('EMAIL01_GREEN_EVIDENCE_PASS');
           NODE
 
-      - name: Apply native external block through controller context
+      - name: Bridge alpha6 legacy compatible repository identity locally
+        run: |
+          set -euo pipefail
+          cd "$GITHUB_WORKSPACE"
+          node --input-type=module - <<'NODE'
+          import fs from 'node:fs';
+          import path from 'node:path';
+          import { createDispatchControlPlaneService } from 'oreshnik-cli';
+          const service=createDispatchControlPlaneService(process.cwd());
+          const identity=service.repositoryIdentity();
+          if(!identity.ok) throw new Error(identity.error.message);
+          const remote=service.loadRemoteState();
+          if(!remote.ok||!remote.value?.state) throw new Error(remote.ok?'missing control state':remote.error.message);
+          const legacyId=remote.value.state.repository.id;
+          const canonicalId=identity.value.repositoryId;
+          if(legacyId!==canonicalId && !identity.value.compatibleRepositoryIds.includes(legacyId)) {
+            throw new Error(`repository identity is not compatibility-safe: legacy=${legacyId} canonical=${canonicalId}`);
+          }
+          const file=path.join(process.env.ORESHNIK_LOCAL_STATE_DIR,'agent-instances.json');
+          const instances=JSON.parse(fs.readFileSync(file,'utf8'));
+          const idx=instances.findIndex(x=>x.agentInstanceUid===process.env.EXPECTED_AGENT_UID);
+          if(idx<0) throw new Error('governed instance missing from local ephemeral registry');
+          const current=instances[idx];
+          if(current.repositoryId!==legacyId) throw new Error(`unexpected local repository id ${current.repositoryId}`);
+          instances[idx]={...current,repositoryId:canonicalId,updatedAt:new Date().toISOString()};
+          const tmp=file+'.tmp';
+          fs.writeFileSync(tmp,JSON.stringify(instances,null,2)+'\n');
+          fs.renameSync(tmp,file);
+          console.log('ALPHA6_COMPAT_REPOSITORY_BRIDGE_PASS '+JSON.stringify({legacyId,canonicalId,compatible:legacyId===canonicalId||identity.value.compatibleRepositoryIds.includes(legacyId)}));
+          NODE
+          node --input-type=module - <<'NODE'
+          import { createExecutionContextResolver } from 'oreshnik-cli';
+          const result=createExecutionContextResolver(process.cwd()).resolve({explicitOperator:process.env.OPERATOR,explicitHarness:process.env.HARNESS,explicitInstance:process.env.INSTANCE,explicitSession:process.env.SESSION,allowCreateInstance:false,requireSession:true,persistSelection:false,refreshSession:false});
+          if(!result.ok) throw new Error(result.error.message);
+          if(result.value.agentInstanceUid!==process.env.EXPECTED_AGENT_UID) throw new Error('resolved wrong governed instance');
+          console.log('ALPHA6_CONTEXT_RESOLVE_PASS '+JSON.stringify({repositoryId:result.value.repositoryId,machineId:result.value.machineId,agent:result.value.agentInstanceUid}));
+          NODE
+
+      - name: Apply native external block
         run: |
           set -euo pipefail
           cd "$GITHUB_WORKSPACE"
@@ -132,7 +169,6 @@ jobs:
           git config user.name "Manuel Vera via ChatGPT Operator"
           git config user.email "manuel@heptacore.dev"
           mapfile -t dirty < <(git status --porcelain=v1 | sed 's/^...//')
-          printf 'post-block dirty: %s\n' "${dirty[@]:-}"
           for p in "${dirty[@]}"; do
             case "$p" in
               var/oreshnik/*|docs/oreshnik/*|docs/obsidian-vault/*|docs/07_handoffs/*) ;;
