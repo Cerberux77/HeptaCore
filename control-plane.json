@@ -5,15 +5,15 @@
     "originUrl": "https://github.com/Cerberux77/HeptaCore.git",
     "canonicalMotherBranch": "master"
   },
-  "generation": 138,
-  "controlHead": "afda9d2ebb70596af3d9831023f2b1b9e6a9a211",
+  "generation": 139,
+  "controlHead": "0511c42156fcc8ed488943c0531c0ee24c354c27",
   "catalog": {
     "taskBoardPath": "var/oreshnik/task-board.json",
     "zoneMapPath": "docs/07_handoffs/zone-map.json",
     "sourceTaskBoardHead": "7236235515cdcbc0a154f59b98f0f9fa55a5f7b8",
     "fingerprint": "41dc14cac7bf243442e13cae8007d2bfcd704650",
     "taskCount": 44,
-    "updatedAt": "2026-09-10T22:04:59.277Z"
+    "updatedAt": "2026-09-10T22:09:19.280Z"
   },
   "policy": {
     "name": "deterministic-v1",
@@ -372,6 +372,13 @@
       "hostname": "runnervmlun5p",
       "registeredAt": "2026-09-10T22:04:57.672Z",
       "updatedAt": "2026-09-10T22:04:57.672Z"
+    },
+    {
+      "machineId": "machine-14a14015-e299-404f-8bee-237cb8bba6c3",
+      "worktreeRoot": "/home/runner/work/_temp/oreshnik-wt-pub07b-recover-v2",
+      "hostname": "runnervmlun5p",
+      "registeredAt": "2026-09-10T22:09:18.181Z",
+      "updatedAt": "2026-09-10T22:09:18.181Z"
     }
   ],
   "agentInstances": [
@@ -548,11 +555,11 @@
       "displayAlias": "manuel-chatgpt1",
       "operatorId": "manuel",
       "harnessId": "chatgpt",
-      "machineId": "machine-b8660c31-d935-47bd-a633-c60594603d8f",
+      "machineId": "machine-26dfce54-2286-4a6d-93c2-2fbe75731346",
       "repositoryId": "32305cad03d6321a",
       "slot": 1,
       "createdAt": "2026-09-10T17:37:21.480Z",
-      "updatedAt": "2026-09-10T17:50:14.770Z",
+      "updatedAt": "2026-09-10T22:05:06.737Z",
       "identityOrigin": "explicit"
     }
   ],
@@ -729,9 +736,9 @@
       "agentInstanceUid": "agent_1b0d08cb2fe44fdb96c1f071337796fd",
       "operatorId": "manuel",
       "harnessId": "chatgpt",
-      "machineId": "machine-b8660c31-d935-47bd-a633-c60594603d8f",
+      "machineId": "machine-26dfce54-2286-4a6d-93c2-2fbe75731346",
       "startedAt": "2026-09-10T17:37:21.480Z",
-      "lastSeenAt": "2026-09-10T17:50:14.770Z",
+      "lastSeenAt": "2026-09-10T22:05:06.737Z",
       "status": "active",
       "identityOrigin": "explicit"
     }
@@ -4784,6 +4791,11 @@
       "agentInstanceUid": "agent_1b0d08cb2fe44fdb96c1f071337796fd",
       "sessionId": "session_f41fead26d4548cd84d66159a64bad09",
       "message": "Takeover by manuel/manuel-chatgpt1 from manuel/manuel-chatgpt1. Reason: Recover verified PUB-07B delivery after CI optional esbuild binary interrupted evidence persistence.. Generation: 3 → 4."
+    },
+    {
+      "at": "2026-09-10T22:09:19.280Z",
+      "action": "dispatch.init",
+      "message": "Registered machine machine-14a14015-e299-404f-8bee-237cb8bba6c3 with root /home/runner/work/_temp/oreshnik-wt-pub07b-recover-v2."
     }
   ],
   "reconciliation": {
@@ -4793,5 +4805,5 @@
     "pendingDiagnostics": []
   },
   "createdAt": "2026-06-29T20:17:43.302Z",
-  "updatedAt": "2026-09-10T22:05:06.737Z"
+  "updatedAt": "2026-09-10T22:09:19.280Z"
 }
