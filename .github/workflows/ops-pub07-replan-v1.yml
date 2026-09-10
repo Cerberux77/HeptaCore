@@ -25,30 +25,23 @@ jobs:
         with:
           node-version: 24
           cache: npm
-      - name: Replan and validate PUB-07
-        run: bash .github/ops/pub07-replan-run.sh
+      - name: Recover structured evidence and validate PUB-07B
+        run: bash .github/ops/pub07b-evidence-recover.sh
       - name: Upload evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: pub07-replan-v1
+          name: pub07b-evidence-recovery
           path: |
-            ${{ runner.temp }}/dispatch-init.json
-            ${{ runner.temp }}/old-takeover.json
-            ${{ runner.temp }}/old-release.json
-            ${{ runner.temp }}/amendment.json
-            ${{ runner.temp }}/post-amend-reconcile.json
-            ${{ runner.temp }}/new-dispatch.json
-            ${{ runner.temp }}/new-run-id.txt
-            ${{ runner.temp }}/new-branch.txt
-            ${{ runner.temp }}/pub07-replan-status.txt
-            ${{ runner.temp }}/pub07-replan-focused.txt
-            ${{ runner.temp }}/pub07-replan-typecheck.txt
-            ${{ runner.temp }}/pub07-replan-build.txt
-            ${{ runner.temp }}/pub07-replan-worker.txt
-            ${{ runner.temp }}/pub07-replan-full-tests.txt
-            ${{ runner.temp }}/pub07-replan-files.txt
-            ${{ runner.temp }}/pub07-replan-product-head.txt
-            ${{ runner.temp }}/pub07-replan-local-reconcile.json
-            ${{ runner.temp }}/pub07-replan-final-head.txt
+            ${{ runner.temp }}/pub07b-recover-init.json
+            ${{ runner.temp }}/pub07b-recover-takeover.json
+            ${{ runner.temp }}/pub07b-dry-run.stdout
+            ${{ runner.temp }}/pub07b-dry-run.stderr
+            ${{ runner.temp }}/pub07b-structured-evidence.json
+            ${{ runner.temp }}/pub07b-recover-handoff.json
+            ${{ runner.temp }}/pub07b-recover-handoff-validation.json
+            ${{ runner.temp }}/pub07b-recover-validation-start.txt
+            ${{ runner.temp }}/pub07b-recover-ready.txt
+            ${{ runner.temp }}/pub07b-recover-reconcile.json
+            ${{ runner.temp }}/pub07b-recover-final-head.txt
           if-no-files-found: ignore
