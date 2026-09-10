@@ -5,7 +5,7 @@
     "originUrl": "https://github.com/Cerberux77/HeptaCore.git",
     "canonicalMotherBranch": "master"
   },
-  "generation": 105,
+  "generation": 106,
   "controlHead": "0b8af70f98e5b31267cf976345fa68b864739e07",
   "catalog": {
     "taskBoardPath": "var/oreshnik/task-board.json",
@@ -1178,10 +1178,10 @@
       "sprintId": "email-infra",
       "title": "Transactional email foundation: domain sender, DNS, reputation, provider integration",
       "operator": "manuel",
-      "machineId": "machine-e6dbba5f-6998-496c-a01f-27480ecacdc5",
+      "machineId": "machine-0b97b14f-552d-4071-a76d-f7cb429a3c60",
       "functionalBranch": "dispatch/manuel/manuel-chatgpt1/email-infra/S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION/ceaa8b659d",
       "motherBranch": "master",
-      "worktreePath": "/home/runner/work/_temp/oreshnik-wt-next/32305cad03d6321a/manuel/manuel-chatgpt1/email-infra/S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION/ceaa8b659d",
+      "worktreePath": "/home/runner/work/_temp/oreshnik-wt-email01/32305cad03d6321a/manuel/manuel-chatgpt1/email-infra/S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION/3f2228d9",
       "runId": "run-manuel-S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION-20260910144612-ccbed006",
       "claimId": "claim-asg-913a8dde-5aef-4f8b-8731-1af33f2228d9",
       "zones": [
@@ -1205,11 +1205,15 @@
       "sourceTaskBoardHead": "a7383709108c26611d16158ba2a8a2a4c4cabf35",
       "catalogFingerprint": "fdf736eb32542e2efbd48b369858d40f03455010",
       "createdAt": "2026-09-10T14:46:12.866Z",
-      "updatedAt": "2026-09-10T14:46:28.833Z",
+      "updatedAt": "2026-09-10T14:57:51.648Z",
       "activatedAt": "2026-09-10T14:46:28.833Z",
-      "resumedCount": 0,
+      "resumedCount": 1,
       "takeoverCount": 0,
-      "ownershipGeneration": 1,
+      "ownershipGeneration": 2,
+      "previousAgentInstanceUid": "agent_e8dd52d1d5de4f40a9a4d9923ffda155",
+      "previousSessionId": "session_5bb21c8aa01e49bcb03886ae23d26864",
+      "takeoverReason": "Validate recovered EMAIL-01 software foundation and preserve external domain/DNS block on the same governed Run",
+      "takenOverAt": "2026-09-10T14:57:51.648Z",
       "harnessId": "chatgpt",
       "agentInstanceUid": "agent_e8dd52d1d5de4f40a9a4d9923ffda155",
       "agentInstanceAlias": "manuel-chatgpt1",
@@ -1623,13 +1627,13 @@
       "taskId": "S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION",
       "sprintId": "email-infra",
       "operator": "manuel",
-      "machineId": "machine-e6dbba5f-6998-496c-a01f-27480ecacdc5",
+      "machineId": "machine-0b97b14f-552d-4071-a76d-f7cb429a3c60",
       "runId": "run-manuel-S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION-20260910144612-ccbed006",
       "branch": "dispatch/manuel/manuel-chatgpt1/email-infra/S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION/ceaa8b659d",
-      "worktreePath": "/home/runner/work/_temp/oreshnik-wt-next/32305cad03d6321a/manuel/manuel-chatgpt1/email-infra/S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION/ceaa8b659d",
+      "worktreePath": "/home/runner/work/_temp/oreshnik-wt-email01/32305cad03d6321a/manuel/manuel-chatgpt1/email-infra/S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION/3f2228d9",
       "status": "active",
       "createdAt": "2026-09-10T14:46:12.866Z",
-      "updatedAt": "2026-09-10T14:46:28.833Z",
+      "updatedAt": "2026-09-10T14:57:51.648Z",
       "zones": [
         "apps/web/app/api/email",
         "packages/core",
@@ -1647,7 +1651,7 @@
         "packages/core",
         "docs"
       ],
-      "ownershipGeneration": 1,
+      "ownershipGeneration": 2,
       "harnessId": "chatgpt",
       "agentInstanceUid": "agent_e8dd52d1d5de4f40a9a4d9923ffda155",
       "agentInstanceAlias": "manuel-chatgpt1",
@@ -2068,12 +2072,12 @@
       "taskId": "S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION",
       "sprintId": "email-infra",
       "operator": "manuel",
-      "machineId": "machine-e6dbba5f-6998-496c-a01f-27480ecacdc5",
+      "machineId": "machine-0b97b14f-552d-4071-a76d-f7cb429a3c60",
       "branch": "dispatch/manuel/manuel-chatgpt1/email-infra/S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION/ceaa8b659d",
-      "worktreePath": "/home/runner/work/_temp/oreshnik-wt-next/32305cad03d6321a/manuel/manuel-chatgpt1/email-infra/S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION/ceaa8b659d",
+      "worktreePath": "/home/runner/work/_temp/oreshnik-wt-email01/32305cad03d6321a/manuel/manuel-chatgpt1/email-infra/S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION/3f2228d9",
       "status": "active",
       "createdAt": "2026-09-10T14:46:12.866Z",
-      "updatedAt": "2026-09-10T14:46:28.833Z",
+      "updatedAt": "2026-09-10T14:57:51.648Z",
       "sourceTaskBoardHead": "a7383709108c26611d16158ba2a8a2a4c4cabf35",
       "zones": [
         "apps/web/app/api/email",
@@ -2092,7 +2096,7 @@
         "packages/core",
         "docs"
       ],
-      "ownershipGeneration": 1,
+      "ownershipGeneration": 2,
       "harnessId": "chatgpt",
       "agentInstanceUid": "agent_e8dd52d1d5de4f40a9a4d9923ffda155",
       "agentInstanceAlias": "manuel-chatgpt1",
@@ -3922,6 +3926,16 @@
       "at": "2026-09-10T14:57:43.377Z",
       "action": "dispatch.init",
       "message": "Registered machine machine-0b97b14f-552d-4071-a76d-f7cb429a3c60 with root /home/runner/work/_temp/oreshnik-wt-email01."
+    },
+    {
+      "at": "2026-09-10T14:57:51.648Z",
+      "action": "dispatch.takeover",
+      "assignmentId": "asg-913a8dde-5aef-4f8b-8731-1af33f2228d9",
+      "runId": "run-manuel-S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION-20260910144612-ccbed006",
+      "operator": "manuel",
+      "agentInstanceUid": "agent_e8dd52d1d5de4f40a9a4d9923ffda155",
+      "sessionId": "session_5bb21c8aa01e49bcb03886ae23d26864",
+      "message": "Takeover by manuel/manuel-chatgpt1 from manuel/manuel-chatgpt1. Reason: Validate recovered EMAIL-01 software foundation and preserve external domain/DNS block on the same governed Run. Generation: 1 → 2."
     }
   ],
   "reconciliation": {
@@ -3931,5 +3945,5 @@
     "pendingDiagnostics": []
   },
   "createdAt": "2026-06-29T20:17:43.302Z",
-  "updatedAt": "2026-09-10T14:57:43.377Z"
+  "updatedAt": "2026-09-10T14:57:51.648Z"
 }
