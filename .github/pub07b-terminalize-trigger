@@ -1,0 +1,9 @@
+task=S-HC-PUB-07B-YOUTUBE-SCHEDULED-E2E
+run=run-manuel-S-HC-PUB-07B-YOUTUBE-SCHEDULED-E2E-20260910173721-206fad0f
+assignment=asg-6ae5ad07-bb79-49f6-b81a-ff6be9e0f149
+merge_commit=6b1dbe32ddb37192ad728fb427e305db9505c779
+pr=29
+operator=manuel
+harness=chatgpt
+action=terminalize
+issued=2026-09-10T23:38:00Z
