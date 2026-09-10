@@ -5,7 +5,7 @@
     "originUrl": "https://github.com/Cerberux77/HeptaCore.git",
     "canonicalMotherBranch": "master"
   },
-  "generation": 123,
+  "generation": 124,
   "controlHead": "2ba31c56700d6f4f455d16b308cbdc068a7a5ca2",
   "catalog": {
     "taskBoardPath": "var/oreshnik/task-board.json",
@@ -1307,10 +1307,10 @@
       "sprintId": "publishing",
       "title": "Real publishing for YouTube: Video 16:9 and YouTube Shorts",
       "operator": "manuel",
-      "machineId": "machine-48901232-a024-45fa-b86e-01bb54b11423",
+      "machineId": "machine-98f879ed-7830-4b46-af95-8d8c491b1276",
       "functionalBranch": "dispatch/manuel/manuel-chatgpt1/publishing/S-HC-PUB-07-YOUTUBE-PUBLISHING/71b46093fd",
       "motherBranch": "master",
-      "worktreePath": "/home/runner/work/_temp/oreshnik-wt/32305cad03d6321a/manuel/manuel-chatgpt1/publishing/S-HC-PUB-07-YOUTUBE-PUBLISHING/7912e8fa",
+      "worktreePath": "/home/runner/work/_temp/oreshnik-wt-initial/32305cad03d6321a/manuel/manuel-chatgpt1/publishing/S-HC-PUB-07-YOUTUBE-PUBLISHING/7912e8fa",
       "runId": "run-manuel-S-HC-PUB-07-YOUTUBE-PUBLISHING-20260910162001-40482454",
       "claimId": "claim-asg-797270cc-485b-40c5-b0d6-43977912e8fa",
       "zones": [
@@ -1334,15 +1334,15 @@
       "sourceTaskBoardHead": "f53a8177602ef441e9427ab22c14f7e579dc232e",
       "catalogFingerprint": "bea95716241d9f6cd5d476ed5a13e204250b63d3",
       "createdAt": "2026-09-10T16:20:01.353Z",
-      "updatedAt": "2026-09-10T16:39:47.529Z",
+      "updatedAt": "2026-09-10T16:53:46.220Z",
       "activatedAt": "2026-09-10T16:20:10.286Z",
-      "resumedCount": 3,
+      "resumedCount": 4,
       "takeoverCount": 0,
-      "ownershipGeneration": 4,
+      "ownershipGeneration": 5,
       "previousAgentInstanceUid": "agent_5930d607f3e043f2a8fee58342a57e07",
       "previousSessionId": "session_dcdf09f15279492f91b148a3e9c751e6",
-      "takeoverReason": "Retry PUB-07 product implementation after correcting the local test runtime; preserve the same governed Run.",
-      "takenOverAt": "2026-09-10T16:39:47.529Z",
+      "takeoverReason": "Continue PUB-07 after validated immediate publishing; canonical zones must be amended for scheduled execution.",
+      "takenOverAt": "2026-09-10T16:53:46.220Z",
       "harnessId": "chatgpt",
       "agentInstanceUid": "agent_5930d607f3e043f2a8fee58342a57e07",
       "agentInstanceAlias": "manuel-chatgpt1",
@@ -1793,13 +1793,13 @@
       "taskId": "S-HC-PUB-07-YOUTUBE-PUBLISHING",
       "sprintId": "publishing",
       "operator": "manuel",
-      "machineId": "machine-48901232-a024-45fa-b86e-01bb54b11423",
+      "machineId": "machine-98f879ed-7830-4b46-af95-8d8c491b1276",
       "runId": "run-manuel-S-HC-PUB-07-YOUTUBE-PUBLISHING-20260910162001-40482454",
       "branch": "dispatch/manuel/manuel-chatgpt1/publishing/S-HC-PUB-07-YOUTUBE-PUBLISHING/71b46093fd",
-      "worktreePath": "/home/runner/work/_temp/oreshnik-wt/32305cad03d6321a/manuel/manuel-chatgpt1/publishing/S-HC-PUB-07-YOUTUBE-PUBLISHING/7912e8fa",
+      "worktreePath": "/home/runner/work/_temp/oreshnik-wt-initial/32305cad03d6321a/manuel/manuel-chatgpt1/publishing/S-HC-PUB-07-YOUTUBE-PUBLISHING/7912e8fa",
       "status": "active",
       "createdAt": "2026-09-10T16:20:01.353Z",
-      "updatedAt": "2026-09-10T16:39:47.529Z",
+      "updatedAt": "2026-09-10T16:53:46.220Z",
       "zones": [
         "apps/web/lib/publishers",
         "apps/web/app/api/publishing",
@@ -1817,7 +1817,7 @@
         "apps/web/app/api/publishing",
         "packages/integrations"
       ],
-      "ownershipGeneration": 4,
+      "ownershipGeneration": 5,
       "harnessId": "chatgpt",
       "agentInstanceUid": "agent_5930d607f3e043f2a8fee58342a57e07",
       "agentInstanceAlias": "manuel-chatgpt1",
@@ -2276,12 +2276,12 @@
       "taskId": "S-HC-PUB-07-YOUTUBE-PUBLISHING",
       "sprintId": "publishing",
       "operator": "manuel",
-      "machineId": "machine-48901232-a024-45fa-b86e-01bb54b11423",
+      "machineId": "machine-98f879ed-7830-4b46-af95-8d8c491b1276",
       "branch": "dispatch/manuel/manuel-chatgpt1/publishing/S-HC-PUB-07-YOUTUBE-PUBLISHING/71b46093fd",
-      "worktreePath": "/home/runner/work/_temp/oreshnik-wt/32305cad03d6321a/manuel/manuel-chatgpt1/publishing/S-HC-PUB-07-YOUTUBE-PUBLISHING/7912e8fa",
+      "worktreePath": "/home/runner/work/_temp/oreshnik-wt-initial/32305cad03d6321a/manuel/manuel-chatgpt1/publishing/S-HC-PUB-07-YOUTUBE-PUBLISHING/7912e8fa",
       "status": "active",
       "createdAt": "2026-09-10T16:20:01.353Z",
-      "updatedAt": "2026-09-10T16:39:47.529Z",
+      "updatedAt": "2026-09-10T16:53:46.220Z",
       "sourceTaskBoardHead": "f53a8177602ef441e9427ab22c14f7e579dc232e",
       "zones": [
         "apps/web/lib/publishers",
@@ -2300,7 +2300,7 @@
         "apps/web/app/api/publishing",
         "packages/integrations"
       ],
-      "ownershipGeneration": 4,
+      "ownershipGeneration": 5,
       "harnessId": "chatgpt",
       "agentInstanceUid": "agent_5930d607f3e043f2a8fee58342a57e07",
       "agentInstanceAlias": "manuel-chatgpt1",
@@ -4318,6 +4318,16 @@
       "at": "2026-09-10T16:53:39.369Z",
       "action": "dispatch.init",
       "message": "Registered machine machine-98f879ed-7830-4b46-af95-8d8c491b1276 with root /home/runner/work/_temp/oreshnik-wt-initial."
+    },
+    {
+      "at": "2026-09-10T16:53:46.220Z",
+      "action": "dispatch.takeover",
+      "assignmentId": "asg-797270cc-485b-40c5-b0d6-43977912e8fa",
+      "runId": "run-manuel-S-HC-PUB-07-YOUTUBE-PUBLISHING-20260910162001-40482454",
+      "operator": "manuel",
+      "agentInstanceUid": "agent_5930d607f3e043f2a8fee58342a57e07",
+      "sessionId": "session_dcdf09f15279492f91b148a3e9c751e6",
+      "message": "Takeover by manuel/manuel-chatgpt1 from manuel/manuel-chatgpt1. Reason: Continue PUB-07 after validated immediate publishing; canonical zones must be amended for scheduled execution.. Generation: 4 → 5."
     }
   ],
   "reconciliation": {
@@ -4327,5 +4337,5 @@
     "pendingDiagnostics": []
   },
   "createdAt": "2026-06-29T20:17:43.302Z",
-  "updatedAt": "2026-09-10T16:53:39.369Z"
+  "updatedAt": "2026-09-10T16:53:46.220Z"
 }
