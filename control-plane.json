@@ -5,15 +5,15 @@
     "originUrl": "https://github.com/Cerberux77/HeptaCore.git",
     "canonicalMotherBranch": "master"
   },
-  "generation": 144,
-  "controlHead": "78b29f083ac5cf84e5254262becd1e57ab43edf9",
+  "generation": 145,
+  "controlHead": "adfe9c7e817c07d6b5833d6e1d3500ec65c6d9a2",
   "catalog": {
     "taskBoardPath": "var/oreshnik/task-board.json",
     "zoneMapPath": "docs/07_handoffs/zone-map.json",
-    "sourceTaskBoardHead": "6b5d53aa1393c753368c58ab72277a72618e8c10",
-    "fingerprint": "dd7222f247cc7c42889f344af967ca60fab06d97",
-    "taskCount": 44,
-    "updatedAt": "2026-09-10T23:48:19.967Z"
+    "sourceTaskBoardHead": "741f3e3f66c4fa1fe14d6db9042df4fd1861bf97",
+    "fingerprint": "d824cfee4ddf2d55c3ccca9d368c40bfc8323238",
+    "taskCount": 45,
+    "updatedAt": "2026-09-10T23:48:39.047Z"
   },
   "policy": {
     "name": "deterministic-v1",
@@ -1497,6 +1497,49 @@
       "agentInstanceAlias": "manuel-chatgpt1",
       "sessionId": "session_f41fead26d4548cd84d66159a64bad09",
       "identityOrigin": "explicit"
+    },
+    {
+      "assignmentId": "asg-63241aa6-6f8f-498f-aba5-554099086a52",
+      "taskId": "S-HC-PUB-07-YOUTUBE-PUBLISHING",
+      "sprintId": "publishing",
+      "title": "Real publishing for YouTube: Video 16:9 and YouTube Shorts",
+      "operator": "manuel",
+      "machineId": "machine-6b34a148-a1c0-4886-ad96-be5e474af54a",
+      "functionalBranch": "dispatch/manuel/manuel-chatgpt1/publishing/S-HC-PUB-07-YOUTUBE-PUBLISHING/5dc36253e7",
+      "motherBranch": "master",
+      "worktreePath": "/home/runner/work/_temp/oreshnik-wt-pub07-external/32305cad03d6321a/manuel/manuel-chatgpt1/publishing/S-HC-PUB-07-YOUTUBE-PUBLISHING/5dc36253e7",
+      "runId": "run-manuel-S-HC-PUB-07-YOUTUBE-PUBLISHING-20260910234839-191d864a",
+      "claimId": "claim-asg-63241aa6-6f8f-498f-aba5-554099086a52",
+      "zones": [
+        "apps/web/lib/publishers",
+        "apps/web/app/api/publishing",
+        "packages/integrations"
+      ],
+      "readZones": [],
+      "writeZones": [
+        "apps/web/lib/publishers",
+        "apps/web/app/api/publishing",
+        "packages/integrations"
+      ],
+      "resources": [],
+      "locks": [
+        "apps/web/lib/publishers",
+        "apps/web/app/api/publishing",
+        "packages/integrations"
+      ],
+      "status": "provisioning",
+      "sourceTaskBoardHead": "741f3e3f66c4fa1fe14d6db9042df4fd1861bf97",
+      "catalogFingerprint": "d824cfee4ddf2d55c3ccca9d368c40bfc8323238",
+      "createdAt": "2026-09-10T23:48:39.047Z",
+      "updatedAt": "2026-09-10T23:48:39.047Z",
+      "resumedCount": 0,
+      "takeoverCount": 0,
+      "ownershipGeneration": 1,
+      "harnessId": "chatgpt",
+      "agentInstanceUid": "agent_590d14e71ce04d2aa89dc33d1d81d75d",
+      "agentInstanceAlias": "manuel-chatgpt1",
+      "sessionId": "pub07-parent-external-20260910234835",
+      "identityOrigin": "explicit"
     }
   ],
   "claims": [
@@ -2020,6 +2063,43 @@
       "agentInstanceUid": "agent_1b0d08cb2fe44fdb96c1f071337796fd",
       "agentInstanceAlias": "manuel-chatgpt1",
       "sessionId": "session_f41fead26d4548cd84d66159a64bad09",
+      "identityOrigin": "explicit"
+    },
+    {
+      "claimId": "claim-asg-63241aa6-6f8f-498f-aba5-554099086a52",
+      "assignmentId": "asg-63241aa6-6f8f-498f-aba5-554099086a52",
+      "taskId": "S-HC-PUB-07-YOUTUBE-PUBLISHING",
+      "sprintId": "publishing",
+      "operator": "manuel",
+      "machineId": "machine-6b34a148-a1c0-4886-ad96-be5e474af54a",
+      "runId": "run-manuel-S-HC-PUB-07-YOUTUBE-PUBLISHING-20260910234839-191d864a",
+      "branch": "dispatch/manuel/manuel-chatgpt1/publishing/S-HC-PUB-07-YOUTUBE-PUBLISHING/5dc36253e7",
+      "worktreePath": "/home/runner/work/_temp/oreshnik-wt-pub07-external/32305cad03d6321a/manuel/manuel-chatgpt1/publishing/S-HC-PUB-07-YOUTUBE-PUBLISHING/5dc36253e7",
+      "status": "active",
+      "createdAt": "2026-09-10T23:48:39.047Z",
+      "updatedAt": "2026-09-10T23:48:39.047Z",
+      "zones": [
+        "apps/web/lib/publishers",
+        "apps/web/app/api/publishing",
+        "packages/integrations"
+      ],
+      "readZones": [],
+      "writeZones": [
+        "apps/web/lib/publishers",
+        "apps/web/app/api/publishing",
+        "packages/integrations"
+      ],
+      "resources": [],
+      "locks": [
+        "apps/web/lib/publishers",
+        "apps/web/app/api/publishing",
+        "packages/integrations"
+      ],
+      "ownershipGeneration": 1,
+      "harnessId": "chatgpt",
+      "agentInstanceUid": "agent_590d14e71ce04d2aa89dc33d1d81d75d",
+      "agentInstanceAlias": "manuel-chatgpt1",
+      "sessionId": "pub07-parent-external-20260910234835",
       "identityOrigin": "explicit"
     }
   ],
@@ -2553,6 +2633,43 @@
       "agentInstanceUid": "agent_1b0d08cb2fe44fdb96c1f071337796fd",
       "agentInstanceAlias": "manuel-chatgpt1",
       "sessionId": "session_f41fead26d4548cd84d66159a64bad09",
+      "identityOrigin": "explicit"
+    },
+    {
+      "runId": "run-manuel-S-HC-PUB-07-YOUTUBE-PUBLISHING-20260910234839-191d864a",
+      "assignmentId": "asg-63241aa6-6f8f-498f-aba5-554099086a52",
+      "taskId": "S-HC-PUB-07-YOUTUBE-PUBLISHING",
+      "sprintId": "publishing",
+      "operator": "manuel",
+      "machineId": "machine-6b34a148-a1c0-4886-ad96-be5e474af54a",
+      "branch": "dispatch/manuel/manuel-chatgpt1/publishing/S-HC-PUB-07-YOUTUBE-PUBLISHING/5dc36253e7",
+      "worktreePath": "/home/runner/work/_temp/oreshnik-wt-pub07-external/32305cad03d6321a/manuel/manuel-chatgpt1/publishing/S-HC-PUB-07-YOUTUBE-PUBLISHING/5dc36253e7",
+      "status": "provisioning",
+      "createdAt": "2026-09-10T23:48:39.047Z",
+      "updatedAt": "2026-09-10T23:48:39.047Z",
+      "sourceTaskBoardHead": "741f3e3f66c4fa1fe14d6db9042df4fd1861bf97",
+      "zones": [
+        "apps/web/lib/publishers",
+        "apps/web/app/api/publishing",
+        "packages/integrations"
+      ],
+      "readZones": [],
+      "writeZones": [
+        "apps/web/lib/publishers",
+        "apps/web/app/api/publishing",
+        "packages/integrations"
+      ],
+      "resources": [],
+      "locks": [
+        "apps/web/lib/publishers",
+        "apps/web/app/api/publishing",
+        "packages/integrations"
+      ],
+      "ownershipGeneration": 1,
+      "harnessId": "chatgpt",
+      "agentInstanceUid": "agent_590d14e71ce04d2aa89dc33d1d81d75d",
+      "agentInstanceAlias": "manuel-chatgpt1",
+      "sessionId": "pub07-parent-external-20260910234835",
       "identityOrigin": "explicit"
     }
   ],
@@ -3780,6 +3897,60 @@
       "agentInstanceAlias": "manuel-chatgpt1",
       "sessionId": "session_f41fead26d4548cd84d66159a64bad09",
       "identityOrigin": "explicit"
+    },
+    {
+      "zone": "apps/web/lib/publishers",
+      "assignmentId": "asg-63241aa6-6f8f-498f-aba5-554099086a52",
+      "taskId": "S-HC-PUB-07-YOUTUBE-PUBLISHING",
+      "sprintId": "publishing",
+      "operator": "manuel",
+      "machineId": "machine-6b34a148-a1c0-4886-ad96-be5e474af54a",
+      "runId": "run-manuel-S-HC-PUB-07-YOUTUBE-PUBLISHING-20260910234839-191d864a",
+      "branch": "dispatch/manuel/manuel-chatgpt1/publishing/S-HC-PUB-07-YOUTUBE-PUBLISHING/5dc36253e7",
+      "status": "reserved",
+      "createdAt": "2026-09-10T23:48:39.047Z",
+      "updatedAt": "2026-09-10T23:48:39.047Z",
+      "harnessId": "chatgpt",
+      "agentInstanceUid": "agent_590d14e71ce04d2aa89dc33d1d81d75d",
+      "agentInstanceAlias": "manuel-chatgpt1",
+      "sessionId": "pub07-parent-external-20260910234835",
+      "identityOrigin": "explicit"
+    },
+    {
+      "zone": "apps/web/app/api/publishing",
+      "assignmentId": "asg-63241aa6-6f8f-498f-aba5-554099086a52",
+      "taskId": "S-HC-PUB-07-YOUTUBE-PUBLISHING",
+      "sprintId": "publishing",
+      "operator": "manuel",
+      "machineId": "machine-6b34a148-a1c0-4886-ad96-be5e474af54a",
+      "runId": "run-manuel-S-HC-PUB-07-YOUTUBE-PUBLISHING-20260910234839-191d864a",
+      "branch": "dispatch/manuel/manuel-chatgpt1/publishing/S-HC-PUB-07-YOUTUBE-PUBLISHING/5dc36253e7",
+      "status": "reserved",
+      "createdAt": "2026-09-10T23:48:39.047Z",
+      "updatedAt": "2026-09-10T23:48:39.047Z",
+      "harnessId": "chatgpt",
+      "agentInstanceUid": "agent_590d14e71ce04d2aa89dc33d1d81d75d",
+      "agentInstanceAlias": "manuel-chatgpt1",
+      "sessionId": "pub07-parent-external-20260910234835",
+      "identityOrigin": "explicit"
+    },
+    {
+      "zone": "packages/integrations",
+      "assignmentId": "asg-63241aa6-6f8f-498f-aba5-554099086a52",
+      "taskId": "S-HC-PUB-07-YOUTUBE-PUBLISHING",
+      "sprintId": "publishing",
+      "operator": "manuel",
+      "machineId": "machine-6b34a148-a1c0-4886-ad96-be5e474af54a",
+      "runId": "run-manuel-S-HC-PUB-07-YOUTUBE-PUBLISHING-20260910234839-191d864a",
+      "branch": "dispatch/manuel/manuel-chatgpt1/publishing/S-HC-PUB-07-YOUTUBE-PUBLISHING/5dc36253e7",
+      "status": "reserved",
+      "createdAt": "2026-09-10T23:48:39.047Z",
+      "updatedAt": "2026-09-10T23:48:39.047Z",
+      "harnessId": "chatgpt",
+      "agentInstanceUid": "agent_590d14e71ce04d2aa89dc33d1d81d75d",
+      "agentInstanceAlias": "manuel-chatgpt1",
+      "sessionId": "pub07-parent-external-20260910234835",
+      "identityOrigin": "explicit"
     }
   ],
   "audit": [
@@ -4849,14 +5020,22 @@
       "at": "2026-09-10T23:48:19.967Z",
       "action": "dispatch.init",
       "message": "Registered machine machine-6b34a148-a1c0-4886-ad96-be5e474af54a with root /home/runner/work/_temp/oreshnik-wt-pub07-external."
+    },
+    {
+      "at": "2026-09-10T23:48:39.047Z",
+      "action": "dispatch.next.reserved",
+      "assignmentId": "asg-63241aa6-6f8f-498f-aba5-554099086a52",
+      "runId": "run-manuel-S-HC-PUB-07-YOUTUBE-PUBLISHING-20260910234839-191d864a",
+      "operator": "manuel",
+      "message": "Reserved S-HC-PUB-07-YOUTUBE-PUBLISHING for manuel."
     }
   ],
   "reconciliation": {
-    "lastAttemptAt": "2026-09-10T17:37:21.476Z",
+    "lastAttemptAt": "2026-09-10T23:48:39.042Z",
     "lastAppliedAt": "2026-07-01T07:00:56.759Z",
     "lastResult": "clean",
     "pendingDiagnostics": []
   },
   "createdAt": "2026-06-29T20:17:43.302Z",
-  "updatedAt": "2026-09-10T23:48:19.967Z"
+  "updatedAt": "2026-09-10T23:48:39.047Z"
 }
