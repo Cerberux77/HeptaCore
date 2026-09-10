@@ -26,7 +26,7 @@ jobs:
           node-version: 24
           cache: npm
       - name: Recover structured evidence and validate PUB-07B
-        run: bash .github/ops/pub07b-evidence-recover.sh
+        run: bash .github/ops/pub07b-evidence-recover-v2.sh
       - name: Upload evidence
         if: always()
         uses: actions/upload-artifact@v4
