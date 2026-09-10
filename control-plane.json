@@ -5,8 +5,8 @@
     "originUrl": "https://github.com/Cerberux77/HeptaCore.git",
     "canonicalMotherBranch": "master"
   },
-  "generation": 131,
-  "controlHead": "eaf686abf5cf6effd2140d2bb645f84bc12c1502",
+  "generation": 132,
+  "controlHead": "b3f1cbc70ea8e56fe374374a3227be8775767746",
   "catalog": {
     "taskBoardPath": "var/oreshnik/task-board.json",
     "zoneMapPath": "docs/07_handoffs/zone-map.json",
@@ -521,6 +521,18 @@
       "createdAt": "2026-09-10T16:20:01.353Z",
       "updatedAt": "2026-09-10T17:31:40.578Z",
       "identityOrigin": "explicit"
+    },
+    {
+      "agentInstanceUid": "agent_1b0d08cb2fe44fdb96c1f071337796fd",
+      "displayAlias": "manuel-chatgpt1",
+      "operatorId": "manuel",
+      "harnessId": "chatgpt",
+      "machineId": "machine-48788fbd-d2ea-43db-8f5d-f8bd5f725a19",
+      "repositoryId": "32305cad03d6321a",
+      "slot": 1,
+      "createdAt": "2026-09-10T17:37:21.480Z",
+      "updatedAt": "2026-09-10T17:37:21.480Z",
+      "identityOrigin": "explicit"
     }
   ],
   "sessions": [
@@ -689,6 +701,17 @@
       "lastSeenAt": "2026-09-10T17:31:40.578Z",
       "status": "closed",
       "closedAt": "2026-09-10T17:31:40.578Z",
+      "identityOrigin": "explicit"
+    },
+    {
+      "sessionId": "session_f41fead26d4548cd84d66159a64bad09",
+      "agentInstanceUid": "agent_1b0d08cb2fe44fdb96c1f071337796fd",
+      "operatorId": "manuel",
+      "harnessId": "chatgpt",
+      "machineId": "machine-48788fbd-d2ea-43db-8f5d-f8bd5f725a19",
+      "startedAt": "2026-09-10T17:37:21.480Z",
+      "lastSeenAt": "2026-09-10T17:37:21.480Z",
+      "status": "active",
       "identityOrigin": "explicit"
     }
   ],
@@ -1413,11 +1436,12 @@
         "apps/web/lib/__tests__",
         "contracts/S-HC-PUB-04"
       ],
-      "status": "provisioning",
+      "status": "active",
       "sourceTaskBoardHead": "7236235515cdcbc0a154f59b98f0f9fa55a5f7b8",
       "catalogFingerprint": "41dc14cac7bf243442e13cae8007d2bfcd704650",
       "createdAt": "2026-09-10T17:37:21.480Z",
-      "updatedAt": "2026-09-10T17:37:21.480Z",
+      "updatedAt": "2026-09-10T17:37:32.065Z",
+      "activatedAt": "2026-09-10T17:37:32.065Z",
       "resumedCount": 0,
       "takeoverCount": 0,
       "ownershipGeneration": 1,
@@ -1914,7 +1938,7 @@
       "worktreePath": "/home/runner/work/_temp/oreshnik-wt-pub07b/32305cad03d6321a/manuel/manuel-chatgpt1/publishing/S-HC-PUB-07B-YOUTUBE-SCHEDULED-E2E/da546a5360",
       "status": "active",
       "createdAt": "2026-09-10T17:37:21.480Z",
-      "updatedAt": "2026-09-10T17:37:21.480Z",
+      "updatedAt": "2026-09-10T17:37:32.065Z",
       "zones": [
         "apps/web/lib/publishers",
         "apps/web/app/api/publishing",
@@ -2444,9 +2468,9 @@
       "machineId": "machine-48788fbd-d2ea-43db-8f5d-f8bd5f725a19",
       "branch": "dispatch/manuel/manuel-chatgpt1/publishing/S-HC-PUB-07B-YOUTUBE-SCHEDULED-E2E/da546a5360",
       "worktreePath": "/home/runner/work/_temp/oreshnik-wt-pub07b/32305cad03d6321a/manuel/manuel-chatgpt1/publishing/S-HC-PUB-07B-YOUTUBE-SCHEDULED-E2E/da546a5360",
-      "status": "provisioning",
+      "status": "active",
       "createdAt": "2026-09-10T17:37:21.480Z",
-      "updatedAt": "2026-09-10T17:37:21.480Z",
+      "updatedAt": "2026-09-10T17:37:32.065Z",
       "sourceTaskBoardHead": "7236235515cdcbc0a154f59b98f0f9fa55a5f7b8",
       "zones": [
         "apps/web/lib/publishers",
@@ -3595,7 +3619,7 @@
       "branch": "dispatch/manuel/manuel-chatgpt1/publishing/S-HC-PUB-07B-YOUTUBE-SCHEDULED-E2E/da546a5360",
       "status": "reserved",
       "createdAt": "2026-09-10T17:37:21.480Z",
-      "updatedAt": "2026-09-10T17:37:21.480Z",
+      "updatedAt": "2026-09-10T17:37:32.065Z",
       "harnessId": "chatgpt",
       "agentInstanceUid": "agent_1b0d08cb2fe44fdb96c1f071337796fd",
       "agentInstanceAlias": "manuel-chatgpt1",
@@ -3613,7 +3637,7 @@
       "branch": "dispatch/manuel/manuel-chatgpt1/publishing/S-HC-PUB-07B-YOUTUBE-SCHEDULED-E2E/da546a5360",
       "status": "reserved",
       "createdAt": "2026-09-10T17:37:21.480Z",
-      "updatedAt": "2026-09-10T17:37:21.480Z",
+      "updatedAt": "2026-09-10T17:37:32.065Z",
       "harnessId": "chatgpt",
       "agentInstanceUid": "agent_1b0d08cb2fe44fdb96c1f071337796fd",
       "agentInstanceAlias": "manuel-chatgpt1",
@@ -3631,7 +3655,7 @@
       "branch": "dispatch/manuel/manuel-chatgpt1/publishing/S-HC-PUB-07B-YOUTUBE-SCHEDULED-E2E/da546a5360",
       "status": "reserved",
       "createdAt": "2026-09-10T17:37:21.480Z",
-      "updatedAt": "2026-09-10T17:37:21.480Z",
+      "updatedAt": "2026-09-10T17:37:32.065Z",
       "harnessId": "chatgpt",
       "agentInstanceUid": "agent_1b0d08cb2fe44fdb96c1f071337796fd",
       "agentInstanceAlias": "manuel-chatgpt1",
@@ -3649,7 +3673,7 @@
       "branch": "dispatch/manuel/manuel-chatgpt1/publishing/S-HC-PUB-07B-YOUTUBE-SCHEDULED-E2E/da546a5360",
       "status": "reserved",
       "createdAt": "2026-09-10T17:37:21.480Z",
-      "updatedAt": "2026-09-10T17:37:21.480Z",
+      "updatedAt": "2026-09-10T17:37:32.065Z",
       "harnessId": "chatgpt",
       "agentInstanceUid": "agent_1b0d08cb2fe44fdb96c1f071337796fd",
       "agentInstanceAlias": "manuel-chatgpt1",
@@ -3667,7 +3691,7 @@
       "branch": "dispatch/manuel/manuel-chatgpt1/publishing/S-HC-PUB-07B-YOUTUBE-SCHEDULED-E2E/da546a5360",
       "status": "reserved",
       "createdAt": "2026-09-10T17:37:21.480Z",
-      "updatedAt": "2026-09-10T17:37:21.480Z",
+      "updatedAt": "2026-09-10T17:37:32.065Z",
       "harnessId": "chatgpt",
       "agentInstanceUid": "agent_1b0d08cb2fe44fdb96c1f071337796fd",
       "agentInstanceAlias": "manuel-chatgpt1",
@@ -3685,7 +3709,7 @@
       "branch": "dispatch/manuel/manuel-chatgpt1/publishing/S-HC-PUB-07B-YOUTUBE-SCHEDULED-E2E/da546a5360",
       "status": "reserved",
       "createdAt": "2026-09-10T17:37:21.480Z",
-      "updatedAt": "2026-09-10T17:37:21.480Z",
+      "updatedAt": "2026-09-10T17:37:32.065Z",
       "harnessId": "chatgpt",
       "agentInstanceUid": "agent_1b0d08cb2fe44fdb96c1f071337796fd",
       "agentInstanceAlias": "manuel-chatgpt1",
@@ -3703,7 +3727,7 @@
       "branch": "dispatch/manuel/manuel-chatgpt1/publishing/S-HC-PUB-07B-YOUTUBE-SCHEDULED-E2E/da546a5360",
       "status": "reserved",
       "createdAt": "2026-09-10T17:37:21.480Z",
-      "updatedAt": "2026-09-10T17:37:21.480Z",
+      "updatedAt": "2026-09-10T17:37:32.065Z",
       "harnessId": "chatgpt",
       "agentInstanceUid": "agent_1b0d08cb2fe44fdb96c1f071337796fd",
       "agentInstanceAlias": "manuel-chatgpt1",
@@ -4682,6 +4706,14 @@
       "runId": "run-manuel-S-HC-PUB-07B-YOUTUBE-SCHEDULED-E2E-20260910173721-206fad0f",
       "operator": "manuel",
       "message": "Reserved S-HC-PUB-07B-YOUTUBE-SCHEDULED-E2E for manuel."
+    },
+    {
+      "at": "2026-09-10T17:37:32.065Z",
+      "action": "dispatch.next.active",
+      "assignmentId": "asg-6ae5ad07-bb79-49f6-b81a-ff6be9e0f149",
+      "runId": "run-manuel-S-HC-PUB-07B-YOUTUBE-SCHEDULED-E2E-20260910173721-206fad0f",
+      "operator": "manuel",
+      "message": "Assignment asg-6ae5ad07-bb79-49f6-b81a-ff6be9e0f149 is active."
     }
   ],
   "reconciliation": {
@@ -4691,5 +4723,5 @@
     "pendingDiagnostics": []
   },
   "createdAt": "2026-06-29T20:17:43.302Z",
-  "updatedAt": "2026-09-10T17:37:21.480Z"
+  "updatedAt": "2026-09-10T17:37:32.065Z"
 }
