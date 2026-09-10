@@ -1,4 +1,4 @@
-task=S-HC-PUB-07-YOUTUBE-PUBLISHING
-old_run=run-manuel-S-HC-PUB-07-YOUTUBE-PUBLISHING-20260910162001-40482454
-mode=supersede-amend-dispatch-e2e
-issued=2026-09-10T13:15:00-04:00
+parent=S-HC-PUB-07-YOUTUBE-PUBLISHING
+child=S-HC-PUB-07B-YOUTUBE-SCHEDULED-E2E
+mode=register-dispatch-validate
+issued=2026-09-10T13:42:00-04:00
