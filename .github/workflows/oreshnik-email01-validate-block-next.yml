@@ -26,7 +26,6 @@ env:
   VALIDATED_HEAD: 18aec87
   EXPECTED_AGENT_UID: agent_e8dd52d1d5de4f40a9a4d9923ffda155
   ORESHNIK_VERSION: 0.3.0-alpha.6
-  ORESHNIK_LOCAL_STATE_DIR: ${{ runner.temp }}/oreshnik-local-state
 
 jobs:
   block-and-next:
@@ -54,7 +53,9 @@ jobs:
           npm ci --ignore-scripts
           test "$(node node_modules/oreshnik-cli/dist/cli.js --version)" = "$ORESHNIK_VERSION"
           npm run oreshnik:ready
-          mkdir -p "$ORESHNIK_LOCAL_STATE_DIR"
+          STATE="$RUNNER_TEMP/oreshnik-local-state"
+          mkdir -p "$STATE"
+          echo "ORESHNIK_LOCAL_STATE_DIR=$STATE" >> "$GITHUB_ENV"
 
       - name: Rehydrate the exact preserved Run on this runner
         id: takeover
