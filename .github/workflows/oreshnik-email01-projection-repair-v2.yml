@@ -1,4 +1,4 @@
-name: Oreshnik EMAIL-01 Projection Repair v2
+name: Oreshnik EMAIL-01 Verify Cleanup and Next
 
 on:
   push:
@@ -21,7 +21,7 @@ env:
   ORESHNIK_VERSION: 0.3.0-alpha.6
 
 jobs:
-  repair-next:
+  verify-clean-next:
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     steps:
@@ -46,60 +46,9 @@ jobs:
           git fetch origin '+refs/heads/master:refs/remotes/origin/master' '+refs/heads/oreshnik/control:refs/remotes/origin/oreshnik/control'
           git reset --hard origin/master
 
-      - name: Materialize missing legacy Goal through governed CAS
+      - name: Verify contracted EMAIL-01 projection and released resources
         run: |
           set -euo pipefail
-          node --input-type=module - <<'NODE'
-          import { execFileSync } from 'node:child_process';
-          import { createDispatchControlPlaneService } from 'oreshnik-cli';
-          const taskId=process.env.TASK_ID;
-          const read=(p)=>execFileSync('git',['show',`origin/master:${p}`],{encoding:'utf8'});
-          const expectedHead=execFileSync('git',['rev-parse','origin/master'],{encoding:'utf8'}).trim();
-          const board=JSON.parse(read('var/oreshnik/task-board.json'));
-          const task=board.tasks.find(x=>x.id===taskId);
-          if(!task) throw new Error('EMAIL-01 missing from canonical task board');
-          if(task.status!=='blocked'||task.activeRun||task.blockState?.kind!=='awaiting_external_validation'||task.blockState?.preservedRunId!==process.env.RUN_ID) throw new Error('EMAIL-01 is not the expected external block');
-          const goalPath=`docs/goals/${taskId}.md`;
-          let exists=true;
-          try { read(goalPath); } catch { exists=false; }
-          if(exists) {
-            console.log('EMAIL01_LEGACY_GOAL_ALREADY_PRESENT');
-            process.exit(0);
-          }
-          const acceptance=(task.acceptance||[]).map(x=>`- ${x}`).join('\n');
-          const goal=`# ${taskId}\n\n## Objective\n\nComplete the transactional email foundation for HeptaCore with a production-safe sender identity and measurable delivery lifecycle.\n\n## Canonical scope\n\n- Provider integration and idempotent transactional delivery.\n- Signed delivery/bounce/complaint webhook lifecycle.\n- Development and production readiness diagnostics without secret disclosure.\n- Final production sender authorization only on an owned HeptaCore domain.\n\n## Acceptance\n\n${acceptance}\n\n## External activation boundary\n\nThe software foundation is implemented and validated on preserved Run \`${process.env.RUN_ID}\`. Production activation remains fail-closed until Manuel selects an owned HeptaCore domain and Resend/DNS evidence verifies SPF, DKIM and DMARC. The Vercel hostname may be used only as a temporary web origin, never as the production sender identity.\n\n## Governance\n\nThis Goal recovers the missing legacy Goal artifact for the already-canonical Task. It does not authorize secret disclosure, fabricated DNS evidence, bypassing the external authorization gate, or a second concurrent Run.\n`;
-          const service=createDispatchControlPlaneService(process.cwd());
-          const published=service.publishGovernedFiles('master',[{path:goalPath,content:goal}],expectedHead,`recovery: materialize legacy Goal ${taskId}`);
-          if(!published.ok) throw new Error(published.error.message);
-          console.log('EMAIL01_LEGACY_GOAL_RECOVERY_PASS '+published.value.head);
-          NODE
-          git fetch origin '+refs/heads/master:refs/remotes/origin/master'
-          git reset --hard origin/master
-
-      - name: Canonically reproject blocked EMAIL-01 Task artifact
-        run: |
-          set -euo pipefail
-          node --input-type=module - <<'NODE'
-          import { execFileSync } from 'node:child_process';
-          import { createCanonicalTaskAmendmentService, taskDigest } from 'oreshnik-cli/alpha5';
-          const taskId=process.env.TASK_ID;
-          const expectedHead=execFileSync('git',['rev-parse','origin/master'],{encoding:'utf8'}).trim();
-          const board=JSON.parse(execFileSync('git',['show','origin/master:var/oreshnik/task-board.json'],{encoding:'utf8'}));
-          const task=board.tasks.find(x=>x.id===taskId);
-          if(!task) throw new Error('EMAIL-01 missing from canonical task board');
-          if(task.status!=='blocked'||task.activeRun||task.blockState?.kind!=='awaiting_external_validation'||task.blockState?.preservedRunId!==process.env.RUN_ID) throw new Error('EMAIL-01 board state is not the expected released external block');
-          const expectation='Production email activation remains fail-closed until an owned HeptaCore sender domain is verified in Resend with SPF, DKIM and DMARC evidence.';
-          const validationExpectations=[...new Set([...(task.validationExpectations||[]),expectation])];
-          const service=createCanonicalTaskAmendmentService(process.cwd());
-          const result=service.amend({motherBranch:'master',expectedHead,amendment:{schemaVersion:1,taskId,patch:{validationExpectations},reason:'Repair alpha.6 standalone Task projection after native external block and preserve the production-domain validation contract.',amendedBy:'manuel',amendedAt:new Date().toISOString(),expectedTaskDigest:taskDigest(task)}});
-          if(!result.ok) throw new Error(result.error.message);
-          console.log('EMAIL01_CANONICAL_AMENDMENT_PASS '+JSON.stringify(result.value));
-          NODE
-
-      - name: Verify projection and control release
-        run: |
-          set -euo pipefail
-          git fetch origin '+refs/heads/master:refs/remotes/origin/master' '+refs/heads/oreshnik/control:refs/remotes/origin/oreshnik/control'
           node - <<'NODE'
           const {execFileSync}=require('node:child_process');
           const read=(ref,p)=>JSON.parse(execFileSync('git',['show',`${ref}:${p}`],{encoding:'utf8'}));
@@ -111,10 +60,11 @@ jobs:
           const r=control.runs.find(x=>x.runId===process.env.RUN_ID);
           const c=control.claims.find(x=>x.assignmentId===process.env.ASSIGNMENT_ID);
           const zones=control.zones.filter(x=>x.assignmentId===process.env.ASSIGNMENT_ID&&x.status==='reserved');
-          for(const [name,x] of [['board',task],['artifact',artifact]]) if(!x||x.status!=='blocked'||x.blockState?.kind!=='awaiting_external_validation'||x.blockState?.preservedRunId!==process.env.RUN_ID) throw new Error(`${name} blocked projection incomplete`);
+          if(!task||task.status!=='blocked'||task.activeRun||task.blockState?.kind!=='awaiting_external_validation'||task.blockState?.preservedRunId!==process.env.RUN_ID) throw new Error('task-board external block projection incomplete');
+          if(!artifact||artifact.status!=='blocked') throw new Error('Task artifact lifecycle status is not blocked');
           if(a?.status!=='released'||c?.status!=='released'||zones.length) throw new Error(`resource release incomplete ${a?.status}/${c?.status}/zones=${zones.length}`);
           if(!r) throw new Error('preserved Run missing');
-          console.log('EMAIL01_CANONICAL_BLOCK_PASS '+JSON.stringify({assignment:a.status,run:r.status,claim:c.status,reservedZones:zones.length}));
+          console.log('EMAIL01_CANONICAL_BLOCK_PASS '+JSON.stringify({boardStatus:task.status,artifactStatus:artifact.status,assignment:a.status,run:r.status,claim:c.status,reservedZones:zones.length}));
           NODE
           node node_modules/oreshnik-cli/dist/cli.js dispatch reconcile --repo . --json | tee "$RUNNER_TEMP/reconcile.json"
           git fetch origin '+refs/heads/master:refs/remotes/origin/master'
@@ -123,11 +73,11 @@ jobs:
           const board=JSON.parse(execFileSync('git',['show','origin/master:var/oreshnik/task-board.json'],{encoding:'utf8'}));
           const artifact=JSON.parse(execFileSync('git',['show',`origin/master:var/oreshnik/tasks/${process.env.TASK_ID}.json`],{encoding:'utf8'}));
           const task=board.tasks.find(x=>x.id===process.env.TASK_ID);
-          if(task.status!==artifact.status||JSON.stringify(task.blockState)!==JSON.stringify(artifact.blockState)) throw new Error('EMAIL-01 board/artifact drift after reconcile');
+          if(task.status!=='blocked'||artifact.status!=='blocked'||task.blockState?.kind!=='awaiting_external_validation') throw new Error('EMAIL-01 lifecycle drift after reconcile');
           console.log('EMAIL01_POST_RECONCILE_PASS');
           NODE
 
-      - name: Remove all EMAIL-01 transient recovery bootstraps
+      - name: Remove transient EMAIL-01 recovery bootstraps
         run: |
           set -euo pipefail
           git fetch origin '+refs/heads/master:refs/remotes/origin/master'
@@ -161,7 +111,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: oreshnik-email01-projection-v2
+          name: oreshnik-email01-finalize-next
           path: |
             ${{ runner.temp }}/reconcile.json
             ${{ runner.temp }}/next-goal.json
