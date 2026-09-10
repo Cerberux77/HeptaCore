@@ -1,6 +1,6 @@
 {
   "project": "HeptaCore",
-  "updatedAt": "2026-09-07T06:46:53.418Z",
+  "updatedAt": "2026-09-10T14:45:26.000Z",
   "currentExecutionOrder": [
     "S-HC-PUB-04-HOURLY-BATCH-CRON",
     "S-HC-PUB-05-RECONCILIATION-OPS",
@@ -1824,7 +1824,7 @@
       "title": "Real publishing for Meta Reels and Stories: Instagram + Facebook",
       "owner": "Manuel",
       "backupOwner": "Manuel",
-      "status": "ready_for_integration",
+      "status": "integrated",
       "track": "publishing",
       "zone": [
         "apps/web/lib/publishers",
@@ -1848,7 +1848,7 @@
         "Cero declaracion de soporte hasta que la combinacion concreta haya sido validada"
       ],
       "handoff": "docs/oreshnik/handoffs/S-HC-PUB-06-REELS-STORIES-PUBLISHERS/handoff-20260907T064520706Z-ea717d730752.md",
-      "attempts": 1,
+      "attempts": 2,
       "history": [
         {
           "at": "2026-06-28T18:47:05.091Z",
@@ -1883,6 +1883,13 @@
           "operator": "manuel",
           "branch": "dispatch/manuel/manuel-chatgpt2/publishing/S-HC-PUB-06-REELS-STORIES-PUBLISHERS/6b8d9d8384",
           "description": "Task delivered with handoff docs/oreshnik/handoffs/S-HC-PUB-06-REELS-STORIES-PUBLISHERS/handoff-20260907T064520706Z-ea717d730752.md"
+        },
+        {
+          "at": "2026-09-10T14:45:26.000Z",
+          "action": "integrated",
+          "operator": "manuel",
+          "branch": "dispatch/manuel/manuel-chatgpt2/publishing/S-HC-PUB-06-REELS-STORIES-PUBLISHERS/6b8d9d8384",
+          "description": "PR #27 integrated Run run-manuel-S-HC-PUB-06-REELS-STORIES-PUBLISHERS-20260906155441-d36bde04 at f6cb367b6ff8bd889609eeb0d038981bb2ea5422 (terminalization term-979fc775-6434-4ee8-92bb-902b2e844ea2)."
         }
       ],
       "validationGateResults": [

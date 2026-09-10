@@ -1,0 +1,15 @@
+{
+  "claimId": "claim-asg-c810d3df-2238-40ee-80ec-0a26622deb28",
+  "taskId": "S-HC-PUB-06-REELS-STORIES-PUBLISHERS",
+  "runId": "run-manuel-S-HC-PUB-06-REELS-STORIES-PUBLISHERS-20260906155441-d36bde04",
+  "operator": "manuel",
+  "workerMode": "chatgpt",
+  "harnessId": "chatgpt",
+  "agentInstanceUid": "agent_6ebdd7f7d7c541a3b4d4aa9bd90ee134",
+  "agentInstanceAlias": "manuel-chatgpt2",
+  "sessionId": "session_93473a46b2904930916a9715222bf6d5",
+  "ownershipGeneration": 6,
+  "worker": "manuel",
+  "status": "released",
+  "updatedAt": "2026-09-10T14:45:26.000Z"
+}
