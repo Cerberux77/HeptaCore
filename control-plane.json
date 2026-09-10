@@ -5,15 +5,15 @@
     "originUrl": "https://github.com/Cerberux77/HeptaCore.git",
     "canonicalMotherBranch": "master"
   },
-  "generation": 110,
-  "controlHead": "3468713be29c04d1c7a451bae3e7c53d9bfa92f1",
+  "generation": 111,
+  "controlHead": "2e9046eeccd797c764774d97423c2a3569e03fa2",
   "catalog": {
     "taskBoardPath": "var/oreshnik/task-board.json",
     "zoneMapPath": "docs/07_handoffs/zone-map.json",
-    "sourceTaskBoardHead": "c6b7f1f06a608744171206f624f5bb568b8e5329",
+    "sourceTaskBoardHead": "11091531bddfa4ff0621aadf1d98b082c9a8b782",
     "fingerprint": "fdf736eb32542e2efbd48b369858d40f03455010",
     "taskCount": 43,
-    "updatedAt": "2026-09-10T15:53:43.165Z"
+    "updatedAt": "2026-09-10T16:00:21.034Z"
   },
   "policy": {
     "name": "deterministic-v1",
@@ -288,6 +288,13 @@
       "hostname": "runnervmlun5p",
       "registeredAt": "2026-09-10T15:53:41.458Z",
       "updatedAt": "2026-09-10T15:53:41.458Z"
+    },
+    {
+      "machineId": "machine-886f4c1e-ed9a-4884-8cf8-ac9ed318b25d",
+      "worktreeRoot": "/home/runner/work/_temp/oreshnik-wt-email01-retry",
+      "hostname": "runnervmlun5p",
+      "registeredAt": "2026-09-10T16:00:19.268Z",
+      "updatedAt": "2026-09-10T16:00:19.268Z"
     }
   ],
   "agentInstances": [
@@ -440,11 +447,11 @@
       "displayAlias": "manuel-chatgpt1",
       "operatorId": "manuel",
       "harnessId": "chatgpt",
-      "machineId": "machine-27590b22-7a28-44e1-ad63-8b64699ee928",
+      "machineId": "machine-0f2dc4b9-a6ef-4261-a420-7d37164433bb",
       "repositoryId": "32305cad03d6321a",
       "slot": 1,
       "createdAt": "2026-09-10T14:46:12.866Z",
-      "updatedAt": "2026-09-10T15:51:08.074Z",
+      "updatedAt": "2026-09-10T15:53:51.876Z",
       "identityOrigin": "explicit"
     }
   ],
@@ -597,9 +604,9 @@
       "agentInstanceUid": "agent_e8dd52d1d5de4f40a9a4d9923ffda155",
       "operatorId": "manuel",
       "harnessId": "chatgpt",
-      "machineId": "machine-27590b22-7a28-44e1-ad63-8b64699ee928",
+      "machineId": "machine-0f2dc4b9-a6ef-4261-a420-7d37164433bb",
       "startedAt": "2026-09-10T14:46:12.866Z",
-      "lastSeenAt": "2026-09-10T15:51:08.074Z",
+      "lastSeenAt": "2026-09-10T15:53:51.876Z",
       "status": "active",
       "identityOrigin": "explicit"
     }
@@ -3980,6 +3987,11 @@
       "agentInstanceUid": "agent_e8dd52d1d5de4f40a9a4d9923ffda155",
       "sessionId": "session_5bb21c8aa01e49bcb03886ae23d26864",
       "message": "Takeover by manuel/manuel-chatgpt1 from manuel/manuel-chatgpt1. Reason: Retry EMAIL-01 external block through stable controller repository context after all software gates passed. Generation: 3 → 4."
+    },
+    {
+      "at": "2026-09-10T16:00:21.034Z",
+      "action": "dispatch.init",
+      "message": "Registered machine machine-886f4c1e-ed9a-4884-8cf8-ac9ed318b25d with root /home/runner/work/_temp/oreshnik-wt-email01-retry."
     }
   ],
   "reconciliation": {
@@ -3989,5 +4001,5 @@
     "pendingDiagnostics": []
   },
   "createdAt": "2026-06-29T20:17:43.302Z",
-  "updatedAt": "2026-09-10T15:53:51.876Z"
+  "updatedAt": "2026-09-10T16:00:21.034Z"
 }
