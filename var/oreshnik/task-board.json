@@ -1,6 +1,6 @@
 {
   "project": "HeptaCore",
-  "updatedAt": "2026-09-10T22:12:48.621Z",
+  "updatedAt": "2026-09-10T23:40:47.000Z",
   "currentExecutionOrder": [
     "S-HC-PUB-04-HOURLY-BATCH-CRON",
     "S-HC-PUB-05-RECONCILIATION-OPS",
@@ -2196,7 +2196,7 @@
       "title": "YouTube scheduled E2E integration: Video, Shorts, cron metadata and credentials",
       "owner": "Manuel",
       "backupOwner": "Manuel",
-      "status": "ready_for_integration",
+      "status": "integrated",
       "track": "publishing",
       "zone": [
         "apps/web/lib/publishers",
@@ -2236,7 +2236,7 @@
         "typecheck, build, worker validation and full repository tests pass."
       ],
       "handoff": "docs/oreshnik/handoffs/S-HC-PUB-07B-YOUTUBE-SCHEDULED-E2E/handoff-20260910T221119888Z-3622de053b4a.md",
-      "attempts": 2,
+      "attempts": 3,
       "history": [
         {
           "at": "2026-09-10T17:40:00.000Z",
@@ -2299,6 +2299,13 @@
           "operator": "manuel",
           "branch": "dispatch/manuel/manuel-chatgpt1/publishing/S-HC-PUB-07B-YOUTUBE-SCHEDULED-E2E/da546a5360",
           "description": "Task delivered with handoff docs/oreshnik/handoffs/S-HC-PUB-07B-YOUTUBE-SCHEDULED-E2E/handoff-20260910T221119888Z-3622de053b4a.md"
+        },
+        {
+          "at": "2026-09-10T23:40:47.000Z",
+          "action": "integrated",
+          "operator": "manuel",
+          "branch": "dispatch/manuel/manuel-chatgpt1/publishing/S-HC-PUB-07B-YOUTUBE-SCHEDULED-E2E/da546a5360",
+          "description": "PR #29 integrated Run run-manuel-S-HC-PUB-07B-YOUTUBE-SCHEDULED-E2E-20260910173721-206fad0f at 6b1dbe32ddb37192ad728fb427e305db9505c779 (terminalization term-c7bda00e-5a5f-42c6-b596-48f574b790d4)."
         }
       ],
       "validationGateResults": [
