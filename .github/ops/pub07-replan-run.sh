@@ -7,8 +7,6 @@ OLD_FUNCTIONAL_BRANCH="dispatch/manuel/manuel-chatgpt1/publishing/S-HC-PUB-07-YO
 OLD_PRODUCT_COMMIT="4a67b755dce1e8e7d91eff6c4c582e6d69dad64d"
 OPERATOR="manuel"
 HARNESS="chatgpt"
-INSTANCE_ALIAS="manuel-chatgpt1"
-SESSION_ID="session_dcdf09f15279492f91b148a3e9c751e6"
 ORESHNIK_VERSION="0.3.0-alpha.6"
 export ORESHNIK_LOCAL_STATE_DIR="$RUNNER_TEMP/oreshnik-local-state"
 
@@ -24,55 +22,19 @@ npm ci --ignore-scripts
 test "$(node node_modules/oreshnik-cli/dist/cli.js --version)" = "$ORESHNIK_VERSION"
 npm run oreshnik:ready
 
-# Register this ephemeral machine, then take over the exact old Run once more.
-ROOT="$RUNNER_TEMP/oreshnik-wt-replan"
-node node_modules/oreshnik-cli/dist/cli.js dispatch init --mother master --worktree-root "$ROOT" --repo . --json > "$RUNNER_TEMP/dispatch-init.json"
-node node_modules/oreshnik-cli/dist/cli.js dispatch takeover \
+# The old Run froze an incomplete zone plan. Its product commit is already durable on the remote
+# functional branch, so superseding is safe and is the native alpha.6 re-planning boundary.
+node node_modules/oreshnik-cli/dist/cli.js dispatch supersede \
   --run "$OLD_RUN_ID" \
-  --reason "Replan PUB-07 after discovering canonical scheduled-publishing zones were omitted; preserve validated code before releasing the old Run." \
-  --operator "$OPERATOR" --harness "$HARNESS" --instance "$INSTANCE_ALIAS" --session "$SESSION_ID" \
-  --repo . --json > "$RUNNER_TEMP/old-takeover.json"
-cat "$RUNNER_TEMP/old-takeover.json"
-test "$(jq -r .runId "$RUNNER_TEMP/old-takeover.json")" = "$OLD_RUN_ID"
-test "$(jq -r .functionalBranch "$RUNNER_TEMP/old-takeover.json")" = "$OLD_FUNCTIONAL_BRANCH"
-
-# Explicitly materialize the exact takeover identity with Oreshnik's own helper.
-export ORESHNIK_MACHINE_ID_OVERRIDE="$(jq -r .machineId "$RUNNER_TEMP/old-takeover.json")"
-export TAKEOVER_JSON="$RUNNER_TEMP/old-takeover.json"
-export REPOSITORY_ID="$(git show origin/oreshnik/control:control-plane.json | jq -r .repository.id)"
-node --input-type=module <<'NODE'
-import fs from 'node:fs';
-import { hydrateEphemeralTakeoverLocalState } from './node_modules/oreshnik-cli/dist/core/ephemeral-takeover-local-state.js';
-const take = JSON.parse(fs.readFileSync(process.env.TAKEOVER_JSON, 'utf8'));
-const result = hydrateEphemeralTakeoverLocalState({
-  operatorId: take.operator,
-  harnessId: take.harnessId,
-  agentInstanceUid: take.agentInstanceUid,
-  agentInstanceAlias: take.agentInstanceAlias,
-  sessionId: take.sessionId,
-  machineId: take.machineId,
-  repositoryId: process.env.REPOSITORY_ID,
-  identityOrigin: take.identityOrigin || 'explicit',
-  instanceCreated: false,
-  sessionCreated: false,
-  sources: { operator: 'flag', harness: 'flag', instance: 'flag', session: 'flag' }
-}, process.env.ORESHNIK_LOCAL_STATE_DIR);
-if (!result.ok) { console.error(result.error); process.exit(1); }
-console.log('NATIVE_IDENTITY_HYDRATION_PASS');
-NODE
-
-# Release the old frozen-zone Run. This preserves its remote branch/code but frees runtime authority.
-node node_modules/oreshnik-cli/dist/cli.js dispatch release \
-  --run "$OLD_RUN_ID" --operator "$OPERATOR" --harness "$HARNESS" \
-  --instance "$INSTANCE_ALIAS" --session "$SESSION_ID" --repo . --json \
-  > "$RUNNER_TEMP/old-release.json"
-cat "$RUNNER_TEMP/old-release.json"
-jq -e '.runStatus == "released" or .assignmentStatus == "released" or .resourceReleaseApplied == true' "$RUNNER_TEMP/old-release.json" >/dev/null
+  --reason "Replan PUB-07 because the original canonical Task omitted the scheduled-publishing cron/executor/contract zones. Product commit $OLD_PRODUCT_COMMIT is preserved on $OLD_FUNCTIONAL_BRANCH." \
+  --force --repo . --json > "$RUNNER_TEMP/old-supersede.json"
+cat "$RUNNER_TEMP/old-supersede.json"
+test "$(jq -r .assignmentId "$RUNNER_TEMP/old-supersede.json")" != "null"
 
 git fetch origin master oreshnik/control
 git reset --hard origin/master
 
-# Amend only planning metadata, with CAS against the current canonical master.
+# Amend only canonical planning metadata through Oreshnik CAS.
 EXPECTED_HEAD="$(git rev-parse origin/master)"
 export EXPECTED_HEAD
 node --input-type=module <<'NODE' | tee "$RUNNER_TEMP/amendment.json"
@@ -95,7 +57,7 @@ const result = service.amend({
         'contracts/S-HC-PUB-04'
       ]
     },
-    reason: 'Correct canonical planning mismatch discovered during governed execution: scheduled YouTube acceptance requires the existing PUB-04 cron route, executor, contract and scheduled-path tests.',
+    reason: 'Correct canonical planning mismatch discovered during governed execution: scheduled YouTube acceptance requires the PUB-04 cron route, executor, contract and scheduled-path tests.',
     amendedBy: 'manuel',
     amendedAt: new Date().toISOString()
   }
@@ -107,12 +69,16 @@ NODE
 git fetch origin master oreshnik/control
 git reset --hard origin/master
 npm run oreshnik:ready
+
+# Register only this fresh runner after the old assignment is terminal.
+ROOT="$RUNNER_TEMP/oreshnik-wt-replan-v2"
+node node_modules/oreshnik-cli/dist/cli.js dispatch init --mother master --worktree-root "$ROOT" --repo . --json > "$RUNNER_TEMP/dispatch-init.json"
 node node_modules/oreshnik-cli/dist/cli.js dispatch reconcile --repo . --json > "$RUNNER_TEMP/post-amend-reconcile.json"
 
-# Dispatch a fresh Run for the SAME Task so the amended zones are frozen into the new assignment.
+# New Run, new execution identity, same canonical Task. The corrected zones are frozen here.
 node node_modules/oreshnik-cli/dist/cli.js dispatch next \
   --task "$TASK_ID" --operator "$OPERATOR" --harness "$HARNESS" \
-  --instance "$INSTANCE_ALIAS" --session "$SESSION_ID" --max-retries 3 --repo . --json \
+  --instance new --session new --max-retries 3 --repo . --json \
   > "$RUNNER_TEMP/new-dispatch.json"
 cat "$RUNNER_TEMP/new-dispatch.json"
 test "$(jq -r .taskId "$RUNNER_TEMP/new-dispatch.json")" = "$TASK_ID"
@@ -127,10 +93,10 @@ printf '%s\n' "$NEW_RUN_ID" > "$RUNNER_TEMP/new-run-id.txt"
 printf '%s\n' "$NEW_BRANCH" > "$RUNNER_TEMP/new-branch.txt"
 test -d "$NEW_WT"
 
-# Salvage only the already validated product commit, never old runtime/governance projections.
 git -C "$NEW_WT" config user.name "Manuel Vera via ChatGPT Operator"
 git -C "$NEW_WT" config user.email "manuel@heptacore.dev"
 git -C "$NEW_WT" fetch origin "+refs/heads/$OLD_FUNCTIONAL_BRANCH:refs/remotes/origin/pub07-old"
+# Salvage product code only; do not import the old runtime checkpoint commit.
 git -C "$NEW_WT" cherry-pick "$OLD_PRODUCT_COMMIT"
 python3 "$RUNNER_TEMP/pub07-scheduler-patch.py" "$NEW_WT" "$RUNNER_TEMP/pub07-scheduled.test.ts"
 
@@ -152,7 +118,7 @@ npm run worker:validate | tee "$RUNNER_TEMP/pub07-replan-worker.txt"
 npm test | tee "$RUNNER_TEMP/pub07-replan-full-tests.txt"
 git diff --check
 
-# Commit only the new scheduled-path product changes. The cherry-picked immediate commit is already isolated.
+# Commit only code within the amended zones.
 git add apps/web/app/api/cron/publisher apps/web/lib/publishing-cron-executor.ts apps/web/lib/__tests__/pub07-scheduled.test.ts contracts/S-HC-PUB-04
 git diff --cached --check
 git diff --cached --name-only | tee "$RUNNER_TEMP/pub07-replan-files.txt"
@@ -161,9 +127,9 @@ git commit -m "feat(publishing): complete scheduled YouTube execution"
 git push origin "HEAD:$NEW_BRANCH"
 git rev-parse HEAD | tee "$RUNNER_TEMP/pub07-replan-product-head.txt"
 
-# Persist governed validation state for the new Run.
-node node_modules/oreshnik-cli/dist/cli.js evidence --task "$TASK_ID" --run "$NEW_RUN_ID" --operator "$OPERATOR" --start-validation --details "PUB-07 immediate and scheduled YouTube Video/Shorts software paths are implemented. Scheduled execution transports format/title/description/thumbnail, uses provider credentialLabel with fail-closed missing-label behavior, and reuses PUB-04 IN_REVIEW transactional finalization. Focused and full project gates pass. Real authorized YouTube channel smoke remains external validation." || true
-node node_modules/oreshnik-cli/dist/cli.js reconcile --write --json > "$RUNNER_TEMP/pub07-replan-local-reconcile.json" || true
+# Enter validating only after all deterministic gates pass.
+node node_modules/oreshnik-cli/dist/cli.js evidence --task "$TASK_ID" --run "$NEW_RUN_ID" --operator "$OPERATOR" --start-validation --details "PUB-07 Video/Shorts immediate and scheduled software paths are implemented. Scheduled execution transports format/title/description/thumbnail, resolves provider credentialLabel dynamically with fail-closed missing-label behavior, and reuses PUB-04 transactional finalization/IN_REVIEW semantics. Focused plus full project gates passed; only a real authorized YouTube channel smoke can remain external." 
+node node_modules/oreshnik-cli/dist/cli.js reconcile --write --json > "$RUNNER_TEMP/pub07-replan-local-reconcile.json"
 git add var/oreshnik docs/oreshnik docs/obsidian-vault docs/07_handoffs 2>/dev/null || true
 if ! git diff --cached --quiet; then
   git diff --cached --check
