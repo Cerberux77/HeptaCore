@@ -1,0 +1,51 @@
+name: Ops PUB07 Scheduler v4
+
+on:
+  push:
+    branches:
+      - ops/pub07-current-run-implementation-20260910
+    paths:
+      - .github/pub07-scheduler-v4-trigger
+
+permissions:
+  contents: write
+  actions: read
+
+jobs:
+  run:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ops/pub07-current-run-implementation-20260910
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - name: Run governed PUB-07 continuation
+        run: |
+          cp .github/ops/pub07-scheduler-run.sh "$RUNNER_TEMP/pub07-run.sh"
+          sed -i 's#node "$WT/node_modules/oreshnik-cli/dist/cli.js" task block#node "$GITHUB_WORKSPACE/node_modules/oreshnik-cli/dist/cli.js" task block#' "$RUNNER_TEMP/pub07-run.sh"
+          bash "$RUNNER_TEMP/pub07-run.sh"
+      - name: Upload evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pub07-governed-scheduler-v4
+          path: |
+            ${{ runner.temp }}/initial-takeover.json
+            ${{ runner.temp }}/amendment.json
+            ${{ runner.temp }}/resumed-takeover.json
+            ${{ runner.temp }}/pub07-scheduler-status.txt
+            ${{ runner.temp }}/pub07-scheduler-focused.txt
+            ${{ runner.temp }}/pub07-scheduler-typecheck.txt
+            ${{ runner.temp }}/pub07-scheduler-build.txt
+            ${{ runner.temp }}/pub07-scheduler-worker.txt
+            ${{ runner.temp }}/pub07-scheduler-full-tests.txt
+            ${{ runner.temp }}/pub07-scheduler-files.txt
+            ${{ runner.temp }}/pub07-scheduler-head.txt
+            ${{ runner.temp }}/pub07-scheduler-reconcile.json
+          if-no-files-found: ignore
