@@ -1,0 +1,138 @@
+name: Oreshnik EMAIL-01 Projection Repair v2
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - ".github/oreshnik-email01-projection-v2-trigger"
+
+permissions:
+  contents: write
+  actions: read
+
+concurrency:
+  group: heptacore-oreshnik-email01-projection-repair
+  cancel-in-progress: false
+
+env:
+  TASK_ID: S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION
+  RUN_ID: run-manuel-S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION-20260910144612-ccbed006
+  ASSIGNMENT_ID: asg-913a8dde-5aef-4f8b-8731-1af33f2228d9
+  ORESHNIK_VERSION: 0.3.0-alpha.6
+
+jobs:
+  repair-next:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: master
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Preflight exact controller
+        run: |
+          set -euo pipefail
+          git config user.name "Manuel Vera via ChatGPT Operator"
+          git config user.email "manuel@heptacore.dev"
+          npm ci --ignore-scripts
+          test "$(node node_modules/oreshnik-cli/dist/cli.js --version)" = "$ORESHNIK_VERSION"
+          npm run oreshnik:ready
+          git fetch origin '+refs/heads/master:refs/remotes/origin/master' '+refs/heads/oreshnik/control:refs/remotes/origin/oreshnik/control'
+          git reset --hard origin/master
+
+      - name: Canonically reproject blocked EMAIL-01 Task artifact
+        run: |
+          set -euo pipefail
+          node --input-type=module - <<'NODE'
+          import { execFileSync } from 'node:child_process';
+          import { createCanonicalTaskAmendmentService, taskDigest } from 'oreshnik-cli/alpha5';
+          const taskId=process.env.TASK_ID;
+          const expectedHead=execFileSync('git',['rev-parse','origin/master'],{encoding:'utf8'}).trim();
+          const board=JSON.parse(execFileSync('git',['show','origin/master:var/oreshnik/task-board.json'],{encoding:'utf8'}));
+          const task=board.tasks.find(x=>x.id===taskId);
+          if(!task) throw new Error('EMAIL-01 missing from canonical task board');
+          if(task.status!=='blocked'||task.activeRun||task.blockState?.kind!=='awaiting_external_validation'||task.blockState?.preservedRunId!==process.env.RUN_ID) throw new Error('EMAIL-01 board state is not the expected released external block');
+          const expectation='Production email activation remains fail-closed until an owned HeptaCore sender domain is verified in Resend with SPF, DKIM and DMARC evidence.';
+          const validationExpectations=[...new Set([...(task.validationExpectations||[]),expectation])];
+          const service=createCanonicalTaskAmendmentService(process.cwd());
+          const result=service.amend({motherBranch:'master',expectedHead,amendment:{schemaVersion:1,taskId,patch:{validationExpectations},reason:'Repair alpha.6 standalone Task projection after native external block and preserve the production-domain validation contract.',amendedBy:'manuel',amendedAt:new Date().toISOString(),expectedTaskDigest:taskDigest(task)}});
+          if(!result.ok) throw new Error(result.error.message);
+          console.log('EMAIL01_CANONICAL_AMENDMENT_PASS '+JSON.stringify(result.value));
+          NODE
+
+      - name: Verify projection and control release
+        run: |
+          set -euo pipefail
+          git fetch origin '+refs/heads/master:refs/remotes/origin/master' '+refs/heads/oreshnik/control:refs/remotes/origin/oreshnik/control'
+          node - <<'NODE'
+          const {execFileSync}=require('node:child_process');
+          const read=(ref,p)=>JSON.parse(execFileSync('git',['show',`${ref}:${p}`],{encoding:'utf8'}));
+          const board=read('origin/master','var/oreshnik/task-board.json');
+          const artifact=read('origin/master',`var/oreshnik/tasks/${process.env.TASK_ID}.json`);
+          const control=read('origin/oreshnik/control','control-plane.json');
+          const task=board.tasks.find(x=>x.id===process.env.TASK_ID);
+          const a=control.assignments.find(x=>x.assignmentId===process.env.ASSIGNMENT_ID);
+          const r=control.runs.find(x=>x.runId===process.env.RUN_ID);
+          const c=control.claims.find(x=>x.assignmentId===process.env.ASSIGNMENT_ID);
+          const zones=control.zones.filter(x=>x.assignmentId===process.env.ASSIGNMENT_ID&&x.status==='reserved');
+          for(const [name,x] of [['board',task],['artifact',artifact]]) if(!x||x.status!=='blocked'||x.blockState?.kind!=='awaiting_external_validation'||x.blockState?.preservedRunId!==process.env.RUN_ID) throw new Error(`${name} blocked projection incomplete`);
+          if(a?.status!=='released'||c?.status!=='released'||zones.length) throw new Error(`resource release incomplete ${a?.status}/${c?.status}/zones=${zones.length}`);
+          if(!r) throw new Error('preserved Run missing');
+          console.log('EMAIL01_CANONICAL_BLOCK_PASS '+JSON.stringify({assignment:a.status,run:r.status,claim:c.status,reservedZones:zones.length}));
+          NODE
+          node node_modules/oreshnik-cli/dist/cli.js dispatch reconcile --repo . --json | tee "$RUNNER_TEMP/reconcile.json"
+          git fetch origin '+refs/heads/master:refs/remotes/origin/master'
+          node - <<'NODE'
+          const {execFileSync}=require('node:child_process');
+          const board=JSON.parse(execFileSync('git',['show','origin/master:var/oreshnik/task-board.json'],{encoding:'utf8'}));
+          const artifact=JSON.parse(execFileSync('git',['show',`origin/master:var/oreshnik/tasks/${process.env.TASK_ID}.json`],{encoding:'utf8'}));
+          const task=board.tasks.find(x=>x.id===process.env.TASK_ID);
+          if(task.status!==artifact.status||JSON.stringify(task.blockState)!==JSON.stringify(artifact.blockState)) throw new Error('EMAIL-01 board/artifact drift after reconcile');
+          console.log('EMAIL01_POST_RECONCILE_PASS');
+          NODE
+
+      - name: Remove all EMAIL-01 transient recovery bootstraps
+        run: |
+          set -euo pipefail
+          git fetch origin '+refs/heads/master:refs/remotes/origin/master'
+          git reset --hard origin/master
+          for p in .github/workflows/oreshnik-email01-projection-repair-v2.yml .github/oreshnik-email01-projection-v2-trigger .github/workflows/oreshnik-email01-validate-block-next.yml .github/oreshnik-email01-validate-block-next-trigger; do
+            test ! -e "$p" || git rm "$p"
+          done
+          if ! git diff --cached --quiet; then
+            git commit -m "chore(oreshnik): remove transient EMAIL-01 recovery bootstraps"
+            git push origin HEAD:master
+          fi
+
+      - name: Dispatch next governed Goal
+        run: |
+          set -euo pipefail
+          git fetch origin '+refs/heads/master:refs/remotes/origin/master' '+refs/heads/oreshnik/control:refs/remotes/origin/oreshnik/control'
+          git reset --hard origin/master
+          npm run oreshnik:ready
+          ROOT="$RUNNER_TEMP/oreshnik-wt-next"
+          node node_modules/oreshnik-cli/dist/cli.js dispatch init --mother master --worktree-root "$ROOT" --repo . --json > "$RUNNER_TEMP/init.json"
+          node node_modules/oreshnik-cli/dist/cli.js dispatch reconcile --repo . --json > "$RUNNER_TEMP/reconcile-next.json"
+          node node_modules/oreshnik-cli/dist/cli.js goal --harness chatgpt --auto-align --repo . --max-retries 3 --json | tee "$RUNNER_TEMP/next-goal.json"
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const g=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/next-goal.json','utf8'));
+          if(!['assigned','resumed','no_task'].includes(g.result)) throw new Error(`unexpected next-goal result ${g.result}`);
+          console.log('NEXT_GOAL_SUMMARY '+JSON.stringify({result:g.result,taskId:g.taskId??null,title:g.title??null,runId:g.runId??null,assignmentId:g.assignmentId??null,functionalBranch:g.functionalBranch??null}));
+          NODE
+
+      - name: Upload evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: oreshnik-email01-projection-v2
+          path: |
+            ${{ runner.temp }}/reconcile.json
+            ${{ runner.temp }}/next-goal.json
+          if-no-files-found: ignore
