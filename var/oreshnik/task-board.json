@@ -1,6 +1,6 @@
 {
   "project": "HeptaCore",
-  "updatedAt": "2026-09-10T23:40:47.000Z",
+  "updatedAt": "2026-09-10T23:48:21.000Z",
   "currentExecutionOrder": [
     "S-HC-PUB-04-HOURLY-BATCH-CRON",
     "S-HC-PUB-05-RECONCILIATION-OPS",
@@ -30,7 +30,8 @@
     "tenant-onboarding",
     "tenant-platform",
     "HC-ORESHNIK-RECOVERY-ALPHA6",
-    "S-HC-PUB-07B-YOUTUBE-SCHEDULED-E2E"
+    "S-HC-PUB-07B-YOUTUBE-SCHEDULED-E2E",
+    "S-HC-PUB-07C-YOUTUBE-AUTH-CHANNEL-SMOKE"
   ],
   "tasks": [
     {
@@ -3573,6 +3574,68 @@
           "description": "Three canonical roles (OWNER/ADMIN/VIEWER), legacy role normalization, identity panel in /admin and /tenant/*, 5/5 E2E pass, 569 unit tests, production intact"
         }
       ]
+    },
+    {
+      "id": "S-HC-PUB-07C-YOUTUBE-AUTH-CHANNEL-SMOKE",
+      "title": "Authorized YouTube OAuth and channel identity smoke (no publishing)",
+      "owner": "Manuel",
+      "backupOwner": "Manuel",
+      "status": "ready",
+      "track": "publishing",
+      "readZones": [
+        "apps/web/lib/publishers/youtube.ts",
+        "apps/web/lib/credential-resolver.ts",
+        "apps/web/app/api/publishing/publish/route.ts"
+      ],
+      "writeZones": [],
+      "resources": [
+        "youtube-authorized-oauth-channel"
+      ],
+      "capabilities": [
+        "external-validation",
+        "youtube-oauth"
+      ],
+      "parallelism": "non_parallel",
+      "approvalMode": "manual",
+      "gates": [
+        "youtube-oauth-channel-smoke"
+      ],
+      "priority": "critical",
+      "validationExpectations": [
+        "No token, refresh token, client secret or credential plaintext is logged or versioned.",
+        "The application resolver follows OAuthConnection.tokenRef to credentialLabel youtube_oauth in an authorized runtime.",
+        "The resolved credential carries the required youtube.upload scope and is not expired.",
+        "A read-only YouTube Data API channels.list request with mine=true returns the authorized channel identity.",
+        "No videos.insert, resumable upload, thumbnail upload, scheduling or production deployment is executed."
+      ],
+      "evidenceType": "prod",
+      "dependsOn": [
+        "S-HC-PUB-07B-YOUTUBE-SCHEDULED-E2E"
+      ],
+      "acceptance": [
+        "Authorized runtime has a connected YOUTUBE SocialAccount for the intended tenant/channel.",
+        "OAuthConnection.tokenRef resolves and decrypts the youtube_oauth vault item without exposing secret material.",
+        "Required scope https://www.googleapis.com/auth/youtube.upload is confirmed.",
+        "Read-only channels.list(part=id,snippet,mine=true) succeeds and records only non-secret channel identity plus HTTP/evidence fingerprints.",
+        "No YouTube content is created, uploaded, scheduled, modified or published by this smoke.",
+        "Parent S-HC-PUB-07-YOUTUBE-PUBLISHING may resume only after this smoke has real authorized PASS evidence."
+      ],
+      "taskExecutionPolicy": {
+        "riskLevel": "high",
+        "recommendedReasoning": "high",
+        "reviewMode": "strict",
+        "humanApprovalRequired": true,
+        "requiredGates": [
+          "youtube-oauth-channel-smoke"
+        ],
+        "evidenceRequirements": [
+          "authorized runtime",
+          "real OAuth tokenRef resolution",
+          "read-only channel identity response",
+          "zero secret disclosure",
+          "zero publication"
+        ]
+      }
     }
   ],
   "reassignments": [
