@@ -5,15 +5,15 @@
     "originUrl": "https://github.com/Cerberux77/HeptaCore.git",
     "canonicalMotherBranch": "master"
   },
-  "generation": 120,
-  "controlHead": "ba924fe2e10ab6fe61738862159b5997138ac00b",
+  "generation": 121,
+  "controlHead": "f85e70a47c2a59ed5287694639d2c4cfb8b2c202",
   "catalog": {
     "taskBoardPath": "var/oreshnik/task-board.json",
     "zoneMapPath": "docs/07_handoffs/zone-map.json",
     "sourceTaskBoardHead": "f53a8177602ef441e9427ab22c14f7e579dc232e",
     "fingerprint": "bea95716241d9f6cd5d476ed5a13e204250b63d3",
     "taskCount": 43,
-    "updatedAt": "2026-09-10T16:37:17.648Z"
+    "updatedAt": "2026-09-10T16:39:40.788Z"
   },
   "policy": {
     "name": "deterministic-v1",
@@ -316,6 +316,13 @@
       "hostname": "runnervmlun5p",
       "registeredAt": "2026-09-10T16:37:16.411Z",
       "updatedAt": "2026-09-10T16:37:16.412Z"
+    },
+    {
+      "machineId": "machine-48901232-a024-45fa-b86e-01bb54b11423",
+      "worktreeRoot": "/home/runner/work/_temp/oreshnik-wt",
+      "hostname": "runnervmlun5p",
+      "registeredAt": "2026-09-10T16:39:39.540Z",
+      "updatedAt": "2026-09-10T16:39:39.541Z"
     }
   ],
   "agentInstances": [
@@ -480,11 +487,11 @@
       "displayAlias": "manuel-chatgpt1",
       "operatorId": "manuel",
       "harnessId": "chatgpt",
-      "machineId": "machine-80fe480f-7001-4b29-bc7c-30cad904c624",
+      "machineId": "machine-0249465c-e1b8-40fe-8aad-0f605b8f202c",
       "repositoryId": "32305cad03d6321a",
       "slot": 1,
       "createdAt": "2026-09-10T16:20:01.353Z",
-      "updatedAt": "2026-09-10T16:32:49.758Z",
+      "updatedAt": "2026-09-10T16:37:24.298Z",
       "identityOrigin": "explicit"
     }
   ],
@@ -649,9 +656,9 @@
       "agentInstanceUid": "agent_5930d607f3e043f2a8fee58342a57e07",
       "operatorId": "manuel",
       "harnessId": "chatgpt",
-      "machineId": "machine-80fe480f-7001-4b29-bc7c-30cad904c624",
+      "machineId": "machine-0249465c-e1b8-40fe-8aad-0f605b8f202c",
       "startedAt": "2026-09-10T16:20:01.353Z",
-      "lastSeenAt": "2026-09-10T16:32:49.758Z",
+      "lastSeenAt": "2026-09-10T16:37:24.298Z",
       "status": "active",
       "identityOrigin": "explicit"
     }
@@ -4284,6 +4291,11 @@
       "agentInstanceUid": "agent_5930d607f3e043f2a8fee58342a57e07",
       "sessionId": "session_dcdf09f15279492f91b148a3e9c751e6",
       "message": "Takeover by manuel/manuel-chatgpt1 from manuel/manuel-chatgpt1. Reason: Retry PUB-07 product implementation after correcting the local zone guard; preserve the same governed Run.. Generation: 2 → 3."
+    },
+    {
+      "at": "2026-09-10T16:39:40.789Z",
+      "action": "dispatch.init",
+      "message": "Registered machine machine-48901232-a024-45fa-b86e-01bb54b11423 with root /home/runner/work/_temp/oreshnik-wt."
     }
   ],
   "reconciliation": {
@@ -4293,5 +4305,5 @@
     "pendingDiagnostics": []
   },
   "createdAt": "2026-06-29T20:17:43.302Z",
-  "updatedAt": "2026-09-10T16:37:24.298Z"
+  "updatedAt": "2026-09-10T16:39:40.789Z"
 }
