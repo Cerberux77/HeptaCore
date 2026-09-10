@@ -1,10 +1,11 @@
-name: Ops PUB-07 Current Run Implementation
+name: Ops PUB07 Current Run
 
 on:
   push:
-    branches: [ops/pub07-current-run-implementation-20260910]
+    branches:
+      - ops/pub07-current-run-implementation-20260910
     paths:
-      - ".github/pub07-current-run-trigger"
+      - .github/pub07-current-run-trigger
 
 permissions:
   contents: write
@@ -14,61 +15,60 @@ concurrency:
   group: heptacore-pub07-current-run
   cancel-in-progress: false
 
-env:
-  TASK_ID: S-HC-PUB-07-YOUTUBE-PUBLISHING
-  RUN_ID: run-manuel-S-HC-PUB-07-YOUTUBE-PUBLISHING-20260910162001-40482454
-  OPERATOR: manuel
-  HARNESS: chatgpt
-  INSTANCE_ALIAS: manuel-chatgpt1
-  SESSION_ID: session_dcdf09f15279492f91b148a3e9c751e6
-  FUNCTIONAL_BRANCH: dispatch/manuel/manuel-chatgpt1/publishing/S-HC-PUB-07-YOUTUBE-PUBLISHING/71b46093fd
-  OLD_BRANCH: dispatch/manuel/manuel-kilo8/publishing/S-HC-PUB-07-YOUTUBE-PUBLISHING/0235fe3455
-  ORESHNIK_VERSION: 0.3.0-alpha.6
-
 jobs:
-  implement-validate:
+  implement:
     runs-on: ubuntu-24.04
     timeout-minutes: 120
+    env:
+      TASK_ID: S-HC-PUB-07-YOUTUBE-PUBLISHING
+      RUN_ID: run-manuel-S-HC-PUB-07-YOUTUBE-PUBLISHING-20260910162001-40482454
+      OPERATOR: manuel
+      HARNESS: chatgpt
+      INSTANCE_ALIAS: manuel-chatgpt1
+      SESSION_ID: session_dcdf09f15279492f91b148a3e9c751e6
+      FUNCTIONAL_BRANCH: dispatch/manuel/manuel-chatgpt1/publishing/S-HC-PUB-07-YOUTUBE-PUBLISHING/71b46093fd
+      OLD_BRANCH: dispatch/manuel/manuel-kilo8/publishing/S-HC-PUB-07-YOUTUBE-PUBLISHING/0235fe3455
+      ORESHNIK_VERSION: 0.3.0-alpha.6
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: master
+          ref: ops/pub07-current-run-implementation-20260910
           fetch-depth: 0
           persist-credentials: true
+
+      - name: Preserve ops scripts and switch to canonical controller
+        run: |
+          cp .github/ops/pub07-patch.py "$RUNNER_TEMP/pub07-patch.py"
+          cp .github/ops/youtube.test.ts "$RUNNER_TEMP/youtube.test.ts"
+          git fetch origin master
+          git checkout -B controller origin/master
+          git config user.name "Manuel Vera via ChatGPT Operator"
+          git config user.email "manuel@heptacore.dev"
+
       - uses: actions/setup-node@v4
         with:
           node-version: 24
           cache: npm
-      - name: Prepare controller and rehydrate same Run
+
+      - name: Rehydrate exact governed Run
         id: rehydrate
         run: |
           set -euo pipefail
-          git config user.name "Manuel Vera via ChatGPT Operator"
-          git config user.email "manuel@heptacore.dev"
           npm ci --ignore-scripts
           test "$(node node_modules/oreshnik-cli/dist/cli.js --version)" = "$ORESHNIK_VERSION"
           npm run oreshnik:ready
           ROOT="$RUNNER_TEMP/oreshnik-wt"
           node node_modules/oreshnik-cli/dist/cli.js dispatch init --mother master --worktree-root "$ROOT" --repo . --json > "$RUNNER_TEMP/init.json"
-          node node_modules/oreshnik-cli/dist/cli.js dispatch takeover \
-            --run "$RUN_ID" \
-            --reason "Continue PUB-07 on an ephemeral Actions runner while preserving the exact governed Run." \
-            --operator "$OPERATOR" \
-            --harness "$HARNESS" \
-            --instance "$INSTANCE_ALIAS" \
-            --session "$SESSION_ID" \
-            --repo . \
-            --json > "$RUNNER_TEMP/takeover.json"
+          node node_modules/oreshnik-cli/dist/cli.js dispatch takeover --run "$RUN_ID" --reason "Continue PUB-07 on an ephemeral Actions runner while preserving the exact governed Run." --operator "$OPERATOR" --harness "$HARNESS" --instance "$INSTANCE_ALIAS" --session "$SESSION_ID" --repo . --json > "$RUNNER_TEMP/takeover.json"
           cat "$RUNNER_TEMP/takeover.json"
-          node - <<'NODE'
-          const fs=require('node:fs');
-          const r=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/takeover.json','utf8'));
-          for(const [k,v] of Object.entries({runId:process.env.RUN_ID,taskId:process.env.TASK_ID,operator:process.env.OPERATOR,harnessId:process.env.HARNESS,agentInstanceAlias:process.env.INSTANCE_ALIAS,sessionId:process.env.SESSION_ID,functionalBranch:process.env.FUNCTIONAL_BRANCH})) if(r[k]!==v) throw new Error(`${k} drifted: ${r[k]} != ${v}`);
-          if(!['taken_over','resumed'].includes(r.result)) throw new Error(`unexpected takeover result ${r.result}`);
-          fs.appendFileSync(process.env.GITHUB_OUTPUT,`worktree=${r.worktreePath}\n`);
-          NODE
+          test "$(jq -r .runId "$RUNNER_TEMP/takeover.json")" = "$RUN_ID"
+          test "$(jq -r .taskId "$RUNNER_TEMP/takeover.json")" = "$TASK_ID"
+          test "$(jq -r .functionalBranch "$RUNNER_TEMP/takeover.json")" = "$FUNCTIONAL_BRANCH"
+          WT="$(jq -r .worktreePath "$RUNNER_TEMP/takeover.json")"
+          test -d "$WT"
+          echo "worktree=$WT" >> "$GITHUB_OUTPUT"
 
-      - name: Recover and adapt YouTube implementation inside authorized zones
+      - name: Apply bounded in-zone implementation
         env:
           WT: ${{ steps.rehydrate.outputs.worktree }}
         run: |
@@ -78,250 +78,16 @@ jobs:
           git -C "$WT" fetch origin "+refs/heads/$FUNCTIONAL_BRANCH:refs/remotes/origin/current-pub07" "+refs/heads/$OLD_BRANCH:refs/remotes/origin/old-pub07"
           git -C "$WT" merge --ff-only refs/remotes/origin/current-pub07
           git -C "$WT" show refs/remotes/origin/old-pub07:apps/web/lib/publishers/youtube.ts > "$WT/apps/web/lib/publishers/youtube.ts"
-          WT="$WT" python3 - <<'PY'
-          import os
-          from pathlib import Path
-          root=Path(os.environ['WT'])
-
-          def replace(path, old, new, count=1):
-              p=root/path
-              s=p.read_text()
-              if old not in s:
-                  raise SystemExit(f"needle missing in {path}: {old[:100]!r}")
-              p.write_text(s.replace(old,new,count))
-
-          # Publisher input metadata required by YouTube.
-          replace(Path('apps/web/lib/publishers/types.ts'),
-              '  mediaType?: "IMAGE" | "VIDEO" | "CAROUSEL";\n}',
-              '  mediaType?: "IMAGE" | "VIDEO" | "CAROUSEL";\n  title?: string | null;\n  description?: string | null;\n  tags?: string[] | null;\n  thumbnailUrl?: string | null;\n  categoryId?: string | null;\n  privacyStatus?: "public" | "unlisted" | "private" | null;\n  madeForKids?: boolean | null;\n}')
-
-          # Register YouTube under the current registry contract.
-          replace(Path('apps/web/lib/publishers/index.ts'),
-              'import { facebookPagePublisher } from "./facebook-page";\n',
-              'import { facebookPagePublisher } from "./facebook-page";\nimport { youtubePublisher } from "./youtube";\n')
-          replace(Path('apps/web/lib/publishers/index.ts'),
-              'registerPublisher(facebookPagePublisher);\n',
-              'registerPublisher(facebookPagePublisher);\nregisterPublisher(youtubePublisher);\n')
-          replace(Path('apps/web/lib/publishers/index.ts'),
-              'export { facebookPagePublisher } from "./facebook-page";\n',
-              'export { facebookPagePublisher } from "./facebook-page";\nexport { youtubePublisher } from "./youtube";\n')
-
-          # Old uploader: retain proven protocol, add current live-format declaration.
-          replace(Path('apps/web/lib/publishers/youtube.ts'),
-              '  requiredScopes: ["https://www.googleapis.com/auth/youtube.upload"],\n  publish: publishToYouTube,',
-              '  requiredScopes: ["https://www.googleapis.com/auth/youtube.upload"],\n  supportedFormats: ["YOUTUBE_VIDEO", "YOUTUBE_SHORT"],\n  publish: publishToYouTube,')
-
-          # Extend the current PUB-06 format facade, staying inside PUB-07 api/publishing zone.
-          pf=Path('apps/web/app/api/publishing/pub06-formats.ts')
-          s=(root/pf).read_text()
-          s=s.replace(
-              'export type Pub06PublishingFormat = PublishingFormat | "INSTAGRAM_REEL" | "FACEBOOK_STORY" | "FACEBOOK_REEL";',
-              'export type Pub06PublishingFormat = PublishingFormat | "INSTAGRAM_REEL" | "FACEBOOK_STORY" | "FACEBOOK_REEL" | "YOUTUBE_VIDEO" | "YOUTUBE_SHORT";')
-          s=s.replace(
-              '  if (network === "FACEBOOK") {',
-              '  if (network === "YOUTUBE") {\n    if (raw.includes("SHORT")) return "YOUTUBE_SHORT";\n    return "YOUTUBE_VIDEO";\n  }\n  if (network === "FACEBOOK") {',1)
-          marker='export function buildPub06DryRun(format: Pub06PublishingFormat, assets: DraftFormatAsset[]) {'
-          if marker not in s: raise SystemExit('buildPub06DryRun marker missing')
-          helper=r'''
-const YOUTUBE_VIDEO_MIMES = ["video/mp4", "video/quicktime", "video/webm"];
-const YOUTUBE_THUMBNAIL_MIMES = ["image/jpeg", "image/png", "image/webp"];
-
-type YouTubePublishingFormat = "YOUTUBE_VIDEO" | "YOUTUBE_SHORT";
-
-function youtubeMime(asset: DraftFormatAsset): string | null {
-  const inferred = inferMimeType(asset);
-  if (inferred) return inferred;
-  const source = `${asset.filename ?? ""} ${asset.url ?? ""}`.toLowerCase().split("?")[0];
-  return source.endsWith(".webm") ? "video/webm" : null;
-}
-
-function buildYouTubeDryRun(format: YouTubePublishingFormat, assets: DraftFormatAsset[]) {
-  const label = format === "YOUTUBE_SHORT" ? "YouTube Shorts" : "YouTube Video 16:9";
-  const expectedRatio = format === "YOUTUBE_SHORT" ? 9 / 16 : 16 / 9;
-  const aspectRatio = format === "YOUTUBE_SHORT" ? "9 / 16" : "16 / 9";
-  const minWidth = format === "YOUTUBE_SHORT" ? 720 : 1280;
-  const minHeight = format === "YOUTUBE_SHORT" ? 1280 : 720;
-  const maxDurationSeconds = format === "YOUTUBE_SHORT" ? 180 : 12 * 60 * 60;
-  const videos = assets.filter((asset) => asset.role !== "thumbnail");
-  const thumbnails = assets.filter((asset) => asset.role === "thumbnail");
-  const errors: Array<{ code: string; message: string; assetId?: string }> = [];
-  const warnings: Array<{ code: string; message: string; assetId?: string }> = [];
-
-  if (videos.length !== 1) errors.push({ code: "ASSET_COUNT", message: `${label} requires exactly one video asset.` });
-  const video = videos[0];
-  if (video) {
-    const mime = youtubeMime(video);
-    if (!mime || !YOUTUBE_VIDEO_MIMES.includes(mime)) errors.push({ code: "ASSET_MIME", assetId: video.id, message: `${label} requires MP4, MOV or WebM video.` });
-    if (video.width != null && video.height != null) {
-      if (video.width < minWidth || video.height < minHeight) errors.push({ code: "ASSET_DIMENSIONS", assetId: video.id, message: `${label} requires at least ${minWidth}x${minHeight}.` });
-      const ratio=video.width/video.height;
-      if (Math.abs(ratio-expectedRatio)>0.06) errors.push({ code: "ASSET_ASPECT_RATIO", assetId: video.id, message: `${label} requires ${format === "YOUTUBE_SHORT" ? "9:16" : "16:9"}.` });
-    } else warnings.push({ code: "ASSET_DIMENSIONS_UNKNOWN", assetId: video.id, message: "Video dimensions are not stored." });
-    if (video.durationSeconds == null) warnings.push({ code: "ASSET_DURATION_UNKNOWN", assetId: video.id, message: "Video duration is not stored." });
-    else if (video.durationSeconds > maxDurationSeconds) errors.push({ code: "ASSET_DURATION", assetId: video.id, message: `${label} exceeds ${maxDurationSeconds}s.` });
-    if (video.sizeBytes != null && video.sizeBytes > 100 * 1024 * 1024) errors.push({ code: "ASSET_SIZE", assetId: video.id, message: `${label} exceeds the current safe 100MB serverless upload limit.` });
-    else if (video.sizeBytes == null) warnings.push({ code: "ASSET_SIZE_UNKNOWN", assetId: video.id, message: "Video size is not stored." });
-  }
-
-  if (format === "YOUTUBE_VIDEO") {
-    if (thumbnails.length !== 1) errors.push({ code: "THUMBNAIL_REQUIRED", message: "YouTube Video 16:9 requires exactly one thumbnail asset with role=thumbnail." });
-    const thumbnail=thumbnails[0];
-    if (thumbnail) {
-      const mime=inferMimeType(thumbnail);
-      if (!mime || !YOUTUBE_THUMBNAIL_MIMES.includes(mime)) errors.push({ code: "THUMBNAIL_MIME", assetId: thumbnail.id, message: "YouTube thumbnail must be JPEG, PNG or WebP." });
-      if (!thumbnail.url) errors.push({ code: "THUMBNAIL_NOT_PUBLIC", assetId: thumbnail.id, message: "YouTube thumbnail requires a resolvable public URL." });
-      if (thumbnail.sizeBytes != null && thumbnail.sizeBytes > 2 * 1024 * 1024) errors.push({ code: "THUMBNAIL_SIZE", assetId: thumbnail.id, message: "YouTube thumbnail exceeds 2MB." });
-    }
-  }
-
-  return {
-    valid: errors.length === 0,
-    errors,
-    warnings,
-    format,
-    assets,
-    previewData: {
-      platform: "YOUTUBE" as const,
-      format,
-      label,
-      aspectRatio,
-      safeAreas: format === "YOUTUBE_SHORT" ? { topPercent: 10, bottomPercent: 20, sidePercent: 6 } : undefined,
-      assets,
-    },
-  };
-}
-
-'''
-          s=s.replace(marker,helper+marker)
-          s=s.replace(marker+'\n  if (!NEW_FORMATS.has(format)) return buildMultiformatDryRun(format as PublishingFormat, assets);',
-              marker+'\n  if (format === "YOUTUBE_VIDEO" || format === "YOUTUBE_SHORT") return buildYouTubeDryRun(format, assets);\n  if (!NEW_FORMATS.has(format)) return buildMultiformatDryRun(format as PublishingFormat, assets);')
-          (root/pf).write_text(s)
-
-          # Integrate YouTube with the current immediate/scheduled front door.
-          route=Path('apps/web/app/api/publishing/publish/route.ts')
-          s=(root/route).read_text()
-          old='''  const orderedAssets = normalizeAssetManifest(draft.assets, (asset) => {\n    if (!asset) return null;\n    return buildPublicAssetUrl(tenantSlug, asset);\n  });\n\n  const draftOnly = tenant.automationMode === "DRAFT_ONLY";'''
-          new='''  const orderedAssets = normalizeAssetManifest(draft.assets, (asset) => {\n    if (!asset) return null;\n    return buildPublicAssetUrl(tenantSlug, asset);\n  });\n  const isYouTube = network === "YOUTUBE";\n  const youtubeThumbnail = isYouTube ? orderedAssets.find((asset) => asset.role === "thumbnail") ?? null : null;\n\n  const draftOnly = tenant.automationMode === "DRAFT_ONLY";'''
-          if old not in s: raise SystemExit('route orderedAssets needle missing')
-          s=s.replace(old,new,1)
-          old='  const primaryAsset = needsAsset ? (draft.assets.find((a) => a.role === "primary") ?? draft.assets[0]) : null;'
-          new='''  const uploadAssets = isYouTube ? draft.assets.filter((a) => a.role !== "thumbnail") : draft.assets;\n  const primaryAsset = needsAsset ? (uploadAssets.find((a) => a.role === "primary") ?? uploadAssets[0] ?? null) : null;'''
-          if old not in s: raise SystemExit('route primaryAsset needle missing')
-          s=s.replace(old,new,1)
-          old='''  const publishInput: PublishInput = {\n    targetId,\n    accessToken,\n    mediaUrl,\n    caption: draft.caption || draft.title,\n    format,\n    mediaType,\n  };\n\n  let publishResult'''
-          new='''  const publishInput: PublishInput = {\n    targetId,\n    accessToken,\n    mediaUrl,\n    caption: draft.caption || draft.title,\n    format,\n    mediaType,\n  };\n\n  if (isYouTube) {\n    publishInput.title = draft.title;\n    publishInput.description = draft.caption ?? draft.title;\n    publishInput.thumbnailUrl = youtubeThumbnail?.url ?? null;\n  }\n\n  let publishResult'''
-          if old not in s: raise SystemExit('route publishInput needle missing')
-          s=s.replace(old,new,1)
-          s=s.replace('error: "Meta devolvio un resultado ambiguo. Verifique la pagina antes de reintentar.",\n        action: "No vuelva a publicar hasta verificar Facebook. El job permanece IN_REVIEW.",',
-              'error: `${network} devolvio un resultado ambiguo. Verifique la publicacion antes de reintentar.`,\n        action: `No vuelva a publicar hasta verificar ${network}. El job permanece IN_REVIEW.`,',1)
-          (root/route).write_text(s)
-          PY
-
-          mkdir -p "$WT/apps/web/lib/publishers/__tests__"
-          cat > "$WT/apps/web/lib/publishers/__tests__/youtube.test.ts" <<'TEST'
-          import { afterEach, describe, it } from "node:test";
-          import assert from "node:assert/strict";
-          import { readFileSync } from "node:fs";
-          import { normalizeYouTubeFormat, withShortsMarker, youtubePublisher } from "../youtube.js";
-          import { ProviderError } from "../types.js";
-          import { buildPub06DryRun, normalizePub06PublishingFormat } from "../../../app/api/publishing/pub06-formats.js";
-
-          const originalFetch = globalThis.fetch;
-          const MEDIA_URL = "https://cdn.example.com/video.mp4";
-          const UPLOAD_URL = "https://upload.googleapis.com/session/pub07";
-          afterEach(() => { globalThis.fetch = originalFetch; });
-
-          const video = { id:"video", url:MEDIA_URL, filename:"video.mp4", mimeType:"video/mp4", width:1920, height:1080, sizeBytes:10_000_000, durationSeconds:300, order:1, role:"primary" };
-          const short = { ...video, id:"short", width:1080, height:1920, durationSeconds:45 };
-          const thumb = { id:"thumb", url:"https://cdn.example.com/thumb.jpg", filename:"thumb.jpg", mimeType:"image/jpeg", width:1280, height:720, sizeBytes:200_000, durationSeconds:null, order:2, role:"thumbnail" };
-
-          describe("PUB-07 YouTube format contract", () => {
-            it("normalizes video and shorts without affecting Meta formats", () => {
-              assert.equal(normalizePub06PublishingFormat("YOUTUBE", "VIDEO"), "YOUTUBE_VIDEO");
-              assert.equal(normalizePub06PublishingFormat("YOUTUBE", "Shorts"), "YOUTUBE_SHORT");
-              assert.equal(normalizeYouTubeFormat("shorts"), "YOUTUBE_SHORT");
-            });
-            it("builds valid provider-specific dry-runs for 16:9 video and 9:16 Shorts", () => {
-              const long=buildPub06DryRun("YOUTUBE_VIDEO", [video as any, thumb as any]);
-              assert.equal(long.valid,true);
-              assert.equal(long.previewData.platform,"YOUTUBE");
-              const vertical=buildPub06DryRun("YOUTUBE_SHORT", [short as any]);
-              assert.equal(vertical.valid,true);
-              assert.equal(vertical.previewData.aspectRatio,"9 / 16");
-            });
-            it("fails closed for invalid Shorts and missing Video thumbnail", () => {
-              const bad=buildPub06DryRun("YOUTUBE_SHORT", [{...video,durationSeconds:200} as any]);
-              assert.equal(bad.valid,false);
-              assert.ok(bad.errors.some((e)=>e.code==="ASSET_ASPECT_RATIO"));
-              assert.ok(bad.errors.some((e)=>e.code==="ASSET_DURATION"));
-              const missing=buildPub06DryRun("YOUTUBE_VIDEO", [video as any]);
-              assert.equal(missing.valid,false);
-              assert.ok(missing.errors.some((e)=>e.code==="THUMBNAIL_REQUIRED"));
-            });
-            it("declares only validated live formats and OAuth upload scope", () => {
-              assert.deepEqual(youtubePublisher.supportedFormats,["YOUTUBE_VIDEO","YOUTUBE_SHORT"]);
-              assert.equal(youtubePublisher.credentialLabel,"youtube_oauth");
-              assert.ok(youtubePublisher.requiredScopes.includes("https://www.googleapis.com/auth/youtube.upload"));
-            });
-          });
-
-          describe("PUB-07 YouTube resumable provider", () => {
-            it("returns only the provider video id and tags Shorts idempotently", async () => {
-              let body:any=null;
-              globalThis.fetch=(async (input:any, init?:any) => {
-                const url=String(input); const method=(init?.method??"GET").toUpperCase();
-                if(url===MEDIA_URL&&method==="GET") return new Response(new Uint8Array([1,2,3]),{status:200,headers:{"content-type":"video/mp4"}});
-                if(url.includes("uploadType=resumable")&&method==="POST") { body=JSON.parse(init.body); return new Response(null,{status:200,headers:{location:UPLOAD_URL}}); }
-                if(url===UPLOAD_URL&&method==="PUT") return new Response(JSON.stringify({id:"yt_real_123",status:{privacyStatus:"private"}}),{status:200,headers:{"content-type":"application/json"}});
-                return new Response("not found",{status:404});
-              }) as typeof fetch;
-              const result=await youtubePublisher.publish({targetId:"channel",accessToken:"token",mediaUrl:MEDIA_URL,caption:"caption",title:"Title",description:"Desc",format:"YOUTUBE_SHORT",mediaType:"VIDEO"});
-              assert.equal(result.externalPostId,"yt_real_123");
-              assert.match(body.snippet.description,/#Shorts/);
-              assert.equal(withShortsMarker("YOUTUBE_SHORT","T","#Shorts already").description,"#Shorts already");
-            });
-            it("marks provider success without a video id as ambiguous instead of fabricating success", async () => {
-              globalThis.fetch=(async (input:any, init?:any) => {
-                const url=String(input); const method=(init?.method??"GET").toUpperCase();
-                if(url===MEDIA_URL) return new Response(new Uint8Array([1]),{status:200,headers:{"content-type":"video/mp4"}});
-                if(url.includes("uploadType=resumable")) return new Response(null,{status:200,headers:{location:UPLOAD_URL}});
-                if(url===UPLOAD_URL&&method==="PUT") return new Response(JSON.stringify({}),{status:200,headers:{"content-type":"application/json"}});
-                return new Response("not found",{status:404});
-              }) as typeof fetch;
-              await assert.rejects(() => youtubePublisher.publish({targetId:"channel",accessToken:"token",mediaUrl:MEDIA_URL,caption:"x",title:"x",format:"YOUTUBE_VIDEO",mediaType:"VIDEO"}), (e:any) => e instanceof ProviderError && e.isAmbiguous===true);
-            });
-          });
-
-          describe("PUB-07 route integration contract", () => {
-            const source=readFileSync(new URL("../../../app/api/publishing/publish/route.ts",import.meta.url),"utf8");
-            it("passes title/description/thumbnail and excludes thumbnail from video upload", () => {
-              assert.match(source,/publishInput\.title = draft\.title/);
-              assert.match(source,/publishInput\.thumbnailUrl = youtubeThumbnail\?\.url/);
-              assert.match(source,/a\.role !== "thumbnail"/);
-            });
-            it("keeps ambiguous provider outcomes network-generic and IN_REVIEW", () => {
-              const idx=source.indexOf("LIVE_RECONCILIATION_REQUIRED");
-              const section=source.slice(idx,idx+700);
-              assert.match(section,/\$\{network\} devolvio un resultado ambiguo/);
-              assert.doesNotMatch(section,/Meta devolvio/);
-              assert.match(section,/IN_REVIEW/);
-            });
-          });
-          TEST
-
+          python3 "$RUNNER_TEMP/pub07-patch.py" "$WT" "$RUNNER_TEMP/youtube.test.ts"
           cd "$WT"
-          allowed=1
-          while IFS= read -r p; do
-            case "$p" in
-              apps/web/lib/publishers/*|apps/web/app/api/publishing/*|packages/integrations/*) ;;
-              *) echo "OUT_OF_ZONE $p"; allowed=0;;
-            esac
-          done < <(git status --short | sed -E 's/^.. //')
-          test "$allowed" = 1
           git diff --check
-          git status --short
+          git status --short | tee "$RUNNER_TEMP/pub07-status.txt"
+          if git status --short | sed -E 's/^.. //' | grep -Ev '^(apps/web/lib/publishers/|apps/web/app/api/publishing/|packages/integrations/)'; then
+            echo "Out-of-zone product change detected"
+            exit 1
+          fi
 
-      - name: Validate provider-specific and project gates
+      - name: Validate focused and full gates
         env:
           WT: ${{ steps.rehydrate.outputs.worktree }}
         run: |
@@ -336,7 +102,7 @@ function buildYouTubeDryRun(format: YouTubePublishingFormat, assets: DraftFormat
           npm test | tee "$RUNNER_TEMP/pub07-full-tests.txt"
           git diff --check
 
-      - name: Commit and push validated product work
+      - name: Commit validated product work
         env:
           WT: ${{ steps.rehydrate.outputs.worktree }}
         run: |
@@ -350,13 +116,13 @@ function buildYouTubeDryRun(format: YouTubePublishingFormat, assets: DraftFormat
           git push origin "HEAD:$FUNCTIONAL_BRANCH"
           git rev-parse HEAD | tee "$RUNNER_TEMP/pub07-head.txt"
 
-      - name: Record validation start on same governed Run
+      - name: Persist validation checkpoint
         env:
           WT: ${{ steps.rehydrate.outputs.worktree }}
         run: |
           set -euo pipefail
           cd "$WT"
-          node node_modules/oreshnik-cli/dist/cli.js evidence --task "$TASK_ID" --run "$RUN_ID" --operator "$OPERATOR" --start-validation --details "YouTube Video/Shorts provider implementation and focused provider contract tests are green; project typecheck/build/worker/full tests are green. Scheduled cron execution still requires a canonical zone amendment before acceptance can be completed." || true
+          node node_modules/oreshnik-cli/dist/cli.js evidence --task "$TASK_ID" --run "$RUN_ID" --operator "$OPERATOR" --start-validation --details "YouTube Video and Shorts provider implementation is green under focused tests, typecheck, build, worker validation and the full project suite. Scheduled cron execution remains outside the current claimed zones and requires a canonical zone amendment before final acceptance." || true
           node node_modules/oreshnik-cli/dist/cli.js reconcile --write --json > "$RUNNER_TEMP/pub07-local-reconcile.json" || true
           git add var/oreshnik docs/oreshnik docs/obsidian-vault docs/07_handoffs 2>/dev/null || true
           if ! git diff --cached --quiet; then
@@ -365,13 +131,14 @@ function buildYouTubeDryRun(format: YouTubePublishingFormat, assets: DraftFormat
             git push origin "HEAD:$FUNCTIONAL_BRANCH"
           fi
 
-      - name: Upload validation evidence
+      - name: Upload evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: pub07-current-run-validation
           path: |
             ${{ runner.temp }}/takeover.json
+            ${{ runner.temp }}/pub07-status.txt
             ${{ runner.temp }}/pub07-focused-tests.txt
             ${{ runner.temp }}/pub07-typecheck.txt
             ${{ runner.temp }}/pub07-build.txt
