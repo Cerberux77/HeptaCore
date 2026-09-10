@@ -51,17 +51,30 @@ function adaptPublisher(raw: ReturnType<typeof getPublisher>): Pub04Publisher | 
   if (!raw) return null;
   return {
     textOnly: raw.capabilities.textOnly,
-    supportedFormats: ["FACEBOOK_FEED", "INSTAGRAM_FEED"],
+    credentialLabel: raw.credentialLabel,
+    supportedFormats: raw.supportedFormats,
     requiredScopes: raw.requiredScopes,
     async publish(input) {
-      const result = await raw.publish({
-        targetId: input.targetId,
-        accessToken: input.accessToken,
-        caption: input.caption,
-        mediaUrl: input.mediaUrl,
-        mediaType: input.mediaType,
-      });
-      return { kind: "success", externalPostId: result.externalPostId, providerResponse: result.providerResponse };
+      try {
+        const result = await raw.publish({
+          targetId: input.targetId,
+          accessToken: input.accessToken,
+          caption: input.caption,
+          mediaUrl: input.mediaUrl,
+          mediaType: input.mediaType,
+          format: input.format,
+          title: input.title,
+          description: input.description,
+          thumbnailUrl: input.thumbnailUrl,
+        });
+        return { kind: "success", externalPostId: result.externalPostId, providerResponse: result.providerResponse };
+      } catch (error) {
+        const candidate = error as { message?: string; isAmbiguous?: boolean; meta?: { httpStatus?: number } };
+        const message = candidate?.message || "Publisher failed";
+        if (candidate?.isAmbiguous) return { kind: "ambiguous", error: message };
+        if (candidate?.meta?.httpStatus === 429) return { kind: "retryable_failure", error: message };
+        return { kind: "terminal_failure", error: message };
+      }
     },
   };
 }
@@ -170,6 +183,7 @@ export async function GET(req: Request) {
             assets: draft.assets.map((da) => ({
               kind: da.asset.kind as "IMAGE" | "VIDEO",
               publicUrl: buildPublicAssetUrl(tenantSlug, da.asset),
+              role: da.role,
             })),
           } : null,
           socialAccounts: socialAccounts.map((sa) => ({
@@ -306,12 +320,13 @@ export async function GET(req: Request) {
     getPublisher(network) {
       return adaptPublisher(getPublisher(network));
     },
-    async resolveCredential({ tenantId, provider, socialAccountId }) {
+    async resolveCredential({ tenantId, provider, socialAccountId, credentialLabel }) {
+      if (!credentialLabel) return { ok: false, code: "CREDENTIAL_LABEL_MISSING" };
       const result = await resolveAndDecryptOAuthCredential({
         tenantId,
         provider,
         socialAccountId,
-        credentialLabel: "facebook_page_oauth",
+        credentialLabel,
       });
       if (!result.ok) return { ok: false, code: result.code };
       return { ok: true, accessToken: result.accessToken, targetId: result.providerUserId };

@@ -23,6 +23,7 @@ export interface Pub04Tenant {
 export interface Pub04Asset {
   kind: "IMAGE" | "VIDEO";
   publicUrl: string | null;
+  role?: string | null;
 }
 
 export interface Pub04Draft {
@@ -65,6 +66,7 @@ export interface Pub04Context {
 
 export interface Pub04Publisher {
   textOnly: boolean;
+  credentialLabel?: string;
   supportedFormats: readonly string[];
   requiredScopes: readonly string[];
   publish(input: {
@@ -73,6 +75,10 @@ export interface Pub04Publisher {
     caption: string;
     mediaUrl?: string;
     mediaType?: "IMAGE" | "VIDEO";
+    format?: string | null;
+    title?: string | null;
+    description?: string | null;
+    thumbnailUrl?: string | null;
   }): Promise<
     | { kind: "success"; externalPostId: string; providerResponse: unknown }
     | { kind: "retryable_failure"; error: string }
@@ -157,6 +163,7 @@ export interface Pub04CronDeps {
     tenantId: string;
     provider: string;
     socialAccountId: string;
+    credentialLabel?: string;
   }): Promise<
     | { ok: true; accessToken: string; targetId: string }
     | { ok: false; code: string }

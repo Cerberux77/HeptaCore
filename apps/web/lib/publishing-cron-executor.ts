@@ -386,6 +386,7 @@ async function processJob(
     tenantId: job.tenantId,
     provider: job.provider,
     socialAccountId: account.id,
+    credentialLabel: publisher.credentialLabel,
   });
   if (!credential.ok) {
     await deps.repo.recordPreProviderBlock({
@@ -407,8 +408,14 @@ async function processJob(
     return { outcome: { jobId: job.id, code: "SKIPPED_CLAIM_LOST", reason: "Claim token invalid after validation" }, publishedCount: 0, reconciliationCount: 0, reconciliationAlerts };
   }
 
-  const mediaAsset = ctx.draft?.assets?.find((a) => a.publicUrl?.startsWith("https://"));
+  const mediaAsset = ctx.draft?.assets?.find(
+    (a) => a.role !== "thumbnail" && a.publicUrl?.startsWith("https://")
+  );
+  const thumbnailAsset = ctx.draft?.assets?.find(
+    (a) => a.role === "thumbnail" && a.kind === "IMAGE" && a.publicUrl?.startsWith("https://")
+  );
   const mediaUrl = mediaAsset?.publicUrl ?? undefined;
+  const thumbnailUrl = thumbnailAsset?.publicUrl ?? undefined;
 
   let providerResult: Awaited<ReturnType<Pub04Publisher["publish"]>>;
   try {
@@ -418,6 +425,10 @@ async function processJob(
       caption: ctx.draft?.caption ?? ctx.draft?.title ?? "",
       mediaUrl,
       mediaType: mediaAsset ? (mediaAsset.kind === "VIDEO" ? "VIDEO" : "IMAGE") : undefined,
+      format: ctx.draft?.format ?? null,
+      title: ctx.draft?.title ?? null,
+      description: ctx.draft?.caption ?? null,
+      thumbnailUrl,
     });
   } catch {
     providerResult = { kind: "terminal_failure", error: "Publisher threw unexpectedly" };
