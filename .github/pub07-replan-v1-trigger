@@ -1,4 +1,4 @@
 parent=S-HC-PUB-07-YOUTUBE-PUBLISHING
 child=S-HC-PUB-07B-YOUTUBE-SCHEDULED-E2E
-mode=structured-dry-run-evidence-recovery-v2
-issued=2026-09-10T13:55:00-04:00
+mode=native-evidence-gate-service-dry-run-recovery-v3
+fix_commit=7adf89ad3faeac865d6a9924c9b9219ff6bf2524
