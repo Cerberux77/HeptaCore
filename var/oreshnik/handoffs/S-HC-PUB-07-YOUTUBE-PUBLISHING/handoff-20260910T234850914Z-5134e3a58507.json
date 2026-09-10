@@ -1,0 +1,145 @@
+{
+  "schema": "oreshnik-handoff/v1",
+  "id": "handoff-20260910T234850914Z-5134e3a58507",
+  "createdAt": "2026-09-10T23:48:50.914Z",
+  "integrity": {
+    "algorithm": "sha256",
+    "digest": "0bcf3d16c23ae3b0d6a9e9d06ccd66d9766338bca90ec25574c25f01e5dfd1d3"
+  },
+  "identity": {
+    "project": "HeptaCore",
+    "repository": "https://github.com/Cerberux77/HeptaCore",
+    "operator": "manuel",
+    "taskId": "S-HC-PUB-07-YOUTUBE-PUBLISHING",
+    "runId": "run-manuel-S-HC-PUB-07-YOUTUBE-PUBLISHING-20260910234839-191d864a",
+    "assignmentId": null,
+    "claimStatus": "claimed",
+    "reason": "external YouTube OAuth/channel validation boundary",
+    "oreshnikVersion": "0.3.0-alpha.6"
+  },
+  "git": {
+    "branch": "dispatch/manuel/manuel-chatgpt1/publishing/S-HC-PUB-07-YOUTUBE-PUBLISHING/5dc36253e7",
+    "upstream": "origin/master",
+    "head": "741f3e3f66c4fa1fe14d6db9042df4fd1861bf97",
+    "base": "741f3e3f66c4fa1fe14d6db9042df4fd1861bf97",
+    "ahead": 0,
+    "behind": 0,
+    "ownCommits": [],
+    "modified": [
+      "var/oreshnik/task-board.json",
+      "var/oreshnik/tasks/S-HC-PUB-07-YOUTUBE-PUBLISHING.json"
+    ],
+    "untracked": [
+      "var/oreshnik/claims/S-HC-PUB-07-YOUTUBE-PUBLISHING.json",
+      "var/oreshnik/runs/S-HC-PUB-07-YOUTUBE-PUBLISHING/run-manuel-S-HC-PUB-07-YOUTUBE-PUBLISHING-20260910234839-191d864a.json"
+    ],
+    "conflicts": [],
+    "stash": [],
+    "clean": false,
+    "detached": false,
+    "worktreePath": "/home/runner/work/_temp/oreshnik-wt-pub07-external/32305cad03d6321a/manuel/manuel-chatgpt1/publishing/S-HC-PUB-07-YOUTUBE-PUBLISHING/5dc36253e7"
+  },
+  "github": {
+    "available": true,
+    "pr": null,
+    "state": null,
+    "base": null,
+    "head": null,
+    "mergeable": null,
+    "checks": [],
+    "reviews": [],
+    "unresolvedConversations": null,
+    "remoteHead": "741f3e3f66c4fa1fe14d6db9042df4fd1861bf97",
+    "source": "github-rest"
+  },
+  "functional": {
+    "objective": "Preserve deterministic PUB-07 software while isolating the real external YouTube smoke.",
+    "implemented": [
+      "PUB-07B deterministic Video/Shorts immediate+scheduled path integrated"
+    ],
+    "partial": [
+      "Real YouTube OAuth/channel identity smoke remains external"
+    ],
+    "decisions": [],
+    "primaryFiles": [
+      "var/oreshnik/claims/S-HC-PUB-07-YOUTUBE-PUBLISHING.json",
+      "var/oreshnik/runs/S-HC-PUB-07-YOUTUBE-PUBLISHING/run-manuel-S-HC-PUB-07-YOUTUBE-PUBLISHING-20260910234839-191d864a.json",
+      "var/oreshnik/task-board.json",
+      "var/oreshnik/tasks/S-HC-PUB-07-YOUTUBE-PUBLISHING.json"
+    ],
+    "testsRun": [
+      "PUB-07B dry-run,typecheck,build,worker,tests PASS"
+    ],
+    "testsPending": [
+      "Authorized read-only YouTube channel identity smoke"
+    ],
+    "gates": [
+      "PUB-07B terminalization verified"
+    ],
+    "regressions": []
+  },
+  "deployments": [],
+  "blockers": [
+    {
+      "id": "YOUTUBE_AUTHORIZED_OAUTH_CHANNEL_REQUIRED",
+      "category": "CREDENTIAL",
+      "description": "Real authorized YouTube OAuth/channel runtime is not available to this execution. The deterministic software delivery is integrated, but no external channel identity smoke may be claimed without real credentials.",
+      "evidence": [
+        "PUB-07B deterministic software Task is integrated and terminalized.",
+        "Current operation intentionally received no application OAuth/token-vault material and performed no YouTube provider mutation.",
+        "Dedicated Task S-HC-PUB-07C-YOUTUBE-AUTH-CHANNEL-SMOKE owns the safe read-only external validation."
+      ],
+      "impact": "Parent PUB-07 cannot honestly satisfy real provider/channel acceptance or declare external support.",
+      "blocking": true,
+      "probableOwner": "Manuel / authorized YouTube channel owner",
+      "recommendedAction": "Provide or connect an authorized YouTube OAuth/channel runtime, then execute S-HC-PUB-07C-YOUTUBE-AUTH-CHANNEL-SMOKE without publishing content.",
+      "nextCommand": "oreshnik task resume --task S-HC-PUB-07-YOUTUBE-PUBLISHING --operator manuel --authorized-external",
+      "unblockCondition": "S-HC-PUB-07C-YOUTUBE-AUTH-CHANNEL-SMOKE has real authorized PASS evidence for tokenRef resolution, required scope, and read-only channel identity."
+    }
+  ],
+  "stability": {
+    "classification": "BLOCKED_EXTERNAL",
+    "reasons": [
+      "Real authorized YouTube OAuth/channel runtime is not available to this execution. The deterministic software delivery is integrated, but no external channel identity smoke may be claimed without real credentials."
+    ]
+  },
+  "resume": {
+    "exactPoint": "Waiting only for authorized YouTube OAuth/channel external validation.",
+    "firstCommand": "Execute S-HC-PUB-07C-YOUTUBE-AUTH-CHANNEL-SMOKE in an authorized runtime; do not publish content.",
+    "branch": "dispatch/manuel/manuel-chatgpt1/publishing/S-HC-PUB-07-YOUTUBE-PUBLISHING/5dc36253e7",
+    "worktreePath": "/home/runner/work/_temp/oreshnik-wt-pub07-external/32305cad03d6321a/manuel/manuel-chatgpt1/publishing/S-HC-PUB-07-YOUTUBE-PUBLISHING/5dc36253e7",
+    "preconditions": [
+      "Run oreshnik preflight",
+      "Verify assignment and claim authority",
+      "Confirm no handoff supersedes this one"
+    ],
+    "priorityFiles": [
+      "var/oreshnik/claims/S-HC-PUB-07-YOUTUBE-PUBLISHING.json",
+      "var/oreshnik/runs/S-HC-PUB-07-YOUTUBE-PUBLISHING/run-manuel-S-HC-PUB-07-YOUTUBE-PUBLISHING-20260910234839-191d864a.json",
+      "var/oreshnik/task-board.json",
+      "var/oreshnik/tasks/S-HC-PUB-07-YOUTUBE-PUBLISHING.json"
+    ],
+    "focusedTests": [
+      "Authorized read-only YouTube channel identity smoke"
+    ],
+    "completionCriterion": "Read-only authorized channel smoke passes with non-secret evidence, then explicitly authorize parent resume."
+  },
+  "sources": [
+    {
+      "kind": "discovered",
+      "field": "identity.taskId",
+      "evidence": "canonical task artifact/task-board"
+    },
+    {
+      "kind": "discovered",
+      "field": "git",
+      "evidence": "git commands executed with typed argv"
+    },
+    {
+      "kind": "declared",
+      "field": "functional",
+      "evidence": "operator CLI input"
+    }
+  ],
+  "warnings": []
+}

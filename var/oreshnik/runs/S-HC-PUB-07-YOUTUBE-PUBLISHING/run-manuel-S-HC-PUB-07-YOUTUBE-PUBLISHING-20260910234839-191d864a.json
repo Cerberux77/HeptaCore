@@ -1,0 +1,35 @@
+{
+  "project": "HeptaCore",
+  "taskId": "S-HC-PUB-07-YOUTUBE-PUBLISHING",
+  "sprint": "publishing",
+  "owner": "Manuel",
+  "operator": "manuel",
+  "worker": "manuel-dispatcher",
+  "workerMode": "shell",
+  "runId": "run-manuel-S-HC-PUB-07-YOUTUBE-PUBLISHING-20260910234839-191d864a",
+  "branch": "dispatch/manuel/manuel-chatgpt1/publishing/S-HC-PUB-07-YOUTUBE-PUBLISHING/5dc36253e7",
+  "worktreePath": "/home/runner/work/_temp/oreshnik-wt-pub07-external/32305cad03d6321a/manuel/manuel-chatgpt1/publishing/S-HC-PUB-07-YOUTUBE-PUBLISHING/5dc36253e7",
+  "zones": [
+    "apps/web/lib/publishers",
+    "apps/web/app/api/publishing",
+    "packages/integrations"
+  ],
+  "resources": [],
+  "taskBoardPath": "/home/runner/work/_temp/oreshnik-wt-pub07-external/32305cad03d6321a/manuel/manuel-chatgpt1/publishing/S-HC-PUB-07-YOUTUBE-PUBLISHING/5dc36253e7/var/oreshnik/task-board.json",
+  "taskStatus": "claimed",
+  "claimStatus": "claimed",
+  "claimedAt": "2026-09-10T23:48:44.426Z",
+  "updatedAt": "2026-09-10T23:48:44.436Z",
+  "expiresAt": "2026-09-11T00:48:44.426Z",
+  "handoffs": [
+    {
+      "id": "handoff-20260910T234850914Z-5134e3a58507",
+      "schema": "oreshnik-handoff/v1",
+      "createdAt": "2026-09-10T23:48:50.914Z",
+      "jsonPath": "var/oreshnik/handoffs/S-HC-PUB-07-YOUTUBE-PUBLISHING/handoff-20260910T234850914Z-5134e3a58507.json",
+      "markdownPath": "docs/oreshnik/handoffs/S-HC-PUB-07-YOUTUBE-PUBLISHING/handoff-20260910T234850914Z-5134e3a58507.md",
+      "digest": "0bcf3d16c23ae3b0d6a9e9d06ccd66d9766338bca90ec25574c25f01e5dfd1d3",
+      "classification": "BLOCKED_EXTERNAL"
+    }
+  ]
+}
