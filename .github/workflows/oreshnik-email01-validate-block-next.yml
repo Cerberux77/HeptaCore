@@ -1,4 +1,4 @@
-name: Oreshnik EMAIL-01 Block Retry and Next
+name: Oreshnik EMAIL-01 Projection Repair and Next
 
 on:
   push:
@@ -11,27 +11,19 @@ permissions:
   actions: read
 
 concurrency:
-  group: heptacore-oreshnik-email01-block-retry
+  group: heptacore-oreshnik-email01-projection-repair
   cancel-in-progress: false
 
 env:
   TASK_ID: S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION
   RUN_ID: run-manuel-S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION-20260910144612-ccbed006
   ASSIGNMENT_ID: asg-913a8dde-5aef-4f8b-8731-1af33f2228d9
-  OPERATOR: manuel
-  HARNESS: chatgpt
-  INSTANCE: manuel-chatgpt1
-  SESSION: session_5bb21c8aa01e49bcb03886ae23d26864
-  FUNCTIONAL_BRANCH: dispatch/manuel/manuel-chatgpt1/email-infra/S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION/ceaa8b659d
-  VALIDATED_HEAD: 18aec87
-  EXPECTED_AGENT_UID: agent_e8dd52d1d5de4f40a9a4d9923ffda155
-  EXPECTED_REPOSITORY_ID: 32305cad03d6321a
   ORESHNIK_VERSION: 0.3.0-alpha.6
 
 jobs:
-  block-and-next:
+  repair-and-next:
     runs-on: ubuntu-24.04
-    timeout-minutes: 45
+    timeout-minutes: 30
     steps:
       - name: Checkout canonical master
         uses: actions/checkout@v4
@@ -40,13 +32,13 @@ jobs:
           fetch-depth: 0
           persist-credentials: true
 
-      - name: Setup exact Oreshnik controller
+      - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: 24
           cache: npm
 
-      - name: Install and preflight
+      - name: Install exact controller and preflight
         run: |
           set -euo pipefail
           git config user.name "Manuel Vera via ChatGPT Operator"
@@ -54,150 +46,75 @@ jobs:
           npm ci --ignore-scripts
           test "$(node node_modules/oreshnik-cli/dist/cli.js --version)" = "$ORESHNIK_VERSION"
           npm run oreshnik:ready
-          STATE="$RUNNER_TEMP/oreshnik-local-state"
-          mkdir -p "$STATE"
-          echo "ORESHNIK_LOCAL_STATE_DIR=$STATE" >> "$GITHUB_ENV"
-
-      - name: Rehydrate the exact preserved Run on this runner
-        id: takeover
-        run: |
-          set -euo pipefail
-          ROOT="$RUNNER_TEMP/oreshnik-wt-email01-retry"
-          node node_modules/oreshnik-cli/dist/cli.js dispatch init --mother master --worktree-root "$ROOT" --repo . --json > "$RUNNER_TEMP/init.json"
-          node node_modules/oreshnik-cli/dist/cli.js dispatch takeover \
-            --run "$RUN_ID" \
-            --reason "Retry EMAIL-01 external block after all software gates passed" \
-            --operator "$OPERATOR" --harness "$HARNESS" --instance "$INSTANCE" --session "$SESSION" \
-            --takeover --repo . --json | tee "$RUNNER_TEMP/takeover.json"
-          WT="$(node -e 'const x=require(process.env.RUNNER_TEMP+"/takeover.json");process.stdout.write(x.worktreePath||"")')"
-          MACHINE="$(node -e 'const x=require(process.env.RUNNER_TEMP+"/takeover.json");process.stdout.write(x.machineId||"")')"
-          AGENT="$(node -e 'const x=require(process.env.RUNNER_TEMP+"/takeover.json");process.stdout.write(x.agentInstanceUid||"")')"
-          test -n "$WT" && test -d "$WT"
-          test -n "$MACHINE"
-          test "$AGENT" = "$EXPECTED_AGENT_UID"
-          test "$(git -C "$WT" branch --show-current)" = "$FUNCTIONAL_BRANCH"
-          git -C "$WT" fetch origin "+refs/heads/$FUNCTIONAL_BRANCH:refs/remotes/origin/$FUNCTIONAL_BRANCH"
-          git -C "$WT" merge --ff-only "origin/$FUNCTIONAL_BRANCH"
-          git -C "$WT" merge-base --is-ancestor "$VALIDATED_HEAD" HEAD
-          echo "WT=$WT" >> "$GITHUB_ENV"
-          echo "ORESHNIK_MACHINE_ID_OVERRIDE=$MACHINE" >> "$GITHUB_ENV"
-
-      - name: Verify preserved green evidence and execution identity
-        run: |
-          set -euo pipefail
-          test -f "$ORESHNIK_LOCAL_STATE_DIR/agent-instances.json"
-          test -f "$ORESHNIK_LOCAL_STATE_DIR/execution-sessions.json"
-          node - <<'NODE'
-          const fs=require('node:fs');
-          const instances=JSON.parse(fs.readFileSync(process.env.ORESHNIK_LOCAL_STATE_DIR+'/agent-instances.json','utf8'));
-          const sessions=JSON.parse(fs.readFileSync(process.env.ORESHNIK_LOCAL_STATE_DIR+'/execution-sessions.json','utf8'));
-          const i=instances.find(x=>x.agentInstanceUid===process.env.EXPECTED_AGENT_UID);
-          const s=sessions.find(x=>x.sessionId===process.env.SESSION);
-          if(!i||i.machineId!==process.env.ORESHNIK_MACHINE_ID_OVERRIDE||i.operatorId!==process.env.OPERATOR||i.harnessId!==process.env.HARNESS||i.repositoryId!==process.env.EXPECTED_REPOSITORY_ID) throw new Error('hydrated instance identity mismatch');
-          if(!s||s.agentInstanceUid!==i.agentInstanceUid||s.status!=='active') throw new Error('hydrated session identity mismatch');
-          console.log('EMAIL01_EXECUTION_IDENTITY_PASS');
-          NODE
-          cd "$WT"
-          HJSON="$(find var/oreshnik/handoffs/$TASK_ID -type f -name '*.json' | sort | tail -1)"
-          test -n "$HJSON" && test -f "$HJSON"
-          node "$GITHUB_WORKSPACE/node_modules/oreshnik-cli/dist/cli.js" handoff validate --path "$HJSON" --json | tee "$RUNNER_TEMP/handoff-revalidate.json"
-          node - <<'NODE'
-          const fs=require('node:fs');
-          const p=process.env.WT+'/var/oreshnik/handoffs/'+process.env.TASK_ID;
-          const f=fs.readdirSync(p).filter(x=>x.endsWith('.json')).sort().at(-1);
-          const h=JSON.parse(fs.readFileSync(p+'/'+f,'utf8'));
-          if(h.stability?.classification!=='BLOCKED_EXTERNAL') throw new Error('expected BLOCKED_EXTERNAL handoff');
-          if(!h.functional?.testsRun?.includes('full tests PASS')) throw new Error('full green gate evidence missing');
-          console.log('EMAIL01_GREEN_EVIDENCE_PASS');
-          NODE
-
-      - name: Bridge alpha6 legacy compatible repository identity locally
-        run: |
-          set -euo pipefail
-          cd "$GITHUB_WORKSPACE"
-          node --input-type=module - <<'NODE'
-          import fs from 'node:fs';
-          import path from 'node:path';
-          import { createDispatchControlPlaneService } from 'oreshnik-cli';
-          const service=createDispatchControlPlaneService(process.cwd());
-          const identity=service.repositoryIdentity();
-          if(!identity.ok) throw new Error(identity.error.message);
-          const remote=service.loadRemoteState();
-          if(!remote.ok||!remote.value?.state) throw new Error(remote.ok?'missing control state':remote.error.message);
-          const legacyId=remote.value.state.repository.id;
-          const canonicalId=identity.value.repositoryId;
-          if(legacyId!==canonicalId && !identity.value.compatibleRepositoryIds.includes(legacyId)) {
-            throw new Error(`repository identity is not compatibility-safe: legacy=${legacyId} canonical=${canonicalId}`);
-          }
-          const file=path.join(process.env.ORESHNIK_LOCAL_STATE_DIR,'agent-instances.json');
-          const instances=JSON.parse(fs.readFileSync(file,'utf8'));
-          const idx=instances.findIndex(x=>x.agentInstanceUid===process.env.EXPECTED_AGENT_UID);
-          if(idx<0) throw new Error('governed instance missing from local ephemeral registry');
-          const current=instances[idx];
-          if(current.repositoryId!==legacyId) throw new Error(`unexpected local repository id ${current.repositoryId}`);
-          instances[idx]={...current,repositoryId:canonicalId,updatedAt:new Date().toISOString()};
-          const tmp=file+'.tmp';
-          fs.writeFileSync(tmp,JSON.stringify(instances,null,2)+'\n');
-          fs.renameSync(tmp,file);
-          console.log('ALPHA6_COMPAT_REPOSITORY_BRIDGE_PASS '+JSON.stringify({legacyId,canonicalId,compatible:legacyId===canonicalId||identity.value.compatibleRepositoryIds.includes(legacyId)}));
-          NODE
-          node --input-type=module - <<'NODE'
-          import { createExecutionContextResolver } from 'oreshnik-cli';
-          const result=createExecutionContextResolver(process.cwd()).resolve({explicitOperator:process.env.OPERATOR,explicitHarness:process.env.HARNESS,explicitInstance:process.env.INSTANCE,explicitSession:process.env.SESSION,allowCreateInstance:false,requireSession:true,persistSelection:false,refreshSession:false});
-          if(!result.ok) throw new Error(result.error.message);
-          if(result.value.agentInstanceUid!==process.env.EXPECTED_AGENT_UID) throw new Error('resolved wrong governed instance');
-          console.log('ALPHA6_CONTEXT_RESOLVE_PASS '+JSON.stringify({repositoryId:result.value.repositoryId,machineId:result.value.machineId,agent:result.value.agentInstanceUid}));
-          NODE
-
-      - name: Apply native external block
-        run: |
-          set -euo pipefail
-          cd "$GITHUB_WORKSPACE"
-          node node_modules/oreshnik-cli/dist/cli.js task block \
-            --task "$TASK_ID" --run "$RUN_ID" --operator "$OPERATOR" \
-            --harness "$HARNESS" --instance "$INSTANCE" --session "$SESSION" \
-            --kind awaiting_external_validation \
-            --reason "Final owned HeptaCore sender domain remains intentionally deferred; software foundation is complete and validated while Vercel remains the temporary web origin." \
-            --external-action "Select the final owned HeptaCore domain, configure it in Resend, and verify SPF, DKIM and DMARC before production email activation." \
-            --resume-policy explicit_authorization_required \
-            --repo "$GITHUB_WORKSPACE"
-
-      - name: Persist blocked runtime projection
-        run: |
-          set -euo pipefail
-          cd "$WT"
-          git config user.name "Manuel Vera via ChatGPT Operator"
-          git config user.email "manuel@heptacore.dev"
-          mapfile -t dirty < <(git status --porcelain=v1 | sed 's/^...//')
-          for p in "${dirty[@]}"; do
-            case "$p" in
-              var/oreshnik/*|docs/oreshnik/*|docs/obsidian-vault/*|docs/07_handoffs/*) ;;
-              *) echo "Unexpected post-block path: $p" >&2; exit 42;;
-            esac
-          done
-          git add var/oreshnik docs/oreshnik docs/obsidian-vault docs/07_handoffs 2>/dev/null || true
-          if ! git diff --cached --quiet; then git commit -m "chore(email): persist external production-domain block"; fi
-          git push origin "HEAD:$FUNCTIONAL_BRANCH"
-
-      - name: Verify canonical blocked and resources released
-        run: |
-          set -euo pipefail
-          cd "$GITHUB_WORKSPACE"
           git fetch origin '+refs/heads/master:refs/remotes/origin/master' '+refs/heads/oreshnik/control:refs/remotes/origin/oreshnik/control'
-          node node_modules/oreshnik-cli/dist/cli.js dispatch reconcile --repo . --json | tee "$RUNNER_TEMP/reconcile-after.json"
+          git reset --hard origin/master
+
+      - name: Repair standalone Task projection through canonical amendment CAS
+        run: |
+          set -euo pipefail
+          node --input-type=module - <<'NODE'
+          import { execFileSync } from 'node:child_process';
+          import { createCanonicalTaskAmendmentService, taskDigest } from 'oreshnik-cli';
+          const taskId=process.env.TASK_ID;
+          const expectedHead=execFileSync('git',['rev-parse','origin/master'],{encoding:'utf8'}).trim();
+          const board=JSON.parse(execFileSync('git',['show',`origin/master:var/oreshnik/task-board.json`],{encoding:'utf8'}));
+          const task=board.tasks.find(x=>x.id===taskId);
+          if(!task) throw new Error(`missing ${taskId} from canonical board`);
+          if(task.status!=='blocked'||task.blockState?.kind!=='awaiting_external_validation'||task.blockState?.preservedRunId!==process.env.RUN_ID) {
+            throw new Error(`canonical board is not the expected preserved external block: ${task.status}`);
+          }
+          if(task.activeRun) throw new Error('blocked task unexpectedly retains activeRun');
+          const expectation='Production email activation remains fail-closed until an owned HeptaCore sender domain is verified in Resend with SPF, DKIM and DMARC evidence.';
+          const validationExpectations=[...new Set([...(task.validationExpectations||[]),expectation])];
+          const service=createCanonicalTaskAmendmentService(process.cwd());
+          const result=service.amend({
+            motherBranch:'master',
+            expectedHead,
+            amendment:{
+              schemaVersion:1,
+              taskId,
+              patch:{validationExpectations},
+              reason:'Repair alpha.6 standalone Task projection after native external block and preserve the explicit production-domain validation contract.',
+              amendedBy:'manuel',
+              amendedAt:new Date().toISOString(),
+              expectedTaskDigest:taskDigest(task),
+            },
+          });
+          if(!result.ok) throw new Error(result.error.message);
+          console.log('EMAIL01_CANONICAL_AMENDMENT_PASS '+JSON.stringify(result.value));
+          NODE
+
+      - name: Verify blocked projection and released resources
+        run: |
+          set -euo pipefail
           git fetch origin '+refs/heads/master:refs/remotes/origin/master' '+refs/heads/oreshnik/control:refs/remotes/origin/oreshnik/control'
           node - <<'NODE'
           const {execFileSync}=require('node:child_process');
           const read=(ref,p)=>JSON.parse(execFileSync('git',['show',`${ref}:${p}`],{encoding:'utf8'}));
-          const task=read('origin/master',`var/oreshnik/tasks/${process.env.TASK_ID}.json`);
+          const board=read('origin/master','var/oreshnik/task-board.json');
+          const artifact=read('origin/master',`var/oreshnik/tasks/${process.env.TASK_ID}.json`);
           const control=read('origin/oreshnik/control','control-plane.json');
+          const task=board.tasks.find(x=>x.id===process.env.TASK_ID);
           const a=(control.assignments||[]).find(x=>x.assignmentId===process.env.ASSIGNMENT_ID);
           const r=(control.runs||[]).find(x=>x.runId===process.env.RUN_ID);
           const c=(control.claims||[]).find(x=>x.assignmentId===process.env.ASSIGNMENT_ID);
           const zones=(control.zones||[]).filter(x=>x.assignmentId===process.env.ASSIGNMENT_ID&&x.status==='reserved');
-          if(task.status!=='blocked'||task.blockState?.kind!=='awaiting_external_validation'||task.blockState?.preservedRunId!==process.env.RUN_ID) throw new Error('canonical block projection incomplete');
-          if(a?.status!=='released'||r?.status!=='released'||c?.status!=='released'||zones.length) throw new Error(`release incomplete ${a?.status}/${r?.status}/${c?.status}/zones=${zones.length}`);
-          console.log('EMAIL01_BLOCK_LIFECYCLE_PASS '+JSON.stringify({assignment:a.status,run:r.status,claim:c.status,reservedZones:zones.length}));
+          for(const [name,x] of [['board',task],['artifact',artifact]]) {
+            if(!x||x.status!=='blocked'||x.blockState?.kind!=='awaiting_external_validation'||x.blockState?.preservedRunId!==process.env.RUN_ID) throw new Error(`${name} blocked projection incomplete`);
+          }
+          if(a?.status!=='released'||c?.status!=='released'||zones.length!==0) throw new Error(`resource release incomplete assignment=${a?.status} claim=${c?.status} zones=${zones.length}`);
+          if(!r||!['released','blocked'].includes(r.status)) throw new Error(`unexpected preserved run status ${r?.status}`);
+          console.log('EMAIL01_BLOCK_CANONICAL_PASS '+JSON.stringify({master:execFileSync('git',['rev-parse','origin/master'],{encoding:'utf8'}).trim(),assignment:a.status,run:r.status,claim:c.status,reservedZones:zones.length}));
+          NODE
+          node node_modules/oreshnik-cli/dist/cli.js dispatch reconcile --repo . --json | tee "$RUNNER_TEMP/reconcile-after-repair.json"
+          git fetch origin '+refs/heads/master:refs/remotes/origin/master'
+          node - <<'NODE'
+          const {execFileSync}=require('node:child_process');
+          const board=JSON.parse(execFileSync('git',['show','origin/master:var/oreshnik/task-board.json'],{encoding:'utf8'}));
+          const artifact=JSON.parse(execFileSync('git',['show',`origin/master:var/oreshnik/tasks/${process.env.TASK_ID}.json`],{encoding:'utf8'}));
+          const task=board.tasks.find(x=>x.id===process.env.TASK_ID);
+          if(task.status!==artifact.status||JSON.stringify(task.blockState)!==JSON.stringify(artifact.blockState)) throw new Error('post-reconcile board/artifact drift');
+          console.log('EMAIL01_POST_RECONCILE_PROJECTION_PASS');
           NODE
 
       - name: Remove transient EMAIL-01 bootstrap
@@ -206,10 +123,10 @@ jobs:
           git fetch origin '+refs/heads/master:refs/remotes/origin/master'
           git reset --hard origin/master
           git rm .github/workflows/oreshnik-email01-validate-block-next.yml .github/oreshnik-email01-validate-block-next-trigger
-          git commit -m "chore(oreshnik): remove transient EMAIL-01 runner"
+          git commit -m "chore(oreshnik): remove transient EMAIL-01 recovery runner"
           git push origin HEAD:master
 
-      - name: Reconcile and dispatch next Goal
+      - name: Dispatch next governed Goal
         run: |
           set -euo pipefail
           git fetch origin '+refs/heads/master:refs/remotes/origin/master' '+refs/heads/oreshnik/control:refs/remotes/origin/oreshnik/control'
@@ -217,7 +134,7 @@ jobs:
           npm run oreshnik:ready
           ROOT="$RUNNER_TEMP/oreshnik-wt-next"
           node node_modules/oreshnik-cli/dist/cli.js dispatch init --mother master --worktree-root "$ROOT" --repo . --json > "$RUNNER_TEMP/next-init.json"
-          node node_modules/oreshnik-cli/dist/cli.js dispatch reconcile --repo . --json | tee "$RUNNER_TEMP/next-reconcile.json"
+          node node_modules/oreshnik-cli/dist/cli.js dispatch reconcile --repo . --json > "$RUNNER_TEMP/next-reconcile.json"
           node node_modules/oreshnik-cli/dist/cli.js goal --harness chatgpt --auto-align --repo . --max-retries 3 --json | tee "$RUNNER_TEMP/next-goal.json"
           node - <<'NODE'
           const fs=require('node:fs');
@@ -226,14 +143,12 @@ jobs:
           console.log('NEXT_GOAL_SUMMARY '+JSON.stringify({result:g.result,taskId:g.taskId??null,title:g.title??null,runId:g.runId??null,assignmentId:g.assignmentId??null,functionalBranch:g.functionalBranch??null}));
           NODE
 
-      - name: Upload lifecycle evidence
+      - name: Upload evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: oreshnik-email01-block-retry-next
+          name: oreshnik-email01-projection-repair-next
           path: |
-            ${{ runner.temp }}/takeover.json
-            ${{ runner.temp }}/handoff-revalidate.json
-            ${{ runner.temp }}/reconcile-after.json
+            ${{ runner.temp }}/reconcile-after-repair.json
             ${{ runner.temp }}/next-goal.json
           if-no-files-found: ignore
