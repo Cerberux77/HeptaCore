@@ -5,7 +5,7 @@
     "originUrl": "https://github.com/Cerberux77/HeptaCore.git",
     "canonicalMotherBranch": "master"
   },
-  "generation": 128,
+  "generation": 129,
   "controlHead": "8066de4e75113c89906e642ae582ea78af697620",
   "catalog": {
     "taskBoardPath": "var/oreshnik/task-board.json",
@@ -508,11 +508,11 @@
       "displayAlias": "manuel-chatgpt1",
       "operatorId": "manuel",
       "harnessId": "chatgpt",
-      "machineId": "machine-7813b32a-6865-4d84-993e-b00af5d1006c",
+      "machineId": "machine-8f867bf0-640c-438a-914a-6fb8f297e61c",
       "repositoryId": "32305cad03d6321a",
       "slot": 1,
       "createdAt": "2026-09-10T16:20:01.353Z",
-      "updatedAt": "2026-09-10T16:55:11.679Z",
+      "updatedAt": "2026-09-10T17:09:54.625Z",
       "identityOrigin": "explicit"
     }
   ],
@@ -677,9 +677,9 @@
       "agentInstanceUid": "agent_5930d607f3e043f2a8fee58342a57e07",
       "operatorId": "manuel",
       "harnessId": "chatgpt",
-      "machineId": "machine-7813b32a-6865-4d84-993e-b00af5d1006c",
+      "machineId": "machine-8f867bf0-640c-438a-914a-6fb8f297e61c",
       "startedAt": "2026-09-10T16:20:01.353Z",
-      "lastSeenAt": "2026-09-10T16:55:11.679Z",
+      "lastSeenAt": "2026-09-10T17:09:54.625Z",
       "status": "active",
       "identityOrigin": "explicit"
     }
@@ -1344,12 +1344,13 @@
         "apps/web/app/api/publishing",
         "packages/integrations"
       ],
-      "status": "active",
+      "status": "superseded",
       "sourceTaskBoardHead": "f53a8177602ef441e9427ab22c14f7e579dc232e",
       "catalogFingerprint": "bea95716241d9f6cd5d476ed5a13e204250b63d3",
       "createdAt": "2026-09-10T16:20:01.353Z",
-      "updatedAt": "2026-09-10T17:09:54.625Z",
+      "updatedAt": "2026-09-10T17:31:40.578Z",
       "activatedAt": "2026-09-10T16:20:10.286Z",
+      "lastError": "Replan PUB-07 because the original canonical Task omitted the scheduled-publishing cron/executor/contract zones. Product commit 4a67b755dce1e8e7d91eff6c4c582e6d69dad64d is preserved on dispatch/manuel/manuel-chatgpt1/publishing/S-HC-PUB-07-YOUTUBE-PUBLISHING/71b46093fd.",
       "resumedCount": 6,
       "takeoverCount": 0,
       "ownershipGeneration": 7,
@@ -1811,9 +1812,9 @@
       "runId": "run-manuel-S-HC-PUB-07-YOUTUBE-PUBLISHING-20260910162001-40482454",
       "branch": "dispatch/manuel/manuel-chatgpt1/publishing/S-HC-PUB-07-YOUTUBE-PUBLISHING/71b46093fd",
       "worktreePath": "/home/runner/work/_temp/oreshnik-wt-replan/32305cad03d6321a/manuel/manuel-chatgpt1/publishing/S-HC-PUB-07-YOUTUBE-PUBLISHING/7912e8fa",
-      "status": "active",
+      "status": "superseded",
       "createdAt": "2026-09-10T16:20:01.353Z",
-      "updatedAt": "2026-09-10T17:09:54.625Z",
+      "updatedAt": "2026-09-10T17:31:40.578Z",
       "zones": [
         "apps/web/lib/publishers",
         "apps/web/app/api/publishing",
@@ -2293,10 +2294,11 @@
       "machineId": "machine-8f867bf0-640c-438a-914a-6fb8f297e61c",
       "branch": "dispatch/manuel/manuel-chatgpt1/publishing/S-HC-PUB-07-YOUTUBE-PUBLISHING/71b46093fd",
       "worktreePath": "/home/runner/work/_temp/oreshnik-wt-replan/32305cad03d6321a/manuel/manuel-chatgpt1/publishing/S-HC-PUB-07-YOUTUBE-PUBLISHING/7912e8fa",
-      "status": "active",
+      "status": "superseded",
       "createdAt": "2026-09-10T16:20:01.353Z",
-      "updatedAt": "2026-09-10T17:09:54.625Z",
+      "updatedAt": "2026-09-10T17:31:40.578Z",
       "sourceTaskBoardHead": "f53a8177602ef441e9427ab22c14f7e579dc232e",
+      "lastError": "Replan PUB-07 because the original canonical Task omitted the scheduled-publishing cron/executor/contract zones. Product commit 4a67b755dce1e8e7d91eff6c4c582e6d69dad64d is preserved on dispatch/manuel/manuel-chatgpt1/publishing/S-HC-PUB-07-YOUTUBE-PUBLISHING/71b46093fd.",
       "zones": [
         "apps/web/lib/publishers",
         "apps/web/app/api/publishing",
@@ -3376,9 +3378,9 @@
       "machineId": "machine-4ae383f2-5fb9-4cb2-a9d2-9660c5a1a5ce",
       "runId": "run-manuel-S-HC-PUB-07-YOUTUBE-PUBLISHING-20260910162001-40482454",
       "branch": "dispatch/manuel/manuel-chatgpt1/publishing/S-HC-PUB-07-YOUTUBE-PUBLISHING/71b46093fd",
-      "status": "reserved",
+      "status": "superseded",
       "createdAt": "2026-09-10T16:20:01.353Z",
-      "updatedAt": "2026-09-10T16:20:10.286Z",
+      "updatedAt": "2026-09-10T17:31:40.578Z",
       "harnessId": "chatgpt",
       "agentInstanceUid": "agent_5930d607f3e043f2a8fee58342a57e07",
       "agentInstanceAlias": "manuel-chatgpt1",
@@ -3394,9 +3396,9 @@
       "machineId": "machine-4ae383f2-5fb9-4cb2-a9d2-9660c5a1a5ce",
       "runId": "run-manuel-S-HC-PUB-07-YOUTUBE-PUBLISHING-20260910162001-40482454",
       "branch": "dispatch/manuel/manuel-chatgpt1/publishing/S-HC-PUB-07-YOUTUBE-PUBLISHING/71b46093fd",
-      "status": "reserved",
+      "status": "superseded",
       "createdAt": "2026-09-10T16:20:01.353Z",
-      "updatedAt": "2026-09-10T16:20:10.286Z",
+      "updatedAt": "2026-09-10T17:31:40.578Z",
       "harnessId": "chatgpt",
       "agentInstanceUid": "agent_5930d607f3e043f2a8fee58342a57e07",
       "agentInstanceAlias": "manuel-chatgpt1",
@@ -3412,9 +3414,9 @@
       "machineId": "machine-4ae383f2-5fb9-4cb2-a9d2-9660c5a1a5ce",
       "runId": "run-manuel-S-HC-PUB-07-YOUTUBE-PUBLISHING-20260910162001-40482454",
       "branch": "dispatch/manuel/manuel-chatgpt1/publishing/S-HC-PUB-07-YOUTUBE-PUBLISHING/71b46093fd",
-      "status": "reserved",
+      "status": "superseded",
       "createdAt": "2026-09-10T16:20:01.353Z",
-      "updatedAt": "2026-09-10T16:20:10.286Z",
+      "updatedAt": "2026-09-10T17:31:40.578Z",
       "harnessId": "chatgpt",
       "agentInstanceUid": "agent_5930d607f3e043f2a8fee58342a57e07",
       "agentInstanceAlias": "manuel-chatgpt1",
@@ -4372,6 +4374,14 @@
       "agentInstanceUid": "agent_5930d607f3e043f2a8fee58342a57e07",
       "sessionId": "session_dcdf09f15279492f91b148a3e9c751e6",
       "message": "Takeover by manuel/manuel-chatgpt1 from manuel/manuel-chatgpt1. Reason: Replan PUB-07 after discovering canonical scheduled-publishing zones were omitted; preserve validated code before releasing the old Run.. Generation: 6 → 7."
+    },
+    {
+      "at": "2026-09-10T17:31:40.578Z",
+      "action": "dispatch.superseded",
+      "assignmentId": "asg-797270cc-485b-40c5-b0d6-43977912e8fa",
+      "runId": "run-manuel-S-HC-PUB-07-YOUTUBE-PUBLISHING-20260910162001-40482454",
+      "operator": "manuel",
+      "message": "Replan PUB-07 because the original canonical Task omitted the scheduled-publishing cron/executor/contract zones. Product commit 4a67b755dce1e8e7d91eff6c4c582e6d69dad64d is preserved on dispatch/manuel/manuel-chatgpt1/publishing/S-HC-PUB-07-YOUTUBE-PUBLISHING/71b46093fd."
     }
   ],
   "reconciliation": {
@@ -4381,5 +4391,5 @@
     "pendingDiagnostics": []
   },
   "createdAt": "2026-06-29T20:17:43.302Z",
-  "updatedAt": "2026-09-10T17:09:54.625Z"
+  "updatedAt": "2026-09-10T17:31:40.578Z"
 }
