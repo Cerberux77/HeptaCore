@@ -1,4 +1,4 @@
-name: Oreshnik EMAIL-01 Validate Block and Next
+name: Oreshnik EMAIL-01 Block Retry and Next
 
 on:
   push:
@@ -11,7 +11,7 @@ permissions:
   actions: read
 
 concurrency:
-  group: heptacore-oreshnik-email01-validate-block-next
+  group: heptacore-oreshnik-email01-block-retry
   cancel-in-progress: false
 
 env:
@@ -23,28 +23,30 @@ env:
   INSTANCE: manuel-chatgpt1
   SESSION: session_5bb21c8aa01e49bcb03886ae23d26864
   FUNCTIONAL_BRANCH: dispatch/manuel/manuel-chatgpt1/email-infra/S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION/ceaa8b659d
+  VALIDATED_HEAD: 18aec87
+  EXPECTED_AGENT_UID: agent_e8dd52d1d5de4f40a9a4d9923ffda155
   ORESHNIK_VERSION: 0.3.0-alpha.6
-  ESBUILD_VERSION: 0.28.0
+  ORESHNIK_LOCAL_STATE_DIR: ${{ runner.temp }}/oreshnik-local-state
 
 jobs:
-  validate-block-next:
+  block-and-next:
     runs-on: ubuntu-24.04
-    timeout-minutes: 120
+    timeout-minutes: 45
     steps:
-      - name: Checkout dispatcher root
+      - name: Checkout canonical master
         uses: actions/checkout@v4
         with:
           ref: master
           fetch-depth: 0
           persist-credentials: true
 
-      - name: Setup Node
+      - name: Setup exact Oreshnik controller
         uses: actions/setup-node@v4
         with:
           node-version: 24
           cache: npm
 
-      - name: Prepare exact controller and baseline readiness
+      - name: Install and preflight
         run: |
           set -euo pipefail
           git config user.name "Manuel Vera via ChatGPT Operator"
@@ -52,176 +54,81 @@ jobs:
           npm ci --ignore-scripts
           test "$(node node_modules/oreshnik-cli/dist/cli.js --version)" = "$ORESHNIK_VERSION"
           npm run oreshnik:ready
+          mkdir -p "$ORESHNIK_LOCAL_STATE_DIR"
 
-      - name: Rehydrate exact EMAIL-01 Run
+      - name: Rehydrate the exact preserved Run on this runner
         id: takeover
         run: |
           set -euo pipefail
-          ROOT="$RUNNER_TEMP/oreshnik-wt-email01"
-          node node_modules/oreshnik-cli/dist/cli.js dispatch init --mother master --worktree-root "$ROOT" --repo . --json | tee "$RUNNER_TEMP/init.json"
+          ROOT="$RUNNER_TEMP/oreshnik-wt-email01-retry"
+          node node_modules/oreshnik-cli/dist/cli.js dispatch init --mother master --worktree-root "$ROOT" --repo . --json > "$RUNNER_TEMP/init.json"
           node node_modules/oreshnik-cli/dist/cli.js dispatch takeover \
             --run "$RUN_ID" \
-            --reason "Validate recovered EMAIL-01 software foundation and preserve external domain/DNS block on the same governed Run" \
-            --operator "$OPERATOR" \
-            --harness "$HARNESS" \
-            --instance "$INSTANCE" \
-            --session "$SESSION" \
-            --takeover \
-            --repo . \
-            --json | tee "$RUNNER_TEMP/takeover.json"
-          WT="$(node -e 'const x=require(process.env.RUNNER_TEMP+"/takeover.json"); process.stdout.write(x.worktreePath || "")')"
+            --reason "Retry EMAIL-01 external block with shared execution identity after all software gates passed" \
+            --operator "$OPERATOR" --harness "$HARNESS" --instance "$INSTANCE" --session "$SESSION" \
+            --takeover --repo . --json | tee "$RUNNER_TEMP/takeover.json"
+          WT="$(node -e 'const x=require(process.env.RUNNER_TEMP+"/takeover.json");process.stdout.write(x.worktreePath||"")')"
+          MACHINE="$(node -e 'const x=require(process.env.RUNNER_TEMP+"/takeover.json");process.stdout.write(x.machineId||"")')"
+          AGENT="$(node -e 'const x=require(process.env.RUNNER_TEMP+"/takeover.json");process.stdout.write(x.agentInstanceUid||"")')"
           test -n "$WT" && test -d "$WT"
-          echo "worktree=$WT" >> "$GITHUB_OUTPUT"
+          test -n "$MACHINE"
+          test "$AGENT" = "$EXPECTED_AGENT_UID"
+          test "$(git -C "$WT" branch --show-current)" = "$FUNCTIONAL_BRANCH"
           git -C "$WT" fetch origin "+refs/heads/$FUNCTIONAL_BRANCH:refs/remotes/origin/$FUNCTIONAL_BRANCH"
           git -C "$WT" merge --ff-only "origin/$FUNCTIONAL_BRANCH"
-          test "$(git -C "$WT" branch --show-current)" = "$FUNCTIONAL_BRANCH"
+          git -C "$WT" merge-base --is-ancestor "$VALIDATED_HEAD" HEAD
+          echo "WT=$WT" >> "$GITHUB_ENV"
+          echo "ORESHNIK_MACHINE_ID_OVERRIDE=$MACHINE" >> "$GITHUB_ENV"
+          echo "worktree=$WT" >> "$GITHUB_OUTPUT"
 
-      - name: Prepare governed candidate dependencies
-        env:
-          WT: ${{ steps.takeover.outputs.worktree }}
+      - name: Verify preserved green evidence and execution identity
+        run: |
+          set -euo pipefail
+          test -f "$ORESHNIK_LOCAL_STATE_DIR/agent-instances.json"
+          test -f "$ORESHNIK_LOCAL_STATE_DIR/execution-sessions.json"
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const instances=JSON.parse(fs.readFileSync(process.env.ORESHNIK_LOCAL_STATE_DIR+'/agent-instances.json','utf8'));
+          const sessions=JSON.parse(fs.readFileSync(process.env.ORESHNIK_LOCAL_STATE_DIR+'/execution-sessions.json','utf8'));
+          const i=instances.find(x=>x.agentInstanceUid===process.env.EXPECTED_AGENT_UID);
+          const s=sessions.find(x=>x.sessionId===process.env.SESSION);
+          if(!i||i.machineId!==process.env.ORESHNIK_MACHINE_ID_OVERRIDE||i.operatorId!==process.env.OPERATOR||i.harnessId!==process.env.HARNESS) throw new Error('hydrated instance identity mismatch');
+          if(!s||s.agentInstanceUid!==i.agentInstanceUid||s.status!=='active') throw new Error('hydrated session identity mismatch');
+          console.log('EMAIL01_EXECUTION_IDENTITY_PASS');
+          NODE
+          cd "$WT"
+          HJSON="$(find var/oreshnik/handoffs/$TASK_ID -type f -name '*.json' | sort | tail -1)"
+          test -n "$HJSON" && test -f "$HJSON"
+          node "$GITHUB_WORKSPACE/node_modules/oreshnik-cli/dist/cli.js" handoff validate --path "$HJSON" --json | tee "$RUNNER_TEMP/handoff-revalidate.json"
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const p=process.env.WT+'/var/oreshnik/handoffs/'+process.env.TASK_ID;
+          const f=fs.readdirSync(p).filter(x=>x.endsWith('.json')).sort().at(-1);
+          const h=JSON.parse(fs.readFileSync(p+'/'+f,'utf8'));
+          if(h.stability?.classification!=='BLOCKED_EXTERNAL') throw new Error('expected BLOCKED_EXTERNAL handoff');
+          if(!h.functional?.testsRun?.includes('full tests PASS')) throw new Error('full green gate evidence missing');
+          console.log('EMAIL01_GREEN_EVIDENCE_PASS');
+          NODE
+
+      - name: Apply native external block from governed worktree
+        run: |
+          set -euo pipefail
+          cd "$WT"
+          node "$GITHUB_WORKSPACE/node_modules/oreshnik-cli/dist/cli.js" task block \
+            --task "$TASK_ID" --run "$RUN_ID" --operator "$OPERATOR" \
+            --harness "$HARNESS" --instance "$INSTANCE" --session "$SESSION" \
+            --kind awaiting_external_validation \
+            --reason "Final owned HeptaCore sender domain remains intentionally deferred; software foundation is complete and validated while Vercel remains the temporary web origin." \
+            --external-action "Select the final owned HeptaCore domain, configure it in Resend, and verify SPF, DKIM and DMARC before production email activation." \
+            --resume-policy explicit_authorization_required \
+            --repo "$WT"
+
+      - name: Persist blocked runtime projection
         run: |
           set -euo pipefail
           cd "$WT"
           git config user.name "Manuel Vera via ChatGPT Operator"
           git config user.email "manuel@heptacore.dev"
-          npm ci --ignore-scripts
-          npm run db:generate
-          npm install --no-save --package-lock=false --ignore-scripts "@esbuild/linux-x64@$ESBUILD_VERSION"
-          test -x node_modules/@esbuild/linux-x64/bin/esbuild
-          test "$(node node_modules/oreshnik-cli/dist/cli.js --version)" = "$ORESHNIK_VERSION"
-
-      - name: Focused EMAIL-01 tests
-        env:
-          WT: ${{ steps.takeover.outputs.worktree }}
-        run: |
-          set -euo pipefail
-          cd "$WT"
-          npm run test -w @heptacore/core
-          node - <<'NODE'
-          const fs=require('node:fs');
-          const provider=fs.readFileSync('apps/web/lib/email/providers/resend-provider.ts','utf8');
-          const delivery=fs.readFileSync('apps/web/lib/email/email-delivery-service.ts','utf8');
-          const webhook=fs.readFileSync('apps/web/app/api/webhooks/resend/route.ts','utf8');
-          const readiness=fs.readFileSync('apps/web/app/api/email/readiness/route.ts','utf8');
-          for (const [name, source, needles] of [
-            ['provider',provider,['resend.emails.send','idempotencyKey']],
-            ['delivery',delivery,['emailDelivery.create','providerMessageId','SENT']],
-            ['webhook',webhook,['webhooks.verify','email.delivered','email.bounced','email.complained']],
-            ['readiness',readiness,['resolveSuperAdminAccess','domains.list','domains.get','resolveTxt','secretValuesExposed: false']],
-          ]) for (const needle of needles) if(!source.includes(needle)) throw new Error(`${name} missing ${needle}`);
-          console.log('EMAIL01_CONTRACT_PROOF_PASS');
-          NODE
-
-      - name: Full governed gates
-        env:
-          WT: ${{ steps.takeover.outputs.worktree }}
-        run: |
-          set -euo pipefail
-          cd "$WT"
-          npm run typecheck
-          npm run build
-          npm run worker:validate
-          npm run test
-          node node_modules/oreshnik-cli/dist/cli.js reconcile --check --json | tee "$RUNNER_TEMP/reconcile-check.json"
-          git diff --check
-
-      - name: Assert implementation stayed inside Goal zones
-        env:
-          WT: ${{ steps.takeover.outputs.worktree }}
-        run: |
-          set -euo pipefail
-          cd "$WT"
-          git fetch origin master
-          mapfile -t files < <(git diff --name-only origin/master...HEAD)
-          printf 'candidate file: %s\n' "${files[@]}"
-          for p in "${files[@]}"; do
-            case "$p" in
-              apps/web/app/api/email/*|packages/core/*|docs/*) ;;
-              *) echo "Out-of-zone implementation path: $p" >&2; exit 41;;
-            esac
-          done
-          test "${#files[@]}" -ge 5
-
-      - name: Create BLOCKED_EXTERNAL handoff
-        id: handoff
-        env:
-          WT: ${{ steps.takeover.outputs.worktree }}
-        run: |
-          set -euo pipefail
-          cat > "$RUNNER_TEMP/blockers.json" <<'JSON'
-          [
-            {
-              "id": "EMAIL-PROD-DOMAIN-DNS",
-              "category": "PROVIDER",
-              "description": "Production email activation requires an owned HeptaCore sender domain; the final domain remains intentionally deferred while development continues.",
-              "evidence": [
-                "Resend provider, idempotent delivery persistence and signed lifecycle webhook handling are present in canonical master.",
-                "The recovered readiness evaluator and SUPER_ADMIN diagnostic endpoint pass focused and full software gates on the current governed Run.",
-                "A shared *.vercel.app hostname is accepted only as temporary web origin and is rejected as sender identity."
-              ],
-              "impact": "Software development can continue, but production sender authorization, SPF/DKIM/DMARC evidence and final branded-link acceptance cannot be truthfully completed before an owned final domain is selected.",
-              "blocking": true,
-              "probableOwner": "manuel",
-              "recommendedAction": "When the final HeptaCore domain is selected, configure the sender domain in Resend, publish SPF/DKIM/DMARC, set branded EMAIL_FROM/EMAIL_REPLY_TO/HEPTACORE_BRAND_DOMAIN/HEPTACORE_APP_URL and explicitly resume this preserved Run.",
-              "nextCommand": "npx oreshnik task resume --task S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION --operator manuel --authorized-external --note <domain-and-dns-evidence>",
-              "unblockCondition": "Owned sender domain exists and Resend plus DNS evidence confirms sender authorization, SPF, DKIM and DMARC."
-            }
-          ]
-          JSON
-          cd "$WT"
-          node node_modules/oreshnik-cli/dist/cli.js handoff create \
-            --task "$TASK_ID" --run "$RUN_ID" --operator "$OPERATOR" \
-            --reason owner-deferred-production-domain \
-            --objective "Complete and validate the transactional email software foundation while keeping production activation fail-closed until the final owned HeptaCore domain exists." \
-            --implemented "Deterministic development/production email readiness contract" "SUPER_ADMIN-only readiness endpoint" "Resend domain/DNS readiness probe without secret disclosure" "Existing Resend provider, idempotent delivery persistence and signed webhook lifecycle verified" \
-            --decision "Keep *.vercel.app only as temporary web origin" "Reject *.vercel.app as email sender identity" "Require owned domain plus Resend verification, SPF, DKIM and DMARC for production-ready" \
-            --test-run "Focused @heptacore/core email-readiness suite PASS" "EMAIL01 contract proof PASS" "typecheck PASS" "build PASS" "worker validation PASS" "full tests PASS" "reconcile check PASS" \
-            --test-pending "External owned-domain and DNS verification intentionally deferred" \
-            --gate "software gates PASS on governed Run" \
-            --blocker-file "$RUNNER_TEMP/blockers.json" \
-            --exact-point "Software foundation is complete and validated; resume this Run only for final owned-domain production activation." \
-            --first-command "npx oreshnik task resume --task S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION --operator manuel --authorized-external --note <domain-and-dns-evidence>" \
-            --completion-criterion "Owned HeptaCore sender domain is authorized and Resend/DNS evidence confirms SPF, DKIM and DMARC with branded application links configured." \
-            --json | tee "$RUNNER_TEMP/handoff.json"
-          JSONP="$(node -e 'const x=require(process.env.RUNNER_TEMP+"/handoff.json"); process.stdout.write(x.jsonPath || "")')"
-          CLASS="$(node -e 'const x=require(process.env.RUNNER_TEMP+"/handoff.json"); process.stdout.write(x.document?.stability?.classification || "")')"
-          test -n "$JSONP" && test -f "$JSONP"
-          test "$CLASS" = "BLOCKED_EXTERNAL"
-          node node_modules/oreshnik-cli/dist/cli.js handoff validate --path "$JSONP" --json | tee "$RUNNER_TEMP/handoff-validate.json"
-          echo "json=$JSONP" >> "$GITHUB_OUTPUT"
-
-      - name: Persist validated software and handoff before block
-        env:
-          WT: ${{ steps.takeover.outputs.worktree }}
-        run: |
-          set -euo pipefail
-          cd "$WT"
-          git add var/oreshnik docs/oreshnik docs/07_handoffs docs/obsidian-vault 2>/dev/null || true
-          if ! git diff --cached --quiet; then git commit -m "chore(oreshnik): persist EMAIL-01 validated handoff"; fi
-          git push origin "HEAD:$FUNCTIONAL_BRANCH"
-
-      - name: Block only external production activation
-        run: |
-          set -euo pipefail
-          node node_modules/oreshnik-cli/dist/cli.js task block \
-            --task "$TASK_ID" \
-            --run "$RUN_ID" \
-            --operator "$OPERATOR" \
-            --harness "$HARNESS" \
-            --instance "$INSTANCE" \
-            --session "$SESSION" \
-            --kind awaiting_external_validation \
-            --reason "Final owned HeptaCore sender domain remains intentionally deferred; software foundation is complete and validated while Vercel remains the temporary web origin." \
-            --external-action "Select the final owned HeptaCore domain, configure it in Resend, and verify SPF, DKIM and DMARC before production email activation." \
-            --resume-policy explicit_authorization_required \
-            --repo .
-
-      - name: Persist blocked Run projection on functional branch
-        env:
-          WT: ${{ steps.takeover.outputs.worktree }}
-        run: |
-          set -euo pipefail
-          cd "$WT"
           mapfile -t dirty < <(git status --porcelain=v1 | sed 's/^...//')
           printf 'post-block dirty: %s\n' "${dirty[@]:-}"
           for p in "${dirty[@]}"; do
@@ -234,9 +141,10 @@ jobs:
           if ! git diff --cached --quiet; then git commit -m "chore(email): persist external production-domain block"; fi
           git push origin "HEAD:$FUNCTIONAL_BRANCH"
 
-      - name: Verify durable blocked and released lifecycle
+      - name: Verify canonical blocked and resources released
         run: |
           set -euo pipefail
+          cd "$GITHUB_WORKSPACE"
           git fetch origin '+refs/heads/master:refs/remotes/origin/master' '+refs/heads/oreshnik/control:refs/remotes/origin/oreshnik/control'
           node node_modules/oreshnik-cli/dist/cli.js dispatch reconcile --repo . --json | tee "$RUNNER_TEMP/reconcile-after.json"
           git fetch origin '+refs/heads/master:refs/remotes/origin/master' '+refs/heads/oreshnik/control:refs/remotes/origin/oreshnik/control'
@@ -249,12 +157,12 @@ jobs:
           const r=(control.runs||[]).find(x=>x.runId===process.env.RUN_ID);
           const c=(control.claims||[]).find(x=>x.assignmentId===process.env.ASSIGNMENT_ID);
           const zones=(control.zones||[]).filter(x=>x.assignmentId===process.env.ASSIGNMENT_ID&&x.status==='reserved');
-          if(task.status!=='blocked'||task.blockState?.kind!=='awaiting_external_validation'||task.blockState?.preservedRunId!==process.env.RUN_ID) throw new Error('canonical task block projection incomplete');
-          if(a?.status!=='released'||r?.status!=='released'||c?.status!=='released'||zones.length) throw new Error(`control release incomplete ${a?.status}/${r?.status}/${c?.status}/zones=${zones.length}`);
-          console.log(JSON.stringify({task:task.status,block:task.blockState.kind,assignment:a.status,run:r.status,claim:c.status,reservedZones:zones.length},null,2));
+          if(task.status!=='blocked'||task.blockState?.kind!=='awaiting_external_validation'||task.blockState?.preservedRunId!==process.env.RUN_ID) throw new Error('canonical block projection incomplete');
+          if(a?.status!=='released'||r?.status!=='released'||c?.status!=='released'||zones.length) throw new Error(`release incomplete ${a?.status}/${r?.status}/${c?.status}/zones=${zones.length}`);
+          console.log('EMAIL01_BLOCK_LIFECYCLE_PASS '+JSON.stringify({assignment:a.status,run:r.status,claim:c.status,reservedZones:zones.length}));
           NODE
 
-      - name: Remove transient bootstrap from master
+      - name: Remove transient EMAIL-01 bootstrap
         run: |
           set -euo pipefail
           git fetch origin '+refs/heads/master:refs/remotes/origin/master'
@@ -263,32 +171,31 @@ jobs:
           git commit -m "chore(oreshnik): remove transient EMAIL-01 runner"
           git push origin HEAD:master
 
-      - name: Reconcile clean master and dispatch next Goal
+      - name: Reconcile and dispatch next Goal
         run: |
           set -euo pipefail
           git fetch origin '+refs/heads/master:refs/remotes/origin/master' '+refs/heads/oreshnik/control:refs/remotes/origin/oreshnik/control'
           git reset --hard origin/master
           npm run oreshnik:ready
           ROOT="$RUNNER_TEMP/oreshnik-wt-next"
-          node node_modules/oreshnik-cli/dist/cli.js dispatch init --mother master --worktree-root "$ROOT" --repo . --json | tee "$RUNNER_TEMP/next-init.json"
+          node node_modules/oreshnik-cli/dist/cli.js dispatch init --mother master --worktree-root "$ROOT" --repo . --json > "$RUNNER_TEMP/next-init.json"
           node node_modules/oreshnik-cli/dist/cli.js dispatch reconcile --repo . --json | tee "$RUNNER_TEMP/next-reconcile.json"
           node node_modules/oreshnik-cli/dist/cli.js goal --harness chatgpt --auto-align --repo . --max-retries 3 --json | tee "$RUNNER_TEMP/next-goal.json"
           node - <<'NODE'
           const fs=require('node:fs');
           const g=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/next-goal.json','utf8'));
-          console.log('NEXT_GOAL_SUMMARY '+JSON.stringify({result:g.result,taskId:g.taskId??null,title:g.title??null,runId:g.runId??null,assignmentId:g.assignmentId??null,functionalBranch:g.functionalBranch??null,worktreePath:g.worktreePath??null,acceptance:g.acceptance??null,alignmentIssues:g.alignmentIssues??null}));
           if(!['assigned','resumed','no_task'].includes(g.result)) throw new Error(`next goal requires recovery: ${g.result}`);
+          console.log('NEXT_GOAL_SUMMARY '+JSON.stringify({result:g.result,taskId:g.taskId??null,title:g.title??null,runId:g.runId??null,assignmentId:g.assignmentId??null,functionalBranch:g.functionalBranch??null}));
           NODE
 
-      - name: Upload EMAIL-01 evidence
+      - name: Upload lifecycle evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: oreshnik-email01-validate-block-next
+          name: oreshnik-email01-block-retry-next
           path: |
-            ${{ runner.temp }}/handoff.json
-            ${{ runner.temp }}/handoff-validate.json
-            ${{ runner.temp }}/reconcile-check.json
+            ${{ runner.temp }}/takeover.json
+            ${{ runner.temp }}/handoff-revalidate.json
             ${{ runner.temp }}/reconcile-after.json
             ${{ runner.temp }}/next-goal.json
           if-no-files-found: ignore
