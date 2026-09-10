@@ -46,15 +46,20 @@ grep -F "fail 0" "$RUNNER_TEMP/pub07b-dry-run.stdout" >/dev/null
 
 export T R START FIN DUR EC OUT="$RUNNER_TEMP/pub07b-dry-run.stdout" ERR="$RUNNER_TEMP/pub07b-dry-run.stderr"
 node --input-type=module <<'NODE' | tee "$RUNNER_TEMP/pub07b-structured-evidence.json"
-import fs from 'node:fs'; import crypto from 'node:crypto'; import { createTaskRuntimeService } from './node_modules/oreshnik-cli/dist/index.js';
+import fs from 'node:fs'; import crypto from 'node:crypto'; import { createTaskRuntimeService, createEvidenceGateService } from './node_modules/oreshnik-cli/dist/index.js';
 const stdout=fs.readFileSync(process.env.OUT,'utf8'), stderr=fs.readFileSync(process.env.ERR,'utf8');
 const args=['tsx','--test','--test-name-pattern','scheduled dry-run recognizes YouTube formats without calling provider','apps/web/lib/__tests__/pub07-scheduled.test.ts'];
 const h=x=>crypto.createHash('sha256').update(x).digest('hex');
 const gate={gateId:'dry-run',command:'npx',args,cwd:process.cwd(),startedAt:process.env.START,finishedAt:process.env.FIN,durationMs:Number(process.env.DUR),exitCode:Number(process.env.EC),signal:null,timedOut:false,spawnError:null,stdout,stderr,passed:true,attempt:1,commandFingerprint:h(JSON.stringify({command:'npx',args,cwd:process.cwd()})),resultFingerprint:h(JSON.stringify({exitCode:Number(process.env.EC),stdout,stderr})),stdoutBytes:Buffer.byteLength(stdout),stderrBytes:Buffer.byteLength(stderr),stdoutTruncated:false,stderrTruncated:false};
 const result=createTaskRuntimeService(process.cwd()).recordTaskValidationResults({taskId:process.env.T,operator:'manuel',runId:process.env.R,gateResults:[gate],taskBoardPath:'var/oreshnik/task-board.json'});
 if(!result.ok){console.error(result.error);process.exit(1)}
-const dry=result.value.evidenceVerifications.find(e=>e.itemId==='dry_run_summary'&&e.verified);
-if(!dry){console.error(JSON.stringify(result.value.evidenceVerifications,null,2));throw new Error('dry_run_summary not derived')}
+const board=JSON.parse(fs.readFileSync('var/oreshnik/task-board.json','utf8'));
+const task=board.tasks.find(t=>t.id===process.env.T);
+if(!task) throw new Error('Persisted PUB-07B task missing');
+const checked=createEvidenceGateService(process.cwd()).checkTaskForIntegration(task,'manuel');
+if(!checked.ok) throw new Error(JSON.stringify(checked.error));
+const dry=checked.value.verifiedEvidence?.find(e=>e.itemId==='dry_run_summary'&&e.verified&&e.gateId==='dry-run'&&e.commandFingerprint===gate.commandFingerprint&&e.resultFingerprint===gate.resultFingerprint);
+if(!dry){console.error(JSON.stringify(checked.value,null,2));throw new Error('dry_run_summary not derived')}
 console.log(JSON.stringify({dryRunEvidence:dry,gateIds:result.value.runManifest.validationGateResults?.map(g=>g.gateId)},null,2));
 NODE
 
