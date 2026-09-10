@@ -1,6 +1,6 @@
 {
   "project": "HeptaCore",
-  "updatedAt": "2026-09-10T14:45:26.000Z",
+  "updatedAt": "2026-09-10T16:00:44.796Z",
   "currentExecutionOrder": [
     "S-HC-PUB-04-HOURLY-BATCH-CRON",
     "S-HC-PUB-05-RECONCILIATION-OPS",
@@ -1462,7 +1462,26 @@
       "title": "Transactional email foundation: domain sender, DNS, reputation, provider integration",
       "owner": "Jean",
       "backupOwner": "Manuel",
-      "status": "ready",
+      "status": "blocked",
+      "blockState": {
+        "kind": "awaiting_external_validation",
+        "reason": "Final owned HeptaCore sender domain remains intentionally deferred; software foundation is complete and validated while Vercel remains the temporary web origin.",
+        "blockedAt": "2026-09-10T16:00:44.796Z",
+        "blockedBy": "manuel",
+        "externalActionRequired": "Select the final owned HeptaCore domain, configure it in Resend, and verify SPF, DKIM and DMARC before production email activation.",
+        "resumePolicy": "explicit_authorization_required",
+        "previousStatus": "claimed",
+        "preservedRunId": "run-manuel-S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION-20260910144612-ccbed006",
+        "history": [
+          {
+            "at": "2026-09-10T16:00:44.796Z",
+            "action": "blocked",
+            "operator": "manuel",
+            "reason": "Final owned HeptaCore sender domain remains intentionally deferred; software foundation is complete and validated while Vercel remains the temporary web origin.",
+            "externalActionRequired": "Select the final owned HeptaCore domain, configure it in Resend, and verify SPF, DKIM and DMARC before production email activation."
+          }
+        ]
+      },
       "track": "email-infra",
       "zone": [
         "apps/web/app/api/email",
@@ -1477,12 +1496,28 @@
         "Webhooks de eventos (delivered, bounced, complained) configurados",
         "Enlaces comerciales y de marca consistentes con el dominio final"
       ],
+      "attempts": 1,
       "history": [
         {
           "at": "2026-09-05T16:07:01.790Z",
           "action": "status_reconciled",
           "operator": "jean",
           "description": "Task status reconciled to ready: dependencies and conflicts are clear for execution"
+        },
+        {
+          "at": "2026-09-10T14:57:52.455Z",
+          "action": "claimed",
+          "operator": "manuel",
+          "branch": "dispatch/manuel/manuel-chatgpt1/email-infra/S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION/ceaa8b659d",
+          "description": "Run run-manuel-S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION-20260910144612-ccbed006 claimed via shell"
+        },
+        {
+          "at": "2026-09-10T16:00:44.796Z",
+          "action": "task_blocked",
+          "operator": "manuel",
+          "reason": "Final owned HeptaCore sender domain remains intentionally deferred; software foundation is complete and validated while Vercel remains the temporary web origin.",
+          "branch": "dispatch/manuel/manuel-chatgpt1/email-infra/S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION/ceaa8b659d",
+          "description": "awaiting_external_validation: Final owned HeptaCore sender domain remains intentionally deferred; software foundation is complete and validated while Vercel remains the temporary web origin."
         }
       ]
     },
