@@ -46,6 +46,36 @@ jobs:
           git fetch origin '+refs/heads/master:refs/remotes/origin/master' '+refs/heads/oreshnik/control:refs/remotes/origin/oreshnik/control'
           git reset --hard origin/master
 
+      - name: Materialize missing legacy Goal through governed CAS
+        run: |
+          set -euo pipefail
+          node --input-type=module - <<'NODE'
+          import { execFileSync } from 'node:child_process';
+          import { createDispatchControlPlaneService } from 'oreshnik-cli';
+          const taskId=process.env.TASK_ID;
+          const read=(p)=>execFileSync('git',['show',`origin/master:${p}`],{encoding:'utf8'});
+          const expectedHead=execFileSync('git',['rev-parse','origin/master'],{encoding:'utf8'}).trim();
+          const board=JSON.parse(read('var/oreshnik/task-board.json'));
+          const task=board.tasks.find(x=>x.id===taskId);
+          if(!task) throw new Error('EMAIL-01 missing from canonical task board');
+          if(task.status!=='blocked'||task.activeRun||task.blockState?.kind!=='awaiting_external_validation'||task.blockState?.preservedRunId!==process.env.RUN_ID) throw new Error('EMAIL-01 is not the expected external block');
+          const goalPath=`docs/goals/${taskId}.md`;
+          let exists=true;
+          try { read(goalPath); } catch { exists=false; }
+          if(exists) {
+            console.log('EMAIL01_LEGACY_GOAL_ALREADY_PRESENT');
+            process.exit(0);
+          }
+          const acceptance=(task.acceptance||[]).map(x=>`- ${x}`).join('\n');
+          const goal=`# ${taskId}\n\n## Objective\n\nComplete the transactional email foundation for HeptaCore with a production-safe sender identity and measurable delivery lifecycle.\n\n## Canonical scope\n\n- Provider integration and idempotent transactional delivery.\n- Signed delivery/bounce/complaint webhook lifecycle.\n- Development and production readiness diagnostics without secret disclosure.\n- Final production sender authorization only on an owned HeptaCore domain.\n\n## Acceptance\n\n${acceptance}\n\n## External activation boundary\n\nThe software foundation is implemented and validated on preserved Run \`${process.env.RUN_ID}\`. Production activation remains fail-closed until Manuel selects an owned HeptaCore domain and Resend/DNS evidence verifies SPF, DKIM and DMARC. The Vercel hostname may be used only as a temporary web origin, never as the production sender identity.\n\n## Governance\n\nThis Goal recovers the missing legacy Goal artifact for the already-canonical Task. It does not authorize secret disclosure, fabricated DNS evidence, bypassing the external authorization gate, or a second concurrent Run.\n`;
+          const service=createDispatchControlPlaneService(process.cwd());
+          const published=service.publishGovernedFiles('master',[{path:goalPath,content:goal}],expectedHead,`recovery: materialize legacy Goal ${taskId}`);
+          if(!published.ok) throw new Error(published.error.message);
+          console.log('EMAIL01_LEGACY_GOAL_RECOVERY_PASS '+published.value.head);
+          NODE
+          git fetch origin '+refs/heads/master:refs/remotes/origin/master'
+          git reset --hard origin/master
+
       - name: Canonically reproject blocked EMAIL-01 Task artifact
         run: |
           set -euo pipefail
