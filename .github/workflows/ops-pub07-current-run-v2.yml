@@ -1,0 +1,146 @@
+name: Ops PUB07 Current Run v2
+
+on:
+  push:
+    branches:
+      - ops/pub07-current-run-implementation-20260910
+    paths:
+      - .github/pub07-v2-trigger
+
+permissions:
+  contents: write
+  actions: read
+
+concurrency:
+  group: heptacore-pub07-current-run-v2
+  cancel-in-progress: false
+
+jobs:
+  implement:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    env:
+      TASK_ID: S-HC-PUB-07-YOUTUBE-PUBLISHING
+      RUN_ID: run-manuel-S-HC-PUB-07-YOUTUBE-PUBLISHING-20260910162001-40482454
+      OPERATOR: manuel
+      HARNESS: chatgpt
+      INSTANCE_ALIAS: manuel-chatgpt1
+      SESSION_ID: session_dcdf09f15279492f91b148a3e9c751e6
+      FUNCTIONAL_BRANCH: dispatch/manuel/manuel-chatgpt1/publishing/S-HC-PUB-07-YOUTUBE-PUBLISHING/71b46093fd
+      OLD_BRANCH: dispatch/manuel/manuel-kilo8/publishing/S-HC-PUB-07-YOUTUBE-PUBLISHING/0235fe3455
+      ORESHNIK_VERSION: 0.3.0-alpha.6
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ops/pub07-current-run-implementation-20260910
+          fetch-depth: 0
+          persist-credentials: true
+      - name: Preserve executor assets and switch to master controller
+        run: |
+          set -euo pipefail
+          cp .github/ops/pub07-patch.py "$RUNNER_TEMP/pub07-patch.py"
+          cp .github/ops/youtube.test.ts "$RUNNER_TEMP/youtube.test.ts"
+          git fetch origin master
+          git checkout -B controller origin/master
+          git config user.name "Manuel Vera via ChatGPT Operator"
+          git config user.email "manuel@heptacore.dev"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - name: Rehydrate preserved Run
+        id: rehydrate
+        run: |
+          set -euo pipefail
+          npm ci --ignore-scripts
+          test "$(node node_modules/oreshnik-cli/dist/cli.js --version)" = "$ORESHNIK_VERSION"
+          npm run oreshnik:ready
+          ROOT="$RUNNER_TEMP/oreshnik-wt"
+          node node_modules/oreshnik-cli/dist/cli.js dispatch init --mother master --worktree-root "$ROOT" --repo . --json >/dev/null
+          node node_modules/oreshnik-cli/dist/cli.js dispatch takeover --run "$RUN_ID" --reason "Retry PUB-07 product implementation after correcting the local zone guard; preserve the same governed Run." --operator "$OPERATOR" --harness "$HARNESS" --instance "$INSTANCE_ALIAS" --session "$SESSION_ID" --repo . --json > "$RUNNER_TEMP/takeover.json"
+          cat "$RUNNER_TEMP/takeover.json"
+          test "$(jq -r .runId "$RUNNER_TEMP/takeover.json")" = "$RUN_ID"
+          test "$(jq -r .functionalBranch "$RUNNER_TEMP/takeover.json")" = "$FUNCTIONAL_BRANCH"
+          WT="$(jq -r .worktreePath "$RUNNER_TEMP/takeover.json")"
+          test -d "$WT"
+          echo "worktree=$WT" >> "$GITHUB_OUTPUT"
+      - name: Apply in-zone implementation and enforce product zones
+        env:
+          WT: ${{ steps.rehydrate.outputs.worktree }}
+        run: |
+          set -euo pipefail
+          git -C "$WT" config user.name "Manuel Vera via ChatGPT Operator"
+          git -C "$WT" config user.email "manuel@heptacore.dev"
+          git -C "$WT" fetch origin "+refs/heads/$FUNCTIONAL_BRANCH:refs/remotes/origin/current-pub07" "+refs/heads/$OLD_BRANCH:refs/remotes/origin/old-pub07"
+          git -C "$WT" merge --ff-only refs/remotes/origin/current-pub07
+          git -C "$WT" show refs/remotes/origin/old-pub07:apps/web/lib/publishers/youtube.ts > "$WT/apps/web/lib/publishers/youtube.ts"
+          python3 "$RUNNER_TEMP/pub07-patch.py" "$WT" "$RUNNER_TEMP/youtube.test.ts"
+          cd "$WT"
+          git diff --check
+          git status --short | tee "$RUNNER_TEMP/pub07-status.txt"
+          bad="$(git status --short | sed -E 's/^.. //' | grep -Ev '^(apps/web/lib/publishers/|apps/web/app/api/publishing/|packages/integrations/|var/oreshnik/)' || true)"
+          if [ -n "$bad" ]; then printf '%s\n' "$bad"; echo 'OUT_OF_ZONE_PRODUCT_CHANGE'; exit 1; fi
+      - name: Focused YouTube tests
+        env:
+          WT: ${{ steps.rehydrate.outputs.worktree }}
+        run: |
+          set -euo pipefail
+          cd "$WT"
+          npm ci --ignore-scripts
+          npm run db:generate
+          npx tsx --test apps/web/lib/publishers/__tests__/youtube.test.ts | tee "$RUNNER_TEMP/pub07-focused-tests.txt"
+      - name: Project gates
+        env:
+          WT: ${{ steps.rehydrate.outputs.worktree }}
+        run: |
+          set -euo pipefail
+          cd "$WT"
+          npm run typecheck | tee "$RUNNER_TEMP/pub07-typecheck.txt"
+          npm run build | tee "$RUNNER_TEMP/pub07-build.txt"
+          npm run worker:validate | tee "$RUNNER_TEMP/pub07-worker.txt"
+          npm test | tee "$RUNNER_TEMP/pub07-full-tests.txt"
+          git diff --check
+      - name: Commit and push validated product work
+        env:
+          WT: ${{ steps.rehydrate.outputs.worktree }}
+        run: |
+          set -euo pipefail
+          cd "$WT"
+          git add apps/web/lib/publishers apps/web/app/api/publishing packages/integrations
+          git diff --cached --check
+          git diff --cached --name-only | tee "$RUNNER_TEMP/pub07-files.txt"
+          test -n "$(git diff --cached --name-only)"
+          git commit -m "feat(publishing): implement YouTube video and Shorts provider"
+          git push origin "HEAD:$FUNCTIONAL_BRANCH"
+          git rev-parse HEAD | tee "$RUNNER_TEMP/pub07-head.txt"
+      - name: Persist validation checkpoint
+        env:
+          WT: ${{ steps.rehydrate.outputs.worktree }}
+        run: |
+          set -euo pipefail
+          cd "$WT"
+          node node_modules/oreshnik-cli/dist/cli.js evidence --task "$TASK_ID" --run "$RUN_ID" --operator "$OPERATOR" --start-validation --details "YouTube Video and Shorts immediate publishing, provider-specific dry-run and resumable provider contracts are green. Full project gates pass. Scheduled cron execution remains outside the current canonical zones and will be resolved by governed zone amendment before final acceptance." || true
+          node node_modules/oreshnik-cli/dist/cli.js reconcile --write --json > "$RUNNER_TEMP/pub07-local-reconcile.json" || true
+          git add var/oreshnik docs/oreshnik docs/obsidian-vault docs/07_handoffs 2>/dev/null || true
+          if ! git diff --cached --quiet; then
+            git diff --cached --check
+            git commit -m "chore(oreshnik): persist PUB-07 validation checkpoint"
+            git push origin "HEAD:$FUNCTIONAL_BRANCH"
+          fi
+      - name: Upload evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pub07-current-run-v2
+          path: |
+            ${{ runner.temp }}/takeover.json
+            ${{ runner.temp }}/pub07-status.txt
+            ${{ runner.temp }}/pub07-focused-tests.txt
+            ${{ runner.temp }}/pub07-typecheck.txt
+            ${{ runner.temp }}/pub07-build.txt
+            ${{ runner.temp }}/pub07-worker.txt
+            ${{ runner.temp }}/pub07-full-tests.txt
+            ${{ runner.temp }}/pub07-files.txt
+            ${{ runner.temp }}/pub07-head.txt
+            ${{ runner.temp }}/pub07-local-reconcile.json
+          if-no-files-found: ignore
