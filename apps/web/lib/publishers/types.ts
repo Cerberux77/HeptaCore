@@ -15,6 +15,13 @@ export interface PublishInput {
   caption: string;
   format?: string | null;
   mediaType?: "IMAGE" | "VIDEO" | "CAROUSEL";
+  title?: string | null;
+  description?: string | null;
+  tags?: string[] | null;
+  thumbnailUrl?: string | null;
+  categoryId?: string | null;
+  privacyStatus?: "public" | "unlisted" | "private" | null;
+  madeForKids?: boolean | null;
 }
 
 export interface PublishResult {
