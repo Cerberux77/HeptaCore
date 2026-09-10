@@ -5,15 +5,15 @@
     "originUrl": "https://github.com/Cerberux77/HeptaCore.git",
     "canonicalMotherBranch": "master"
   },
-  "generation": 147,
-  "controlHead": "0e21126e20373bc3763c36b98203871c113ea678",
+  "generation": 148,
+  "controlHead": "a494778eda2291f4a91305d2522f032af73fdefa",
   "catalog": {
     "taskBoardPath": "var/oreshnik/task-board.json",
     "zoneMapPath": "docs/07_handoffs/zone-map.json",
     "sourceTaskBoardHead": "0a2e10fd46f3bcc3a0be5d766673d8693571a784",
     "fingerprint": "c0d17207ca928e4fcc3f55b3564aeb8f5f71bf16",
     "taskCount": 45,
-    "updatedAt": "2026-09-10T23:48:58.452Z"
+    "updatedAt": "2026-09-10T23:52:31.719Z"
   },
   "policy": {
     "name": "deterministic-v1",
@@ -393,6 +393,13 @@
       "hostname": "runnervmlun5p",
       "registeredAt": "2026-09-10T23:48:19.008Z",
       "updatedAt": "2026-09-10T23:48:19.008Z"
+    },
+    {
+      "machineId": "machine-c880b8de-f11f-45ba-9ce7-1cfb089e46f9",
+      "worktreeRoot": "/home/runner/work/_temp/oreshnik-wt-continuation-v2",
+      "hostname": "runnervmlun5p",
+      "registeredAt": "2026-09-10T23:52:30.861Z",
+      "updatedAt": "2026-09-10T23:52:30.861Z"
     }
   ],
   "agentInstances": [
@@ -585,7 +592,7 @@
       "repositoryId": "32305cad03d6321a",
       "slot": 1,
       "createdAt": "2026-09-10T23:48:39.047Z",
-      "updatedAt": "2026-09-10T23:48:47.191Z",
+      "updatedAt": "2026-09-10T23:48:58.452Z",
       "identityOrigin": "explicit"
     }
   ],
@@ -776,8 +783,9 @@
       "harnessId": "chatgpt",
       "machineId": "machine-6b34a148-a1c0-4886-ad96-be5e474af54a",
       "startedAt": "2026-09-10T23:48:39.047Z",
-      "lastSeenAt": "2026-09-10T23:48:47.191Z",
-      "status": "active",
+      "lastSeenAt": "2026-09-10T23:48:58.452Z",
+      "status": "closed",
+      "closedAt": "2026-09-10T23:48:58.452Z",
       "identityOrigin": "explicit"
     }
   ],
@@ -5070,6 +5078,11 @@
       "runId": "run-manuel-S-HC-PUB-07-YOUTUBE-PUBLISHING-20260910234839-191d864a",
       "operator": "manuel",
       "message": "awaiting_external_validation: Only real authorized YouTube OAuth/channel identity smoke remains; no credential is available to this execution and no provider support will be claimed without it."
+    },
+    {
+      "at": "2026-09-10T23:52:31.719Z",
+      "action": "dispatch.init",
+      "message": "Registered machine machine-c880b8de-f11f-45ba-9ce7-1cfb089e46f9 with root /home/runner/work/_temp/oreshnik-wt-continuation-v2."
     }
   ],
   "reconciliation": {
@@ -5079,5 +5092,5 @@
     "pendingDiagnostics": []
   },
   "createdAt": "2026-06-29T20:17:43.302Z",
-  "updatedAt": "2026-09-10T23:48:58.452Z"
+  "updatedAt": "2026-09-10T23:52:31.719Z"
 }
