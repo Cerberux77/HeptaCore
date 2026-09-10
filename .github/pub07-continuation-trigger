@@ -1,0 +1,4 @@
+parent=S-HC-PUB-07-YOUTUBE-PUBLISHING
+smoke=S-HC-PUB-07C-YOUTUBE-AUTH-CHANNEL-SMOKE
+action=verify-release-and-discover-next
+issued=2026-09-10T23:52:00Z
