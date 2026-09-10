@@ -32,7 +32,7 @@ npm ci --ignore-scripts
 ESBUILD_VERSION="$(node -p "require('esbuild/package.json').version")"
 ESBUILD_TMP="$(mktemp -d "$RUNNER_TEMP/pub07b-esbuild.XXXXXX")"
 npm pack "@esbuild/linux-x64@$ESBUILD_VERSION" --pack-destination "$ESBUILD_TMP" --json > "$ESBUILD_TMP/pack.json"
-ESBUILD_TGZ="$(node -e 'const fs=require("node:fs");const p=JSON.parse(fs.readFileSync(process.argv[1],"utf8"))[0];const lock=JSON.parse(fs.readFileSync("package-lock.json","utf8"));const entry=lock.packages["node_modules/@esbuild/linux-x64"];if(!entry||entry.version!==process.argv[2]||entry.integrity!==p.integrity)throw new Error("esbuild tarball does not match lockfile");process.stdout.write(p.filename)' "$ESBUILD_TMP/pack.json" "$ESBUILD_VERSION")"
+ESBUILD_TGZ="$(node -e 'const fs=require("node:fs");const p=JSON.parse(fs.readFileSync(process.argv[1],"utf8"))[0];const lock=JSON.parse(fs.readFileSync("package-lock.json","utf8"));const entry=lock.packages["node_modules/@esbuild/linux-x64"];const esbuild=lock.packages["node_modules/esbuild"];if(esbuild?.version!==process.argv[2]||esbuild?.optionalDependencies?.["@esbuild/linux-x64"]!==process.argv[2]||p.version!==process.argv[2]||(entry&&(entry.version!==process.argv[2]||entry.integrity!==p.integrity)))throw new Error("esbuild tarball does not match locked esbuild optional dependency");process.stdout.write(p.filename)' "$ESBUILD_TMP/pack.json" "$ESBUILD_VERSION")"
 mkdir -p node_modules/@esbuild/linux-x64
 tar -xzf "$ESBUILD_TMP/$ESBUILD_TGZ" -C node_modules/@esbuild/linux-x64 --strip-components=1
 git diff --exit-code -- package.json package-lock.json
