@@ -57,7 +57,7 @@ jobs:
           npm run oreshnik:ready
           ROOT="$RUNNER_TEMP/oreshnik-wt"
           node node_modules/oreshnik-cli/dist/cli.js dispatch init --mother master --worktree-root "$ROOT" --repo . --json >/dev/null
-          node node_modules/oreshnik-cli/dist/cli.js dispatch takeover --run "$RUN_ID" --reason "Retry PUB-07 product implementation after correcting the local zone guard; preserve the same governed Run." --operator "$OPERATOR" --harness "$HARNESS" --instance "$INSTANCE_ALIAS" --session "$SESSION_ID" --repo . --json > "$RUNNER_TEMP/takeover.json"
+          node node_modules/oreshnik-cli/dist/cli.js dispatch takeover --run "$RUN_ID" --reason "Retry PUB-07 product implementation after correcting the local test runtime; preserve the same governed Run." --operator "$OPERATOR" --harness "$HARNESS" --instance "$INSTANCE_ALIAS" --session "$SESSION_ID" --repo . --json > "$RUNNER_TEMP/takeover.json"
           cat "$RUNNER_TEMP/takeover.json"
           test "$(jq -r .runId "$RUNNER_TEMP/takeover.json")" = "$RUN_ID"
           test "$(jq -r .functionalBranch "$RUNNER_TEMP/takeover.json")" = "$FUNCTIONAL_BRANCH"
@@ -87,6 +87,8 @@ jobs:
           set -euo pipefail
           cd "$WT"
           npm ci --ignore-scripts
+          ESBUILD_VERSION="$(node -p "require('esbuild/package.json').version")"
+          npm install --no-save --package-lock=false --ignore-scripts "@esbuild/linux-x64@$ESBUILD_VERSION"
           npm run db:generate
           npx tsx --test apps/web/lib/publishers/__tests__/youtube.test.ts | tee "$RUNNER_TEMP/pub07-focused-tests.txt"
       - name: Project gates
