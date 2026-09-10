@@ -7,7 +7,7 @@
   "title": "Transactional email foundation: domain sender, DNS, reputation, provider integration",
   "owner": "Jean",
   "backupOwner": "Manuel",
-  "status": "ready",
+  "status": "blocked",
   "taskBoardPath": "/home/runner/work/_temp/oreshnik-wt/32305cad03d6321a/manuel/manuel-chatgpt1/recovery/HC-ORESHNIK-RECOVERY-ALPHA6/adfcc418/var/oreshnik/task-board.json",
   "zone": [
     "apps/web/app/api/email",
@@ -28,8 +28,46 @@
       "action": "status_reconciled",
       "operator": "jean",
       "description": "Task status reconciled to ready: dependencies and conflicts are clear for execution"
+    },
+    {
+      "at": "2026-09-10T14:57:52.455Z",
+      "action": "claimed",
+      "operator": "manuel",
+      "branch": "dispatch/manuel/manuel-chatgpt1/email-infra/S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION/ceaa8b659d",
+      "description": "Run run-manuel-S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION-20260910144612-ccbed006 claimed via shell"
+    },
+    {
+      "at": "2026-09-10T16:00:44.796Z",
+      "action": "task_blocked",
+      "operator": "manuel",
+      "reason": "Final owned HeptaCore sender domain remains intentionally deferred; software foundation is complete and validated while Vercel remains the temporary web origin.",
+      "branch": "dispatch/manuel/manuel-chatgpt1/email-infra/S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION/ceaa8b659d",
+      "description": "awaiting_external_validation: Final owned HeptaCore sender domain remains intentionally deferred; software foundation is complete and validated while Vercel remains the temporary web origin."
+    },
+    {
+      "at": "2026-09-10T16:11:30.680Z",
+      "action": "canonical_task_amended",
+      "operator": "manuel",
+      "description": "Repair alpha.6 standalone Task projection after native external block and preserve the production-domain validation contract.; fields=validationExpectations; priorDigest=c307c316d181db183d7cfdf27461d66e483762dca93044d7b4b2e57a4c24f336"
     }
   ],
-  "updatedAt": "2026-09-05T16:07:01.790Z",
-  "runs": []
+  "updatedAt": "2026-09-10T16:11:30.680Z",
+  "runs": [],
+  "readZones": [],
+  "writeZones": [],
+  "resources": [],
+  "capabilities": [],
+  "gates": [],
+  "validationExpectations": [
+    "Production email activation remains fail-closed until an owned HeptaCore sender domain is verified in Resend with SPF, DKIM and DMARC evidence."
+  ],
+  "amendment": {
+    "amendedBy": "manuel",
+    "amendedAt": "2026-09-10T16:11:30.680Z",
+    "reason": "Repair alpha.6 standalone Task projection after native external block and preserve the production-domain validation contract.",
+    "priorTaskDigest": "c307c316d181db183d7cfdf27461d66e483762dca93044d7b4b2e57a4c24f336",
+    "changedFields": [
+      "validationExpectations"
+    ]
+  }
 }
