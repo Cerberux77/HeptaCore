@@ -3,7 +3,7 @@
 type: collaborator-status
 project: "HeptaCore"
 operator: "Manuel"
-last_updated: "2026-09-11T00:02:27.944Z"
+last_updated: "2026-09-11T01:27:06.171Z"
 generated_by: "Oreshnik canonical-check"
 source: "var/oreshnik/task-board.json"
 ---
@@ -182,7 +182,7 @@ Zonas: `package.json`, `package-lock.json`, `prisma.config.ts`, `packages/db/**`
 
 ### S-HC-EMAIL-01A-TRANSACTIONAL-SOFTWARE-FOUNDATION - Transactional email deterministic readiness software foundation
 
-Estado: `validating`
+Estado: `ready_for_integration`
 
 - Deterministic email readiness contract is present in @heptacore/core and exported.
 - SUPER_ADMIN-only /api/email/readiness endpoint evaluates Resend domain and DMARC state without exposing secret material.

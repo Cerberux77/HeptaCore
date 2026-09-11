@@ -5,10 +5,10 @@ project: "HeptaCore"
 task_id: "S-HC-EMAIL-01A-TRANSACTIONAL-SOFTWARE-FOUNDATION"
 run_id: "run-manuel-S-HC-EMAIL-01A-TRANSACTIONAL-SOFTWARE-FOUNDATION-20260911000149-407e2085"
 sprint: "email-infra"
-status: "validating"
-claim_status: "claimed"
+status: "ready_for_integration"
+claim_status: "released"
 operator: "manuel"
-last_updated: "2026-09-11T00:02:27.510Z"
+last_updated: "2026-09-11T01:27:05.694Z"
 source: "var/oreshnik/runs/S-HC-EMAIL-01A-TRANSACTIONAL-SOFTWARE-FOUNDATION/run-manuel-S-HC-EMAIL-01A-TRANSACTIONAL-SOFTWARE-FOUNDATION-20260911000149-407e2085.json"
 ---
 
@@ -25,13 +25,13 @@ source: "var/oreshnik/runs/S-HC-EMAIL-01A-TRANSACTIONAL-SOFTWARE-FOUNDATION/run-
 - operator: `manuel`
 - worker: `manuel-dispatcher`
 - mode: `shell`
-- task status: `validating`
-- claim status: `claimed`
+- task status: `ready_for_integration`
+- claim status: `released`
 - branch: `dispatch/manuel/manuel-chatgpt1/email-infra/S-HC-EMAIL-01A-TRANSACTIONAL-SOFTWARE-FOUNDATION/afe65dfa54`
 - worktree: `/home/runner/work/_temp/oreshnik-wt-email01a/32305cad03d6321a/manuel/manuel-chatgpt1/email-infra/S-HC-EMAIL-01A-TRANSACTIONAL-SOFTWARE-FOUNDATION/afe65dfa54`
 - claimed at: `2026-09-11T00:01:56.454Z`
 - expires at: `2026-09-11T01:01:56.454Z`
-- released at: `-`
+- released at: `2026-09-11T01:27:05.694Z`
 
 ## Boundaries
 

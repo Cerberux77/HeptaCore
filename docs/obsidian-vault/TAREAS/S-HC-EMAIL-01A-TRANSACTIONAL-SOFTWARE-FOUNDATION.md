@@ -4,9 +4,9 @@ type: task-runtime
 project: "HeptaCore"
 task_id: "S-HC-EMAIL-01A-TRANSACTIONAL-SOFTWARE-FOUNDATION"
 sprint: "email-infra"
-status: "validating"
+status: "ready_for_integration"
 owner: "Manuel"
-last_updated: "2026-09-11T00:02:27.502Z"
+last_updated: "2026-09-11T01:27:05.686Z"
 source: "var/oreshnik/tasks/S-HC-EMAIL-01A-TRANSACTIONAL-SOFTWARE-FOUNDATION.json"
 ---
 
@@ -18,7 +18,7 @@ Transactional email deterministic readiness software foundation
 
 ## Runtime
 
-- estado: `validating`
+- estado: `ready_for_integration`
 - owner: `Manuel`
 - backup: `Manuel`
 - intentos: `1`
@@ -65,7 +65,7 @@ Transactional email deterministic readiness software foundation
 
 | Run | Operator | Mode | Task Status | Claim | Branch |
 |---|---|---|---|---|---|
-| run-manuel-S-HC-EMAIL-01A-TRANSACTIONAL-SOFTWARE-FOUNDATION-20260911000149-407e2085 | manuel | shell | validating | claimed | dispatch/manuel/manuel-chatgpt1/email-infra/S-HC-EMAIL-01A-TRANSACTIONAL-SOFTWARE-FOUNDATION/afe65dfa54 |
+| run-manuel-S-HC-EMAIL-01A-TRANSACTIONAL-SOFTWARE-FOUNDATION-20260911000149-407e2085 | manuel | shell | ready_for_integration | released | dispatch/manuel/manuel-chatgpt1/email-infra/S-HC-EMAIL-01A-TRANSACTIONAL-SOFTWARE-FOUNDATION/afe65dfa54 |
 
 ## Integracion
 

@@ -1,6 +1,6 @@
 {
   "project": "HeptaCore",
-  "updatedAt": "2026-09-11T00:02:27.699Z",
+  "updatedAt": "2026-09-11T01:27:05.686Z",
   "currentExecutionOrder": [
     "S-HC-PUB-04-HOURLY-BATCH-CRON",
     "S-HC-PUB-05-RECONCILIATION-OPS",
@@ -1529,7 +1529,7 @@
       "title": "Transactional email deterministic readiness software foundation",
       "owner": "Manuel",
       "backupOwner": "Manuel",
-      "status": "validating",
+      "status": "ready_for_integration",
       "track": "email-infra",
       "zone": [
         "packages/core/src/email-readiness.ts",
@@ -1571,28 +1571,6 @@
       ],
       "handoff": "docs/oreshnik/handoffs/S-HC-EMAIL-01A-TRANSACTIONAL-SOFTWARE-FOUNDATION/handoff-20260911T000224649Z-9f86b3db5db1.md",
       "attempts": 1,
-      "activeRun": {
-        "runId": "run-manuel-S-HC-EMAIL-01A-TRANSACTIONAL-SOFTWARE-FOUNDATION-20260911000149-407e2085",
-        "operator": "manuel",
-        "worker": "manuel-dispatcher",
-        "workerMode": "shell",
-        "claimedAt": "2026-09-11T00:01:56.454Z",
-        "updatedAt": "2026-09-11T00:01:56.454Z",
-        "expiresAt": "2026-09-11T01:01:56.454Z",
-        "branch": "dispatch/manuel/manuel-chatgpt1/email-infra/S-HC-EMAIL-01A-TRANSACTIONAL-SOFTWARE-FOUNDATION/afe65dfa54",
-        "worktreePath": "/home/runner/work/_temp/oreshnik-wt-email01a/32305cad03d6321a/manuel/manuel-chatgpt1/email-infra/S-HC-EMAIL-01A-TRANSACTIONAL-SOFTWARE-FOUNDATION/afe65dfa54",
-        "zones": [
-          "packages/core/src/email-readiness.ts",
-          "packages/core/src/__tests__/email-readiness.test.ts",
-          "packages/core/src/index.ts",
-          "apps/web/app/api/email/readiness/route.ts",
-          "docs/operations/EMAIL_TRANSACTIONAL_READINESS.md",
-          "apps/web/app/api/webhooks/resend",
-          "apps/web/lib/email",
-          ".env.example"
-        ],
-        "resources": []
-      },
       "history": [
         {
           "at": "2026-09-11T00:01:34.000Z",
@@ -1612,6 +1590,186 @@
           "operator": "manuel",
           "branch": "dispatch/manuel/manuel-chatgpt1/email-infra/S-HC-EMAIL-01A-TRANSACTIONAL-SOFTWARE-FOUNDATION/afe65dfa54",
           "description": "Fresh child Run owns only deterministic email readiness software recovered from released parent work."
+        },
+        {
+          "at": "2026-09-11T01:27:05.686Z",
+          "action": "validated",
+          "operator": "manuel",
+          "branch": "dispatch/manuel/manuel-chatgpt1/email-infra/S-HC-EMAIL-01A-TRANSACTIONAL-SOFTWARE-FOUNDATION/afe65dfa54",
+          "description": "EMAIL-01A deterministic software revalidated on the preserved Run using the canonical alpha6 Linux bootstrap: Prisma client generated and exact esbuild 0.28.0 platform binary installed without manifest or lockfile mutation.; typecheck passed; build passed; worker passed; tests passed"
+        },
+        {
+          "at": "2026-09-11T01:27:05.686Z",
+          "action": "ready_for_integration",
+          "operator": "manuel",
+          "branch": "dispatch/manuel/manuel-chatgpt1/email-infra/S-HC-EMAIL-01A-TRANSACTIONAL-SOFTWARE-FOUNDATION/afe65dfa54",
+          "description": "Task delivered with handoff docs/oreshnik/handoffs/S-HC-EMAIL-01A-TRANSACTIONAL-SOFTWARE-FOUNDATION/handoff-20260911T000224649Z-9f86b3db5db1.md"
+        }
+      ],
+      "validationGateResults": [
+        {
+          "gateId": "typecheck",
+          "command": "npm",
+          "args": [
+            "run",
+            "typecheck"
+          ],
+          "cwd": "/home/runner/work/_temp/oreshnik-wt-email01a-resume/32305cad03d6321a/manuel/manuel-chatgpt1/email-infra/S-HC-EMAIL-01A-TRANSACTIONAL-SOFTWARE-FOUNDATION/6509bb04",
+          "startedAt": "2026-09-11T01:25:43.487Z",
+          "finishedAt": "2026-09-11T01:25:51.316Z",
+          "durationMs": 7829,
+          "exitCode": 0,
+          "signal": null,
+          "timedOut": false,
+          "spawnError": null,
+          "stdout": "\n> heptacore@0.1.0 typecheck\n> npm run typecheck --workspaces --if-present\n\n\n> @heptacore/web@0.1.0 typecheck\n> tsc --noEmit\n\n\n> @heptacore/worker@0.2.0 typecheck\n> tsc --noEmit\n\n\n> @heptacore/agents@0.1.0 typecheck\n> tsc --noEmit\n\n\n> @heptacore/core@0.1.0 typecheck\n> tsc --noEmit\n\n\n> @heptacore/db@0.1.0 typecheck\n> tsc --noEmit\n\n\n> @heptacore/integrations@0.1.0 typecheck\n> tsc --noEmit\n\n\n> @heptacore/ui@0.1.0 typecheck\n> tsc --noEmit\n\n\nORESHNIK_EVIDENCE_EXECUTED provider=local execution=exec-0fa67e70-3e86-4a76-90d7-455c304d1976 source=30bcd27315bb06d0f95684ee613105351e06b124",
+          "stderr": "",
+          "passed": true,
+          "attempt": 1,
+          "commandFingerprint": "74e1397c0601c23cd306a124a805f49d1c76c962d79c8d5078e6a7daa09a6e3d",
+          "resultFingerprint": "342bb474c195be800d45cbf68ac27fd989d5def8d16df5d42f257c664e115aa2",
+          "stdoutBytes": 582,
+          "stderrBytes": 0,
+          "stdoutTruncated": false,
+          "stderrTruncated": false
+        },
+        {
+          "gateId": "build",
+          "command": "npm",
+          "args": [
+            "run",
+            "build"
+          ],
+          "cwd": "/home/runner/work/_temp/oreshnik-wt-email01a-resume/32305cad03d6321a/manuel/manuel-chatgpt1/email-infra/S-HC-EMAIL-01A-TRANSACTIONAL-SOFTWARE-FOUNDATION/6509bb04",
+          "startedAt": "2026-09-11T01:25:51.365Z",
+          "finishedAt": "2026-09-11T01:26:31.240Z",
+          "durationMs": 39875,
+          "exitCode": 0,
+          "signal": null,
+          "timedOut": false,
+          "spawnError": null,
+          "stdout": "\n> heptacore@0.1.0 build\n> npm run build --workspaces --if-present\n\n\n> @heptacore/web@0.1.0 build\n> node scripts/copy-tenant-assets.mjs && prisma generate --schema ../../packages/db/prisma/schema.prisma && next build --webpack\n\n[copy-tenant-assets] Turpial assets copied to /home/runner/work/_temp/oreshnik-wt-email01a-resume/32305cad03d6321a/manuel/manuel-chatgpt1/email-infra/S-HC-EMAIL-01A-TRANSACTIONAL-SOFTWARE-FOUNDATION/6509bb04/apps/web/public/tenant-assets/turpial\n\n✔ Generated Prisma Client (v7.10.0) to ./../../node_modules/@prisma/client in 335ms\n\nStart by importing your Prisma Client (See: https://pris.ly/d/importing-client)\n\n\n▲ Next.js 16.3.4 (webpack)\n✓ Running next.config.mjs took 13ms\n⚠ No build cache found. Please configure build caching for faster rebuilds. Read more: https://nextjs.org/docs/messages/no-cache\nAttention: Next.js now collects completely anonymous telemetry regarding usage.\nThis information is used to shape Next.js' roadmap and prioritize features.\nYou can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:\nhttps://nextjs.org/telemetry\n\n\n  Creating an optimized production build ...\n✓ Compiled successfully in 13.6s\n  Running TypeScript ...\n  Finished TypeScript in 8.1s ...\n  Collecting page data using 3 workers ...\n  Generating static pages using 3 workers (0/27) ...\n  Generating static pages using 3 workers (6/27) \r\n  Generating static pages using 3 workers (13/27) \r\n  Generating static pages using 3 workers (20/27) \r\n✓ Generating static pages using 3 workers (27/27) in 369ms\n  Finalizing page optimization ...\n  Collecting build traces ...\n\nRoute (app)\n┌ ƒ /\n├ ○ /_not-found\n├ ƒ /accept-invitation\n├ ƒ /access-required\n├ ƒ /admin\n├ ƒ /admin/tenants\n├ ƒ /admin/tenants/[slug]\n├ ƒ /admin/tenants/new\n├ ƒ /api/admin/capabilities\n├ ƒ /api/admin/facebook-page/bootstrap\n├ ƒ /api/admin/llm-config\n├ ƒ /api/admin/llm-governance\n├ ƒ /api/admin/llm-usage\n├ ƒ /api/admin/tenants\n├ ƒ /api/admin/tenants/[slug]\n├ ƒ /api/admin/tenants/[slug]/invitations\n├ ƒ /api/admin/tenants/[slug]/invitations/[id]\n├ ƒ /api/admin/tenants/[slug]/invitations/[id]/resend\n├ ƒ /api/admin/tenants/[slug]/members\n├ ƒ /api/admin/tenants/[slug]/members/[membershipId]\n├ ƒ /api/admin/tenants/[slug]/status\n├ ƒ /api/assets/[id]\n├ ƒ /api/assets/upload\n├ ƒ /api/assistant\n├ ƒ /api/auth/[...nextauth]\n├ ƒ /api/auth/recover\n├ ƒ /api/auth/register\n├ ƒ /api/auth/reset-password\n├ ƒ /api/campaigns\n├ ƒ /api/campaigns/[id]/approve\n├ ƒ /api/cron/publisher\n├ ƒ /api/drafts/[id]\n├ ƒ /api/drafts/[id]/approve\n├ ƒ /api/drafts/[id]/asset\n├ ƒ /api/drafts/[id]/reject\n├ ƒ /api/drafts/new\n├ ƒ /api/drafts/reorder\n├ ƒ /api/email/readiness\n├ ƒ /api/invitations\n├ ƒ /api/invitations/accept\n├ ƒ /api/oauth/facebook/callback\n├ ƒ /api/oauth/facebook/login\n├ ƒ /api/oauth/instagram/callback\n├ ƒ /api/oauth/instagram/login\n├ ƒ /api/publishing/publish\n├ ƒ /api/publishing/rollback\n├ ƒ /api/session/capabilities\n├ ƒ /api/strategy/generate\n├ ƒ /api/strategy/update\n├ ƒ /api/tenant-assets/[[...path]]\n├ ƒ /api/tenant-networks\n├ ƒ /api/tenants/[slug]/assets\n├ ƒ /api/tenants/[slug]/assets/[assetId]\n├ ƒ /api/tenants/[slug]/assets/[assetId]/content\n├ ƒ /api/tenants/[slug]/assets/[assetId]/content/upload\n├ ƒ /api/tenants/[slug]/assets/[assetId]/derivatives\n├ ƒ /api/tenants/[slug]/assets/by-storage-key\n├ ƒ /api/tenants/[slug]/assets/finalize\n├ ƒ /api/tenants/[slug]/assets/upload\n├ ƒ /api/webhooks/resend\n├ ƒ /app\n├ ○ /data-deletion\n├ ○ /icon.svg\n├ ○ /login\n├ ○ /privacy\n├ ○ /recover\n├ ○ /register\n├ ○ /reset-password\n├ ƒ /tenant/[slug]\n└ ○ /terms\n\n\nƒ Proxy (Middleware)\n\n○  (Static)   prerendered as static content\nƒ  (Dynamic)  server-rendered on demand\n\n\nORESHNIK_EVIDENCE_EXECUTED provider=local execution=exec-ffddc29a-6156-4226-8c6a-b19249b8a213 source=30bcd27315bb06d0f95684ee613105351e06b124",
+          "stderr": "Prisma schema loaded from ../../packages/db/prisma/schema.prisma.\n",
+          "passed": true,
+          "attempt": 1,
+          "commandFingerprint": "b95ffa0dede26981193dd5bfa2a053e266956380f5be818b799059afae94ea02",
+          "resultFingerprint": "e8e03e1e04496235adda846abbed8e4a0636dab18649be968e98e3d9a776092d",
+          "stdoutBytes": 4097,
+          "stderrBytes": 66,
+          "stdoutTruncated": false,
+          "stderrTruncated": false
+        },
+        {
+          "gateId": "worker",
+          "command": "npm",
+          "args": [
+            "run",
+            "worker:validate"
+          ],
+          "cwd": "/home/runner/work/_temp/oreshnik-wt-email01a-resume/32305cad03d6321a/manuel/manuel-chatgpt1/email-infra/S-HC-EMAIL-01A-TRANSACTIONAL-SOFTWARE-FOUNDATION/6509bb04",
+          "startedAt": "2026-09-11T01:26:31.281Z",
+          "finishedAt": "2026-09-11T01:26:31.570Z",
+          "durationMs": 289,
+          "exitCode": 0,
+          "signal": null,
+          "timedOut": false,
+          "spawnError": null,
+          "stdout": "\n> heptacore@0.1.0 worker:validate\n> npm run validate -w @heptacore/worker\n\n\n> @heptacore/worker@0.2.0 validate\n> node src/validate.mjs\n\n\n=== Validacion de Assets ===\n\nPresentes: 46/46\n✅ Todos los assets presentes.\n\n\n=== Validacion de Cola de Publicaciones ===\nTotal entries: 29\n\n\n=== Resumen de Validacion ===\nValidos: 29/29\nAssets faltantes: 0\nFechas faltantes: 0\n\n✅ Todos los drafts validos.\n\nORESHNIK_EVIDENCE_EXECUTED provider=local execution=exec-938e83c3-3969-4579-90f9-7ce6aa3bc95d source=30bcd27315bb06d0f95684ee613105351e06b124",
+          "stderr": "[config] .env.rrss no encontrado. Usando solo variables de entorno del sistema.\n",
+          "passed": true,
+          "attempt": 1,
+          "commandFingerprint": "0e0efda699ea5f45bdecae8af766fdf22b190c7e45961e6f7b13464b2b4aecde",
+          "resultFingerprint": "2a60bcc2f07de223563c93d3e77b40d607ae41d9793d9a72227806796f2642ff",
+          "stdoutBytes": 541,
+          "stderrBytes": 80,
+          "stdoutTruncated": false,
+          "stderrTruncated": false
+        },
+        {
+          "gateId": "tests",
+          "command": "npm",
+          "args": [
+            "run",
+            "test"
+          ],
+          "cwd": "/home/runner/work/_temp/oreshnik-wt-email01a-resume/32305cad03d6321a/manuel/manuel-chatgpt1/email-infra/S-HC-EMAIL-01A-TRANSACTIONAL-SOFTWARE-FOUNDATION/6509bb04",
+          "startedAt": "2026-09-11T01:26:31.615Z",
+          "finishedAt": "2026-09-11T01:27:05.076Z",
+          "durationMs": 33461,
+          "exitCode": 0,
+          "signal": null,
+          "timedOut": false,
+          "spawnError": null,
+          "stdout": "\n> heptacore@0.1.0 test\n> node --test apps/web/lib/calendar-state.test.mjs && npm run test:infra && npm run test --workspaces --if-present\n\n✔ calendar display state prefers operational state over approval status (0.838282ms)\nℹ tests 1\nℹ suites 0\nℹ pass 1\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 100.44624\n\n> heptacore@0.1.0 test:infra\n> node --test scripts/goal-runner/__tests__/*.test.mjs scripts/oreshnik/__tests__/*.test.mjs\n\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\n▶ Doctor Command\n  ✔ reports healthy for empty clean worktree (9.521344ms)\n  ✔ detects stale lock when state status is not ACTIVE (11.624149ms)\n  ✔ detects stale lock when state file is missing (10.578165ms)\n  ✔ reports DOCTOR-I002 for valid lock and ACTIVE state (9.088773ms)\n  ✔ detects state validation failure (corrupt state) (24.921848ms)\n  ✔ detects index inconsistency (stale content hash) (14.551141ms)\n  ✔ detects index entry with no goal directory (8.687724ms)\n  ✔ detects resumable goals when no lock exists (5.615033ms)\n  ✔ reports missing history directory as warning (5.036778ms)\n  ✔ reports missing schema file as error (5.046147ms)\n  ✔ resolveGateSpawn wraps npm in cmd.exe /c on Windows (0.289636ms)\n  ✔ resolveGateSpawn preserves non-aliased commands unchanged (1.283152ms)\n  ✔ resolveGateSpawn wraps aliased commands via cmd.exe /c on Windows (0.193701ms)\n✔ Doctor Command (122.011054ms)\n▶ Evidence and Gates\n  ✔ complete fails without evidence (9.676418ms)\n  ✔ complete fails with wrong evidence type (1.073797ms)\n  ✔ evidence-add rejects sensitive paths (1.533969ms)\n  ✔ evidence-add rejects absolute paths (0.547424ms)\n  ✔ evidence-add rejects non-existent file (0.640635ms)\n  ✔ evidence-add rejects directory (0.755918ms)\n  ✔ evidence-add rejects path traversal (0.676919ms)\n  ✔ evidence-add accepts valid relative path and computes hash (1.813671ms)\n  ✔ validateGateIds rejects unknown gates (0.751621ms)\n  ✔ validateGateIds rejects non-array (0.422876ms)\n  ✔ setGates works for DRAFT and READY statuses (2.271059ms)\n  ✔ setGates rejects after ACTIVE (0.59789ms)\n  ✔ setGates rejects unknown gate IDs (0.528275ms)\n  ✔ setGates deduplicates while preserving order (0.7241ms)\n  ✔ validateEvidencePath rejects absolute paths (0.217908ms)\n✔ Evidence and Gates (26.022345ms)\n▶ ID Generation\n  ✔ generates valid goal IDs (2.142666ms)\n  ✔ generates 5000 IDs with same title without collisions (27.2144ms)\n  ✔ generates 5000 IDs with fixed timestamp without collisions (30.003337ms)\n  ✔ rejects path traversal in IDs (0.318299ms)\n  ✔ rejects Windows reserved characters (0.323827ms)\n  ✔ rejects control characters (0.234453ms)\n  ✔ rejects invalid goal ID format (0.181413ms)\n  ✔ sanitizeSlug handles edge cases (0.19282ms)\n  ✔ generated IDs contain no Windows-problematic chars (2.937813ms)\n  ✔ goal ID has 8 hex chars of entropy suffix (0.800505ms)\n✔ ID Generation (66.853873ms)\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nError: Worktree already locked by active goal: GR-20260911T012633Z-31a78892-first-active-goal\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\nError: Cannot complete: No evidence submitted\nfatal: not a git repository (or any of the parent directories): .git\nfile:///home/runner/work/_temp/oreshnik-wt-email01a-resume/32305cad03d6321a/manuel/manuel-chatgpt1/email-infra/S-HC-EMAIL-01A-TRANSACTIONAL-SOFTWARE-FOUNDATION/6509bb04/scripts/goal-runner/lib.mjs:189\n  if (!check.valid) throw new Error(check.reason);\n                          ^\n\nError: Status COMPLETED is terminal and immutable\n    at applyTransition (file:///home/runner/work/_temp/oreshnik-wt-email01a-resume/32305cad03d6321a/manuel/manuel-chatgpt1/email-infra/S-HC-EMAIL-01A-TRANSACTIONAL-SOFTWARE-FOUNDATION/6509bb04/scripts/goal-runner/lib.mjs:189:27)\n    at cmdActivate (file:///home/runner/work/_temp/oreshnik-wt-email01a-resume/32305cad03d6321a/manuel/manuel-chatgpt1/email-infra/S-HC-EMAIL-01A-TRANSACTIONAL-SOFTWARE-FOUNDATION/6509bb04/scripts/goal-runner/run.mjs:183:3)\n    at file:///home/runner/work/_temp/oreshnik-wt-email01a-resume/32305cad03d6321a/manuel/manuel-chatgpt1/email-infra/S-HC-EMAIL-01A-TRANSACTIONAL-SOFTWARE-FOUNDATION/6509bb04/scripts/goal-runner/run.mjs:559:20\n    at ModuleJob.run (node:internal/modules/esm/module_job:561:25)\n    at async node:internal/modules/esm/loader:647:26\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5)\n\nNode.js v24.20.0\nError: Goal is not ACTIVE (current: COMPLETED)\n▶ Goal Runner CLI Integration\n  ✔ 1. create (77.136154ms)\n  ✔ 2. plan-record (56.657318ms)\n  ✔ 3. gates-set (122.434918ms)\n  ✔ 4. activate (67.13326ms)\n  ✔ 5. step-start and step-complete (118.914282ms)\n  ✔ 6. finding-add (48.656188ms)\n  ✔ 7. evidence-add (49.66023ms)\n  ✔ 8. complete (49.213503ms)\n  ✔ 9. resume from PAUSED (319.703021ms)\n  ✔ 10. second ACTIVE goal is rejected (373.854317ms)\n  ✔ 11. stale lock detection (235.738213ms)\n  ✔ 12. complete is rejected without evidence (262.572935ms)\n  ✔ 13. terminal state is immutable after complete (94.662392ms)\n✔ Goal Runner CLI Integration (1882.143821ms)\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\n▶ Lock Exclusivity\n  ✔ readLock returns null when no lock exists (1.126666ms)\n  ✔ stale lock on wrong worktreeRoot (0.778703ms)\n  ✔ stale lock on different branch (6.010953ms)\n",
+          "stderr": "",
+          "passed": true,
+          "attempt": 1,
+          "commandFingerprint": "250248577f878ef8f32a2f855e3d723f8e58a1165ab565f49ae5db0970749e5b",
+          "resultFingerprint": "f571cb74d0de9b31d73f02a08405a83b4d7cb9a584f32419cb27c4bc4f8a9360",
+          "stdoutBytes": 8286,
+          "stderrBytes": 0,
+          "stdoutTruncated": true,
+          "stderrTruncated": false
+        }
+      ],
+      "evidenceVerifications": [
+        {
+          "itemId": "build_passed",
+          "label": "build passed",
+          "verified": true,
+          "verifiedAt": "2026-09-11T01:26:31.240Z",
+          "runId": "run-manuel-S-HC-EMAIL-01A-TRANSACTIONAL-SOFTWARE-FOUNDATION-20260911000149-407e2085",
+          "gateId": "build",
+          "source": "gate",
+          "commandFingerprint": "b95ffa0dede26981193dd5bfa2a053e266956380f5be818b799059afae94ea02",
+          "resultFingerprint": "e8e03e1e04496235adda846abbed8e4a0636dab18649be968e98e3d9a776092d",
+          "summary": "S-HC-EMAIL-01A-TRANSACTIONAL-SOFTWARE-FOUNDATION:build | exit=0 | timed_ok | signal=none | stdout=> heptacore@0.1.0 build | stderr=Prisma schema loaded from ../../packages/db/prisma/schema.prisma."
+        },
+        {
+          "itemId": "changed_files_diff",
+          "label": "changed files diff",
+          "verified": true,
+          "verifiedAt": "2026-09-11T01:27:05.094Z",
+          "runId": "run-manuel-S-HC-EMAIL-01A-TRANSACTIONAL-SOFTWARE-FOUNDATION-20260911000149-407e2085",
+          "source": "git",
+          "resultFingerprint": "a1781a855bbf44ebbf1d1f3a88cfbe79ba4d6cd36a75577956f79a3827d52e7a",
+          "summary": "diff master..dispatch/manuel/manuel-chatgpt1/email-infra/S-HC-EMAIL-01A-TRANSACTIONAL-SOFTWARE-FOUNDATION/afe65dfa54: apps/web/app/api/email/readiness/route.ts, apps/web/next-env.d.ts, docs/obsidian-vault/00_CENTRAL_HEPTACORE.md, docs/obsidian-vault/COLABORADORES/ESTADO_MANUEL.md, docs/obsidian-vault/PRODUCT/STATUS_BOARD.md, docs/obsidian-vault/RUNS/S-HC-EMAIL-01A-TRANSACTIONAL-SOFTWARE-FOUNDATION/run-manuel-S-HC-EMAIL-01A-TRANSACTIONAL-SOFTWARE-FOUNDATION-20260911000149-407e2085.md, docs/obsidian-vault/TAREAS/HC-ORESHNIK-RECOVERY-ALPHA6.md, docs/obsidian-vault/TAREAS/S-HC-00.md, docs/obsidian-vault/TAREAS/S-HC-01.md, docs/obsidian-vault/TAREAS/S-HC-EMAIL-01A-TRANSACTIONAL-SOFTWARE-FOUNDATION.md, docs/obsidian-vault/TAREAS/S-HC-INBOX-01-UNIFIED-ENGAGEMENT.md, docs/obsidian-vault/TAREAS/S-HC-ONB-01-MASTER-BRIEF-INGESTION.md, docs/obsidian-vault/TAREAS/S-HC-ONB-02-GAP-RESOLUTION-WIZARD.md, docs/obsidian-vault/TAREAS/S-HC-OPS-01-CAMPAIGN-REVIEW-DEPLOYMENT.md, docs/obsidian-vault/TAREAS/S-HC-OPT-01-SENTIMENT-STRATEGY-ITERATION.md, docs/obsidian-vault/TAREAS/S-HC-PROD-02.md, docs/obsidian-vault/TAREAS/S-HC-PUB-02-MULTIFORMAT-PREVIEW.md, docs/obsidian-vault/TAREAS/S-HC-PUB-03-MULTITENANT-ASSETS.md, docs/obsidian-vault/TAREAS/S-HC-PUB-06-REELS-STORIES-PUBLISHERS.md, docs/obsidian-vault/TAREAS/S-HC-PUB-07-YOUTUBE-PUBLISHING.md"
+        },
+        {
+          "itemId": "tests_passed",
+          "label": "tests passed",
+          "verified": true,
+          "verifiedAt": "2026-09-11T01:27:05.076Z",
+          "runId": "run-manuel-S-HC-EMAIL-01A-TRANSACTIONAL-SOFTWARE-FOUNDATION-20260911000149-407e2085",
+          "gateId": "tests",
+          "source": "gate",
+          "commandFingerprint": "250248577f878ef8f32a2f855e3d723f8e58a1165ab565f49ae5db0970749e5b",
+          "resultFingerprint": "f571cb74d0de9b31d73f02a08405a83b4d7cb9a584f32419cb27c4bc4f8a9360",
+          "summary": "S-HC-EMAIL-01A-TRANSACTIONAL-SOFTWARE-FOUNDATION:tests | exit=0 | timed_ok | signal=none | stdout=> heptacore@0.1.0 test"
+        },
+        {
+          "itemId": "typecheck_passed",
+          "label": "typecheck passed",
+          "verified": true,
+          "verifiedAt": "2026-09-11T01:25:51.316Z",
+          "runId": "run-manuel-S-HC-EMAIL-01A-TRANSACTIONAL-SOFTWARE-FOUNDATION-20260911000149-407e2085",
+          "gateId": "typecheck",
+          "source": "gate",
+          "commandFingerprint": "74e1397c0601c23cd306a124a805f49d1c76c962d79c8d5078e6a7daa09a6e3d",
+          "resultFingerprint": "342bb474c195be800d45cbf68ac27fd989d5def8d16df5d42f257c664e115aa2",
+          "summary": "S-HC-EMAIL-01A-TRANSACTIONAL-SOFTWARE-FOUNDATION:typecheck | exit=0 | timed_ok | signal=none | stdout=> heptacore@0.1.0 typecheck"
+        },
+        {
+          "itemId": "worker_validation_passed",
+          "label": "worker validation passed",
+          "verified": true,
+          "verifiedAt": "2026-09-11T01:26:31.570Z",
+          "runId": "run-manuel-S-HC-EMAIL-01A-TRANSACTIONAL-SOFTWARE-FOUNDATION-20260911000149-407e2085",
+          "gateId": "worker",
+          "source": "gate",
+          "commandFingerprint": "0e0efda699ea5f45bdecae8af766fdf22b190c7e45961e6f7b13464b2b4aecde",
+          "resultFingerprint": "2a60bcc2f07de223563c93d3e77b40d607ae41d9793d9a72227806796f2642ff",
+          "summary": "S-HC-EMAIL-01A-TRANSACTIONAL-SOFTWARE-FOUNDATION:worker | exit=0 | timed_ok | signal=none | stdout=> heptacore@0.1.0 worker:validate | stderr=[config] .env.rrss no encontrado. Usando solo variables de entorno del sistema."
         }
       ]
     },

@@ -2,7 +2,7 @@
 ---
 type: status-board
 project: "HeptaCore"
-last_updated: "2026-09-11T00:02:27.952Z"
+last_updated: "2026-09-11T01:27:06.177Z"
 generated_by: "Oreshnik canonical-check"
 source: "var/oreshnik/task-board.json"
 ---
@@ -62,7 +62,7 @@ source: "var/oreshnik/task-board.json"
 | S-HC-COMM-02-BILLING-ACTIVATION | blocked | Manuel | Tenant billing activation: plan selection, usage tracking, payment integration | S-HC-COMM-01-SELF-SERVICE-SIGNUP |
 | S-HC-INFRA-BASELINE-GATES-RECOVERY | ready_for_integration | Manuel | Baseline gates recovery: Oreshnik alpha.9, identity v2, Prisma, typecheck, build and canonical suite | - |
 | S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION | ready | Jean | Transactional email foundation: domain sender, DNS, reputation, provider integration | - |
-| S-HC-EMAIL-01A-TRANSACTIONAL-SOFTWARE-FOUNDATION | validating | Manuel | Transactional email deterministic readiness software foundation | - |
+| S-HC-EMAIL-01A-TRANSACTIONAL-SOFTWARE-FOUNDATION | ready_for_integration | Manuel | Transactional email deterministic readiness software foundation | - |
 | S-HC-INBOX-01-UNIFIED-ENGAGEMENT | blocked | Manuel | Unified engagement inbox: read and respond to messages and comments | S-HC-AN-01-CAMPAIGN-PERFORMANCE |
 | S-HC-ONB-01-MASTER-BRIEF-INGESTION | blocked | Manuel | Master document ingestion: extract structured info from company briefs | S-HC-COMM-02-BILLING-ACTIVATION |
 | S-HC-ONB-02-GAP-RESOLUTION-WIZARD | blocked | Manuel | Gap resolution wizard: dynamic form to resolve missing or conflicting data | S-HC-ONB-01-MASTER-BRIEF-INGESTION |
