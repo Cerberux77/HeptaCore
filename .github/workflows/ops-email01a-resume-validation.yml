@@ -1,0 +1,154 @@
+name: Ops EMAIL01A Resume Validation
+
+on:
+  push:
+    branches:
+      - ops/email01a-deterministic-rescue-20260910
+    paths:
+      - .github/email01a-resume-validation-trigger
+
+permissions:
+  contents: write
+  actions: read
+
+concurrency:
+  group: heptacore-email01a-resume-validation
+  cancel-in-progress: false
+
+env:
+  TASK_ID: S-HC-EMAIL-01A-TRANSACTIONAL-SOFTWARE-FOUNDATION
+  RUN_ID: run-manuel-S-HC-EMAIL-01A-TRANSACTIONAL-SOFTWARE-FOUNDATION-20260911000149-407e2085
+  OPERATOR: manuel
+  HARNESS: chatgpt
+  INSTANCE: manuel-chatgpt1
+  SESSION: email01a-rescue-20260911000143
+  ORESHNIK_VERSION: 0.3.0-alpha.6
+  BRANCH: dispatch/manuel/manuel-chatgpt1/email-infra/S-HC-EMAIL-01A-TRANSACTIONAL-SOFTWARE-FOUNDATION/afe65dfa54
+  EXPECTED_BRANCH_HEAD: 30bcd27315bb06d0f95684ee613105351e06b124
+  HANDOFF: docs/oreshnik/handoffs/S-HC-EMAIL-01A-TRANSACTIONAL-SOFTWARE-FOUNDATION/handoff-20260911T000224649Z-9f86b3db5db1.md
+
+jobs:
+  resume-validation:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    steps:
+      - name: Checkout current canonical master
+        uses: actions/checkout@v4
+        with:
+          ref: master
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Configure identity
+        run: |
+          git config user.name "Manuel Vera via ChatGPT Operator"
+          git config user.email "manuel@heptacore.dev"
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Verify exact alpha6 and preserved branch
+        run: |
+          set -euo pipefail
+          npm ci --ignore-scripts
+          test "$(node node_modules/oreshnik-cli/dist/cli.js --version)" = "$ORESHNIK_VERSION"
+          npm run oreshnik:ready
+          git fetch origin "+refs/heads/$BRANCH:refs/remotes/origin/$BRANCH" '+refs/heads/master:refs/remotes/origin/master' '+refs/heads/oreshnik/control:refs/remotes/origin/oreshnik/control'
+          test "$(git rev-parse origin/$BRANCH)" = "$EXPECTED_BRANCH_HEAD"
+          echo "master=$(git rev-parse origin/master)"
+          echo "control=$(git rev-parse origin/oreshnik/control)"
+
+      - name: Rehydrate same governed Run with alpha6 takeover
+        id: takeover
+        run: |
+          set -euo pipefail
+          node node_modules/oreshnik-cli/dist/cli.js dispatch init \
+            --mother master \
+            --worktree-root "$RUNNER_TEMP/oreshnik-wt-email01a-resume" \
+            --repo . --json
+          node node_modules/oreshnik-cli/dist/cli.js dispatch takeover \
+            --run "$RUN_ID" \
+            --reason "Recover the same EMAIL-01A Run on a fresh ephemeral runner after the prior validation runner ended; preserve branch and ownership identity." \
+            --operator "$OPERATOR" --harness "$HARNESS" \
+            --instance "$INSTANCE" --session "$SESSION" \
+            --repo . --json | tee "$RUNNER_TEMP/email01a-takeover.json"
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const p=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/email01a-takeover.json','utf8'));
+          if(p.result!=='taken_over'||p.runId!==process.env.RUN_ID||p.taskId!==process.env.TASK_ID) throw new Error(`Unexpected takeover result: ${JSON.stringify(p)}`);
+          if(p.functionalBranch!==process.env.BRANCH) throw new Error(`Branch drift: ${p.functionalBranch}`);
+          fs.appendFileSync(process.env.GITHUB_OUTPUT,`worktree=${p.worktreePath}\ncontrol=${p.controlHead}\nassignment=${p.assignmentId}\n`);
+          NODE
+
+      - name: Generate Prisma client and prove raw typecheck
+        env:
+          WT: ${{ steps.takeover.outputs.worktree }}
+        run: |
+          set -euo pipefail
+          cd "$WT"
+          git config user.name "Manuel Vera via ChatGPT Operator"
+          git config user.email "manuel@heptacore.dev"
+          npm ci --ignore-scripts
+          test "$(node node_modules/oreshnik-cli/dist/cli.js --version)" = "$ORESHNIK_VERSION"
+          npm run db:generate
+          npm run typecheck
+
+      - name: Execute governed alpha6 gates and ready_for_integration
+        env:
+          WT: ${{ steps.takeover.outputs.worktree }}
+        run: |
+          set -euo pipefail
+          cd "$WT"
+          test -f "$HANDOFF"
+          node node_modules/oreshnik-cli/dist/cli.js evidence \
+            --task "$TASK_ID" --run "$RUN_ID" --operator "$OPERATOR" \
+            --handoff "$HANDOFF" \
+            --details "EMAIL-01A deterministic software revalidated on the preserved Run after generating the Prisma client omitted by the prior ignore-scripts bootstrap." \
+            --ready-for-integration | tee "$RUNNER_TEMP/email01a-evidence.txt"
+          node node_modules/oreshnik-cli/dist/cli.js reconcile --write --json | tee "$RUNNER_TEMP/email01a-reconcile.json"
+          git add var/oreshnik docs/obsidian-vault docs/oreshnik docs/07_handoffs || true
+          git diff --cached --check
+          if ! git diff --cached --quiet; then
+            git commit -m "chore(oreshnik): persist EMAIL-01A validated readiness"
+          fi
+          git push origin "HEAD:$BRANCH"
+
+      - name: Verify remote lifecycle and gates
+        env:
+          WT: ${{ steps.takeover.outputs.worktree }}
+          ASSIGNMENT_ID: ${{ steps.takeover.outputs.assignment }}
+        run: |
+          set -euo pipefail
+          cd "$WT"
+          git fetch origin "+refs/heads/$BRANCH:refs/remotes/origin/$BRANCH" '+refs/heads/oreshnik/control:refs/remotes/origin/oreshnik/control'
+          git show "origin/$BRANCH:var/oreshnik/tasks/$TASK_ID.json" > "$RUNNER_TEMP/email01a-task.json"
+          git show "origin/$BRANCH:var/oreshnik/runs/$TASK_ID/$RUN_ID.json" > "$RUNNER_TEMP/email01a-run.json"
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const t=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/email01a-task.json','utf8'));
+          const r=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/email01a-run.json','utf8'));
+          const required=['typecheck','build','worker','tests'];
+          if(t.status!=='ready_for_integration'||r.taskStatus!=='ready_for_integration') throw new Error(`Lifecycle not ready: ${t.status}/${r.taskStatus}`);
+          for(const id of required){const g=(r.validationGateResults||[]).find(x=>x.gateId===id);if(!g?.passed) throw new Error(`Gate ${id} missing/pass=false`);}
+          console.log(JSON.stringify({task:t.status,run:r.taskStatus,branch:process.env.BRANCH,gates:(r.validationGateResults||[]).map(g=>({id:g.gateId,passed:g.passed}))},null,2));
+          NODE
+          git rev-parse "origin/$BRANCH" | tee "$RUNNER_TEMP/email01a-final-head.txt"
+          git rev-parse origin/oreshnik/control | tee "$RUNNER_TEMP/email01a-control-head.txt"
+
+      - name: Upload validation evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: email01a-resume-validation
+          path: |
+            ${{ runner.temp }}/email01a-takeover.json
+            ${{ runner.temp }}/email01a-evidence.txt
+            ${{ runner.temp }}/email01a-reconcile.json
+            ${{ runner.temp }}/email01a-task.json
+            ${{ runner.temp }}/email01a-run.json
+            ${{ runner.temp }}/email01a-final-head.txt
+            ${{ runner.temp }}/email01a-control-head.txt
+          if-no-files-found: ignore
