@@ -1,0 +1,3 @@
+triggered-at: 2026-09-11T01:21:00Z
+branch-head: 30bcd27315bb06d0f95684ee613105351e06b124
+purpose: verify clean npm ci with optional platform binaries and local postinstall before governed retry
