@@ -1,0 +1,79 @@
+name: Ops EMAIL01A Clean Integration Projection
+
+on:
+  push:
+    branches:
+      - ops/email01a-deterministic-rescue-20260910
+    paths:
+      - .github/email01a-clean-integration-trigger
+
+permissions:
+  contents: write
+
+env:
+  SOURCE_BRANCH: dispatch/manuel/manuel-chatgpt1/email-infra/S-HC-EMAIL-01A-TRANSACTIONAL-SOFTWARE-FOUNDATION/afe65dfa54
+  SOURCE_HEAD: 6e7cae7bc63682f3c87c3a38db76e88b3da49ccd
+  MASTER_HEAD: 9e1a4467c9c142d984224135145e6dcbca63e2b7
+  INTEGRATION_BRANCH: integration/email01a-deterministic-clean-20260911
+
+jobs:
+  project:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - name: Checkout canonical master
+        uses: actions/checkout@v4
+        with:
+          ref: master
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Configure identity and freeze heads
+        run: |
+          set -euo pipefail
+          git config user.name "Manuel Vera via ChatGPT Integrator"
+          git config user.email "manuel@heptacore.dev"
+          git fetch origin "+refs/heads/$SOURCE_BRANCH:refs/remotes/origin/$SOURCE_BRANCH" '+refs/heads/master:refs/remotes/origin/master'
+          test "$(git rev-parse origin/master)" = "$MASTER_HEAD"
+          test "$(git rev-parse origin/$SOURCE_BRANCH)" = "$SOURCE_HEAD"
+
+      - name: Project only validated functional commits
+        run: |
+          set -euo pipefail
+          git checkout -B "$INTEGRATION_BRANCH" origin/master
+          git cherry-pick \
+            2870e4d11c9bece61a0f8b583378f54ba55044c0 \
+            bef6c842f5e1f0f45baf98247fa5150f4a5e6521 \
+            22f09f22e8f656c63aa433ebda039f1cb397041a \
+            36407671df1c052709a87c14db8db12719a243d0 \
+            e5d5b7ad50d1a39ad740fb91da9a38423a07ae16
+          changed="$(git diff --name-only "$MASTER_HEAD"..HEAD)"
+          printf '%s\n' "$changed"
+          expected="$(printf '%s\n' \
+            apps/web/app/api/email/readiness/route.ts \
+            docs/operations/EMAIL_TRANSACTIONAL_READINESS.md \
+            packages/core/src/__tests__/email-readiness.test.ts \
+            packages/core/src/email-readiness.ts \
+            packages/core/src/index.ts | sort)"
+          test "$(printf '%s\n' "$changed" | sort)" = "$expected"
+          for p in \
+            apps/web/app/api/email/readiness/route.ts \
+            docs/operations/EMAIL_TRANSACTIONAL_READINESS.md \
+            packages/core/src/__tests__/email-readiness.test.ts \
+            packages/core/src/email-readiness.ts \
+            packages/core/src/index.ts; do
+            git diff --exit-code "origin/$SOURCE_BRANCH" -- "$p"
+          done
+          git diff --check "$MASTER_HEAD"..HEAD
+
+      - name: Push immutable clean integration branch
+        run: |
+          set -euo pipefail
+          if git ls-remote --exit-code --heads origin "$INTEGRATION_BRANCH" >/dev/null 2>&1; then
+            remote="$(git ls-remote origin "refs/heads/$INTEGRATION_BRANCH" | awk '{print $1}')"
+            local="$(git rev-parse HEAD)"
+            test "$remote" = "$local"
+          else
+            git push origin "HEAD:refs/heads/$INTEGRATION_BRANCH"
+          fi
+          git rev-parse HEAD
