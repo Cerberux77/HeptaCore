@@ -13,6 +13,7 @@ permissions:
 env:
   EXPECTED_MASTER: 9e1a4467c9c142d984224135145e6dcbca63e2b7
   EXPECTED_CONTROL: 747ad4f277de826a0f586ed77a79dd15bf61d3df
+  ORESHNIK_MACHINE_ID_OVERRIDE: machine-097bcea2-01c5-4ffd-9414-e5754592a47e
 
 jobs:
   inspect:
@@ -63,16 +64,16 @@ jobs:
           node node_modules/oreshnik-cli/dist/cli.js dispatch next \
             --operator manuel \
             --harness chatgpt \
-            --instance manuel-chatgpt1 \
-            --session "next-dry-run-${GITHUB_RUN_ID}" \
             --repo "$GITHUB_WORKSPACE" \
             --dry-run \
             --json | tee dispatch-next-dry-run.json
 
       - name: Upload read-only dispatch evidence
+        if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: oreshnik-next-dry-run
+          name: oreshnik-next-dry-run-${{ github.run_id }}
           path: |
             dispatch-status.json
             dispatch-next-dry-run.json
+          if-no-files-found: warn
