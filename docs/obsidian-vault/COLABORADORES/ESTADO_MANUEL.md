@@ -3,7 +3,7 @@
 type: collaborator-status
 project: "HeptaCore"
 operator: "Manuel"
-last_updated: "2026-09-10T22:07:19.966Z"
+last_updated: "2026-09-11T00:02:27.944Z"
 generated_by: "Oreshnik canonical-check"
 source: "var/oreshnik/task-board.json"
 ---
@@ -180,6 +180,19 @@ Estado: `ready_for_integration`
 
 Zonas: `package.json`, `package-lock.json`, `prisma.config.ts`, `packages/db/**`, `apps/worker/**`, `scripts/oreshnik/**`, `scripts/goal-runner/**`, `var/oreshnik/**`
 
+### S-HC-EMAIL-01A-TRANSACTIONAL-SOFTWARE-FOUNDATION - Transactional email deterministic readiness software foundation
+
+Estado: `validating`
+
+- Deterministic email readiness contract is present in @heptacore/core and exported.
+- SUPER_ADMIN-only /api/email/readiness endpoint evaluates Resend domain and DMARC state without exposing secret material.
+- Automated tests cover development test-sender mode, invalid Vercel sender identity, custom-domain verification and production fail-closed behavior.
+- Operational documentation distinguishes deterministic software readiness from external production-domain activation.
+- No domain, DNS record, Resend credential or production activation is invented or claimed by this child Task.
+- typecheck, build, worker validation and full repository tests pass.
+
+Zonas: `packages/core/src/email-readiness.ts`, `packages/core/src/__tests__/email-readiness.test.ts`, `packages/core/src/index.ts`, `apps/web/app/api/email/readiness/route.ts`, `docs/operations/EMAIL_TRANSACTIONAL_READINESS.md`
+
 ### S-HC-INBOX-01-UNIFIED-ENGAGEMENT - Unified engagement inbox: read and respond to messages and comments
 
 Estado: `blocked`
@@ -282,7 +295,7 @@ Zonas: `apps/web/lib/publishers`, `apps/web/lib/publishing-formats.ts`, `apps/we
 
 ### S-HC-PUB-07B-YOUTUBE-SCHEDULED-E2E - YouTube scheduled E2E integration: Video, Shorts, cron metadata and credentials
 
-Estado: `ready_for_integration`
+Estado: `integrated`
 
 - Validated YouTube Video 16:9 and Shorts publisher is present in the governed delivery.
 - Scheduled cron transports YouTube format, title, description, primary video and thumbnail to the provider adapter.
@@ -293,6 +306,19 @@ Estado: `ready_for_integration`
 - typecheck, build, worker validation and full repository tests pass.
 
 Zonas: `apps/web/lib/publishers`, `apps/web/app/api/publishing`, `packages/integrations`, `apps/web/app/api/cron/publisher`, `apps/web/lib/publishing-cron-executor.ts`, `apps/web/lib/__tests__`, `contracts/S-HC-PUB-04`
+
+### S-HC-PUB-07C-YOUTUBE-AUTH-CHANNEL-SMOKE - Authorized YouTube OAuth and channel identity smoke (no publishing)
+
+Estado: `blocked`
+
+- Authorized runtime has a connected YOUTUBE SocialAccount for the intended tenant/channel.
+- OAuthConnection.tokenRef resolves and decrypts the youtube_oauth vault item without exposing secret material.
+- Required scope https://www.googleapis.com/auth/youtube.upload is confirmed.
+- Read-only channels.list(part=id,snippet,mine=true) succeeds and records only non-secret channel identity plus HTTP/evidence fingerprints.
+- No YouTube content is created, uploaded, scheduled, modified or published by this smoke.
+- Parent S-HC-PUB-07-YOUTUBE-PUBLISHING may resume only after this smoke has real authorized PASS evidence.
+
+Zonas: -
 
 ### HC-ORESHNIK-RECOVERY-ALPHA6 - Upgrade HeptaCore governance to Oreshnik 0.3.0-alpha.6 and reconcile control plane
 

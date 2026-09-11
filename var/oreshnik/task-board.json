@@ -1,6 +1,6 @@
 {
   "project": "HeptaCore",
-  "updatedAt": "2026-09-11T00:01:56.454Z",
+  "updatedAt": "2026-09-11T00:02:27.699Z",
   "currentExecutionOrder": [
     "S-HC-PUB-04-HOURLY-BATCH-CRON",
     "S-HC-PUB-05-RECONCILIATION-OPS",
@@ -1529,7 +1529,7 @@
       "title": "Transactional email deterministic readiness software foundation",
       "owner": "Manuel",
       "backupOwner": "Manuel",
-      "status": "claimed",
+      "status": "validating",
       "track": "email-infra",
       "zone": [
         "packages/core/src/email-readiness.ts",
@@ -1569,6 +1569,7 @@
         "No domain, DNS record, Resend credential or production activation is invented or claimed by this child Task.",
         "typecheck, build, worker validation and full repository tests pass."
       ],
+      "handoff": "docs/oreshnik/handoffs/S-HC-EMAIL-01A-TRANSACTIONAL-SOFTWARE-FOUNDATION/handoff-20260911T000224649Z-9f86b3db5db1.md",
       "attempts": 1,
       "activeRun": {
         "runId": "run-manuel-S-HC-EMAIL-01A-TRANSACTIONAL-SOFTWARE-FOUNDATION-20260911000149-407e2085",
@@ -1604,6 +1605,13 @@
           "operator": "manuel",
           "branch": "dispatch/manuel/manuel-chatgpt1/email-infra/S-HC-EMAIL-01A-TRANSACTIONAL-SOFTWARE-FOUNDATION/afe65dfa54",
           "description": "Run run-manuel-S-HC-EMAIL-01A-TRANSACTIONAL-SOFTWARE-FOUNDATION-20260911000149-407e2085 claimed via shell"
+        },
+        {
+          "at": "2026-09-11T00:02:27.502Z",
+          "action": "validation_started",
+          "operator": "manuel",
+          "branch": "dispatch/manuel/manuel-chatgpt1/email-infra/S-HC-EMAIL-01A-TRANSACTIONAL-SOFTWARE-FOUNDATION/afe65dfa54",
+          "description": "Fresh child Run owns only deterministic email readiness software recovered from released parent work."
         }
       ]
     },
@@ -2727,7 +2735,7 @@
       "title": "Authorized YouTube OAuth and channel identity smoke (no publishing)",
       "owner": "Manuel",
       "backupOwner": "Manuel",
-      "status": "ready",
+      "status": "blocked",
       "track": "publishing",
       "zone": [],
       "readZones": [
@@ -2772,6 +2780,12 @@
           "at": "2026-09-10T23:48:21.000Z",
           "action": "canonical_task_registered",
           "operator": "manuel"
+        },
+        {
+          "at": "2026-09-11T00:02:27.699Z",
+          "action": "status_reconciled",
+          "operator": "manuel",
+          "description": "Task status reconciled to blocked: missing capabilities: external-validation, youtube-oauth"
         }
       ]
     },

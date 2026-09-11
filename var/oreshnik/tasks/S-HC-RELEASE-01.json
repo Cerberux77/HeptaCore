@@ -3,12 +3,12 @@
   "taskId": "S-HC-RELEASE-01",
   "sprint": "release",
   "sprintOrderIndex": 22,
-  "taskOrderIndex": 36,
+  "taskOrderIndex": 38,
   "title": "End-to-end Turpial Sound production proof",
   "owner": "Manuel+Jean",
   "backupOwner": "Manuel+Jean",
   "status": "done",
-  "taskBoardPath": "/home/runner/work/_temp/oreshnik-wt-pub07b-recover-v2/32305cad03d6321a/manuel/manuel-chatgpt1/publishing/S-HC-PUB-07B-YOUTUBE-SCHEDULED-E2E/e9e0f149/var/oreshnik/task-board.json",
+  "taskBoardPath": "/home/runner/work/_temp/oreshnik-wt-email01a/32305cad03d6321a/manuel/manuel-chatgpt1/email-infra/S-HC-EMAIL-01A-TRANSACTIONAL-SOFTWARE-FOUNDATION/afe65dfa54/var/oreshnik/task-board.json",
   "zone": [
     "docs",
     "apps/web",
@@ -36,6 +36,6 @@
       "description": "E2E Turpial Sound production proof"
     }
   ],
-  "updatedAt": "2026-09-10T22:07:19.702Z",
+  "updatedAt": "2026-09-11T00:02:27.699Z",
   "runs": []
 }

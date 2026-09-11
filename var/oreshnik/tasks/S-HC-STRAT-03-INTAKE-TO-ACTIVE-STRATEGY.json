@@ -3,12 +3,12 @@
   "taskId": "S-HC-STRAT-03-INTAKE-TO-ACTIVE-STRATEGY",
   "sprint": "strategy",
   "sprintOrderIndex": 23,
-  "taskOrderIndex": 39,
+  "taskOrderIndex": 41,
   "title": "End-to-end intake, generated strategy persistence, approval and calendar materialization",
   "owner": "Manuel",
   "backupOwner": "Manuel",
   "status": "blocked",
-  "taskBoardPath": "/home/runner/work/_temp/oreshnik-wt-pub07b-recover-v2/32305cad03d6321a/manuel/manuel-chatgpt1/publishing/S-HC-PUB-07B-YOUTUBE-SCHEDULED-E2E/e9e0f149/var/oreshnik/task-board.json",
+  "taskBoardPath": "/home/runner/work/_temp/oreshnik-wt-email01a/32305cad03d6321a/manuel/manuel-chatgpt1/email-infra/S-HC-EMAIL-01A-TRANSACTIONAL-SOFTWARE-FOUNDATION/afe65dfa54/var/oreshnik/task-board.json",
   "zone": [
     "apps/web/components/dashboard-console.tsx",
     "apps/web/app/api/strategy/**",
@@ -142,6 +142,6 @@
       "description": "Task status reconciled to blocked: missing capabilities: codex, typescript, nextjs, multi-tenant, strategy-generation, transactional-activation, timezone-scheduling, testing"
     }
   ],
-  "updatedAt": "2026-09-10T22:07:19.702Z",
+  "updatedAt": "2026-09-11T00:02:27.699Z",
   "runs": []
 }

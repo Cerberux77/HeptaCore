@@ -4,9 +4,9 @@ type: task-runtime
 project: "HeptaCore"
 task_id: "S-HC-PUB-07B-YOUTUBE-SCHEDULED-E2E"
 sprint: "publishing"
-status: "ready_for_integration"
+status: "integrated"
 owner: "Manuel"
-last_updated: "2026-09-10T22:12:48.621Z"
+last_updated: "2026-09-11T00:02:27.699Z"
 source: "var/oreshnik/tasks/S-HC-PUB-07B-YOUTUBE-SCHEDULED-E2E.json"
 ---
 
@@ -18,10 +18,10 @@ YouTube scheduled E2E integration: Video, Shorts, cron metadata and credentials
 
 ## Runtime
 
-- estado: `ready_for_integration`
+- estado: `integrated`
 - owner: `Manuel`
 - backup: `Manuel`
-- intentos: `2`
+- intentos: `3`
 - handoff: docs/oreshnik/handoffs/S-HC-PUB-07B-YOUTUBE-SCHEDULED-E2E/handoff-20260910T221119888Z-3622de053b4a.md
 
 ## Dependencias
@@ -69,7 +69,7 @@ YouTube scheduled E2E integration: Video, Shorts, cron metadata and credentials
 
 | Run | Operator | Mode | Task Status | Claim | Branch |
 |---|---|---|---|---|---|
-| run-manuel-S-HC-PUB-07B-YOUTUBE-SCHEDULED-E2E-20260910173721-206fad0f | manuel | shell | ready_for_integration | released | dispatch/manuel/manuel-chatgpt1/publishing/S-HC-PUB-07B-YOUTUBE-SCHEDULED-E2E/da546a5360 |
+| Ninguno | - | - | - | - | - |
 
 ## Integracion
 

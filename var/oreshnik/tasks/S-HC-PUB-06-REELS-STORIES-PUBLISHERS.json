@@ -3,12 +3,12 @@
   "taskId": "S-HC-PUB-06-REELS-STORIES-PUBLISHERS",
   "sprint": "publishing",
   "sprintOrderIndex": 20,
-  "taskOrderIndex": 28,
+  "taskOrderIndex": 29,
   "title": "Real publishing for Meta Reels and Stories: Instagram + Facebook",
   "owner": "Manuel",
   "backupOwner": "Manuel",
   "status": "integrated",
-  "taskBoardPath": "/home/runner/work/_temp/oreshnik-wt-pub07b-recover-v2/32305cad03d6321a/manuel/manuel-chatgpt1/publishing/S-HC-PUB-07B-YOUTUBE-SCHEDULED-E2E/e9e0f149/var/oreshnik/task-board.json",
+  "taskBoardPath": "/home/runner/work/_temp/oreshnik-wt-email01a/32305cad03d6321a/manuel/manuel-chatgpt1/email-infra/S-HC-EMAIL-01A-TRANSACTIONAL-SOFTWARE-FOUNDATION/afe65dfa54/var/oreshnik/task-board.json",
   "zone": [
     "apps/web/lib/publishers",
     "apps/web/app/api/publishing",
@@ -280,6 +280,6 @@
       "classification": "STABLE_COMPLETE"
     }
   ],
-  "updatedAt": "2026-09-10T22:07:19.702Z",
+  "updatedAt": "2026-09-11T00:02:27.699Z",
   "runs": []
 }

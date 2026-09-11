@@ -3,12 +3,12 @@
   "taskId": "HC-ORESHNIK-RECOVERY-ALPHA6",
   "sprint": "recovery",
   "sprintOrderIndex": 21,
-  "taskOrderIndex": 35,
+  "taskOrderIndex": 37,
   "title": "Upgrade HeptaCore governance to Oreshnik 0.3.0-alpha.6 and reconcile control plane",
   "owner": "Manuel",
   "backupOwner": "Manuel",
   "status": "integrated",
-  "taskBoardPath": "/home/runner/work/_temp/oreshnik-wt-pub07b-recover-v2/32305cad03d6321a/manuel/manuel-chatgpt1/publishing/S-HC-PUB-07B-YOUTUBE-SCHEDULED-E2E/e9e0f149/var/oreshnik/task-board.json",
+  "taskBoardPath": "/home/runner/work/_temp/oreshnik-wt-email01a/32305cad03d6321a/manuel/manuel-chatgpt1/email-infra/S-HC-EMAIL-01A-TRANSACTIONAL-SOFTWARE-FOUNDATION/afe65dfa54/var/oreshnik/task-board.json",
   "zone": [
     "package.json",
     "package-lock.json",
@@ -470,7 +470,7 @@
       "summary": "HC-ORESHNIK-RECOVERY-ALPHA6:worker | exit=0 | timed_ok | signal=none | stdout=> heptacore@0.1.0 worker:validate | stderr=[config] .env.rrss no encontrado. Usando solo variables de entorno del sistema."
     }
   ],
-  "updatedAt": "2026-09-10T22:07:19.702Z",
+  "updatedAt": "2026-09-11T00:02:27.699Z",
   "runs": [],
   "integration": {
     "runId": "run-manuel-HC-ORESHNIK-RECOVERY-ALPHA6-20260904140329-21ab3a41",

@@ -3,12 +3,12 @@
   "taskId": "S-HC-TEN-02-CEPEG-ONBOARDING",
   "sprint": "tenant-onboarding",
   "sprintOrderIndex": 25,
-  "taskOrderIndex": 41,
+  "taskOrderIndex": 43,
   "title": "CEPEG tenant onboarding: brand, assets, network configuration",
   "owner": "Manuel",
   "backupOwner": "Manuel",
   "status": "blocked",
-  "taskBoardPath": "/home/runner/work/_temp/oreshnik-wt-pub07b-recover-v2/32305cad03d6321a/manuel/manuel-chatgpt1/publishing/S-HC-PUB-07B-YOUTUBE-SCHEDULED-E2E/e9e0f149/var/oreshnik/task-board.json",
+  "taskBoardPath": "/home/runner/work/_temp/oreshnik-wt-email01a/32305cad03d6321a/manuel/manuel-chatgpt1/email-infra/S-HC-EMAIL-01A-TRANSACTIONAL-SOFTWARE-FOUNDATION/afe65dfa54/var/oreshnik/task-board.json",
   "zone": [
     "examples/tenants/cepeg",
     "apps/web",
@@ -36,6 +36,6 @@
       "description": "Task status reconciled to blocked: dependency S-HC-OPS-01-CAMPAIGN-REVIEW-DEPLOYMENT still pending (S-HC-OPS-01-CAMPAIGN-REVIEW-DEPLOYMENT:pending) | dependency S-HC-COMM-02-BILLING-ACTIVATION still pending (S-HC-COMM-02-BILLING-ACTIVATION:pending) | dependency S-HC-ONB-02-GAP-RESOLUTION-WIZARD still pending (S-HC-ONB-02-GAP-RESOLUTION-WIZARD:pending) | dependency S-HC-STRAT-02-CONTENT-CALENDAR-BLUEPRINT still pending (S-HC-STRAT-02-CONTENT-CALENDAR-BLUEPRINT:pending) | dependency S-HC-ASSET-01-STRATEGY-ASSET-MANIFEST still pending (S-HC-ASSET-01-STRATEGY-ASSET-MANIFEST:pending)"
     }
   ],
-  "updatedAt": "2026-09-10T22:07:19.702Z",
+  "updatedAt": "2026-09-11T00:02:27.699Z",
   "runs": []
 }

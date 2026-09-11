@@ -4,7 +4,7 @@ type: master-dashboard
 project: "HeptaCore"
 status: active-production
 phase: "Canonical Oreshnik task board governs current assignments"
-last_updated: "2026-09-10T22:12:49.156Z"
+last_updated: "2026-09-11T00:02:27.944Z"
 mother_branch: "MADRE/v47-s-hc-pub-03-multitenant-assets-multitenant-assets-metadata-compatibility-batch--2026-06-23"
 tags:
   - "#central"
@@ -19,7 +19,7 @@ tags:
 
 | Campo | Valor |
 |---|---|
-| Task board actualizado | 2026-09-10T22:12:48.621Z |
+| Task board actualizado | 2026-09-11T00:02:27.699Z |
 | Rama madre | MADRE/v47-s-hc-pub-03-multitenant-assets-multitenant-assets-metadata-compatibility-batch--2026-06-23 |
 
 
@@ -54,6 +54,8 @@ tags:
 - tenant-platform
 - HC-ORESHNIK-RECOVERY-ALPHA6
 - S-HC-PUB-07B-YOUTUBE-SCHEDULED-E2E
+- S-HC-PUB-07C-YOUTUBE-AUTH-CHANNEL-SMOKE
+- S-HC-EMAIL-01A-TRANSACTIONAL-SOFTWARE-FOUNDATION
 
 ## Tareas Abiertas
 
@@ -72,6 +74,7 @@ tags:
 | S-HC-COMM-02-BILLING-ACTIVATION | blocked | Manuel | Tenant billing activation: plan selection, usage tracking, payment integration | S-HC-COMM-01-SELF-SERVICE-SIGNUP |
 | S-HC-INFRA-BASELINE-GATES-RECOVERY | ready_for_integration | Manuel | Baseline gates recovery: Oreshnik alpha.9, identity v2, Prisma, typecheck, build and canonical suite | - |
 | S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION | ready | Jean | Transactional email foundation: domain sender, DNS, reputation, provider integration | - |
+| S-HC-EMAIL-01A-TRANSACTIONAL-SOFTWARE-FOUNDATION | validating | Manuel | Transactional email deterministic readiness software foundation | - |
 | S-HC-INBOX-01-UNIFIED-ENGAGEMENT | blocked | Manuel | Unified engagement inbox: read and respond to messages and comments | S-HC-AN-01-CAMPAIGN-PERFORMANCE |
 | S-HC-ONB-01-MASTER-BRIEF-INGESTION | blocked | Manuel | Master document ingestion: extract structured info from company briefs | S-HC-COMM-02-BILLING-ACTIVATION |
 | S-HC-ONB-02-GAP-RESOLUTION-WIZARD | blocked | Manuel | Gap resolution wizard: dynamic form to resolve missing or conflicting data | S-HC-ONB-01-MASTER-BRIEF-INGESTION |
@@ -80,7 +83,8 @@ tags:
 | S-HC-PUB-06-REELS-STORIES-PUBLISHERS | integrated | Manuel | Real publishing for Meta Reels and Stories: Instagram + Facebook | S-HC-PUB-03-MULTITENANT-ASSETS, S-HC-PUB-04-HOURLY-BATCH-CRON |
 | S-HC-PUB-07-YOUTUBE-PUBLISHING | ready | Manuel | Real publishing for YouTube: Video 16:9 and YouTube Shorts | S-HC-PUB-03-MULTITENANT-ASSETS, S-HC-PUB-04-HOURLY-BATCH-CRON |
 | S-HC-PUB-08-PLATFORM-FORMAT-PARITY | blocked | Manuel | Platform-format parity: manifest, preview, dry-run, scheduling and publishing for every supported format | S-HC-PUB-06-REELS-STORIES-PUBLISHERS, S-HC-PUB-07-YOUTUBE-PUBLISHING |
-| S-HC-PUB-07B-YOUTUBE-SCHEDULED-E2E | ready_for_integration | Manuel | YouTube scheduled E2E integration: Video, Shorts, cron metadata and credentials | S-HC-PUB-03-MULTITENANT-ASSETS, S-HC-PUB-04-HOURLY-BATCH-CRON |
+| S-HC-PUB-07B-YOUTUBE-SCHEDULED-E2E | integrated | Manuel | YouTube scheduled E2E integration: Video, Shorts, cron metadata and credentials | S-HC-PUB-03-MULTITENANT-ASSETS, S-HC-PUB-04-HOURLY-BATCH-CRON |
+| S-HC-PUB-07C-YOUTUBE-AUTH-CHANNEL-SMOKE | blocked | Manuel | Authorized YouTube OAuth and channel identity smoke (no publishing) | S-HC-PUB-07B-YOUTUBE-SCHEDULED-E2E |
 | HC-ORESHNIK-RECOVERY-ALPHA6 | integrated | Manuel | Upgrade HeptaCore governance to Oreshnik 0.3.0-alpha.6 and reconcile control plane | - |
 | S-HC-STRAT-01-MASTER-STRATEGY-WORKBENCH | blocked | Manuel | Master strategy workbench: LLM-powered strategy generation and conversational refinement | S-HC-ONB-02-GAP-RESOLUTION-WIZARD, S-HC-AI-01-LLM-SELECTION-COST-GOVERNANCE |
 | S-HC-STRAT-02-CONTENT-CALENDAR-BLUEPRINT | blocked | Manuel | Content calendar blueprint: master publishing calendar from strategy | S-HC-STRAT-01-MASTER-STRATEGY-WORKBENCH |

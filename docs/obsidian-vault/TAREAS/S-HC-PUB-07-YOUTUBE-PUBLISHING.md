@@ -6,7 +6,7 @@ task_id: "S-HC-PUB-07-YOUTUBE-PUBLISHING"
 sprint: "publishing"
 status: "ready"
 owner: "Manuel"
-last_updated: "2026-09-04T14:03:10.743Z"
+last_updated: "2026-09-11T00:02:27.699Z"
 source: "var/oreshnik/tasks/S-HC-PUB-07-YOUTUBE-PUBLISHING.json"
 ---
 
