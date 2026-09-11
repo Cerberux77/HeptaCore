@@ -1,4 +1,6 @@
-triggered-at: 2026-09-11T01:16:00Z
+triggered-at: 2026-09-11T01:24:00Z
 run: run-manuel-S-HC-EMAIL-01A-TRANSACTIONAL-SOFTWARE-FOUNDATION-20260911000149-407e2085
 branch-head: 30bcd27315bb06d0f95684ee613105351e06b124
-reason: same-run takeover after ephemeral runner ended; generate Prisma client before canonical gates
+master-head: 9e1a4467c9c142d984224135145e6dcbca63e2b7
+control-head: bf26cf56f86c820a1cc59e3689c4e57ba6079816
+reason: same-run takeover with canonical alpha6 Linux bootstrap including exact esbuild platform binary
