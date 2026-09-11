@@ -1,4 +1,7 @@
 task=S-HC-EMAIL-01A-TRANSACTIONAL-SOFTWARE-FOUNDATION
 source=dispatch/manuel/manuel-chatgpt1/email-infra/S-HC-EMAIL-01-TRANSACTIONAL-FOUNDATION/ceaa8b659d
 action=register-dispatch-rescue-validate
-issued=2026-09-10T23:58:00Z
+schema_fix=evidenceType-code
+baseline_master=0a2e10fd46f3bcc3a0be5d766673d8693571a784
+baseline_control=74b4351b21ea2504cb8d0ea0607c997a1f3895d6
+issued=2026-09-11T00:02:00Z
