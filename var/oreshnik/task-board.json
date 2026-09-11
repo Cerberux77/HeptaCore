@@ -1,6 +1,6 @@
 {
   "project": "HeptaCore",
-  "updatedAt": "2026-09-11T00:01:34.000Z",
+  "updatedAt": "2026-09-11T00:01:56.454Z",
   "currentExecutionOrder": [
     "S-HC-PUB-04-HOURLY-BATCH-CRON",
     "S-HC-PUB-05-RECONCILIATION-OPS",
@@ -1525,6 +1525,89 @@
       ]
     },
     {
+      "id": "S-HC-EMAIL-01A-TRANSACTIONAL-SOFTWARE-FOUNDATION",
+      "title": "Transactional email deterministic readiness software foundation",
+      "owner": "Manuel",
+      "backupOwner": "Manuel",
+      "status": "claimed",
+      "track": "email-infra",
+      "zone": [
+        "packages/core/src/email-readiness.ts",
+        "packages/core/src/__tests__/email-readiness.test.ts",
+        "packages/core/src/index.ts",
+        "apps/web/app/api/email/readiness/route.ts",
+        "docs/operations/EMAIL_TRANSACTIONAL_READINESS.md"
+      ],
+      "readZones": [
+        "apps/web/app/api/webhooks/resend",
+        "apps/web/lib/email",
+        ".env.example"
+      ],
+      "writeZones": [
+        "packages/core/src/email-readiness.ts",
+        "packages/core/src/__tests__/email-readiness.test.ts",
+        "packages/core/src/index.ts",
+        "apps/web/app/api/email/readiness/route.ts",
+        "docs/operations/EMAIL_TRANSACTIONAL_READINESS.md"
+      ],
+      "resources": [],
+      "capabilities": [],
+      "gates": [],
+      "priority": "high",
+      "validationExpectations": [
+        "typecheck, build, worker validation and full tests pass on the rescued implementation against current master.",
+        "Readiness logic remains fail-closed for production until a custom owned domain and verified SPF/DKIM/DMARC are present.",
+        "Readiness endpoint exposes configuration booleans and non-secret provider state only; it never returns API keys or webhook secrets."
+      ],
+      "evidenceType": "code",
+      "dependsOn": [],
+      "acceptance": [
+        "Deterministic email readiness contract is present in @heptacore/core and exported.",
+        "SUPER_ADMIN-only /api/email/readiness endpoint evaluates Resend domain and DMARC state without exposing secret material.",
+        "Automated tests cover development test-sender mode, invalid Vercel sender identity, custom-domain verification and production fail-closed behavior.",
+        "Operational documentation distinguishes deterministic software readiness from external production-domain activation.",
+        "No domain, DNS record, Resend credential or production activation is invented or claimed by this child Task.",
+        "typecheck, build, worker validation and full repository tests pass."
+      ],
+      "attempts": 1,
+      "activeRun": {
+        "runId": "run-manuel-S-HC-EMAIL-01A-TRANSACTIONAL-SOFTWARE-FOUNDATION-20260911000149-407e2085",
+        "operator": "manuel",
+        "worker": "manuel-dispatcher",
+        "workerMode": "shell",
+        "claimedAt": "2026-09-11T00:01:56.454Z",
+        "updatedAt": "2026-09-11T00:01:56.454Z",
+        "expiresAt": "2026-09-11T01:01:56.454Z",
+        "branch": "dispatch/manuel/manuel-chatgpt1/email-infra/S-HC-EMAIL-01A-TRANSACTIONAL-SOFTWARE-FOUNDATION/afe65dfa54",
+        "worktreePath": "/home/runner/work/_temp/oreshnik-wt-email01a/32305cad03d6321a/manuel/manuel-chatgpt1/email-infra/S-HC-EMAIL-01A-TRANSACTIONAL-SOFTWARE-FOUNDATION/afe65dfa54",
+        "zones": [
+          "packages/core/src/email-readiness.ts",
+          "packages/core/src/__tests__/email-readiness.test.ts",
+          "packages/core/src/index.ts",
+          "apps/web/app/api/email/readiness/route.ts",
+          "docs/operations/EMAIL_TRANSACTIONAL_READINESS.md",
+          "apps/web/app/api/webhooks/resend",
+          "apps/web/lib/email",
+          ".env.example"
+        ],
+        "resources": []
+      },
+      "history": [
+        {
+          "at": "2026-09-11T00:01:34.000Z",
+          "action": "canonical_task_registered",
+          "operator": "manuel"
+        },
+        {
+          "at": "2026-09-11T00:01:56.454Z",
+          "action": "claimed",
+          "operator": "manuel",
+          "branch": "dispatch/manuel/manuel-chatgpt1/email-infra/S-HC-EMAIL-01A-TRANSACTIONAL-SOFTWARE-FOUNDATION/afe65dfa54",
+          "description": "Run run-manuel-S-HC-EMAIL-01A-TRANSACTIONAL-SOFTWARE-FOUNDATION-20260911000149-407e2085 claimed via shell"
+        }
+      ]
+    },
+    {
       "id": "S-HC-INBOX-01-UNIFIED-ENGAGEMENT",
       "title": "Unified engagement inbox: read and respond to messages and comments",
       "owner": "Manuel",
@@ -2130,26 +2213,7 @@
       "title": "Real publishing for YouTube: Video 16:9 and YouTube Shorts",
       "owner": "Manuel",
       "backupOwner": "Manuel",
-      "status": "blocked",
-      "blockState": {
-        "kind": "awaiting_external_validation",
-        "reason": "Only real authorized YouTube OAuth/channel identity smoke remains; no credential is available to this execution and no provider support will be claimed without it.",
-        "blockedAt": "2026-09-10T23:48:56.387Z",
-        "blockedBy": "manuel",
-        "externalActionRequired": "Complete S-HC-PUB-07C-YOUTUBE-AUTH-CHANNEL-SMOKE in an explicitly authorized runtime using real OAuth/tokenRef and a read-only channel identity call; never invent/version credentials and do not publish content.",
-        "resumePolicy": "explicit_authorization_required",
-        "previousStatus": "claimed",
-        "preservedRunId": "run-manuel-S-HC-PUB-07-YOUTUBE-PUBLISHING-20260910234839-191d864a",
-        "history": [
-          {
-            "at": "2026-09-10T23:48:56.387Z",
-            "action": "blocked",
-            "operator": "manuel",
-            "reason": "Only real authorized YouTube OAuth/channel identity smoke remains; no credential is available to this execution and no provider support will be claimed without it.",
-            "externalActionRequired": "Complete S-HC-PUB-07C-YOUTUBE-AUTH-CHANNEL-SMOKE in an explicitly authorized runtime using real OAuth/tokenRef and a read-only channel identity call; never invent/version credentials and do not publish content."
-          }
-        ]
-      },
+      "status": "ready",
       "track": "publishing",
       "zone": [
         "apps/web/lib/publishers",
@@ -2169,28 +2233,12 @@
         "Reutilizacion de transactional finalization y IN_REVIEW state machine",
         "Cero declaracion de soporte hasta validacion real"
       ],
-      "attempts": 1,
       "history": [
         {
           "at": "2026-06-28T18:47:05.091Z",
           "action": "status_reconciled",
           "operator": "manuel",
           "description": "Task status reconciled to ready: dependencies and conflicts are clear for execution"
-        },
-        {
-          "at": "2026-09-10T23:48:44.427Z",
-          "action": "claimed",
-          "operator": "manuel",
-          "branch": "dispatch/manuel/manuel-chatgpt1/publishing/S-HC-PUB-07-YOUTUBE-PUBLISHING/5dc36253e7",
-          "description": "Run run-manuel-S-HC-PUB-07-YOUTUBE-PUBLISHING-20260910234839-191d864a claimed via shell"
-        },
-        {
-          "at": "2026-09-10T23:48:56.387Z",
-          "action": "task_blocked",
-          "operator": "manuel",
-          "reason": "Only real authorized YouTube OAuth/channel identity smoke remains; no credential is available to this execution and no provider support will be claimed without it.",
-          "branch": "dispatch/manuel/manuel-chatgpt1/publishing/S-HC-PUB-07-YOUTUBE-PUBLISHING/5dc36253e7",
-          "description": "awaiting_external_validation: Only real authorized YouTube OAuth/channel identity smoke remains; no credential is available to this execution and no provider support will be claimed without it."
         }
       ]
     },
@@ -3662,52 +3710,6 @@
           "branch": "Manuel/s-hc-ten-01-global-tenant-admin",
           "description": "Three canonical roles (OWNER/ADMIN/VIEWER), legacy role normalization, identity panel in /admin and /tenant/*, 5/5 E2E pass, 569 unit tests, production intact"
         }
-      ]
-    },
-    {
-      "id": "S-HC-EMAIL-01A-TRANSACTIONAL-SOFTWARE-FOUNDATION",
-      "title": "Transactional email deterministic readiness software foundation",
-      "owner": "Manuel",
-      "backupOwner": "Manuel",
-      "status": "ready",
-      "track": "email-infra",
-      "zone": [
-        "packages/core/src/email-readiness.ts",
-        "packages/core/src/__tests__/email-readiness.test.ts",
-        "packages/core/src/index.ts",
-        "apps/web/app/api/email/readiness/route.ts",
-        "docs/operations/EMAIL_TRANSACTIONAL_READINESS.md"
-      ],
-      "readZones": [
-        "apps/web/app/api/webhooks/resend",
-        "apps/web/lib/email",
-        ".env.example"
-      ],
-      "writeZones": [
-        "packages/core/src/email-readiness.ts",
-        "packages/core/src/__tests__/email-readiness.test.ts",
-        "packages/core/src/index.ts",
-        "apps/web/app/api/email/readiness/route.ts",
-        "docs/operations/EMAIL_TRANSACTIONAL_READINESS.md"
-      ],
-      "resources": [],
-      "capabilities": [],
-      "gates": [],
-      "priority": "high",
-      "validationExpectations": [
-        "typecheck, build, worker validation and full tests pass on the rescued implementation against current master.",
-        "Readiness logic remains fail-closed for production until a custom owned domain and verified SPF/DKIM/DMARC are present.",
-        "Readiness endpoint exposes configuration booleans and non-secret provider state only; it never returns API keys or webhook secrets."
-      ],
-      "evidenceType": "code",
-      "dependsOn": [],
-      "acceptance": [
-        "Deterministic email readiness contract is present in @heptacore/core and exported.",
-        "SUPER_ADMIN-only /api/email/readiness endpoint evaluates Resend domain and DMARC state without exposing secret material.",
-        "Automated tests cover development test-sender mode, invalid Vercel sender identity, custom-domain verification and production fail-closed behavior.",
-        "Operational documentation distinguishes deterministic software readiness from external production-domain activation.",
-        "No domain, DNS record, Resend credential or production activation is invented or claimed by this child Task.",
-        "typecheck, build, worker validation and full repository tests pass."
       ]
     }
   ],

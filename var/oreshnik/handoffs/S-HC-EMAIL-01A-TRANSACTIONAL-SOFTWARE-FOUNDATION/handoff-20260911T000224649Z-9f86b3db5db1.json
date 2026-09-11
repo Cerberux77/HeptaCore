@@ -1,0 +1,131 @@
+{
+  "schema": "oreshnik-handoff/v1",
+  "id": "handoff-20260911T000224649Z-9f86b3db5db1",
+  "createdAt": "2026-09-11T00:02:24.649Z",
+  "integrity": {
+    "algorithm": "sha256",
+    "digest": "be877ee6541298454b0ab4bb0c675c84c368a8473ed998efeef776cc83c4a211"
+  },
+  "identity": {
+    "project": "HeptaCore",
+    "repository": "https://github.com/Cerberux77/HeptaCore",
+    "operator": "manuel",
+    "taskId": "S-HC-EMAIL-01A-TRANSACTIONAL-SOFTWARE-FOUNDATION",
+    "runId": "run-manuel-S-HC-EMAIL-01A-TRANSACTIONAL-SOFTWARE-FOUNDATION-20260911000149-407e2085",
+    "assignmentId": null,
+    "claimStatus": "claimed",
+    "reason": "Integrate deterministic email readiness software independently from external domain activation.",
+    "oreshnikVersion": "0.3.0-alpha.6"
+  },
+  "git": {
+    "branch": "dispatch/manuel/manuel-chatgpt1/email-infra/S-HC-EMAIL-01A-TRANSACTIONAL-SOFTWARE-FOUNDATION/afe65dfa54",
+    "upstream": "origin/master",
+    "head": "e5d5b7ad50d1a39ad740fb91da9a38423a07ae16",
+    "base": "9e1a4467c9c142d984224135145e6dcbca63e2b7",
+    "ahead": 5,
+    "behind": 0,
+    "ownCommits": [
+      "e5d5b7ad50d1a39ad740fb91da9a38423a07ae16 docs(email): document production readiness gate and deferred DNS",
+      "36407671df1c052709a87c14db8db12719a243d0 feat(email): export readiness contract",
+      "22f09f22e8f656c63aa433ebda039f1cb397041a feat(email): expose super-admin readiness probe",
+      "bef6c842f5e1f0f45baf98247fa5150f4a5e6521 test(email): cover transactional readiness gates",
+      "2870e4d11c9bece61a0f8b583378f54ba55044c0 feat(email): add deterministic transactional readiness contract"
+    ],
+    "modified": [
+      "var/oreshnik/task-board.json",
+      "var/oreshnik/tasks/S-HC-EMAIL-01A-TRANSACTIONAL-SOFTWARE-FOUNDATION.json"
+    ],
+    "untracked": [
+      "var/oreshnik/claims/S-HC-EMAIL-01A-TRANSACTIONAL-SOFTWARE-FOUNDATION.json",
+      "var/oreshnik/runs/S-HC-EMAIL-01A-TRANSACTIONAL-SOFTWARE-FOUNDATION/run-manuel-S-HC-EMAIL-01A-TRANSACTIONAL-SOFTWARE-FOUNDATION-20260911000149-407e2085.json"
+    ],
+    "conflicts": [],
+    "stash": [],
+    "clean": false,
+    "detached": false,
+    "worktreePath": "/home/runner/work/_temp/oreshnik-wt-email01a/32305cad03d6321a/manuel/manuel-chatgpt1/email-infra/S-HC-EMAIL-01A-TRANSACTIONAL-SOFTWARE-FOUNDATION/afe65dfa54"
+  },
+  "github": {
+    "available": true,
+    "pr": null,
+    "state": null,
+    "base": null,
+    "head": null,
+    "mergeable": null,
+    "checks": [],
+    "reviews": [],
+    "unresolvedConversations": null,
+    "remoteHead": "e5d5b7ad50d1a39ad740fb91da9a38423a07ae16",
+    "source": "github-rest"
+  },
+  "functional": {
+    "objective": "Recover validated readiness contract, tests, SUPER_ADMIN probe and operations guide onto current master.",
+    "implemented": [
+      "Email readiness core contract; focused tests; SUPER_ADMIN readiness API; core export; operations guide"
+    ],
+    "partial": [],
+    "decisions": [],
+    "primaryFiles": [
+      "var/oreshnik/claims/S-HC-EMAIL-01A-TRANSACTIONAL-SOFTWARE-FOUNDATION.json",
+      "var/oreshnik/runs/S-HC-EMAIL-01A-TRANSACTIONAL-SOFTWARE-FOUNDATION/run-manuel-S-HC-EMAIL-01A-TRANSACTIONAL-SOFTWARE-FOUNDATION-20260911000149-407e2085.json",
+      "var/oreshnik/task-board.json",
+      "var/oreshnik/tasks/S-HC-EMAIL-01A-TRANSACTIONAL-SOFTWARE-FOUNDATION.json"
+    ],
+    "testsRun": [],
+    "testsPending": [
+      "Oreshnik governed typecheck, build, worker and full tests on current master"
+    ],
+    "gates": [
+      "External sender-domain/DNS activation explicitly out of child scope"
+    ],
+    "regressions": []
+  },
+  "deployments": [],
+  "blockers": [],
+  "stability": {
+    "classification": "STABLE_PARTIAL",
+    "reasons": [
+      "Worktree has uncommitted changes.",
+      "Tests remain pending."
+    ]
+  },
+  "resume": {
+    "exactPoint": "Implementation rescued onto the fresh governed child branch; full alpha6 gates are next.",
+    "firstCommand": "Run Oreshnik evidence --ready-for-integration for this same Run.",
+    "branch": "dispatch/manuel/manuel-chatgpt1/email-infra/S-HC-EMAIL-01A-TRANSACTIONAL-SOFTWARE-FOUNDATION/afe65dfa54",
+    "worktreePath": "/home/runner/work/_temp/oreshnik-wt-email01a/32305cad03d6321a/manuel/manuel-chatgpt1/email-infra/S-HC-EMAIL-01A-TRANSACTIONAL-SOFTWARE-FOUNDATION/afe65dfa54",
+    "preconditions": [
+      "Run oreshnik preflight",
+      "Verify assignment and claim authority",
+      "Confirm no handoff supersedes this one"
+    ],
+    "priorityFiles": [
+      "var/oreshnik/claims/S-HC-EMAIL-01A-TRANSACTIONAL-SOFTWARE-FOUNDATION.json",
+      "var/oreshnik/runs/S-HC-EMAIL-01A-TRANSACTIONAL-SOFTWARE-FOUNDATION/run-manuel-S-HC-EMAIL-01A-TRANSACTIONAL-SOFTWARE-FOUNDATION-20260911000149-407e2085.json",
+      "var/oreshnik/task-board.json",
+      "var/oreshnik/tasks/S-HC-EMAIL-01A-TRANSACTIONAL-SOFTWARE-FOUNDATION.json"
+    ],
+    "focusedTests": [
+      "Oreshnik governed typecheck, build, worker and full tests on current master"
+    ],
+    "completionCriterion": "All deterministic gates pass, PR merges, and this child terminalizes; parent EMAIL-01 remains external until real domain/DNS/provider evidence exists."
+  },
+  "sources": [
+    {
+      "kind": "discovered",
+      "field": "identity.taskId",
+      "evidence": "canonical task artifact/task-board"
+    },
+    {
+      "kind": "discovered",
+      "field": "git",
+      "evidence": "git commands executed with typed argv"
+    },
+    {
+      "kind": "declared",
+      "field": "functional",
+      "evidence": "operator CLI input"
+    }
+  ],
+  "warnings": []
+}

@@ -1,0 +1,40 @@
+{
+  "project": "HeptaCore",
+  "taskId": "S-HC-EMAIL-01A-TRANSACTIONAL-SOFTWARE-FOUNDATION",
+  "sprint": "email-infra",
+  "owner": "Manuel",
+  "operator": "manuel",
+  "worker": "manuel-dispatcher",
+  "workerMode": "shell",
+  "runId": "run-manuel-S-HC-EMAIL-01A-TRANSACTIONAL-SOFTWARE-FOUNDATION-20260911000149-407e2085",
+  "branch": "dispatch/manuel/manuel-chatgpt1/email-infra/S-HC-EMAIL-01A-TRANSACTIONAL-SOFTWARE-FOUNDATION/afe65dfa54",
+  "worktreePath": "/home/runner/work/_temp/oreshnik-wt-email01a/32305cad03d6321a/manuel/manuel-chatgpt1/email-infra/S-HC-EMAIL-01A-TRANSACTIONAL-SOFTWARE-FOUNDATION/afe65dfa54",
+  "zones": [
+    "packages/core/src/email-readiness.ts",
+    "packages/core/src/__tests__/email-readiness.test.ts",
+    "packages/core/src/index.ts",
+    "apps/web/app/api/email/readiness/route.ts",
+    "docs/operations/EMAIL_TRANSACTIONAL_READINESS.md",
+    "apps/web/app/api/webhooks/resend",
+    "apps/web/lib/email",
+    ".env.example"
+  ],
+  "resources": [],
+  "taskBoardPath": "/home/runner/work/_temp/oreshnik-wt-email01a/32305cad03d6321a/manuel/manuel-chatgpt1/email-infra/S-HC-EMAIL-01A-TRANSACTIONAL-SOFTWARE-FOUNDATION/afe65dfa54/var/oreshnik/task-board.json",
+  "taskStatus": "claimed",
+  "claimStatus": "claimed",
+  "claimedAt": "2026-09-11T00:01:56.454Z",
+  "updatedAt": "2026-09-11T00:01:56.463Z",
+  "expiresAt": "2026-09-11T01:01:56.454Z",
+  "handoffs": [
+    {
+      "id": "handoff-20260911T000224649Z-9f86b3db5db1",
+      "schema": "oreshnik-handoff/v1",
+      "createdAt": "2026-09-11T00:02:24.649Z",
+      "jsonPath": "var/oreshnik/handoffs/S-HC-EMAIL-01A-TRANSACTIONAL-SOFTWARE-FOUNDATION/handoff-20260911T000224649Z-9f86b3db5db1.json",
+      "markdownPath": "docs/oreshnik/handoffs/S-HC-EMAIL-01A-TRANSACTIONAL-SOFTWARE-FOUNDATION/handoff-20260911T000224649Z-9f86b3db5db1.md",
+      "digest": "be877ee6541298454b0ab4bb0c675c84c368a8473ed998efeef776cc83c4a211",
+      "classification": "STABLE_PARTIAL"
+    }
+  ]
+}
