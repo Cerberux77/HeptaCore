@@ -116,7 +116,7 @@ jobs:
                 'Readiness logic remains fail-closed for production until a custom owned domain and verified SPF/DKIM/DMARC are present.',
                 'Readiness endpoint exposes configuration booleans and non-secret provider state only; it never returns API keys or webhook secrets.'
               ],
-              evidenceType:'ci',
+              evidenceType:'code',
               dependsOn:[],
               acceptance:[
                 'Deterministic email readiness contract is present in @heptacore/core and exported.',
@@ -255,6 +255,7 @@ jobs:
 
       - name: Reconcile and verify remote child lifecycle
         env:
+          WT: ${{ steps.dispatch.outputs.worktree }}
           RUN_ID: ${{ steps.dispatch.outputs.run }}
           ASSIGNMENT_ID: ${{ steps.dispatch.outputs.assignment }}
           BRANCH: ${{ steps.dispatch.outputs.branch }}
