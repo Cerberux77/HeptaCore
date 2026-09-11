@@ -1,0 +1,46 @@
+name: Ops EMAIL01A Bootstrap Diagnostic
+
+on:
+  push:
+    branches:
+      - ops/email01a-deterministic-rescue-20260910
+    paths:
+      - .github/email01a-bootstrap-trigger
+
+permissions:
+  contents: read
+  actions: read
+
+env:
+  ORESHNIK_VERSION: 0.3.0-alpha.6
+  BRANCH: dispatch/manuel/manuel-chatgpt1/email-infra/S-HC-EMAIL-01A-TRANSACTIONAL-SOFTWARE-FOUNDATION/afe65dfa54
+  EXPECTED_HEAD: 30bcd27315bb06d0f95684ee613105351e06b124
+
+jobs:
+  bootstrap:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - name: Checkout governed functional branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ env.BRANCH }}
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - name: Clean install including platform optional dependencies
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$EXPECTED_HEAD"
+          npm ci --include=optional
+          test "$(node node_modules/oreshnik-cli/dist/cli.js --version)" = "$ORESHNIK_VERSION"
+          node -e "const e=require('esbuild'); console.log('esbuild='+e.version)"
+          node -e "require.resolve('@esbuild/linux-x64/package.json'); console.log('@esbuild/linux-x64=resolved')"
+      - name: Run raw repository tests
+        run: |
+          set -o pipefail
+          npm test 2>&1 | tee "$RUNNER_TEMP/email01a-bootstrap-tests.log"
