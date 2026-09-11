@@ -1,0 +1,58 @@
+{
+  "project": "HeptaCore",
+  "taskId": "S-HC-EMAIL-01A-TRANSACTIONAL-SOFTWARE-FOUNDATION",
+  "sprint": "email-infra",
+  "title": "Transactional email deterministic readiness software foundation",
+  "owner": "Manuel",
+  "backupOwner": "Manuel",
+  "status": "ready",
+  "taskBoardPath": "var/oreshnik/task-board.json",
+  "zone": [
+    "packages/core/src/email-readiness.ts",
+    "packages/core/src/__tests__/email-readiness.test.ts",
+    "packages/core/src/index.ts",
+    "apps/web/app/api/email/readiness/route.ts",
+    "docs/operations/EMAIL_TRANSACTIONAL_READINESS.md"
+  ],
+  "readZones": [
+    "apps/web/app/api/webhooks/resend",
+    "apps/web/lib/email",
+    ".env.example"
+  ],
+  "writeZones": [
+    "packages/core/src/email-readiness.ts",
+    "packages/core/src/__tests__/email-readiness.test.ts",
+    "packages/core/src/index.ts",
+    "apps/web/app/api/email/readiness/route.ts",
+    "docs/operations/EMAIL_TRANSACTIONAL_READINESS.md"
+  ],
+  "resources": [],
+  "capabilities": [],
+  "gates": [],
+  "priority": "high",
+  "validationExpectations": [
+    "typecheck, build, worker validation and full tests pass on the rescued implementation against current master.",
+    "Readiness logic remains fail-closed for production until a custom owned domain and verified SPF/DKIM/DMARC are present.",
+    "Readiness endpoint exposes configuration booleans and non-secret provider state only; it never returns API keys or webhook secrets."
+  ],
+  "evidenceType": "code",
+  "dependsOn": [],
+  "acceptance": [
+    "Deterministic email readiness contract is present in @heptacore/core and exported.",
+    "SUPER_ADMIN-only /api/email/readiness endpoint evaluates Resend domain and DMARC state without exposing secret material.",
+    "Automated tests cover development test-sender mode, invalid Vercel sender identity, custom-domain verification and production fail-closed behavior.",
+    "Operational documentation distinguishes deterministic software readiness from external production-domain activation.",
+    "No domain, DNS record, Resend credential or production activation is invented or claimed by this child Task.",
+    "typecheck, build, worker validation and full repository tests pass."
+  ],
+  "attempts": 0,
+  "history": [
+    {
+      "at": "2026-09-11T00:01:34.000Z",
+      "action": "canonical_task_registered",
+      "operator": "manuel"
+    }
+  ],
+  "updatedAt": "2026-09-11T00:01:34.000Z",
+  "runs": []
+}

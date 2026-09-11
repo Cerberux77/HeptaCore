@@ -1,6 +1,6 @@
 {
   "project": "HeptaCore",
-  "updatedAt": "2026-09-10T23:48:56.387Z",
+  "updatedAt": "2026-09-11T00:01:34.000Z",
   "currentExecutionOrder": [
     "S-HC-PUB-04-HOURLY-BATCH-CRON",
     "S-HC-PUB-05-RECONCILIATION-OPS",
@@ -31,7 +31,8 @@
     "tenant-platform",
     "HC-ORESHNIK-RECOVERY-ALPHA6",
     "S-HC-PUB-07B-YOUTUBE-SCHEDULED-E2E",
-    "S-HC-PUB-07C-YOUTUBE-AUTH-CHANNEL-SMOKE"
+    "S-HC-PUB-07C-YOUTUBE-AUTH-CHANNEL-SMOKE",
+    "S-HC-EMAIL-01A-TRANSACTIONAL-SOFTWARE-FOUNDATION"
   ],
   "tasks": [
     {
@@ -3661,6 +3662,52 @@
           "branch": "Manuel/s-hc-ten-01-global-tenant-admin",
           "description": "Three canonical roles (OWNER/ADMIN/VIEWER), legacy role normalization, identity panel in /admin and /tenant/*, 5/5 E2E pass, 569 unit tests, production intact"
         }
+      ]
+    },
+    {
+      "id": "S-HC-EMAIL-01A-TRANSACTIONAL-SOFTWARE-FOUNDATION",
+      "title": "Transactional email deterministic readiness software foundation",
+      "owner": "Manuel",
+      "backupOwner": "Manuel",
+      "status": "ready",
+      "track": "email-infra",
+      "zone": [
+        "packages/core/src/email-readiness.ts",
+        "packages/core/src/__tests__/email-readiness.test.ts",
+        "packages/core/src/index.ts",
+        "apps/web/app/api/email/readiness/route.ts",
+        "docs/operations/EMAIL_TRANSACTIONAL_READINESS.md"
+      ],
+      "readZones": [
+        "apps/web/app/api/webhooks/resend",
+        "apps/web/lib/email",
+        ".env.example"
+      ],
+      "writeZones": [
+        "packages/core/src/email-readiness.ts",
+        "packages/core/src/__tests__/email-readiness.test.ts",
+        "packages/core/src/index.ts",
+        "apps/web/app/api/email/readiness/route.ts",
+        "docs/operations/EMAIL_TRANSACTIONAL_READINESS.md"
+      ],
+      "resources": [],
+      "capabilities": [],
+      "gates": [],
+      "priority": "high",
+      "validationExpectations": [
+        "typecheck, build, worker validation and full tests pass on the rescued implementation against current master.",
+        "Readiness logic remains fail-closed for production until a custom owned domain and verified SPF/DKIM/DMARC are present.",
+        "Readiness endpoint exposes configuration booleans and non-secret provider state only; it never returns API keys or webhook secrets."
+      ],
+      "evidenceType": "code",
+      "dependsOn": [],
+      "acceptance": [
+        "Deterministic email readiness contract is present in @heptacore/core and exported.",
+        "SUPER_ADMIN-only /api/email/readiness endpoint evaluates Resend domain and DMARC state without exposing secret material.",
+        "Automated tests cover development test-sender mode, invalid Vercel sender identity, custom-domain verification and production fail-closed behavior.",
+        "Operational documentation distinguishes deterministic software readiness from external production-domain activation.",
+        "No domain, DNS record, Resend credential or production activation is invented or claimed by this child Task.",
+        "typecheck, build, worker validation and full repository tests pass."
       ]
     }
   ],
