@@ -5,15 +5,15 @@
     "originUrl": "https://github.com/Cerberux77/HeptaCore.git",
     "canonicalMotherBranch": "master"
   },
-  "generation": 153,
-  "controlHead": "c67e61a8c7c24892b54826df2e77a43fdebac4ed",
+  "generation": 154,
+  "controlHead": "bf26cf56f86c820a1cc59e3689c4e57ba6079816",
   "catalog": {
     "taskBoardPath": "var/oreshnik/task-board.json",
     "zoneMapPath": "docs/07_handoffs/zone-map.json",
     "sourceTaskBoardHead": "9e1a4467c9c142d984224135145e6dcbca63e2b7",
     "fingerprint": "615e7753bca59fe804792df678b25f976e4aa680",
     "taskCount": 46,
-    "updatedAt": "2026-09-11T01:16:14.662Z"
+    "updatedAt": "2026-09-11T01:23:43.904Z"
   },
   "policy": {
     "name": "deterministic-v1",
@@ -414,6 +414,13 @@
       "hostname": "runnervmlun5p",
       "registeredAt": "2026-09-11T01:16:13.652Z",
       "updatedAt": "2026-09-11T01:16:13.652Z"
+    },
+    {
+      "machineId": "machine-097bcea2-01c5-4ffd-9414-e5754592a47e",
+      "worktreeRoot": "/home/runner/work/_temp/oreshnik-wt-email01a-resume",
+      "hostname": "runnervmlun5p",
+      "registeredAt": "2026-09-11T01:23:42.884Z",
+      "updatedAt": "2026-09-11T01:23:42.884Z"
     }
   ],
   "agentInstances": [
@@ -614,11 +621,11 @@
       "displayAlias": "manuel-chatgpt1",
       "operatorId": "manuel",
       "harnessId": "chatgpt",
-      "machineId": "machine-a5829bd3-7d81-4e90-9476-d07ca2ae19fd",
+      "machineId": "machine-349b79ad-dc83-4b34-be11-9ca81c7baf97",
       "repositoryId": "32305cad03d6321a",
       "slot": 1,
       "createdAt": "2026-09-11T00:01:49.156Z",
-      "updatedAt": "2026-09-11T00:02:00.606Z",
+      "updatedAt": "2026-09-11T01:16:20.146Z",
       "identityOrigin": "explicit"
     }
   ],
@@ -819,9 +826,9 @@
       "agentInstanceUid": "agent_f20a136601734d5e8c4de55328a3c38e",
       "operatorId": "manuel",
       "harnessId": "chatgpt",
-      "machineId": "machine-a5829bd3-7d81-4e90-9476-d07ca2ae19fd",
+      "machineId": "machine-349b79ad-dc83-4b34-be11-9ca81c7baf97",
       "startedAt": "2026-09-11T00:01:49.156Z",
-      "lastSeenAt": "2026-09-11T00:02:00.606Z",
+      "lastSeenAt": "2026-09-11T01:16:20.146Z",
       "status": "active",
       "identityOrigin": "explicit"
     }
@@ -5470,6 +5477,11 @@
       "agentInstanceUid": "agent_f20a136601734d5e8c4de55328a3c38e",
       "sessionId": "email01a-rescue-20260911000143",
       "message": "Takeover by manuel/manuel-chatgpt1 from manuel/manuel-chatgpt1. Reason: Recover the same EMAIL-01A Run on a fresh ephemeral runner after the prior validation runner ended; preserve branch and ownership identity.. Generation: 1 → 2."
+    },
+    {
+      "at": "2026-09-11T01:23:43.904Z",
+      "action": "dispatch.init",
+      "message": "Registered machine machine-097bcea2-01c5-4ffd-9414-e5754592a47e with root /home/runner/work/_temp/oreshnik-wt-email01a-resume."
     }
   ],
   "reconciliation": {
@@ -5479,5 +5491,5 @@
     "pendingDiagnostics": []
   },
   "createdAt": "2026-06-29T20:17:43.302Z",
-  "updatedAt": "2026-09-11T01:16:20.146Z"
+  "updatedAt": "2026-09-11T01:23:43.904Z"
 }
