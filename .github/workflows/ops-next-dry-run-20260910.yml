@@ -1,0 +1,78 @@
+name: Ops Next Oreshnik Task Dry Run
+
+on:
+  push:
+    branches:
+      - ops/next-dry-run-20260910
+    paths:
+      - .github/workflows/ops-next-dry-run-20260910.yml
+
+permissions:
+  contents: read
+
+env:
+  EXPECTED_MASTER: 9e1a4467c9c142d984224135145e6dcbca63e2b7
+  EXPECTED_CONTROL: 747ad4f277de826a0f586ed77a79dd15bf61d3df
+
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout canonical master
+        uses: actions/checkout@v4
+        with:
+          ref: master
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Verify frozen canonical heads
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin '+refs/heads/master:refs/remotes/origin/master' '+refs/heads/oreshnik/control:refs/remotes/origin/oreshnik/control'
+          test "$(git rev-parse origin/master)" = "$EXPECTED_MASTER"
+          test "$(git rev-parse origin/oreshnik/control)" = "$EXPECTED_CONTROL"
+
+      - name: Install exact repository dependencies
+        run: npm ci --ignore-scripts
+
+      - name: Verify exact Oreshnik alpha6
+        shell: bash
+        run: |
+          set -euo pipefail
+          version="$(node node_modules/oreshnik-cli/dist/cli.js --version)"
+          echo "Oreshnik=$version"
+          test "$version" = "0.3.0-alpha.6"
+
+      - name: Read dispatcher status
+        shell: bash
+        run: |
+          set -euo pipefail
+          node node_modules/oreshnik-cli/dist/cli.js dispatch status --repo "$GITHUB_WORKSPACE" --json | tee dispatch-status.json
+
+      - name: Preview next eligible task without mutation
+        shell: bash
+        run: |
+          set -euo pipefail
+          node node_modules/oreshnik-cli/dist/cli.js dispatch next \
+            --operator manuel \
+            --harness chatgpt \
+            --instance manuel-chatgpt1 \
+            --session "next-dry-run-${GITHUB_RUN_ID}" \
+            --repo "$GITHUB_WORKSPACE" \
+            --dry-run \
+            --json | tee dispatch-next-dry-run.json
+
+      - name: Upload read-only dispatch evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: oreshnik-next-dry-run
+          path: |
+            dispatch-status.json
+            dispatch-next-dry-run.json
