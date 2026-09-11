@@ -1,0 +1,6 @@
+triggered-at: 2026-09-11T01:34:00Z
+source-task: S-HC-EMAIL-01A-TRANSACTIONAL-SOFTWARE-FOUNDATION
+source-run: run-manuel-S-HC-EMAIL-01A-TRANSACTIONAL-SOFTWARE-FOUNDATION-20260911000149-407e2085
+source-head: 6e7cae7bc63682f3c87c3a38db76e88b3da49ccd
+master-head: 9e1a4467c9c142d984224135145e6dcbca63e2b7
+purpose: project only five validated functional files; preserve governed source branch and canonical lifecycle evidence
