@@ -5,7 +5,7 @@
     "originUrl": "https://github.com/Cerberux77/HeptaCore.git",
     "canonicalMotherBranch": "master"
   },
-  "generation": 154,
+  "generation": 155,
   "controlHead": "bf26cf56f86c820a1cc59e3689c4e57ba6079816",
   "catalog": {
     "taskBoardPath": "var/oreshnik/task-board.json",
@@ -1624,7 +1624,7 @@
       "sprintId": "email-infra",
       "title": "Transactional email deterministic readiness software foundation",
       "operator": "manuel",
-      "machineId": "machine-349b79ad-dc83-4b34-be11-9ca81c7baf97",
+      "machineId": "machine-097bcea2-01c5-4ffd-9414-e5754592a47e",
       "functionalBranch": "dispatch/manuel/manuel-chatgpt1/email-infra/S-HC-EMAIL-01A-TRANSACTIONAL-SOFTWARE-FOUNDATION/afe65dfa54",
       "motherBranch": "master",
       "worktreePath": "/home/runner/work/_temp/oreshnik-wt-email01a-resume/32305cad03d6321a/manuel/manuel-chatgpt1/email-infra/S-HC-EMAIL-01A-TRANSACTIONAL-SOFTWARE-FOUNDATION/6509bb04",
@@ -1667,15 +1667,15 @@
       "sourceTaskBoardHead": "9e1a4467c9c142d984224135145e6dcbca63e2b7",
       "catalogFingerprint": "615e7753bca59fe804792df678b25f976e4aa680",
       "createdAt": "2026-09-11T00:01:49.156Z",
-      "updatedAt": "2026-09-11T01:16:20.146Z",
+      "updatedAt": "2026-09-11T01:23:49.592Z",
       "activatedAt": "2026-09-11T00:02:00.606Z",
-      "resumedCount": 1,
+      "resumedCount": 2,
       "takeoverCount": 0,
-      "ownershipGeneration": 2,
+      "ownershipGeneration": 3,
       "previousAgentInstanceUid": "agent_f20a136601734d5e8c4de55328a3c38e",
       "previousSessionId": "email01a-rescue-20260911000143",
-      "takeoverReason": "Recover the same EMAIL-01A Run on a fresh ephemeral runner after the prior validation runner ended; preserve branch and ownership identity.",
-      "takenOverAt": "2026-09-11T01:16:20.146Z",
+      "takeoverReason": "Recover the same EMAIL-01A Run on a fresh ephemeral runner after validation bootstrap diagnosis; preserve branch and ownership identity.",
+      "takenOverAt": "2026-09-11T01:23:49.592Z",
       "harnessId": "chatgpt",
       "agentInstanceUid": "agent_f20a136601734d5e8c4de55328a3c38e",
       "agentInstanceAlias": "manuel-chatgpt1",
@@ -2249,13 +2249,13 @@
       "taskId": "S-HC-EMAIL-01A-TRANSACTIONAL-SOFTWARE-FOUNDATION",
       "sprintId": "email-infra",
       "operator": "manuel",
-      "machineId": "machine-349b79ad-dc83-4b34-be11-9ca81c7baf97",
+      "machineId": "machine-097bcea2-01c5-4ffd-9414-e5754592a47e",
       "runId": "run-manuel-S-HC-EMAIL-01A-TRANSACTIONAL-SOFTWARE-FOUNDATION-20260911000149-407e2085",
       "branch": "dispatch/manuel/manuel-chatgpt1/email-infra/S-HC-EMAIL-01A-TRANSACTIONAL-SOFTWARE-FOUNDATION/afe65dfa54",
       "worktreePath": "/home/runner/work/_temp/oreshnik-wt-email01a-resume/32305cad03d6321a/manuel/manuel-chatgpt1/email-infra/S-HC-EMAIL-01A-TRANSACTIONAL-SOFTWARE-FOUNDATION/6509bb04",
       "status": "active",
       "createdAt": "2026-09-11T00:01:49.156Z",
-      "updatedAt": "2026-09-11T01:16:20.146Z",
+      "updatedAt": "2026-09-11T01:23:49.592Z",
       "zones": [
         "packages/core/src/email-readiness.ts",
         "packages/core/src/__tests__/email-readiness.test.ts",
@@ -2289,7 +2289,7 @@
         "apps/web/lib/email",
         ".env.example"
       ],
-      "ownershipGeneration": 2,
+      "ownershipGeneration": 3,
       "harnessId": "chatgpt",
       "agentInstanceUid": "agent_f20a136601734d5e8c4de55328a3c38e",
       "agentInstanceAlias": "manuel-chatgpt1",
@@ -2873,12 +2873,12 @@
       "taskId": "S-HC-EMAIL-01A-TRANSACTIONAL-SOFTWARE-FOUNDATION",
       "sprintId": "email-infra",
       "operator": "manuel",
-      "machineId": "machine-349b79ad-dc83-4b34-be11-9ca81c7baf97",
+      "machineId": "machine-097bcea2-01c5-4ffd-9414-e5754592a47e",
       "branch": "dispatch/manuel/manuel-chatgpt1/email-infra/S-HC-EMAIL-01A-TRANSACTIONAL-SOFTWARE-FOUNDATION/afe65dfa54",
       "worktreePath": "/home/runner/work/_temp/oreshnik-wt-email01a-resume/32305cad03d6321a/manuel/manuel-chatgpt1/email-infra/S-HC-EMAIL-01A-TRANSACTIONAL-SOFTWARE-FOUNDATION/6509bb04",
       "status": "active",
       "createdAt": "2026-09-11T00:01:49.156Z",
-      "updatedAt": "2026-09-11T01:16:20.146Z",
+      "updatedAt": "2026-09-11T01:23:49.592Z",
       "sourceTaskBoardHead": "9e1a4467c9c142d984224135145e6dcbca63e2b7",
       "zones": [
         "packages/core/src/email-readiness.ts",
@@ -2913,7 +2913,7 @@
         "apps/web/lib/email",
         ".env.example"
       ],
-      "ownershipGeneration": 2,
+      "ownershipGeneration": 3,
       "harnessId": "chatgpt",
       "agentInstanceUid": "agent_f20a136601734d5e8c4de55328a3c38e",
       "agentInstanceAlias": "manuel-chatgpt1",
@@ -5482,6 +5482,16 @@
       "at": "2026-09-11T01:23:43.904Z",
       "action": "dispatch.init",
       "message": "Registered machine machine-097bcea2-01c5-4ffd-9414-e5754592a47e with root /home/runner/work/_temp/oreshnik-wt-email01a-resume."
+    },
+    {
+      "at": "2026-09-11T01:23:49.592Z",
+      "action": "dispatch.takeover",
+      "assignmentId": "asg-c97c1574-4739-4bc7-b9a6-dc2e6509bb04",
+      "runId": "run-manuel-S-HC-EMAIL-01A-TRANSACTIONAL-SOFTWARE-FOUNDATION-20260911000149-407e2085",
+      "operator": "manuel",
+      "agentInstanceUid": "agent_f20a136601734d5e8c4de55328a3c38e",
+      "sessionId": "email01a-rescue-20260911000143",
+      "message": "Takeover by manuel/manuel-chatgpt1 from manuel/manuel-chatgpt1. Reason: Recover the same EMAIL-01A Run on a fresh ephemeral runner after validation bootstrap diagnosis; preserve branch and ownership identity.. Generation: 2 → 3."
     }
   ],
   "reconciliation": {
@@ -5491,5 +5501,5 @@
     "pendingDiagnostics": []
   },
   "createdAt": "2026-06-29T20:17:43.302Z",
-  "updatedAt": "2026-09-11T01:23:43.904Z"
+  "updatedAt": "2026-09-11T01:23:49.592Z"
 }
