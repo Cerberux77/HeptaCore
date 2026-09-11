@@ -5,15 +5,15 @@
     "originUrl": "https://github.com/Cerberux77/HeptaCore.git",
     "canonicalMotherBranch": "master"
   },
-  "generation": 148,
-  "controlHead": "a494778eda2291f4a91305d2522f032af73fdefa",
+  "generation": 149,
+  "controlHead": "74b4351b21ea2504cb8d0ea0607c997a1f3895d6",
   "catalog": {
     "taskBoardPath": "var/oreshnik/task-board.json",
     "zoneMapPath": "docs/07_handoffs/zone-map.json",
-    "sourceTaskBoardHead": "0a2e10fd46f3bcc3a0be5d766673d8693571a784",
-    "fingerprint": "c0d17207ca928e4fcc3f55b3564aeb8f5f71bf16",
-    "taskCount": 45,
-    "updatedAt": "2026-09-10T23:52:31.719Z"
+    "sourceTaskBoardHead": "9e1a4467c9c142d984224135145e6dcbca63e2b7",
+    "fingerprint": "615e7753bca59fe804792df678b25f976e4aa680",
+    "taskCount": 46,
+    "updatedAt": "2026-09-11T00:01:41.521Z"
   },
   "policy": {
     "name": "deterministic-v1",
@@ -400,6 +400,13 @@
       "hostname": "runnervmlun5p",
       "registeredAt": "2026-09-10T23:52:30.861Z",
       "updatedAt": "2026-09-10T23:52:30.861Z"
+    },
+    {
+      "machineId": "machine-a5829bd3-7d81-4e90-9476-d07ca2ae19fd",
+      "worktreeRoot": "/home/runner/work/_temp/oreshnik-wt-email01a",
+      "hostname": "runnervmlun5p",
+      "registeredAt": "2026-09-11T00:01:39.906Z",
+      "updatedAt": "2026-09-11T00:01:39.906Z"
     }
   ],
   "agentInstances": [
@@ -5083,6 +5090,11 @@
       "at": "2026-09-10T23:52:31.719Z",
       "action": "dispatch.init",
       "message": "Registered machine machine-c880b8de-f11f-45ba-9ce7-1cfb089e46f9 with root /home/runner/work/_temp/oreshnik-wt-continuation-v2."
+    },
+    {
+      "at": "2026-09-11T00:01:41.521Z",
+      "action": "dispatch.init",
+      "message": "Registered machine machine-a5829bd3-7d81-4e90-9476-d07ca2ae19fd with root /home/runner/work/_temp/oreshnik-wt-email01a."
     }
   ],
   "reconciliation": {
@@ -5092,5 +5104,5 @@
     "pendingDiagnostics": []
   },
   "createdAt": "2026-06-29T20:17:43.302Z",
-  "updatedAt": "2026-09-10T23:52:31.719Z"
+  "updatedAt": "2026-09-11T00:01:41.521Z"
 }
