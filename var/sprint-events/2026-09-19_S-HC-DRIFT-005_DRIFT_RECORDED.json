@@ -1,0 +1,21 @@
+{
+  "id": "S-HC-DRIFT-005",
+  "title": "Vercel deployment governance: disable automatic Git deployments, remove exposed Deploy Hook, and separate manual Preview/Production commands",
+  "operator": "Manuel",
+  "status": "recorded",
+  "mode": "silent",
+  "parentSprint": "S-HC-OPS",
+  "parentBranch": "Manuel/s-hc-ops-vercel-deploy-governance-final-2026-09-19",
+  "date": "2026-09-19",
+  "at": "2026-09-19T14:37:35.802Z",
+  "description": "Vercel deployment governance: disable automatic Git deployments, remove exposed Deploy Hook, and separate manual Preview/Production commands",
+  "zones": [
+    "package.json",
+    "vercel.json"
+  ],
+  "changedFiles": [
+    "M package.json",
+    "M vercel.json"
+  ],
+  "fileCount": 2
+}

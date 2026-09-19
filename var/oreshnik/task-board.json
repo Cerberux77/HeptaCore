@@ -1,6 +1,6 @@
 {
   "project": "HeptaCore",
-  "updatedAt": "2026-09-11T00:01:34.000Z",
+  "updatedAt": "2026-09-19T14:37:35.802Z",
   "currentExecutionOrder": [
     "S-HC-PUB-04-HOURLY-BATCH-CRON",
     "S-HC-PUB-05-RECONCILIATION-OPS",
@@ -3708,6 +3708,34 @@
         "Operational documentation distinguishes deterministic software readiness from external production-domain activation.",
         "No domain, DNS record, Resend credential or production activation is invented or claimed by this child Task.",
         "typecheck, build, worker validation and full repository tests pass."
+      ]
+    },
+    {
+      "id": "S-HC-DRIFT-005",
+      "title": "Vercel deployment governance: disable automatic Git deployments, remove exposed Deploy Hook, and separate manual Preview/Production commands",
+      "owner": "Manuel",
+      "backupOwner": "Manuel",
+      "status": "done",
+      "track": "ad-hoc",
+      "zone": [
+        "package.json",
+        "vercel.json"
+      ],
+      "dependsOn": [
+        "S-HC-OPS"
+      ],
+      "acceptance": [
+        "Ad-hoc: Vercel deployment governance: disable automatic Git deployments, remove exposed Deploy Hook, and separate manual Preview/Production commands"
+      ],
+      "handoff": "Drift registered via preflight on 2026-09-19. Mode: silent.",
+      "history": [
+        {
+          "at": "2026-09-19T14:37:35.802Z",
+          "action": "drift-recorded",
+          "operator": "Manuel",
+          "mode": "silent",
+          "description": "Vercel deployment governance: disable automatic Git deployments, remove exposed Deploy Hook, and separate manual Preview/Production commands"
+        }
       ]
     }
   ],
